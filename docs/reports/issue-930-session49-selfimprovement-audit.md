@@ -6,18 +6,21 @@ Base commit: `5e18073d` (`origin/main` at audit start)
 
 Branch: `gpt55/issue-930-selfimprovement-audit`
 
-> **Status note, 2026-05-12.** This report records the pre-#1458 and
-> pre-#1525 state of the Section 9 self-improvement interface.  Its statements
-> that the paper-facing theorem `selfImprovement` takes the three explicit
-> obligation hypotheses, and that Section 6 calls `selfImprovementFromSubMeas`,
-> are historical.  The current source-facing theorem `selfImprovement` has the
-> paper-shaped input-consistency hypothesis and leaves the derivation of the
-> helper strong self-consistency, orthonormalization, and final-fields inputs as
-> the tracked proof obligation #1515.  The old Section 9 submeasurement wrappers
+> **Status note, 2026-05-13.** This report records the pre-#1458, pre-#1525,
+> pre-#1539, and pre-orthonormalization-input-cleanup state of the Section 9
+> self-improvement interface.  Its statements that the paper-facing theorem
+> `selfImprovement` takes three explicit obligation hypotheses, and that
+> Section 6 calls `selfImprovementFromSubMeas`, are historical.  The current
+> source-facing theorem `selfImprovement` has the paper-shaped input-consistency
+> hypothesis.  The former `SelfImprovementObligations`,
+> `SelfImprovement.HelperStrongSelfConsistencyInput`,
+> `SelfImprovement.OrthonormalizationInput`, and `SelfImprovement.FinalFieldsInput`
+> bundles have been removed.  The old Section 9 submeasurement wrappers
 > `selfImprovementFromSubMeas` and `selfImprovementFromObligationsSubMeas` have
-> been removed; the current conditional Section 6 route is
-> `selfImprovementInInductionSection_ofObligations`, which internally completes
-> the input submeasurement.
+> also been removed.  The remaining helper strong-self-consistency,
+> orthonormalization, and final-field derivations are tracked proof obligations
+> on the source-facing theorem and its named construction lemmas, especially
+> #1514 and #1515.
 
 ## Executive summary
 
@@ -173,11 +176,12 @@ This bridge system is progress toward #931 and is explicitly documented.
 ### Matrix realization (`MatrixRealization.lean`)
 
 The matrix realization module provides concrete finite-dimensional matrix
-versions of the SDP data (`MatrixSdpRealization`,
-`MatrixSdpOptimalWitness`, `MatrixAddInUTransferStatement`). These are
-auxiliary definitions not directly referenced by the main theorem chain.
-No paper-against-formalization discrepancies were found in this module;
-the matrix-level definitions mirror the operator-level ones structurally.
+versions of the SDP data, including `MatrixSdpRealization` and
+`MatrixSdpOptimalWitness`. These are auxiliary definitions not directly
+referenced by the main theorem chain.  The former
+`MatrixAddInUTransferStatement` scaffold is no longer a live Lean declaration.
+No paper-against-formalization discrepancies were found in the retained
+matrix-level definitions; they mirror the operator-level ones structurally.
 
 ## Existing documented bookkeeping
 

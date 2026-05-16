@@ -135,6 +135,24 @@ noncomputable def evaluatedAtNextPoint {params : Parameters} [FieldModel params.
     evaluateAt params (truncatePoint params u)
       ((family.meas (pointHeight params u)).toSubMeas)
 
+/-- In degree zero, the evaluated slice family is independent of the old point
+coordinates once the slice height is fixed.
+
+Lean-only helper for the degree-zero branch of `thm:ld-pasting`; the source
+context is `references/ldt-paper/ld-pasting.tex:12-55`.  This does not identify
+different slice heights.  That remaining height-consistency step is the
+mathematical content still tracked by issue #1622. -/
+theorem evaluatedAtNextPoint_eq_of_same_height_degree_zero {params : Parameters}
+    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (family : IdxPolyFamily params ι) (hd : params.d = 0)
+    {u v : Point params.next} (hheight : pointHeight params u = pointHeight params v) :
+    family.evaluatedAtNextPoint u = family.evaluatedAtNextPoint v := by
+  unfold evaluatedAtNextPoint
+  rw [← hheight]
+  exact evaluateAt_eq_of_degree_zero params
+    ((family.meas (pointHeight params u)).toSubMeas) hd
+    (truncatePoint params u) (truncatePoint params v)
+
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in source-style
 boundedness assumptions. -/
 noncomputable def averagedPointEvaluationOperator {params : Parameters}

@@ -568,9 +568,9 @@ lemma fromHToGAdjacentStage_paperMoveChain
           simp [fromHToGRecurrenceError, Real.sqrt_eq_rpow]
           ring
 
-/-- Adjacent-stage facts obtained by applying the paper move chain at every
+/-- Adjacent-stage recurrence obtained by applying the paper move chain at every
 nonterminal stage. -/
-lemma fromHToGAdjacentStageFacts_of_paperMoveChain
+lemma fromHToG_recurrenceStep_of_paperMoveChain
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -583,19 +583,21 @@ lemma fromHToGAdjacentStageFacts_of_paperMoveChain
       CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
     (k : ℕ) :
-    FromHToGAdjacentStageFacts params ψbi family gamma zeta k := by
-  refine ⟨?_⟩
+    ∀ ℓ : ℕ, ℓ < k →
+      |fromHToGStageMass params ψbi family k ℓ -
+          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
+        fromHToGRecurrenceError params gamma zeta k := by
   intro ℓ hℓ
   exact fromHToGAdjacentStage_paperMoveChain params ψbi hnorm family gamma zeta
     hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k ℓ hℓ
 
-/-- The paper-total telescope bridge for `fromHToG`.
+/-- The paper-total stage-mass telescope for `fromHToG`.
 
 This follows the iteration in `ld-pasting.tex:1354--1372`: applying the adjacent-stage
 estimate over all `k` stages gives `k` copies of the per-stage error.  Lean records
 that literal telescope before the final scalar bound `fromHToGPaperTotalError_le`
 absorbs it into `fromHToGError`. -/
-lemma fromHToGPaperTelescopeFacts_of_paperTelescope
+lemma fromHToG_stageMassTelescope_of_paperMoveChain
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -608,12 +610,17 @@ lemma fromHToGPaperTelescopeFacts_of_paperTelescope
       CommuteGHalfSandwichStatement params ψbi family gamma zeta j)
     (hstageExact : FromHToGAdjacentStageExactFacts params ψbi family)
     (k : ℕ) :
-    FromHToGPaperTelescopeFacts params ψbi family gamma zeta k := by
-  refine ⟨?_⟩
-  have hadj : FromHToGAdjacentStageFacts params ψbi family gamma zeta k :=
-    fromHToGAdjacentStageFacts_of_paperMoveChain params ψbi hnorm family gamma zeta
+    |fromHToGStageMass params ψbi family k 0 -
+        fromHToGStageMass params ψbi family k k| ≤
+      fromHToGPaperTotalError params gamma zeta k := by
+  have hadj :
+      ∀ ℓ : ℕ, ℓ < k →
+        |fromHToGStageMass params ψbi family k ℓ -
+            fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
+          fromHToGRecurrenceError params gamma zeta k :=
+    fromHToG_recurrenceStep_of_paperMoveChain params ψbi hnorm family gamma zeta
       hgamma_nonneg hzeta_nonneg hfacts hhalf hstageExact k
   simpa [fromHToGPaperTotalError] using
-    fromHToGStageMass_telescope params ψbi family gamma zeta k hadj.recurrenceStep
+    fromHToGStageMass_telescope params ψbi family gamma zeta k hadj
 
 end MIPStarRE.LDT.Pasting

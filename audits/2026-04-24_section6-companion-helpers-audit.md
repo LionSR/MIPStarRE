@@ -52,20 +52,20 @@ All three relevant constructors live in `MIPStarRE/LDT/MainInductionStep/Theorem
 - `RestrictedProbabilitiesStatement.ofWeightedBounds`
   - proposition-valued packaging lemma
   - correctly declared as a `lemma`
-- `SliceRestrictionPackage.ofRestrictedProbabilities`
+- `SliceRestrictionData.ofRestrictedProbabilities`
   - data-bearing package constructor
   - correctly declared as a `noncomputable def`
-- `PerSliceInductionPackage.ofRecursion`
+- `PerSliceInductionData.ofRecursion`
   - data-bearing package constructor
   - correctly declared as a `noncomputable def`
 
 These are exactly the names suggested by issue #653, so there is no missing export to add.
 
-### 3. `SelfImprovementPackage.ofSelfImprovementInInductionSection` already received the same promotion
+### 3. `SelfImprovementData.ofSelfImprovementInInductionSection` already received the same promotion
 
 The analogous self-improvement constructor from PR #659 is also already public on `main`:
 
-- `SelfImprovementPackage.ofSelfImprovementInInductionSection`
+- `SelfImprovementData.ofSelfImprovementInInductionSection`
   - data-bearing package constructor
   - correctly declared as a `noncomputable def`
 
@@ -81,7 +81,7 @@ The current naming scheme is internally coherent:
 That means:
 
 - `RestrictedProbabilitiesStatement.ofWeightedBounds` being a lemma is appropriate because `RestrictedProbabilitiesStatement ...` is a proposition;
-- `SliceRestrictionPackage.ofRestrictedProbabilities`, `PerSliceInductionPackage.ofRecursion`, and `SelfImprovementPackage.ofSelfImprovementInInductionSection` being `noncomputable def`s is appropriate because they return structures carrying data.
+- `SliceRestrictionData.ofRestrictedProbabilities`, `PerSliceInductionData.ofRecursion`, and `SelfImprovementData.ofSelfImprovementInInductionSection` being `noncomputable def`s is appropriate because they return structures carrying data.
 
 No renaming is recommended.
 
@@ -89,7 +89,7 @@ No renaming is recommended.
 
 On `origin/gpt54/issue-633-session24`, `mainInductionPublicWrapper` is the only new public boundary theorem. Its statement introduces
 
-- `let hrestrict := SliceRestrictionPackage.ofRestrictedProbabilities ...`
+- `let hrestrict := SliceRestrictionData.ofRestrictedProbabilities ...`
 
 inside the types of `hrec` and `hselfProducer`, and its proof body reuses the same public constructor name.
 
@@ -99,9 +99,9 @@ So, after the review fix that removed the private helper mentioned in the origin
 
 Issue #653 is a **no-action API audit**:
 
-- `SliceRestrictionPackage.ofRestrictedProbabilities` is already public;
-- `PerSliceInductionPackage.ofRecursion` is already public;
-- `SelfImprovementPackage.ofSelfImprovementInInductionSection` is already public;
+- `SliceRestrictionData.ofRestrictedProbabilities` is already public;
+- `PerSliceInductionData.ofRecursion` is already public;
+- `SelfImprovementData.ofSelfImprovementInInductionSection` is already public;
 - `RestrictedProbabilitiesStatement.ofWeightedBounds` is already public and correctly theorem-valued;
 - `mainInductionPublicWrapper` on PR #649 already leans on those public names rather than on a private bridge helper.
 

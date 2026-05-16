@@ -2,7 +2,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGra
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.RectangularSvd
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ResidualDomination
 
 /-!
 # Section 5 — Q/X/XHat/P identities and approximations

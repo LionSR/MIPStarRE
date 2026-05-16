@@ -20,6 +20,19 @@ proved with the paper constant, or that no theorem statement needed to change,
 should be read as a record of the May 1 audit state rather than as current
 guidance.
 
+It is also superseded on the old bundled-input point by the 2026-05-13
+orthonormalization-input cleanup.  The former
+`MakingMeasurementsProjective.OrthonormalizationInput` record has been removed;
+the Section 5 paper-facing theorem keeps the sharp orthonormalization
+construction as a tracked proof gap rather than as an extra theorem hypothesis.
+The paragraphs below that describe `OrthonormalizationInput` as the current
+formalization boundary are therefore historical.
+
+The same cleanup later removed the older `ProjectivizationRepairInput` and
+`LeftLiftedProjectivizationRepairInput` abbreviations and the conditional
+rounding lemmas that consumed them.  The current Section 5 repair route uses the
+proved theorem `leftLiftedProjectivizationRepairProducer` directly.
+
 ## Executive summary
 
 I audited the already-formalized orthonormalization/projective-completion slice against:
@@ -65,7 +78,13 @@ A_a \otimes I approx_{100 zeta^(1/4)} P_a \otimes I.
 
 The Lean theorem `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization` has the same mathematical conclusion, expressed as an `SDDRel` between the left lifts of `A` and `P.toSubMeas` with error `orthonormalizationError zeta = 100 * zeta^(1/4)` (`Defs.lean:288-290`, `Orthonormalization.lean:674-688`). The permutation-invariance hypothesis is explicit as `PermInvState psi`, and the pure-state normalization convention is explicit as `psi.IsNormalized`; this is the formal counterpart of the paper's vector state convention and is already documented in #933.
 
-The theorem also takes `OrthonormalizationInput psi A zeta` (`Statements.lean:215-228`). This is not an undocumented change to the paper theorem. It is the current formalization boundary for the spectral-truncation and locality-preserving repair stages of the paper's proof. PR #945 removed `\leanok` from the unconditional blueprint nodes and added comments explaining that `thm:orthonormalization` and `lem:orthonormalization-main-lemma` still require these bridge inputs. The local wrappers whose statements include the extra inputs remain correctly marked as formalized.
+At the time of this audit, the theorem also took
+`OrthonormalizationInput psi A zeta` (`Statements.lean:215-228` in that
+snapshot).  This was then treated as the formalization boundary for the
+spectral-truncation and locality-preserving repair stages of the paper's proof.
+That boundary has since been removed.  The present Section 5 theorem keeps the
+paper-facing statement and records the unfinished construction as a proof gap
+rather than as a theorem hypothesis.
 
 The proof route matches the paper reduction from submeasurements to measurements. Lean completes `A` to `optionCompletion A`, whose `none` outcome is `I - sum_a A_a` (`Statements.lean:164-190`). The lemma `optionCompletion_bipartiteSSCRel` proves the completed measurement is strongly self-consistent with error `2*zeta` (`Orthonormalization.lean:58-173`), exactly reflecting the paper's `1 - 2 zeta` lower bound at `orthonormalization.tex:339-354`. The returned projective submeasurement on `Option Outcome` is restricted back to the original outcomes by `restrictSomeProjSubMeas`, and `qSDD_liftLeft_restrictSomeProjSubMeas_le` records that dropping the extra nonnegative summand cannot increase the distance (`Orthonormalization.lean:35-56` and `175-227`). This is the formal version of the paper's definition `P_a = \widehat P_a` for `a` in the original outcome set.
 
@@ -75,7 +94,8 @@ The large-error branch is also harmless. The paper treats the measurement lemma 
 
 The paper's measurement lemma assumes measurements `A` and `B` with `A_a \otimes I \simeq_zeta I \otimes B_a`, and concludes a projective submeasurement `P` with error `84 zeta^(1/4)` (`orthonormalization.tex:282-293`).
 
-The formal declaration `orthonormalizationMainLemma` exposes the current bridge boundary directly. It takes:
+In the audited snapshot, the formal declaration `orthonormalizationMainLemma`
+exposed the then-current bridge boundary directly.  It took:
 
 - an explicit normalized state `psi.IsNormalized`;
 - the nonnegative and bounded error hypotheses `0 <= zeta` and `zeta <= 1`;
@@ -83,9 +103,27 @@ The formal declaration `orthonormalizationMainLemma` exposes the current bridge 
 - a `ProjectivizationRepairInput` for the same left-lifted measurement;
 - a `ConsRel` hypothesis representing `A_a \otimes I \simeq_zeta I \otimes B_a`.
 
-It returns a rounded projective witness for the left-lifted measurement with error `orthonormalizationMainLemmaError zeta = 84 * zeta^(1/4)` (`Defs.lean:296-298`, `Orthonormalization.lean:400-449`). The extra bridge hypotheses are the same gap documented by #937 / PR #945. The `zeta <= 1` bound is a helper-level non-vacuous-regime assumption used in the scalar comparison `12*sqrt(2*zeta) <= 84*zeta^(1/4)`; the paper handles larger values by a trivial branch, and the public submeasurement theorem has its own large-error branch.
+It returned a rounded projective witness for the left-lifted measurement with
+error `orthonormalizationMainLemmaError zeta = 84 * zeta^(1/4)`
+(`Defs.lean:296-298`, `Orthonormalization.lean:400-449` in that snapshot).
+Those extra bridge hypotheses are historical.  The current repair direction is
+to prove the spectral and repair constructions internally, leaving a tracked
+`sorry` on the source-facing statement where the construction is not yet
+formalized.  The `zeta <= 1` bound was a helper-level non-vacuous-regime
+assumption used in the scalar comparison `12*sqrt(2*zeta) <= 84*zeta^(1/4)`;
+the paper handles larger values by a trivial branch, and the public
+submeasurement theorem has its own large-error branch.
 
-The local wrapper `orthonormalizationMainLemma_local` specializes this route to a measurement `A` whose strong self-consistency is converted to consistency with itself (`Orthonormalization.lean:514-557`). This matches the paper's note at `orthonormalization.tex:295-297`: for a measurement on a permutation-invariant state, strong self-consistency is equivalent to consistency with itself. The wrapper also uses `LeftLiftedProjectivizationRepairInput`, which guarantees that the repaired lifted family is of the form `P_a \otimes I`; this is the formal condition needed to descend from a projective submeasurement on the product space to a local projective submeasurement. The blueprint records this as `lem:orthonormalization-main-lemma-local` and correctly includes the extra hypotheses in the informal statement.
+The local wrapper `orthonormalizationMainLemma_local` in the audited snapshot
+specialized this route to a measurement `A` whose strong self-consistency is
+converted to consistency with itself (`Orthonormalization.lean:514-557` in that
+snapshot).  This matches the paper's note at `orthonormalization.tex:295-297`:
+for a measurement on a permutation-invariant state, strong self-consistency is
+equivalent to consistency with itself.  The old wrapper also used
+`LeftLiftedProjectivizationRepairInput` to assert that the repaired lifted
+family is of the form `P_a \otimes I`; that input abbreviation has since been
+removed, and the locality-preserving repair is now a construction theorem or a
+tracked proof gap rather than an additional source theorem assumption.
 
 The cross-consistency helper `orthonormalizationMainLemma_local_of_consistency` is the direct formal counterpart of the paper's measurement lemma when the locality-preserving repair input is available (`Orthonormalization.lean:565-602`). Its public measurement-level wrappers then weaken the constant from `84` to the theorem-level `100` using `84 <= 100` (`Orthonormalization.lean:606-664`). This is faithful to the paper constants.
 

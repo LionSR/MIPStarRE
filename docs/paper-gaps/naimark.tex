@@ -66,7 +66,8 @@ The formalization isolates two related but distinct theorem forms.
     =\widetilde\tau\bigl(\widetilde\rho\,\widetilde A^x_{(a,\mathrm{some})}\bigr).
   \]
   This is the form actually formalized; see the Lean structure
-  \leanid{NaimarkStatement}.%
+  \leanid{NaimarkStatement} and the Lean theorem
+  \leanid{questionwiseNaimark}.%
   \footnote{Defined at
   \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean}.}
   \item \textbf{Downstream theorem form.}  The downstream uses inside the LDT
@@ -156,11 +157,12 @@ formalization:
 
 \section{Conclusion}
 
-The Lean structure \leanid{NaimarkStatement} records the per-question
-one-measurement Naimark data and the single-outcome marginal-preservation
-conclusions used by downstream LDT lemmas.  The full bipartite tensor-product
-assembly of the paper's Naimark theorem is intentionally not formalized here;
-this note records that deliberate gap at the same paper origin cited by the
+The Lean structure \leanid{NaimarkStatement} and theorem
+\leanid{questionwiseNaimark} record the per-question one-measurement Naimark
+data and the single-outcome marginal-preservation conclusions used by
+downstream LDT lemmas.  The full bipartite tensor-product assembly of the
+paper's Naimark theorem is intentionally not formalized here; this note records
+that deliberate gap at the same paper origin cited by the
 \leanid{NaimarkStatement} declaration site.
 
 \end{document}

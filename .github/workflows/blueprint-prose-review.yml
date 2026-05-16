@@ -7,6 +7,16 @@ on:
       - "MIPStarRE/**/*.lean"
       - "MIPStarRE.lean"
       - "blueprint/src/**/*.tex"
+      - ".github/prompts/**"
+      - "AGENTS.md"
+      - "docs/CONTRIBUTING.md"
+      - "docs/PROOF_INTEGRITY.md"
+      - "docs/anti_patterns.md"
+      - "docs/blueprint_style_guide.md"
+      - "docs/formalization-patterns.md"
+      - "docs/mathematical_language.md"
+      - "docs/pr-review.md"
+      - "docs/proof_frontier_review.md"
 
 concurrency:
   group: blueprint-prose-review-${{ github.event.pull_request.number }}

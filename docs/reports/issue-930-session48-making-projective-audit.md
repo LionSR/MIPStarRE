@@ -25,7 +25,7 @@ Verdict: no new `docs/paper-gaps/` note is warranted for this slice. The checked
 
 The only open PR at audit start was draft #889, `chore: upgrade Lean/Mathlib to v4.29.1`. I made no Lean or blueprint changes that could interact with that upgrade.
 
-Issue #931 remains open and assigned to `jizhengfeng`; it owns the self-improvement input producers for Section 6 and is outside this audit. Issue #834 remains open for the current `mainFormal` Step-6 witness residual. This audit therefore does not attempt to construct `MainFormalRolePackageResidual`, line-130 orthonormalization inputs, completion producers, or match-mass witnesses for `mainFormal`.
+Issue #931 remains open and assigned to `jizhengfeng`; it owns the self-improvement input producers for Section 6 and is outside this audit. Issue #834 remains open for the current `mainFormal` Step-6 witness residual. This audit therefore does not attempt to construct `MainFormalRoleInductionWitness`, line-130 orthonormalization inputs, completion producers, or match-mass witnesses for `mainFormal`.
 
 The requested parallel orthonormalization audit has a separate worktree and branch. I read the blueprint comments needed to understand the boundary, but I did not audit or edit `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean`.
 

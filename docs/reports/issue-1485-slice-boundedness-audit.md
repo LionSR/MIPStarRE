@@ -24,6 +24,10 @@ headers. The auxiliary theorems
 `IdxPolyFamily.averagedPoint_le_witness` expose the residual and domination
 parts of the paper hypothesis.
 
+After issue #1556, Lean no longer exposes the former domination-target
+identification field. That identification is not part of the paper statement
+and should not be exposed as a paper-facing hypothesis.
+
 ## Classification
 
 The following paper-facing declarations carry these boundedness assumptions.

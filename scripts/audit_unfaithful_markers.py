@@ -25,7 +25,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Sequence
 
-from lean_header_utils import line_number
+from lean_header_utils import ldt_lean_files, line_number
 
 
 PAPER_CITATION_RE = re.compile(
@@ -54,14 +54,6 @@ class MarkerAuditResult:
     @property
     def ok(self) -> bool:
         return not self.findings
-
-
-def lean_files(root: Path) -> list[Path]:
-    """Return Lean files in the active LDT tree."""
-    base = root / "MIPStarRE" / "LDT"
-    if not base.exists():
-        return []
-    return sorted(p for p in base.rglob("*.lean") if p.is_file())
 
 
 def doc_comment_blocks(text: str) -> list[tuple[int, str]]:
@@ -116,7 +108,7 @@ def run_audit(root: Path) -> MarkerAuditResult:
     """Run the marker audit under ``root``."""
     findings: list[MarkerFinding] = []
     scanned = 0
-    for path in lean_files(root):
+    for path in ldt_lean_files(root):
         text = path.read_text(encoding="utf-8", errors="replace")
         for offset, block in marker_blocks(text):
             scanned += 1

@@ -33,7 +33,7 @@ lemma ldSandwichLineOnePoint_prefix_cauchySchwarz_transport
     (family : IdxPolyFamily params ι)
     (gamma zeta : Error)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
-    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi) :
+    (facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi) :
     bipartiteConsError strategy.state
       (uniformDistribution (SandwichedLineQuestion params k))
       (ldSandwichLineOnePointPrefixOriginalFamily params family hi)
@@ -68,9 +68,9 @@ lemma ldSandwichLineOnePoint_prefix_cauchySchwarz_transport
 
 This is the match-mass lower-bound step after unfolding `ConsRel`: it bounds the
 averaged off-diagonal defect for the prefix-marginalized one-point family.  The
-helper now consumes `LdSandwichLineOnePointResidualFacts`, so all endpoint
-packaging, raw-family reindexing, exact tail deletion, and match-mass expansion
-facts are outside the remaining Cauchy--Schwarz gap. -/
+helper consumes only the adjoint raw-core bound; endpoint packaging,
+raw-family reindexing, exact tail deletion, and match-mass expansion are now
+proved directly in the local lemmas that use them. -/
 lemma ldSandwichLineOnePoint_matchMass_lower_bound
     (params : Parameters)
     [FieldModel params.q]
@@ -83,7 +83,7 @@ lemma ldSandwichLineOnePoint_matchMass_lower_bound
     (hzeta_le : zeta ≤ 1)
     (family : IdxPolyFamily params ι)
     {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0)
-    (facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi)
+    (facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi)
     (hmovedEndpoint :
       ConsRel strategy.state
         (uniformDistribution (SandwichedLineQuestion params k))
@@ -130,7 +130,7 @@ lemma ldSandwichLineOnePoint_matchMass_lower_bound
       params eps delta gamma zeta (Nat.succ_pos i) (Nat.succ_le_of_lt hi)
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
 
-/-- Package the scalar match-mass lower bound as the `ConsRel` needed by the
+/-- Turn the scalar match-mass lower bound into the `ConsRel` needed by the
 public one-point bridge. -/
 lemma ldSandwichLineOnePoint_nonzero_prefix_transport
     (params : Parameters)
@@ -147,12 +147,6 @@ lemma ldSandwichLineOnePoint_nonzero_prefix_transport
     (hcomm : ∀ j : ℕ, 2 ≤ j →
       CommuteGHalfSandwichStatement params strategy.state family
         gamma zeta j)
-    (hprefixRaw :
-      SDDOpRel strategy.state
-        (uniformDistribution (SandwichedLineQuestion params k))
-        (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily params family hi)
-        (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily params family hi)
-        (commuteGHalfSandwichError params gamma zeta (i + 1)))
     (hmovedEndpoint :
       ConsRel strategy.state
         (uniformDistribution (SandwichedLineQuestion params k))
@@ -164,41 +158,11 @@ lemma ldSandwichLineOnePoint_nonzero_prefix_transport
       (ldSandwichLineOnePointLeftFamily params strategy family k i)
       (ldSandwichLineOnePointRightFamily params strategy family k i)
       (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
-  have hrawCore :=
-    ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
-      params strategy family gamma zeta hi hprefixRaw
   have hadjointRawCore :=
     ldSandwichLineOnePoint_adjointRawCommutation_qSDDCore_bound
       params strategy family gamma zeta hcomm hi hi0
-  have hmatchExpand :=
-    fun q : SandwichedLineQuestion params k =>
-      qBipartiteMatchMass_option_right_none_zero strategy.state
-        ((ldSandwichLineOnePointPrefixOriginalFamily params family hi) q)
-        ((ldSandwichLineOnePointRightFamily params strategy family k i) q)
-        (ldSandwichLineOnePointRightFamily_outcome_none_eq_zero
-          params strategy family hi q)
-  have hprefixOriginalSome :=
-    fun (q : SandwichedLineQuestion params k) (a : Fq params) =>
-      ldSandwichLineOnePointPrefixOriginalFamily_outcome_some params family hi q a
-  have hmovedSome :=
-    fun (q : SandwichedLineQuestion params k) (a : Fq params) =>
-      ldSandwichLineOnePointPrefixMovedFamily_outcome_some params family hi q a
-  have hrawLeftEndpoint :=
-    fun (q : SandwichedLineQuestion params k) (gs : GHatTupleOutcome params (i + 1)) =>
-      ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcome_eq_lastFrontHalf
-        params family hi q gs
-  have hrawRightEndpoint :=
-    fun (q : SandwichedLineQuestion params k) (gs : GHatTupleOutcome params (i + 1)) =>
-      ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcome_eq_prefixHalf
-        params family hi q gs
-  have facts : LdSandwichLineOnePointResidualFacts params strategy family gamma zeta hi :=
-    { rawCore := hrawCore
-      adjointRawCore := hadjointRawCore
-      matchExpand := hmatchExpand
-      prefixOriginalSome := hprefixOriginalSome
-      movedSome := hmovedSome
-      rawLeftEndpoint := hrawLeftEndpoint
-      rawRightEndpoint := hrawRightEndpoint }
+  have facts : LdSandwichLineOnePointAdjointRawCoreBound params strategy family gamma zeta hi :=
+    { bound := hadjointRawCore }
   have hprefixBound := ldSandwichLineOnePoint_matchMass_lower_bound
     params strategy eps delta gamma zeta
     heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
@@ -207,7 +171,7 @@ lemma ldSandwichLineOnePoint_nonzero_prefix_transport
     simpa [ldSandwichLineOnePointLeftFamily_eq_prefixOriginal params strategy family hi]
       using hprefixBound⟩
 
-/-- Bridge: Cauchy-Schwarz sandwich elimination for one-point consistency.
+/-- Cauchy-Schwarz sandwich elimination for one-point consistency.
 
 Given the half-sandwich commutation bound from `commuteGHalfSandwich`, performs
 the Cauchy-Schwarz + measurement-completeness argument that converts the
@@ -302,8 +266,6 @@ lemma ldSandwichLineOnePoint_core
     Remaining branch: the paper's two Cauchy-Schwarz transports across the nonempty
     prefix `Ghat_<i`, followed by the same endpoint reduction used above.
     -/
-    have hprefixRaw := ldSandwichLineOnePointPrefixMoved_rawCommutation_originalOutcome
-      params strategy.state family gamma zeta hcomm hi hi0
     let eps' : Error := min eps 1
     let delta' : Error := min delta 1
     have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
@@ -332,10 +294,16 @@ lemma ldSandwichLineOnePoint_core
     exact ldSandwichLineOnePoint_nonzero_prefix_transport
       params strategy eps delta gamma zeta
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
-      family hi hi0 hcomm hprefixRaw hmovedEndpoint'
+      family hi hi0 hcomm hmovedEndpoint'
 
-/-- `lem:ld-sandwich-line-one-point`. -/
-lemma ldSandwichLineOnePoint
+/-- Internal form of `lem:ld-sandwich-line-one-point` after applying
+`cor:G-hat-facts`.
+
+**Source:** The proof in `references/ldt-paper/ld-pasting.tex:956-1074` uses
+the half-sandwich commutation estimates obtained from `cor:G-hat-facts`.  The
+paper-facing theorem `ldSandwichLineOnePoint` below derives those estimates
+from the source hypotheses. -/
+lemma ldSandwichLineOnePoint_ofGHatFacts
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -357,10 +325,46 @@ lemma ldSandwichLineOnePoint
         CommuteGHalfSandwichStatement params strategy.state family
           gamma zeta j := by
     intro j hj
-    exact commuteGHalfSandwich params strategy.state family gamma zeta
+    exact commuteGHalfSandwich_ofGHatFacts params strategy.state family gamma zeta
       j hj hzeta_le hfacts
   exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
     hgood hzeta_le family hcons hcomm k i hi⟩
 
+/-- `lem:ld-sandwich-line-one-point`, source-facing form. -/
+lemma ldSandwichLineOnePoint
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
+    (hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          IdxPolyFamily.storedResidual strategy family
+            (fun y => (family.meas y).toSubMeas) x) ≤ zeta)
+    (hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
+    (k i : ℕ)
+    (hi : i < k) :
+    LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+  have hgamma_nonneg : 0 ≤ gamma :=
+    gamma_nonneg_of_isGood params.next strategy hgood
+  have hzeta_nonneg : 0 ≤ zeta :=
+    IdxPolyFamily.zeta_nonneg_of_consistentWithPoints strategy family hcons
+  have hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
+    gHatFacts params strategy family eps delta gamma zeta
+      hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le
+      hgood hcons hself hbound_psd hbound_residual hbound_dom
+  exact ldSandwichLineOnePoint_ofGHatFacts params strategy eps delta gamma zeta
+    hgood hgamma_le hzeta_le hdq_le family hcons hself hfacts k i hi
 
 end MIPStarRE.LDT.Pasting

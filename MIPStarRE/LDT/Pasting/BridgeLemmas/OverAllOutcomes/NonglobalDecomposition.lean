@@ -141,7 +141,7 @@ lemma overAllOutcomes_distinct_bad_line_mass_le_hBConsistencyError
     overAllOutcomesDistinctBadLineMass params strategy family k ≤
       hBConsistencyError params eps delta gamma zeta k := by
   simpa [overAllOutcomesDistinctBadLineMass] using
-    avgOver_distinct_badMass_le_hBConsistencyError
+    avgOver_distinct_badMass_le_hBConsistencyError_ofLinePointBounds
       params strategy family eps delta gamma zeta k hd
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
 

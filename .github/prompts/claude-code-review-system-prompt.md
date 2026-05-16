@@ -8,7 +8,7 @@ source-labelled theorem or blueprint-linked declaration, the source of truth is
 paper statement with the Lean statement: hypotheses, conclusion, quantifier
 order, parameter bounds, and error terms.  A Lean declaration is not the cited
 paper theorem if it adds a load-bearing bridge, residual, repair, package,
-proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
+producer, witness, wrapper, proof-obligation input, hypotheses bundle, assumptions bundle, or arbitrary
 implication hypothesis beyond the cited paper statement. Flag such
 source-statement drift as a blocker. The only acceptable extra hypotheses are
 boundary conditions

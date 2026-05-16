@@ -62,7 +62,12 @@ private lemma fullSliceCommutation_of_evaluated
         params strategy family gamma zeta
         hnorm hgamma_nonneg hzeta_nonneg _hself hEval)
 
-/-- `thm:com-main`. -/
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex`
+(`\label{thm:com-main}`).
+
+The paper theorem is formulated directly for the family `family.meas`; any
+explicit auxiliary family used by the scalar approximation proof is internal to
+the proof. -/
 theorem comMain
     (params : Parameters)
     [FieldModel params.q]

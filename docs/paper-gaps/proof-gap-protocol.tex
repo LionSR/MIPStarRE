@@ -256,6 +256,24 @@ When a source-labelled proof is blocked, use the following order.
   notes, not in the source theorem block.
 \end{enumerate}
 
+\section{Retirement criterion}
+
+An auxiliary declaration should be removed from the main blueprint route, or
+renamed and documented as a purely internal lemma, when all three of the
+following conditions hold:
+\begin{enumerate}
+  \item it is not a statement in the cited paper and is not an explicitly cited
+        outside result;
+  \item no current proof of a paper-level target needs it as stated;
+  \item it assumes stronger proof data, finite-length data, completion data,
+        repair data, synchronization data, or package fields than the paper
+        proof requires.
+\end{enumerate}
+If such a declaration is still useful as a formal intermediate result, it
+should remain a lemma or a visibly conditional helper with a planned discharge.
+It should not be a headline replacement for the paper theorem, and it should
+not support a source-labelled blueprint \verb|\leanok| claim.
+
 \section{Review questions}
 
 A reviewer should first compare every paper-labelled declaration with the cited

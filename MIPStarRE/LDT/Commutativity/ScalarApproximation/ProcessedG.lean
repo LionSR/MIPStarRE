@@ -79,7 +79,11 @@ Error: `√ζ + √ζ`.
 
 Total: `12√ζ + 12√(γ(m+1))`. Then `2 * total ≤ 48m(√γ + √ζ)`. -/
 
-/-- `lem:comm-data-processed-g`. -/
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex`
+(`\label{lem:comm-data-processed-g}`).
+
+The paper statement is formulated directly for the family `family.meas`; the
+auxiliary family used by the scalar chain is introduced inside the proof. -/
 lemma commDataProcessedG
     (params : Parameters)
     [FieldModel params.q]

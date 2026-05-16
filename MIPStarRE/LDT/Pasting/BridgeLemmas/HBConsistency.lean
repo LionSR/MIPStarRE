@@ -102,12 +102,18 @@ private lemma hBConsistency_core
             exact avgOver_mono _ _ _ (fun u =>
               avgOver_distinct_pasted_defect_le_badMass params strategy family u)
     _ ≤ hBConsistencyError params eps delta gamma zeta k := by
-            exact avgOver_distinct_badMass_le_hBConsistencyError
+            exact avgOver_distinct_badMass_le_hBConsistencyError_ofLinePointBounds
               params strategy family eps delta gamma zeta k hd
               heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
 
-/-- `lem:h-b-consistency`. -/
-lemma hBConsistency
+/-- Internal form of `lem:h-b-consistency` after applying
+`lem:ld-sandwich-line-one-point` at each coordinate.
+
+**Source:** The proof in `references/ldt-paper/ld-pasting.tex:1075-1109`
+uses the one-point line estimates and then performs the averaging and
+distinct-tuple comparison.  The paper-facing theorem `hBConsistency` below
+derives the one-point estimates from the source hypotheses. -/
+lemma hBConsistency_ofLinePointBounds
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -125,5 +131,41 @@ lemma hBConsistency
         eps delta gamma zeta k := by
   exact ⟨hBConsistency_core params strategy eps delta gamma zeta
     hgood hd family hcons hself k hline⟩
+
+/-- `lem:h-b-consistency`, source-facing form. -/
+lemma hBConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
+    (hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          IdxPolyFamily.storedResidual strategy family
+            (fun y => (family.meas y).toSubMeas) x) ≤ zeta)
+    (hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
+    (k : ℕ) :
+    HBConsistencyStatement params strategy family
+        eps delta gamma zeta k := by
+  have hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+    intro i hi
+    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
+      hgood hgamma_le hzeta_le hdq_le family hcons hself
+      hbound_psd hbound_residual hbound_dom k i hi
+  exact hBConsistency_ofLinePointBounds params strategy eps delta gamma zeta
+    hgood hd family hcons hself k hline
 
 end MIPStarRE.LDT.Pasting

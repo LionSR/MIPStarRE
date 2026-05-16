@@ -27,7 +27,7 @@ from audit_conclusion_shaped_hypotheses import (
 from lean_header_utils import line_number, starts_keyword
 
 
-EXCLUDE_DIRS: tuple[str, ...] = (".git", ".lake", "lake-packages", "tmp")
+EXCLUDE_DIRS: tuple[str, ...] = (".git", ".lake", ".worktrees", "lake-packages", "tmp")
 DEFAULT_MIN_NORMALIZED_CHARS = 40
 
 _DECL_RE = re.compile(

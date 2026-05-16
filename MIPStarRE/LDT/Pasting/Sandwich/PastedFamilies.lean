@@ -85,6 +85,38 @@ noncomputable def constructedPastedMeasurement (params : Parameters) [FieldModel
     (constructedPastedSubMeas params family k)
     (pastedFallbackOutcome params)
 
+/-- Degree-zero candidate pasted submeasurement obtained by averaging the slice
+family and viewing each slice polynomial as a polynomial in one more variable.
+
+Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  This is a
+Lean-only construction for the `d = 0` branch of `thm:ld-pasting`, where the
+ordinary interpolation construction is not available because `d + 1 = 1`
+collapses the distinct-height argument.  It introduces no additional
+hypothesis. -/
+noncomputable def averagedSliceAppendedSubMeas (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) : SubMeas (Polynomial params.next) ι :=
+  postprocess family.averagedSubMeas
+    (fun g => Polynomial.appendAtHeight params g zeroCoord)
+
+/-- Evaluating the averaged appended-slice submeasurement at a next-level point
+is the same as evaluating the averaged slice family at the truncated point.
+
+This is the first formal step in the degree-zero branch of `thm:ld-pasting`;
+the remaining work is the consistency rectangle that compares this averaged
+slice construction with the point measurement. -/
+theorem evaluateAt_averagedSliceAppendedSubMeas
+    (params : Parameters) [FieldModel params.q]
+    (family : IdxPolyFamily params ι) (u : Point params.next) :
+    evaluateAt params.next u (averagedSliceAppendedSubMeas params family) =
+      evaluateAt params (truncatePoint params u) family.averagedSubMeas := by
+  have hpoint :
+      appendPoint params (truncatePoint params u) (pointHeight params u) = u :=
+    (CommutativityPoints.pointNextEquiv params).left_inv u
+  rw [← hpoint]
+  simp [averagedSliceAppendedSubMeas,
+    evaluateAt_postprocess_appendAtHeight_appendPoint params
+      family.averagedSubMeas zeroCoord (truncatePoint params u) (pointHeight params u)]
+
 /-- Placeholder family for the vertical axis-parallel line measurement `B^u_f`. -/
 noncomputable def verticalLineMeasurementFamily (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
@@ -254,6 +286,27 @@ noncomputable def liftedVerticalLineAnswerFamily
     postprocess
       (verticalLineMeasurementFamily params strategy (truncatePoint params u))
       (fun f => f (pointHeight params u))
+
+/-- In degree zero, the lifted vertical-line answer family is independent of
+the height coordinate once the old point coordinates are fixed.
+
+Lean-only helper for the degree-zero branch of `thm:ld-pasting`; it formalizes
+the fact that a vertical line answer of degree zero is constant in the line
+parameter.  The source context is `references/ldt-paper/ld-pasting.tex:12-55`. -/
+theorem liftedVerticalLineAnswerFamily_eq_of_same_truncate_degree_zero
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι) (hd : params.d = 0)
+    {u v : Point params.next} (hbase : truncatePoint params u = truncatePoint params v) :
+    liftedVerticalLineAnswerFamily params strategy u =
+      liftedVerticalLineAnswerFamily params strategy v := by
+  unfold liftedVerticalLineAnswerFamily
+  rw [hbase]
+  congr
+  funext f
+  have hd_next : params.next.d = 0 := by
+    simpa [Parameters.next] using hd
+  exact AxisLinePolynomial.apply_eq_apply_of_degree_zero f hd_next
+    (pointHeight params u) (pointHeight params v)
 
 /-- Reparametrizing the fixed last-coordinate branch to the canonical vertical
 base point matches `liftedVerticalLineAnswerFamily`. -/

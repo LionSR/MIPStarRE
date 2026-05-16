@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 
 OPEN_TO_CLOSE = {"(": ")", "{": "}", "[": "]", "⦃": "⦄"}
 CLOSE_TO_OPEN = {value: key for key, value in OPEN_TO_CLOSE.items()}
@@ -12,6 +14,15 @@ def line_number(text: str, offset: int) -> int:
     """Return the one-based line number of ``offset`` in ``text``."""
 
     return text.count("\n", 0, offset) + 1
+
+
+def ldt_lean_files(root: Path) -> list[Path]:
+    """Return Lean files in the active LDT tree."""
+
+    base = root / "MIPStarRE" / "LDT"
+    if not base.exists():
+        return []
+    return sorted(path for path in base.rglob("*.lean") if path.is_file())
 
 
 def advance_depth(ch: str, stack: list[str]) -> None:

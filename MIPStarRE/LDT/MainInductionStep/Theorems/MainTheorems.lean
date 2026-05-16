@@ -1,16 +1,14 @@
 import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementBridge
+import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
-import MIPStarRE.LDT.MainInductionStep.Theorems.PackageConstructors
-import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors
-import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly
+import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 
 /-!
 # Section 6 — Main Induction Theorems
 
 The top-level induction theorem `mainInduction`, its proved base case
-`mainInductionBaseCase`, and the internal successor-step assembly theorem
-`mainInductionByRecursionOnM`.
+`mainInductionBaseCase`, and the public restricted-probability data record
+constructors used by the Section 3 handoff.
 
 ## References
 
@@ -181,6 +179,45 @@ theorem mainInductionBaseCase
     mainInductionOfWitness params strategy eps delta gamma k
       ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩
 
+/-- Successor branch of `thm:main-induction`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, the induction
+step after the restricted-probability estimates and the slice-wise recursive
+calls have been set up.
+
+This theorem is the self-contained mathematical obligation left by the
+successor case.  Its assumptions are the source assumptions of
+`thm:main-induction`, together with the branch condition `params.m ≠ 1`; it
+does not accept restricted-probability records, per-slice induction data,
+self-improvement data, pasting data, bridge hypotheses, residual inputs, or
+data record hypotheses.  The intended proof is to construct these objects internally
+from the paper hypotheses, then apply the already checked assembly theorem
+`mainInductionFromStageData`.
+
+**Proof obligation:** Prove the successor branch from the paper hypotheses by
+deriving the restricted slice profiles, the recursive slice measurements, the
+slice-wise self-improvement conclusions, and the averaged pasting input inside
+the proof.  This is tracked by issues #1507 and #1458.  Discharge: construct the
+four stage objects from `references/ldt-paper/inductive_step.tex:441-551` and
+close the scalar comparison using `mainInductionFromStageData`. -/
+theorem mainInductionSuccessor
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk : params.m * params.d ≤ k)
+    (_hm1 : params.m ≠ 1) :
+    ∃ G : Measurement (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (mainInductionError params k eps delta gamma) := by
+  -- TODO(#1507, #1458): derive the successor-stage constructions from the
+  -- source hypotheses, rather than adding them as theorem assumptions.
+  sorry
+
 /-- `thm:main-induction`.
 
 This is the statement from
@@ -188,17 +225,14 @@ This is the statement from
 integer `k ≥ m d` produce a polynomial measurement consistent with the point
 measurement at error `mainInductionError`.
 
-The proved successor-step assembly below currently uses the stronger auxiliary
-side condition `400 * m * d ≤ k` and explicit proof-stage data. These are
-internal proof obligations, not hypotheses of this theorem.
-
 **Proof gap:** the base case is proved by `mainInductionBaseCase`. The
-successor case, corresponding to
-`references/ldt-paper/inductive_step.tex:441-551`, remains to be proved from
-the paper hypotheses. This gap is tracked by #1507 and #1458.  The proof should
-derive the restricted probability estimates, recursive slice witnesses,
-slice-wise self-improvement outputs, and pasting side condition internally,
-rather than adding any of them to the theorem statement. -/
+successor case is isolated as the source-shaped theorem
+`mainInductionSuccessor`, corresponding to
+`references/ldt-paper/inductive_step.tex:441-551`.  This gap is tracked by
+#1507 and #1458.  The proof should derive the restricted probability estimates,
+recursive slice measurements, slice-wise self-improvement outputs, and pasting
+side condition internally, rather than adding any of them to the theorem
+statement. -/
 theorem mainInduction
     (params : Parameters)
     [FieldModel params.q]
@@ -214,111 +248,7 @@ theorem mainInduction
         (mainInductionError params k eps delta gamma) := by
   by_cases hm1 : params.m = 1
   · exact mainInductionBaseCase params strategy eps delta gamma k hm1 hgood
-  · -- TODO(#1507, #1458): prove the successor branch of
-    -- `thm:main-induction` from the paper hypotheses.  The conditional
-    -- assembly theorems below record useful proof content, but their inputs
-    -- must be derived here rather than added as assumptions.
-    sorry
-
-/-- Successor-step recursion entry point for the main-induction conclusion.
-
-Given the slice restriction package, recursive witnesses for the slice-level
-main-induction conclusions, and an obligation for the corresponding slice-wise
-self-improvement package, this theorem executes the remaining
-`restrict → induct → self-improve → paste` assembly and returns the
-higher-dimensional point-consistency conclusion.
-
-Note: this is the internal assembly theorem. The public boundary theorem is
-`mainInduction`, whose successor case remains the tracked proof gap. The
-restricted-probabilities boundary is already exposed separately via
-`restrictedProbabilities`, and
-`SelfImprovementPackage.ofSelfImprovementInInductionSection` forms the
-slice-wise restricted-strategy self-improvement output once it is supplied. This
-theorem therefore keeps `hselfObligation` as an explicit input; the remaining
-self-improvement proof must be derived inside the successor theorem,
-as tracked by #1507, #1503, and #1458.
-
-**Unfaithful:** this conditional assembly assumes the proof-stage inputs
-`hrestrict`, `hrec`, and `hselfObligation`, including the slice-wise
-self-improvement package that is not derived here from the hypotheses of
-`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
-This is tracked by #1507, #1503, and #1458.  Elimination: prove the successor
-branch of `thm:main-induction` from the paper hypotheses, deriving the
-restricted probabilities, recursive slice witnesses, and self-improvement
-packages internally. -/
-theorem mainInductionByRecursionOnM
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
-    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
-    (hrec :
-      ∀ x,
-        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
-            (polynomialEvaluationFamily params G.toSubMeas)
-            error ∧
-          error ≤
-            mainInductionError params k
-              (hrestrict.profile.axisParallel x)
-              (hrestrict.profile.selfConsistency x)
-              (hrestrict.profile.diagonal x))
-    (hselfObligation :
-      ∀ hinduction :
-        PerSliceInductionPackage params strategy eps delta gamma hrestrict k,
-      SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
-    (hk_pos : 1 ≤ k)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ G : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)
-        (mainInductionError params.next k eps delta gamma) := by
-  -- Split into the informative small-error regime and the trivial
-  -- `mainInductionError ≥ 1` regime.
-  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
-  · let hinduction :=
-      PerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
-        hrestrict hrec
-    let hself := hselfObligation hinduction
-    have heps_le_one : eps ≤ 1 := by
-      exact eps_le_one_of_mainInductionError_lt_one params strategy hgood hsmall
-    have hdelta_le_one : delta ≤ 1 := by
-      exact delta_le_one_of_mainInductionError_lt_one params strategy hgood hsmall
-    have hgamma_le : gamma ≤ 1 := by
-      exact gamma_le_one_of_mainInductionError_lt_one params strategy hgood hsmall
-    have hdq_le_q : params.d ≤ params.q := by
-      exact dq_le_q_of_mainInductionError_lt_one params strategy hgood hsmall
-    have hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1 := by
-      have hnu_lt :=
-        mainInductionNu_lt_one_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
-      have hzeta_le_nu :=
-        selfImprovementInInductionError_le_mainInductionNu params strategy eps delta gamma k
-          hgood hsmall heps_le_one hdelta_le_one hdq_le_q
-      linarith
-    let hpaste :=
-      assembleAveragedPastingInput params strategy eps delta gamma k
-        hgood hsmall hgamma_le hzeta_le hdq_le_q hrestrict hinduction hself hk
-    exact
-      mainInductionFromPackages params strategy eps delta gamma k
-        hgood hd hrestrict hinduction hself hpaste hk_pos hk
-  · let G : Measurement (Polynomial params.next) ι :=
-      trivialPolynomialMeasurement (ι := ι) params.next
-    have hcons :
-        ConsRel strategy.state (uniformDistribution (Point params.next))
-          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)
-          1 := by
-      exact ⟨bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)⟩
-    exact
-      mainInductionOfWitness params.next strategy eps delta gamma k
-        ⟨1, G, hcons, le_of_not_gt hsmall⟩
+  · exact mainInductionSuccessor params strategy eps delta gamma k hgood hk hm1
 
 /-- Restricted-probabilities data built from the explicit weighted bounds in the
 successor proof of `thm:main-induction`.
@@ -327,7 +257,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`), used in the proof of
 `\label{thm:main-induction}` at
 `references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def mainInductionPublicRestrictionPackage
+noncomputable def mainInductionPublicRestrictionData
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -341,102 +271,19 @@ noncomputable def mainInductionPublicRestrictionPackage
       avgOver (uniformDistribution (Fq params))
           (fun x => sliceTransverseDirectionWeight params *
             (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma) :
-    SliceRestrictionPackage params strategy eps delta gamma :=
-  SliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+    SliceRestrictionData params strategy eps delta gamma :=
+  SliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
     (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
       hgood haxisWeightedBound hdiagonalWeightedBound)
 
-/-- Answer-valued successor-step recursion entry point.
-
-This theorem keeps the paper-facing restricted strategy interface
-`xRestrictedAnswerSymStrat`, then explicitly forgets that extra diagonal
-answer structure to reuse the proved legacy assembly.
-
-**Unfaithful:** this conditional assembly assumes the answer-valued proof-stage
-inputs `hrestrict`, `hrec`, and `hselfObligation`, including slice-wise
-self-improvement outputs that are not derived here from the successor case of
-`thm:main-induction` (`references/ldt-paper/inductive_step.tex:441-551`).
-This is tracked by #1507, #1503, #1369, and #1458.  Elimination: derive the
-answer-valued restriction, recursive slice witnesses, and self-improvement
-packages inside the successor proof, then use this theorem only
-as an internal assembly step. -/
-theorem answerMainInductionByRecursionOnM
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
-    (hrestrict : AnswerSliceRestrictionPackage params strategy eps delta gamma)
-    (hrec :
-      ∀ x,
-        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas
-              (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
-            (polynomialEvaluationFamily params G.toSubMeas)
-            error ∧
-          error ≤
-            mainInductionError params k
-              (hrestrict.profile.axisParallel x)
-              (hrestrict.profile.selfConsistency x)
-              (hrestrict.profile.diagonal x))
-    (hselfObligation :
-      ∀ hinduction :
-        AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k,
-        AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
-    (hk_pos : 1 ≤ k)
-    (hk : 400 * params.m * params.d ≤ k) :
-    ∃ G : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)
-        (mainInductionError params.next k eps delta gamma) := by
-  let legacyRestrict : SliceRestrictionPackage params strategy eps delta gamma :=
-    SliceRestrictionPackage.ofAnswer params strategy eps delta gamma hrestrict
-  have hrec' :
-      ∀ x,
-        ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
-            (polynomialEvaluationFamily params G.toSubMeas)
-            error ∧
-          error ≤
-            mainInductionError params k
-              (legacyRestrict.profile.axisParallel x)
-              (legacyRestrict.profile.selfConsistency x)
-              (legacyRestrict.profile.diagonal x) := by
-    intro x
-    rcases hrec x with ⟨error, G, hcons, herror⟩
-    refine ⟨error, G, ?_, ?_⟩
-    · simpa using hcons
-    · simpa [legacyRestrict, SliceRestrictionPackage.ofAnswer] using herror
-  have hselfObligation' :
-      ∀ hinduction : PerSliceInductionPackage params strategy eps delta gamma legacyRestrict k,
-        SelfImprovementPackage params strategy eps delta gamma k legacyRestrict hinduction := by
-    intro hinduction
-    let answerInduction :
-        AnswerPerSliceInductionPackage params strategy eps delta gamma hrestrict k :=
-      AnswerPerSliceInductionPackage.ofLegacy params strategy eps delta gamma k hrestrict hinduction
-    let answerSelf :
-        AnswerSelfImprovementPackage params strategy eps delta gamma k hrestrict answerInduction :=
-      hselfObligation answerInduction
-    exact
-      SelfImprovementPackage.ofAnswerForLegacy params strategy eps delta gamma k hrestrict
-        hinduction answerSelf
-  exact
-    mainInductionByRecursionOnM params strategy eps delta gamma k hgood hd legacyRestrict hrec'
-      hselfObligation' hk_pos hk
-
-/-- Answer-valued restricted-probabilities package built from explicit weighted
+/-- Answer-valued restricted-probabilities data record built from explicit weighted
 answer-valued slice bounds.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`), used in the proof of
 `\label{thm:main-induction}` at
 `references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def answerMainInductionPublicRestrictionPackage
+noncomputable def answerMainInductionPublicRestrictionData
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -450,8 +297,8 @@ noncomputable def answerMainInductionPublicRestrictionPackage
       avgOver (uniformDistribution (Fq params))
           (fun x => sliceTransverseDirectionWeight params *
             (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma) :
-    AnswerSliceRestrictionPackage params strategy eps delta gamma :=
-  AnswerSliceRestrictionPackage.ofRestrictedProbabilities params strategy eps delta gamma
+    AnswerSliceRestrictionData params strategy eps delta gamma :=
+  AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
     (AnswerRestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
       hgood haxisWeightedBound hdiagonalWeightedBound)
 

@@ -2,6 +2,10 @@ The automated code review found issues in this PR. Your task is to fix them.
 
 Instructions:
 0. First, use the PR number and repository from the runtime context to read the full PR diff and all review threads yourself. The thread summaries above are seeds; read the actual threads for complete context.
+0a. Before changing a paper-facing theorem statement, a blueprint `\leanok`
+    link, or a proof-debt record, read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`,
+    and `docs/paper-gaps/proof-gap-protocol.tex`. The repair must preserve the
+    cited statement in `references/ldt-paper/` up to faithful formal encoding.
 1. Use your judgment on whether Mathlib scouting is needed. For proof-level review comments, read PR/issue comments for existing **Mathlib Scouting Reports**. For cosmetic comments (naming, docstrings, style), skip scouting.
 2. Read each review thread conversation and understand the issue raised, including any follow-up replies.
 3. Fix each issue in the relevant file at the indicated line.
@@ -10,8 +14,8 @@ Instructions:
    - For an ordinary proof hole not involving source-statement realignment,
      remove `sorry` and fully close the lemma/theorem.
    - Do not close a proof obligation by changing a paper-labelled theorem statement or
-     adding bridge, residual, repair, package, proof-obligation input, hypotheses bundle,
-     assumptions bundle, or arbitrary implication hypotheses absent from the
+     adding bridge, residual, repair, package, producer, witness, wrapper, proof-obligation input,
+     hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses absent from the
      cited statement.
    - If a paper-labelled theorem was previously weakened by such a change,
      restore the paper statement and leave the missing proof as a tracked
@@ -20,7 +24,7 @@ Instructions:
    - If the proof cannot be completed from the paper hypotheses and the source
      statement is already faithful, stop and post a PR comment naming the
      missing lemma, internal obligation, or paper-gap note. Do not introduce a
-     new conditional helper, producer, repair bundle, or obligation package
+     new conditional helper, producer, witness, wrapper, repair bundle, or obligation package
      merely to satisfy the review.
    - Fix naming to match Mathlib conventions.
    - Add missing docstrings where requested.
@@ -53,8 +57,8 @@ Quality bar (your fix MUST satisfy ALL of these before committing):
 - Source-statement fidelity (BLOCKER): declarations named after paper results or
   linked by `\lean{...}` must preserve the cited statement up to faithful formal
   encoding. Do not add load-bearing bridge, residual, repair, package,
-  proof-obligation input,
-  hypotheses bundle, assumptions bundle, or arbitrary implication hypotheses.
+  producer, witness, wrapper, proof-obligation input, hypotheses bundle, assumptions bundle, or
+  arbitrary implication hypotheses.
   The only acceptable extra hypotheses are
   boundary conditions genuinely needed to state the same mathematics in Lean,
   such as positivity for a division, nonemptiness, decidability, or a

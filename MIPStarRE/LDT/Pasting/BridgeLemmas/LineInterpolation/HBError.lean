@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.BadMass
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.Averaging
+import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint
 
 /-!
 # Line interpolation: H-B consistency error aggregation
@@ -233,7 +234,14 @@ lemma avgOver_distinct_badMass_le_avgOver_uniform_badMass_add_dnoteq
             gcongr
             exact ldDnoteq params k
 
-lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+/-- Internal aggregation form after the one-point line estimates have been
+supplied.
+
+**Source:** In `references/ldt-paper/ld-pasting.tex:1075-1109`, the proof of
+`lem:h-b-consistency` applies `lem:ld-sandwich-line-one-point` for each
+coordinate and then sums the resulting bounds.  The paper-facing theorem below
+derives these one-point estimates from the source hypotheses. -/
+lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError_ofLinePointBounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
@@ -287,13 +295,50 @@ lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
     _ = (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k := by
           simp
 
+/-- The independent-tuple bad mass is bounded by the sum of the one-point line
+errors, in the source-facing Section 12 context. -/
+lemma avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
+    (hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          IdxPolyFamily.storedResidual strategy family
+            (fun y => (family.meas y).toSubMeas) x) ≤ zeta)
+    (hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x)
+    (k : ℕ) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+      avgOver (uniformDistribution (PointTuple params k)) (fun xs =>
+        hBConsistencyBadMass params strategy family u xs))
+      ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k := by
+  have hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+    intro i hi
+    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
+      hgood hgamma_le hzeta_le hdq_le family hcons hself
+      hbound_psd hbound_residual hbound_dom k i hi
+  exact avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError_ofLinePointBounds
+    params strategy family eps delta gamma zeta k hline
+
 /-- Aggregate the one-point line comparison statements over all inserted vertical
 lines and absorb the distinct-tuple loss into the displayed `hBConsistency`
 error.
 
 This is the reusable bad-mass aggregation from `ld-pasting.tex` lines
 1186--1202 (also used in the proof of `lem:h-b-consistency`). -/
-lemma avgOver_distinct_badMass_le_hBConsistencyError
+lemma avgOver_distinct_badMass_le_hBConsistencyError_ofLinePointBounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι)
@@ -331,10 +376,66 @@ lemma avgOver_distinct_badMass_le_hBConsistencyError
     _ ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k +
           ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
           gcongr
-          exact avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError
+          exact avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError_ofLinePointBounds
             params strategy family eps delta gamma zeta k hline
     _ ≤ hBConsistencyError params eps delta gamma zeta k := by
           exact hBConsistency_error_bound params eps delta gamma zeta k hd
             heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+
+/-- Aggregate the one-point line comparison estimates and absorb the
+distinct-tuple loss into the displayed `hBConsistency` error, deriving the
+one-point estimates internally from `lem:ld-sandwich-line-one-point`. -/
+lemma avgOver_distinct_badMass_le_hBConsistencyError
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error) (k : ℕ)
+    (hd : 0 < params.d)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
+    (hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          IdxPolyFamily.storedResidual strategy family
+            (fun y => (family.meas y).toSubMeas) x) ≤ zeta)
+    (hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x) :
+    avgOver (uniformDistribution (Point params)) (fun u =>
+        avgOver (distinctTupleDistribution params k) (fun xs =>
+          hBConsistencyBadMass params strategy family u xs)) ≤
+      hBConsistencyError params eps delta gamma zeta k := by
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      hgood.axisParallelTest
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hgood.selfConsistencyTest
+  have hgamma_nonneg : 0 ≤ gamma :=
+    gamma_nonneg_of_isGood params.next strategy hgood
+  have hzeta_nonneg : 0 ≤ zeta :=
+    IdxPolyFamily.zeta_nonneg_of_consistentWithPoints strategy family hcons
+  have hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+    intro i hi
+    exact ldSandwichLineOnePoint params strategy eps delta gamma zeta
+      hgood hgamma_le hzeta_le hdq_le family hcons hself
+      hbound_psd hbound_residual hbound_dom k i hi
+  exact avgOver_distinct_badMass_le_hBConsistencyError_ofLinePointBounds
+    params strategy family eps delta gamma zeta k hd
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
 
 end MIPStarRE.LDT.Pasting

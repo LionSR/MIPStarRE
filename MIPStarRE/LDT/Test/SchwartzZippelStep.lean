@@ -230,7 +230,7 @@ After expanding the postprocessed outcomes and separating the colliding pairs
 Schwartz--Zippel in `Preliminaries.polynomialCollisionMass_le_mdq`.  This
 predicate records precisely that expansion step, without bundling the
 Schwartz--Zippel estimate itself into an unproved hypothesis. -/
-def MainFormalStep5ExpansionResidual
+def MainFormalStep5ExpansionBound
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters) [FieldModel params.q]
     (ψ : QuantumState (ι × ι))
@@ -242,16 +242,16 @@ def MainFormalStep5ExpansionResidual
       (polynomialEvaluationFamily params Right) +
     Preliminaries.polynomialCollisionMass params ψ Left Right
 
-/-- The algebraic Step 5 expansion residual: the full-polynomial consistency
+/-- The algebraic Step 5 expansion bound: the full-polynomial consistency
 error is bounded by the evaluated consistency error plus the collision mass. -/
-theorem mainFormalStep5_expansionResidual
+theorem mainFormalStep5_expansionBound
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters) [FieldModel params.q]
     (ψ : QuantumState (ι × ι))
     (Left Right : SubMeas (Polynomial params) ι) :
-    MainFormalStep5ExpansionResidual params ψ Left Right := by
+    MainFormalStep5ExpansionBound params ψ Left Right := by
   classical
-  unfold MainFormalStep5ExpansionResidual
+  unfold MainFormalStep5ExpansionBound
   calc
     bipartiteConsError ψ (uniformDistribution Unit)
         (constSubMeasFamily Left) (constSubMeasFamily Right)
@@ -285,13 +285,13 @@ theorem mainFormalStep5_expansionResidual
             Preliminaries.polynomialCollisionMass params ψ Left Right
           rw [avg_localCollisionMass_eval_eq_polynomialCollisionMass]
 
-/-- Step 5 packaging for `mainFormal` using the proved algebraic expansion residual.
+/-- Step 5 packaging for `mainFormal` using the proved algebraic expansion bound.
 
 Given evaluated consistency at error `ζ` (paper line 116) and the exact
-line-122--125 expansion recorded by `MainFormalStep5ExpansionResidual`, the
+line-122--125 expansion recorded by `MainFormalStep5ExpansionBound`, the
 proved tensor Schwartz--Zippel bound contributes the paper's `md/q` loss and
 returns full-polynomial consistency at error `ζ + md/q` (paper lines 126--133). -/
-theorem mainFormalStep5_selfConsistency_ofExpansionResidual
+theorem mainFormalStep5_selfConsistency_ofExpansionBound
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters) [FieldModel params.q]
     (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
@@ -310,7 +310,7 @@ theorem mainFormalStep5_selfConsistency_ofExpansionResidual
           (polynomialEvaluationFamily params Left)
           (polynomialEvaluationFamily params Right) +
         Preliminaries.polynomialCollisionMass params ψ Left Right :=
-        mainFormalStep5_expansionResidual params ψ Left Right
+        mainFormalStep5_expansionBound params ψ Left Right
     _ ≤ ζ + (params.m * params.d : Error) / params.q := by
         have hcollision :=
           Preliminaries.polynomialCollisionMass_le_mdq params ψ hnorm Left Right

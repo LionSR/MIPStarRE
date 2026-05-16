@@ -15,9 +15,10 @@ The **one-measurement Naimark lemma** (`OneMeasNaimarkLemma`) is the
 building block: any submeasurement can be dilated to a projective
 submeasurement on a space enlarged by one auxiliary register.
 
-The full **Naimark dilation** (`NaimarkStatement`) combines per-question
-one-measurement dilations into a single statement about bipartite
-correlations on the fully enlarged space.
+The questionwise **Naimark interface** (`NaimarkStatement`) records the
+per-question one-measurement dilations and their single-outcome marginal
+preservation identities.  It is not the full tensor-product statement of
+`\label{thm:naimark}`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -37,7 +38,7 @@ def OneMeasNaimarkLemma (α : Type*) [Fintype α] [DecidableEq α]
     (M : MIPStarRE.Quantum.Submeasurement α d) : Prop :=
   ∃ data : OneMeasNaimarkData α d, data.source = M
 
-/-! ### Full Naimark dilation statement -/
+/-! ### Questionwise Naimark interface -/
 
 /-- Paper origin: deliberate paper-gap (`docs/paper-gaps/naimark.tex`).
 
@@ -55,10 +56,10 @@ state-dependent non-preservation example
 (`references/ldt-paper/orthonormalization.tex:189-272`) are tracked
 separately, see `docs/paper-gaps/naimark.tex`.
 
-This records the questionwise one-measurement Naimark dilations used in the
-full theorem: each `A x` and `B y` is equipped with a local projective dilation
-preserving all single-outcome expectations. The full tensor-product assembly is
-tracked separately. -/
+This records the questionwise one-measurement Naimark dilations that appear in
+the proof of the full theorem: each `A x` and `B y` is equipped with a local
+projective dilation preserving all single-outcome expectations. The
+tensor-product assembly of the paper theorem is tracked separately. -/
 structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -170,36 +171,6 @@ structure RoundedProjMeasStatement {Outcome : Type*}
       (constSubMeasFamily P.toSubMeas)
       ζ
 
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:533-627`.
-
-Explicit input exposing the late repair from a rounded family to a genuine
-projective submeasurement. -/
-abbrev ProjectivizationRepairInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :=
-  SpectralTruncationStatement ψ A ζ →
-    ∃ P : ProjSubMeas Outcome ι,
-      RoundedProjMeasStatement ψ A P (roundingToProjectiveError ζ)
-
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:533-627`
-and `references/ldt-paper/self_improvement.tex:690-705`.
-
-Locality-preserving repair input for a left-lifted measurement.
-
-This is the structural invariant needed to descend the lifted-space output of
-`orthonormalizationMainLemma` back to a local projective submeasurement: when
-the input measurement already has the form `A_a ⊗ I`, the repaired family can
-be chosen in the same form `P_a ⊗ I`. -/
-abbrev LeftLiftedProjectivizationRepairInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) (ζ : Error) :=
-  SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) A) ζ →
-    ∃ P : ProjSubMeas Outcome ι,
-      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
-        (ProjSubMeas.liftLeft P) (roundingToProjectiveError ζ)
-
 /-- Complete a submeasurement by adjoining the residual `I - ∑ₐ Aₐ` at the
 fresh `none` outcome.
 
@@ -239,65 +210,5 @@ noncomputable def optionCompletion {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
     (A : SubMeas Outcome ι) (a : Outcome) :
     (optionCompletion A).outcome (some a) = A.outcome a := rfl
-
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:380-627`
-(`\label{thm:orthonormalization}`).
-
-Explicit input exposing only the remaining truncation-function and
-locality-preserving repair witnesses needed for the submeasurement version of
-`thm:orthonormalization`.
-
-The lifted/local descent is now formalized by
-`orthonormalizationMainLemma_local`; the only still-opaque inputs are the
-truncation-function and late repair steps for the option-completed measurement
-`optionCompletion A`. Both fields live at error
-`consistencyToAlmostProjectiveError (2 * ζ)` because completing a
-`ζ`-strongly-self-consistent submeasurement to a measurement doubles the defect,
-exactly as in the paper's `1 - 2ζ` lower bound for the completed family. -/
-structure OrthonormalizationInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
-  /-- Truncation-function step on the option-completed measurement. -/
-  spectral :
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-      (consistencyToAlmostProjectiveError (2 * ζ))
-  /-- Locality-preserving repair on the option-completed measurement. -/
-  repair :
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    LeftLiftedProjectivizationRepairInput ψ Ahat
-      (consistencyToAlmostProjectiveError (2 * ζ))
-
-/-- Strengthened orthonormalization input carrying residual domination through
-the option-completed repair.
-
-The ordinary `OrthonormalizationInput` only asks that the repair of
-`optionCompletion A` can be chosen as a left-lifted local projective
-submeasurement.  For the monotone-total route in self-improvement one needs an
-additional construction-level fact: the repaired projective family on
-`Option Outcome` assigns at least the original residual `1 - A.total` to the
-fresh `none` outcome.  This invariant is deliberately stated as extra input,
-since it is not a consequence of state-dependent-distance closeness alone. -/
-structure OrthonormalizationInputWithResidualDomination {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (A : SubMeas Outcome ι) (ζ : Error) where
-  /-- Truncation-function step on the option-completed measurement. -/
-  spectral :
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    SpectralTruncationInput ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-      (consistencyToAlmostProjectiveError (2 * ζ))
-  /-- Locality-preserving repair, strengthened by domination of the completed
-  residual outcome. -/
-  repair :
-    let Ahat : Measurement (Option Outcome) ι := optionCompletion A
-    SpectralTruncationStatement ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-        (consistencyToAlmostProjectiveError (2 * ζ)) →
-      ∃ P : ProjSubMeas (Option Outcome) ι,
-        RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) Ahat)
-          (ProjSubMeas.liftLeft P)
-          (roundingToProjectiveError (consistencyToAlmostProjectiveError (2 * ζ))) ∧
-        (optionCompletion A).outcome none ≤ P.outcome none
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

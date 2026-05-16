@@ -16,16 +16,24 @@ the LaTeX sources in `references/ldt-paper/` where the original LDT theorem
 statements and proofs are stored — read the relevant sections, compare
 hypotheses and conclusions, and cite the source path, line range, and label when
 flagging a discrepancy. For paper-labelled declarations, do not address review
-feedback by adding bridge, residual, repair, package, proof-obligation input, or
-arbitrary hypothesis inputs, including generic hypotheses bundle or assumptions
-bundle inputs. The only acceptable extra hypotheses are boundary conditions
+feedback by adding bridge, residual, repair, package, producer, witness, wrapper,
+proof-obligation input, or arbitrary hypothesis inputs, including generic
+hypotheses bundle or assumptions bundle inputs. The only acceptable extra
+hypotheses are boundary conditions
 genuinely needed to state the same mathematics in Lean, such as positivity for a
 division, nonemptiness, decidability, or a field-model instance. Proof-debt
 objects are not boundary conditions.
 
 Generated PR comments should name the theorem, lemma, definition, proof
 obligation, or paper-gap assertion directly and cite paper or blueprint path,
-line, label, and short quotation or precise paraphrase when available. You MUST
-fully close every lemma and theorem — never leave `sorry`, `admit`, `native_decide`
-on non-trivial goals, or any placeholder. Validate Lean changes with `lake build`
-before committing. Use GitHub MCP tools (`mcp__github__*`) to comment on the PR.
+line, label, and short quotation or precise paraphrase when available. Fully
+close ordinary proof holes whenever this can be done without changing the
+mathematical statement.  If a paper-labelled declaration has drifted away from
+the cited source statement, restore the source-faithful statement and leave the
+missing proof as a tracked `sorry` with a TODO and issue or paper-gap citation.
+This is preferable to preserving a theorem whose public statement contains
+non-paper bridge, residual, repair, package, producer, witness, wrapper, obligation, hypotheses,
+or assumptions data.  Never leave untracked `sorry`, `admit`,
+`native_decide` on non-trivial goals, or any placeholder. Validate Lean changes
+with `lake build` before committing. Use GitHub MCP tools (`mcp__github__*`) to
+comment on the PR.

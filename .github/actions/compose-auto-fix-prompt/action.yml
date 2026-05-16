@@ -91,20 +91,23 @@ runs:
 
         source_statement_guard="$(printf '%s\n' \
           'Source-statement guard:' \
+          '- Read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`, and' \
+          '  `docs/paper-gaps/proof-gap-protocol.tex` before changing a theorem' \
+          '  statement, a blueprint `\leanok` link, or a proof-debt record.' \
           '- For any declaration named as, linked to, or documented as a paper theorem,' \
           '  lemma, or proposition, preserve the statement in `references/ldt-paper/` up to' \
           '  faithful formal encoding.' \
           '- Do not repair CI, blueprint sync, or review comments by adding bridge,' \
-          '  residual, repair, package, producer, proof-obligation input,' \
-          '  hypotheses bundle, assumptions bundle,' \
-          '  or arbitrary hypothesis inputs to' \
+          '  residual, repair, package, producer, witness, wrapper,' \
+          '  proof-obligation input, hypotheses bundle, assumptions bundle,' \
+          '  or arbitrary hypothesis or implication inputs to' \
           '  a source-labelled theorem.' \
           '- The only extra hypotheses allowed on a paper-facing theorem are' \
           '  boundary conditions genuinely' \
           '  needed to state the same mathematics in Lean, such as positivity for a' \
           '  division, nonemptiness, decidability, or a field-model instance.' \
           '- Proof-debt objects are not boundary conditions, even when recorded as' \
-          '  inputs or producers.' \
+          '  inputs, producers, witnesses, wrappers, or conclusion packages.' \
           '- If the available Lean theorem proves only a restricted or conditional' \
           '  version of the paper theorem, do not mark the unrestricted source label' \
           '  with `\leanok`; put the restricted statement in a separate entry whose' \
@@ -117,11 +120,12 @@ runs:
           '- A source-aligned theorem with a tracked `sorry` in its proof is preferable' \
           '  to a theorem whose public statement has been weakened by non-paper' \
           '  assumptions.' \
-          '- Do not introduce a conditional helper, proof-debt bundle, producer, or' \
-          '  obligation package as a CI-fix strategy. Existing conditional helpers' \
-          '  should be deleted, replaced by theorems with the paper statement and tracked' \
-          '  `sorry`, or retained only when a maintainer has identified a specific' \
-          '  mathematical construction theorem whose proof content they preserve.' \
+          '- Do not introduce a conditional helper, proof-debt bundle, producer,' \
+          '  witness, wrapper, or obligation package as a CI-fix strategy. Existing' \
+          '  conditional helpers should be deleted, replaced by theorems with the' \
+          '  paper statement and tracked `sorry`, or retained only when a maintainer' \
+          '  has identified a specific mathematical construction theorem whose proof' \
+          '  content they preserve.' \
           '  They must stay out of source-labelled `\leanok`.' \
           '- When in doubt, restore the paper-aligned theorem statement and expose the' \
           '  missing proof obligation; do not turn the paper theorem into a conditional' \

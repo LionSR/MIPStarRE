@@ -40,17 +40,12 @@ noncomputable def comMainError (params : Parameters) (gamma zeta : Error) : Erro
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (4 : Error)))
 
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex:16-47`
-(`\label{lem:comm-data-processed-g}`); output package for the
-commutativity-of-`G`-after-evaluation lemma.
+(`\label{lem:comm-data-processed-g}`).
 
-The strategy state is bipartite.  Alice-side measurements are lifted to
-the left tensor factor, while Bob-side postprocessed point measurements
-are lifted to the right tensor factor.
-
-The parameter `G` is the slice-indexed family `x ↦ G^x`; the hypothesis
-`familyG` ties it back to `family.meas` so that the stability weights
-`√(G^y_h)` and `√(G^x_g)` agree with the family's projective
-sub-measurements. -/
+Displayed conclusion of the commutativity-of-`G`-after-evaluation lemma.  The
+strategy state is bipartite.  Alice-side measurements are lifted to the left
+tensor factor, while Bob-side postprocessed point measurements are lifted to the
+right tensor factor. -/
 structure CommDataProcessedGConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -76,7 +71,9 @@ structure CommDataProcessedGConclusion (params : Parameters)
       (commDataProcessedGError params gamma zeta)
 
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex:228-257`
-(`\label{thm:com-main}`); output package for the commutativity-of-`G` theorem. -/
+(`\label{thm:com-main}`).
+
+Displayed conclusion of the commutativity-of-`G` theorem. -/
 structure ComMainConclusion (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)

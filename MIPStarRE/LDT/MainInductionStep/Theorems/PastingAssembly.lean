@@ -1,6 +1,6 @@
 import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
-import MIPStarRE.LDT.MainInductionStep.Theorems.PackageConstructors
+import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors
 import MIPStarRE.LDT.CommutativityPoints.Approximation
 import MIPStarRE.LDT.Tactic.AvgCongr
@@ -10,7 +10,7 @@ import MIPStarRE.LDT.Tactic.AvgCongr
 
 Private helpers for the fifth-of-ν bound on `ldPastingInInductionNu`,
 the family-averaging lemmas, and the main assembly definition
-`assembleAveragedPastingInput`.
+`assembleAveragedPastingData`.
 
 ## References
 
@@ -28,7 +28,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 induction-side `ldPastingInInductionNu` constructed from `ζ =
 selfImprovementInInductionError` is bounded by `(1/5) · ν` where `ν =
 mainInductionNu`. This bound discharges the first factor of the telescoping
-derivation inside `assembleAveragedPastingInput.error_le`. -/
+derivation inside `assembleAveragedPastingData.error_le`. -/
 private lemma ldPastingInInductionNu_le_fifth_mainInductionNu
     (params : Parameters)
     [FieldModel params.q]
@@ -314,9 +314,9 @@ private lemma family_averagedMass_eq_avg
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     {eps delta gamma : Error} {k : ℕ}
-    {hrestrict : SliceRestrictionPackage params strategy eps delta gamma}
-    {hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k}
-    (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction) :
+    {hrestrict : SliceRestrictionData params strategy eps delta gamma}
+    {hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k}
+    (hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction) :
     subMeasMass strategy.state hself.family.averagedSubMeas.liftLeft =
       avgOver (uniformDistribution (Fq params))
         (fun x => subMeasMass strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)) := by
@@ -361,9 +361,9 @@ private lemma family_pointConsistencyError_eq_avg
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     {eps delta gamma : Error} {k : ℕ}
-    {hrestrict : SliceRestrictionPackage params strategy eps delta gamma}
-    {hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k}
-    (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction) :
+    {hrestrict : SliceRestrictionData params strategy eps delta gamma}
+    {hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k}
+    (hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction) :
     bipartiteConsError strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (IdxPolyFamily.evaluatedAtNextPoint hself.family) =
@@ -421,7 +421,7 @@ pasting hypotheses.
 
 This is where the paper's `E_x[σ_x]`, `E_x[ζ_x]`, and
 `σ* ≤ mainInductionError` bookkeeping will eventually live. -/
-noncomputable def assembleAveragedPastingInput
+noncomputable def assembleAveragedPastingData
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -432,11 +432,11 @@ noncomputable def assembleAveragedPastingInput
     (hgamma_le : gamma ≤ 1)
     (hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1)
     (hdq_le_q : params.d ≤ params.q)
-    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
-    (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
-    (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
+    (hrestrict : SliceRestrictionData params strategy eps delta gamma)
+    (hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k)
+    (hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction)
     (_hk : 400 * params.m * params.d ≤ k) :
-    AveragedPastingInput params strategy eps delta gamma k hself := by
+    AveragedPastingData params strategy eps delta gamma k hself := by
   classical
   let 𝒟 : Distribution (Fq params) := uniformDistribution (Fq params)
   let zeta : Error := selfImprovementInInductionError params.next eps delta gamma
@@ -563,7 +563,7 @@ noncomputable def assembleAveragedPastingInput
                     (hself.sliceProj x).toSubMeas) := by
           apply avgOver_congr
           intro x
-          simpa [tensorFailureExpectation, SelfImprovementPackage.family,
+          simpa [tensorFailureExpectation, SelfImprovementData.family,
             leftTensor_mul_rightTensor_eq_opTensor] using
             (ev_opTensor_swap_of_density_fixed strategy.state
               strategy.permInvState.density_swap

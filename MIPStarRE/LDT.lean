@@ -79,8 +79,7 @@ import MIPStarRE.LDT.SelfImprovement.Defs
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
-import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationBridge
-import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationInputConstructors
+import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationSpectral
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 import MIPStarRE.LDT.CommutativityPoints.Defs
@@ -135,6 +134,7 @@ import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Pasting.BridgeLemmas
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.Pasting.ContextWrappers
 import MIPStarRE.LDT.Preliminaries.Polynomials

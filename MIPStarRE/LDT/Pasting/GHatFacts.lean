@@ -106,8 +106,15 @@ private lemma qSDDCore_option_pair_decompose
   rw [show (∑ u : Unit, ev ψ ((Lnn u - Rnn u)ᴴ * (Lnn u - Rnn u))) =
         ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())) from Fintype.sum_unique _]
 
-/-- `cor:G-hat-facts`. -/
-theorem gHatFacts
+/-- Internal form of `cor:G-hat-facts` after applying
+`lem:g-complete-self-consistency`, `cor:g-bot-self-consistency`,
+`cor:commuting-with-G-complete`, and `cor:commuting-with-G-incomplete`.
+
+**Source:** The proof in `references/ldt-paper/ld-pasting.tex:817-862`
+uses these four preceding Section 12 results internally.  The paper-facing
+theorem `gHatFacts` below derives them from the source hypotheses rather than
+exposing them as public hypotheses. -/
+theorem gHatFacts_ofSelfConsistencyAndCommutation
     (params : Parameters)
     [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -122,10 +129,6 @@ theorem gHatFacts
     (hcommIncomplete : CommutingWithGIncompleteStatement params ψbi family gamma zeta) :
     GHatFactsStatement params ψbi family gamma zeta := by
   refine {
-    completePartSelfConsistencyWitness := hselfComplete
-    incompletePartSelfConsistencyWitness := hselfIncomplete
-    completePartCommutationWitness := hcommComplete
-    incompletePartCommutationWitness := hcommIncomplete
     completedSelfConsistency := ?_
     completedCommutation := ?_
   }
@@ -505,5 +508,45 @@ theorem gHatFacts
               _ = gHatCommutationError params gamma zeta := by
                     simp [gHatCommutationError, sixteenthSum]
                     ring
+
+/-- `cor:G-hat-facts`, source-facing form. -/
+theorem gHatFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound_psd : ∀ x : Fq params, 0 ≤ family.witness x)
+    (hbound_residual :
+      avgOver (uniformDistribution (Fq params))
+        (fun x =>
+          IdxPolyFamily.storedResidual strategy family
+            (fun y => (family.meas y).toSubMeas) x) ≤ zeta)
+    (hbound_dom :
+      ∀ x : Fq params, ∀ g : Polynomial params,
+        IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ family.witness x) :
+    GHatFactsStatement params strategy.state family gamma zeta := by
+  have hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
+    gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
+  have hselfIncomplete : GBotSelfConsistencyStatement params strategy.state family zeta :=
+    gBotSelfConsistency params strategy.state family zeta strategy.permInvState hself
+  have hcommComplete : CommutingWithGCompleteStatement params strategy.state family gamma zeta :=
+    commutingWithGComplete params strategy family eps delta gamma zeta
+      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself
+      hbound_psd hbound_residual hbound_dom
+  have hcommIncomplete :
+      CommutingWithGIncompleteStatement params strategy.state family gamma zeta :=
+    commutingWithGIncomplete params strategy family eps delta gamma zeta
+      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself
+      hbound_psd hbound_residual hbound_dom
+  exact gHatFacts_ofSelfConsistencyAndCommutation params strategy.state family gamma zeta
+    hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+    hselfComplete hselfIncomplete hcommComplete hcommIncomplete
 
 end MIPStarRE.LDT.Pasting

@@ -14,6 +14,11 @@ blueprint labels updated, and any deliberate difference from the paper statement
 <!-- What was verified and how. -->
 <!-- Examples: `lake env lean MIPStarRE/LDT/Basic.lean`, `lake build MIPStarRE`,
      `rg -n "sorry|axiom" MIPStarRE/LDT/Basic.lean || true`. -->
+<!-- If this PR adds or changes a proof-integrity, statement-integrity, or
+     blueprint-sync guard, state its local-hook tier decision here:
+     pre-commit, pre-push, full pre-push, or CI-only.  Mention whether
+     `.githooks/`, `scripts/install_git_hooks.sh`, or `docs/ci-automation.md`
+     had to change. -->
 
 -
 

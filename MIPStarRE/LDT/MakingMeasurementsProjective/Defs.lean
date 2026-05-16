@@ -26,12 +26,14 @@ register has dimension `|α| + 1`, with the extra dimension absorbing the
 `V|ψ⟩ = ∑_a √M_a |ψ⟩ ⊗ |a⟩ + √(I−M)|ψ⟩ ⊗ |⊥⟩` and defines
 `P̂_a = V† (I ⊗ |a⟩⟨a|) V`.
 
-### Full Naimark dilation (Theorem 5.1)
+### Questionwise Naimark data
 
-For the full bipartite setting, one-measurement Naimark is applied
+For a prospective full bipartite assembly, one-measurement Naimark is applied
 independently to each question on each side. The lifted index type is
 `ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`,
-reflecting the tensor product of per-question auxiliary registers.
+reflecting the tensor product of per-question auxiliary registers.  The current
+formal interface records these questionwise local data and their marginal
+preservation identities, not the full tensor-product correlation theorem.
 
 ## Matrix-level witnesses
 
@@ -150,10 +152,10 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
       MIPStarRE.Quantum.normalizedTrace
         (oneMeasLiftedDensity α ρ * liftedEffect (some a))
 
-/-! ### Full Naimark dilation (Theorem 5.1)
+/-! ### Questionwise Naimark data
 
-The full Naimark dilation applies one-measurement Naimark independently
-to each question on each side. The lifted index type is
+The current Lean data applies one-measurement Naimark independently to each
+question on each side. The lifted index type is
 `ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`. -/
 
 /-- The lifted index type for Naimark dilation. For each question on each
@@ -168,7 +170,7 @@ for Bob. -/
 abbrev NaimarkLiftedIndex (ι : Type*) (QuestionA OutcomeA QuestionB OutcomeB : Type*) :=
   ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)
 
-/-- Output data for the paper's Naimark dilation theorem.
+/-- Questionwise Naimark data for the prospective full assembly.
 
 Given submeasurements on space `ι`, this carries the questionwise
 one-measurement Naimark dilations used as the local building blocks for the

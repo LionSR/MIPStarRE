@@ -1,15 +1,15 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementBridge
+import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly
 import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities
 
 /-!
-# Section 6 — Package Constructors and Skeletal Assembly
+# Section 6 — Stage-Data Constructors
 
 Constructors for the slice restriction, per-slice induction, self-improvement,
-and averaged pasting packages: `SliceRestrictionPackage.ofRestrictedProbabilities`,
-`AnswerSliceRestrictionPackage.ofRestrictedProbabilities`,
-`SliceRestrictionPackage.ofAnswer`, `PerSliceInductionPackage.ofRecursion`,
-`AnswerPerSliceInductionPackage.*`, `SelfImprovementPackage.ofAnswerForLegacy`,
-`AveragedPastingInput.output`, and `mainInductionFromPackages`.
+and averaged pasting stage records: `SliceRestrictionData.ofRestrictedProbabilities`,
+`AnswerSliceRestrictionData.ofRestrictedProbabilities`,
+`SliceRestrictionData.ofAnswer`, `PerSliceInductionData.ofRecursion`,
+`AnswerPerSliceInductionData.*`, `SelfImprovementData.ofAnswerForLegacy`,
+`AveragedPastingData.invokeLdPasting`, and `mainInductionFromStageData`.
 
 ## References
 
@@ -23,20 +23,20 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Package constructors and skeletal assembly -/
+/-! ## Stage-data constructors and theorem composition -/
 
-/-- Extract a concrete slice-restriction package from
+/-- Extract a concrete slice-restriction data record from
 `lem:restricted-probabilities`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`). -/
-noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
+noncomputable def SliceRestrictionData.ofRestrictedProbabilities
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (hrestricted : RestrictedProbabilitiesStatement params strategy eps delta gamma) :
-    SliceRestrictionPackage params strategy eps delta gamma := by
+    SliceRestrictionData params strategy eps delta gamma := by
   classical
   let profile := Classical.choose hrestricted.profileExists
   let hprofile := Classical.choose_spec hrestricted.profileExists
@@ -47,19 +47,19 @@ noncomputable def SliceRestrictionPackage.ofRestrictedProbabilities
       selfAverageBound := hselfAverage
       diagonalAverageBound := hdiagonalAverage }
 
-/-- Extract a concrete answer-valued slice-restriction package from the
+/-- Extract a concrete answer-valued slice-restriction data record from the
 answer-valued restricted-probabilities bookkeeping statement.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
 (`\label{lem:restricted-probabilities}`), with the answer-valued restriction
 interface used for the recursive slice call. -/
-noncomputable def AnswerSliceRestrictionPackage.ofRestrictedProbabilities
+noncomputable def AnswerSliceRestrictionData.ofRestrictedProbabilities
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (hrestricted : AnswerRestrictedProbabilitiesStatement params strategy eps delta gamma) :
-    AnswerSliceRestrictionPackage params strategy eps delta gamma := by
+    AnswerSliceRestrictionData params strategy eps delta gamma := by
   classical
   let profile := Classical.choose hrestricted.profileExists
   let hprofile := Classical.choose_spec hrestricted.profileExists
@@ -77,13 +77,13 @@ at the sampled answer level.
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
 formalization-only transport between two encodings of the same restricted slice
 call. -/
-noncomputable def SliceRestrictionPackage.ofAnswer
+noncomputable def SliceRestrictionData.ofAnswer
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
-    (answerPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma) :
-    SliceRestrictionPackage params strategy eps delta gamma where
+    (answerPkg : AnswerSliceRestrictionData params strategy eps delta gamma) :
+    SliceRestrictionData params strategy eps delta gamma where
   profile :=
     { axisParallel := answerPkg.profile.axisParallel
       selfConsistency := answerPkg.profile.selfConsistency
@@ -115,13 +115,13 @@ noncomputable def SliceRestrictionPackage.ofAnswer
 slice data `x ↦ (σ_x, G^x)`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def PerSliceInductionPackage.ofRecursion
+noncomputable def PerSliceInductionData.ofRecursion
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma)
+    (restrictionPkg : SliceRestrictionData params strategy eps delta gamma)
     (hrec :
       ∀ x,
         ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
@@ -134,7 +134,7 @@ noncomputable def PerSliceInductionPackage.ofRecursion
               (restrictionPkg.profile.axisParallel x)
               (restrictionPkg.profile.selfConsistency x)
               (restrictionPkg.profile.diagonal x)) :
-    PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k := by
+    PerSliceInductionData params strategy eps delta gamma restrictionPkg k := by
   classical
   let sliceError : Fq params → Error := fun x => Classical.choose (hrec x)
   let sliceMeasurement : Fq params → Measurement (Polynomial params) ι :=
@@ -163,13 +163,13 @@ noncomputable def PerSliceInductionPackage.ofRecursion
 slice data `x ↦ (σ_x, G^x)`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def AnswerPerSliceInductionPackage.ofRecursion
+noncomputable def AnswerPerSliceInductionData.ofRecursion
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
     (hrec :
       ∀ x,
         ∃ error : Error, ∃ G : Measurement (Polynomial params) ι,
@@ -183,7 +183,7 @@ noncomputable def AnswerPerSliceInductionPackage.ofRecursion
               (restrictionPkg.profile.axisParallel x)
               (restrictionPkg.profile.selfConsistency x)
               (restrictionPkg.profile.diagonal x)) :
-    AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k := by
+    AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k := by
   classical
   let sliceError : Fq params → Error := fun x => Classical.choose (hrec x)
   let sliceMeasurement : Fq params → Measurement (Polynomial params) ι :=
@@ -209,22 +209,22 @@ noncomputable def AnswerPerSliceInductionPackage.ofRecursion
       pointConsistency := fun x => (hslice x).1
       error_le := fun x => (hslice x).2 }
 
-/-- Build an answer-valued per-slice induction package from exact
+/-- Build an answer-valued per-slice induction data record from exact
 main-induction conclusions for the answer-restricted slices.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.
 
-This is the package form of the paper's invocation of the induction hypothesis in
+This is the data record form of the paper's invocation of the induction hypothesis in
 `inductive_step.tex`, lines 441--454.  The hypotheses already have the exact
 restricted-profile `mainInductionError` bound, so the proof only records those
-witnesses in the `AnswerPerSliceInductionPackage` structure. -/
-noncomputable def AnswerPerSliceInductionPackage.ofMainInductionConclusions
+witnesses in the `AnswerPerSliceInductionData` structure. -/
+noncomputable def AnswerPerSliceInductionData.ofMainInductionConclusions
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
     (hinduction :
       ∀ x,
         AnswerMainInductionConclusion params
@@ -233,35 +233,35 @@ noncomputable def AnswerPerSliceInductionPackage.ofMainInductionConclusions
           (restrictionPkg.profile.selfConsistency x)
           (restrictionPkg.profile.diagonal x)
           k) :
-    AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k := by
-  refine AnswerPerSliceInductionPackage.ofRecursion params strategy eps delta gamma k
+    AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k := by
+  refine AnswerPerSliceInductionData.ofRecursion params strategy eps delta gamma k
     restrictionPkg ?_
   intro x
   rcases hinduction x with ⟨G, hG⟩
   refine ⟨_, G, hG, le_rfl⟩
 
-/-- Build an answer-valued per-slice induction package from a predecessor
+/-- Build an answer-valued per-slice induction data record from a predecessor
 answer-valued main-induction hypothesis.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.
 
-The restriction package already records that every `xRestrictedAnswerSymStrat`
+The restriction data record already records that every `xRestrictedAnswerSymStrat`
 is good with the slice profile.  The large-`k` side condition is the predecessor
 side condition `400 * params.m * params.d ≤ k`, matching the application of the
 induction hypothesis in `inductive_step.tex`, lines 441--442. -/
-noncomputable def AnswerPerSliceInductionPackage.ofMainInductionHypothesis
+noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
     (hinduction : AnswerMainInductionHypothesis params)
     (hd : 0 < params.d)
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
-    AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k :=
-  AnswerPerSliceInductionPackage.ofMainInductionConclusions params strategy eps delta gamma k
+    AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k :=
+  AnswerPerSliceInductionData.ofMainInductionConclusions params strategy eps delta gamma k
     restrictionPkg fun x =>
       hinduction ι (xRestrictedAnswerSymStrat params strategy x)
         (restrictionPkg.profile.axisParallel x)
@@ -269,60 +269,23 @@ noncomputable def AnswerPerSliceInductionPackage.ofMainInductionHypothesis
         (restrictionPkg.profile.diagonal x)
         k hd (restrictionPkg.profile.restrictedGood x) hk_pos hk
 
-/-- View an answer-valued per-slice induction package as a legacy package after
-forgetting the answer-valued restriction boundary.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
-formalization-only conversion between answer-valued and legacy restricted-slice
-interfaces for the same recursive induction call.
-
-**Status:** currently unused (no callers).  The inverse direction
-`AnswerPerSliceInductionPackage.ofLegacy` and the combined
-`SelfImprovementPackage.ofAnswerForLegacy` are the live conversions used by the
-answer-valued self-improvement route.  This direction is retained for future
-callers that need to recover an ordinary `PerSliceInductionPackage` from an
-answer-valued one.
-
-**Route note:** the answer-valued route (using `xRestrictedAnswerSymStrat`) is
-the preferred paper-faithful route; see the section comment in
-`MIPStarRE.LDT.Test.MainTheorem` for context. -/
-noncomputable def PerSliceInductionPackage.ofAnswer
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
-    (answerInduction :
-      AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k) :
-    PerSliceInductionPackage params strategy eps delta gamma
-      (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg) k where
-  sliceError := answerInduction.sliceError
-  sliceMeasurement := answerInduction.sliceMeasurement
-  pointConsistency := by
-    intro x
-    simpa using answerInduction.pointConsistency x
-  error_le := by
-    intro x
-    simpa [SliceRestrictionPackage.ofAnswer] using answerInduction.error_le x
-
-/-- View a legacy per-slice induction package over an answer-forgotten restriction
-package as an answer-valued package.
+/-- View a legacy per-slice induction data record over an answer-forgotten restriction
+data record as an answer-valued data record.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
 formalization-only conversion between answer-valued and legacy restricted-slice
 interfaces for the same recursive induction call. -/
-noncomputable def AnswerPerSliceInductionPackage.ofLegacy
+noncomputable def AnswerPerSliceInductionData.ofLegacy
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
     (legacyInduction :
-      PerSliceInductionPackage params strategy eps delta gamma
-        (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg) k) :
-    AnswerPerSliceInductionPackage params strategy eps delta gamma restrictionPkg k where
+      PerSliceInductionData params strategy eps delta gamma
+        (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k) :
+    AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k where
   sliceError := legacyInduction.sliceError
   sliceMeasurement := legacyInduction.sliceMeasurement
   pointConsistency := by
@@ -330,73 +293,73 @@ noncomputable def AnswerPerSliceInductionPackage.ofLegacy
     simpa using legacyInduction.pointConsistency x
   error_le := by
     intro x
-    simpa [SliceRestrictionPackage.ofAnswer] using legacyInduction.error_le x
+    simpa [SliceRestrictionData.ofAnswer] using legacyInduction.error_le x
 
-/-- Forget an answer-valued self-improvement package when the target legacy
-induction package is the one used by the legacy assembly.
+/-- Forget an answer-valued self-improvement data record when the target legacy
+induction data record is the one used by the legacy assembly.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`; this is a
 formalization-only conversion between answer-valued and legacy restricted-slice
-self-improvement packages. -/
-noncomputable def SelfImprovementPackage.ofAnswerForLegacy
+self-improvement collects. -/
+noncomputable def SelfImprovementData.ofAnswerForLegacy
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionPackage params strategy eps delta gamma)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
     (legacyInduction :
-      PerSliceInductionPackage params strategy eps delta gamma
-        (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg) k)
+      PerSliceInductionData params strategy eps delta gamma
+        (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k)
     (answerSelf :
-      AnswerSelfImprovementPackage params strategy eps delta gamma k restrictionPkg
-        (AnswerPerSliceInductionPackage.ofLegacy params strategy eps delta gamma k
+      AnswerSelfImprovementData params strategy eps delta gamma k restrictionPkg
+        (AnswerPerSliceInductionData.ofLegacy params strategy eps delta gamma k
           restrictionPkg legacyInduction)) :
-    SelfImprovementPackage params strategy eps delta gamma k
-      (SliceRestrictionPackage.ofAnswer params strategy eps delta gamma restrictionPkg)
+    SelfImprovementData params strategy eps delta gamma k
+      (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg)
       legacyInduction where
   sliceProj := answerSelf.sliceProj
   sliceWitness := answerSelf.sliceWitness
   completeness := by
     intro x
-    simpa [AnswerPerSliceInductionPackage.ofLegacy, SliceRestrictionPackage.ofAnswer,
+    simpa [AnswerPerSliceInductionData.ofLegacy, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.completeness x
   pointConsistency := by
     intro x
-    simpa [AnswerPerSliceInductionPackage.ofLegacy, SliceRestrictionPackage.ofAnswer,
+    simpa [AnswerPerSliceInductionData.ofLegacy, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.pointConsistency x
   strongSelfConsistency := by
     intro x
-    simpa [SliceRestrictionPackage.ofAnswer, sliceSelfImprovementError,
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.strongSelfConsistency x
   selfCloseness := by
     intro x
-    simpa [SliceRestrictionPackage.ofAnswer, sliceSelfImprovementError,
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.selfCloseness x
   bounded := by
     intro x
-    simpa [SliceRestrictionPackage.ofAnswer, sliceSelfImprovementError,
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.bounded x
   dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
 
 /-- Invoke `thm:ld-pasting-in-induction-section` from averaged pasting input. -/
-theorem AveragedPastingInput.output
+theorem AveragedPastingData.invokeLdPasting
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    {restrictionPkg : SliceRestrictionPackage params strategy eps delta gamma}
+    {restrictionPkg : SliceRestrictionData params strategy eps delta gamma}
     {inductionPkg :
-      PerSliceInductionPackage params strategy eps delta gamma restrictionPkg k}
+      PerSliceInductionData params strategy eps delta gamma restrictionPkg k}
     {selfPkg :
-      SelfImprovementPackage params strategy eps delta gamma k restrictionPkg inductionPkg}
-    (pkg : AveragedPastingInput params strategy eps delta gamma k selfPkg)
+      SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg}
+    (pkg : AveragedPastingData params strategy eps delta gamma k selfPkg)
     (hgood : strategy.IsGood eps delta gamma)
     (hd : 0 < params.d)
     (_hk_pos : 1 ≤ k)
@@ -406,16 +369,17 @@ theorem AveragedPastingInput.output
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next H.toSubMeas)
         (ldPastingInInductionError params k eps delta gamma pkg.kappa pkg.zeta) := by
-  exact
-    ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
+  obtain ⟨H, hH⟩ :=
+    ldPastingInInductionSectionNontrivial params strategy eps delta gamma pkg.kappa pkg.zeta
       hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q hd
       selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent
       pkg.boundedPSD pkg.boundedResidual pkg.dominatesAveragedPoint k hk
+  exact ⟨H, hH.pointConsistency⟩
 
 /-- Compose the four paper-faithful induction-step inputs
 `restrict → induct → self-improve → paste` into the main-induction conclusion in
 one higher dimension. -/
-theorem mainInductionFromPackages
+theorem mainInductionFromStageData
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
@@ -423,10 +387,10 @@ theorem mainInductionFromPackages
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
     (hd : 0 < params.d)
-    (hrestrict : SliceRestrictionPackage params strategy eps delta gamma)
-    (hinduction : PerSliceInductionPackage params strategy eps delta gamma hrestrict k)
-    (hself : SelfImprovementPackage params strategy eps delta gamma k hrestrict hinduction)
-    (hpaste : AveragedPastingInput params strategy eps delta gamma k hself)
+    (hrestrict : SliceRestrictionData params strategy eps delta gamma)
+    (hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k)
+    (hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction)
+    (hpaste : AveragedPastingData params strategy eps delta gamma k hself)
     (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
@@ -451,7 +415,7 @@ theorem mainInductionFromPackages
             (polynomialEvaluationFamily params.next H.toSubMeas)
         (ldPastingInInductionError params k eps delta gamma kappa zeta) := by
       simpa [family, kappa, zeta] using
-        hpaste.output (params := params) (strategy := strategy)
+        hpaste.invokeLdPasting (params := params) (strategy := strategy)
           (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hd hk_pos hk
     rcases hpasted with ⟨H, hH⟩
     exact
