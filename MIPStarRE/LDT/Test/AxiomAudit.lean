@@ -22,10 +22,10 @@ axioms only: the locality-preserving repair obligation in
 documented completion-route construction and the paper-facing
 `100\zeta^{1/4}` theorem.
 
-The audit for `SelfImprovement.selfImprovement` records the current open
-derivation for `thm:self-improvement`: the statement corresponding to the
-blueprint theorem is present, and the missing derivation from the incoming
-consistency hypothesis is tracked by issue #1515.
+The audit for `SelfImprovement.selfImprovement` now records only the transitive
+SDP slackness dependency from issue #1230: the source-facing theorem
+`thm:self-improvement` no longer carries a separate projective self-improvement
+proof gap.
 
 The audit for `Test.mainFormal` records the current tracked proof gap
 transitively: the paper-facing statement has no connection, residual, repair,
@@ -100,8 +100,8 @@ the still-unproved heterogeneous `orthonormalizationMainLemma`. -/
 private def expectedOrthonormalizationAxioms : Array Name :=
   expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1515 derivation
-needed for `selfImprovement`. -/
+/-- Standard kernel axioms plus `sorryAx`; tracks the transitive issue #1230 SDP
+slackness dependency used by `selfImprovement`. -/
 private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
