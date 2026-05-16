@@ -926,7 +926,6 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 
 \begin{corollary}[Consistency of $H$ with $A$]\label{cor:h-a-consistency}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas}
-	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency}
 	\leanok
 	\uses{lem:h-b-consistency}
 	On average over $(u,x) \sim \F_q^{m+1}$,
@@ -955,10 +954,21 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	the claim follows.
 \end{proof}
 
+\begin{lemma}[Point consistency from vertical-line consistency]
+	\label{lem:h-a-consistency-from-line-consistency}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency}
+	\leanok
+	\uses{prop:triangle-sub}
+	Let $H$ be any polynomial-valued submeasurement. Suppose that the strategy is
+	good, that $\gamma,\zeta \ge 0$, that $k \ge 1$, and that the restriction of
+	$H$ to every vertical line is consistent with the vertical-line measurement
+	with error $\nu_6$. Then the pointwise evaluations of $H$ are consistent with
+	Alice's point measurement with error $\nu$.
+\end{lemma}
+
 \begin{corollary}[Consistency of the completed $H$ with $A$]
 	\label{cor:h-a-consistency-completed}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed}
-	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
 	\leanok
 	\uses{cor:h-a-consistency, cor:ld-pasting-N-completeness}
 	Let $H_{\mathrm{meas}}$ be the completion of $H$ at the fallback outcome.
@@ -983,6 +993,18 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		e^{-k/(80000m^2)} = \sigma.
 	\]
 \end{proof}
+
+\begin{lemma}[Completion from submeasurement consistency]
+	\label{lem:h-a-consistency-completed-from-submeas}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
+	\leanok
+	Let $H$ be any polynomial-valued submeasurement. Suppose that the pointwise
+	evaluations of $H$ are consistent with Alice's point measurement with error
+	$\nu$, and that $H$ has the lower mass bound used in
+	Corollary~\ref{cor:ld-pasting-N-completeness}. Then completing $H$ at the
+	fallback polynomial preserves point consistency with the enlarged error
+	appearing in the induction statement.
+\end{lemma}
 
 \subsection{Completeness of $H$}
 \label{sec:completeness-of-h-low-degree}
