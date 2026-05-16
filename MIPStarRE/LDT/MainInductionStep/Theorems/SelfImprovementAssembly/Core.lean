@@ -11,7 +11,10 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 Core public API for the ordinary self-improvement data: constructors for
 `SelfImprovementData`, the induction-section theorem
 `selfImprovementInInductionSection`, the monotone-witness cleanup
-`mainInductionOfWitness`, and the pasting theorem `ldPastingInInductionSectionNontrivial`.
+`mainInductionOfWitness`, and the source-facing pasting theorem
+`ldPastingInInductionSection`.  The theorem
+`ldPastingInInductionSectionNontrivial` is the restricted nontrivial-regime
+form used as an auxiliary statement.
 
 The answer-valued slice-transport constructors are separated into
 `SelfImprovementAssembly.AnswerSlice`.
@@ -572,7 +575,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:299-338`
 Chapter 6 restatement of `thm:ld-pasting`, with the error parameters named as
 they are used in the main-induction proof.
 
-**Proof obligation:** This wrapper invokes `Pasting.ldPasting`; until the
+**Proof obligation:** This theorem invokes `Pasting.ldPasting`; until the
 degree-zero branch of unrestricted pasting is discharged, it inherits the
 tracked proof obligation #1622. -/
 theorem ldPastingInInductionSection
