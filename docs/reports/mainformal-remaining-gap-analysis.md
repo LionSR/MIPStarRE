@@ -14,19 +14,11 @@ Date: 2026-05-07
 > construction target is now
 > `MainFormalProjectiveCompletionTransportWitness`.
 >
-> **Status note, 2026-05-13.**  The post-role diagonal completion theorem now
-> reduces to two named match-mass preservation obligations,
-> `leftMatchMassPreservation_ofDiagonalConsistency` and
-> `rightMatchMassPreservation_ofDiagonalConsistency`, tracked by #1566.  The
-> broader completion construction is tracked by #1565.
->
-> **Status note, 2026-05-14.**  The two downstream match-mass theorems are now
-> projections from the line-130 orthonormalization witness.  The active proof
-> gap has been lowered to
-> `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
-> which must prove the exact construction-level match-mass monotonicity needed
-> for line 169, or be replaced by the checked repaired line-169 route with its
-> explicit loss; this is tracked by #1610 under #1566.
+> **Status note, 2026-05-15.**  The exact line-169 match-mass branch has been
+> removed from the active `mainFormal` path.  The post-role diagonal completion
+> theorem now derives its witness directly from line-130 cross consistency and
+> orthonormalization closeness, while the completion transport uses the checked
+> repaired line-169 estimate with its explicit loss.
 >
 > **Status note, 2026-05-15.**  The Step 3 factor-two unsymmetrization record
 > has been renamed from `UnsymmetrizationBridgePackage` to
@@ -143,29 +135,25 @@ projective submeasurements they concern.
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
 | `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness` | `roleInductionWitness` only | Source-shaped internal construction target; delegates the completion step to `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` |
-| `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Constructs the completion witness from the retained match-mass preservation proofs |
-| `leftMatchMassPreservation_ofDiagonalConsistency` / `rightMatchMassPreservation_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Projection theorems exposing the retained match-mass proofs |
-| `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass` | exact line-169 orthonormalization route | Current `sorry`; must prove construction-level match-mass monotonicity from the paper hypotheses, or be replaced by the checked repaired line-169 route with its explicit loss |
+| `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Constructs the completion witness directly from the checked completion-closeness argument |
+| `mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutcomeStatements` | role witness + line-130 cross consistency + orthonormalize-and-complete statements | Uses the checked repaired line-169 transport with its explicit loss |
 
-**Current route:** Once Field 1 (`roleInductionWitness`) is produced, the proof must
-derive the line-130 orthonormalization witness from cross consistency and then
-prove the two match-mass preservation obligations.  These are internal
-obligations, not public inputs to `mainFormal`.
+**Current route:** Once Field 1 (`roleInductionWitness`) is produced, the proof
+derives the line-130 orthonormalization witness from cross consistency, builds
+the completion witness directly from the checked completion argument, and then
+uses the repaired line-169 transport in the final projective completion step.
 
 The line-130 consistency data supplies the orthonormalization witness via
 `MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency`.
 
 The completion theorem now fixes the distinguished completion outcome to the
 zero polynomial and derives the completion-closeness fields from the checked
-analytic completion argument.  The only remaining line-130 completion content
-is the exact construction-level match-mass preservation used at line 169.  The
-former QXP outcome-expectation formulation was stronger than the present
-Section 5 API and should not be treated as the proof target.
+analytic completion argument.  The former exact match-mass branch and its QXP
+outcome-expectation formulation have both been removed from the active route.
 
-**Status:** partially derivable once Field 1 is obtained.  The active local
-target is
-`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
-unless the final theorem is rerouted through the repaired line-169 estimate.
+**Status:** partially derivable once Field 1 is obtained.  The active route is
+the repaired line-169 estimate, and the remaining work sits in the successor /
+induction side rather than in a separate exact line-169 sub-obligation.
 
 ## 4. Historical resolution routes
 
@@ -321,9 +309,8 @@ Several issues already cover the sub-gaps identified above:
 |-------|-------------|------------|
 | #1363 | Historical tracker for closing the MainFormal successor-case projective completion gap | Primary tracker |
 | #1565 | Discharge the line-130 diagonal completion construction for `mainFormal` | Current post-role completion tracker |
-| #1566 | Prove line-169 match-mass preservation for the chosen `mainFormal` witnesses | Current lowest match-mass obligations |
+| #1566 | Historical line-169 match-mass tracker for the chosen `mainFormal` witnesses | Former exact branch, now superseded by the repaired route |
 | #1558 | Audit and reduce final-theorem residual and package layers | Current final-theorem cleanup branch under #1458 |
-| #1610 | Prove the exact construction-level line-169 match-mass preservation | Current lowest open sub-obligation under #1566 |
 | #1035 | Prove recursive mainFormal for successor restricted slices | `MainFormalSuccessorRecursiveSlices` |
 | #1036 | Construct successor-case self-improvement obligations | `MainFormalSuccessorSelfImprovementObligations` |
 | #1041 | Assemble successor-case mainFormal branch | Final wiring of #1035 + #1036 |
