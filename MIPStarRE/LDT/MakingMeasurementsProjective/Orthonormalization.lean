@@ -248,56 +248,6 @@ lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
   rcases hP with ⟨hP⟩
   exact ⟨hP.trans hbound⟩
 
-set_option linter.unusedDecidableInType false in
-/-- Cross-consistency orthonormalization with the exact line-169 match-mass
-preservation needed by the final Step 6 completion argument.
-
-The ordinary orthonormalization theorem gives the state-dependent-distance
-comparison between the pre-projective measurement `A` and a projective
-submeasurement `P`.  The exact line-169 route additionally needs the diagonal
-match mass against the opposite measurement `B` not to decrease.
-
-This is the source-facing proof obligation for the exact route.  A previous
-formulation attempted to discharge it by requiring the QXP construction to
-preserve every outcome expectation against an arbitrary partner measurement.
-That outcomewise monotonicity is stronger than what the present Section 5 API
-provides and is not a consequence of SDD closeness alone.  The exact route is
-therefore left as a direct proof gap here, while the checked local repair with
-the additional `10 ζ^{1/8}` loss is formalized in
-`ProjectivizationLine169Repair`.
-
-**Unfaithful:** This proof currently asserts the exact match-mass preservation
-needed for the paper's line-169 replacement step, but that preservation has not
-been derived from `references/ldt-paper/orthonormalization.tex:862-1194` and
-`references/ldt-paper/inductive_step.tex:135-169`.  Documented by issue #1610
-and the paper-gap note
-`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.  Elimination:
-either prove this exact construction-level monotonicity from the paper
-hypotheses, or route the final theorem through the already formalized repaired
-line-169 estimate with its explicit loss. -/
-lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass
-    {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι))
-    (hψ : ψ.IsNormalized)
-    (A B : Measurement Outcome ι) (ζ : Error)
-    (hζ : 0 ≤ ζ) :
-    ConsRel ψ (uniformDistribution Unit)
-      (constSubMeasFamily A.toSubMeas)
-      (constSubMeasFamily B.toSubMeas) ζ →
-      ∃ P : ProjSubMeas Outcome ι,
-        SDDRel ψ (uniformDistribution Unit)
-            (constSubMeasFamily A.toSubMeas.liftLeft)
-            (constSubMeasFamily P.toSubMeas.liftLeft)
-            (orthonormalizationError ζ) ∧
-          OrthonormalizationMatchMassPreservation ψ A P B := by
-  -- The SDD part follows from `orthonormalizationMeasurement_of_consistency`.
-  -- The exact diagonal match-mass monotonicity is the remaining source-level
-  -- proof gap; SDD closeness alone gives only the repaired route in
-  -- `ProjectivizationLine169Repair`.
-  sorry
-
 set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 /-- Completion-route orthonormalization with the documented weakened constant.

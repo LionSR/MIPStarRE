@@ -27,7 +27,7 @@ mass against a fixed partner measurement by the square root of the SDD error.
 This is the single-question `Unit` specialization of
 `prop:easy-approx-from-approx_delta`, written directly in the bipartite
 `qBipartiteMatchMass` notation used by the Step 6 projectivization chain. -/
-private theorem qBipartiteMatchMass_ge_sub_sqrt_of_sdd
+theorem qBipartiteMatchMass_ge_sub_sqrt_of_sdd
     {Outcome : Type*} {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
     (G : Measurement Outcome ι) (P : SubMeas Outcome ι) (B : Measurement Outcome ι)
