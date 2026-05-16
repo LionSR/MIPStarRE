@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
 
 /-!
 # Diagonal completion construction
@@ -12,9 +13,9 @@ left unfinished rather than represented by additional diagonal-consistency or
 match-mass hypotheses in the public `mainFormal` statement.
 
 The checked auxiliary lemmas in this file keep useful analytic content: they
-show how completion follows once the relevant match-mass preservation and
-self-consistency estimates have been proved.  They are not source-level
-assumptions for the paper theorem.
+show how completion follows once the line-130 cross consistency and
+orthonormalization closeness estimates have been proved.  They are not
+source-level assumptions for the paper theorem.
 
 ## References
 
@@ -31,6 +32,8 @@ namespace MIPStarRE.LDT
 namespace Test
 
 namespace MainFormalDiagonalCompletionWitness
+
+open MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair
 
 /-- Completing after lifting to the left tensor agrees with lifting the
 completion of the original submeasurement.
@@ -144,22 +147,20 @@ private lemma qSDD_completeAtOutcomeProj_le_of_total_gap
   rw [hq_eq] at hraw
   simpa [Preliminaries.completeAtOutcomeProj_toSubMeas] using hraw
 
-/-- Combine cross consistency, orthonormalization closeness, and match-mass
-preservation into the completed-closeness estimate for one side.
+/-- Combine cross consistency and orthonormalization closeness into the
+completed-closeness estimate for one side.
 
 This is the side-agnostic Step 6 argument used below for both roles: the cross
-`ConsRel` bounds `1 - qBipartiteMatchMass`, the match-mass hypothesis turns that
-into a bound on the missing total of `P`, and `questionSDD_triangle` then joins
-the orthonormalization and completion errors. -/
-private lemma completedCloseness_of_consistency_and_matchMassPreservation
+`ConsRel` bounds `1 - qBipartiteMatchMass`, the checked local line-169 repair
+controls the loss in diagonal match mass by `sqrt ε`, and `questionSDD_triangle`
+then joins the orthonormalization and completion errors. -/
+private lemma completedCloseness_of_consistency_and_sdd
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized) (ζ : Error)
     (G H : Measurement Outcome ι) (P : ProjSubMeas Outcome ι) (a0 : Outcome)
     (hpre : ConsRel ψ (uniformDistribution Unit)
       (constSubMeasFamily G.toSubMeas) (constSubMeasFamily H.toSubMeas) ζ)
-    (hmatch :
-      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation ψ G P H)
     (horth :
       SDDRel ψ (uniformDistribution Unit)
         (constSubMeasFamily G.toSubMeas.liftLeft)
@@ -174,19 +175,27 @@ private lemma completedCloseness_of_consistency_and_matchMassPreservation
   have hpre_q : qBipartiteConsDefect ψ G.toSubMeas H.toSubMeas ≤ ζ := by
     simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
       hpre.offDiagonalBound
+  have hζ0 : 0 ≤ ζ :=
+    le_trans (qBipartiteConsDefect_nonneg ψ G.toSubMeas H.toSubMeas) hpre_q
   have hmatch_GH : 1 - qBipartiteMatchMass ψ G.toSubMeas H.toSubMeas ≤ ζ := by
     rw [qBipartiteConsDefect_of_measurements ψ G H] at hpre_q
     have hone : ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) = 1 :=
       ev_one_of_isNormalized ψ hψ
     linarith
-  have hmatch_PH : 1 - qBipartiteMatchMass ψ P.toSubMeas H.toSubMeas ≤ ζ := by
-    linarith [hmatch_GH, hmatch.matchMassPreservation]
+  have hmatch_PH :
+      qBipartiteMatchMass ψ P.toSubMeas H.toSubMeas ≥
+        qBipartiteMatchMass ψ G.toSubMeas H.toSubMeas -
+          Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ) :=
+    qBipartiteMatchMass_ge_sub_sqrt_of_sdd
+      ψ hψ G P.toSubMeas H horth
   have hmass_P :
-      1 - ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) ≤ ζ := by
+      1 - ev ψ (leftTensor (ι₂ := ι) P.toSubMeas.total) ≤
+        ζ + Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ) := by
     have hmatch_le :=
       qBipartiteMatchMass_le_left_total_of_measurement ψ P.toSubMeas H
     linarith
-  have hPP_q : qSDD ψ P.toSubMeas.liftLeft Q.toSubMeas.liftLeft ≤ ζ := by
+  have hPP_q : qSDD ψ P.toSubMeas.liftLeft Q.toSubMeas.liftLeft ≤
+      ζ + Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ) := by
     simpa [Q] using qSDD_completeAtOutcomeProj_le_of_total_gap ψ hψ P a0 hmass_P
   have hGP_q :
       qSDD ψ G.toSubMeas.liftLeft P.toSubMeas.liftLeft ≤
@@ -200,26 +209,27 @@ private lemma completedCloseness_of_consistency_and_matchMassPreservation
           qSDD ψ P.toSubMeas.liftLeft Q.toSubMeas.liftLeft) := by
             exact Preliminaries.questionSDD_triangle ψ
               G.toSubMeas.liftLeft P.toSubMeas.liftLeft Q.toSubMeas.liftLeft
-    _ ≤ 2 * (MakingMeasurementsProjective.orthonormalizationError ζ + ζ) := by
+    _ ≤ 2 * (MakingMeasurementsProjective.orthonormalizationError ζ +
+          (ζ + Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ))) := by
           gcongr
-    _ = 2 * MakingMeasurementsProjective.orthonormalizationError ζ + 2 * ζ := by ring
+    _ = 2 * MakingMeasurementsProjective.orthonormalizationError ζ +
+          2 * ζ + 2 * Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ) := by ring
     _ ≤ MakingMeasurementsProjective.orthonormalizeAndCompleteError ζ := by
           have hsqrt_nonneg :
-              0 ≤ 4 * Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ) := by
-            positivity
+              0 ≤ Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ) :=
+            Real.sqrt_nonneg _
           unfold MakingMeasurementsProjective.orthonormalizeAndCompleteError
-          linarith
+          linarith [hζ0, hsqrt_nonneg]
 
 /-- Produce the line-130 completion witnesses directly from the cross
-consistency statement and the orthonormalization match-mass data.
+consistency statement and the orthonormalization closeness data.
 
 This argument does not invoke `Preliminaries.completingToMeasurement`.
 Instead, the role-measurement record already reconstructs line 130 as a cross `ConsRel`
 `G^A \simeq_{\zeta_1} G^B`, the orthonormalization witness already carries the
 projective submeasurements `P^A,P^B`, and the remaining completion bound is
-derived directly from the construction-level match-mass preservation facts for
-those `P`-families. -/
-private theorem nonempty_ofDiagonalConsistencyAndMatchMassPreservation
+derived directly from the checked local line-169 repair estimate. -/
+private theorem nonempty_ofDiagonalConsistencyAndSdd
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
@@ -231,15 +241,7 @@ private theorem nonempty_ofDiagonalConsistencyAndMatchMassPreservation
     (hpre : ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas)
       (constSubMeasFamily (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas)
-      scalars.zeta1)
-    (leftMatchMassPreservation :
-      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-        (unsymmetrizedLeftPOVM roleWitness.roleMeasurement) orthWitness.P_A
-        (unsymmetrizedRightPOVM roleWitness.roleMeasurement))
-    (rightMatchMassPreservation :
-      MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-      (unsymmetrizedRightPOVM roleWitness.roleMeasurement) orthWitness.P_B
-      (unsymmetrizedLeftPOVM roleWitness.roleMeasurement)) :
+      scalars.zeta1) :
     Nonempty (MainFormalDiagonalCompletionWitness
       params strategy eps k scalars roleWitness) := by
   let G_A := unsymmetrizedLeftPOVM roleWitness.roleMeasurement
@@ -251,9 +253,9 @@ private theorem nonempty_ofDiagonalConsistencyAndMatchMassPreservation
           (Preliminaries.completeAtOutcomeProj orthWitness.P_A a_A).toSubMeas.liftLeft)
         (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
     simpa [G_A, G_B] using
-      completedCloseness_of_consistency_and_matchMassPreservation
+      completedCloseness_of_consistency_and_sdd
         strategy.state strategy.isNormalized scalars.zeta1
-        G_A G_B orthWitness.P_A a_A hpre leftMatchMassPreservation
+        G_A G_B orthWitness.P_A a_A hpre
         orthWitness.leftCloseness
   have hpre_symm : ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily G_B.toSubMeas)
@@ -271,9 +273,9 @@ private theorem nonempty_ofDiagonalConsistencyAndMatchMassPreservation
           (Preliminaries.completeAtOutcomeProj orthWitness.P_B a_B).toSubMeas.liftLeft)
         (MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1) := by
     simpa [G_A, G_B] using
-      completedCloseness_of_consistency_and_matchMassPreservation
+      completedCloseness_of_consistency_and_sdd
         strategy.state strategy.isNormalized scalars.zeta1
-        G_B G_A orthWitness.P_B a_B hpre_symm rightMatchMassPreservation
+        G_B G_A orthWitness.P_B a_B hpre_symm
         orthWitness.rightCloseness
   exact ⟨{
     orthWitness := orthWitness
@@ -281,60 +283,6 @@ private theorem nonempty_ofDiagonalConsistencyAndMatchMassPreservation
     a_B := a_B
     leftCompletedCloseness := hleftCompletedCloseness
     rightCompletedCloseness := hrightCompletedCloseness }⟩
-
-/-- Alice-side match-mass preservation still needed from the concrete
-orthonormalization construction.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-169`, where the
-paper replaces the pre-projective measurement \(G^{\mathrm A}\) by the
-orthonormalized projective submeasurement \(P^{\mathrm A}\) and later applies
-the line-169 transport.  The analytic source of the submeasurement is
-`references/ldt-paper/orthonormalization.tex:282`.
-
-This is a construction theorem for issue #1566.  It is deliberately not a
-hypothesis of `mainFormal`: callers provide only the line-130 consistency
-relation and the orthonormalization witness.  The substantive proof now lives
-at the QXP repair construction point, tracked by #1610. -/
-theorem leftMatchMassPreservation_ofDiagonalConsistency
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {roleWitness : MainFormalRoleMeasurementWitness params strategy eps k scalars}
-    (orthWitness : MainFormalDiagonalOrthonormalizationWitness
-      params strategy eps k scalars roleWitness)
-    (_hpre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas)
-      scalars.zeta1) :
-    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-      (unsymmetrizedLeftPOVM roleWitness.roleMeasurement) orthWitness.P_A
-      (unsymmetrizedRightPOVM roleWitness.roleMeasurement) := by
-  exact orthWitness.leftMatchMass
-
-/-- Bob-side mirror of
-`leftMatchMassPreservation_ofDiagonalConsistency`.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-169`, with the two
-roles interchanged.  This is the corresponding construction theorem for issue
-#1566 and is not a hypothesis in the statement of `mainFormal`.  The substantive
-proof now lives at the QXP repair construction point, tracked by #1610. -/
-theorem rightMatchMassPreservation_ofDiagonalConsistency
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
-    {scalars : MainFormalCascadeScalars params eps k}
-    {roleWitness : MainFormalRoleMeasurementWitness params strategy eps k scalars}
-    (orthWitness : MainFormalDiagonalOrthonormalizationWitness
-      params strategy eps k scalars roleWitness)
-    (_hpre : ConsRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas)
-      scalars.zeta1) :
-    MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation strategy.state
-      (unsymmetrizedRightPOVM roleWitness.roleMeasurement) orthWitness.P_B
-      (unsymmetrizedLeftPOVM roleWitness.roleMeasurement) := by
-  exact orthWitness.rightMatchMass
 
 /-- Direct completion construction from the paper line-130 cross consistency.
 
@@ -346,21 +294,14 @@ proof.  It does not ask callers for a diagonal-consistency record, a
 strong-self-consistency record, or match-mass preservation as an extra input.
 Those facts must be proved from the role-block construction and the
 orthonormalization argument.  The checked lemmas above prove the completion
-argument from the two named match-mass preservation obligations, so this
+argument directly from the line-130 cross consistency and orthonormalization
+closeness, so this
 declaration no longer hides the remaining construction as an additional
 assumption.
 
-**Unfaithful:** This construction currently depends, through the supplied
-orthonormalization witness, on
-`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_with_matchMass`,
-whose exact match-mass preservation conclusion is not yet derived from
-`references/ldt-paper/inductive_step.tex:130-173`.  This is documented in
-issue #1610 and in
-`docs/paper-gaps/issue-1099-line169-triangle-sub-loss.tex`.  Elimination: prove
-the exact construction-level monotonicity from the paper hypotheses, or route
-this completion construction through the repaired line-169 theorem with its
-explicit loss.
--/
+The repaired line-169 route is handled later, in the projective completion
+transport witness, so this completion construction is now independent of the
+former exact match-mass branch. -/
 theorem nonempty_ofDiagonalConsistency
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -380,10 +321,7 @@ theorem nonempty_ofDiagonalConsistency
       lowIndividualDegree := by
         intro i
         simp }
-  exact nonempty_ofDiagonalConsistencyAndMatchMassPreservation
-    orthWitness a0 a0 hpre
-    (leftMatchMassPreservation_ofDiagonalConsistency orthWitness hpre)
-    (rightMatchMassPreservation_ofDiagonalConsistency orthWitness hpre)
+  exact nonempty_ofDiagonalConsistencyAndSdd orthWitness a0 a0 hpre
 
 end MainFormalDiagonalCompletionWitness
 
