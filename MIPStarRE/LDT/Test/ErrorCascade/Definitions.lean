@@ -81,6 +81,19 @@ noncomputable def cascadeZeta3 (ζ₁ ζ₂ : Error) : Error :=
 noncomputable def cascadeZeta4 (σ ζ₁ ζ₃ : Error) : Error :=
   2 * σ + 2 * Real.sqrt (ζ₁ + ζ₃ / 2)
 
+/-- Repaired line-169 error obtained by the checked local pre-completion route.
+
+This is the `ζ₁ + 10·ζ₁^(1/8)` estimate coming from
+`ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss`
+and its Bob-side mirror. -/
+noncomputable def cascadeLine169RepairError (ζ₁ : Error) : Error :=
+  ζ₁ + 10 * Real.rpow ζ₁ (1 / (8 : Error))
+
+/-- Repaired final point-consistency scalar obtained by substituting the checked
+line-169 repair error into the last Step 8 transport triangle. -/
+noncomputable def cascadeZeta4Repaired (σ ζ₁ ζ₃ : Error) : Error :=
+  2 * σ + 2 * Real.sqrt (cascadeLine169RepairError ζ₁ + ζ₃ / 2)
+
 /-- Paper origin: `references/ldt-paper/inductive_step.tex:130-211`
 (`\label{eq:G-self-consistency}` through `\label{eq:another-goal}`, error cascade
 ζ₁–ζ₄); blueprint `\label{def:main-formal-error-cascade}`.
