@@ -1,10 +1,9 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
+import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.Preliminaries.Defs
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
@@ -146,38 +145,6 @@ theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
 
-/-- Paper-faithful fresh-outcome completion of a polynomial submeasurement.
-
-This packages the completion step from `def:measurement-completion` in the form
-needed for the induction-section self-improvement theorem: the original
-polynomial outcomes are preserved and a fresh outcome `none = ⊥` carries the
-residual mass. -/
-noncomputable def selfImprovementFreshCompletion
-    (params : Parameters)
-    [FieldModel params.q]
-    (G : SubMeas (Polynomial params) ι) : Measurement (Option (Polynomial params)) ι := by
-  classical
-  let residual : MIPStarRE.Quantum.Op ι := 1 - G.total
-  exact
-    { toSubMeas :=
-        { outcome := fun og =>
-            match og with
-            | some g => G.outcome g
-            | none => residual
-          total := 1
-          outcome_pos := by
-            intro og
-            cases og with
-            | none =>
-                simpa [residual] using sub_nonneg.mpr G.total_le_one
-            | some g =>
-                simpa using G.outcome_pos g
-          sum_eq_total := by
-            classical
-            simp [residual, G.sum_eq_total, sub_eq_add_neg]
-          total_le_one := le_rfl }
-      total_eq_one := rfl }
-
 /-- Proof obligation for the paper-faithful completion route in
 `thm:self-improvement-in-induction-section`.
 
@@ -187,7 +154,7 @@ with the Section 9 measurement theorem.  It should eventually be discharged by
 formalizing the fresh-`⊥` completion argument from
 `references/ldt-paper/preliminaries.tex` and the reduction back to polynomial
 outcomes. -/
-lemma selfImprovementInInductionSection_ofFreshCompletion
+lemma selfImprovementInInductionSection_freshCompletionGap
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -206,8 +173,12 @@ lemma selfImprovementInInductionSection_ofFreshCompletion
   -- 3. discard the fresh outcome and transport the conclusion back to the
   --    original polynomial outcomes.
   --
-  -- This should not be discharged via the same-type distinguished-outcome
-  -- completion `completeAtOutcome`; the paper route uses a fresh outcome.
+  -- Use `MakingMeasurementsProjective.optionCompletion` as the canonical fresh
+  -- completion object; the remaining gap is the Section 9 bridge and the
+  -- restriction back to polynomial outcomes, not the completion data itself.
+  let Ghat : Measurement (Option (Polynomial params)) ι :=
+    MakingMeasurementsProjective.optionCompletion G
+  let _ := Ghat
   sorry
 
 /-- `thm:self-improvement-in-induction-section`.
@@ -216,7 +187,14 @@ The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
 the stated point-consistency hypothesis.  It does not assume that `G` is the
 underlying submeasurement of a complete measurement, and it does not assume the
 Section 7 helper, orthonormalization, or final-field proof stages as external
-inputs. -/
+inputs.
+
+**Unfaithful:** This proof currently delegates to
+`selfImprovementInInductionSection_freshCompletionGap`, whose fresh-outcome
+completion reduction remains a tracked proof gap rather than a derivation from
+`thm:self-improvement-in-induction-section`.  Documented in issue `#1645`,
+downstream of `#1503`.  Elimination: discharge the fresh-outcome completion
+reduction from the paper hypotheses and remove the gap lemma. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
@@ -230,7 +208,7 @@ theorem selfImprovementInInductionSection
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
   exact
-    selfImprovementInInductionSection_ofFreshCompletion
+    selfImprovementInInductionSection_freshCompletionGap
       params strategy eps delta gamma nu hgood G hcons
 
 /-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
