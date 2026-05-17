@@ -148,9 +148,9 @@ private theorem addInU_selected_cs_chain_step3_factored_cs
         have hX_herm : (Av - Au)ᴴ = Av - Au := by
           rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
         have hXMohX_pos : 0 ≤ (Av - Au) * Moh * (Av - Au) := by
-          have :=
-            ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
-              (Av - Au)).nonneg
+          have this : 0 ≤ (Av - Au)ᴴ * Moh * (Av - Au) := by
+            simpa [Matrix.star_eq_conjTranspose] using
+              star_left_conjugate_nonneg hMoh_pos (Av - Au)
           rwa [hX_herm] at this
         exact ev_nonneg_of_psd strategy.state _
           (opTensor_nonneg hXMohX_pos hTh_pos))
@@ -164,9 +164,9 @@ private theorem addInU_selected_cs_chain_step3_factored_cs
           SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas
             (ah.2 uv.2)
         have hAvMohAv_pos : 0 ≤ Av * Moh * Av := by
-          have :=
-            ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
-              Av).nonneg
+          have this : 0 ≤ Avᴴ * Moh * Av := by
+            simpa [Matrix.star_eq_conjTranspose] using
+              star_left_conjugate_nonneg hMoh_pos Av
           rwa [hAv_herm] at this
         exact ev_nonneg_of_psd strategy.state _
           (opTensor_nonneg hAvMohAv_pos hTh_pos))
@@ -252,9 +252,9 @@ private theorem addInU_selected_cs_chain_step4_factored_cs
           SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas
             (ah.2 uv.1)
         have hAuMohAu_pos : 0 ≤ Au * Moh * Au := by
-          have :=
-            ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
-              Au).nonneg
+          have this : 0 ≤ Auᴴ * Moh * Au := by
+            simpa [Matrix.star_eq_conjTranspose] using
+              star_left_conjugate_nonneg hMoh_pos Au
           rwa [hAu_herm] at this
         exact ev_nonneg_of_psd strategy.state _
           (opTensor_nonneg hAuMohAu_pos hTh_pos))
@@ -274,9 +274,9 @@ private theorem addInU_selected_cs_chain_step4_factored_cs
         have hY_herm : (Av - Au)ᴴ = Av - Au := by
           rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
         have hYMohY_pos : 0 ≤ (Av - Au) * Moh * (Av - Au) := by
-          have :=
-            ((Matrix.nonneg_iff_posSemidef.mp hMoh_pos).conjTranspose_mul_mul_same
-              (Av - Au)).nonneg
+          have this : 0 ≤ (Av - Au)ᴴ * Moh * (Av - Au) := by
+            simpa [Matrix.star_eq_conjTranspose] using
+              star_left_conjugate_nonneg hMoh_pos (Av - Au)
           rwa [hY_herm] at this
         exact ev_nonneg_of_psd strategy.state _
           (opTensor_nonneg hYMohY_pos hTh_pos))
@@ -311,9 +311,9 @@ private lemma addInU_selected_sandwich_tensor_if_sum_le
     have hM_pos : 0 ≤ (M u).outcome ah.1 := (M u).outcome_pos ah.1
     have hT_pos : 0 ≤ T.outcome ah.2 := T.outcome_pos ah.2
     have hleft_pos : 0 ≤ X ah.2 * (M u).outcome ah.1 * X ah.2 := by
-      have :=
-        ((Matrix.nonneg_iff_posSemidef.mp hM_pos).conjTranspose_mul_mul_same
-          (X ah.2)).nonneg
+      have this : 0 ≤ (X ah.2)ᴴ * (M u).outcome ah.1 * X ah.2 := by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_left_conjugate_nonneg hM_pos (X ah.2)
       rwa [hX_herm ah.2] at this
     exact opTensor_nonneg hleft_pos hT_pos
   have hif_eq :

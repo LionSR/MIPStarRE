@@ -88,7 +88,9 @@ noncomputable def matrixWeightedPolynomialState (params : Parameters) [FieldMode
   let W := matrixPolynomialWeightRightTensorOperator params model g
   { matrix := W * model.state.matrix * Wᴴ
     positive :=
-      ((Matrix.nonneg_iff_posSemidef.mp model.state.positive).mul_mul_conjTranspose_same W).nonneg }
+      by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_right_conjugate_nonneg model.state.positive W }
 
 /-- The local operator `A^u_{g(u)}`. -/
 noncomputable def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters)

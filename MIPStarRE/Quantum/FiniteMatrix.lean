@@ -125,8 +125,9 @@ theorem trace_mul_nonneg_of_nonneg {A B : Op d} (hA : 0 ≤ A) (hB : 0 ≤ B) :
   rw [Matrix.star_eq_conjTranspose]
   have htrace_nonneg :
       (0 : ℂ) ≤ Matrix.trace (Y * A * Yᴴ) :=
-    (Matrix.PosSemidef.mul_mul_conjTranspose_same
-      (Matrix.nonneg_iff_posSemidef.mp hA) Y).trace_nonneg
+    (Matrix.nonneg_iff_posSemidef.mp (by
+      simpa [Matrix.star_eq_conjTranspose] using
+        star_right_conjugate_nonneg hA Y)).trace_nonneg
   have hre : 0 ≤ Complex.re (Matrix.trace (Y * A * Yᴴ)) :=
     (Complex.nonneg_iff.mp htrace_nonneg).1
   have htrace :

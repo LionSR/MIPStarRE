@@ -360,8 +360,9 @@ theorem helperDeleteAQuantity_abs_sub_clonedQuantity_le_sqrt
       have hdiff_herm : (Au - Av)ᴴ = Au - Av := by
         rw [Matrix.conjTranspose_sub, hAu, hAv]
       have hleft_pos : 0 ≤ (Au - Av) * Hh' * (Au - Av) := by
-        have := ((Matrix.nonneg_iff_posSemidef.mp hH_pos).conjTranspose_mul_mul_same
-          (Au - Av)).nonneg
+        have this : 0 ≤ (Au - Av)ᴴ * Hh' * (Au - Av) := by
+          simpa [Matrix.star_eq_conjTranspose] using
+            star_left_conjugate_nonneg hH_pos (Au - Av)
         rwa [hdiff_herm] at this
       exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hleft_pos hT_pos)
     · intro uv hh

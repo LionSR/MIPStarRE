@@ -34,8 +34,9 @@ noncomputable def weightedPolynomialState (params : Parameters) [FieldModel para
   let W := rightTensor (ι₁ := ι) sqrtG
   { density := W * strategy.state.density * Wᴴ
     density_psd :=
-      ((Matrix.nonneg_iff_posSemidef.mp strategy.state.density_psd).mul_mul_conjTranspose_same
-        W).nonneg }
+      by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_right_conjugate_nonneg strategy.state.density_psd W }
 
 /-- The concrete operator `A^u_{g(u)}` for a fixed polynomial `g`. -/
 noncomputable def pointConditionedOutcomeOperatorAtPolynomial (params : Parameters)

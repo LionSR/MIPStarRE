@@ -230,7 +230,6 @@ private lemma orthogonalModeProjectorMatrix_eq_sum (params : Parameters) :
             sum_fourierBasisProjector_eq_one]
           rfl
     _ = ∑ α ∈ (Finset.univ.erase (0 : Point params)), fourierBasisProjector params α := by
-          have hsplit' := congrArg (fun A => A - fourierBasisProjector params 0) hsplit
           rw [← hsplit]
           simp [sub_eq_add_neg, add_left_comm]
 

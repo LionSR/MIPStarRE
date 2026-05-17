@@ -105,8 +105,11 @@ theorem ev_adjoint_self_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
   apply div_nonneg
   · rw [← Matrix.mul_assoc, Matrix.trace_mul_comm (ψ.density * Mᴴ) M,
         ← Matrix.mul_assoc]
+    have hpos : 0 ≤ M * ψ.density * Mᴴ := by
+      simpa [Matrix.star_eq_conjTranspose] using
+        star_right_conjugate_nonneg ψ.density_psd M
     exact (Complex.nonneg_iff.mp
-      ((Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).mul_mul_conjTranspose_same M).trace_nonneg).1
+      (Matrix.nonneg_iff_posSemidef.mp hpos).trace_nonneg).1
   · exact Nat.cast_nonneg _
 
 /-! ### Parallelogram inequality for normalized trace -/
@@ -122,7 +125,10 @@ theorem normalizedTrace_diff_sq_nonneg {n : Type*} [Fintype n]
   apply div_nonneg
   · rw [← Matrix.mul_assoc, Matrix.trace_mul_comm (ρ * (D₁ - D₂)ᴴ) (D₁ - D₂),
         ← Matrix.mul_assoc]
-    exact (Complex.nonneg_iff.mp (hρ.mul_mul_conjTranspose_same (D₁ - D₂)).trace_nonneg).1
+    have hpos : 0 ≤ (D₁ - D₂) * ρ * (D₁ - D₂)ᴴ := by
+      simpa [Matrix.star_eq_conjTranspose] using
+        star_right_conjugate_nonneg hρ.nonneg (D₁ - D₂)
+    exact (Complex.nonneg_iff.mp (Matrix.nonneg_iff_posSemidef.mp hpos).trace_nonneg).1
   · exact Nat.cast_nonneg _
 
 /-- Triangle inequality for normalized trace of PSD-weighted quadratic forms:
@@ -280,8 +286,10 @@ theorem ev_nonneg_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
     rw [hS, Matrix.star_eq_conjTranspose,
         ← Matrix.mul_assoc, Matrix.trace_mul_comm (ψ.density * Sᴴ) S,
         ← Matrix.mul_assoc]
-    have hρ := Matrix.nonneg_iff_posSemidef.mp ψ.density_psd
-    exact (Complex.nonneg_iff.mp (hρ.mul_mul_conjTranspose_same S).trace_nonneg).1
+    have hpos : 0 ≤ S * ψ.density * Sᴴ := by
+      simpa [Matrix.star_eq_conjTranspose] using
+        star_right_conjugate_nonneg ψ.density_psd S
+    exact (Complex.nonneg_iff.mp (Matrix.nonneg_iff_posSemidef.mp hpos).trace_nonneg).1
   · exact Nat.cast_nonneg _
 
 /-- `ev` is monotone under the matrix order. -/
@@ -542,7 +550,9 @@ private theorem ev_opTensor_sandwich_diag_nonneg
     0 ≤ ev ψ (opTensor (Xᴴ * M * X) T) :=
   ev_nonneg_of_psd ψ _
     (opTensor_nonneg
-      ((Matrix.nonneg_iff_posSemidef.mp hM).conjTranspose_mul_mul_same X).nonneg
+      (by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_left_conjugate_nonneg hM X)
       hT)
 
 /-- Absolute-value form of the bipartite-tensor sandwich Cauchy–Schwarz. -/
