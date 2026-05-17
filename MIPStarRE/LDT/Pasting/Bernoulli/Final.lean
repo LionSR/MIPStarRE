@@ -427,8 +427,9 @@ Lines 52--55 explain that the proof may assume the nontrivial regime
 `eps, delta, gamma, zeta, d / q ≤ 1`, since the complementary cases are
 trivial.  This declaration states the restricted assumptions
 `gamma ≤ 1`, `zeta ≤ 1`, `params.d ≤ params.q`, `0 < params.d`, and `1 ≤ k`.
-The unrestricted statement aligned with the paper is `ldPasting`; the only
-remaining complementary branch is the degree-zero case tracked by issue #1622. -/
+The unrestricted statement aligned with the paper is `ldPasting`; the
+degree-zero complementary branch is handled separately by
+`ldPastingDegreeZeroBranch`. -/
 theorem ldPastingNontrivial
     (params : Parameters)
     [FieldModel params.q]
@@ -631,7 +632,7 @@ large-error reduction names the cases
 hypothesis of `thm:ld-pasting`.  Thus the Lean theorem should not add `0 < d`
 as an assumption of that cited theorem.
 
-Issue #1622 tracks the direct proof of this degree-zero branch; see
+Issue #1622 recorded the need for a direct proof of this degree-zero branch; see
 `docs/paper-gaps/issue-1622-ld-pasting-degree-zero.tex`.  The existing
 nontrivial argument cannot simply be reused: its `hBConsistency` aggregation
 passes from distinct sampled heights to independent sampled heights and absorbs
@@ -643,21 +644,21 @@ theorem ldPastingDegreeZeroBranch
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (_hcomplete : family.Complete strategy.state kappa)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (_hk : 400 * params.m * params.d ≤ k)
-    (_hd_zero : params.d = 0)
+    (hd_zero : params.d = 0)
     (_hk_pos : 1 ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   obtain ⟨H, _hHdef, hH⟩ :=
     degreeZeroPastedPointConsistency params strategy eps delta gamma kappa zeta
-      _hgood family _hcomplete _hcons _hd_zero k
+      hgood family hcomplete hcons hd_zero k
   exact ⟨H, { pointConsistency := hH }⟩
 
 /-- Projection from the restricted nontrivial construction.
@@ -700,10 +701,9 @@ following lines 52--55 explain that the proof may restrict to the regime
 `eps, delta, gamma, zeta, d / q ≤ 1`, because the complementary cases are
 trivial.  The restricted theorem `ldPastingNontrivial` proves the nontrivial
 regime, and the large-`gamma`, large-`zeta`, large-`d / q`, and `k = 0`
-complementary branches are proved above.  The only remaining branch is the
-degree-zero case tracked by issue #1622, so this declaration keeps the
-unrestricted paper statement visible without adding the non-paper assumptions
-from the restricted theorem.  The obstruction is documented in
+complementary branches are proved above, including the degree-zero case, so
+this declaration keeps the unrestricted paper statement visible without adding
+the non-paper assumptions from the restricted theorem.  The former obstruction is documented in
 `docs/paper-gaps/issue-1622-ld-pasting-degree-zero.tex`. -/
 theorem ldPasting
     (params : Parameters)

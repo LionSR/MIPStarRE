@@ -323,8 +323,8 @@ proof-level `\leanok`:
   `references/ldt-paper/ld-pasting.tex`, lines 12--50, assumes
   `k >= 400md` but does not state the nontrivial-regime inequalities as
   hypotheses.  The source-facing declaration `Pasting.ldPasting` keeps this
-  unrestricted statement visible; it has a tracked proof obligation for the
-  degree-zero complementary branch, issue #1622.  The restricted declarations
+  unrestricted statement visible, including the direct degree-zero branch
+  formerly tracked by issue #1622.  The restricted declarations
   `Pasting.ldPastingNontrivial` and
   `MainInductionStep.ldPastingInInductionSectionNontrivial` still belong in
   Lean-only remarks because they assume `gamma <= 1`, `zeta <= 1`, `d <= q`,
