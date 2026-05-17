@@ -92,6 +92,14 @@ theorem kronecker_sub_left
 
 variable {d : Type*} [Fintype d]
 
+noncomputable local instance : DecidableEq d := Classical.decEq d
+
+local instance : NonnegSpectrumClass ℝ (Op d) :=
+  Matrix.instNonnegSpectrumClass (𝕜 := ℂ) (n := d)
+
+noncomputable local instance : NonUnitalContinuousFunctionalCalculus ℝ (Op d) IsSelfAdjoint :=
+  ContinuousFunctionalCalculus.toNonUnital (R := ℝ) (A := Op d) (p := IsSelfAdjoint)
+
 /-- Sandwiching a PSD operator by a Hermitian operator preserves positivity. -/
 theorem sandwich_nonneg {M P : Op d} (hP : 0 ≤ P) (hMH : Mᴴ = M) :
     0 ≤ M * P * M := by
@@ -114,11 +122,6 @@ duality arguments: if \(A,B\geq 0\), then
 \(\operatorname{Re}\operatorname{Tr}(AB)\geq 0\). -/
 theorem trace_mul_nonneg_of_nonneg {A B : Op d} (hA : 0 ≤ A) (hB : 0 ≤ B) :
     0 ≤ Complex.re (Matrix.trace (A * B)) := by
-  letI : DecidableEq d := Classical.decEq d
-  letI : NonnegSpectrumClass ℝ (Op d) :=
-    Matrix.instNonnegSpectrumClass (𝕜 := ℂ) (n := d)
-  letI : NonUnitalContinuousFunctionalCalculus ℝ (Op d) IsSelfAdjoint :=
-    ContinuousFunctionalCalculus.toNonUnital (R := ℝ) (A := Op d) (p := IsSelfAdjoint)
   obtain ⟨Y, hY⟩ := CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hB
   subst B
   rw [Matrix.star_eq_conjTranspose]
@@ -142,10 +145,6 @@ theorem trace_mul_nonneg_of_nonneg {A B : Op d} (hA : 0 ≤ A) (hB : 0 ≤ B) :
 /-- An operator between `0` and `1` dominates its square. -/
 theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
     X * X ≤ X := by
-  letI : NonnegSpectrumClass ℝ (Op d) :=
-    Matrix.instNonnegSpectrumClass (𝕜 := ℂ) (n := d)
-  letI : NonUnitalContinuousFunctionalCalculus ℝ (Op d) IsSelfAdjoint :=
-    ContinuousFunctionalCalculus.toNonUnital (R := ℝ) (A := Op d) (p := IsSelfAdjoint)
   have hcomm : Commute X (1 - X) :=
     (Commute.one_right X).sub_right (Commute.refl X)
   have hnonneg : 0 ≤ X * (1 - X) :=
@@ -158,10 +157,6 @@ identity must vanish. -/
 theorem eq_zero_of_nonneg_mul_eq_zero_of_one_le [DecidableEq d]
     {S Z : Op d} (hS : 0 ≤ S) (hZ : (1 : Op d) ≤ Z) (hSZ : S * Z = 0) :
     S = 0 := by
-  letI : NonnegSpectrumClass ℝ (Op d) :=
-    Matrix.instNonnegSpectrumClass (𝕜 := ℂ) (n := d)
-  letI : NonUnitalContinuousFunctionalCalculus ℝ (Op d) IsSelfAdjoint :=
-    ContinuousFunctionalCalculus.toNonUnital (R := ℝ) (A := Op d) (p := IsSelfAdjoint)
   have hZ_nonneg : 0 ≤ Z :=
     le_trans Matrix.PosSemidef.one.nonneg hZ
   have hS_herm : Sᴴ = S :=

@@ -21,9 +21,8 @@ proof-integrity rules.** This repository has a single, consolidated agent guide 
 
 - **Current**: Lean v4.30.0-rc2 / Mathlib v4.30.0-rc2 (from `lean-toolchain`
   and `lakefile.toml`)
-- After the upgrade: remove any file-scope
-  `set_option backward.isDefEq.respectTransparency false` usages and replace
-  with local-scope alternatives
-- The `backward.isDefEq.respectTransparency` option was introduced in v4.29.0
-  and should only be used temporarily for porting; permanent fixes involve
-  repairing instance/type-synonym definitions
+- For future toolchain bumps: if any file-scope
+  `set_option backward.isDefEq.respectTransparency false` usages are introduced
+  during porting, replace them by local-scope alternatives before merge. This
+  option should only be used temporarily; permanent fixes involve repairing
+  instance or type-synonym definitions.
