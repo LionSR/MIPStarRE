@@ -1,8 +1,10 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Preliminaries.Defs
+import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
@@ -144,6 +146,70 @@ theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
 
+/-- Paper-faithful fresh-outcome completion of a polynomial submeasurement.
+
+This packages the completion step from `def:measurement-completion` in the form
+needed for the induction-section self-improvement theorem: the original
+polynomial outcomes are preserved and a fresh outcome `none = ⊥` carries the
+residual mass. -/
+noncomputable def selfImprovementFreshCompletion
+    (params : Parameters)
+    [FieldModel params.q]
+    (G : SubMeas (Polynomial params) ι) : Measurement (Option (Polynomial params)) ι := by
+  classical
+  let residual : MIPStarRE.Quantum.Op ι := 1 - G.total
+  exact
+    { toSubMeas :=
+        { outcome := fun og =>
+            match og with
+            | some g => G.outcome g
+            | none => residual
+          total := 1
+          outcome_pos := by
+            intro og
+            cases og with
+            | none =>
+                simpa [residual] using sub_nonneg.mpr G.total_le_one
+            | some g =>
+                simpa using G.outcome_pos g
+          sum_eq_total := by
+            classical
+            simp [residual, G.sum_eq_total, sub_eq_add_neg]
+          total_le_one := le_rfl }
+      total_eq_one := rfl }
+
+/-- Proof obligation for the paper-faithful completion route in
+`thm:self-improvement-in-induction-section`.
+
+This is the exact point where the source proof passes from the submeasurement
+input `G` to a fresh-outcome completion and proves the required compatibility
+with the Section 9 measurement theorem.  It should eventually be discharged by
+formalizing the fresh-`⊥` completion argument from
+`references/ldt-paper/preliminaries.tex` and the reduction back to polynomial
+outcomes. -/
+lemma selfImprovementInInductionSection_ofFreshCompletion
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (G : SubMeas (Polynomial params) ι)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G)
+      nu) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
+  -- Source-faithful gap (#1645, downstream of #1503):
+  -- 1. complete `G` by adjoining a fresh outcome `⊥`,
+  -- 2. reduce the induction-section theorem to the Section 9 measurement theorem,
+  -- 3. discard the fresh outcome and transport the conclusion back to the
+  --    original polynomial outcomes.
+  --
+  -- This should not be discharged via the same-type distinguished-outcome
+  -- completion `completeAtOutcome`; the paper route uses a fresh outcome.
+  sorry
+
 /-- `thm:self-improvement-in-induction-section`.
 
 The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
@@ -163,11 +229,9 @@ theorem selfImprovementInInductionSection
         (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  -- TODO(#1503): prove the induction-section theorem from the paper hypotheses.
-  -- In particular, do not replace the input-submeasurement completion and
-  -- Section 9 derivation by a bundled obligation hypothesis; such assumptions
-  -- are proof debt, not hypotheses of the paper statement.
-  sorry
+  exact
+    selfImprovementInInductionSection_ofFreshCompletion
+      params strategy eps delta gamma nu hgood G hcons
 
 /-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
 into the bookkeeping object expected by the later induction-step assembly.
