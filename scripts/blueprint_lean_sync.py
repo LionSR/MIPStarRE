@@ -700,6 +700,7 @@ def find_header_leanok_without_proof_leanok(
     env_end_re = re.compile(
         r"\\end\{(lemma|theorem|proposition|corollary)\}"
     )
+    theorem_like_envs = {"lemma", "theorem", "proposition", "corollary"}
     proof_begin_re = re.compile(r"\\begin\{proof\}")
     proof_end_re = re.compile(r"\\end\{proof\}")
     # Generic environment begin: used to skip intervening non-proof envs.
@@ -765,8 +766,12 @@ def find_header_leanok_without_proof_leanok(
                     proof_lines = p_lines
                     k = l + 1
                     break
-                # Skip any intervening non-proof environment.
+                # Skip intervening non-proof, non-theorem environments.  A
+                # second theorem-like environment starts a new statement and
+                # must not lend its proof to the preceding statement.
                 intervening = _any_env_begin_re.search(lines[k])
+                if intervening and intervening.group(1) in theorem_like_envs:
+                    break
                 if intervening and intervening.group(1) != "proof":
                     env_name = intervening.group(1)
                     end_pat = re.compile(

@@ -1232,6 +1232,26 @@ class HeaderLeanokWithoutProofLeanokTests(unittest.TestCase):
         )
         self.assertEqual(mismatches, [])
 
+    def test_consecutive_theorem_like_environments_do_not_share_proofs(self) -> None:
+        """A proof of the second statement is not attributed to the first."""
+        mismatches = self._run_scan(
+            r"""
+\begin{lemma}\label{lem:first}
+  \lean{Foo.first}
+  \leanok
+\end{lemma}
+\begin{lemma}\label{lem:second}
+  \lean{Foo.second}
+  \leanok
+\end{lemma}
+\begin{proof}
+  Proof of the second statement, without \leanok.
+\end{proof}
+"""
+        )
+        self.assertEqual(len(mismatches), 1)
+        self.assertEqual(mismatches[0].label, "lem:second")
+
     def test_multiline_lean_blocks_are_handled(self) -> None:
         """(d) multiline \\lean{} remains ok when both have \\leanok."""
         mismatches = self._run_scan(
