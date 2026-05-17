@@ -353,6 +353,16 @@ structure IsProj (P : Op d) : Prop where
   /-- The projection is idempotent. -/
   idempotent : P * P = P
 
+/-- A projective operator in the local matrix sense is a Mathlib star projection. -/
+lemma IsProj.isStarProjection {P : Op d} (hP : IsProj P) : IsStarProjection P where
+  isIdempotentElem := hP.idempotent
+  isSelfAdjoint := hP.isHermitian.isSelfAdjoint
+
+/-- A Mathlib star projection is a projective operator in the local matrix sense. -/
+lemma IsProj.of_isStarProjection {P : Op d} (hP : IsStarProjection P) : IsProj P where
+  isHermitian := hP.isSelfAdjoint.isHermitian
+  idempotent := hP.isIdempotentElem
+
 /-! ### Spectral truncation -/
 
 /--

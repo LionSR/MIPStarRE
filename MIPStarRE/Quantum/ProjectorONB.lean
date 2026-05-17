@@ -18,7 +18,7 @@ low-degree-test formalization.
 - `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.lean`.
 -/
 
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
+open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.L2Operator
 
 namespace MIPStarRE.Quantum
 
@@ -276,28 +276,6 @@ lemma subprojector_rank (S : Finset (Fin P.rank)) :
     rw [← htrace_rank, htrace_card]
   exact_mod_cast hcast
 
-/-- A partial projector is dominated by the original projector. -/
-lemma subprojector_le (S : Finset (Fin P.rank)) :
-    b.subprojector S ≤ P := by
-  classical
-  let C : Op ι := ∑ i ∈ (Sᶜ : Finset (Fin P.rank)), b.rankOne i
-  have hsplit : b.subprojector S + C = P := by
-    calc
-      b.subprojector S + C
-          = (∑ i ∈ S, b.rankOne i) + ∑ i ∈ (Sᶜ : Finset (Fin P.rank)), b.rankOne i := rfl
-      _ = ∑ i : Fin P.rank, b.rankOne i := by
-            rw [Finset.sum_add_sum_compl]
-      _ = P := by simpa [rankOne] using b.decomposition.symm
-  change (P - b.subprojector S).PosSemidef
-  have hdiff : P - b.subprojector S = C := by
-    have h := congrArg (fun X : Op ι => X - b.subprojector S) hsplit.symm
-    have hcancel : (b.subprojector S + C) - b.subprojector S = C := by abel
-    exact h.trans hcancel
-  rw [hdiff]
-  unfold C rankOne
-  exact Matrix.nonneg_iff_posSemidef.mp <|
-    Finset.sum_nonneg fun i _ => (Matrix.posSemidef_vecMulVec_self_star (b.vec i)).nonneg
-
 /-- A partial projector plus its complementary partial projector is the original projector. -/
 lemma subprojector_add_compl (S : Finset (Fin P.rank)) :
     b.subprojector S + b.subprojector (Sᶜ : Finset (Fin P.rank)) = P := by
@@ -318,6 +296,13 @@ lemma subprojector_diff_eq_compl (S : Finset (Fin P.rank)) :
         b.subprojector (Sᶜ : Finset (Fin P.rank)) := by
     abel
   exact h.trans hcancel
+
+/-- A partial projector is dominated by the original projector. -/
+lemma subprojector_le (S : Finset (Fin P.rank)) :
+    b.subprojector S ≤ P := by
+  rw [← sub_nonneg]
+  rw [b.subprojector_diff_eq_compl S]
+  exact (b.subprojector_isProj (Sᶜ : Finset (Fin P.rank))).isStarProjection.nonneg
 
 end ProjectorRangeONB
 

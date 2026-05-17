@@ -1,3 +1,4 @@
+import Mathlib.Analysis.InnerProductSpace.GramMatrix
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Completion
 
 /-!
@@ -107,12 +108,16 @@ theorem exists_xHat_of_sigmaFinRangeEmbedding_positiveGram
   have hgram : Xᴴ * X = QTotal qLayer := by
     simpa [X, QTotal] using
       sigmaFinRangeEmbedding_gram_right qLayer.q hRank.projective hRank.sum_eq_total
-  have hQ : (QTotal qLayer).IsHermitian := by
-    rw [← hgram]
-    exact Matrix.isHermitian_conjTranspose_mul_self X
   have hQ_pos : (QTotal qLayer).PosSemidef := by
+    have hX_gram :
+        Matrix.gram ℂ (fun j : ι => WithLp.toLp 2 fun r => X r j) = Xᴴ * X := by
+      ext i j
+      simp [Matrix.gram, Matrix.mul_apply, Matrix.conjTranspose_apply,
+        EuclideanSpace.inner_toLp_toLp, dotProduct, mul_comm]
     rw [← hgram]
-    exact Matrix.posSemidef_conjTranspose_mul_self X
+    rw [← hX_gram]
+    exact Matrix.posSemidef_gram ℂ _
+  have hQ : (QTotal qLayer).IsHermitian := hQ_pos.isHermitian
   have hcard :
       Fintype.card (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
         (fun a : Outcome => (qLayer.q.outcome a).rank))) ≤ Fintype.card ι := by
