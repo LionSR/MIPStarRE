@@ -105,6 +105,7 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon
       Function.comp] using hproc
   convert hprod' using 2
 
+set_option linter.flexible false in
 -- The proof compares the one-question equivalence with the endpoint
 -- formulation; the broad simplification is confined to unfolding the two
 -- equivalent presentations of the same postprocessed submeasurement.
@@ -141,6 +142,7 @@ lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
           ldSandwichLineOnePointRightFamily]
         exact (postprocess_postprocess _ _ _).symm
 
+set_option linter.flexible false in
 -- The proof lifts the endpoint consistency relation through the split
 -- sandwiched-line equivalence; the simplification only unfolds this equivalence
 -- and the endpoint-family definition.
