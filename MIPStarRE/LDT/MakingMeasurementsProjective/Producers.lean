@@ -267,6 +267,259 @@ private lemma sddRel_of_leftPlaced_sddOpRel {Outcome : Type*}
   rw [herror]
   exact hclose.squaredDistanceBound
 
+/-- Option-completion specialization of the locality-preserving QXP repair route,
+augmented with residual domination of the fresh `none` outcome.
+
+This is the orthonormalization-output-path producer required by issue `#1642`.
+Starting from the option-completed source almost-projective bound, it runs the
+Section 5 repair chain through rank reduction and the sigma-space QXP layer,
+uses the supplied fresh-`Q` source identification together with the derived
+sigma-space coisometry to invoke
+`residualDominatingRepairProducer_of_qxpLayer_and_coisometry`, and finally
+returns the repaired projective submeasurement together with the residual
+comparison consumed by `RestrictSome`. -/
+theorem optionCompletionRepairProducer_of_sourceAlmostProjective_two_mul_with_residual_domination
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) (ζ : Error)
+    (hsource :
+      ∀ {qLayer : QLayerData (Option Outcome) ι},
+        RankReductionWitness (leftMarginalState ψ) (optionCompletion A) ζ qLayer →
+          qLayer.q.outcome none = (optionCompletion A).outcome none)
+    (hsum_le_one :
+      ∀ {qLayer : QLayerData (Option Outcome) ι},
+        RankReductionWitness (leftMarginalState ψ) (optionCompletion A) ζ qLayer →
+          (∑ oa : Option Outcome, qLayer.q.outcome oa) ≤
+            (1 : MIPStarRE.Quantum.Op ι))
+    (hsourceAlmost :
+      ∑ oa : Option Outcome,
+          ev ψ
+            ((leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa -
+              (leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa *
+                (leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa) ≤
+        2 * ζ)
+    (hζ_small : ζ ≤ 1 / (4 : Error)) :
+    ∃ P : ProjSubMeas (Option Outcome) ι,
+      RoundedProjMeasStatement ψ
+        (leftLiftedMeasurement (ιB := ι) (optionCompletion A))
+        (ProjSubMeas.liftLeft P)
+        (orthonormalizationMainLemmaError ζ) ∧
+      (optionCompletion A).outcome none ≤ P.outcome none := by
+  let φ : QuantumState ι := leftMarginalState ψ
+  have hφ : φ.IsNormalized := by
+    simpa [φ] using leftMarginalState_isNormalized (ψ := ψ) hψ
+  have hterm : ∀ oa : Option Outcome,
+      ev ψ
+        ((leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa -
+          (leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa *
+            (leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa) =
+      ev φ
+        ((optionCompletion A).outcome oa -
+          (optionCompletion A).outcome oa * (optionCompletion A).outcome oa) := by
+    intro oa
+    simpa [φ, leftLiftedMeasurement, leftPlacedSubMeas, leftTensor_sub,
+      leftTensor_mul_leftTensor] using
+      (leftMarginal_ev_eq (ψ := ψ)
+        (X := (optionCompletion A).outcome oa -
+          (optionCompletion A).outcome oa * (optionCompletion A).outcome oa))
+  have hsourceLocal :
+      ∑ oa : Option Outcome,
+          ev φ
+            ((optionCompletion A).outcome oa -
+              (optionCompletion A).outcome oa * (optionCompletion A).outcome oa) ≤
+        2 * ζ := by
+    simpa [hterm] using hsourceAlmost
+  have hζ_nonneg : 0 ≤ ζ := by
+    have hsource_nonneg :
+        0 ≤ ∑ oa : Option Outcome,
+          ev φ
+            ((optionCompletion A).outcome oa -
+              (optionCompletion A).outcome oa * (optionCompletion A).outcome oa) :=
+      sourceAlmostProjective_nonneg φ (optionCompletion A)
+    nlinarith
+  have hprojective : projectiveNonMeasurement φ (optionCompletion A) ζ :=
+    projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
+      φ (optionCompletion A) ζ hφ hsourceLocal
+  obtain ⟨R, hR⟩ := hprojective
+  have hSpectral : SpectralTruncationStatement φ (optionCompletion A) ζ :=
+    spectralTruncationStatement_of_witness φ (optionCompletion A) ζ R hR
+  obtain ⟨qLayer, hRank⟩ :=
+    projectiveLowRankSum_of_spectralTruncationStatement φ (optionCompletion A) ζ
+      hφ hζ_nonneg hζ_small hSpectral hsourceLocal
+  by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun oa : Option Outcome => (qLayer.q.outcome oa).rank))
+  · letI := hsigma
+    obtain ⟨_xHat, _hxHat_coisometry, _hxHat_mixed, data, hq, _hx, _hxHat,
+        _hx_coisometry, hQP, hdom⟩ :=
+      pQApprox_ofRankReductionSigmaRangePositiveGram_with_residualDomination
+        φ A ζ hRank (by simpa [φ] using hsum_le_one hRank)
+        (by simpa [φ] using hsource hRank) hφ hζ_nonneg hζ_small
+    have hAQ :
+        SDDOpRel φ (uniformDistribution Unit)
+          (constOpFamily ((optionCompletion A).toSubMeas : OpFamily (Option Outcome) ι))
+          (constOpFamily data.qLayer.q) (roundingToProjectiveError ζ) := by
+      simpa [hq] using hRank.toSigmaRangeQLayer.closeness
+    have hAP_local :
+        SDDOpRel φ (uniformDistribution Unit)
+          (constOpFamily ((optionCompletion A).toSubMeas : OpFamily (Option Outcome) ι))
+          (constOpFamily (PFamily data)) (orthonormalizationMainLemmaError ζ) := by
+      exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono φ (uniformDistribution Unit)
+        (constOpFamily ((optionCompletion A).toSubMeas : OpFamily (Option Outcome) ι))
+        (constOpFamily (PFamily data))
+        (2 * (roundingToProjectiveError ζ + 30 * zetaQuarterRoot ζ))
+        (orthonormalizationMainLemmaError ζ)
+        (MIPStarRE.LDT.Preliminaries.sddOpRel_triangle φ (uniformDistribution Unit)
+          (constOpFamily ((optionCompletion A).toSubMeas : OpFamily (Option Outcome) ι))
+          (constOpFamily data.qLayer.q)
+          (constOpFamily (PFamily data))
+          (roundingToProjectiveError ζ) (30 * zetaQuarterRoot ζ) hAQ hQP)
+        (projectivizationRepair_small_error_bound hζ_nonneg hζ_small)
+    have hLifted :
+        SDDOpRel ψ (uniformDistribution Unit)
+          (fun _ =>
+            OpFamily.leftPlacedOpFamily (ιB := ι)
+              ((optionCompletion A).toSubMeas : OpFamily (Option Outcome) ι))
+          (fun _ => OpFamily.leftPlacedOpFamily (ιB := ι) (PFamily data))
+          (orthonormalizationMainLemmaError ζ) := by
+      refine MIPStarRE.LDT.Preliminaries.sddOpRel_leftPlaced_of_ev_eq ψ φ
+        (uniformDistribution Unit)
+        (constOpFamily ((optionCompletion A).toSubMeas : OpFamily (Option Outcome) ι))
+        (constOpFamily (PFamily data))
+        (orthonormalizationMainLemmaError ζ) ?_ hAP_local
+      intro X
+      exact leftMarginal_ev_eq ψ X
+    exact ⟨qxpProjSubMeas data,
+      ⟨by
+        simpa [leftLiftedMeasurement, ProjSubMeas.liftLeft, SubMeas.liftLeft]
+          using
+            sddRel_of_leftPlaced_sddOpRel
+              (A := optionCompletion A) (R := PFamily data) (P := qxpProjSubMeas data)
+              (fun oa => by rw [qxpProjSubMeas_outcome]; rfl) hLifted⟩,
+      hdom.residual_le⟩
+  · have hQzero_rank : ∀ oa : Option Outcome, (qLayer.q.outcome oa).rank = 0 := by
+      intro oa
+      by_contra hrank
+      have hpos : 0 < (qLayer.q.outcome oa).rank := Nat.pos_of_ne_zero hrank
+      have : Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+          (fun oa : Option Outcome => (qLayer.q.outcome oa).rank)) := by
+        refine ⟨⟨Fintype.equivFin (Option Outcome) oa, ⟨0, ?_⟩⟩⟩
+        simpa [Fintype.equivFin] using hpos
+      exact hsigma this
+    have hQzero : ∀ oa : Option Outcome, qLayer.q.outcome oa = 0 := by
+      intro oa
+      exact matrix_eq_zero_of_rank_eq_zero (qLayer.q.outcome oa) (hQzero_rank oa)
+    have hQ_lifted :
+        SDDOpRel ψ (uniformDistribution Unit)
+          (fun _ =>
+            OpFamily.leftPlacedOpFamily (ιB := ι)
+              ((optionCompletion A).toSubMeas : OpFamily (Option Outcome) ι))
+          (fun _ => OpFamily.leftPlacedOpFamily (ιB := ι) qLayer.q)
+          (roundingToProjectiveError ζ) := by
+      refine MIPStarRE.LDT.Preliminaries.sddOpRel_leftPlaced_of_ev_eq ψ φ
+        (uniformDistribution Unit)
+        (constOpFamily ((optionCompletion A).toSubMeas : OpFamily (Option Outcome) ι))
+        (constOpFamily qLayer.q) (roundingToProjectiveError ζ) ?_ hRank.closeness
+      intro X
+      exact leftMarginal_ev_eq ψ X
+    have hResidualZero : (optionCompletion A).outcome none = 0 := by
+      calc
+        (optionCompletion A).outcome none = qLayer.q.outcome none := by
+          symm
+          simpa [φ] using hsource hRank
+        _ = 0 := hQzero none
+    refine ⟨zeroProjSubMeas (Outcome := Option Outcome) (ι := ι),
+      MIPStarRE.LDT.MakingMeasurementsProjective.roundedProjMeasStatement_mono
+        ⟨by
+          simpa [leftLiftedMeasurement, ProjSubMeas.liftLeft, SubMeas.liftLeft]
+            using
+              sddRel_of_leftPlaced_sddOpRel
+                (A := optionCompletion A) (R := qLayer.q)
+                (P := zeroProjSubMeas (Outcome := Option Outcome) (ι := ι))
+                hQzero hQ_lifted⟩
+        (roundingToProjectiveError_le_orthonormalizationMainLemmaError hζ_nonneg hζ_small),
+      ?_⟩
+    simp [zeroProjSubMeas, hResidualZero]
+
+/-- The option-completion output-path producer yields a projective submeasurement
+on the original outcome type whose total is bounded by the source total.
+
+This is the operator-level monotone-total consequence of the residual-domination
+output: after producing a projective family on `Option Outcome`, one discards
+the fresh `none` outcome and applies the generic `RestrictSome` comparison. -/
+theorem optionCompletionRepair_total_le_of_sourceAlmostProjective_two_mul_with_residual_domination
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) (ζ : Error)
+    (hsource :
+      ∀ {qLayer : QLayerData (Option Outcome) ι},
+        RankReductionWitness (leftMarginalState ψ) (optionCompletion A) ζ qLayer →
+          qLayer.q.outcome none = (optionCompletion A).outcome none)
+    (hsum_le_one :
+      ∀ {qLayer : QLayerData (Option Outcome) ι},
+        RankReductionWitness (leftMarginalState ψ) (optionCompletion A) ζ qLayer →
+          (∑ oa : Option Outcome, qLayer.q.outcome oa) ≤
+            (1 : MIPStarRE.Quantum.Op ι))
+    (hsourceAlmost :
+      ∑ oa : Option Outcome,
+          ev ψ
+            ((leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa -
+              (leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa *
+                (leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa) ≤
+        2 * ζ)
+    (hζ_small : ζ ≤ 1 / (4 : Error)) :
+    ∃ P : ProjSubMeas Outcome ι,
+      P.toSubMeas.total ≤ A.total := by
+  obtain ⟨Popt, _hRounded, hresidual⟩ :=
+    optionCompletionRepairProducer_of_sourceAlmostProjective_two_mul_with_residual_domination
+      ψ hψ A ζ hsource hsum_le_one hsourceAlmost hζ_small
+  refine ⟨restrictSomeProjSubMeas Popt, ?_⟩
+  exact restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le A Popt hresidual
+
+/-- Right-register expectation form of
+`optionCompletionRepair_total_le_of_sourceAlmostProjective_two_mul_with_residual_domination`.
+
+This is the scalar monotone-total consequence needed by the point-consistency
+transport route: the repaired projective output produced after discarding the
+fresh `none` outcome has right-register total expectation bounded by the source
+submeasurement total expectation. -/
+theorem optionCompletionRepair_rightTensor_total_ev_le_with_residual_domination
+    {Outcome : Type*} {ι : Type*}
+    [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ι) (ζ : Error)
+    (hsource :
+      ∀ {qLayer : QLayerData (Option Outcome) ι},
+        RankReductionWitness (leftMarginalState ψ) (optionCompletion A) ζ qLayer →
+          qLayer.q.outcome none = (optionCompletion A).outcome none)
+    (hsum_le_one :
+      ∀ {qLayer : QLayerData (Option Outcome) ι},
+        RankReductionWitness (leftMarginalState ψ) (optionCompletion A) ζ qLayer →
+          (∑ oa : Option Outcome, qLayer.q.outcome oa) ≤
+            (1 : MIPStarRE.Quantum.Op ι))
+    (hsourceAlmost :
+      ∑ oa : Option Outcome,
+          ev ψ
+            ((leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa -
+              (leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa *
+                (leftLiftedMeasurement (ιB := ι) (optionCompletion A)).outcome oa) ≤
+        2 * ζ)
+    (hζ_small : ζ ≤ 1 / (4 : Error)) :
+    ∃ P : ProjSubMeas Outcome ι,
+      ev ψ (rightTensor (ι₁ := ι) P.toSubMeas.total) ≤
+        ev ψ (rightTensor (ι₁ := ι) A.total) := by
+  obtain ⟨Popt, _hRounded, hresidual⟩ :=
+    optionCompletionRepairProducer_of_sourceAlmostProjective_two_mul_with_residual_domination
+      ψ hψ A ζ hsource hsum_le_one hsourceAlmost hζ_small
+  refine ⟨restrictSomeProjSubMeas Popt, ?_⟩
+  exact
+    restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
+      (ψ := ψ) A Popt hresidual
+
 /-- Locality-preserving `Q/X/XHat/P` repair for a left-lifted measurement at the
 paper's `2ζ` source-defect scale.
 
