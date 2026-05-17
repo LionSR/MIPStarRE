@@ -51,13 +51,32 @@ private lemma avgOver_right_linear
               refine Finset.sum_congr rfl ?_
               intro g _
               rw [Finset.sum_comm]
-    _ = ∑ g : Γ, ∑ a : Aidx,
-        ev ψ (leftTensor (ι₂ := ι) (L g a) *
-          rightTensor (ι₁ := ι)
-            (P a * averageOperatorOverDistribution 𝒟U (fun u => Q u g))) := by
-        simp [T, averageOperatorOverDistribution, ev_finset_sum, ev_real_smul,
-          ← rightTensor_finset_sum, leftTensor_mul_rightTensor_real_smul_right,
-          Matrix.mul_sum, mul_comm]
+      _ = ∑ g : Γ, ∑ a : Aidx,
+          ev ψ (leftTensor (ι₂ := ι) (L g a) *
+            rightTensor (ι₁ := ι)
+              (P a * averageOperatorOverDistribution 𝒟U (fun u => Q u g))) := by
+          suffices
+              ∑ g : Γ, ∑ a : Aidx, ∑ u ∈ 𝒟U.support,
+                  ev ψ (leftTensor (ι₂ := ι) (L g a) *
+                      rightTensor (ι₁ := ι) (P a * Q u g)) * 𝒟U.weight u =
+                ∑ g : Γ, ∑ a : Aidx, ∑ u ∈ 𝒟U.support,
+                  ev ψ ((𝒟U.weight u : Error) •
+                    (leftTensor (ι₂ := ι) (L g a) *
+                      rightTensor (ι₁ := ι) (P a * Q u g))) by
+            simpa [T, averageOperatorOverDistribution, ev_finset_sum,
+              ← rightTensor_finset_sum, leftTensor_mul_rightTensor_real_smul_right,
+              Matrix.mul_sum] using this
+          refine Finset.sum_congr rfl ?_
+          intro g _
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          refine Finset.sum_congr rfl ?_
+          intro u _
+          let X : MIPStarRE.Quantum.Op (ι × ι) :=
+            leftTensor (ι₂ := ι) (L g a) * rightTensor (ι₁ := ι) (P a * Q u g)
+          change ev ψ X * 𝒟U.weight u = ev ψ ((𝒟U.weight u : Error) • X)
+          rw [ev_real_smul]
+          ring
 
 private lemma sum_ev_leftTensor_mul_rightTensor_const
     {α : Type*} (s : Finset α)

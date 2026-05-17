@@ -245,7 +245,7 @@ If `successor.pred.next = params`, then `successor.pred.q = params.q`; this help
 transports the ambient base-universe field model along that cardinality equality.
 The explicit equality cast keeps the transport visible to callers, rather than
 hiding it behind a tactic-mode `rw; infer_instance` definition. -/
-noncomputable def fieldModelOfSuccessorDecomposition
+@[reducible] noncomputable def fieldModelOfSuccessorDecomposition
     {params : Parameters} [FieldModel.{0} params.q]
     (successor : Parameters.SuccessorDecomposition params) :
     FieldModel.{0} successor.pred.q :=

@@ -20,7 +20,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- Named obligations for the helper-stage strong self-consistency proof.
 
@@ -87,6 +87,9 @@ structure HelperStrongSelfConsistencyObligations
           ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
         addInUError params eps delta
 
+set_option maxHeartbeats 800000 in
+-- This constructor fills the helper SSC obligation record by composing the
+-- point self-consistency bounds with the local-to-global variance transfer.
 /-- Construct the helper-stage obligations from the remaining mathematical
 inputs after the add-in-`u` chain has been closed.
 
@@ -442,6 +445,9 @@ theorem helperOffDiagonalSelectedCSChainQ2_eq_swappedIndicator
         intro h' _
         rw [avgOver_mul_const]
 
+set_option maxHeartbeats 800000 in
+-- The off-diagonal swap invokes the selected Step 3/4 bound and the
+-- local-to-global variance transfer.
 /-- The first off-diagonal variance swap, corresponding to
 `eq:swapped-u-for-v` in the helper SSC residual chain. -/
 theorem helperOffDiagonalIndicatorQuantity_abs_sub_oneSidedSwappedIndicator_le_sqrt
@@ -466,6 +472,9 @@ theorem helperOffDiagonalIndicatorQuantity_abs_sub_oneSidedSwappedIndicator_le_s
     helperOffDiagonalSelectedCSChainQ3_eq_oneSidedSwappedIndicator,
     abs_sub_comm, selfImprovementVarianceError] using hsteps.2
 
+set_option maxHeartbeats 800000 in
+-- This is the analogous second off-diagonal swap with the same variance
+-- transfer input.
 /-- The second off-diagonal variance swap, corresponding to
 `eq:swapped-u-for-v-this-time-it's-personal` in the helper SSC residual chain. -/
 theorem helperOffDiagonalOneSidedSwappedIndicator_abs_sub_swappedIndicator_le_sqrt

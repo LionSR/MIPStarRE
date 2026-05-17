@@ -40,9 +40,12 @@ lemma hermitian_eq_sum_eigenvalues_vecMulVec (A : Op ι) (hA : A.IsHermitian) :
         Matrix.vecMulVec ((hA.eigenvectorBasis i).ofLp)
           (star ((hA.eigenvectorBasis i).ofLp))) := by
           ext r c
-          simp [Unitary.conjStarAlgAut_apply, Matrix.mul_apply, Matrix.diagonal_apply,
-            Matrix.sum_apply, Matrix.vecMulVec_apply,
-            Matrix.IsHermitian.eigenvectorUnitary_apply, mul_assoc, mul_comm]
+          simp only [Unitary.conjStarAlgAut_apply, Matrix.mul_apply, Matrix.diagonal_apply,
+            Matrix.sum_apply, Matrix.IsHermitian.eigenvectorUnitary_apply, Finset.sum_mul]
+          apply Finset.sum_congr rfl
+          intro i _
+          simp [Matrix.smul_apply, Matrix.vecMulVec_apply]
+          ring
 
 /-- For a Hermitian idempotent matrix, every eigenvalue is either `0` or `1`. -/
 lemma IsProj.eigenvalues_zero_or_one (P : Op ι) (hP : IsProj P) (i : ι) :
@@ -62,10 +65,12 @@ lemma IsProj.eigenvalues_zero_or_one (P : Op ι) (hP : IsProj P) (i : ι) :
       calc
         (hP.isHermitian.eigenvalues i * hP.isHermitian.eigenvalues i) • v
             = hP.isHermitian.eigenvalues i •
-                (hP.isHermitian.eigenvalues i • v) := by simp [mul_smul]
+                (hP.isHermitian.eigenvalues i • v) := by
+              exact (smul_smul (hP.isHermitian.eigenvalues i)
+                (hP.isHermitian.eigenvalues i) v).symm
         _ = hP.isHermitian.eigenvalues i • (P *ᵥ v) := by rw [hmul1]
         _ = P *ᵥ (hP.isHermitian.eigenvalues i • v) := by
-              rw [Matrix.mulVec_smul]
+              exact (Matrix.mulVec_smul P (hP.isHermitian.eigenvalues i) v).symm
         _ = P *ᵥ (P *ᵥ v) := by rw [hmul1]
         _ = P *ᵥ v := hmul2
         _ = hP.isHermitian.eigenvalues i • v := hmul1

@@ -21,7 +21,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- Selected-support weighted Cauchy--Schwarz for the add-in-`u` Step 3/4
 summands.
@@ -645,7 +645,7 @@ private lemma addInU_selected_cs_chain_step34_variance_factor_le_globalVarianceD
     refine avgOver_congr _ _ _ ?_
     intro uv
     simp only [squaredTerm]
-    rw [weightedPointConditionedOperator_sq]
+    rw [← weightedPointConditionedOperator_sq]
   calc
     avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
       ∑ ah : Outcome × Polynomial params,

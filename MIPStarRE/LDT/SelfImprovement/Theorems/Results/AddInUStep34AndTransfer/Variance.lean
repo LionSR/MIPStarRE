@@ -21,7 +21,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- Self-energy factor `≤ 1` for the `Q₃ → Q₄` factored Cauchy--Schwarz.
 
@@ -279,7 +279,7 @@ lemma add_in_u_cs_chain_q2_q3_variance_factor_le_globalVarianceDeviation_sum
     refine avgOver_congr _ _ _ ?_
     intro uv
     simp only [squaredTerm]
-    rw [weightedPointConditionedOperator_sq]
+    rw [← weightedPointConditionedOperator_sq]
   calc
     avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
       ∑ h : Polynomial params,
@@ -518,6 +518,9 @@ lemma add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds
     (add_in_u_cs_chain_q2_q3_le_sqrt_globalVarianceDeviation_sum params strategy T)
     (add_in_u_cs_chain_q3_q4_le_sqrt_globalVarianceDeviation_sum params strategy T)
 
+set_option maxHeartbeats 800000 in
+-- This bridge applies the global-variance sum transfer and the two
+-- Cauchy--Schwarz factor bounds, all over the polynomial-indexed family.
 /-- Local-variance-sum version of the combined Step 3/4 variance bridge.
 
 This consumes the expected output of the local-variance normalization step
@@ -555,6 +558,9 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
       params strategy eps delta T hlocal)
     h23cs h34cs
 
+set_option maxHeartbeats 800000 in
+-- This wrapper composes the local-to-global sum transfer with the first
+-- projection-simplified Cauchy--Schwarz factor estimate.
 /-- Closed local-variance bridge for the first projection-simplified
 Cauchy--Schwarz replacement step.
 
@@ -577,6 +583,9 @@ lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_localVarianceDeviation_sum_le_from_fact
     (globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
       params strategy eps delta T hlocal)
 
+set_option maxHeartbeats 800000 in
+-- This wrapper composes the local-to-global sum transfer with the second
+-- projection-simplified Cauchy--Schwarz factor estimate.
 /-- Closed local-variance bridge for the second projection-simplified
 Cauchy--Schwarz replacement step.
 

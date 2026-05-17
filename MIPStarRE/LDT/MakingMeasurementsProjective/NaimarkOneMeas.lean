@@ -77,14 +77,11 @@ private lemma partialIsometry_to_unitary
           (Matrix.toEuclideanLin A).comp (Matrix.toEuclideanLin B) := by
     intro A B
     simp [Matrix.toEuclideanLin, Matrix.toLpLin_mul_same (p := (2 : ENNReal)) A B]
-  let E := EuclideanSpace ℂ n
-  letI : NormedAddCommGroup E := by dsimp [E]; infer_instance
-  letI : InnerProductSpace ℂ E := by dsimp [E]; infer_instance
-  letI : FiniteDimensional ℂ E := by dsimp [E]; infer_instance
-  let Pₗ : E →ₗ[ℂ] E := Matrix.toEuclideanLin P
-  let Vₗ : E →ₗ[ℂ] E := Matrix.toEuclideanLin V
-  let S : Submodule ℂ E := LinearMap.range Pₗ
-  have hP_fix : ∀ x : S, Pₗ (x : E) = x := by
+  let Pₗ : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n := Matrix.toEuclideanLin P
+  let Vₗ : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n := Matrix.toEuclideanLin V
+  let S : Submodule ℂ (EuclideanSpace ℂ n) := LinearMap.range Pₗ
+  letI : InnerProductSpace ℂ S := Submodule.innerProductSpace S
+  have hP_fix : ∀ x : S, Pₗ (x : EuclideanSpace ℂ n) = x := by
     intro x
     rcases x.2 with ⟨y, hy⟩
     rw [← hy]
@@ -96,26 +93,35 @@ private lemma partialIsometry_to_unitary
     calc
       Vₗ.comp Pₗ = Matrix.toEuclideanLin (V * P) := by rw [toEuclideanLin_mul]
       _ = Vₗ := by rw [hVP]
-  have hgram : Vₗ.adjoint.comp Vₗ = Pₗ := by
+  have hgram : Matrix.toEuclideanLin (Vᴴ * V) = Pₗ := by
     calc
-      Vₗ.adjoint.comp Vₗ = Matrix.toEuclideanLin (Vᴴ * V) := by
-        rw [Matrix.toEuclideanLin_conjTranspose_mul_self]
-      _ = Pₗ := by rw [hVV]
-  let Llin : S →ₗ[ℂ] E := Vₗ.comp S.subtype
+      Matrix.toEuclideanLin (Vᴴ * V) = Matrix.toEuclideanLin P := by rw [hVV]
+      _ = Pₗ := rfl
+  let Llin : S →ₗ[ℂ] EuclideanSpace ℂ n := Vₗ.comp S.subtype
   have hLnorm : ∀ x : S, ‖Llin x‖ = ‖x‖ := by
-    exact (LinearMap.norm_map_iff_inner_map_map Llin).2 fun x y => by
-      have hy : Vₗ.adjoint (Vₗ (y : E)) = y := by
+    exact (LinearMap.norm_map_iff_inner_map_map
+      (𝕜 := ℂ) (E := S) (E' := EuclideanSpace ℂ n)
+      (F := S →ₗ[ℂ] EuclideanSpace ℂ n) Llin).2 fun x y => by
+      have hy : Matrix.toEuclideanLin (Vᴴ * V) (y : EuclideanSpace ℂ n) = y := by
         calc
-          Vₗ.adjoint (Vₗ (y : E)) = (Vₗ.adjoint.comp Vₗ) (y : E) := rfl
-          _ = Pₗ (y : E) := by rw [hgram]
+          Matrix.toEuclideanLin (Vᴴ * V) (y : EuclideanSpace ℂ n) =
+              Pₗ (y : EuclideanSpace ℂ n) := by rw [hgram]
           _ = y := hP_fix y
       calc
-        inner ℂ (Llin x) (Llin y) = inner ℂ (Vₗ (x : E)) (Vₗ (y : E)) := rfl
-        _ = inner ℂ (x : E) (Vₗ.adjoint (Vₗ (y : E))) := by rw [LinearMap.adjoint_inner_right]
-        _ = inner ℂ (x : E) (y : E) := by rw [hy]
+        inner ℂ (Llin x) (Llin y) =
+            inner ℂ (Vₗ (x : EuclideanSpace ℂ n)) (Vₗ (y : EuclideanSpace ℂ n)) := rfl
+        _ = inner ℂ (x : EuclideanSpace ℂ n)
+            (Matrix.toEuclideanLin (Vᴴ * V) (y : EuclideanSpace ℂ n)) := by
+          dsimp [Vₗ]
+          rw [Matrix.toEuclideanLin_conjTranspose_mul_self]
+          exact (LinearMap.adjoint_inner_right (𝕜 := ℂ)
+            (Matrix.toEuclideanLin V) (x : EuclideanSpace ℂ n)
+            (Matrix.toEuclideanLin V (y : EuclideanSpace ℂ n))).symm
+        _ = inner ℂ (x : EuclideanSpace ℂ n) (y : EuclideanSpace ℂ n) := by rw [hy]
         _ = inner ℂ x y := rfl
-  let L : S →ₗᵢ[ℂ] E := { toLinearMap := Llin, norm_map' := hLnorm }
-  let Ulin : E →ₗᵢ[ℂ] E := L.extend
+  let L : S →ₗᵢ[ℂ] EuclideanSpace ℂ n := { toLinearMap := Llin, norm_map' := hLnorm }
+  let Ulin : EuclideanSpace ℂ n →ₗᵢ[ℂ] EuclideanSpace ℂ n :=
+    LinearIsometry.extend (𝕜 := ℂ) (V := EuclideanSpace ℂ n) (S := S) L
   let Umat : MIPStarRE.Quantum.Op n :=
     Matrix.toEuclideanLin.symm Ulin.toLinearMap
   have hUmat_lin : Matrix.toEuclideanLin Umat = Ulin.toLinearMap := by
@@ -149,7 +155,8 @@ private lemma partialIsometry_to_unitary
           rfl
     _ = Vₗ (Pₗ x) := hExt
     _ = Vₗ x := by
-          have hx := congrArg (fun f : E →ₗ[ℂ] E => f x) hVP_lin
+          have hx := congrArg
+            (fun f : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n => f x) hVP_lin
           simpa [LinearMap.comp_apply] using hx
     _ = Matrix.toEuclideanLin V x := rfl
 

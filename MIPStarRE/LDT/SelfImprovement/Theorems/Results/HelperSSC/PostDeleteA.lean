@@ -20,7 +20,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-! ### Post-`delete-an-A` transports -/
 
@@ -182,7 +182,7 @@ private lemma helperDeleteA_clone_variance_factor_le_globalVarianceDeviation_sum
     refine avgOver_congr _ _ _ ?_
     intro uv
     simp only [squaredTerm]
-    rw [weightedPointConditionedOperator_sq]
+    rw [← weightedPointConditionedOperator_sq]
   calc
     avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
       ∑ hh : Polynomial params × Polynomial params,
@@ -216,6 +216,9 @@ private lemma helperDeleteA_clone_mass_factor_le_one
       (sandwichedPolynomialSubMeasAt params strategy T uv.1) T
   exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
 
+set_option maxHeartbeats 800000 in
+-- This post-delete transport combines the clone variance factor estimate with
+-- the local-to-global variance transfer.
 /-- Paper `eq:swap-u-for-v-attack-of-the-clones`: after `delete-an-A`, the
 remaining point projector may be evaluated at an independent point at cost
 `√ζ_variance`. -/

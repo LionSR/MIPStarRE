@@ -59,7 +59,8 @@ column dimension, the positive spectral rows of `Q` determine a rectangular
 coisometry `Xhat` satisfying the two primitive QXP identities:
 `Xhat Xhat† = I` and `X† Xhat = sqrt Q`. -/
 theorem exists_xHat_of_positive_gram_spectrum
-    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    [NonUnitalContinuousFunctionalCalculus ℝ (Matrix ι ι ℂ) IsSelfAdjoint]
     (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
     (hQ : Q.IsHermitian) (hQ_pos : Q.PosSemidef)
     (hgram : Xᴴ * X = Q)
@@ -67,6 +68,7 @@ theorem exists_xHat_of_positive_gram_spectrum
     ∃ xHat : Matrix μ ι ℂ,
       xHat * xHatᴴ = (1 : Matrix μ μ ℂ) ∧
         Xᴴ * xHat = CFC.sqrt Q := by
+  classical
   obtain ⟨e, U, hU_left, hU_right, hU_rows⟩ :=
     exists_unitary_with_positive_gram_spectrum_rows_of_card X Q hQ hgram
   obtain ⟨W, hW, hW_rows⟩ :=
@@ -114,8 +116,7 @@ theorem exists_xHat_of_sigmaFinRangeEmbedding_positiveGram
   have hcard :
       Fintype.card (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
         (fun a : Outcome => (qLayer.q.outcome a).rank))) ≤ Fintype.card ι := by
-    simpa [sigmaRangeQLayer, FiniteHilbertSpace.sigmaFin, Fintype.card_ulift] using
-      hRank.toSigmaRangeQLayer.auxDim_le
+    exact hRank.toSigmaRangeQLayer.auxDim_le
   simpa [X] using
     exists_xHat_of_positive_gram_spectrum X (QTotal qLayer) hQ hQ_pos hgram hcard
 

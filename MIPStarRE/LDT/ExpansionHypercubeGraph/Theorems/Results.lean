@@ -6,7 +6,7 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- Averaging over two independently sampled hypercube points is the same as
 averaging over the uniform distribution on the product of point types. -/
@@ -162,6 +162,7 @@ private lemma globalWitness_smul (params : Parameters)
           (((c • matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix) *
             matrixCombinedColumnOperator params model)) := by
               simp [matrixTensorOperator, Matrix.smul_kronecker]
+              rfl
     _ = c •
           ((matrixCombinedColumnOperator params model)ᴴ *
             (matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix *
@@ -270,14 +271,14 @@ the left tensor factor.  The squared difference is represented as
   (leftTensor (A u) - leftTensor (A v))`; for self-adjoint `A u`, this is the
 operator-square expression appearing in the paper. -/
 noncomputable def bipartiteLocalVariance (params : Parameters)
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    {ιA ιB : Type} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
   localVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
 /-- The global variance for a bipartite state when the operator family acts on
 the left tensor factor. -/
 noncomputable def bipartiteGlobalVariance (params : Parameters)
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    {ιA ιB : Type} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
   globalVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
@@ -300,7 +301,7 @@ family `A^u ⊗ I`.  The surrounding paper section discusses positive
 contractions, but the spectral estimate itself is valid for every operator
 family. -/
 lemma localToGlobalBipartite (params : Parameters)
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    {ιA ιB : Type} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Point params → MIPStarRE.Quantum.Op ιA)
     (ψ : QuantumState (ιA × ιB)) :
     bipartiteGlobalVariance params A ψ ≤

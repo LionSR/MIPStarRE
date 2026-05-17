@@ -19,8 +19,8 @@ proof-integrity rules.** This repository has a single, consolidated agent guide 
 
 ## Toolchain upgrade notes
 
-- **Current**: Lean v4.28.0 / Mathlib v4.28.0 (from `lean-toolchain`)
-- **Planned**: PR #889 upgrades to v4.29.1 (draft, not yet merged)
+- **Current**: Lean v4.30.0-rc2 / Mathlib v4.30.0-rc2 (from `lean-toolchain`
+  and `lakefile.toml`)
 - After the upgrade: remove any file-scope
   `set_option backward.isDefEq.respectTransparency false` usages and replace
   with local-scope alternatives

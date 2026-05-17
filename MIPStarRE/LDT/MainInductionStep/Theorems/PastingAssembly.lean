@@ -408,6 +408,7 @@ private lemma family_pointConsistencyError_eq_avg
           avg_congr with x, u
           simp [g, IdxPolyFamily.evaluatedAtNextPoint, polynomialEvaluationFamily,
             IdxProjMeas.toIdxSubMeas]
+          rfl
 
 set_option maxHeartbeats 1000000 in
 -- The averaged slice-to-pasting assembly generates several large nonlinear

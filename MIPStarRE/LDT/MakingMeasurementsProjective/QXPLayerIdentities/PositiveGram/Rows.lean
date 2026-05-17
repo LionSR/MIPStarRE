@@ -53,7 +53,13 @@ theorem orthonormal_normalized_image_of_adjoint_comp_eigenvectors
             rw [LinearMap.adjoint_inner_right]
       _ = inner ℂ (v i) ((lam j : ℂ) • v j) := by rw [heig j]
       _ = (lam j : ℂ) * (if i = j then (1 : ℂ) else 0) := by
-            simp [orthonormal_iff_ite.mp hv i j]
+            by_cases hij : i = j
+            · subst i
+              rw [inner_smul_right]
+              simp only [inner_self_eq_norm_sq_to_K, hv.norm_eq_one j, one_pow,
+                map_one, if_true, mul_one]
+            · rw [inner_smul_right]
+              rw [orthonormal_iff_ite.mp hv i j]
   have hscale_mul :
       ((1 / Real.sqrt (lam j) : ℝ) : ℂ) *
           ((lam j : ℂ) * (if i = j then (1 : ℂ) else 0) *
@@ -311,10 +317,12 @@ lemma sqrt_eq_sum_sqrt_eigenvalues_vecMulVec
           Matrix.vecMulVec ((hQ.eigenvectorBasis i).ofLp)
             (star ((hQ.eigenvectorBasis i).ofLp))) := by
         ext r c
-        simp [Matrix.IsHermitian.cfc, Unitary.conjStarAlgAut_apply,
+        simp only [Matrix.IsHermitian.cfc, Unitary.conjStarAlgAut_apply,
           Matrix.mul_apply, Matrix.diagonal_apply, Matrix.sum_apply,
-          Matrix.vecMulVec_apply, Matrix.IsHermitian.eigenvectorUnitary_apply,
-          mul_assoc, mul_comm]
+          Matrix.IsHermitian.eigenvectorUnitary_apply]
+        apply Finset.sum_congr rfl
+        intro i _hi
+        simp [Matrix.smul_apply, Matrix.vecMulVec_apply, mul_assoc, mul_comm]
 
 /-- Rows dual to the positive Gram eigenvectors.
 
@@ -381,8 +389,7 @@ theorem positive_gram_spectrum_image_rows_mixed_eq_sqrt
   ext r c
   have hsqrt_entry := congrFun (congrFun hsqrt r) c
   rw [hmixed]
-  simp only [Complex.coe_smul, Matrix.sum_apply, Matrix.smul_apply,
-    Matrix.vecMulVec_apply, Pi.star_apply, RCLike.star_def, Complex.real_smul,
+  simp only [Complex.coe_smul, Matrix.sum_apply, RCLike.star_def,
     positiveGramSpectrumRightRows, Matrix.mul_apply, Matrix.of_apply] at hsqrt_entry ⊢
   rw [hsqrt_entry]
   let coeff : ι → ℂ := fun i =>

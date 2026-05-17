@@ -31,8 +31,12 @@ lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
     let auxSpace : FiniteHilbertSpace.{uι} := FiniteHilbertSpace.sigmaFin m
     refine ⟨auxSpace, sigmaFinProjMeas m, ?_⟩
     refine ⟨rfl, ?_⟩
-    simpa [auxSpace, FiniteHilbertSpace.sigmaFin, Fintype.card_ulift] using
+    have hcard :
+        Fintype.card (FiniteHilbertSpace.sigmaFinCarrier m) ≤ Fintype.card ι :=
       sigmaFinCard_le_of_sum_le (ι := ι) m hm
+    change Fintype.card (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ≤ Fintype.card ι
+    rw [Fintype.card_ulift]
+    exact hcard
   · let a0 : Outcome := Classical.choice (inferInstance : Nonempty Outcome)
     let auxSpace : FiniteHilbertSpace.{uι} :=
       { carrier := ULift.{uι} Unit

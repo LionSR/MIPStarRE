@@ -167,7 +167,7 @@ lemma truncationInequality (δ x : Error) :
     rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
     nlinarith [sq_nonneg (1 - x), sq_nonneg δ]
   · next h =>
-    push_neg at h
+    push Not at h
     simp only [sub_zero]
     rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
     have hlt : 0 ≤ 1 - δ - x := by linarith
@@ -249,8 +249,15 @@ lemma sum_rank_le_scalar_mul_card_of_projectors_le {Outcome : Type*} [Fintype Ou
     rw [MIPStarRE.Quantum.IsProj.trace_eq_rank (R a) (hproj a)]
     simp
   have hreal_bound' : ∑ a, Complex.re (Matrix.trace (R a)) ≤ c * Fintype.card ι := by
-    simpa [Matrix.trace_sub, Matrix.trace_one, Matrix.trace_sum, Matrix.trace_smul,
-      Complex.ofReal_mul] using hreal_nonneg
+    have hbound : ∑ a, Complex.re (Matrix.trace (R a)) ≤
+        Complex.re (Matrix.trace ((c : ℂ) • (1 : MIPStarRE.Quantum.Op ι))) := by
+      simpa [Matrix.trace_sub, Matrix.trace_sum] using hreal_nonneg
+    have htrace_one :
+        Complex.re (Matrix.trace ((c : ℂ) • (1 : MIPStarRE.Quantum.Op ι))) =
+          c * Fintype.card ι := by
+      rw [Matrix.trace_smul, Matrix.trace_one]
+      simp
+    exact hbound.trans_eq htrace_one
   simpa [htrace_rank] using hreal_bound'
 
 namespace FiniteHilbertSpace
@@ -889,10 +896,16 @@ theorem RankReductionWitness.toSigmaRangeQLayer
   · simpa [sigmaRangeQLayer] using hRank.closeness
   · simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
   · simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
-  · simpa [sigmaRangeQLayer, FiniteHilbertSpace.sigmaFin, Fintype.card_ulift] using
+  · have hcard :
+        Fintype.card (FiniteHilbertSpace.sigmaFinCarrier
+          (fun a : Outcome => (qLayer.q.outcome a).rank)) ≤ Fintype.card ι :=
       sigmaFinCard_le_of_sum_le
         (ι := ι) (m := fun a : Outcome => (qLayer.q.outcome a).rank)
         hRank.totalRank_le
+    change Fintype.card (ULift (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ≤ Fintype.card ι
+    rw [Fintype.card_ulift]
+    exact hcard
 
 
 end

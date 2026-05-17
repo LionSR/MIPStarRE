@@ -88,7 +88,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-! NOTE: This file has not yet been fully split.  The
 `BoundednessTransport/Agreement.lean` extraction exists, but the point-consistency
@@ -502,6 +502,9 @@ theorem helper_point_consistency_error_eq_off_diagonal_avg
   rw [htotal, hmatch]
   rw [max_eq_right hdiff_nonneg, hdiff_eq]
 
+set_option maxHeartbeats 800000 in
+-- This point-consistency conversion expands the off-diagonal add-in-u transfer
+-- and the helper error normalization.
 /-- Helper-stage point consistency from the point-consistency `add-in-u`
 transfer hypothesis.
 
@@ -534,6 +537,9 @@ theorem helper_point_consistency_of_pointConsistencyAddInU_transfer
     pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer
       params strategy eps delta heps hdelta T Hhat htransfer
 
+set_option maxHeartbeats 800000 in
+-- This wrapper composes the selected point-consistency add-in-u chain with the
+-- point-consistency conversion above.
 /-- Helper-stage point consistency obtained directly from the selected
 add-in-`u` chain.
 
@@ -1302,6 +1308,9 @@ theorem helper_boundedness_gap_le_selfImprovementHelperError
     _ ≤ selfImprovementHelperError params eps delta :=
       helper_boundedness_error_le_selfImprovementHelperError params eps delta heps hdelta
 
+set_option maxHeartbeats 800000 in
+-- This bound combines the off-diagonal add-in-u transfer with the boundedness
+-- gap decomposition.
 /-- Helper-stage boundedness from the scalar comparison and the
 point-consistency `add-in-u` transfer.
 
@@ -1354,6 +1363,9 @@ theorem helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistency
     helper_boundedness_gap_le_selfImprovementHelperError
       params strategy eps delta heps hdelta hZ_vs_H hoffdiag
 
+set_option maxHeartbeats 800000 in
+-- This comparison transports the helper-completeness scalar through the
+-- left/right tensor swap on the permutation-invariant state.
 /-- Convert the helper-completeness `Hhat`-versus-`Z` comparison to the
 right-placed total comparison used in the boundedness gap.
 

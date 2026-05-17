@@ -169,6 +169,7 @@ private lemma avgOver_slice_total_left_sandwich_eq
         (((uniformDistribution (Fq params)).weight y : Error) : ℂ) •
           (A * (family.meas y).total * A) := by
     simp [mul_assoc]
+    rfl
   rw [hmatrix]
   rw [← leftTensor_smul (ι₂ := ι)
     (((uniformDistribution (Fq params)).weight y : Error) : ℂ)

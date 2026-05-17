@@ -228,7 +228,8 @@ class FieldModel (q : ℕ) where
   instDecidableEq : DecidableEq K
   equiv : K ≃ Fin q
 
-attribute [instance] FieldModel.instField FieldModel.instFintype FieldModel.instDecidableEq
+attribute [instance_reducible, instance] FieldModel.instField FieldModel.instFintype
+  FieldModel.instDecidableEq
 
 namespace FieldModel
 
@@ -262,7 +263,7 @@ theorem card_cast_ne_zero (q : ℕ) [FieldModel q] :
 end FieldModel
 
 /-- Build the honest field model from prime-power data. -/
-noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
+@[reducible] noncomputable def PrimePowerFieldSpec.toFieldModel (params : Parameters)
     (spec : PrimePowerFieldSpec params) : FieldModel params.q := by
   classical
   letI : Fact spec.p.Prime := ⟨spec.pPrime⟩
@@ -463,12 +464,12 @@ def decodePoint {params : Parameters} [FieldModel params.q] (u : Point params) :
   fun i => decodeScalar (u i)
 
 /-- Evaluate a multivariate polynomial over the chosen field model on a coded point. -/
-def evalPolynomialModel (params : Parameters) [FieldModel params.q]
+noncomputable def evalPolynomialModel (params : Parameters) [FieldModel params.q]
     (p : PolynomialModel params) (u : Point params) : Fq params :=
   encodeScalar (MvPolynomial.eval (decodePoint u) p)
 
 /-- Evaluate a univariate polynomial over the chosen field model on a coded point. -/
-def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
+noncomputable def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
     (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
   encodeScalar (_root_.Polynomial.eval (decodeScalar t) p)
 

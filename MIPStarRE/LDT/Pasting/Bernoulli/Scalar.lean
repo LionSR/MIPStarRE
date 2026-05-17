@@ -50,6 +50,7 @@ private lemma bernoulli_centered_mgf_le {p t : Error}
     (1 - p) * Real.exp (t * p) + p * Real.exp (t * (p - 1)) ≤
       Real.exp (t ^ (2 : ℕ) / 8) := by
   let pNN : NNReal := ⟨p, hp0⟩
+  have hpNN_coe : (pNN : Error) = p := rfl
   have hpNN : pNN ≤ 1 := by
     exact hp1
   let μ : Measure Bool := (PMF.bernoulli pNN hpNN).toMeasure
@@ -65,14 +66,15 @@ private lemma bernoulli_centered_mgf_le {p t : Error}
         ((‖(1 : Error) - 0‖₊ / 2) ^ (2 : ℕ)) μ := by
     refine hsubG.neg.congr ?_
     filter_upwards with b
-    simp [μ, pNN, PMF.bernoulli_expectation]
+    simp [μ, PMF.bernoulli_expectation, hpNN_coe]
   have hmgf := hcentered.mgf_le t
   have hmgf' :
       p * Real.exp (t * (p - 1)) +
           Real.exp (p * t) * ((1 - pNN : NNReal) : Error) ≤
         Real.exp (t ^ (2 : ℕ) * (2 ^ (2 : ℕ))⁻¹ / 2) := by
     simpa [μ, ProbabilityTheory.mgf, PMF.integral_eq_sum, PMF.bernoulli_apply,
-      smul_eq_mul, pNN, mul_comm, add_comm, add_left_comm, add_assoc] using hmgf
+      smul_eq_mul, hpNN_coe, mul_comm, add_comm, add_left_comm, add_assoc]
+      using hmgf
   have hcoeff : ((1 - pNN : NNReal) : Error) = 1 - p := by
     simpa [pNN] using (NNReal.coe_sub hpNN)
   have hexp :
@@ -126,7 +128,11 @@ private lemma binomial_centered_mgf_eq
               simpa [pNN] using
                 (ENNReal.toReal_sub_of_le hpENN (by simp) :
                   (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error))
-            simp [hcoeff, pNN, mul_left_comm, mul_comm]
+            have hcoeff' : (1 - (pNN : ENNReal)).toReal = 1 - p := hcoeff
+            rw [hcoeff']
+            change p ^ r * (1 - p) ^ (k - r) * (Nat.choose k r : Error) =
+              (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))
+            ring
           calc
             (pmf (Fin.ofNat (k + 1) r)).toReal * Real.exp (t * (p * k - r))
               = ((Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))) *
@@ -237,7 +243,10 @@ private lemma binomial_lowerTail_eq
       simpa [pNN] using
         (ENNReal.toReal_sub_of_le hpENN (by simp) :
           (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error))
-    simp [hcoeff, pNN, f, mul_left_comm, mul_comm]
+    have hcoeff' : (1 - (pNN : ENNReal)).toReal = 1 - p := hcoeff
+    rw [hcoeff']
+    change p ^ r * (1 - p) ^ (k - r) * (Nat.choose k r : Error) = f r
+    ring
   calc
     pmf.toMeasure.real {i : Fin (k + 1) | (i : Error) ≤ degree}
       = ∑ i : Fin (k + 1), if (i : Error) ≤ degree then (pmf i).toReal else 0 := by

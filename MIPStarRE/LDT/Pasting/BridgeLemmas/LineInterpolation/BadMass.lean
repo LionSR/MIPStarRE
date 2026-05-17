@@ -378,6 +378,7 @@ lemma ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum
         else 0 := by
   simp [ldSandwichLineOnePointRightMeasurement, ldSandwichLineOnePointRightFamily,
     postprocess, i.2, Finset.sum_filter]
+  rfl
 
 lemma grouped_coordinate_mismatch_le_left_falseOutcome
     (params : Parameters) [FieldModel params.q]
@@ -503,7 +504,24 @@ lemma hBConsistencyCoordMass_le_linePointDefect
                   ev strategy.state
                     (opTensor (leftFalse (f (xs i))) (
                       (verticalLineMeasurementFamily params strategy u).outcome f)) := by
-                simp
+                let term : Fq params → Error := fun a =>
+                  if f (xs i) = a then
+                    ev strategy.state
+                      (opTensor (leftFalse a) (
+                        (verticalLineMeasurementFamily params strategy u).outcome f))
+                  else 0
+                have hsingle :
+                    (∑ a ∈ (Finset.univ : Finset (Fq params)), term a) =
+                      term (f (xs i)) := by
+                  refine Finset.sum_eq_single (f (xs i)) ?_ ?_
+                  · intro b _hb hb
+                    have hneq : ¬f (xs i) = b := by
+                      intro h
+                      exact hb h.symm
+                    simp [term, hneq]
+                  · intro hmem
+                    exact False.elim (hmem (Finset.mem_univ _))
+                simpa [term] using hsingle
               exact hsingle.symm
       _ = ∑ a : Fq params,
             ∑ f : AxisLinePolynomial params.next,

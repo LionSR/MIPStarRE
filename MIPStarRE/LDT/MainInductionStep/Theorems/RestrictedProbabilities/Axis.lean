@@ -55,7 +55,8 @@ private lemma restrictAxisParallelMeasurement_postprocess_zero
     funext a
     cases a
     rfl
-  simp [hreadout]
+  rw [hreadout]
+  rfl
 
 private lemma restrictedAxisSampleError_eq
     (params : Parameters)

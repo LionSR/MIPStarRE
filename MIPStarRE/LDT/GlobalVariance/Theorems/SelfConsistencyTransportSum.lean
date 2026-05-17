@@ -8,7 +8,7 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-! ## Sum-form (cardinality-free) `2ε` axis-parallel consistency endpoints
 
@@ -109,6 +109,10 @@ private lemma liftRight_pointAnswerMeasurement_outcome_at_g
     pointConditionedOutcomeOperatorAtPolynomial,
     SubMeas.toMeasurement_toSubMeas, mkRightPlacedSubMeas_outcome]
 
+set_option maxHeartbeats 800000 in
+-- The unnormalized polynomial-sum statement expands the `qSDD` and
+-- `cabApproxDelta` operator families during elaboration; after the Lean 4.30
+-- update this exceeds the default heartbeat budget before the proof begins.
 /-- Sum-level base-sample form of the `2ε` axis-parallel consistency move,
 oriented with the line event on the left register and the point event on the
 right register.
@@ -264,7 +268,14 @@ lemma axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum
           symm at ht
           subst u
           dsimp [F]
-          rw [weightedGeneralizeBLeftOperatorAtPolynomial_rebaseAt_pointAt]
+          have hrebase :
+              weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g
+                  (ℓ, ℓ.pointAt t) =
+                weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g
+                  (AxisParallelLine.rebaseAt ℓ t, ℓ.pointAt t) :=
+            weightedGeneralizeBLeftOperatorAtPolynomial_rebaseAt_pointAt
+              params strategy G g ℓ t
+          rw [hrebase]
           simp [AxisParallelLine.rebaseAt]
     _ = ∑ g : Polynomial params,
           avgOver (uniformDistribution (AxisParallelTestSample params)) (F g) := by

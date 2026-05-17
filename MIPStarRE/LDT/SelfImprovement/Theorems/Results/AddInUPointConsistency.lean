@@ -38,7 +38,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- The off-diagonal selection used in the helper-stage `A`-consistency
 application of `lem:add-in-u`.
@@ -214,6 +214,9 @@ theorem pointConsistencyAddInU_transfer_of_selected_chain_bounds
       (η34 := η34)
       h01 h12 h23 h34 hsum
 
+set_option maxHeartbeats 800000 in
+-- This point-consistency specialization combines the selected add-in-u scalar
+-- chain with the global-variance sum estimate.
 /-- Point-consistency add-in-u transfer with the two self-consistency moves and
 the two selected global-variance moves supplied by the proved Cauchy--Schwarz
 bounds.

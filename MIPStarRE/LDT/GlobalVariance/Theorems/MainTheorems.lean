@@ -8,7 +8,7 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-! # Main variance theorem wrappers and matrix-level counterparts
 
@@ -139,6 +139,9 @@ lemma localVarianceOfPoints
 
 /-! ## Strategy-state reductions -/
 
+set_option maxHeartbeats 800000 in
+-- The statement contains the full strategy-state edge comparison package; Lean
+-- 4.30 needs a larger local budget to elaborate the record fields.
 /-- Strict reduction for `lem:local-variance-of-points` on the strategy state.
 
 Compared with the legacy wrapper `localVarianceOfPoints`, this theorem no longer
@@ -192,6 +195,9 @@ lemma localVarianceOfPointsFromEdgeDeviation
               exact pointConditionedLocalVarianceAtPolynomial_le_of_deviation
                 params strategy G (hedge g)) }
 
+set_option maxHeartbeats 800000 in
+-- This wrapper builds the global-variance record from the local record and the
+-- expansion transfer, expanding several indexed operator families.
 /-- Reduction for `lem:global-variance-of-points` on the strategy state.
 
 This theorem proves the independent-points norm bound from the local edge norm
@@ -257,6 +263,9 @@ lemma globalVarianceOfPointsFromLocalDeviation
             (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
             (globalVarianceOfPointsError params eps delta) hglobalVariance }
 
+set_option maxHeartbeats 800000 in
+-- The sum-level transfer expands both the global and local deviation families
+-- over all polynomials.
 /-- Sum-level local-to-global transfer for the polynomial-indexed squared-norm
 form of `lem:global-variance-of-points`.
 
@@ -288,6 +297,9 @@ lemma globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum
           localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
           rw [Finset.mul_sum]
 
+set_option maxHeartbeats 800000 in
+-- The polynomial-sum wrapper combines the previous transfer with the public
+-- error normalization, and its expanded statement is large after elaboration.
 /-- A polynomial-sum local-variance bound implies the corresponding sum-form
 global-variance bound with the paper's `24m(ε + δ + md/q)` error term.
 
@@ -322,6 +334,9 @@ lemma globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
           simp only [globalVarianceOfPointsError, localVarianceOfPointsError]
           ring
 
+set_option maxHeartbeats 800000 in
+-- This theorem applies the post-triangle transport-chain residual to the
+-- strategy-state local-variance record.
 /-- Strategy-state reduction for `lem:local-variance-of-points` from the
 post-triangle six-step transport-chain bound.
 
@@ -348,6 +363,9 @@ lemma localVarianceOfPointsFromTransportChainBound
     (localVarianceTransportChainError_le_localVarianceOfPointsError
       params strategy hgood)
 
+set_option maxHeartbeats 800000 in
+-- This theorem composes the transport-chain residual with the global-variance
+-- reduction and therefore elaborates both record packages.
 /-- Strategy-state global-variance reduction from the post-triangle six-step
 local-variance transport-chain bound. -/
 lemma globalVarianceOfPointsFromTransportChainBound
@@ -368,6 +386,9 @@ lemma globalVarianceOfPointsFromTransportChainBound
     (localVarianceTransportChainError_le_localVarianceOfPointsError
       params strategy hgood)
 
+set_option maxHeartbeats 800000 in
+-- The supplied-bounds wrapper constructs the arbitrary-state global-variance
+-- record and expands the independent-point comparison families.
 /-- Auxiliary lemma for `lem:global-variance-of-points` with arbitrary
 bipartite state and the independent-points norm bound supplied explicitly.
 
@@ -435,6 +456,9 @@ lemma globalVarianceOfPoints_ofSuppliedBounds
             (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
             (globalVarianceOfPointsError params eps delta) hglobal }
 
+set_option maxHeartbeats 800000 in
+-- The paper-facing wrapper invokes the transport-chain theorem and the
+-- strategy-state global-variance record constructor.
 /-- Paper origin: `references/ldt-paper/expansion.tex:325-353`
 (`\label{lem:global-variance-of-points}`).
 

@@ -33,7 +33,7 @@ lemma axisLinePolynomial_ne_gives_support_eval_ne
     ∃ i : Fin k, i ∈ σ ∧ f (xs i) ≠ g (xs i) := by
   classical
   by_contra hcontra
-  push_neg at hcontra
+  push Not at hcontra
   let s : Finset (Scalar params.next) := σ.image (fun i => decodeScalar (xs i))
   have hs_card : s.card = params.d + 1 := by
     rw [Finset.card_image_of_injective]
@@ -78,8 +78,10 @@ lemma exists_onePoint_family_witness_of_eval_mismatch
   | none =>
       simp [Option.isSome, hgi] at hiSome
   | some g =>
-      simp [hgi] at hiSome
-      simpa [hgi] using hiNe
+      have hiNe' : g u ≠ f (xs i) := by
+        simpa [hgi] using hiNe
+      intro h
+      exact hiNe' (Option.some.inj h)
 
 lemma nonglobal_gives_slice_mismatch_against_interpolant
     (params : Parameters) [FieldModel params.q]
@@ -94,7 +96,7 @@ lemma nonglobal_gives_slice_mismatch_against_interpolant
   classical
   let hStar := interpolateCompletedSlices params k xs gs
   by_contra hcontra
-  push_neg at hcontra
+  push Not at hcontra
   apply hNGlobal
   refine ⟨hStar, ?_⟩
   intro i hiSome
@@ -216,7 +218,24 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
         MvPolynomial.C (decodeScalar (xs i)) := by
     simp [Polynomial.restrictAtHeightCoordinateMap, lastCoord]
   unfold interpolateCompletedSlicesFromSupport
-  rw [map_sum, Finset.sum_eq_single ⟨i, hi⟩]
+  simp only
+  trans ∑ idx ∈ σ.attach,
+      MvPolynomial.eval₂Hom MvPolynomial.C
+        (Polynomial.restrictAtHeightCoordinateMap params (xs i))
+        (_root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ (fun i : Fin k => decodeScalar (xs i)) idx.1) *
+          (MvPolynomial.rename (embedCoord params))
+            (extractSlicePoly gs idx.1 (hσsubset idx.2)).poly)
+  · convert map_sum
+      (g := MvPolynomial.eval₂Hom MvPolynomial.C
+        (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
+      (s := σ.attach)
+      (f := fun idx : {j // j ∈ σ} =>
+        _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+            (Lagrange.basis σ (fun i : Fin k => decodeScalar (xs i)) idx.1) *
+          (MvPolynomial.rename (embedCoord params))
+            (extractSlicePoly gs idx.1 (hσsubset idx.2)).poly) using 1
+  rw [Finset.sum_eq_single ⟨i, hi⟩]
   · simp_rw [map_mul]
     have hslice :
         MvPolynomial.eval₂Hom MvPolynomial.C

@@ -90,7 +90,7 @@ lemma commuteGHalfSandwich_postMoveFlatError_sum
       rw [Fin.sum_univ_succ]
       simp [commuteGHalfSandwich_postMoveFlatError,
         commuteGHalfSandwich_postMoveFlatError_sum params gamma zeta r,
-        gHatSelfConsistencyError, Nat.mod_eq_of_lt hone_lt]
+        gHatSelfConsistencyError]
       ring
 
 def commuteGHalfSandwich_flatChainLength (r : ℕ) : ℕ :=
