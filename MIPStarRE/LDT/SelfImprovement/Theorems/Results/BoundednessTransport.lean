@@ -1785,8 +1785,10 @@ theorem final_fields_bounded
       upperBound := ?_ }
   · have : leftTensor (ι₂ := ι) Z = opTensor Z (1 : MIPStarRE.Quantum.Op ι) := rfl
     rw [this]
-    have hPSD : 0 ≤ Z := le_trans (op_one_nonneg (d := ι)) hOne
-    exact opTensor_nonneg hPSD op_one_nonneg
+    have hPSD : 0 ≤ Z :=
+      le_trans (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι)) hOne
+    exact opTensor_nonneg hPSD
+      (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
   · have hAle : A.total ≤ Z :=
       le_trans A.total_le_one hOne
     have hLTle :
@@ -1794,7 +1796,8 @@ theorem final_fields_bounded
       have hopMono :
           opTensor A.total (1 : MIPStarRE.Quantum.Op ι) ≤
             opTensor Z (1 : MIPStarRE.Quantum.Op ι) :=
-        opTensor_mono_left hAle op_one_nonneg
+        opTensor_mono_left hAle
+          (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
       simpa [leftTensor, opTensor] using hopMono
     have hsubmass :
         subMeasMass ψ A.liftLeft = ev ψ (leftTensor (ι₂ := ι) A.total) := rfl

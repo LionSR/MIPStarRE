@@ -71,7 +71,8 @@ theorem matrixSdpStrictDualWitness_nonneg {params : Parameters} [FieldModel para
     0 ≤ matrixSdpStrictDualWitness model := by
   unfold matrixSdpStrictDualWitness
   exact smul_nonneg (by norm_num)
-    (op_one_nonneg (d := model.space.carrier))
+    (Matrix.PosSemidef.one.nonneg :
+      0 ≤ (1 : MIPStarRE.Quantum.Op model.space.carrier))
 
 /-- The matrix-level strict-feasible dual witness dominates the identity. -/
 theorem one_le_matrixSdpStrictDualWitness {params : Parameters} [FieldModel params.q]
