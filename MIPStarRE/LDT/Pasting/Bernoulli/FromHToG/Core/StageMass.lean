@@ -183,7 +183,6 @@ lemma fromHToG_averagedSandwichByType_total_eq_type_sum
   congr 1
   simp [restrictSubMeas, postprocess, fromHToG_outcomesByType_iff_type_eq]
 
-set_option linter.flexible false in
 -- This declaration expands a finite operator average into the corresponding
 -- scalar trace average; the displayed statement is less readable after writing
 -- the fully expanded finite-sum target as an intermediate `suffices`.
@@ -217,7 +216,6 @@ lemma fromHToG_avgOver_tail_type_ev
             (gHatHalfProductOutcomeOperator params family n xs i)ᴴ) *
         rightTensor (ι₁ := ι) B)).symm
 
-set_option linter.flexible false in
 -- This declaration is the right-register analogue of the preceding finite-sum
 -- expansion; spelling out the simplified scalar target obscures the average
 -- identity being proved.
