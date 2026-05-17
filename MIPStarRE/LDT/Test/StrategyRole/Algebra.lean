@@ -251,7 +251,6 @@ private lemma opTensor_roleCond_BB {ι : Type*} [Fintype ι] [DecidableEq ι]
 -- gives the analogous statement.  These are trace identities, not operator
 -- identities: arbitrary off-diagonal role blocks of `Y` need not vanish, but
 -- they do not contribute to the paper's expectation calculation.
-set_option linter.flexible false in
 private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_A {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (D : MIPStarRE.Quantum.Op (ι × ι))
@@ -269,7 +268,6 @@ private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_A {ι : Type*}
   simp_rw [sum_role_eq_add]
   simp
 
-set_option linter.flexible false in
 private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_A {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (D : MIPStarRE.Quantum.Op (ι × ι))
@@ -284,7 +282,6 @@ private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_A {ι : Type*}
   simp_rw [sum_role_eq_add]
   simp
 
-set_option linter.flexible false in
 private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_B {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (D : MIPStarRE.Quantum.Op (ι × ι))
@@ -302,7 +299,6 @@ private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_B {ι : Type*}
   simp_rw [sum_role_eq_add]
   simp
 
-set_option linter.flexible false in
 private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_B {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (D : MIPStarRE.Quantum.Op (ι × ι))
@@ -394,7 +390,6 @@ lemma ev_classicalRoleSymmState_rolePair_BB {ι : Type*}
 
 -- The `Role.A` block of the left tensor only sees the `Role.B` principal block
 -- of the right tensor against the classically role-symmetrized state.
-set_option linter.flexible false in
 private lemma ev_classicalRoleSymmState_opTensor_roleCond_A_ignore {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι))
@@ -425,7 +420,6 @@ lemma ev_classicalRoleSymmState_opTensor_roleCond_A {ι : Type*}
 
 -- The `Role.B` block of the left tensor only sees the `Role.A` principal block
 -- of the right tensor against the classically role-symmetrized state.
-set_option linter.flexible false in
 private lemma ev_classicalRoleSymmState_opTensor_roleCond_B_ignore {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι))

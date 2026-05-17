@@ -1,8 +1,6 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 
 set_option linter.style.setOption false
-set_option linter.flexible false
-
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT

@@ -104,7 +104,6 @@ lemma matrixTensorOperator_mono_left {H K : FiniteHilbertSpace}
     matrixTensorOperator A₁ B ≤ matrixTensorOperator A₂ B := by
   simpa [matrixTensorOperator] using MIPStarRE.Quantum.kronecker_mono_left hA hB
 
-set_option linter.flexible false in
 /-- Adjoint sandwiching is monotone in the middle factor. -/
 lemma conjTranspose_mul_mul_mono {H K : FiniteHilbertSpace}
     (M : RectangularMatrixOperator H K) {A B : MatrixOperator K} (hAB : A ≤ B) :
