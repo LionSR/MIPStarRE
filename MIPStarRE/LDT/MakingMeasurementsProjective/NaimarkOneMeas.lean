@@ -283,7 +283,9 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     let P : MIPStarRE.Quantum.Op (d × Option α) :=
       Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)
     have hPproj : MIPStarRE.Quantum.IsProj P := by
-      exact isProj_kronecker op_one_isProj (optionBasisProj_isProj oa)
+      exact isProj_kronecker
+        (MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _))
+        (optionBasisProj_isProj oa)
     simpa [Umat, P] using isProj_unitary_conj U hPproj
   · /-
     Since the auxiliary rank-one projectors sum to the identity on `Option α`,

@@ -257,7 +257,9 @@ lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d] :
     MIPStarRE.Quantum.IsProj
       (oneMeasNaimarkInputProj (α := α) (d := d)) :=
-  isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)
+  isProj_kronecker
+    (MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _))
+    (optionBasisProj_isProj (α := α) none)
 
 /-- **Isometry property of the Naimark column**: `V†V = P`.
 
@@ -346,7 +348,9 @@ lemma oneMeasNaimarkCompression
     oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a)
   have hP_proj : MIPStarRE.Quantum.IsProj P := by
     dsimp [P, oneMeasNaimarkOutcomeProj]
-    exact isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) (some a))
+    exact isProj_kronecker
+      (MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _))
+      (optionBasisProj_isProj (α := α) (some a))
   have hsqrt : (CFC.sqrt (M.effect a))ᴴ = CFC.sqrt (M.effect a) := by
     simpa using (CFC.sqrt_nonneg (M.effect a)).isHermitian.eq
   have hsingle :
