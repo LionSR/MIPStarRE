@@ -49,7 +49,7 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_point_consistency_error_eq_off_diagonal_avg** — identifies the
   averaged off-diagonal mass with the helper-stage `ConsRel` defect for the
   point measurement against `polynomialEvaluationFamily`.
-- **helper_point_consistency_of_pointConsistencyAddInU_transfer** — packages
+- **helper_point_consistency_of_pointConsistencyAddInU_transfer** — records
   the point-consistency `add-in-u` transfer as a `ConsRel` at
   `selfImprovementHelperError`.
 - **final_fields_point_consistency_totalGap_natural** — transports the
@@ -65,7 +65,7 @@ data-processing transport of the boundedness gap, and the standalone
 - **final_fields_projective_residual_bound_natural** — combines the dual-slack
   comparator with the data-processing transport to bound the projective
   residual at `selfImprovementHelperError + √selfImprovementDataProcessingError`.
-- **final_fields_projective_residual_bound** — literal-threshold wrapper
+- **final_fields_projective_residual_bound** — literal-threshold theorem
   absorbing the natural error into `selfImprovementError`.
 - **final_fields_projective_residual_bound_of_helper_outputs**
   — final projective-residual construction from helper outputs, data processing,
@@ -86,9 +86,10 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
+open MIPStarRE.Quantum
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-! NOTE: This file has not yet been fully split.  The
 `BoundednessTransport/Agreement.lean` extraction exists, but the point-consistency
@@ -502,6 +503,9 @@ theorem helper_point_consistency_error_eq_off_diagonal_avg
   rw [htotal, hmatch]
   rw [max_eq_right hdiff_nonneg, hdiff_eq]
 
+set_option maxHeartbeats 800000 in
+-- This point-consistency conversion expands the off-diagonal add-in-u transfer
+-- and the helper error normalization.
 /-- Helper-stage point consistency from the point-consistency `add-in-u`
 transfer hypothesis.
 
@@ -534,6 +538,9 @@ theorem helper_point_consistency_of_pointConsistencyAddInU_transfer
     pointConsistencyAddInU_off_diagonal_avg_le_helper_error_of_transfer
       params strategy eps delta heps hdelta T Hhat htransfer
 
+set_option maxHeartbeats 800000 in
+-- This lemma composes the selected point-consistency add-in-u chain with the
+-- point-consistency conversion above.
 /-- Helper-stage point consistency obtained directly from the selected
 add-in-`u` chain.
 
@@ -895,7 +902,7 @@ theorem final_fields_point_consistency_totalGap_natural_of_data_processing
 /-- Literal-threshold point-consistency transport from the helper output to the
 projective output.
 
-This wrapper isolates the numerical absorption needed to turn the natural
+This theorem isolates the numerical absorption needed to turn the natural
 error
 `selfImprovementHelperError + sqrt selfImprovementDataProcessingError + η`
 into the final `selfImprovementError` threshold.  The analytic content is
@@ -1302,10 +1309,13 @@ theorem helper_boundedness_gap_le_selfImprovementHelperError
     _ ≤ selfImprovementHelperError params eps delta :=
       helper_boundedness_error_le_selfImprovementHelperError params eps delta heps hdelta
 
+set_option maxHeartbeats 800000 in
+-- This bound combines the off-diagonal add-in-u transfer with the boundedness
+-- gap decomposition.
 /-- Helper-stage boundedness from the scalar comparison and the
 point-consistency `add-in-u` transfer.
 
-This wrapper composes the off-diagonal estimate supplied by
+This theorem composes the off-diagonal estimate supplied by
 `pointConsistencyAddInUSelection` with
 `helper_boundedness_gap_le_selfImprovementHelperError`.  It is the theorem-side
 form of the sentence "combined with the explicit `A`-consistency bound" in the
@@ -1354,6 +1364,9 @@ theorem helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistency
     helper_boundedness_gap_le_selfImprovementHelperError
       params strategy eps delta heps hdelta hZ_vs_H hoffdiag
 
+set_option maxHeartbeats 800000 in
+-- This comparison transports the helper-completeness scalar through the
+-- left/right tensor swap on the permutation-invariant state.
 /-- Convert the helper-completeness `Hhat`-versus-`Z` comparison to the
 right-placed total comparison used in the boundedness gap.
 
@@ -1629,7 +1642,7 @@ theorem final_fields_projective_residual_bound_natural
 
 /-- Literal-threshold projective-residual construction.
 
-This wraps `final_fields_projective_residual_bound_natural` with a separately
+This theorem combines `final_fields_projective_residual_bound_natural` with a separately
 named numerical absorption lemma. The analytic inputs are only the helper-stage
 boundedness estimate, dual feasibility from `SelfImprovementHelperConclusion`,
 and the data-processing SDD output already produced inside `selfImprovement`. -/
@@ -1664,7 +1677,7 @@ theorem final_fields_projective_residual_bound
 /-- Literal-threshold projective-residual construction under the standard
 unit-interval smallness hypotheses.
 
-This is the convenience wrapper around
+This is the convenience theorem following from
 `final_fields_projective_residual_bound`: the numerical absorption input is
 provided by
 `final_fields_projective_residual_error_le_selfImprovementError`, so callers
@@ -1772,8 +1785,10 @@ theorem final_fields_bounded
       upperBound := ?_ }
   · have : leftTensor (ι₂ := ι) Z = opTensor Z (1 : MIPStarRE.Quantum.Op ι) := rfl
     rw [this]
-    have hPSD : 0 ≤ Z := le_trans (op_one_nonneg (d := ι)) hOne
-    exact opTensor_nonneg hPSD op_one_nonneg
+    have hPSD : 0 ≤ Z :=
+      le_trans (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι)) hOne
+    exact opTensor_nonneg hPSD
+      (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
   · have hAle : A.total ≤ Z :=
       le_trans A.total_le_one hOne
     have hLTle :
@@ -1781,7 +1796,8 @@ theorem final_fields_bounded
       have hopMono :
           opTensor A.total (1 : MIPStarRE.Quantum.Op ι) ≤
             opTensor Z (1 : MIPStarRE.Quantum.Op ι) :=
-        opTensor_mono_left hAle op_one_nonneg
+        opTensor_mono_left hAle
+          (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
       simpa [leftTensor, opTensor] using hopMono
     have hsubmass :
         subMeasMass ψ A.liftLeft = ev ψ (leftTensor (ι₂ := ι) A.total) := rfl

@@ -331,14 +331,20 @@ private lemma one_sub_spectralTruncationError_smul_le_sqrt
   have hspec_le : ∀ x, x ∈ spectrum NNReal Q → x ≤ b := by
     have hle : Q ≤ (algebraMap NNReal (MIPStarRE.Quantum.Op ι)) b := by
       rw [nnreal_algebraMap_matrix b]
-      simpa [b, ε] using hQ_le
+      have hb_real : (b : Error) = 1 + 2 * ε := by
+        exact NNReal.coe_mk (1 + 2 * ε) (by positivity)
+      change Q ≤ (((b : Error) : ℂ) • (1 : MIPStarRE.Quantum.Op ι))
+      rw [hb_real]
+      simpa [ε] using hQ_le
     rw [← cfc_id' NNReal Q (ha := hQ_nonneg),
       ← cfc_const (R := NNReal) b Q (ha := hQ_nonneg),
       cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg hQ_nonneg)
         (ha := hQ_nonneg)] at hle
     exact hle
   have hc_cast : (c : ℂ) = (((1 : Error) - ε) : ℂ) := by
-    simp [c]
+    have hc_real : (c : Error) = 1 - ε := by
+      exact NNReal.coe_mk (1 - ε) (by linarith)
+    simpa using congrArg (fun r : Error => (r : ℂ)) hc_real
   rw [← hc_cast]
   rw [nnreal_smul_matrix_eq_complex Q c]
   rw [CFC.sqrt_eq_cfc]

@@ -106,6 +106,9 @@ private lemma qSDDCore_option_pair_decompose
   rw [show (∑ u : Unit, ev ψ ((Lnn u - Rnn u)ᴴ * (Lnn u - Rnn u))) =
         ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())) from Fintype.sum_unique _]
 
+set_option maxHeartbeats 800000 in
+-- The quadrant decomposition expands nested `Option × Option` sums whose
+-- normalization exceeds the default local resource limit after the Lean 4.30 update.
 /-- Internal form of `cor:G-hat-facts` after applying
 `lem:g-complete-self-consistency`, `cor:g-bot-self-consistency`,
 `cor:commuting-with-G-complete`, and `cor:commuting-with-G-incomplete`.
@@ -405,21 +408,7 @@ theorem gHatFacts_ofSelfConsistencyAndCommutation
             completeQuadrant (x, y) +
               incompleteQuadrant (x, y) +
               swappedQuadrant (x, y) +
-              totalQuadrant (x, y) := by
-                have hcompleteQuadrant :
-                    qSDDCore ψbi completeLeft completeRight = completeQuadrant (x, y) := by
-                  rfl
-                have hincompleteQuadrant :
-                    qSDDCore ψbi incompleteLeft incompleteRight =
-                      incompleteQuadrant (x, y) := by
-                  rfl
-                have hswappedQuadrant :
-                    qSDDCore ψbi swappedLeft swappedRight = swappedQuadrant (x, y) := by
-                  rfl
-                have htotalQuadrant :
-                    qSDDCore ψbi totalLeft totalRight = totalQuadrant (x, y) := by
-                  rfl
-                rw [hcompleteQuadrant, hincompleteQuadrant, hswappedQuadrant, htotalQuadrant]
+              totalQuadrant (x, y) := rfl
     rcases hcommComplete.pairwiseCompletePartCommutation with ⟨hcomplete_bound⟩
     rcases hcommIncomplete.pointWithIncompletePartCommutation with ⟨hincomplete_point_bound⟩
     rcases hcommIncomplete.incompletePartCommutation with ⟨hincomplete_total_bound⟩
@@ -531,7 +520,8 @@ theorem gHatFacts
   have hcommComplete : CommutingWithGCompleteStatement params strategy.state family gamma zeta :=
     commutingWithGComplete params strategy family eps delta gamma zeta
       hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself hbound
-  have hcommIncomplete : CommutingWithGIncompleteStatement params strategy.state family gamma zeta :=
+  have hcommIncomplete :
+      CommutingWithGIncompleteStatement params strategy.state family gamma zeta :=
     commutingWithGIncomplete params strategy family eps delta gamma zeta
       hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hgood hcons hself hbound
   exact gHatFacts_ofSelfConsistencyAndCommutation params strategy.state family gamma zeta

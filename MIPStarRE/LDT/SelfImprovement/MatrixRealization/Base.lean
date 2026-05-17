@@ -18,6 +18,7 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
+open MIPStarRE.Quantum
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- A concrete finite-dimensional matrix realization of the SDP data. -/
@@ -70,22 +71,18 @@ theorem matrixSdpStrictDualWitness_nonneg {params : Parameters} [FieldModel para
     0 ≤ matrixSdpStrictDualWitness model := by
   unfold matrixSdpStrictDualWitness
   exact smul_nonneg (by norm_num)
-    (op_one_nonneg (d := model.space.carrier))
+    (Matrix.PosSemidef.one.nonneg :
+      0 ≤ (1 : MIPStarRE.Quantum.Op model.space.carrier))
 
 /-- The matrix-level strict-feasible dual witness dominates the identity. -/
 theorem one_le_matrixSdpStrictDualWitness {params : Parameters} [FieldModel params.q]
     (model : MatrixSdpRealization params) :
     (1 : MatrixOperator model.space) ≤ matrixSdpStrictDualWitness model := by
-  calc
-    (1 : MatrixOperator model.space) =
-        (1 : Error) • (1 : MatrixOperator model.space) := by simp
-    _ ≤ (2 : Error) • (1 : MatrixOperator model.space) :=
-        smul_le_smul_of_nonneg_right
-          (show (1 : Error) ≤ 2 by norm_num)
-          (op_one_nonneg (d := model.space.carrier))
+  simpa [matrixSdpStrictDualWitness, sdpStrictDualWitness] using
+    (one_le_sdpStrictDualWitness (ι := model.space.carrier))
 
 /-- The concrete operator `A^u_{g(u)}` entering the SDP average. -/
-def matrixAveragedPointOperatorContribution (params : Parameters)
+noncomputable def matrixAveragedPointOperatorContribution (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=

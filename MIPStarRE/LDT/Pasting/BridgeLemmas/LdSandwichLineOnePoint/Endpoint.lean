@@ -37,6 +37,7 @@ lemma ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas
       postprocess (verticalLineMeasurementFamily params strategy ux.1) (fun f => f ux.2) := by
   simp [ldSandwichLineOnePointRightEndpointMeasurement, verticalLineMeasurementFamily,
     postprocessMeasurement]
+  rfl
 
 lemma ldSandwichLineOnePoint_endpoint_ldGbcon
     (params : Parameters)
@@ -100,10 +101,14 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon
         (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
         (fun _ a => some a)
         hprod
-    simpa [pointNextEquiv, evaluateFiberFamilyAtNextPoint, postprocess_postprocess] using hproc
-  simpa [ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas, postprocess_postprocess]
-    using hprod'
+    simpa [pointNextEquiv, evaluateFiberFamilyAtNextPoint, postprocess_postprocess,
+      Function.comp] using hproc
+  convert hprod' using 2
 
+set_option linter.flexible false in
+-- The proof compares the one-question equivalence with the endpoint
+-- formulation; the broad simplification is confined to unfolding the two
+-- equivalent presentations of the same postprocessed submeasurement.
 lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
     (params : Parameters)
     [FieldModel params.q]
@@ -131,10 +136,16 @@ lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
         some)
     (ldSandwichLineOnePointRightFamily params strategy family 1 0)
     (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))).2 <| by
-      simpa [sandwichedLineQuestionOneEquiv, pointTupleOneEquiv,
-        ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas,
-        ldSandwichLineOnePointRightFamily, postprocess_postprocess] using hux
+      convert hux using 2
+      · simp [sandwichedLineQuestionOneEquiv, pointTupleOneEquiv,
+          ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas,
+          ldSandwichLineOnePointRightFamily]
+        exact (postprocess_postprocess _ _ _).symm
 
+set_option linter.flexible false in
+-- The proof lifts the endpoint consistency relation through the split
+-- sandwiched-line equivalence; the simplification only unfolds this equivalence
+-- and the endpoint-family definition.
 lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
     (params : Parameters)
     [FieldModel params.q]
@@ -188,10 +199,13 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
     (Preliminaries.consRel_uniform_equiv e strategy.state endpointLeft endpointRight
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))).2
       (by
-        simpa [e, endpointLeft, endpointRight, iFin,
-          sandwichedLineQuestionSplitAtEquiv,
-          ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas,
-          ldSandwichLineOnePointRightFamily, postprocess_postprocess, hi] using hprod)
+        convert hprod using 2
+        · simp [e, endpointLeft, iFin,
+            sandwichedLineQuestionSplitAtEquiv]
+        · simp [e, endpointRight, iFin, sandwichedLineQuestionSplitAtEquiv,
+            ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas,
+            ldSandwichLineOnePointRightFamily, hi]
+          exact (postprocess_postprocess _ _ _).symm)
   simpa [endpointLeft, endpointRight, iFin] using hlift
 
 lemma gHatIdxMeas_outcome_some_eq_evaluateAt

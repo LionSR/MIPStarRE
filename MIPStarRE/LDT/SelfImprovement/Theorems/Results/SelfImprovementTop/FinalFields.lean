@@ -18,15 +18,18 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
+set_option maxHeartbeats 800000 in
+-- This final-fields route assembles completeness, point consistency,
+-- self-closeness, and boundedness from the helper-output constructors.
 /-- Final-fields construction using the monotone-total point-consistency route.
 
 This theorem assembles the four fields of `SelfImprovementFinalFields` from the
 already isolated helper-output constructions.  The point-consistency field is
 obtained from
 `final_fields_point_consistency_of_total_expectation_le_of_small_errors`, rather
-than from the total-gap data-processing wrapper; consequently the proof uses the
+than from the total-gap data-processing estimate; consequently the proof uses the
 paper's `ζ̂ + √ζ̂_dataprocess` point-consistency error and does not introduce
 the Cauchy--Schwarz alphabet-size term
 `√(#F_q · ζ̂_dataprocess)`.
@@ -118,6 +121,9 @@ theorem final_fields_of_helper_outputs_of_total_expectation_le
         params strategy eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q
         hhelper hpointSSC hslack htransfer hdata
 
+set_option maxHeartbeats 800000 in
+-- This alternative final-fields route uses the total-difference point-consistency
+-- constructor and therefore assembles the same four output fields.
 /-- Final-fields construction using an explicit right-total-difference bound.
 
 This is the submeasurement-total fallback for the point-consistency field.  When

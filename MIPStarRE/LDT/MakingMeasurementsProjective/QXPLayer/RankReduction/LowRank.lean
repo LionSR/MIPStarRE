@@ -31,8 +31,12 @@ lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
     let auxSpace : FiniteHilbertSpace.{uι} := FiniteHilbertSpace.sigmaFin m
     refine ⟨auxSpace, sigmaFinProjMeas m, ?_⟩
     refine ⟨rfl, ?_⟩
-    simpa [auxSpace, FiniteHilbertSpace.sigmaFin, Fintype.card_ulift] using
+    have hcard :
+        Fintype.card (FiniteHilbertSpace.sigmaFinCarrier m) ≤ Fintype.card ι :=
       sigmaFinCard_le_of_sum_le (ι := ι) m hm
+    change Fintype.card (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ≤ Fintype.card ι
+    rw [Fintype.card_ulift]
+    exact hcard
   · let a0 : Outcome := Classical.choice (inferInstance : Nonempty Outcome)
     let auxSpace : FiniteHilbertSpace.{uι} :=
       { carrier := ULift.{uι} Unit
@@ -95,8 +99,7 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
     exact hR.projective a
   · intro a
     have hproj := hR.projective a
-    simpa [hproj.isHermitian.eq, hproj.idempotent] using
-      (Matrix.posSemidef_conjTranspose_mul_self (R.outcome a)).nonneg
+    simpa using hproj.isStarProjection.nonneg
   · simpa [Qa, QTotal, data] using hR.sum_eq_total
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)
@@ -144,8 +147,7 @@ lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
     exact hR.projective a
   · intro a
     have hproj := hR.projective a
-    simpa [hproj.isHermitian.eq, hproj.idempotent] using
-      (Matrix.posSemidef_conjTranspose_mul_self (R.outcome a)).nonneg
+    simpa using hproj.isStarProjection.nonneg
   · simpa [Qa, QTotal, data] using hR.sum_eq_total
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)
@@ -432,8 +434,7 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
     · intro a
       have hproj : MIPStarRE.Quantum.IsProj (Q.outcome a) := by
         simpa [Q] using (onb a).subprojector_isProj (fiber a)
-      simpa [Qa, data, hproj.isHermitian.eq, hproj.idempotent] using
-        (Matrix.posSemidef_conjTranspose_mul_self (Q.outcome a)).nonneg
+      simpa [Qa, data] using hproj.isStarProjection.nonneg
     · simp [Qa, QTotal, data, Q]
     · simpa [data] using hAQ
     · simpa [QTotal, data] using hQtotal_le

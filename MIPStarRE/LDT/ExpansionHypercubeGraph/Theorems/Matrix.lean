@@ -94,6 +94,7 @@ private lemma orthogonalModeProjector_re_sum (params : Parameters)
           intro v hv
           simp [orthogonalModeProjectorMatrix, constantModeProjectorMatrix, Matrix.one_apply,
             sub_mul]
+          rfl
     _ = ∑ u, ∑ v, Complex.re (((if u = v then (1 : ℂ) else 0) * z u v)) -
           ∑ u, ∑ v, Complex.re (((hypercubeVertexCount params : ℂ)⁻¹ * z u v)) := by
           simp_rw [Finset.sum_sub_distrib]
@@ -457,7 +458,7 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
         + (if a = v ∧ v = b then (1 : ℂ) else 0)) := by
     by_cases hau : a = u <;> by_cases hav : a = v <;>
       by_cases hub : u = b <;> by_cases hvb : v = b <;>
-      simp [hau, hav, hub, hvb]; ring
+      simp_all
   -- Step 2: each of the four indicator-weighted sums has a closed form.
   have hSum1 :
       ∑ uv : Point params × Point params,
@@ -487,11 +488,9 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
           (rerandomizeCoordWeight params u v : ℂ) *
               (if a = u ∧ u = b then (1 : ℂ) else 0) = 0 := by
         intro u v
-        by_cases hau : a = u
-        · subst hau
-          have : ¬ a = b := hab
-          simp [this]
-        · simp [hau]
+        by_cases h : a = u ∧ u = b
+        · exact (hab (h.1.trans h.2)).elim
+        · simp [h]
       simp_rw [hzero, Finset.sum_const_zero]
       simp [hab]
   have hSum2 :
@@ -511,7 +510,16 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
         simp [Finset.sum_ite_eq', Finset.mem_univ]
       · simp [hau]
     simp_rw [step]
-    simp only [Finset.sum_ite_eq, Finset.mem_univ, if_true]
+    have hsingle :
+        (∑ x : Point params,
+          if a = x then (rerandomizeCoordWeight params x b : ℂ) else 0) =
+        (if a = a then (rerandomizeCoordWeight params a b : ℂ) else 0) := by
+      apply Finset.sum_eq_single a
+      · intro x _ hxa
+        simp [show ¬ a = x by exact fun h => hxa h.symm]
+      · intro ha
+        exact (ha (Finset.mem_univ a)).elim
+    simpa using hsingle
   have hSum3 :
       ∑ uv : Point params × Point params,
         (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
@@ -526,7 +534,21 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
       intro u
       by_cases hub : u = b
       · subst hub
-        simp [Finset.sum_ite_eq, Finset.mem_univ]
+        have hsingle :
+            (∑ x : Point params,
+              if a = x then (rerandomizeCoordWeight params u x : ℂ) else 0) =
+            (rerandomizeCoordWeight params u a : ℂ) := by
+          simpa using
+            (Finset.sum_eq_single (s := (Finset.univ : Finset (Point params))) (a := a)
+              (f := fun x : Point params =>
+                if a = x then (rerandomizeCoordWeight params u x : ℂ) else 0)
+              (by
+                intro x _ hxa
+                simp [show ¬ a = x by exact fun h => hxa h.symm])
+              (by
+                intro ha
+                exact (ha (Finset.mem_univ a)).elim))
+        simpa using hsingle
       · have hzero : ∀ v : Point params,
             (rerandomizeCoordWeight params u v : ℂ) *
                 (if a = v ∧ u = b then (1 : ℂ) else 0) = 0 := by
@@ -536,7 +558,12 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
         simp_rw [hzero, Finset.sum_const_zero]
         simp [hub]
     simp_rw [step]
-    simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
+    have hsingle :
+        (∑ x : Point params,
+          if x = b then (rerandomizeCoordWeight params x a : ℂ) else 0) =
+        (rerandomizeCoordWeight params b a : ℂ) := by
+      simp
+    rw [hsingle]
     have hsymm := rerandomizeCoordWeight_symm params b a
     exact_mod_cast hsymm
   have hSum4 :
@@ -571,11 +598,9 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
           (rerandomizeCoordWeight params u v : ℂ) *
               (if a = v ∧ v = b then (1 : ℂ) else 0) = 0 := by
         intro u v
-        by_cases hav : a = v
-        · subst hav
-          have : ¬ a = b := hab
-          simp [this]
-        · simp [hav]
+        by_cases h : a = v ∧ v = b
+        · exact (hab (h.1.trans h.2)).elim
+        · simp [h]
       simp_rw [hzero, Finset.sum_const_zero]
       simp [hab]
   -- Step 3: assemble.  LHS first.
@@ -619,10 +644,26 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
       ring
     rw [rewrite_step, Finset.sum_add_distrib, Finset.sum_sub_distrib,
       Finset.sum_sub_distrib, hSum1, hSum2, hSum3, hSum4]
-  rw [hsum_decomp]
-  by_cases hab : a = b
-  · simp [hab]; ring
-  · simp [hab]; ring
+  calc
+    (if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)
+        - (rerandomizeCoordWeight params a b : ℂ) =
+        (1 / 2 : ℂ) *
+          ((if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)
+            - (rerandomizeCoordWeight params a b : ℂ)
+            - (rerandomizeCoordWeight params a b : ℂ)
+            + (if a = b then ((hypercubeVertexCount params : Error)⁻¹ : ℂ) else 0)) := by
+      by_cases hab : a = b
+      · simp [hab]; ring_nf
+      · simp [hab]; ring_nf
+    _ =
+        (1 / 2 : ℂ) *
+          (∑ uv : Point params × Point params,
+            (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
+              (((if a = uv.1 then (1 : ℂ) else 0)
+                  - (if a = uv.2 then (1 : ℂ) else 0)) *
+                ((if uv.1 = b then (1 : ℂ) else 0)
+                  - (if uv.2 = b then (1 : ℂ) else 0)))) := by
+      exact (congrArg (fun x : ℂ => (1 / 2 : ℂ) * x) hsum_decomp).symm
 
 /-- Closed form for the matrix local-variance trace expression. -/
 lemma matrixLocalVarianceTraceForm_eq_closedForm (params : Parameters)
@@ -716,6 +757,7 @@ lemma matrixLocalVarianceTraceForm_eq_closedForm (params : Parameters)
               refine Finset.sum_congr rfl ?_
               intro v hv
               simp [matrixLaplacianOperator, Matrix.one_apply, sub_mul]
+              rfl
     _ = ∑ u, ∑ v,
           Complex.re
             (((if u = v then ((hypercubeVertexCount params : ℂ)⁻¹) else 0) *

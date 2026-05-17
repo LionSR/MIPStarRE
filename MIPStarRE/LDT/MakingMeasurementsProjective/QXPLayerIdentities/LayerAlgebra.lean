@@ -56,18 +56,6 @@ lemma qaRestated {Outcome : Type*}
         _ = (Xa data a)ᴴ * data.x := by
           simp [Xa, Matrix.conjTranspose_mul, hTa]
 
-/-- **`X` squared** (`lem:X-squared`).
-
-Identifies the right Gram matrix of `X` with the total operator `Q`.  This is
-the only part of the paper's SVD bookkeeping used by the downstream
-`P`-vs-`Q` algebra. -/
-lemma xSquared {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xᴴ * data.x = QTotal data.qLayer := by
-  exact data.x_gram_right
-
 /-- If the original `X` rows are already coisometric and the mixed product
 `X† XHat` agrees with the Gram operator `X† X`, then the polar replacement
 `XHat` is equal to `X`.
@@ -355,30 +343,6 @@ lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
     data.qLayer.q.outcome none ≤ Pa data none :=
   le_of_eq (qa_eq_pa_of_xHatA_eq_xa data none hrow)
 
-/-- **`XHat` squared** (`lem:X-hat-squared`).
-
-The unitary-part matrix `XHat` has `XHat XHat† = I` on the auxiliary space. -/
-lemma xHatSquared {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xHat * data.xHatᴴ =
-      (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
-  simpa using data.xHat_coisometry
-
-/-- **`X` times `XHat`** (`lem:X-times-X-hat`).
-
-Relates the surviving mixed product `X† XHat` to `sqrt Q`.  The complementary
-`X XHat†` formula from the paper is not stored as an SVD field; the later
-proofs derive the properties they need algebraically from this identity and the
-coisometry of `XHat`. -/
-lemma xTimesXHat {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xᴴ * data.xHat = CFC.sqrt (QTotal data.qLayer) := by
-  exact data.xHat_mixed
-
 private lemma xHat_mixed_adjoint {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -588,19 +552,11 @@ lemma pProjectivity {Outcome : Type*}
     have hX_herm : Xᴴ = X := by
       dsimp [X]
       simp [Matrix.conjTranspose_mul]
-    have h_one_sub_X_sq : (1 - X) * (1 - X) = 1 - X := by
-      calc
-        (1 - X) * (1 - X) = 1 - X - X + X * X := by
-          noncomm_ring
-        _ = 1 - X := by
-          rw [hX_sq]
-          noncomm_ring
-    have h_one_sub_X_herm : (1 - X)ᴴ = 1 - X := by
-      simp [hX_herm]
+    have hX_proj : MIPStarRE.Quantum.IsProj X :=
+      { isHermitian := hX_herm
+        idempotent := hX_sq }
     have h_one_sub_X_nonneg : 0 ≤ 1 - X := by
-      apply Matrix.nonneg_iff_posSemidef.mpr
-      have hpsd := Matrix.posSemidef_conjTranspose_mul_self (1 - X)
-      simpa [h_one_sub_X_herm, h_one_sub_X_sq] using hpsd
+      exact hX_proj.isStarProjection.one_sub_nonneg
     have hsum :
         (∑ a, Pa data a) = X := by
       simpa [X] using sum_pa_eq_xHat_adjoint_mul_xHat data

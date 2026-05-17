@@ -29,11 +29,11 @@ theorem degreeOf_rename_embedCoord_lastCoord (params : Parameters) [FieldModel p
 namespace Polynomial
 
 /-- Evaluation of the stored multivariate polynomial on a coded point. -/
-def toFun {params : Parameters} [FieldModel params.q] (g : Polynomial params) :
+noncomputable def toFun {params : Parameters} [FieldModel params.q] (g : Polynomial params) :
     Point params → Fq params :=
   evalPolynomialModel params g.poly
 
-instance {params : Parameters} [FieldModel params.q] :
+noncomputable instance {params : Parameters} [FieldModel params.q] :
     CoeFun (Polynomial params) (fun _ => Point params → Fq params) :=
   ⟨Polynomial.toFun⟩
 
@@ -160,10 +160,7 @@ private theorem degreeOf_restrictAtHeightCoordinateMap_le
       have hX : (MvPolynomial.X i : PolynomialModel params) = 0 := Subsingleton.elim _ _
       simp [restrictAtHeightCoordinateMap, embedCoord, hX]
     · letI := hnontriv
-      simpa [restrictAtHeightCoordinateMap, embedCoord] using
-        (show MvPolynomial.degreeOf i (MvPolynomial.X i : PolynomialModel params) ≤ 1 by
-          rw [MvPolynomial.degreeOf_X]
-          simp)
+      simp [restrictAtHeightCoordinateMap, embedCoord]
   · by_cases hj : j.1 < params.m
     · have hne : (⟨j.1, hj⟩ : Fin params.m) ≠ i := by
         intro h
@@ -188,16 +185,23 @@ noncomputable def restrictAtHeight (params : Parameters) [FieldModel params.q]
   lowIndividualDegree := by
     intro i
     classical
-    rw [g.poly.as_sum, map_sum]
+    let p : MvPolynomial (Fin params.next.m) (Scalar params) := g.poly
+    change MvPolynomial.degreeOf i
+      (MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x) p) ≤ params.d
+    rw [p.as_sum]
+    rw [map_sum
+      (g := MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x))
+      (s := p.support)
+      (f := fun n => (MvPolynomial.monomial n) (MvPolynomial.coeff n p))]
     calc
       MvPolynomial.degreeOf i
-          (∑ n ∈ g.poly.support,
+          (∑ n ∈ p.support,
             MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x)
-              (MvPolynomial.monomial n (g.poly.coeff n))) ≤
-          g.poly.support.sup fun n =>
+              (MvPolynomial.monomial n (p.coeff n))) ≤
+          p.support.sup fun n =>
             MvPolynomial.degreeOf i
               (MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x)
-                (MvPolynomial.monomial n (g.poly.coeff n))) :=
+                (MvPolynomial.monomial n (p.coeff n))) :=
         MvPolynomial.degreeOf_sum_le i _ _
       _ ≤ params.d := by
         apply Finset.sup_le
@@ -205,9 +209,9 @@ noncomputable def restrictAtHeight (params : Parameters) [FieldModel params.q]
         rw [MvPolynomial.eval₂Hom_monomial]
         calc
           MvPolynomial.degreeOf i
-              ((MvPolynomial.C (g.poly.coeff n) : PolynomialModel params) *
+              ((MvPolynomial.C (p.coeff n) : PolynomialModel params) *
                 ∏ j ∈ n.support, restrictAtHeightCoordinateMap params x j ^ n j) ≤
-              MvPolynomial.degreeOf i (MvPolynomial.C (g.poly.coeff n)) +
+              MvPolynomial.degreeOf i (MvPolynomial.C (p.coeff n)) +
                 MvPolynomial.degreeOf i
                   (∏ j ∈ n.support, restrictAtHeightCoordinateMap params x j ^ n j) :=
             MvPolynomial.degreeOf_mul_le i _ _

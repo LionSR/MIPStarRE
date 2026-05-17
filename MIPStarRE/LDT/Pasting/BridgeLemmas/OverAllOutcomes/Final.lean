@@ -96,10 +96,9 @@ private lemma lineConsistentIndicator_probability_le_mdq
           have hgf : ((gs i).get hiSome) u = f (xs i) := by
             by_contra hne
             exact hnotNe hne
-          calc
-            ((gs i).get hiSome) u = f (xs i) := hgf
-            _ = tupleInterpolatedVerticalLine params u xs gs (xs i) := by rw [← hLine]
-            _ = hStarSlice u := htupleEval
+          exact hgf.trans
+            ((congrArg (fun line : AxisLinePolynomial params.next => line (xs i))
+              hLine.symm).trans htupleEval)
         rw [if_pos hCons, if_pos hsliceEq]
       · rw [if_neg hCons]
         by_cases hEq : ((gs i).get hiSome) u = hStarSlice u <;> simp [hEq]

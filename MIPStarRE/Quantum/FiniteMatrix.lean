@@ -92,12 +92,18 @@ theorem kronecker_sub_left
 
 variable {d : Type*} [Fintype d]
 
+noncomputable local instance : DecidableEq d := Classical.decEq d
+
+local instance : NonnegSpectrumClass ℝ (Op d) :=
+  Matrix.instNonnegSpectrumClass (𝕜 := ℂ) (n := d)
+
+noncomputable local instance : NonUnitalContinuousFunctionalCalculus ℝ (Op d) IsSelfAdjoint :=
+  ContinuousFunctionalCalculus.toNonUnital (R := ℝ) (A := Op d) (p := IsSelfAdjoint)
+
 /-- Sandwiching a PSD operator by a Hermitian operator preserves positivity. -/
 theorem sandwich_nonneg {M P : Op d} (hP : 0 ≤ P) (hMH : Mᴴ = M) :
     0 ≤ M * P * M := by
-  simpa [hMH] using
-    (Matrix.PosSemidef.mul_mul_conjTranspose_same
-      (Matrix.nonneg_iff_posSemidef.mp hP) M).nonneg
+  simpa [Matrix.star_eq_conjTranspose, hMH] using star_right_conjugate_nonneg hP M
 
 /-- Sandwiching is monotone in the middle factor for a fixed Hermitian outer operator. -/
 theorem sandwich_mono {M P Q : Op d} (hMH : Mᴴ = M) (hPQ : P ≤ Q) :
@@ -114,14 +120,14 @@ duality arguments: if \(A,B\geq 0\), then
 \(\operatorname{Re}\operatorname{Tr}(AB)\geq 0\). -/
 theorem trace_mul_nonneg_of_nonneg {A B : Op d} (hA : 0 ≤ A) (hB : 0 ≤ B) :
     0 ≤ Complex.re (Matrix.trace (A * B)) := by
-  letI : DecidableEq d := Classical.decEq d
   obtain ⟨Y, hY⟩ := CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hB
   subst B
   rw [Matrix.star_eq_conjTranspose]
   have htrace_nonneg :
       (0 : ℂ) ≤ Matrix.trace (Y * A * Yᴴ) :=
-    (Matrix.PosSemidef.mul_mul_conjTranspose_same
-      (Matrix.nonneg_iff_posSemidef.mp hA) Y).trace_nonneg
+    (Matrix.nonneg_iff_posSemidef.mp (by
+      simpa [Matrix.star_eq_conjTranspose] using
+        star_right_conjugate_nonneg hA Y)).trace_nonneg
   have hre : 0 ≤ Complex.re (Matrix.trace (Y * A * Yᴴ)) :=
     (Complex.nonneg_iff.mp htrace_nonneg).1
   have htrace :
@@ -340,6 +346,21 @@ structure IsProj (P : Op d) : Prop where
   isHermitian : P.IsHermitian
   /-- The projection is idempotent. -/
   idempotent : P * P = P
+
+/-- A projective operator in the local matrix sense is a Mathlib star projection. -/
+lemma IsProj.isStarProjection {P : Op d} (hP : IsProj P) : IsStarProjection P where
+  isIdempotentElem := hP.idempotent
+  isSelfAdjoint := hP.isHermitian.isSelfAdjoint
+
+/-- A Mathlib star projection is a projective operator in the local matrix sense. -/
+lemma IsProj.of_isStarProjection {P : Op d} (hP : IsStarProjection P) : IsProj P where
+  isHermitian := hP.isSelfAdjoint.isHermitian
+  idempotent := hP.isIdempotentElem
+
+/-- Orthogonal projections are positive semidefinite operators. -/
+lemma IsProj.nonneg (P : Op d) (hP : IsProj P) :
+    0 ≤ P := by
+  exact hP.isStarProjection.nonneg
 
 /-! ### Spectral truncation -/
 

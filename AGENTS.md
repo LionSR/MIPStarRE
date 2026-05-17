@@ -143,8 +143,8 @@ For blueprint changes:
 
 ## Toolchain
 
-- **Lean**: v4.28.0 (from `lean-toolchain`)
-- **Mathlib**: v4.28.0 (from `lakefile.toml`)
+- **Lean**: v4.30.0-rc2 (from `lean-toolchain`)
+- **Mathlib**: v4.30.0-rc2 (from `lakefile.toml`)
 
 Important `lakefile.toml` options:
 

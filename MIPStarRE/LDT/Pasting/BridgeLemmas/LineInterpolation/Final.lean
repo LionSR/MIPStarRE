@@ -28,7 +28,7 @@ lemma not_interpolationEligible_exists_none
     (hNot : ¬ InterpolationEligible params gs) :
     ∃ i : Fin k, (gs i).isSome = false := by
   by_contra hnone
-  push_neg at hnone
+  push Not at hnone
   apply hNot
   unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
   have hfull : (Finset.univ.filter fun i : Fin k => (gs i).isSome).card = k := by

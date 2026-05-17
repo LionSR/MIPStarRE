@@ -97,6 +97,7 @@ lemma fromHToG_interpolationEligible_iff_type_weight
       params.d + 1 ≤ gHatTypeWeight (gHatTupleType gs) := by
   simp [InterpolationEligible, gHatTupleHammingWeight, gHatTupleSupport,
     gHatTypeWeight, gHatTupleType]
+  rfl
 
 /-- Split the eligible sandwich total into a sum over exact Boolean outcome types. -/
 lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
@@ -182,6 +183,10 @@ lemma fromHToG_averagedSandwichByType_total_eq_type_sum
   congr 1
   simp [restrictSubMeas, postprocess, fromHToG_outcomesByType_iff_type_eq]
 
+set_option linter.flexible false in
+-- This declaration expands a finite operator average into the corresponding
+-- scalar trace average; the displayed statement is less readable after writing
+-- the fully expanded finite-sum target as an intermediate `suffices`.
 /-- Fold the tail point/outcome average of a fixed type into
 `averagedSandwichByTypeSubMeas`. -/
 lemma fromHToG_avgOver_tail_type_ev
@@ -199,10 +204,23 @@ lemma fromHToG_avgOver_tail_type_ev
           rightTensor (ι₁ := ι) B) := by
   classical
   rw [fromHToG_averagedSandwichByType_total_eq_type_sum params family n τ]
-  simp [avgOver, gHatSandwichFamily, ev_finset_sum, ev_real_smul,
+  simp [avgOver, gHatSandwichFamily, ev_finset_sum,
     ← leftTensor_finset_sum, leftTensor_mul_rightTensor_real_smul_left,
     Finset.sum_mul]
+  apply Finset.sum_congr rfl
+  intro xs _hxs
+  rw [← ev_finset_sum]
+  exact (ev_scale ψbi ((uniformDistribution (PointTuple params n)).weight xs)
+    (∑ i with gHatTupleType i = τ,
+      leftTensor (ι₂ := ι)
+          (gHatHalfProductOutcomeOperator params family n xs i *
+            (gHatHalfProductOutcomeOperator params family n xs i)ᴴ) *
+        rightTensor (ι₁ := ι) B)).symm
 
+set_option linter.flexible false in
+-- This declaration is the right-register analogue of the preceding finite-sum
+-- expansion; spelling out the simplified scalar target obscures the average
+-- identity being proved.
 /-- Fold a head-point scalar average into an operator average on the right tensor
 factor, with a fixed left factor and fixed left multiplier `S` on the right
 register. -/
@@ -217,8 +235,12 @@ lemma fromHToG_avgOver_head_ev
           (S * averageOperatorOverDistribution (uniformDistribution (Fq params)) F)) := by
   classical
   unfold avgOver averageOperatorOverDistribution
-  simp [ev_finset_sum, ev_real_smul, ← rightTensor_finset_sum,
+  simp [ev_finset_sum, ← rightTensor_finset_sum,
     leftTensor_mul_rightTensor_real_smul_right, Matrix.mul_sum]
+  apply Finset.sum_congr rfl
+  intro x _hx
+  exact (ev_scale ψbi ((uniformDistribution (Fq params)).weight x)
+    (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) (S * F x))).symm
 
 /-- Fold the complete/incomplete head branch average into the stored exact branch
 averages. -/

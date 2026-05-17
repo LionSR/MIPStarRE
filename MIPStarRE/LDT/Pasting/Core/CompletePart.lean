@@ -33,7 +33,7 @@ lemma looksEasyButTookMeAWhile
     · subst hone
       simpa using hz
   · -- Interior case: `lambda ≠ 0` and `lambda ≠ 1`, hence `0 < lambda < 1`.
-    push_neg at hl_boundary
+    push Not at hl_boundary
     have hlpos : 0 < lambda := lt_of_le_of_ne h0 (Ne.symm hl_boundary.1)
     let e : Error := 1 / ((d + 1 : ℕ) : Error)
     have hd1_ne : (((d + 1 : ℕ) : Error)) ≠ 0 := by positivity

@@ -282,9 +282,9 @@ theorem add_in_u_cs_chain_q2_q3_factored_cs
     have hX_herm : (Av - Au)ᴴ = Av - Au := by
       rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
     have hXMhX_pos : 0 ≤ (Av - Au) * Mh * (Av - Au) := by
-      have :=
-        ((Matrix.nonneg_iff_posSemidef.mp hMh_pos).conjTranspose_mul_mul_same
-          (Av - Au)).nonneg
+      have this : 0 ≤ (Av - Au)ᴴ * Mh * (Av - Au) := by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_left_conjugate_nonneg hMh_pos (Av - Au)
       rwa [hX_herm] at this
     exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hXMhX_pos hTh_pos)
   · -- `0 ≤ y uv h`: the self-energy expectation is nonnegative.
@@ -297,8 +297,9 @@ theorem add_in_u_cs_chain_q2_q3_factored_cs
     have hAv_herm : Avᴴ = Av :=
       SubMeas.outcome_hermitian (strategy.pointMeasurement uv.2).toSubMeas (h uv.2)
     have hAvMhAv_pos : 0 ≤ Av * Mh * Av := by
-      have :=
-        ((Matrix.nonneg_iff_posSemidef.mp hMh_pos).conjTranspose_mul_mul_same Av).nonneg
+      have this : 0 ≤ Avᴴ * Mh * Av := by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_left_conjugate_nonneg hMh_pos Av
       rwa [hAv_herm] at this
     exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hAvMhAv_pos hTh_pos)
 
@@ -387,8 +388,9 @@ theorem add_in_u_cs_chain_q3_q4_factored_cs
     have hAu_herm : Auᴴ = Au :=
       SubMeas.outcome_hermitian (strategy.pointMeasurement uv.1).toSubMeas (h uv.1)
     have hAuMhAu_pos : 0 ≤ Au * Mh * Au := by
-      have :=
-        ((Matrix.nonneg_iff_posSemidef.mp hMh_pos).conjTranspose_mul_mul_same Au).nonneg
+      have this : 0 ≤ Auᴴ * Mh * Au := by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_left_conjugate_nonneg hMh_pos Au
       rwa [hAu_herm] at this
     exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hAuMhAu_pos hTh_pos)
   · -- `0 ≤ y uv h`: the variance-style diagonal expectation is nonneg.
@@ -406,9 +408,9 @@ theorem add_in_u_cs_chain_q3_q4_factored_cs
     have hY_herm : (Av - Au)ᴴ = Av - Au := by
       rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]
     have hYMhY_pos : 0 ≤ (Av - Au) * Mh * (Av - Au) := by
-      have :=
-        ((Matrix.nonneg_iff_posSemidef.mp hMh_pos).conjTranspose_mul_mul_same
-          (Av - Au)).nonneg
+      have this : 0 ≤ (Av - Au)ᴴ * Mh * (Av - Au) := by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_left_conjugate_nonneg hMh_pos (Av - Au)
       rwa [hY_herm] at this
     exact ev_nonneg_of_psd strategy.state _ (opTensor_nonneg hYMhY_pos hTh_pos)
 

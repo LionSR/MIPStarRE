@@ -38,7 +38,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- View a matrix submeasurement as the paper-local `SubMeas` structure. -/
 noncomputable def matrixSubmeasurementToSubMeas {Outcome : Type*}
@@ -108,6 +108,7 @@ theorem matrixSdpDualSlackOperator_ofPointRealization (params : Parameters)
       sdpDualSlackOperator params strategy Z g := by
   rw [matrixSdpDualSlackOperator, sdpDualSlackOperator,
     matrixAveragedPointOperator_ofPointRealization]
+  rfl
 
 /-- Canonical primal-dual data with complementary slackness and zero slack
 block.

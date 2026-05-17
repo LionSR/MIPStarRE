@@ -108,6 +108,7 @@ private lemma liftedVerticalLineConsistency
     intro ux
     rcases ux with ⟨u, x⟩
     simp [liftedVerticalLineAnswerFamily, truncatePoint_appendPoint, pointHeight_appendPoint]
+    rfl
   have hprod_next :
       ConsRel strategy.state
         (uniformDistribution (Point params × Fq params))

@@ -14,6 +14,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
+open MIPStarRE.Quantum
 
 /-! ### One-measurement Naimark (Lemma 5.2) -/
 
@@ -27,14 +28,6 @@ lemma optionBasisProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
     by_cases hio : oa = i <;> by_cases hjo : oa = j <;>
       simp [Matrix.single, hio, hjo, and_comm]
   · simp
-
-/-- The rank-one projector onto an `Option` basis vector is positive semidefinite. -/
-lemma optionBasisProj_nonneg {α : Type*} [Finite α] [DecidableEq α]
-    (oa : Option α) :
-    0 ≤ (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) := by
-  refine Matrix.nonneg_iff_posSemidef.mpr ?_
-  let col : Matrix (Option α) Unit ℂ := Matrix.single oa () 1
-  simpa [col] using Matrix.posSemidef_self_mul_conjTranspose col
 
 /-- The `Option` basis projectors sum to the identity. -/
 lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
@@ -63,18 +56,6 @@ lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
         | some b =>
             have hab : a ≠ b := fun h => hij (congrArg some h)
             simp [Matrix.sum_apply, Matrix.single_apply, hab]
-
-/-- The identity operator is projective. -/
-lemma op_one_isProj {d : Type*} [Fintype d] [DecidableEq d] :
-    MIPStarRE.Quantum.IsProj (1 : MIPStarRE.Quantum.Op d) := by
-  refine ⟨?_, by simp⟩
-  refine Matrix.IsHermitian.ext fun i j => ?_
-  simp [Matrix.one_apply, eq_comm]
-
-/-- The identity operator is positive semidefinite. -/
-lemma op_one_nonneg {d : Type*} [DecidableEq d] :
-    0 ≤ (1 : MIPStarRE.Quantum.Op d) := by
-  exact Matrix.PosSemidef.one.nonneg
 
 /-- Kronecker products of projectors are projective. -/
 lemma isProj_kronecker {d₁ d₂ : Type*}
@@ -125,15 +106,6 @@ lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
             simp [mul_assoc]
       _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n) := by
             rw [hP.idempotent]
-
-/-- Unitary conjugation preserves positive semidefiniteness. -/
-lemma nonneg_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
-    (U : Matrix.unitaryGroup n ℂ) {P : MIPStarRE.Quantum.Op n}
-    (hP : 0 ≤ P) :
-    0 ≤ ((U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n)) := by
-  exact
-    (Matrix.PosSemidef.conjTranspose_mul_mul_same
-      (Matrix.nonneg_iff_posSemidef.mp hP) (U : MIPStarRE.Quantum.Op n)).nonneg
 
 /-- Unitary conjugation preserves identity decompositions. -/
 lemma unitary_conj_sum_eq_one {β n : Type*} [Fintype β] [Fintype n] [DecidableEq n]
@@ -285,7 +257,9 @@ lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d] :
     MIPStarRE.Quantum.IsProj
       (oneMeasNaimarkInputProj (α := α) (d := d)) :=
-  isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) none)
+  isProj_kronecker
+    (MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _))
+    (optionBasisProj_isProj (α := α) none)
 
 /-- **Isometry property of the Naimark column**: `V†V = P`.
 
@@ -374,7 +348,9 @@ lemma oneMeasNaimarkCompression
     oneMeasNaimarkOutcomeProj (α := α) (d := d) (some a)
   have hP_proj : MIPStarRE.Quantum.IsProj P := by
     dsimp [P, oneMeasNaimarkOutcomeProj]
-    exact isProj_kronecker op_one_isProj (optionBasisProj_isProj (α := α) (some a))
+    exact isProj_kronecker
+      (MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _))
+      (optionBasisProj_isProj (α := α) (some a))
   have hsqrt : (CFC.sqrt (M.effect a))ᴴ = CFC.sqrt (M.effect a) := by
     simpa using (CFC.sqrt_nonneg (M.effect a)).isHermitian.eq
   have hsingle :

@@ -29,7 +29,7 @@ theorem degreeOf_eval₂_C_X_le_natDegree {K σ : Type*} [Field K] [DecidableEq 
     _ ≤ if i = j then p.natDegree else 0 := by
           by_cases hij : i = j
           · have hn_le : n ≤ p.natDegree := Nat.lt_succ_iff.mp (Finset.mem_range.mp hn)
-            simp [hij, MvPolynomial.degreeOf_X, hn_le]
+            simp [hij, hn_le]
           · simp [hij, MvPolynomial.degreeOf_X]
 
 /-- Extend an axis-line answer to a global polynomial by substituting the ambient

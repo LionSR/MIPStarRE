@@ -575,10 +575,8 @@ lemma conjTranspose_mul_mono
     Zᴴ * X * Z ≤ Zᴴ * Y * Z := by
   apply sub_nonneg.mp
   have hnonneg : 0 ≤ Zᴴ * (Y - X) * Z := by
-    simpa [Matrix.conjTranspose_conjTranspose] using
-      (Matrix.PosSemidef.mul_mul_conjTranspose_same
-        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hXY))
-        Zᴴ).nonneg
+    simpa [Matrix.star_eq_conjTranspose] using
+      star_left_conjugate_nonneg (sub_nonneg.mpr hXY) Z
   simpa [mul_sub, sub_mul, Matrix.conjTranspose_conjTranspose, mul_assoc] using hnonneg
 
 

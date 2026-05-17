@@ -112,6 +112,7 @@ private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
               (AxisParallelLine.rebaseAt ℓ (pointHeight params u))).toSubMeas)
             (· zeroCoord)).outcome a := by
               simp [ldGbconAxisLineMeasurement, ldGbcon_rebased_vertical_line, ℓ]
+              rfl
       _ = (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas)
             (fun f => f (pointHeight params u))).outcome a := by
               exact AxisParallelCovariantMeasurement.reparamInvariant
@@ -331,8 +332,13 @@ theorem pointVerticalLineSdd
           (8 * (params.m : Error) * eps + 4 * delta) ?_ hpoint_to_axis_raw
         ring_nf
         exact le_rfl
-  simpa [ldGbconVerticalLineMeasurement,
-    ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy] using hpoint_to_axis
+  have hlift :
+      IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas
+          (ldGbconAxisLineMeasurement params strategy)) =
+        IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas
+          (ldGbconVerticalLineMeasurement params strategy)) := by
+    rw [ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy]
+  exact hlift ▸ hpoint_to_axis
 
 /-- `lem:ld-gbcon`.
 

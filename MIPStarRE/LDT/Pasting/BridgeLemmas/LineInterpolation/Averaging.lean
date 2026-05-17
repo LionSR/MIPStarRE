@@ -28,7 +28,15 @@ lemma opTensor_smul_left
     (B : MIPStarRE.Quantum.Op ιB) :
     opTensor ((c : ℂ) • A) B = (c : ℂ) • opTensor A B := by
   ext x y
-  simp [opTensor, mul_comm, mul_left_comm]
+  simp only [Complex.coe_smul, Matrix.smul_apply, smul_eq_mul]
+  calc
+    (c • A) x.1 y.1 * B x.2 y.2 =
+        (c • (A x.1 y.1)) * B x.2 y.2 := by rfl
+    _ = ((c : ℂ) * A x.1 y.1) * B x.2 y.2 := by
+      rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
+      rw [smul_eq_mul]
+      rfl
+    _ = (c : ℂ) * (A x.1 y.1 * B x.2 y.2) := by ring
 
 lemma opTensor_sum_left
     {α ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]

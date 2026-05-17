@@ -295,9 +295,18 @@ theorem one_le_matrixSdpCanonicalStrictDualConstraint
     · subst c
       by_cases hij : i = j
       · subst j
-        simp [B, matrixSdpCanonicalBlockDiagonal]
-      · simp [B, matrixSdpCanonicalBlockDiagonal, hij]
-    · simp [B, matrixSdpCanonicalBlockDiagonal, hbc]
+        change (if b = b then B b i i else 0) -
+            (if (b, i) = (b, i) then (1 : ℂ) else 0) =
+          (if b = b then (B b - (1 : MatrixOperator model.space)) i i else 0)
+        simp [Matrix.sub_apply]
+      · change (if b = b then B b i j else 0) -
+            (if (b, i) = (b, j) then (1 : ℂ) else 0) =
+          (if b = b then (B b - (1 : MatrixOperator model.space)) i j else 0)
+        simp [Matrix.sub_apply, Prod.ext_iff, hij]
+    · change (if b = c then B b i j else 0) -
+          (if (b, i) = (c, j) then (1 : ℂ) else 0) =
+        (if b = c then (B b - (1 : MatrixOperator model.space)) i j else 0)
+      simp [Prod.ext_iff, hbc]
   rw [hsub]
   refine matrixSdpCanonicalBlockDiagonal_nonneg params model
     (fun b => B b - (1 : MatrixOperator model.space)) ?_
@@ -639,7 +648,12 @@ theorem matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
     | some g =>
         simpa [matrixSdpCanonicalBlockDiagonal, matrixSdpCanonicalPrimalBlockFamily] using
           hentry
-  · simp [matrixSdpCanonicalBlockDiagonal, hbc]
+  · change (if b = c then
+          (matrixSdpCanonicalPrimalBlockFamily params model
+              (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) b *
+            matrixSdpCanonicalDualSlackBlockFamily params model Z b) i j
+        else 0) = (0 : ℂ)
+    simp [hbc]
 
 /-- Canonical complementary slackness implies the paper-form defect equation
 `T_g (Z - A_g) = 0` on each polynomial block. -/

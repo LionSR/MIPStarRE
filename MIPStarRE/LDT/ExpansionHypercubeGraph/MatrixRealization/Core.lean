@@ -121,7 +121,12 @@ private lemma sum_fourierBasisProjector_eq_one (params : Parameters) :
       (Matrix.sum_apply u v (Finset.univ : Finset (Point params))
         (fun α => fourierBasisProjector params α))
   rw [hsum, key, fourierBasisState_inner_product_dual params v u]
-  simp [Matrix.one_apply, eq_comm]
+  by_cases h : v = u
+  · subst v
+    change (if u = u then (1 : ℂ) else 0) = (if u = u then 1 else 0)
+    rfl
+  · change (if v = u then (1 : ℂ) else 0) = (if u = v then 1 else 0)
+    simp [h, show u ≠ v by intro huv; exact h huv.symm]
 
 private lemma frequencyWeight_zero (params : Parameters) :
     frequencyWeight params (0 : Point params) = 0 := by
@@ -223,9 +228,10 @@ private lemma orthogonalModeProjectorMatrix_eq_sum (params : Parameters) :
           rw [orthogonalModeProjectorMatrix,
             constantModeProjectorMatrix_eq_fourierBasisProjector_zero,
             sum_fourierBasisProjector_eq_one]
+          rfl
     _ = ∑ α ∈ (Finset.univ.erase (0 : Point params)), fourierBasisProjector params α := by
-          have hsplit' := congrArg (fun A => A - fourierBasisProjector params 0) hsplit
-          simpa [sub_eq_add_neg, add_assoc, add_left_comm, add_comm] using hsplit'.symm
+          rw [← hsplit]
+          simp [sub_eq_add_neg, add_left_comm]
 
 private lemma matrixAdjacencyOperator_spectral_decomp (params : Parameters) :
     matrixAdjacencyOperator params =
@@ -238,13 +244,25 @@ private lemma matrixAdjacencyOperator_spectral_decomp (params : Parameters) :
       = ∑ w : Point params,
           (matrixAdjacencyOperator params) u w *
             (if v = w then (1 : ℂ) else 0) := by
-              simp
+              symm
+              simpa using
+                (Finset.sum_eq_single
+                  (s := (Finset.univ : Finset (Point params)))
+                  (f := fun w : Point params =>
+                    (matrixAdjacencyOperator params) u w *
+                      (if v = w then (1 : ℂ) else 0))
+                  v
+              (by
+                    intro w _ hw
+                    simp [show ¬v = w by intro hvw; exact hw hvw.symm])
+                  (by simp))
     _ = ∑ w : Point params,
           (matrixAdjacencyOperator params) u w *
             ∑ α : Point params,
               star (fourierBasisState params α v) * fourierBasisState params α w := by
             congr 1 with w
             rw [fourierBasisState_inner_product_dual params v w]
+            rfl
     _ = ∑ α : Point params,
           star (fourierBasisState params α v) *
             ((matrixAdjacencyOperator params).mulVec (fourierBasisState params α)) u := by
@@ -313,6 +331,7 @@ private lemma matrixLaplacianOperator_spectral_decomp (params : Parameters) :
             (((adjacencyEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) := by
           rw [matrixLaplacianOperator, sum_fourierBasisProjector_eq_one,
             matrixAdjacencyOperator_spectral_decomp]
+          rfl
     _ = ∑ α : Point params,
           (((hypercubeVertexCount params : ℂ)⁻¹ -
               (((adjacencyEigenvalue params α : Error) : ℂ))) •
@@ -367,6 +386,7 @@ private lemma matrixLaplacianOperator_mul_fourierBasisState (params : Parameters
     _ = ((hypercubeVertexCount params : ℂ)⁻¹) • fourierBasisState params α -
           (((adjacencyEigenvalue params α : Error) : ℂ) • fourierBasisState params α) := by
             rw [Matrix.sub_mulVec, Matrix.smul_mulVec, Matrix.one_mulVec, eigenvectors params α]
+            rfl
     _ = (((hypercubeVertexCount params : ℂ)⁻¹ -
             (((adjacencyEigenvalue params α : Error) : ℂ))) • fourierBasisState params α) := by
             rw [← sub_smul]
@@ -420,11 +440,15 @@ private lemma fourierBasisChange_conj_laplacian (params : Parameters) :
     _ = (((laplacianEigenvalue params β : Error) : ℂ) *
           (if α = β then 1 else 0)) := by
             rw [fourierBasisState_inner_product params α β]
+            rfl
     _ = Matrix.diagonal (fun γ => ((laplacianEigenvalue params γ : Error) : ℂ)) α β := by
             by_cases hαβ : α = β
             · subst hαβ
               simp
-            · simp [hαβ]
+            · rw [if_neg hαβ]
+              rw [mul_zero]
+              exact (Matrix.diagonal_apply_ne
+                (fun γ => ((laplacianEigenvalue params γ : Error) : ℂ)) hαβ).symm
 
 private lemma matrixLaplacianOperator_charpoly_roots_eq_fourier (params : Parameters) :
     (matrixLaplacianOperator params).charpoly.roots.map Complex.re =
@@ -477,23 +501,57 @@ private lemma hypercubeSpectralGap_operator_posSemidef (params : Parameters) :
         ∑ α ∈ (Finset.univ.erase (0 : Point params)),
           (((laplacianEigenvalue params α - hypercubeSpectralGap params : Error) : ℂ) •
             fourierBasisProjector params α) := by
-    rw [matrixLaplacianOperator_spectral_decomp, orthogonalModeProjectorMatrix_eq_sum,
-      Finset.smul_sum]
-    have hsplit :
-        (((laplacianEigenvalue params 0 : Error) : ℂ) • fourierBasisProjector params 0) +
+    rw [matrixLaplacianOperator_spectral_decomp, orthogonalModeProjectorMatrix_eq_sum]
+    have hweighted :
+        ∑ α : Point params,
+            (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) =
+          ∑ α ∈ (Finset.univ.erase (0 : Point params)),
+            (((laplacianEigenvalue params α : Error) : ℂ) •
+              fourierBasisProjector params α) := by
+      have hsplit :
+          (((laplacianEigenvalue params 0 : Error) : ℂ) • fourierBasisProjector params 0) +
+              ∑ α ∈ (Finset.univ.erase (0 : Point params)),
+                (((laplacianEigenvalue params α : Error) : ℂ) •
+                  fourierBasisProjector params α) =
+            ∑ α : Point params,
+              (((laplacianEigenvalue params α : Error) : ℂ) •
+                fourierBasisProjector params α) := by
+        simpa using
+          (Finset.add_sum_erase (s := (Finset.univ : Finset (Point params)))
+            (f := fun α =>
+              (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α))
+            (by simp))
+      rw [← hsplit]
+      simp [hlap0]
+    calc
+      (∑ α : Point params,
+          (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α)) -
+          ((hypercubeSpectralGap params : ℂ) •
+            ∑ α ∈ (Finset.univ.erase (0 : Point params)), fourierBasisProjector params α)
+        = (∑ α ∈ (Finset.univ.erase (0 : Point params)),
+            (((laplacianEigenvalue params α : Error) : ℂ) •
+              fourierBasisProjector params α)) -
+            ((hypercubeSpectralGap params : ℂ) •
+              ∑ α ∈ (Finset.univ.erase (0 : Point params)), fourierBasisProjector params α) := by
+            rw [hweighted]
+      _ = (∑ α ∈ (Finset.univ.erase (0 : Point params)),
+            (((laplacianEigenvalue params α : Error) : ℂ) •
+              fourierBasisProjector params α)) -
             ∑ α ∈ (Finset.univ.erase (0 : Point params)),
-              (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) =
-          ∑ α : Point params,
-            (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α) := by
-      simpa using
-        (Finset.add_sum_erase (s := (Finset.univ : Finset (Point params)))
-          (f := fun α =>
-            (((laplacianEigenvalue params α : Error) : ℂ) • fourierBasisProjector params α))
-          (by simp))
-    rw [← hsplit]
-    ext u v
-    simp [Matrix.sub_apply, Matrix.sum_apply, hlap0, sub_smul,
-      Finset.sum_sub_distrib]
+              ((hypercubeSpectralGap params : ℂ) • fourierBasisProjector params α) := by
+            rw [Finset.smul_sum]
+      _ = ∑ α ∈ (Finset.univ.erase (0 : Point params)),
+            ((((laplacianEigenvalue params α : Error) : ℂ) •
+                fourierBasisProjector params α) -
+              ((hypercubeSpectralGap params : ℂ) • fourierBasisProjector params α)) := by
+            rw [Finset.sum_sub_distrib]
+      _ = ∑ α ∈ (Finset.univ.erase (0 : Point params)),
+            (((laplacianEigenvalue params α - hypercubeSpectralGap params : Error) : ℂ) •
+              fourierBasisProjector params α) := by
+            refine Finset.sum_congr rfl ?_
+            intro α hα
+            rw [← sub_smul]
+            norm_num
   rw [hdecomp]
   refine Matrix.posSemidef_sum _ ?_
   intro α hα

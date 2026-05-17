@@ -75,6 +75,7 @@ private lemma restrictedDiagonalSampleError_eq
     RestrictedSymStrat.restrictedDiagonalLineAnswerFamily, diagonalPointAnswerFamily,
     diagonalLineAnswerFamily, xRestrictedStrategy]
   simp [hline]
+  rfl
 
 /-- Per-index diagonal-line consistency defect of the restricted `x`-slice strategy
 at embedded index `j`, averaged over the restricted diagonal sample space. -/

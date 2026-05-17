@@ -24,7 +24,7 @@ namespace MIPStarRE.LDT.SelfImprovement
 open MIPStarRE.LDT
 open MIPStarRE.LDT.GlobalVariance
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- Paper-faithful full statement of `lem:add-in-u`.
 
@@ -83,6 +83,9 @@ structure AddInUFullStatement
         - addInURightQuantity params strategy M T.toSubMeas S|
       ≤ addInUError params eps delta
 
+set_option maxHeartbeats 800000 in
+-- The paper-facing add-in-u statement combines the selected scalar chain, the
+-- local-variance transport theorem, and the global-variance sum transfer.
 /-- Proves the selection-dependent transfer inequality of `lem:add-in-u`:
 for any auxiliary sub-measurement family `M = {M^u_o}` and selection rule
 `S : Point → Set (Outcome × Polynomial)`, the two indexed expectations agree

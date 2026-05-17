@@ -77,14 +77,15 @@ noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
       have hweight : 0 ≤ sdpStrictPrimalWeight params := by
         unfold sdpStrictPrimalWeight
         positivity
-      exact smul_nonneg hweight (op_one_nonneg (d := ι))
+      exact smul_nonneg hweight
+        (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
     sum_eq_total := rfl
     total_le_one := by
       rw [sdpStrictPrimalConstantSum (ι := ι) params]
       simpa using
         (smul_le_smul_of_nonneg_right
           (show (1 / 2 : Error) ≤ 1 by norm_num)
-          (op_one_nonneg (d := ι))) }
+          (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))) }
 
 /-- The paper's uniform strict-feasible primal witness has total mass
 `(1 / 2) • I`, leaving the residual `(1 / 2) • I` used by
@@ -126,7 +127,8 @@ noncomputable def sdpStrictDualWitness : MIPStarRE.Quantum.Op ι :=
     0 ≤ (sdpStrictDualWitness (ι := ι)) := by
   letI := Fintype.ofFinite ι
   unfold sdpStrictDualWitness
-  exact smul_nonneg (by norm_num) (op_one_nonneg (d := ι))
+  exact smul_nonneg (by norm_num)
+    (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
 
 /-- The paper's strict-feasible dual witness dominates the identity: `I ≤ 2I`. -/
 theorem one_le_sdpStrictDualWitness {ι : Type*} [Finite ι] [DecidableEq ι] :
@@ -135,7 +137,7 @@ theorem one_le_sdpStrictDualWitness {ι : Type*} [Finite ι] [DecidableEq ι] :
   simpa [sdpStrictDualWitness] using
     (smul_le_smul_of_nonneg_right
       (show (1 : Error) ≤ 2 by norm_num)
-      (op_one_nonneg (d := ι)))
+      (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι)))
 
 /-- The averaged point operator `A_g = E_u A^u_{g(u)}`. -/
 noncomputable def averagedPointOperator (params : Parameters)

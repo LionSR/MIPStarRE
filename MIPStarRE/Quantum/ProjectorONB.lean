@@ -18,7 +18,7 @@ low-degree-test formalization.
 - `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.lean`.
 -/
 
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
+open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.L2Operator
 
 namespace MIPStarRE.Quantum
 
@@ -40,9 +40,12 @@ lemma hermitian_eq_sum_eigenvalues_vecMulVec (A : Op ι) (hA : A.IsHermitian) :
         Matrix.vecMulVec ((hA.eigenvectorBasis i).ofLp)
           (star ((hA.eigenvectorBasis i).ofLp))) := by
           ext r c
-          simp [Unitary.conjStarAlgAut_apply, Matrix.mul_apply, Matrix.diagonal_apply,
-            Matrix.sum_apply, Matrix.vecMulVec_apply,
-            Matrix.IsHermitian.eigenvectorUnitary_apply, mul_assoc, mul_comm]
+          simp only [Unitary.conjStarAlgAut_apply, Matrix.mul_apply, Matrix.diagonal_apply,
+            Matrix.sum_apply, Matrix.IsHermitian.eigenvectorUnitary_apply, Finset.sum_mul]
+          apply Finset.sum_congr rfl
+          intro i _
+          simp [Matrix.smul_apply, Matrix.vecMulVec_apply]
+          ring
 
 /-- For a Hermitian idempotent matrix, every eigenvalue is either `0` or `1`. -/
 lemma IsProj.eigenvalues_zero_or_one (P : Op ι) (hP : IsProj P) (i : ι) :
@@ -62,10 +65,12 @@ lemma IsProj.eigenvalues_zero_or_one (P : Op ι) (hP : IsProj P) (i : ι) :
       calc
         (hP.isHermitian.eigenvalues i * hP.isHermitian.eigenvalues i) • v
             = hP.isHermitian.eigenvalues i •
-                (hP.isHermitian.eigenvalues i • v) := by simp [mul_smul]
+                (hP.isHermitian.eigenvalues i • v) := by
+              exact (smul_smul (hP.isHermitian.eigenvalues i)
+                (hP.isHermitian.eigenvalues i) v).symm
         _ = hP.isHermitian.eigenvalues i • (P *ᵥ v) := by rw [hmul1]
         _ = P *ᵥ (hP.isHermitian.eigenvalues i • v) := by
-              rw [Matrix.mulVec_smul]
+              exact (Matrix.mulVec_smul P (hP.isHermitian.eigenvalues i) v).symm
         _ = P *ᵥ (P *ᵥ v) := by rw [hmul1]
         _ = P *ᵥ v := hmul2
         _ = hP.isHermitian.eigenvalues i • v := hmul1
@@ -271,28 +276,6 @@ lemma subprojector_rank (S : Finset (Fin P.rank)) :
     rw [← htrace_rank, htrace_card]
   exact_mod_cast hcast
 
-/-- A partial projector is dominated by the original projector. -/
-lemma subprojector_le (S : Finset (Fin P.rank)) :
-    b.subprojector S ≤ P := by
-  classical
-  let C : Op ι := ∑ i ∈ (Sᶜ : Finset (Fin P.rank)), b.rankOne i
-  have hsplit : b.subprojector S + C = P := by
-    calc
-      b.subprojector S + C
-          = (∑ i ∈ S, b.rankOne i) + ∑ i ∈ (Sᶜ : Finset (Fin P.rank)), b.rankOne i := rfl
-      _ = ∑ i : Fin P.rank, b.rankOne i := by
-            rw [Finset.sum_add_sum_compl]
-      _ = P := by simpa [rankOne] using b.decomposition.symm
-  change (P - b.subprojector S).PosSemidef
-  have hdiff : P - b.subprojector S = C := by
-    have h := congrArg (fun X : Op ι => X - b.subprojector S) hsplit.symm
-    have hcancel : (b.subprojector S + C) - b.subprojector S = C := by abel
-    exact h.trans hcancel
-  rw [hdiff]
-  unfold C rankOne
-  exact Matrix.nonneg_iff_posSemidef.mp <|
-    Finset.sum_nonneg fun i _ => (Matrix.posSemidef_vecMulVec_self_star (b.vec i)).nonneg
-
 /-- A partial projector plus its complementary partial projector is the original projector. -/
 lemma subprojector_add_compl (S : Finset (Fin P.rank)) :
     b.subprojector S + b.subprojector (Sᶜ : Finset (Fin P.rank)) = P := by
@@ -313,6 +296,13 @@ lemma subprojector_diff_eq_compl (S : Finset (Fin P.rank)) :
         b.subprojector (Sᶜ : Finset (Fin P.rank)) := by
     abel
   exact h.trans hcancel
+
+/-- A partial projector is dominated by the original projector. -/
+lemma subprojector_le (S : Finset (Fin P.rank)) :
+    b.subprojector S ≤ P := by
+  rw [← sub_nonneg]
+  rw [b.subprojector_diff_eq_compl S]
+  exact (b.subprojector_isProj (Sᶜ : Finset (Fin P.rank))).isStarProjection.nonneg
 
 end ProjectorRangeONB
 
@@ -352,15 +342,6 @@ noncomputable def IsProj.rangeONB (P : Op ι) (hP : IsProj P) :
           fun i : {i : ι // hP.isHermitian.eigenvalues i ≠ 0} =>
             Matrix.vecMulVec ((hP.isHermitian.eigenvectorBasis i.1).ofLp)
               (star ((hP.isHermitian.eigenvectorBasis i.1).ofLp))).symm))
-
-/-- An orthogonal projection is positive semidefinite. -/
-lemma IsProj.nonneg (P : Op ι) (hP : IsProj P) :
-    0 ≤ P := by
-  classical
-  let b := hP.rangeONB P
-  rw [b.decomposition]
-  exact Finset.sum_nonneg fun i _ =>
-    (Matrix.posSemidef_vecMulVec_self_star (b.vec i)).nonneg
 
 end
 

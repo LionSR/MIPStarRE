@@ -35,7 +35,7 @@ matches the paper's convention that point and line operators act on the left
 register and polynomial weights act on the right register. -/
 structure MatrixVarianceTransferRealization (params : Parameters) [FieldModel params.q] where
   /-- The local finite-dimensional Hilbert space carrying the point/line measurements. -/
-  space : FiniteHilbertSpace
+  space : FiniteHilbertSpace.{0}
   /-- The ambient bipartite positive matrix state. -/
   state : PositiveMatrixState (tensorHilbertSpace space space)
   /-- The point measurement family `u ↦ A^u`. -/
@@ -88,10 +88,13 @@ noncomputable def matrixWeightedPolynomialState (params : Parameters) [FieldMode
   let W := matrixPolynomialWeightRightTensorOperator params model g
   { matrix := W * model.state.matrix * Wᴴ
     positive :=
-      ((Matrix.nonneg_iff_posSemidef.mp model.state.positive).mul_mul_conjTranspose_same W).nonneg }
+      by
+        simpa [Matrix.star_eq_conjTranspose] using
+          star_right_conjugate_nonneg model.state.positive W }
 
 /-- The local operator `A^u_{g(u)}`. -/
-def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters) [FieldModel params.q]
+noncomputable def matrixPointConditionedOutcomeOperatorAtPolynomial (params : Parameters)
+    [FieldModel params.q]
     (model : MatrixVarianceTransferRealization params)
     (g : Polynomial params) (u : Point params) : MatrixOperator model.space :=
   (model.pointMeasurement u).effect (g u)

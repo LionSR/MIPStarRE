@@ -184,11 +184,34 @@ lemma avgOver_avgOver_phaseTwo_linear
               ((averageOperatorOverDistribution 𝒟Q (fun q => ∑ a : Aidx, F q g a)) * R) *
             rightTensor (ι₁ := ι)
               (averageOperatorOverDistribution 𝒟V (fun v => P g v))) := by
-          simp [T, averageOperatorOverDistribution, ev_finset_sum, ev_real_smul,
-            ← leftTensor_finset_sum, ← rightTensor_finset_sum,
-            Finset.smul_sum, Finset.sum_mul, Finset.mul_sum,
-            leftTensor_mul_rightTensor_real_smul_left, leftTensor_mul_rightTensor_real_smul_right,
-            mul_assoc, mul_comm]
+          suffices
+              ∑ g : Γ, ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx,
+                  ev ψ (leftTensor (ι₂ := ι) (F q g a * R) *
+                    rightTensor (ι₁ := ι) (P g v)) *
+                    (𝒟Q.weight q * 𝒟V.weight v) =
+                ∑ g : Γ, ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx,
+                  ev ψ ((𝒟V.weight v : Error) • (𝒟Q.weight q : Error) •
+                    (leftTensor (ι₂ := ι) (F q g a * R) *
+                      rightTensor (ι₁ := ι) (P g v))) by
+            simpa [T, averageOperatorOverDistribution, ev_finset_sum,
+              ← leftTensor_finset_sum, ← rightTensor_finset_sum,
+              Finset.smul_sum, Finset.sum_mul, Finset.mul_sum,
+              leftTensor_mul_rightTensor_real_smul_left,
+              leftTensor_mul_rightTensor_real_smul_right] using this
+          refine Finset.sum_congr rfl ?_
+          intro g _
+          refine Finset.sum_congr rfl ?_
+          intro v _
+          refine Finset.sum_congr rfl ?_
+          intro q _
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          let X : MIPStarRE.Quantum.Op (ι × ι) :=
+            leftTensor (ι₂ := ι) (F q g a * R) * rightTensor (ι₁ := ι) (P g v)
+          change ev ψ X * (𝒟Q.weight q * 𝒟V.weight v) =
+            ev ψ ((𝒟V.weight v : Error) • (𝒟Q.weight q : Error) • X)
+          rw [ev_real_smul, ev_real_smul]
+          ring
 
 set_option maxHeartbeats 210000 in
 -- The explicit finite-fiber/tensor-linearity proof is just above the default

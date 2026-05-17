@@ -103,9 +103,17 @@ private lemma question_easyApproxFromApproxDelta
                   (fun a => A.outcome a - B.outcome a)
                   (fun a => C.outcome a)
       _ = Real.sqrt (qSDD ψ A B) * Real.sqrt diagC := by
-            congr 1
-            · simp [qSDD, qSDDCore, hherm]
-            · simp [diagC, SubMeas.outcome_hermitian]
+            have hleft :
+                (∑ a : Outcome,
+                    ev ψ
+                      ((A.outcome a - B.outcome a) *
+                        (A.outcome a - B.outcome a)ᴴ)) =
+                  qSDD ψ A B := by
+              simp [qSDD, qSDDCore, hherm]
+            have hright :
+                (∑ a : Outcome, ev ψ ((C.outcome a)ᴴ * C.outcome a)) = diagC := by
+              simp [diagC, SubMeas.outcome_hermitian]
+            rw [hleft, hright]
   have hsqrt_diagC : Real.sqrt diagC ≤ 1 := by
     simpa using Real.sqrt_le_sqrt hdiagC_le_one
   have hmain' :

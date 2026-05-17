@@ -23,7 +23,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- Assemble the projection-simplified scalar transfer from the four scalar
 chain moves. The analytic work remains exactly the four bounds
@@ -256,6 +256,9 @@ lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
     (Real.sqrt (selfImprovementVarianceError params eps delta))
     h01 h12 h23 h34 hsum
 
+set_option maxHeartbeats 800000 in
+-- This lemma combines the two local-variance Cauchy--Schwarz replacements
+-- with the scalar add-in-u transfer inequality.
 /-- Projection-simplified add-in-`u` transfer with the Step 3/4 variance bounds
 supplied by the local-variance sum hypothesis.
 

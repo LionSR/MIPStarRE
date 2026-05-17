@@ -79,7 +79,8 @@ theorem rectangularSvd_xHat_mixed_raw
 This is the uniqueness of the positive square root, stated in the matrix
 language used in the projectivization layer. -/
 theorem eq_sqrt_of_sq_of_nonneg
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ι : Type*} [Fintype ι]
+    [NonUnitalContinuousFunctionalCalculus ℝ (Matrix ι ι ℂ) IsSelfAdjoint]
     (B Q : Matrix ι ι ℂ)
     (hB_nonneg : 0 ≤ B)
     (hB_sq : B * B = Q) :
@@ -94,7 +95,8 @@ target operator `Q`, then it is the positive square root of `Q`.  This is the
 spectral input which turns the raw SVD calculation into the paper's identity
 `X† Xhat = sqrt Q`. -/
 theorem rectangularSvd_middle_eq_sqrt_of_square
-    {μ ι : Type*} [Fintype μ] [Fintype ι] [DecidableEq ι]
+    {μ ι : Type*} [Fintype μ] [Fintype ι]
+    [NonUnitalContinuousFunctionalCalculus ℝ (Matrix ι ι ℂ) IsSelfAdjoint]
     (V : Matrix ι ι ℂ) (S Iro : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
     (hMiddle_nonneg : 0 ≤ V * (Sᴴ * Iro) * Vᴴ)
     (hMiddle_sq :
@@ -109,7 +111,8 @@ This is the form compatible with the QXP constructors, where the spectral input
 is naturally stated as `CFC.sqrt (QTotal qLayer)` rather than by rewriting
 through the right Gram matrix of `X`. -/
 theorem rectangularSvd_xHat_mixed_of_sqrtQ
-    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    [NonUnitalContinuousFunctionalCalculus ℝ (Matrix ι ι ℂ) IsSelfAdjoint]
     (x : Matrix μ ι ℂ)
     (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
     (S Iro : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
@@ -121,7 +124,8 @@ theorem rectangularSvd_xHat_mixed_of_sqrtQ
 
 /-- The mixed rectangular SVD identity in the right Gram form. -/
 theorem rectangularSvd_xHat_mixed
-    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    [NonUnitalContinuousFunctionalCalculus ℝ (Matrix ι ι ℂ) IsSelfAdjoint]
     (x : Matrix μ ι ℂ)
     (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
     (S Iro : Matrix μ ι ℂ)
