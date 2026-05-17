@@ -410,7 +410,7 @@ private lemma family_pointConsistencyError_eq_avg
             IdxProjMeas.toIdxSubMeas]
           rfl
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 800000 in
 -- The averaged slice-to-pasting assembly generates several large nonlinear
 -- arithmetic goals in the final telescoping estimate.
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:12-50`
