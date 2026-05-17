@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MainInductionStep.Statements
-import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
@@ -145,42 +144,6 @@ theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
           GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
         simpa using hdom' }
 
-/-- Proof obligation for the paper-faithful completion route in
-`thm:self-improvement-in-induction-section`.
-
-This is the exact point where the source proof passes from the submeasurement
-input `G` to a fresh-outcome completion and proves the required compatibility
-with the Section 9 measurement theorem.  It should eventually be discharged by
-formalizing the fresh-`⊥` completion argument from
-`references/ldt-paper/preliminaries.tex` and the reduction back to polynomial
-outcomes. -/
-lemma selfImprovementInInductionSection_freshCompletionGap
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma nu : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeas (Polynomial params) ι)
-    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      (polynomialEvaluationFamily params G)
-      nu) :
-    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  -- Source-faithful gap (#1645, downstream of #1503):
-  -- 1. complete `G` by adjoining a fresh outcome `⊥`,
-  -- 2. reduce the induction-section theorem to the Section 9 measurement theorem,
-  -- 3. discard the fresh outcome and transport the conclusion back to the
-  --    original polynomial outcomes.
-  --
-  -- Use `MakingMeasurementsProjective.optionCompletion` as the canonical fresh
-  -- completion object; the remaining gap is the Section 9 bridge and the
-  -- restriction back to polynomial outcomes, not the completion data itself.
-  let Ghat : Measurement (Option (Polynomial params)) ι :=
-    MakingMeasurementsProjective.optionCompletion G
-  let _ := Ghat
-  sorry
-
 /-- `thm:self-improvement-in-induction-section`.
 
 The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
@@ -189,12 +152,12 @@ underlying submeasurement of a complete measurement, and it does not assume the
 Section 7 helper, orthonormalization, or final-field proof stages as external
 inputs.
 
-**Unfaithful:** This proof currently delegates to
-`selfImprovementInInductionSection_freshCompletionGap`, whose fresh-outcome
-completion reduction remains a tracked proof gap rather than a derivation from
-`thm:self-improvement-in-induction-section`.  Documented in issue `#1645`,
-downstream of `#1503`.  Elimination: discharge the fresh-outcome completion
-reduction from the paper hypotheses and remove the gap lemma. -/
+**Proof gap:** The declaration has the paper hypotheses and conclusion, but its
+proof is still open.  Documented in issue `#1645`, downstream of `#1503`.
+Elimination plan: complete `G` by adjoining a fresh outcome `⊥`, apply the
+Section 9 self-improvement theorem to the completed measurement, and transport
+the resulting projective submeasurement and dual witness back to the original
+polynomial outcomes. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
@@ -207,9 +170,10 @@ theorem selfImprovementInInductionSection
         (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  exact
-    selfImprovementInInductionSection_freshCompletionGap
-      params strategy eps delta gamma nu hgood G hcons
+  -- Source-faithful proof gap (#1645, downstream of #1503): complete `G` by
+  -- adjoining a fresh outcome, apply Section 9 self-improvement, and restrict
+  -- the resulting conclusion back to polynomial outcomes.
+  sorry
 
 /-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
 into the bookkeeping object expected by the later induction-step assembly.
