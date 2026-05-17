@@ -1143,9 +1143,11 @@ class PRCommentTests(unittest.TestCase):
         ) as mock_req:
             mock_req.side_effect = [[{"id": 1}], []]
             result = _github_api_request_paginated(
-                "https://api.github.com/repos/o/r/issues/1/comments", "tok"
+                "https://api.github.com/repos/o/r/issues/1/comments", "tok",
+                per_page=1,
             )
         self.assertEqual(len(result), 1)
+        self.assertEqual(mock_req.call_count, 2)
 
     def test_paginated_stops_on_dict_response(self) -> None:
         """A dict response (GitHub error object) stops pagination cleanly."""
@@ -1158,10 +1160,12 @@ class PRCommentTests(unittest.TestCase):
                 {"message": "Bad credentials", "documentation_url": "..."},
             ]
             result = _github_api_request_paginated(
-                "https://api.github.com/repos/o/r/issues/1/comments", "tok"
+                "https://api.github.com/repos/o/r/issues/1/comments", "tok",
+                per_page=1,
             )
         # Should return only the items from the first (successful) page.
         self.assertEqual(result, [{"id": 1}])
+        self.assertEqual(mock_req.call_count, 2)
 
     def test_paginated_stops_on_none_response(self) -> None:
         with mock.patch(
@@ -1169,9 +1173,11 @@ class PRCommentTests(unittest.TestCase):
         ) as mock_req:
             mock_req.side_effect = [[{"id": 1}], None]
             result = _github_api_request_paginated(
-                "https://api.github.com/repos/o/r/issues/1/comments", "tok"
+                "https://api.github.com/repos/o/r/issues/1/comments", "tok",
+                per_page=1,
             )
         self.assertEqual(result, [{"id": 1}])
+        self.assertEqual(mock_req.call_count, 2)
 
 
 
