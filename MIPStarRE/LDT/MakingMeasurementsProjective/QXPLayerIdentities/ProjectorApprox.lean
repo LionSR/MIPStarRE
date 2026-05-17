@@ -164,6 +164,20 @@ private lemma xHat_cross_sum_eq_sqrt {Outcome : Type*}
             congrArg (fun M => data.xᴴ * M * data.xHat) data.qLayer.t.sum_eq
     _ = CFC.sqrt (QTotal data.qLayer) := data.xHat_mixed
 
+/-- The mixed `X`--`Xhat` summation appearing in the proof of
+`lem:P-Q-approx`.
+
+After rewriting `Q_a` and `P_a` through the matrices `X`, `Xhat`, and the
+projective measurement `T`, the sum of the mixed terms collapses to
+`Xᴴ * Xhat`, hence to `sqrt Q` by `lem:X-times-X-hat`. -/
+lemma qxpMixedCrossSum_eq_sqrt {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    (∑ a : Outcome, (Xa data a)ᴴ * data.xHat * Pa data a) =
+      CFC.sqrt (QTotal data.qLayer) :=
+  xHat_cross_sum_eq_sqrt data
+
 private lemma q_p_cross_close {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

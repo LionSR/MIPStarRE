@@ -74,6 +74,35 @@ theorem rectangularSvd_xHat_mixed_raw
             _ = V * Sᴴ * (Iro * Vᴴ) := by rw [hUcollapse]
             _ = V * (Sᴴ * Iro) * Vᴴ := by simp [Matrix.mul_assoc]
 
+/-- The first mixed product obtained from the rectangular SVD formulae.
+
+This is the first identity in the paper's `lem:X-times-X-hat`, written in the
+rectangular notation used by the formalization.  If
+`X = U * S * Vᴴ` and `Xhat = U * Iro * Vᴴ`, then
+`X * Xhatᴴ = U * (S * Iroᴴ) * Uᴴ`.  The middle factor `S * Iroᴴ` is the
+formal counterpart of the square matrix `Σ_{m × m}` appearing in the paper. -/
+theorem rectangularSvd_x_mul_xHat_conjTranspose_raw
+    {μ ι : Type*} [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
+    (S Iro : Matrix μ ι ℂ)
+    (hV_right : Vᴴ * V = (1 : Matrix ι ι ℂ))
+    (hx : x = U * S * Vᴴ) :
+    x * (U * Iro * Vᴴ)ᴴ = U * (S * Iroᴴ) * Uᴴ := by
+  calc
+    x * (U * Iro * Vᴴ)ᴴ =
+        U * (S * Iroᴴ) * Uᴴ := by
+          rw [hx, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
+          simp only [Matrix.conjTranspose_conjTranspose]
+          have hVcollapse : Vᴴ * (V * (Iroᴴ * Uᴴ)) = Iroᴴ * Uᴴ := by
+            rw [← Matrix.mul_assoc, hV_right, Matrix.one_mul]
+          calc
+            U * S * Vᴴ * (V * (Iroᴴ * Uᴴ)) =
+                U * S * (Vᴴ * (V * (Iroᴴ * Uᴴ))) := by
+                  simp [Matrix.mul_assoc]
+            _ = U * S * (Iroᴴ * Uᴴ) := by rw [hVcollapse]
+            _ = U * (S * Iroᴴ) * Uᴴ := by simp [Matrix.mul_assoc]
+
 /-- A positive operator whose square is `Q` is the CFC square root of `Q`.
 
 This is the uniqueness of the positive square root, stated in the matrix
