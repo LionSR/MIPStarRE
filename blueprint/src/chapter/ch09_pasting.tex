@@ -48,11 +48,10 @@
 		      \]
 	\end{enumerate}
 \end{theorem}
-\begin{proof}
+\begin{proof}\leanok
 	\uses{lem:ld-pasting-sub-measurement}
-	The Lean proof of the unrestricted theorem currently has one tracked branch
-	obligation, the degree-zero case in issue~\#1622.  The argument below is the
-	paper proof.
+	The argument below is the paper proof, and the unrestricted Lean theorem now
+	formalizes it directly.
 	Let $H$ be the submeasurement from Lemma~\ref{lem:ld-pasting-sub-measurement}, and fix an arbitrary polynomial $h^* \in \polyfunc{m+1}{q}{d}$. Define a measurement $H_{\mathrm{meas}} \in \polymeas{m+1}{q}{d}$ by
 	\[
 		(H_{\mathrm{meas}})_h
@@ -91,8 +90,8 @@
 	explain that the proof may restrict to
 	\(\eps,\delta,\gamma,\zeta,d/q\le 1\), since the complementary cases are
 	trivial.  The unrestricted source statement is linked from
-	Theorem~\ref{thm:ld-pasting}.  Four complementary branches are now proved in
-	Lean; the remaining degree-zero branch is tracked by issue~\#1622.
+	Theorem~\ref{thm:ld-pasting}.  All complementary branches, including the
+	degree-zero case, are now proved in Lean.
 \end{remark}
 
 \begin{remark}[Degree-zero Lean branch]\label{rem:ld-pasting-degree-zero-lean-branch}
