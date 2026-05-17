@@ -212,8 +212,9 @@ noncomputable def projectiveP {Outcome : Type*} [Fintype Outcome]
 
 If each `Q_a` is represented as `X† T_a X` and the auxiliary measurement
 `T = {T_a}` sums to the identity, then the right Gram matrix of `X` is the total
-operator `Q = ∑_a Q_a`.  This is the source-level calculation behind
-`lem:X-squared`, stated independently of the later `QXPLayerData` record. -/
+operator `Q = ∑_a Q_a`.  This proves `lem:X-squared` from the
+`Q_a = X† T_a X` representation, independently of the later `QXPLayerData`
+record. -/
 theorem xSquared_of_qa_eq {Outcome : Type uOutcome} [Fintype Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (qLayer : QLayerData Outcome ι)
@@ -251,7 +252,8 @@ theorem xSquared_of_qa_eq {Outcome : Type uOutcome} [Fintype Outcome]
     _ = ∑ a : Outcome, Qa qLayer a := rfl
     _ = QTotal qLayer := q_sum_eq_total
 
-/-- Local producer for the `X/Xhat/P` data layer.
+/-- Assembles the `QXPLayerData` datum from a `Q`-layer and the
+SVD-derived identities.
 
 Given a `Q`-layer (`def:matrix-decomposition-Q`), the matrix decomposition `X`
 of the paper, the chosen `Xhat`, and the two genuinely SVD-derived identities
