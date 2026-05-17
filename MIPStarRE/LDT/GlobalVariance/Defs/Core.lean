@@ -61,7 +61,8 @@ noncomputable instance (params : Parameters) : Fintype (AxisParallelLine params)
         rfl }
   exact Fintype.ofEquiv (Point params × Fin params.m) e.symm
 
-/-- The placeholder finite polynomial model uses classical equality on the bundled witness. -/
+/-- The finite low-individual-degree polynomial model uses classical equality on
+the bundled witness. -/
 noncomputable instance (params : Parameters) [FieldModel params.q] :
     DecidableEq (Polynomial params) :=
   Classical.decEq _
@@ -72,7 +73,8 @@ noncomputable instance (params : Parameters) [FieldModel params.q] :
     DecidableEq (AxisLinePolynomial params) :=
   Classical.decEq _
 
-/-- A default low-degree polynomial used so uniform placeholder distributions are inhabited. -/
+/-- A default low-degree polynomial witnessing nonemptiness of the finite
+polynomial answer type. -/
 instance (params : Parameters) [FieldModel params.q] : Nonempty (Polynomial params) := by
   exact ⟨⟨0, by
     intro i
@@ -188,7 +190,7 @@ noncomputable def axisParallelLineQuestionDistribution (params : Parameters) [Fi
         intro qu hqu
         simp [hqu] }
 
-/-- A placeholder distribution over low-degree polynomials. -/
+/-- The uniform distribution over bundled low-individual-degree polynomials. -/
 noncomputable def polynomialDistribution (params : Parameters) [FieldModel params.q] :
     Distribution (Polynomial params) :=
   uniformDistribution (Polynomial params)

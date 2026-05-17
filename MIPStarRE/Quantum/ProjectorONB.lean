@@ -346,11 +346,7 @@ noncomputable def IsProj.rangeONB (P : Op ι) (hP : IsProj P) :
 /-- An orthogonal projection is positive semidefinite. -/
 lemma IsProj.nonneg (P : Op ι) (hP : IsProj P) :
     0 ≤ P := by
-  classical
-  let b := hP.rangeONB P
-  rw [b.decomposition]
-  exact Finset.sum_nonneg fun i _ =>
-    (Matrix.posSemidef_vecMulVec_self_star (b.vec i)).nonneg
+  exact hP.isStarProjection.nonneg
 
 end
 
