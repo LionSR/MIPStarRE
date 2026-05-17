@@ -246,8 +246,10 @@ noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
     have hM_ne : (hypercubeVertexCount params : ℂ) ≠ 0 := by
       exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
     ext i j
-    simp [Matrix.sum_apply, Finset.sum_sub_distrib, smul_eq_mul,
-      Finset.mul_sum, hypercubeVertexCount]
+    simp only [Matrix.sum_apply, Finset.sum_sub_distrib, smul_eq_mul,
+      Finset.mul_sum, hypercubeVertexCount, Finset.sum_const, Finset.card_univ,
+      Fintype.card_pi, Fintype.card_fin, Finset.prod_const, nsmul_eq_mul,
+      Nat.cast_pow, Matrix.sub_apply, Matrix.smul_apply, Matrix.zero_apply]
     rw [sub_eq_zero]
     refine Finset.sum_congr rfl ?_
     intro x hx

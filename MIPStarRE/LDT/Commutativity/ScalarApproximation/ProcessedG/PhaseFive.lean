@@ -464,7 +464,7 @@ lemma evaluatedSlicePhaseFiveQuestionDefect_appendPoint_expansion
                 rightTensor (ι₁ := ι)
                   ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
                     (g u))) := by
-          simp [evaluatedSlicePhaseFiveQuestionDefect, evaluatedSliceFirstFactor,
+          simp only [evaluatedSlicePhaseFiveQuestionDefect, evaluatedSliceFirstFactor,
             evaluatedSliceSecondFactor, evaluatedSlicePointMeas, pointHeight_appendPoint,
             evaluatedPointFamily_appendPoint_outcome, hG]
           rw [Finset.sum_comm]
