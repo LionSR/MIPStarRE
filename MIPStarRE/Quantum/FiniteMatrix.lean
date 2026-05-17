@@ -103,9 +103,7 @@ noncomputable local instance : NonUnitalContinuousFunctionalCalculus ℝ (Op d) 
 /-- Sandwiching a PSD operator by a Hermitian operator preserves positivity. -/
 theorem sandwich_nonneg {M P : Op d} (hP : 0 ≤ P) (hMH : Mᴴ = M) :
     0 ≤ M * P * M := by
-  simpa [hMH] using
-    (Matrix.PosSemidef.mul_mul_conjTranspose_same
-      (Matrix.nonneg_iff_posSemidef.mp hP) M).nonneg
+  simpa [Matrix.star_eq_conjTranspose, hMH] using star_right_conjugate_nonneg hP M
 
 /-- Sandwiching is monotone in the middle factor for a fixed Hermitian outer operator. -/
 theorem sandwich_mono {M P Q : Op d} (hMH : Mᴴ = M) (hPQ : P ≤ Q) :
