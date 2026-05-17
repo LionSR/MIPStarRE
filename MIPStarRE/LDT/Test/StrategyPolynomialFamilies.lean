@@ -140,8 +140,8 @@ coordinates once the slice height is fixed.
 
 Lean-only helper for the degree-zero branch of `thm:ld-pasting`; the source
 context is `references/ldt-paper/ld-pasting.tex:12-55`.  This does not identify
-different slice heights.  That remaining height-consistency step is the
-mathematical content still tracked by issue #1622. -/
+different slice heights.  The height-compatibility step is handled separately in
+the degree-zero pasting construction in `Pasting/Bernoulli/Final.lean`. -/
 theorem evaluatedAtNextPoint_eq_of_same_height_degree_zero {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι) (hd : params.d = 0)

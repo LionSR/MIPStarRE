@@ -51,10 +51,10 @@ obligation for `thm:main-induction`: the theorem statement matches the paper
 statement, and the remaining work is to derive the internal successor-stage
 inputs from the paper hypotheses.  This is tracked by issue #1507.
 
-The audit for `Pasting.ldPasting` records the current proof obligation for
-`thm:ld-pasting`: the theorem statement matches the unrestricted paper
-statement, and the remaining direct `sorry` is the degree-zero complementary
-branch tracked by issue #1622.
+The audit for `Pasting.ldPasting` now requires the standard Lean axioms only:
+the unrestricted paper-facing theorem no longer depends on a dedicated
+degree-zero `sorryAx`, because issue #1622 has been discharged by the direct
+degree-zero construction in `Pasting/Bernoulli/Final.lean`.
 
 The audit for `ExpansionHypercubeGraph.laplacianSpectralGapOrdered` now
 requires the standard Lean axioms only: the ordered-eigenvalue statement of
@@ -121,10 +121,10 @@ needed for `mainInduction`. -/
 private def expectedMainInductionAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1622 degree-zero
-branch needed for unrestricted `ldPasting`. -/
+/-- Standard kernel axioms only: the issue #1622 degree-zero branch for
+unrestricted `ldPasting` has been discharged. -/
 private def expectedLdPastingAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
 /-- Standard kernel axioms only: the issue #1497 derivation for
 `laplacianSpectralGapOrdered` has been discharged. -/
