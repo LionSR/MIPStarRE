@@ -47,7 +47,7 @@ Finally reindex the left side from 𝒟 to rerandomizeCoord.
 
 set_option maxHeartbeats 800000 in
 -- The polynomial-sum statement expands both weighted generalize-B families
--- during elaboration; Lean 4.30 needs a declaration-local budget here.
+-- while checking the proof; Lean 4.30 needs a declaration-local resource limit here.
 /-- Reverse generalize-B bound summed over all polynomials.
 
 The reverse squared distance equals the forward one by `ev_adjoint_sub_swap`;
@@ -88,10 +88,10 @@ lemma generalizeBReversePointwiseBound_polysum_le_error
   exact generalizeBDeviationAtPolynomial_polysum_le_error params strategy G
 
 
-set_option maxHeartbeats 1000000 in
--- The chain assembly simultaneously elaborates six step sums and their
+set_option maxHeartbeats 800000 in
+-- The chain assembly simultaneously combines six step sums and their
 -- reindexing maps.  The statement and proof are unchanged, but Lean 4.30
--- requires a larger local heartbeat budget for these definitional equalities.
+-- requires a larger local resource limit for these identities.
 /-- **Chain assembly for `eq:equivalent-local-variance`**.
 
 This theorem closes the six-step sum-form local-variance chain.  For each

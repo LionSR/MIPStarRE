@@ -106,9 +106,9 @@ private lemma qSDDCore_option_pair_decompose
   rw [show (∑ u : Unit, ev ψ ((Lnn u - Rnn u)ᴴ * (Lnn u - Rnn u))) =
         ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())) from Fintype.sum_unique _]
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 800000 in
 -- The quadrant decomposition expands nested `Option × Option` sums whose
--- normalization exceeds the default heartbeat budget after the Lean 4.30 update.
+-- normalization exceeds the default local resource limit after the Lean 4.30 update.
 /-- Internal form of `cor:G-hat-facts` after applying
 `lem:g-complete-self-consistency`, `cor:g-bot-self-consistency`,
 `cor:commuting-with-G-complete`, and `cor:commuting-with-G-incomplete`.
