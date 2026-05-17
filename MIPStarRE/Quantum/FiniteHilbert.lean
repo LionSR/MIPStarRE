@@ -23,25 +23,6 @@ open Module
 
 namespace LinearIsometry
 
-/-- The adjoint of a finite-dimensional linear isometry is a left inverse. -/
-theorem adjoint_comp_toLinearMap
-    {𝕜 : Type*} [RCLike 𝕜]
-    {E F : Type*}
-    [NormedAddCommGroup E] [InnerProductSpace 𝕜 E] [FiniteDimensional 𝕜 E]
-    [NormedAddCommGroup F] [InnerProductSpace 𝕜 F] [FiniteDimensional 𝕜 F]
-    (L : E →ₗᵢ[𝕜] F) :
-    L.toLinearMap.adjoint.comp L.toLinearMap = 1 := by
-  apply LinearMap.ext
-  intro x
-  refine ext_inner_right 𝕜 fun y => ?_
-  calc
-    inner 𝕜 ((L.toLinearMap.adjoint.comp L.toLinearMap) x) y =
-        inner 𝕜 (L x) (L y) := by
-          rw [LinearMap.comp_apply, LinearMap.adjoint_inner_left]
-          rfl
-    _ = inner 𝕜 x y := L.inner_map_map x y
-    _ = inner 𝕜 ((1 : E →ₗ[𝕜] E) x) y := rfl
-
 /-- A finite-dimensional Hilbert space admits a linear isometric embedding into
 any finite-dimensional Hilbert space whose dimension is at least as large.
 
@@ -130,7 +111,8 @@ theorem exists_mul_conjTranspose_eq_one_of_card_le
           (Matrix.toEuclideanLin M).adjoint.comp (Matrix.toEuclideanLin M) := by
             exact Matrix.toEuclideanLin_conjTranspose_mul_self M
       _ = L.toLinearMap.adjoint.comp L.toLinearMap := by rw [hM_lin]
-      _ = 1 := L.adjoint_comp_toLinearMap
+      _ = 1 := by
+            exact L.adjoint_comp_self'
       _ = Matrix.toEuclideanLin (1 : Matrix m m 𝕜) := by
             rw [Matrix.toEuclideanLin, Matrix.toLpLin_one]
             rfl

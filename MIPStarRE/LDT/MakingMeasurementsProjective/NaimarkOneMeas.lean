@@ -134,7 +134,7 @@ private lemma partialIsometry_to_unitary
           (Matrix.toEuclideanLin Umat).adjoint.comp (Matrix.toEuclideanLin Umat) := by
             rw [Matrix.toEuclideanLin_conjTranspose_mul_self]
       _ = Ulin.toLinearMap.adjoint.comp Ulin.toLinearMap := by rw [hUmat_lin]
-      _ = 1 := Ulin.adjoint_comp_toLinearMap
+      _ = 1 := by exact Ulin.adjoint_comp_self'
       _ = Matrix.toEuclideanLin (1 : MIPStarRE.Quantum.Op n) := by
             rw [Matrix.toEuclideanLin, Matrix.toLpLin_one]
             rfl
