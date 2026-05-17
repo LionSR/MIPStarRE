@@ -692,15 +692,17 @@ def find_header_leanok_without_proof_leanok(
     if not chapter_dir.exists():
         return []
 
+    theorem_like_env_names = ("lemma", "theorem", "proposition", "corollary")
+    theorem_like_env_pattern = "|".join(theorem_like_env_names)
+    theorem_like_envs = set(theorem_like_env_names)
     env_begin_re = re.compile(
-        r"\\begin\{(lemma|theorem|proposition|corollary)\}"
+        r"\\begin\{(" + theorem_like_env_pattern + r")\}"
         r"(?:\[[^\]]*\])?"
     )
     label_re = re.compile(r"\\label\{([^}]+)\}")
     env_end_re = re.compile(
-        r"\\end\{(lemma|theorem|proposition|corollary)\}"
+        r"\\end\{(" + theorem_like_env_pattern + r")\}"
     )
-    theorem_like_envs = {"lemma", "theorem", "proposition", "corollary"}
     proof_begin_re = re.compile(r"\\begin\{proof\}")
     proof_end_re = re.compile(r"\\end\{proof\}")
     # Generic environment begin: used to skip intervening non-proof envs.
