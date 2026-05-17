@@ -90,7 +90,7 @@ lemma completePartAggregateCommutation_as_total
                   (switcherooAggregateRight_completePart_outcome params family q)
     _ ≤ gamma := hcomm
 
-set_option maxHeartbeats 1000000 in -- large sqrt/rpow proof, see issue #894
+set_option maxHeartbeats 1000000 in -- large sqrt/rpow proof; tracked by #1648
 /-- Variant of the first switcheroo scalar bound using the intermediate
 `eighthSum`; shared with `CommutingWithG/Complete`. -/
 lemma firstSwitcherooError_le_eighth_stage
@@ -261,7 +261,7 @@ lemma firstSwitcherooError_le_eighth_stage
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (8 : Error))) := by
             simp [eighthSum]
 
-set_option maxHeartbeats 1000000 in -- large sqrt/rpow proof, see issue #894
+set_option maxHeartbeats 1000000 in -- large sqrt/rpow proof; tracked by #1648
 /-- Many sqrt/rpow manipulations for `12 * sqrt zeta + 4 * sqrt (ν_com) ≤ ν₂`.
 This shows that the first-switcheroo error (the `commutativitySwitcherooError`)
 is bounded above by the complete-part commuting-with-G error. -/

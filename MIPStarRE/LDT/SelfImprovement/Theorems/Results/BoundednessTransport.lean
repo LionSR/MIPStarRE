@@ -111,7 +111,7 @@ it is the checked `easy-approx-from-approx-delta` part of
 `references/ldt-paper/self_improvement.tex` lines 747--755, mirrored in
 `blueprint/src/chapter/ch07_self_improvement.tex` lines 609--618. -/
 
--- TODO(#1127): This lemma is duplicated in `BoundednessTransport/Agreement.lean` as a
+-- TODO(#1647): This lemma is duplicated in `BoundednessTransport/Agreement.lean` as a
 -- public `lemma helper_agreement_average_ev_eq_avg`.  Once the parent file is fully split,
 -- remove this private copy and import the sub-module instead.
 private lemma helper_agreement_average_ev_eq_avg
@@ -335,7 +335,7 @@ theorem helperAgreementOperatorAtPoint_ev_slack_eq_off_diagonal_sum
     ev_sum]
   simp only [ev_finset_sum]
 
--- TODO(#1127): These three private lemmas are local to the point-consistency
+-- TODO(#1647): These three private lemmas are local to the point-consistency
 -- transport block.  Once the parent file is fully split, move them to the
 -- corresponding submodule.
 private lemma opTensor_one_left_eq_rightTensor
