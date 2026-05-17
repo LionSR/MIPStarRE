@@ -2394,6 +2394,8 @@
     <span class="lemma_thmtitle">\(X\) squared</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -2726,7 +2728,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The Lean declarations linked in Lemmas&#160;<a href="chap-projective.html#lem:X-squared">4.31</a>, <a href="chap-projective.html#lem:X-hat-squared">4.34</a>, and&#160;<a href="chap-projective.html#lem:X-times-X-hat">4.35</a> record useful parts of the paper’s \(X,\widehat X,P\) algebra. The small lemmas named after these paper labels are projections from the structure <span class="ttfamily">QXPLayerData</span>; the accompanying construction lemmas build such data from sigma-range and rectangular-SVD ingredients. The blueprint therefore does not mark these three entries as source-complete formalizations until the cited identities are exposed as source-faithful construction theorems rather than hidden as fields of the data package. </p>
+  <p> The Lean declarations linked in Lemmas&#160;<a href="chap-projective.html#lem:X-squared">4.31</a>, <a href="chap-projective.html#lem:X-hat-squared">4.34</a>, and&#160;<a href="chap-projective.html#lem:X-times-X-hat">4.35</a> now expose the corresponding matrix identities as construction theorems. The <span class="ttfamily">QXPLayerData</span> structure still stores these identities for later algebraic use, but the Lean declarations listed above point to theorems proving the identities from the \(Q\)-layer, sigma-range, or rectangular-SVD hypotheses. The blueprint still refrains from declaring the full late-stage orthogonalization argument source-complete until these construction theorems are connected all the way to the preceding rounding-to-projectors and rank-reduction route. </p>
 
   </div>
 </div>
@@ -2915,7 +2917,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.35</a>. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used in the residual-domination argument for the fresh completed outcome. As in Remark&#160;<a href="chap-projective.html#rem:qxp-layer-lean-status">4.36</a>, the statement is left without a source-complete formalization marker while the QXP package still hides some of the displayed SVD identities as structure fields. The quantity to bound is </p>
+  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.35</a>. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used in the residual-domination argument for the fresh completed outcome. As in Remark&#160;<a href="chap-projective.html#rem:qxp-layer-lean-status">4.36</a>, the statement is left without a source-complete formalization marker until the displayed identities are connected to the preceding construction route. The quantity to bound is </p>
 <div class="equation" id="eq:P-Q-thing-to-bound">
 <p>
   <div class="equation_content">
