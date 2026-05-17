@@ -132,13 +132,9 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
   For outcome `some a`, this is the Naimark projector `P̂_a`.
   For outcome `none`, this is the projector for the "missing mass". -/
   liftedEffect : Option α → MIPStarRE.Quantum.Op (d × Option α)
-  /-- Each lifted effect is a genuine orthogonal projection. -/
+  /-- Each lifted effect is a genuine orthogonal projection. Positivity follows
+  from `MIPStarRE.Quantum.IsProj.nonneg`. -/
   lifted_isProj : ∀ a, MIPStarRE.Quantum.IsProj (liftedEffect a)
-  /-- Each lifted effect is positive semidefinite, so the family forms a submeasurement.
-  Note: this is mathematically redundant with `lifted_isProj` (projections are PSD),
-  but kept as a convenience field for downstream `Submeasurement` packaging until
-  `IsProj.pos` is available in Mathlib. -/
-  lifted_pos : ∀ a, 0 ≤ liftedEffect a
   /-- The lifted projections sum to at most identity (which together with
   `lifted_isProj` implies mutual orthogonality). -/
   lifted_sum_le_one : ∑ a, liftedEffect a ≤ 1
@@ -151,6 +147,17 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
     MIPStarRE.Quantum.normalizedTrace (ρ * source.effect a) =
       MIPStarRE.Quantum.normalizedTrace
         (oneMeasLiftedDensity α ρ * liftedEffect (some a))
+
+/-- Positivity of a lifted Naimark effect, derived from its projectivity.
+
+Lean-only consequence of the one-measurement Naimark data: the paper records
+the lifted effects as projections, and positivity is supplied here by the
+Mathlib star-projection order theorem through `MIPStarRE.Quantum.IsProj.nonneg`. -/
+theorem OneMeasNaimarkData.lifted_pos {α : Type*} [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (data : OneMeasNaimarkData α d) (a : Option α) :
+    0 ≤ data.liftedEffect a :=
+  MIPStarRE.Quantum.IsProj.nonneg (data.liftedEffect a) (data.lifted_isProj a)
 
 /-! ### Questionwise Naimark data
 

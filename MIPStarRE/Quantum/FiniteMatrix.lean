@@ -358,6 +358,11 @@ lemma IsProj.of_isStarProjection {P : Op d} (hP : IsStarProjection P) : IsProj P
   isHermitian := hP.isSelfAdjoint.isHermitian
   idempotent := hP.isIdempotentElem
 
+/-- Orthogonal projections are positive semidefinite operators. -/
+lemma IsProj.nonneg (P : Op d) (hP : IsProj P) :
+    0 ≤ P := by
+  exact hP.isStarProjection.nonneg
+
 /-! ### Spectral truncation -/
 
 /--

@@ -257,7 +257,7 @@ lemma add_in_u_simplified_transfer_of_cs_chain_sqrt_form
     h01 h12 h23 h34 hsum
 
 set_option maxHeartbeats 800000 in
--- This wrapper combines the two local-variance Cauchy--Schwarz replacements
+-- This lemma combines the two local-variance Cauchy--Schwarz replacements
 -- with the scalar add-in-u transfer inequality.
 /-- Projection-simplified add-in-`u` transfer with the Step 3/4 variance bounds
 supplied by the local-variance sum hypothesis.

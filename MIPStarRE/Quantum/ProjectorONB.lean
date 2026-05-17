@@ -343,11 +343,6 @@ noncomputable def IsProj.rangeONB (P : Op ι) (hP : IsProj P) :
             Matrix.vecMulVec ((hP.isHermitian.eigenvectorBasis i.1).ofLp)
               (star ((hP.isHermitian.eigenvectorBasis i.1).ofLp))).symm))
 
-/-- An orthogonal projection is positive semidefinite. -/
-lemma IsProj.nonneg (P : Op ι) (hP : IsProj P) :
-    0 ≤ P := by
-  exact hP.isStarProjection.nonneg
-
 end
 
 end MIPStarRE.Quantum

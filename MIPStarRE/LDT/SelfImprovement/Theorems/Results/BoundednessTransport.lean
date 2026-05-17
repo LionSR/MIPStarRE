@@ -49,7 +49,7 @@ data-processing transport of the boundedness gap, and the standalone
 - **helper_point_consistency_error_eq_off_diagonal_avg** — identifies the
   averaged off-diagonal mass with the helper-stage `ConsRel` defect for the
   point measurement against `polynomialEvaluationFamily`.
-- **helper_point_consistency_of_pointConsistencyAddInU_transfer** — packages
+- **helper_point_consistency_of_pointConsistencyAddInU_transfer** — records
   the point-consistency `add-in-u` transfer as a `ConsRel` at
   `selfImprovementHelperError`.
 - **final_fields_point_consistency_totalGap_natural** — transports the
@@ -65,7 +65,7 @@ data-processing transport of the boundedness gap, and the standalone
 - **final_fields_projective_residual_bound_natural** — combines the dual-slack
   comparator with the data-processing transport to bound the projective
   residual at `selfImprovementHelperError + √selfImprovementDataProcessingError`.
-- **final_fields_projective_residual_bound** — literal-threshold wrapper
+- **final_fields_projective_residual_bound** — literal-threshold theorem
   absorbing the natural error into `selfImprovementError`.
 - **final_fields_projective_residual_bound_of_helper_outputs**
   — final projective-residual construction from helper outputs, data processing,
@@ -538,7 +538,7 @@ theorem helper_point_consistency_of_pointConsistencyAddInU_transfer
       params strategy eps delta heps hdelta T Hhat htransfer
 
 set_option maxHeartbeats 800000 in
--- This wrapper composes the selected point-consistency add-in-u chain with the
+-- This lemma composes the selected point-consistency add-in-u chain with the
 -- point-consistency conversion above.
 /-- Helper-stage point consistency obtained directly from the selected
 add-in-`u` chain.
@@ -901,7 +901,7 @@ theorem final_fields_point_consistency_totalGap_natural_of_data_processing
 /-- Literal-threshold point-consistency transport from the helper output to the
 projective output.
 
-This wrapper isolates the numerical absorption needed to turn the natural
+This theorem isolates the numerical absorption needed to turn the natural
 error
 `selfImprovementHelperError + sqrt selfImprovementDataProcessingError + η`
 into the final `selfImprovementError` threshold.  The analytic content is
@@ -1314,7 +1314,7 @@ set_option maxHeartbeats 800000 in
 /-- Helper-stage boundedness from the scalar comparison and the
 point-consistency `add-in-u` transfer.
 
-This wrapper composes the off-diagonal estimate supplied by
+This theorem composes the off-diagonal estimate supplied by
 `pointConsistencyAddInUSelection` with
 `helper_boundedness_gap_le_selfImprovementHelperError`.  It is the theorem-side
 form of the sentence "combined with the explicit `A`-consistency bound" in the
@@ -1641,7 +1641,7 @@ theorem final_fields_projective_residual_bound_natural
 
 /-- Literal-threshold projective-residual construction.
 
-This wraps `final_fields_projective_residual_bound_natural` with a separately
+This theorem combines `final_fields_projective_residual_bound_natural` with a separately
 named numerical absorption lemma. The analytic inputs are only the helper-stage
 boundedness estimate, dual feasibility from `SelfImprovementHelperConclusion`,
 and the data-processing SDD output already produced inside `selfImprovement`. -/
@@ -1676,7 +1676,7 @@ theorem final_fields_projective_residual_bound
 /-- Literal-threshold projective-residual construction under the standard
 unit-interval smallness hypotheses.
 
-This is the convenience wrapper around
+This is the convenience theorem following from
 `final_fields_projective_residual_bound`: the numerical absorption input is
 provided by
 `final_fields_projective_residual_error_le_selfImprovementError`, so callers

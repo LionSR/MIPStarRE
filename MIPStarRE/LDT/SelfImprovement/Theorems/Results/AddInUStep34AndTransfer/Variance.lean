@@ -528,7 +528,7 @@ This consumes the expected output of the local-variance normalization step
 `globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le`, then applies
 the combined Step 3/4 bridge above.  It remains a named bridge because the
 blueprint cites this local-sum interface separately from the closed
-factor-bound wrapper below. -/
+factor-bound lemma below. -/
 lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -559,7 +559,7 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
     h23cs h34cs
 
 set_option maxHeartbeats 800000 in
--- This wrapper composes the local-to-global sum transfer with the first
+-- This lemma composes the local-to-global sum transfer with the first
 -- projection-simplified Cauchy--Schwarz factor estimate.
 /-- Closed local-variance bridge for the first projection-simplified
 Cauchy--Schwarz replacement step.
@@ -584,7 +584,7 @@ lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_localVarianceDeviation_sum_le_from_fact
       params strategy eps delta T hlocal)
 
 set_option maxHeartbeats 800000 in
--- This wrapper composes the local-to-global sum transfer with the second
+-- This lemma composes the local-to-global sum transfer with the second
 -- projection-simplified Cauchy--Schwarz factor estimate.
 /-- Closed local-variance bridge for the second projection-simplified
 Cauchy--Schwarz replacement step.

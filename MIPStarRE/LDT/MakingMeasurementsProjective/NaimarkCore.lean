@@ -28,14 +28,6 @@ lemma optionBasisProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
       simp [Matrix.single, hio, hjo, and_comm]
   · simp
 
-/-- The rank-one projector onto an `Option` basis vector is positive semidefinite. -/
-lemma optionBasisProj_nonneg {α : Type*} [Finite α] [DecidableEq α]
-    (oa : Option α) :
-    0 ≤ (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) := by
-  refine Matrix.nonneg_iff_posSemidef.mpr ?_
-  let col : Matrix (Option α) Unit ℂ := Matrix.single oa () 1
-  simpa [col] using Matrix.posSemidef_self_mul_conjTranspose col
-
 /-- The `Option` basis projectors sum to the identity. -/
 lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
     ∑ oa : Option α, (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) = 1 := by
@@ -123,15 +115,6 @@ lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
             simp [mul_assoc]
       _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n) := by
             rw [hP.idempotent]
-
-/-- Unitary conjugation preserves positive semidefiniteness. -/
-lemma nonneg_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
-    (U : Matrix.unitaryGroup n ℂ) {P : MIPStarRE.Quantum.Op n}
-    (hP : 0 ≤ P) :
-    0 ≤ ((U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n)) := by
-  exact
-    (Matrix.PosSemidef.conjTranspose_mul_mul_same
-      (Matrix.nonneg_iff_posSemidef.mp hP) (U : MIPStarRE.Quantum.Op n)).nonneg
 
 /-- Unitary conjugation preserves identity decompositions. -/
 lemma unitary_conj_sum_eq_one {β n : Type*} [Fintype β] [Fintype n] [DecidableEq n]

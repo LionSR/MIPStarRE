@@ -3,11 +3,11 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 
 /-!
-# Helper completeness: bracketed mass identities and reduced wrappers
+# Helper completeness: bracketed mass identities and reduced reductions
 
 This file contains the exact bracketed reindexing of the helper-stage mass, the
 paper-shaped completeness assemblies, and the reduced `sdp` and `addInU`
-wrappers used by the surrounding self-improvement theorem.
+reductions used by the surrounding self-improvement theorem.
 
 ## References
 
@@ -385,7 +385,7 @@ theorem helper_completeness_of_bracketed_cauchy_schwarz_input_consistency
 /-- Helper-stage completeness from point self-consistency, complementary
 slackness, and input consistency.
 
-This wrapper removes the two external Cauchy--Schwarz hypotheses from
+This theorem removes the two external Cauchy--Schwarz hypotheses from
 `helper_completeness_of_bracketed_cauchy_schwarz_input_consistency`; both are
 proved from the single point-measurement self-consistency hypothesis. -/
 theorem helper_completeness_of_self_consistency_complementary_slackness_input_consistency
@@ -478,7 +478,7 @@ theorem helper_hhat_vs_z_of_self_consistency_and_helper_slackness
 /-- Helper-stage completeness from point self-consistency, a helper conclusion
 carrying SDP complementary slackness, and input consistency.
 
-This wrapper removes the standalone `hslack` hypothesis from
+This theorem removes the standalone `hslack` hypothesis from
 `helper_completeness_of_self_consistency_complementary_slackness_input_consistency`;
 the slackness equations are read from
 `SelfImprovementHelperConclusionWithSlackness`. -/
@@ -508,7 +508,7 @@ theorem helper_completeness_of_self_consistency_helper_slackness_input_consisten
 
 /-- Reduced version of `lem:sdp`.
 
-This reduced wrapper now instantiates the paper's explicit Slater witnesses: the
+This reduced theorem now instantiates the paper's explicit Slater witnesses: the
 primal uses the uniform strict-feasible submeasurement
 `T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`, canonically completed at the zero
 polynomial to fit the downstream `Measurement` interface, and the dual uses
@@ -598,14 +598,14 @@ theorem sdp_slackness_measurement
     (sdp_statement_with_slackness params strategy)
 
 set_option maxHeartbeats 800000 in
--- The reduced add-in-u wrapper invokes the global-variance transport record and
--- elaborates the full polynomial-indexed variance family.
+-- The reduced add-in-u lemma invokes the global-variance transport record and
+-- checks the full polynomial-indexed variance family.
 /-- Reduced version of `lem:add-in-u`.
 
 This currently keeps only the global-variance consequence used downstream. It
 now derives that consequence from the post-triangle six-step edge-transport
 chain bound via `globalVarianceOfPointsFromTransportChainBound`. The `gamma` and
-`hgood` arguments are intentionally retained so this reduced wrapper still
+`hgood` arguments are intentionally retained so this reduced theorem still
 matches the surrounding self-improvement API and can be strengthened back to the
 full paper statement without another caller-wide signature change. The
 selection-dependent transfer inequality from the paper, together with its

@@ -10,15 +10,15 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
-/-! # Main variance theorem wrappers and matrix-level counterparts
+/-! # Main variance theorem reductions and matrix-level counterparts
 
-This module contains the high-level theorem wrappers for
+This module contains the high-level theorem reductions for
 `lem:local-variance-of-points`, `lem:global-variance-of-points`, and
 their matrix-level counterparts. These combine the algebraic identities,
 collision expansions, and transport estimates from the preceding modules
-into the final statement packages used by downstream consumers.
+into the final statement records used by downstream consumers.
 
-## Matrix statement wrappers
+## Matrix statement reductions
 -/
 
 private lemma matrixGeneralizeB_of_pointwise
@@ -86,7 +86,7 @@ private lemma matrixGlobalVarianceOfPoints_from_local
         (globalVarianceOfPointsError params eps delta) hglobal
 
 
-/-- Legacy wrapper for `lem:local-variance-of-points` with arbitrary bipartite
+/-- Legacy reduction for `lem:local-variance-of-points` with arbitrary bipartite
 state and both pointwise bounds supplied explicitly.
 
 For the paper-faithful strategy state, prefer
@@ -140,11 +140,11 @@ lemma localVarianceOfPoints
 /-! ## Strategy-state reductions -/
 
 set_option maxHeartbeats 800000 in
--- The statement contains the full strategy-state edge comparison package; Lean
--- 4.30 needs a larger local budget to elaborate the record fields.
+-- The statement contains the full strategy-state edge comparison data; Lean
+-- 4.30 needs a larger local resource limit to check the record fields.
 /-- Strict reduction for `lem:local-variance-of-points` on the strategy state.
 
-Compared with the legacy wrapper `localVarianceOfPoints`, this theorem no longer
+Compared with the legacy theorem `localVarianceOfPoints`, this theorem no longer
 requires the local-variance bound as a separate hypothesis: it derives it from
 the edgewise weighted squared-norm estimate using
 `localVarianceDeviationAtPolynomial_eq_two_pointConditionedLocalVarianceAtPolynomial`.
@@ -196,7 +196,7 @@ lemma localVarianceOfPointsFromEdgeDeviation
                 params strategy G (hedge g)) }
 
 set_option maxHeartbeats 800000 in
--- This wrapper builds the global-variance record from the local record and the
+-- This lemma builds the global-variance record from the local record and the
 -- expansion transfer, expanding several indexed operator families.
 /-- Reduction for `lem:global-variance-of-points` on the strategy state.
 
@@ -298,8 +298,8 @@ lemma globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum
           rw [Finset.mul_sum]
 
 set_option maxHeartbeats 800000 in
--- The polynomial-sum wrapper combines the previous transfer with the public
--- error normalization, and its expanded statement is large after elaboration.
+-- This polynomial-sum lemma combines the previous transfer with the public
+-- error normalization, and its expanded statement has a large checked form.
 /-- A polynomial-sum local-variance bound implies the corresponding sum-form
 global-variance bound with the paper's `24m(ε + δ + md/q)` error term.
 
@@ -335,14 +335,14 @@ lemma globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
           ring
 
 set_option maxHeartbeats 800000 in
--- This theorem applies the post-triangle transport-chain residual to the
+-- This theorem applies the post-triangle transport-chain bound to the
 -- strategy-state local-variance record.
 /-- Strategy-state reduction for `lem:local-variance-of-points` from the
 post-triangle six-step transport-chain bound.
 
-This replaces the final displayed edge estimate by the residual produced after
+This replaces the final displayed edge estimate by the bound produced after
 applying `prop:triangle-inequality-for-approx_delta` with `k = 6` to the six
-paper steps (`2δ + 2ε + md/q + md/q + 2ε + 2δ`).  Thus the named residual is
+paper steps (`2δ + 2ε + md/q + md/q + 2ε + 2δ`). Thus the named estimate is
 `∀ g, localVarianceDeviationAtPolynomial … g ≤ localVarianceTransportChainError …`.
 The absorption into the public `24(ε + δ + md/q)` statement is proved above. -/
 lemma localVarianceOfPointsFromTransportChainBound
@@ -364,8 +364,8 @@ lemma localVarianceOfPointsFromTransportChainBound
       params strategy hgood)
 
 set_option maxHeartbeats 800000 in
--- This theorem composes the transport-chain residual with the global-variance
--- reduction and therefore elaborates both record packages.
+-- This theorem composes the transport-chain bound with the global-variance
+-- reduction and therefore checks both record structures.
 /-- Strategy-state global-variance reduction from the post-triangle six-step
 local-variance transport-chain bound. -/
 lemma globalVarianceOfPointsFromTransportChainBound
@@ -387,7 +387,7 @@ lemma globalVarianceOfPointsFromTransportChainBound
       params strategy hgood)
 
 set_option maxHeartbeats 800000 in
--- The supplied-bounds wrapper constructs the arbitrary-state global-variance
+-- This supplied-bounds lemma constructs the arbitrary-state global-variance
 -- record and expands the independent-point comparison families.
 /-- Auxiliary lemma for `lem:global-variance-of-points` with arbitrary
 bipartite state and the independent-points norm bound supplied explicitly.
@@ -457,7 +457,7 @@ lemma globalVarianceOfPoints_ofSuppliedBounds
             (globalVarianceOfPointsError params eps delta) hglobal }
 
 set_option maxHeartbeats 800000 in
--- The paper-facing wrapper invokes the transport-chain theorem and the
+-- The paper-facing theorem invokes the transport-chain theorem and the
 -- strategy-state global-variance record constructor.
 /-- Paper origin: `references/ldt-paper/expansion.tex:325-353`
 (`\label{lem:global-variance-of-points}`).
@@ -481,7 +481,7 @@ lemma globalVarianceOfPoints
   intro g
   exact localVarianceTransportChainBound params strategy eps delta gamma hgood G g
 
-/-! ## Matrix wrappers -/
+/-! ## Matrix reductions -/
 
 /-- Matrix-level counterpart of `lem:generalize-b`, proved by reducing to the
 abstract version via an explicit compatibility hypothesis linking the matrix

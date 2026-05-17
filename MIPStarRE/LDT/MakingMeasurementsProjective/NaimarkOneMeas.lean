@@ -271,7 +271,6 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     liftedEffect := fun oa =>
       Umatᴴ * Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa) * Umat
     lifted_isProj := ?_
-    lifted_pos := ?_
     lifted_sum_le_one := ?_
     expectation_preservation := ?_
   }, rfl⟩
@@ -285,15 +284,6 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     have hPproj : MIPStarRE.Quantum.IsProj P := by
       exact isProj_kronecker op_one_isProj (optionBasisProj_isProj oa)
     simpa [Umat, P] using isProj_unitary_conj U hPproj
-  · intro oa
-    /-
-    Each `I ⊗ |oa⟩⟨oa|` is PSD, so its unitary conjugate is PSD as well.
-    -/
-    let P : MIPStarRE.Quantum.Op (d × Option α) :=
-      Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)
-    have hPnonneg : 0 ≤ P := by
-      exact MIPStarRE.Quantum.kronecker_nonneg op_one_nonneg (optionBasisProj_nonneg oa)
-    simpa [Umat, P] using nonneg_unitary_conj U hPnonneg
   · /-
     Since the auxiliary rank-one projectors sum to the identity on `Option α`,
     the lifted family is actually a complete projective measurement, hence in
