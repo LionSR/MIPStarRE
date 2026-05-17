@@ -56,18 +56,6 @@ lemma qaRestated {Outcome : Type*}
         _ = (Xa data a)ᴴ * data.x := by
           simp [Xa, Matrix.conjTranspose_mul, hTa]
 
-/-- **`X` squared** (`lem:X-squared`).
-
-Identifies the right Gram matrix of `X` with the total operator `Q`.  This is
-the only part of the paper's SVD bookkeeping used by the downstream
-`P`-vs-`Q` algebra. -/
-lemma xSquared {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xᴴ * data.x = QTotal data.qLayer := by
-  exact data.x_gram_right
-
 /-- If the original `X` rows are already coisometric and the mixed product
 `X† XHat` agrees with the Gram operator `X† X`, then the polar replacement
 `XHat` is equal to `X`.
@@ -354,30 +342,6 @@ lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
     (hrow : XHatA data none = Xa data none) :
     data.qLayer.q.outcome none ≤ Pa data none :=
   le_of_eq (qa_eq_pa_of_xHatA_eq_xa data none hrow)
-
-/-- **`XHat` squared** (`lem:X-hat-squared`).
-
-The unitary-part matrix `XHat` has `XHat XHat† = I` on the auxiliary space. -/
-lemma xHatSquared {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xHat * data.xHatᴴ =
-      (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
-  simpa using data.xHat_coisometry
-
-/-- **`X` times `XHat`** (`lem:X-times-X-hat`).
-
-Relates the surviving mixed product `X† XHat` to `sqrt Q`.  The complementary
-`X XHat†` formula from the paper is not stored as an SVD field; the later
-proofs derive the properties they need algebraically from this identity and the
-coisometry of `XHat`. -/
-lemma xTimesXHat {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xᴴ * data.xHat = CFC.sqrt (QTotal data.qLayer) := by
-  exact data.xHat_mixed
 
 private lemma xHat_mixed_adjoint {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

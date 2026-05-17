@@ -992,7 +992,7 @@
 	\end{proof}
 
 	\begin{lemma}[$X$ squared]\label{lem:X-squared}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_gram_right}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xSquared_of_qa_eq, MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_gram_right}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_posSemidef_of_x_squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_eigenvalues_nonneg_of_x_squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sqrt_eq_sum_sqrt_eigenvalues_vecMulVec}
@@ -1091,7 +1091,6 @@
 	\end{proof}
 
 	\begin{lemma}[$\widehat{X}$ squared]\label{lem:X-hat-squared}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHatSquared}
 		\lean{Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_image_of_adjoint_comp_eigenvectors}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormal_normalized_matrix_image_of_gram_eigenvectors}
@@ -1151,7 +1150,6 @@
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xTimesXHat}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.adjoint_image_eq_zero_of_unitary_positive_gram_completion_row}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_selected_left_unitary_mixed_column}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_completion_left_unitary_mixed_column_eq_zero}
@@ -1183,14 +1181,15 @@
 
 	\begin{remark}[Lean status for the QXP algebra]\label{rem:qxp-layer-lean-status}
 		The Lean declarations linked in Lemmas~\ref{lem:X-squared},
-		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} record useful parts of
-		the paper's \(X,\widehat X,P\) algebra.  The small lemmas named after these
-		paper labels are projections from the structure \texttt{QXPLayerData};
-		the accompanying construction lemmas build such data from sigma-range and
-		rectangular-SVD ingredients.  The blueprint therefore does not mark these
-		three entries as source-complete formalizations until the cited identities
-		are exposed as source-faithful construction theorems rather than hidden as
-		fields of the data package.
+		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} now expose the
+		corresponding matrix identities as construction theorems.  The
+		\texttt{QXPLayerData} structure still stores these identities for later
+		algebraic use, but the source-facing references above point to theorems
+		proving the identities from the \(Q\)-layer, sigma-range, or
+		rectangular-SVD hypotheses.  The blueprint still refrains from declaring
+		the full late-stage orthogonalization argument source-complete until these
+		construction theorems are connected all the way to the preceding
+		rounding-to-projectors and rank-reduction route.
 	\end{remark}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
@@ -1267,8 +1266,8 @@
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis
 		later used in the residual-domination argument for the fresh completed
 		outcome.  As in Remark~\ref{rem:qxp-layer-lean-status}, the statement is
-		left without a source-complete formalization marker while the QXP package
-		still hides some of the displayed SVD identities as structure fields.
+		left without a source-complete formalization marker until the displayed
+		identities are connected to the preceding construction route.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}
