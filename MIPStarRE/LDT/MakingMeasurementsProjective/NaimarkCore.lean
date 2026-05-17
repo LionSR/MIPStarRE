@@ -14,6 +14,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
+open MIPStarRE.Quantum
 
 /-! ### One-measurement Naimark (Lemma 5.2) -/
 
@@ -55,16 +56,6 @@ lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
         | some b =>
             have hab : a ≠ b := fun h => hij (congrArg some h)
             simp [Matrix.sum_apply, Matrix.single_apply, hab]
-
-/-- The identity operator is projective. -/
-lemma op_one_isProj {d : Type*} [Fintype d] [DecidableEq d] :
-    MIPStarRE.Quantum.IsProj (1 : MIPStarRE.Quantum.Op d) := by
-  exact MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _)
-
-/-- The identity operator is positive semidefinite. -/
-lemma op_one_nonneg {d : Type*} [DecidableEq d] :
-    0 ≤ (1 : MIPStarRE.Quantum.Op d) := by
-  exact Matrix.PosSemidef.one.nonneg
 
 /-- Kronecker products of projectors are projective. -/
 lemma isProj_kronecker {d₁ d₂ : Type*}

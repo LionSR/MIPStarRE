@@ -363,6 +363,15 @@ lemma IsProj.nonneg (P : Op d) (hP : IsProj P) :
     0 ≤ P := by
   exact hP.isStarProjection.nonneg
 
+/-- The identity operator is projective. -/
+lemma op_one_isProj [DecidableEq d] : IsProj (1 : Op d) := by
+  exact IsProj.of_isStarProjection (IsStarProjection.one _)
+
+omit [Fintype d] in
+/-- The identity operator is positive semidefinite. -/
+lemma op_one_nonneg [DecidableEq d] : 0 ≤ (1 : Op d) := by
+  exact Matrix.PosSemidef.one.nonneg
+
 /-! ### Spectral truncation -/
 
 /--

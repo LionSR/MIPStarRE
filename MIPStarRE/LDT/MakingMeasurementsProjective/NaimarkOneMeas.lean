@@ -12,6 +12,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
+open MIPStarRE.Quantum
 
 /-- The Naimark column acts as an isometry on the input subspace: `VP = V`. -/
 private lemma oneMeasNaimarkColumn_mul_inputProj
