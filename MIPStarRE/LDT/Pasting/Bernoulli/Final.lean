@@ -644,21 +644,21 @@ theorem ldPastingDegreeZeroBranch
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma kappa zeta : Error)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (hgood : strategy.IsGood eps delta gamma)
     (family : IdxPolyFamily params ι)
-    (_hcomplete : family.Complete strategy.state kappa)
-    (_hcons : family.ConsistentWithPoints strategy zeta)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
     (_hself : family.StronglySelfConsistent strategy.state zeta)
     (_hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
     (k : ℕ)
     (_hk : 400 * params.m * params.d ≤ k)
-    (_hd_zero : params.d = 0)
+    (hd_zero : params.d = 0)
     (_hk_pos : 1 ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingConclusion params strategy family H eps delta gamma kappa zeta k := by
   obtain ⟨H, _hHdef, hH⟩ :=
     degreeZeroPastedPointConsistency params strategy eps delta gamma kappa zeta
-      _hgood family _hcomplete _hcons _hd_zero k
+      hgood family hcomplete hcons hd_zero k
   exact ⟨H, { pointConsistency := hH }⟩
 
 /-- Projection from the restricted nontrivial construction.
