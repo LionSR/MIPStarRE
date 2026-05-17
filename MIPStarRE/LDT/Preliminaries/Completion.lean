@@ -34,42 +34,25 @@ noncomputable def completeAtOutcomeProj {Outcome : Type*}
       simpa [T] using projSubMeas_total_proj P
     have hPaT : Pa * T = Pa := by
       simpa [Pa, T] using projSubMeas_outcome_mul_total_eq_outcome P a0
-    have hPaPa : Pa * Pa = Pa := by
-      simpa [Pa] using P.proj a0
-    have hPa_herm : Paᴴ = Pa := by
-      simpa [Pa] using P.outcome_hermitian a0
-    have hT_herm : Tᴴ = T := by
-      simpa [T] using (Matrix.nonneg_iff_posSemidef.mp P.total_nonneg).isHermitian.eq
-    have hR_herm : Rᴴ = R := by
-      simp [R, hT_herm]
+    have hPa_star : IsStarProjection Pa := by
+      exact MIPStarRE.Quantum.IsProj.isStarProjection
+        { isHermitian := (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a0)).isHermitian
+          idempotent := by simpa [Pa] using P.proj a0 }
+    have hT_star : IsStarProjection T := by
+      exact MIPStarRE.Quantum.IsProj.isStarProjection
+        { isHermitian := (Matrix.nonneg_iff_posSemidef.mp P.total_nonneg).isHermitian
+          idempotent := hTT }
+    have hR_star : IsStarProjection R := by
+      simpa [R] using hT_star.one_sub
     have hPaR : Pa * R = 0 := by
       calc
         Pa * R = Pa * (1 - T) := by rfl
         _ = Pa - Pa * T := by rw [mul_sub, mul_one]
         _ = 0 := by simp [hPaT]
-    have hRPa : R * Pa = 0 := by
-      simpa [Matrix.conjTranspose_mul, hPa_herm, hR_herm] using
-        congrArg Matrix.conjTranspose hPaR
-    have hRR : R * R = R := by
-      calc
-        R * R = (1 - T) * (1 - T) := by rfl
-        _ = 1 - T - T + T * T := by
-          noncomm_ring
-        _ = 1 - T := by
-          rw [hTT]
-          abel
-        _ = R := by rfl
     have hproj :
         (P.outcome a0 + (1 - P.total)) * (P.outcome a0 + (1 - P.total)) =
           P.outcome a0 + (1 - P.total) := by
-      calc
-        (P.outcome a0 + (1 - P.total)) * (P.outcome a0 + (1 - P.total))
-            = (Pa + R) * (Pa + R) := by rfl
-        _ = Pa * Pa + Pa * R + R * Pa + R * R := by
-          noncomm_ring
-        _ = Pa + R := by
-          simp [hPaPa, hPaR, hRPa, hRR]
-        _ = P.outcome a0 + (1 - P.total) := by rfl
+      simpa [Pa, R] using (hPa_star.add hR_star hPaR).isIdempotentElem.eq
     simpa [completeAtOutcome] using hproj
   · simpa [completeAtOutcome, ha] using P.proj a
 

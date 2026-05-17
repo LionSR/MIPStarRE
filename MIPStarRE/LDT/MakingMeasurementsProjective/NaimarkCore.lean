@@ -67,9 +67,7 @@ lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
 /-- The identity operator is projective. -/
 lemma op_one_isProj {d : Type*} [Fintype d] [DecidableEq d] :
     MIPStarRE.Quantum.IsProj (1 : MIPStarRE.Quantum.Op d) := by
-  refine ⟨?_, by simp⟩
-  refine Matrix.IsHermitian.ext fun i j => ?_
-  simp [Matrix.one_apply, eq_comm]
+  exact MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _)
 
 /-- The identity operator is positive semidefinite. -/
 lemma op_one_nonneg {d : Type*} [DecidableEq d] :
