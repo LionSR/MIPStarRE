@@ -18,6 +18,7 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
+open MIPStarRE.Quantum
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-- A concrete finite-dimensional matrix realization of the SDP data. -/

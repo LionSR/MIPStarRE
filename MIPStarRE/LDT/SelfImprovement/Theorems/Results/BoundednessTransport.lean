@@ -86,6 +86,7 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
+open MIPStarRE.Quantum
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type} [Fintype ι] [DecidableEq ι]
