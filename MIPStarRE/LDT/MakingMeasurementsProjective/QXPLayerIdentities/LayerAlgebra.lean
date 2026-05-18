@@ -413,6 +413,43 @@ private lemma xxHat_nonneg {Outcome : Type*}
     _ = data.x * data.xHatᴴ := by
       simp [data.xHat_coisometry]
 
+/-- The adjoint mixed product `Xhat† X` equals the positive square root of
+`Q`.
+
+This is the adjoint form of the stored identity `X† Xhat = sqrt Q`.  It is
+used to identify the operator `Y = X Xhat†` in the proof of
+`lem:squared-difference`. -/
+lemma xHat_adjoint_mul_x_eq_sqrt {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    data.xHatᴴ * data.x = CFC.sqrt (QTotal data.qLayer) :=
+  xHat_mixed_adjoint data
+
+/-- The operator `X Xhat†` is Hermitian in a QXP layer. -/
+lemma x_mul_xHat_adjoint_isHermitian {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    (data.x * data.xHatᴴ)ᴴ = data.x * data.xHatᴴ :=
+  xxHat_isHermitian data
+
+/-- The square of `X Xhat†` is `X X†` in a QXP layer. -/
+lemma x_mul_xHat_adjoint_sq {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    (data.x * data.xHatᴴ) * (data.x * data.xHatᴴ) = data.x * data.xᴴ :=
+  xxHat_sq data
+
+/-- The operator `X Xhat†` is positive semidefinite in a QXP layer. -/
+lemma x_mul_xHat_adjoint_nonneg {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    0 ≤ data.x * data.xHatᴴ :=
+  xxHat_nonneg data
+
 /-- **Squared difference** (`lem:squared-difference`).
 
 Bounds the defect between `X` and `XHat` by the squared defect of `X X†`
@@ -427,11 +464,11 @@ lemma squaredDifference {Outcome : Type*}
   have hY_sub :
       (data.x - data.xHat) * (data.x - data.xHat)ᴴ = (Y - 1) * (Y - 1) := by
     have hYh : Yᴴ = Y := by
-      simpa [Y] using xxHat_isHermitian data
+      simpa [Y] using x_mul_xHat_adjoint_isHermitian data
     have hYadj : data.xHat * data.xᴴ = Y := by
       simpa [Y, Matrix.conjTranspose_mul] using hYh
     have hYsq : data.x * data.xᴴ = Y * Y := by
-      simpa [Y] using (xxHat_sq data).symm
+      simpa [Y] using (x_mul_xHat_adjoint_sq data).symm
     calc
       (data.x - data.xHat) * (data.x - data.xHat)ᴴ
           = (data.x - data.xHat) * (data.xᴴ - data.xHatᴴ) := by
@@ -450,12 +487,12 @@ lemma squaredDifference {Outcome : Type*}
       _ = (Y - 1) * (Y - 1) := by
             noncomm_ring
   have hY_nonneg : 0 ≤ Y := by
-    simpa [Y] using xxHat_nonneg data
+    simpa [Y] using x_mul_xHat_adjoint_nonneg data
   have hYsq :
       Y * Y = data.x * data.xᴴ := by
-    simpa [Y] using xxHat_sq data
+    simpa [Y] using x_mul_xHat_adjoint_sq data
   have hY_herm : Yᴴ = Y := by
-    simpa [Y] using xxHat_isHermitian data
+    simpa [Y] using x_mul_xHat_adjoint_isHermitian data
   have hYm1_herm : (Y - 1)ᴴ = Y - 1 := by
     simp [hY_herm]
   have hYp1_nonneg : 0 ≤ Y + 1 := add_nonneg hY_nonneg zero_le_one
