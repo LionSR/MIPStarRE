@@ -4,6 +4,7 @@ import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
 # Section 6 — Ordinary Self-Improvement Assembly
@@ -167,13 +168,11 @@ theorem selfImprovementInInductionSection
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G.toSubMeas H Z
         eps delta gamma nu := by
-  -- Source-faithful proof gap (#1645, downstream of #1503): apply the Section 9
-  -- self-improvement theorem to the measurement `G` and transport its fields by
-  -- `selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion`.
-  -- The present obstruction is formal rather than mathematical: the completed
-  -- Section 9 proof stack is still specialized to universe level 0, while the
-  -- Section 6 strategy interface is universe-polymorphic.
-  sorry
+  rcases SelfImprovement.selfImprovement params strategy eps delta gamma nu hgood G hcons with
+    ⟨H, Z, hfinal⟩
+  exact ⟨H, Z,
+    selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
+      params strategy eps delta gamma nu G.toSubMeas G H Z hfinal⟩
 
 /-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
 into the bookkeeping object expected by the later induction-step assembly.
@@ -270,9 +269,9 @@ derive the extra `SymStrat` fields (`permInvState`, `densityFixed`, or
 concrete slice strategies.
 
 The Section 9 analytic proof debt is not stored in this record.  The data record
-constructor below calls
-`selfImprovementInInductionSection`, whose present proof gap is the tracked
-place where that work belongs. -/
+constructor below calls the paper-facing theorem
+`selfImprovementInInductionSection`; its proof applies the Section 9 theorem and
+then repackages the output estimates in the induction notation. -/
 structure SelfImprovementData.SliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]

@@ -41,7 +41,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- A good strategy has a nonnegative final self-improvement error threshold. -/
 lemma selfImprovementError_nonneg_of_isGood

@@ -104,14 +104,12 @@
 	This is Theorem~\ref{thm:self-improvement}, with the conclusions repackaged in the notation used by the induction step. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
 \end{proof}
 
-\begin{remark}[Lean proof gap for induction self-improvement]\label{rem:self-improvement-in-induction-section-conditional}
+\begin{remark}[Lean realization of induction self-improvement]\label{rem:self-improvement-in-induction-section-conditional}
 	The Lean declaration for
 	Theorem~\ref{thm:self-improvement-in-induction-section} has the paper
 	hypotheses, in particular that \(G\) is a complete polynomial measurement.
-	The proof is still open only because the formalized Section~\ref{chap:self-improvement}
-	theorem is presently specialized to universe level \(0\), while the
-	induction-step strategy interface is universe-polymorphic.  The intended proof is to apply
-	\texttt{SelfImprovement.selfImprovement} to \(G\), then use
+	The proof applies
+	\texttt{SelfImprovement.selfImprovement} to \(G\), then uses
 	\texttt{selfImprovementInInductionSectionConclusion\_ofSelfImprovementConclusion}
 	to repackage the fields.
 \end{remark}

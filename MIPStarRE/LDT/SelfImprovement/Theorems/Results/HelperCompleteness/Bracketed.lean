@@ -23,7 +23,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Exact `Hhat` reindexing for the helper-stage left-tensor mass.
 
