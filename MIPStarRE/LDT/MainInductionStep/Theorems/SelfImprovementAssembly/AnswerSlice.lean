@@ -19,7 +19,7 @@ namespace MIPStarRE.LDT.MainInductionStep
 open MIPStarRE.LDT
 open scoped MatrixOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- Transport data for producing the answer-valued self-improvement data from
 concrete per-slice symmetric strategies.
