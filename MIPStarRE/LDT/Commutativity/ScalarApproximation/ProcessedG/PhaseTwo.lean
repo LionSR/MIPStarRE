@@ -213,9 +213,6 @@ lemma avgOver_avgOver_phaseTwo_linear
           rw [ev_real_smul, ev_real_smul]
           ring
 
-set_option maxHeartbeats 210000 in
--- The explicit finite-fiber/tensor-linearity proof is just above the default
--- heartbeat budget, but avoids hiding the #714 residual in one large `simp`.
 /-- Reindex the pointwise phase-2 question defect by polynomial outcomes.
 
 When the sampled second point is `appendPoint v y`, the postprocessed slice
