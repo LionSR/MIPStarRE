@@ -83,7 +83,6 @@ structure AddInUFullStatement
         - addInURightQuantity params strategy M T.toSubMeas S|
       ≤ addInUError params eps delta
 
-set_option maxHeartbeats 800000 in
 -- The paper-facing add-in-u statement combines the selected scalar chain, the
 -- local-variance transport theorem, and the global-variance sum transfer.
 /-- Proves the selection-dependent transfer inequality of `lem:add-in-u`:
