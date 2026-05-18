@@ -5,7 +5,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.Point
 
 This file contains the helper boundedness-gap decomposition, its
 data-processing transport, and the final projective-residual boundedness
-constructors used in the self-improvement assembly.
+constructors used in the self-improvement proof.
 
 ## References
 
@@ -113,8 +113,8 @@ point-consistency `add-in-u` transfer.
 
 This theorem composes the off-diagonal estimate supplied by
 `pointConsistencyAddInUSelection` with
-`helper_boundedness_gap_le_selfImprovementHelperError`.  It is the theorem-side
-form of the sentence "combined with the explicit `A`-consistency bound" in the
+`helper_boundedness_gap_le_selfImprovementHelperError`.  It is the formal
+statement of the sentence "combined with the explicit `A`-consistency bound" in the
 boundedness paragraph of the self-improvement proof. -/
 theorem helper_boundedness_gap_le_selfImprovementHelperError_of_pointConsistencyAddInU_transfer
     (params : Parameters) [FieldModel params.q]
@@ -210,7 +210,7 @@ This theorem composes the helper-completeness comparison `Hhat`-versus-`Z`
 with the boundedness off-diagonal estimate. Complementary slackness remains an
 explicit hypothesis because the reduced `SelfImprovementHelperConclusion`
 records only the presently formalized SDP facts. The off-diagonal transfer is
-likewise explicit: it is the theorem-side form of the `add-in-u` application
+likewise explicit: it is the formal statement of the `add-in-u` application
 with `S_u = {(a,h) : h(u) ≠ a}`. -/
 theorem helper_boundedness_gap_le_selfImprovementHelperError_of_helper_outputs
     (params : Parameters) [FieldModel params.q]
@@ -480,7 +480,7 @@ theorem final_fields_projective_residual_bound
 /-- Literal-threshold projective-residual construction under the standard
 unit-interval smallness hypotheses.
 
-This is the convenience theorem following from
+This derived theorem follows from
 `final_fields_projective_residual_bound`: the numerical absorption input is
 provided by
 `final_fields_projective_residual_error_le_selfImprovementError`, so callers
@@ -519,7 +519,7 @@ theorem final_fields_projective_residual_bound_of_small_errors
 /-- Final projective-residual construction from helper outputs and the
 point-consistency `add-in-u` transfer.
 
-The theorem performs the boundedness part of the final-fields assembly once the
+The theorem proves the boundedness part of the final-fields construction once the
 orthonormalization data-processing estimate is available. It supplies the
 helper-stage boundedness estimate from the helper comparison, complementary
 slackness, point self-consistency, and the off-diagonal `add-in-u` transfer,
@@ -580,7 +580,7 @@ submeasurement is dominated by `Z ⊗ I`: the total bound `A.total ≤ 1 ≤ Z` 
 by monotonicity to `leftTensor A.total ≤ leftTensor Z`, and evaluation against
 the state preserves this order. Consequently `bndError ψ A.liftLeft (Z ⊗ I) = 0`,
 so the boundedness statement holds at any nonnegative tolerance. The
-`selfImprovement` assembly uses this constructor instead of requiring a combined
+`selfImprovement` proof uses this constructor instead of requiring a combined
 boundedness-field hypothesis. -/
 theorem final_fields_bounded
     {α : Type*} [Fintype α]
