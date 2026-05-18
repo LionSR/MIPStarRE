@@ -253,7 +253,7 @@ The older branch-residual route used the following proved wiring functions:
   `Nonempty (MainFormalRoleInductionWitness)`
 
 These functions have since been removed.  The current role-register route uses
-`MainFormalRoleInductionWitness.ofMainInductionLargeK`, so the missing successor
+`MainFormalRoleInductionWitness.ofMainInduction`, so the missing successor
 construction is the `sorry` in the paper-facing Section 6 theorem
 `MainInductionStep.mainInduction`, not a separate obligation API in Section 3.
 
