@@ -80,8 +80,8 @@ private lemma qSDDCore_option_pair_decompose
 
 set_option maxHeartbeats 500000 in
 -- The proof expands the `Option × Option` indexing of `\widehat G` into four
--- quadrant sums.  The explicit normalization remains above the default budget,
--- but isolating it here keeps the Section 12 consequence at the default limit.
+-- quadrant sums.  The conversion step still times out below 500000 heartbeats:
+-- 450000 fails at weak-head normalization.
 /-- The pointwise `\widehat G` pair product splits into the complete-complete,
 complete-incomplete, incomplete-complete, and incomplete-incomplete quadrants. -/
 private lemma gHatPairProduct_qSDDOp_decompose
