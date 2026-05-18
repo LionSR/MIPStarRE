@@ -396,9 +396,16 @@ Unset that Git config value to return to Git's default hook directory.
 ### Pre-commit hook
 
 The pre-commit hook first runs `git diff --cached --check`.  When the staged
-files touch blueprint LaTeX sources (`blueprint/src/**/*.{tex,sty,cls}`) or the
-lint script or its shared helper, it also runs the blueprint LaTeX convention
-lint:
+files touch any `scripts/*.py` or `scripts/tests/**` entry, it also runs the
+blueprint and audit helper unit tests:
+
+```bash
+python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+```
+
+When the staged files touch blueprint LaTeX sources
+(`blueprint/src/**/*.{tex,sty,cls}`) or the lint script or its shared helper,
+it also runs the blueprint LaTeX convention lint:
 
 ```bash
 python3 scripts/check_blueprint_latex.py --root blueprint/src
@@ -545,7 +552,8 @@ remains the authoritative merge gate.  The responsibilities are:
 | Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, rebuild changed Lean modules, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning.  The local rebuild prevents stale `.olean` files from making an existing declaration look missing. |
 | Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
 | Whole-project Lean compilation | `pre-push` full mode: `lake build` | `lean_action_ci.yml` | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
-| Blueprint LaTeX convention lint (no active `cleveref` / `\Cref`) | `pre-commit`: `check_blueprint_latex.py --root blueprint/src` when blueprint sources or the lint script change | `lint-blueprint.yml` runs the lint's unit tests via the `scripts/tests` discovery step, but no longer scans `blueprint/src/`. The pre-commit hook is the active gate; bypass it with `MIPSTARRE_SKIP_HOOKS=1` only to recover from a local tooling problem. |
+| Blueprint and audit helper unit tests still pass | `pre-commit`: `python3 -m unittest discover -s scripts/tests` when any `scripts/*.py` or `scripts/tests/**` file is staged | Broken helpers surface in `lint-blueprint.yml` / `blueprint-sync.yml` via the integration steps (`blueprint_lean_sync.py --ci`, `checkdecls`, `leanblueprint web`). | The pre-commit hook is the active regression gate. |
+| Blueprint LaTeX convention lint (no active `cleveref` / `\Cref`) | `pre-commit`: `check_blueprint_latex.py --root blueprint/src` when blueprint sources or the lint script change | No CI gate; broken LaTeX renders would still trip `leanblueprint web/pdf`. | The pre-commit hook is the active scan. Bypass it with `MIPSTARRE_SKIP_HOOKS=1` only to recover from a local tooling problem. |
 | Blueprint LaTeX/PDF/web build | `pre-push`: `leanblueprint web` for `blueprint/src/` changes; full mode reruns it only if the default smoke tier did not run | `lint-blueprint.yml` and `blueprint.yml` | Local warm smoke check measured about 8 seconds on 2026-05-14; CI remains the render authority. |
 
 This split keeps the proof-status audit separate from ordinary compilation.

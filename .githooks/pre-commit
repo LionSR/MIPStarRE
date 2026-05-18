@@ -17,6 +17,11 @@ fi
 echo "MIPStarRE pre-commit: checking staged whitespace."
 git diff --cached --check
 
+if printf '%s\n' "$STAGED_FILES" | grep -Eq '^scripts/(.*\.py|tests/.*)$'; then
+  echo "MIPStarRE pre-commit: running scripts/tests unit tests."
+  python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+fi
+
 if printf '%s\n' "$STAGED_FILES" | grep -Eq \
   '^(blueprint/src/.*\.(tex|sty|cls)|scripts/(check_blueprint_latex|tex_utils)\.py|scripts/tests/test_check_blueprint_latex\.py|\.githooks/pre-commit)$'; then
   echo "MIPStarRE pre-commit: checking blueprint LaTeX conventions."

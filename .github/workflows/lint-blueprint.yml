@@ -71,12 +71,11 @@ jobs:
           pip install leanblueprint
           pip install plastex
 
-      - name: Test blueprint Python helpers
-        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
-
-      # Blueprint LaTeX convention lint (scripts/check_blueprint_latex.py) runs
-      # locally in .githooks/pre-commit. The unit tests above still exercise the
-      # checker, but the active blueprint/src scan is the pre-commit hook's job.
+      # Blueprint helper unit tests (scripts/tests/test_*.py) and the blueprint
+      # LaTeX convention lint (scripts/check_blueprint_latex.py) both run
+      # locally in .githooks/pre-commit. Broken helpers would still surface
+      # here through the integration steps below (blueprint_lean_sync.py,
+      # checkdecls, leanblueprint web/pdf).
 
       - name: Run leanblueprint pdf (catches undefined macros and LaTeX errors)
         working-directory: blueprint
