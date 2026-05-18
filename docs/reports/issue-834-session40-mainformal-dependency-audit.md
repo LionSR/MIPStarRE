@@ -63,6 +63,11 @@ have roleWitnessResidualLeftCompletionLine169Residual :
 The residual structure is defined at `MainTheorem.lean:2659-2672` and has exactly
 two fields:
 
+> **Historical snapshot.**  The residual structures and fields in the next two
+> code blocks are session-40 snapshot material.  The current tree has retired
+> this exact line-169 residual route in favor of the repaired pre-completion
+> transport.
+
 ```lean
 structure MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual ... where
   roleInductionWitness : MainFormalRoleInductionWitness params strategy eps hpass k
@@ -263,8 +268,8 @@ least expect nontrivial rebase work.
    - run/apply the orthonormalize-and-complete witness for Alice and Bob to obtain
      `leftMeasurement`, `rightMeasurement`, and the two left-lifted completion
      estimates at `ζ₂`;
-   - use the #950 match-mass preservation theorem to fill
-     `line169MatchMassMonotonicity`;
+   - historical session-40 plan: use the then-open #950 match-mass
+      preservation theorem to fill `line169MatchMassMonotonicity`;
    - let the existing conversions handle Bob's right-register transport, line-169
      consistency, line 156, the `ζ₄` point goals, and final error weakening.
 6. Validate with at least `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`,

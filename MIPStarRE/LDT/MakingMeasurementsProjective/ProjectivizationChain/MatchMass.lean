@@ -10,7 +10,7 @@ partner submeasurement, because the completion adds a positive residual at a
 single outcome.
 
 The older exact line-169 monotonicity interfaces have been retired.  The active
-`mainFormal` pipeline uses the repaired pre-completion transport in
+`mainFormal` route uses the repaired pre-completion transport in
 `ProjectivizationChain.Line169Repair`, and this file now keeps only the
 completion lemma that route consumes.
 -/
@@ -24,6 +24,8 @@ open MIPStarRE.LDT.Preliminaries (completeAtOutcome completeAtOutcomeProj)
 
 /-! ### Completion preserves diagonal match mass -/
 
+/-- The namespace is kept so the surviving helper retains its established
+qualified name in downstream references. -/
 namespace ProjectivizationMatchMassMonotonicity
 
 /-- Completing a projective submeasurement at one outcome can only increase its
