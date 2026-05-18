@@ -4,9 +4,10 @@ import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
-# Section 6 — Ordinary Self-Improvement Assembly
+# Section 6 — Ordinary Self-Improvement Data
 
 Core public API for the ordinary self-improvement data: constructors for
 `SelfImprovementData`, the induction-section theorem
@@ -29,12 +30,14 @@ namespace MIPStarRE.LDT.MainInductionStep
 open MIPStarRE.LDT
 open scoped MatrixOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+universe uι
+
+variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 /-- Monotone postprocessing of an explicit witness for the main-induction conclusion.
 
 This helper is the final `error ≤ mainInductionError` cleanup step only; the
-actual Section 6 assembly is carried by `mainInductionBaseCase`,
+actual Section 6 construction is carried by `mainInductionBaseCase`,
 `mainInduction` and its successor proof gap. -/
 theorem mainInductionOfWitness
     (params : Parameters)
@@ -146,37 +149,48 @@ theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
 
 /-- `thm:self-improvement-in-induction-section`.
 
-The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
-the stated point-consistency hypothesis.  It does not assume that `G` is the
-underlying submeasurement of a complete measurement, and it does not assume the
-Section 7 helper, orthonormalization, or final-field proof stages as external
-inputs.
+Paper origin: `references/ldt-paper/self_improvement.tex:631-811`
+(`\label{thm:self-improvement}`), used in the induction section at
+`references/ldt-paper/inductive_step.tex:461-485`.  The labelled induction
+statement at `references/ldt-paper/inductive_step.tex:249-286` states the input
+as a submeasurement, while the proved form at
+`references/ldt-paper/self_improvement.tex:635-671` uses a measurement.  This
+Lean statement follows the proved measurement-valued form needed in the
+induction proof.
 
-**Proof gap:** The declaration has the paper hypotheses and conclusion, but its
-proof is still open.  Documented in issue `#1645`, downstream of `#1503`.
-Elimination plan: complete `G` by adjoining a fresh outcome `⊥`, apply the
-Section 9 self-improvement theorem to the completed measurement, and transport
-the resulting projective submeasurement and dual witness back to the original
-polynomial outcomes. -/
+The input \(G\) is a complete polynomial measurement, as in the paper's
+restated self-improvement theorem.  The conclusion is phrased in the Section 6
+record `SelfImprovementInInductionSectionConclusion`, whose fields are exactly
+the projective output estimates used in the inductive step.
+
+**Unfaithful:** This proof currently depends transitively on
+`SelfImprovement.selfImprovement`, hence on `sdp_statement_with_slackness`, whose
+complementary-slackness proof is not yet derived from
+`references/ldt-paper/self_improvement.tex` (`lem:sdp`). Documented by issue
+#1230. Elimination: prove `sdp_statement_with_slackness` from the SDP
+strong-duality and complementary-slackness argument, then remove the inherited
+`sorryAx` dependency. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeas (Polynomial params) ι)
+    (G : Measurement (Polynomial params) ι)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G) nu) :
+        (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  -- Source-faithful proof gap (#1645, downstream of #1503): complete `G` by
-  -- adjoining a fresh outcome, apply Section 9 self-improvement, and restrict
-  -- the resulting conclusion back to polynomial outcomes.
-  sorry
+      SelfImprovementInInductionSectionConclusion params strategy G.toSubMeas H Z
+        eps delta gamma nu := by
+  rcases SelfImprovement.selfImprovement params strategy eps delta gamma nu hgood G hcons with
+    ⟨H, Z, hfinal⟩
+  exact ⟨H, Z,
+    selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
+      params strategy eps delta gamma nu G.toSubMeas G H Z hfinal⟩
 
-/-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
-into the bookkeeping object expected by the later induction-step assembly.
+/-- Convert the slice-wise outputs feeding `selfImprovementInInductionSection`
+into the bookkeeping object expected by the later inductive step.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`, using the
 self-improvement theorem restated in
@@ -269,10 +283,10 @@ derive the extra `SymStrat` fields (`permInvState`, `densityFixed`, or
 `isNormalized`) from the restricted strategy; those remain part of the supplied
 concrete slice strategies.
 
-The Section 9 analytic proof debt is not stored in this record.  The data record
-constructor below calls
-`selfImprovementInInductionSection`, whose present proof gap is the tracked
-place where that work belongs. -/
+The Section 9 analytic proof debt is not stored in this record.  The data-record
+constructor below calls the paper-facing theorem
+`selfImprovementInInductionSection`; its proof applies the Section 9 theorem and
+then transports the output estimates to the induction notation. -/
 structure SelfImprovementData.SliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
@@ -474,9 +488,9 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 The construction assumes the concrete slice strategies and their structural
 measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
-across the recorded equalities to the restricted-slice interface.  The theorem
-itself is currently a tracked proof gap (#1503); this constructor does not carry
-the Section 9 proof debt as an additional data record hypothesis. -/
+across the recorded equalities to the restricted-slice interface.  The inherited
+Section 9 SDP proof debt is documented on `selfImprovementInInductionSection`;
+this constructor does not carry it as an additional data-record hypothesis. -/
 noncomputable def SelfImprovementData.ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
@@ -510,7 +524,7 @@ noncomputable def SelfImprovementData.ofSliceStrategyTransport
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
       (sliceTransport.good x)
-      (inductionPkg.sliceMeasurement x).toSubMeas
+      (inductionPkg.sliceMeasurement x)
       hconsSlice with
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩

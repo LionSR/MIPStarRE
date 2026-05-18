@@ -18,7 +18,7 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 set_option maxHeartbeats 800000 in
 -- This final-fields route assembles completeness, point consistency,

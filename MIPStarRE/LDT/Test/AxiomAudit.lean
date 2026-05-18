@@ -44,8 +44,10 @@ by `GlobalVariance.localVarianceTransportChainBound`, so the paper-facing theore
 no longer carries a `sorryAx` dependency.
 
 The audit for `MainInductionStep.selfImprovementInInductionSection` records
-the current proof obligation for the submeasurement-input statement of
-`thm:self-improvement-in-induction-section`.
+the current proof obligation for the measurement-valued realization of
+`thm:self-improvement-in-induction-section`.  The remaining `sorryAx`
+dependency is inherited transitively from the issue-#1230 SDP slackness
+obligation used by `SelfImprovement.selfImprovement`.
 
 The audit for `MainInductionStep.mainInduction` records the current proof
 obligation for `thm:main-induction`: the theorem statement matches the paper
@@ -112,8 +114,8 @@ slackness dependency used by `selfImprovement`. -/
 private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1503 derivation
-needed for `selfImprovementInInductionSection`. -/
+/-- Standard kernel axioms plus `sorryAx`; tracks the transitive issue #1230
+SDP slackness dependency used by `selfImprovementInInductionSection`. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 

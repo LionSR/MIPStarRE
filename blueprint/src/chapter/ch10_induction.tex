@@ -62,9 +62,10 @@
 \section{The inductive construction}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
-	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+  \lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
+  \leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polysub{m}{q}{d}$ be a submeasurement with the following property:
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
   \begin{enumerate}
     \item (Consistency with~$A$): \label{item:si-inductive-G-consistency} On average over $u \sim \F_q^m$,
     \[
@@ -100,19 +101,30 @@
   \end{enumerate}
 \end{theorem}
 \begin{proof}
-	\uses{thm:self-improvement, prop:completing-to-measurement, prop:simeq-data-processing, prop:triangle-sub, prop:two-notions-of-self-consistency}
-	Complete $G$ to a measurement by adjoining an extra outcome $\bot$. Apply Theorem~\ref{thm:self-improvement} to the completed measurement, then discard the $\bot$ outcome. By Lemma~\ref{prop:completing-to-measurement}, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass $\bra{\psi} (I - \sum_g G_g) \ot I \ket{\psi}$. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
+	\uses{thm:self-improvement, prop:two-notions-of-self-consistency}
+	This is Theorem~\ref{thm:self-improvement}, with the conclusions reformulated in the notation used by the induction step. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
 \end{proof}
 
-\begin{remark}[Lean proof gap for induction self-improvement]\label{rem:self-improvement-in-induction-section-conditional}
+\begin{remark}[Lean realization of induction self-improvement]\label{rem:self-improvement-in-induction-section-realization}
 	The Lean declaration for
 	Theorem~\ref{thm:self-improvement-in-induction-section} has the paper
-	hypotheses, and its proof is still open.  The conditional helper that used
-	to assume Section~\ref{chap:self-improvement} proof-stage data has
-	been removed from the successor-step assembly.  The ordinary and
-	answer-valued slice constructors now call this theorem directly, so the
-	missing Section~\ref{chap:self-improvement} work remains a tracked proof
-	gap on the paper statement rather than an additional hypothesis.
+	hypotheses, in particular that \(G\) is a complete polynomial measurement.
+	The labelled theorem in
+	\texttt{references/ldt-paper/inductive\_step.tex:249--286} states the input
+	as a submeasurement, while the proved form in
+	\texttt{references/ldt-paper/self\_improvement.tex:635--671} states it as a
+	measurement.  The blueprint and Lean follow the proved measurement-valued
+	form, which is also the form used at the point where the theorem is applied
+	in \texttt{references/ldt-paper/inductive\_step.tex:461--485}.
+	The proof applies
+	\texttt{SelfImprovement.selfImprovement} to \(G\), then uses
+	\texttt{selfImprovementInInductionSectionConclusion\_ofSelfImprovementConclusion}
+	to transport the fields.
+	It therefore inherits the Section~\ref{chap:self-improvement} SDP proof debt:
+	\texttt{SelfImprovement.selfImprovement} still depends on
+	\texttt{sdp\_statement\_with\_slackness}, whose complementary-slackness proof
+	is tracked by issue \#1230.  This is not an additional hypothesis of the
+	induction-section theorem.
 \end{remark}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}

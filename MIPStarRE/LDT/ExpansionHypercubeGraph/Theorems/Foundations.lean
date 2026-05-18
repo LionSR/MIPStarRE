@@ -6,7 +6,9 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+universe u
+
+variable {ι : Type u} [Fintype ι] [DecidableEq ι]
 
 /-! ## Statement packages and matrix realization bridge -/
 
@@ -32,7 +34,7 @@ structure GlobalRewriteStatement (params : Parameters)
     ∃ decomp : GlobalVarianceDecomposition params A,
       globalVariance params A ψ = globalVarianceTraceForm params A ψ decomp
 
-private def ambientHilbertSpaceOf (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] :
+private def ambientHilbertSpaceOf (ι : Type u) [Fintype ι] [DecidableEq ι] [Nonempty ι] :
     FiniteHilbertSpace where
   carrier := ι
   instFintype := inferInstance

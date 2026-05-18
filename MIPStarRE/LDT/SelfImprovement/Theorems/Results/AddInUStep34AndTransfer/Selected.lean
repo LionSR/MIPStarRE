@@ -21,7 +21,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Selected-support weighted Cauchy--Schwarz for the add-in-`u` Step 3/4
 summands.

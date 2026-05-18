@@ -21,6 +21,8 @@ open MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+universe u
+
 /-- Tensor two finite Hilbert spaces by taking the cartesian product of indices. -/
 def tensorHilbertSpace (H K : FiniteHilbertSpace) : FiniteHilbertSpace where
   carrier := H.carrier × K.carrier
@@ -53,7 +55,7 @@ noncomputable def matrixAverageOperator {α : Type*} [Fintype α]
 
 /-- The concrete matrix family underlying the variance calculations. -/
 structure MatrixOperatorFamilyRealization (params : Parameters) where
-  space : FiniteHilbertSpace
+  space : FiniteHilbertSpace.{u}
   state : PositiveMatrixState space
   family : Point params → MatrixOperator space
 
