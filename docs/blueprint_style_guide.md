@@ -198,10 +198,12 @@ Excerpt from `blueprint/src/chapter/ch08_commutativity.tex:8-19`:
 
 A recurring historical example is the chapter 4 `Q/X/\widehat X/P` witness
 layer.  Once Lean has construction theorems deriving the displayed identities
-and estimates from the rank-reduction, sigma-range, positive-Gram, or
-rectangular-SVD hypotheses, the corresponding blueprint entries may carry
-`\leanok`.  A declaration that merely projects an identity from an opaque data
-record is not enough by itself.
+and estimates from the rank-reduction, sigma-range, positive-Gram, native
+spectral-theorem, or rectangular-SVD hypotheses, the corresponding blueprint
+entries may carry `\leanok`.  A declaration that merely projects an identity
+from an opaque data record is not enough by itself, and a theorem depending on
+extra rectangular-SVD data should not be used as evidence for an unconditional
+paper statement unless a separate construction supplies that data.
 
 ## Dependency Graph Colors (web)
 - **Light green box**: definition with `\lean` + `\leanok` (defined in Lean)

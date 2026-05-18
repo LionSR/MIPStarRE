@@ -1145,9 +1145,11 @@
 		records the analogous rectangular completion for prescribed right rows
 		when the dimension bound permits it.  The formal lemma
 		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
-		calculation, and \texttt{exists\_xHat\_of\_rectangularSvd} gives the
-		resulting choice of $\widehat X$ together with the mixed square-root identity
-		below.
+		calculation.  The unconditional positive-Gram route is
+		\texttt{exists\_xHat\_of\_sigmaFinRangeEmbedding\_positiveGram}, which
+		constructs $\widehat X$ from the rank-reduction witness and proves
+		$\widehat X\widehat X^\dagger=I$ together with the mixed square-root
+		identity below.
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
@@ -1161,6 +1163,7 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_sigmaFinRangeEmbedding_positiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_middle_eq_sqrt_of_square}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.x_mul_xHat_adjoint_spectral_theorem}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
@@ -1176,13 +1179,19 @@
 		\leanok
 		\uses{lem:X-squared}
 		The paper obtains this from the SVD formula for $X$ and the definition of
-		$\widehat X$.  The formal lemma
-		\texttt{rectangularSvd\_x\_mul\_xHat\_conjTranspose\_raw} records the first
-		displayed identity, with the middle factor \(S I_{m\times d}^\dagger\)
-		serving as the formal square matrix \(\Sigma_{m\times m}\).  The formal
-		lemma \texttt{rectangularSvd\_xHat\_mixed\_of\_sqrtQ} records the second
-		matrix calculation in the form whose square-root target is the operator
-		$Q$ supplied by the QXP construction.  The formal lemma
+		$\widehat X$.  In Lean, the unconditional QXP data first proves that
+		$X\widehat X^\dagger$ is Hermitian and positive.  The formal lemma
+		\texttt{x\_mul\_xHat\_adjoint\_spectral\_theorem} then applies Mathlib's
+		spectral theorem for Hermitian matrices, giving the displayed
+		$U\Sigma U^\dagger$ form with the Mathlib eigenvector unitary and the
+		diagonal matrix of real eigenvalues.  The auxiliary lemma
+		\texttt{rectangularSvd\_x\_mul\_xHat\_conjTranspose\_raw} records the same
+		calculation under explicit rectangular-SVD data, where the middle factor
+		\(S I_{m\times d}^\dagger\) is the formal square matrix
+		\(\Sigma_{m\times m}\).  The formal lemma
+		\texttt{rectangularSvd\_xHat\_mixed\_of\_sqrtQ} records the second matrix
+		calculation in the form whose square-root target is the operator $Q$
+		supplied by the QXP construction.  The formal lemma
 		\texttt{rectangularSvd\_middle\_eq\_sqrt\_of\_square} records the spectral
 		step: a positive middle factor whose square is $Q$ is the positive square
 		root of $Q$.  The reduced datum then records this mixed-product

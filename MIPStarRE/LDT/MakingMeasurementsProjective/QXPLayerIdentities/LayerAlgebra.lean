@@ -468,6 +468,30 @@ lemma x_mul_xHat_adjoint_nonneg {Outcome : Type*}
     0 ≤ data.x * data.xHatᴴ :=
   xxHat_nonneg data
 
+/-- Spectral form of the paper's identity
+`X * Xhat† = U * Σ * U†` in `lem:X-times-X-hat`.
+
+The unitary is the Mathlib eigenvector unitary of the already proved Hermitian
+operator `X * Xhat†`; the diagonal matrix is the corresponding real spectrum,
+embedded in `ℂ`.  This is the unconditional form used by the later
+`lem:squared-difference` argument. -/
+lemma x_mul_xHat_adjoint_spectral_theorem {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    data.x * data.xHatᴴ =
+      (Unitary.conjStarAlgAut ℂ _
+        (Matrix.IsHermitian.eigenvectorUnitary
+          (show (data.x * data.xHatᴴ).IsHermitian from
+            x_mul_xHat_adjoint_isHermitian data)))
+        (Matrix.diagonal
+          (RCLike.ofReal ∘
+            (show (data.x * data.xHatᴴ).IsHermitian from
+              x_mul_xHat_adjoint_isHermitian data).eigenvalues)) := by
+  let hY : (data.x * data.xHatᴴ).IsHermitian := x_mul_xHat_adjoint_isHermitian data
+  simpa [hY]
+    using hY.spectral_theorem
+
 /-- **Squared difference** (`lem:squared-difference`).
 
 Bounds the defect between `X` and `XHat` by the squared defect of `X X†`
