@@ -586,12 +586,6 @@
           
           <li><a href="chap-self-improvement.html#thm:self-improvement">Theorem 7.11</a></li>
           
-          <li><a href="sec-prelims.html#prop:completing-to-measurement">Lemma 3.42</a></li>
-          
-          <li><a href="sec-prelims.html#prop:simeq-data-processing">Lemma 3.30</a></li>
-          
-          <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.20</a></li>
-          
           <li><a href="sec-prelims.html#prop:two-notions-of-self-consistency">Lemma 3.36</a></li>
           
         </ul>
@@ -623,7 +617,7 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>   Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m,q,d)\) low individual degree test. Let \(G \in \mathrm{PolySub}(m,q,d)\) be a submeasurement with the following property: </p>
+  <p>   Let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m,q,d)\) low individual degree test. Let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement with the following property: </p>
 <ol class="enumerate">
   <li><p>(Consistency with&#160;\(A\)):  On average over \(u \sim \mathbb {F}_q^m\), </p>
 <div class="displaymath" id="a0000000552">
@@ -673,30 +667,30 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Complete \(G\) to a measurement by adjoining an extra outcome \(\bot \). Apply Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.11</a> to the completed measurement, then discard the \(\bot \) outcome. By Lemma&#160;<a href="sec-prelims.html#prop:completing-to-measurement">3.42</a>, the completeness, consistency, strong self-consistency, and boundedness estimates transfer back to the original polynomial outcomes with an additive error from the missing mass \(\langle \psi  \rvert  (I - \sum _g G_g) \otimes I \lvert \psi  \rangle \). Since the output is projective, Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.36</a> converts the strong self-consistency statement to the usual bipartite formulation. </p>
+  <p> This is Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.11</a>, with the conclusions reformulated in the notation used by the induction step. Since the output is projective, Lemma&#160;<a href="sec-prelims.html#prop:two-notions-of-self-consistency">3.36</a> converts the strong self-consistency statement to the usual bipartite formulation. </p>
 
   </div>
 </div>
-<div class="remark_thmwrapper theorem-style-remark" id="rem:self-improvement-in-induction-section-conditional">
+<div class="remark_thmwrapper theorem-style-remark" id="rem:self-improvement-in-induction-section-realization">
   <div class="remark_thmheading">
     <span class="remark_thmcaption">
     Remark
     </span>
     <span class="remark_thmlabel">10.7</span>
-    <span class="remark_thmtitle">Lean proof gap for induction self-improvement</span>
+    <span class="remark_thmtitle">Lean realization of induction self-improvement</span>
     <div class="thm_header_extras">
 
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="sec-induction.html#rem:self-improvement-in-induction-section-conditional">#</a>
+    <a class="icon proof" href="sec-induction.html#rem:self-improvement-in-induction-section-realization">#</a>
     
     
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> has the paper hypotheses, and its proof is still open. The conditional helper that used to assume Section&#160;<a href="chap-self-improvement.html">7</a> proof-stage data has been removed from the successor-step assembly. The ordinary and answer-valued slice constructors now call this theorem directly, so the missing Section&#160;<a href="chap-self-improvement.html">7</a> work remains a tracked proof gap on the paper statement rather than an additional hypothesis. </p>
+  <p> The Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> has the paper hypotheses, in particular that \(G\) is a complete polynomial measurement. The labelled theorem in <span class="ttfamily">references/ldt-paper/inductive_step.tex:249–286</span> states the input as a submeasurement, while the proved form in <span class="ttfamily">references/ldt-paper/self_improvement.tex:635–671</span> states it as a measurement. The blueprint and Lean follow the proved measurement-valued form, which is also the form used at the point where the theorem is applied in <span class="ttfamily">references/ldt-paper/inductive_step.tex:461–485</span>. The proof applies <span class="ttfamily">SelfImprovement.selfImprovement</span> to \(G\), then uses <span class="ttfamily">selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion</span> to transport the fields. It therefore inherits the Section&#160;<a href="chap-self-improvement.html">7</a> SDP proof debt: <span class="ttfamily">SelfImprovement.selfImprovement</span> still depends on <span class="ttfamily">sdp_statement_with_slackness</span>, whose complementary-slackness proof is tracked by issue #1230. This is not an additional hypothesis of the induction-section theorem. </p>
 
   </div>
 </div>
