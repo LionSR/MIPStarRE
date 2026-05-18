@@ -284,6 +284,7 @@
 
 \begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
+	\leanok
 	\uses{def:simeq, def:approx_delta}
 	Let $\ket{\psi}$ be a state, and let $A = \{A_a\}$ and $B = \{B_a\}$ be measurements such that
 	\[
@@ -300,9 +301,8 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
 	\leanok
 	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair, def:simeq, def:approx_delta}
-	The formalized measurement-level version of Lemma~\ref{lem:orthonormalization-main-lemma}
-	is the same-space specialization of the paper lemma, with the corrected public
-	orthonormalization envelope \(100\zeta^{1/4}\).  Thus, if \(A=\{A_a\}\) and
+	This same-space corollary weakens Lemma~\ref{lem:orthonormalization-main-lemma}
+	to the public orthonormalization envelope \(100\zeta^{1/4}\).  Thus, if \(A=\{A_a\}\) and
 	\(B=\{B_a\}\) are measurements on the same finite-dimensional space satisfying
 	\[
 		A_a \ot I \simeq_\zeta I \ot B_a
@@ -313,8 +313,8 @@
 		A_a \ot I \approx_{100\zeta^{1/4}} P_a \ot I .
 	\]
 	This is the corrected Lean theorem proved from the Section~5
-	projectivization repair construction; it is not a replacement for the
-	sharper source statement \(84\zeta^{1/4}\) in
+	projectivization repair construction.  The sharper heterogeneous source
+	statement \(84\zeta^{1/4}\) is now formalized as
 	Lemma~\ref{lem:orthonormalization-main-lemma}.
 \end{lemma}
 
@@ -322,15 +322,13 @@
 	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
 	The Lean declaration
 	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
-	now states Lemma~\ref{lem:orthonormalization-main-lemma} without adding
-	spectral-truncation or repair hypotheses.  Those construction steps belong to
-	the proof of the lemma, not to its assumptions.  The current Lean proof is
-	therefore recorded as a tracked proof gap.  The separate
-	Lemma~\ref{lem:orthonormalization-main-lemma-formalized-envelope} records the
-	already proved measurement-level statement with the corrected
-	\(100\zeta^{1/4}\) envelope.  Internal conditional lemmas may still record
-	the already-formalized descent from explicit construction data to the local
-	conclusion, but they are not advertised as formalizations of the paper lemma.
+	proves Lemma~\ref{lem:orthonormalization-main-lemma} without adding
+	spectral-truncation or repair hypotheses.  The proof first converts the
+	cross-consistency hypothesis into the source almost-projective estimate for
+	the left-lifted measurement, and then applies the locality-preserving
+	\(Q/X/\widehat X/P\) construction in its heterogeneous left-register form.
+	Lemma~\ref{lem:orthonormalization-main-lemma-formalized-envelope} remains as
+	the same-space corollary with the weaker public \(100\zeta^{1/4}\) envelope.
 \end{remark}
 
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
@@ -481,6 +479,7 @@
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
 	\proves{lem:orthonormalization-main-lemma}
+	\leanok
 	\uses{prop:simeq-for-measurements, lem:projective-non-measurement, lem:projective-low-rank-sum, lem:Q-completeness, lem:sqrt-Q-completeness, lem:q-almost-projective, lem:xa-t, lem:qa-restated, lem:X-squared, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity, lem:P-Q-approx, prop:triangle-inequality-for-approx_delta}
 	The statement is trivial when $\zeta > 1/4$, so assume
 	\begin{equation}\label{eq:assumption-on-zeta}

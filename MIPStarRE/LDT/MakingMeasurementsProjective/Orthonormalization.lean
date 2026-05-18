@@ -52,8 +52,8 @@ Paper origin: `references/ldt-paper/orthonormalization.tex:282-310`
 This is the source-facing orthogonalization lemma for complete measurements.
 The theorem statement deliberately contains no spectral-truncation or repair
 input: those are steps in the proof of the paper lemma, not hypotheses of the
-lemma. The remaining formal proof is tracked as a direct `sorry` rather than
-being moved into the public statement. -/
+lemma. The proof uses the locality-preserving projectivization repair in its
+heterogeneous left-register form. -/
 lemma orthonormalizationMainLemma {Outcome : Type*}
     {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -69,12 +69,22 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
         SDDRel ψ (uniformDistribution Unit)
           (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) A.toSubMeas))
           (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) P.toSubMeas))
-          (orthonormalizationMainLemmaError ζ) := by
-  intro _hCons
-  -- TODO(#1032): formalize the heterogeneous spectral truncation and locality-preserving
-  -- repair construction in the proof of `lem:orthonormalization-main-lemma`,
-  -- rather than assuming these proof steps as theorem hypotheses.
-  sorry
+      (orthonormalizationMainLemmaError ζ) := by
+  classical
+  intro hCons
+  letI : DecidableEq Outcome := Classical.decEq Outcome
+  have hAlmost :
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (leftLiftedMeasurement (ιB := ιB) A)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
+      (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
+  obtain ⟨P, hP⟩ :=
+    leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+      (ψ := ψ) (hψ := hψ) (A := A) (ζ := ζ) hζ <| by
+        simpa [consistencyToAlmostProjectiveError] using
+          hAlmost.sourceAlmostProjective
+  exact ⟨P, hP⟩
 
 /-- Pointwise collapse for a complete measurement `A`: the bipartite
 self-consistency defect equals the bipartite consistency defect of `A` with
@@ -391,7 +401,7 @@ theorem orthonormalization {Outcome : Type*}
       (ψ := ψ) (A := Ahat) (B := Ahat) (ζ := 2 * ζ) hCons
   obtain ⟨P, hRounded⟩ :=
     leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
-      ψ hψ Ahat (2 * ζ) <| by
+      ψ hψ Ahat (2 * ζ) (by nlinarith [hζ_nonneg]) <| by
         simpa [consistencyToAlmostProjectiveError] using
           hAlmost.sourceAlmostProjective
   have hP_local :
