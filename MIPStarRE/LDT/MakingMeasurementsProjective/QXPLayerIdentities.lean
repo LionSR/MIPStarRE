@@ -7,6 +7,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorAp
 # Section 5 — Q/X/XHat/P identities and approximations
 
 Compatibility module collecting the positive-Gram construction, rectangular-SVD
-constructors, algebraic `Q/X/XHat/P` identities, residual-domination
-bookkeeping, and the final `P`-versus-`Q` approximation lemmas.
+constructors, algebraic `Q/X/XHat/P` identities, fresh-row comparison lemmas,
+and the final `P`-versus-`Q` approximation lemmas.
 -/

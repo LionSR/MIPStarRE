@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.RectangularSvd
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSome
 
 /-!
 # Section 5 — P-Q approximation for QXP layers
@@ -589,59 +588,6 @@ lemma pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
   refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl,
     hx_coisometry, ?_⟩
   exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
-
-/-- Apply the positive-Gram sigma-space QXP repair route and simultaneously
-build the residual-domination witness for an option-completed source
-submeasurement.
-
-This is the output-path producer requested by issue `#1642`: once the fresh
-`Q` outcome is identified with the residual outcome of `optionCompletion A`, the
-sigma-range coisometry theorem supplies `X X† = I`, and the fresh-row
-preservation chain upgrades that to the actual residual domination consumed by
-`RestrictSome`. -/
-lemma pQApprox_ofRankReductionSigmaRangePositiveGram_with_residualDomination
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : SubMeas Outcome ι) (ζ : Error)
-    {qLayer : QLayerData (Option Outcome) ι}
-    (hRank : RankReductionWitness ψ (optionCompletion A) ζ qLayer)
-    (hsum_le_one :
-      (∑ oa : Option Outcome, qLayer.q.outcome oa) ≤ (1 : MIPStarRE.Quantum.Op ι))
-    (hsource : qLayer.q.outcome none = (optionCompletion A).outcome none)
-    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
-      (fun oa : Option Outcome => (qLayer.q.outcome oa).rank))]
-    (hψ : ψ.IsNormalized)
-    (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
-    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun oa : Option Outcome => (qLayer.q.outcome oa).rank))) ι ℂ,
-      xHat * xHatᴴ =
-          (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-            (fun oa : Option Outcome => (qLayer.q.outcome oa).rank)))) ∧
-        (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
-            CFC.sqrt (QTotal qLayer) ∧
-          ∃ data : QXPLayerData (Option Outcome) ι,
-            ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
-              hq ▸ data.x =
-                  (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-                    sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
-                hq ▸ data.xHat =
-                  (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from xHat) ∧
-                data.x * data.xᴴ =
-                  (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) ∧
-                  SDDOpRel ψ (uniformDistribution Unit)
-                    (constOpFamily data.qLayer.q)
-                    (constOpFamily (PFamily data))
-                    (30 * zetaQuarterRoot ζ) ∧
-                  QXPLayerResidualDomination data A := by
-  obtain ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat, hx_coisometry, hQP⟩ :=
-    pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
-      ψ (optionCompletion A) ζ hRank hsum_le_one hψ hζ hζ_small
-  have hsource_data : data.qLayer.q.outcome none = (optionCompletion A).outcome none := by
-    simpa [hq, sigmaRangeQLayer] using hsource
-  refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat, hx_coisometry, hQP, ?_⟩
-  exact residualDominatingRepairProducer_of_qxpLayer_and_coisometry data A hsource_data
-    hx_coisometry
 
 /-- Apply `lem:P-Q-approx` to the canonical sigma-space QXP layer obtained
 from rectangular SVD data and the positive-square characterization of the

@@ -343,14 +343,13 @@ lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
     data.qLayer.q.outcome none ≤ Pa data none :=
   le_of_eq (qa_eq_pa_of_xHatA_eq_xa data none hrow)
 
-/-- Coisometry of the original sigma-space embedding gives fresh-outcome
-domination for the repaired fresh `P`-operator.
+/-- Coisometry of the sigma-space embedding gives the fresh-row comparison
+`Q_none ≤ P_none`.
 
-This is the composed residual-domination producer promised by the QXP fresh-row
-route: if the source matrix `X` already has orthonormal rows, then the polar
-replacement preserves the fresh `none` row, so the repaired `P_none` operator
-keeps at least the fresh outcome mass present in the `Q` layer. -/
-lemma fresh_outcome_le_of_qxpLayer_and_coisometry {Outcome : Type*}
+If the source matrix `X` has orthonormal rows, then the polar replacement
+preserves the fresh `none` row.  The corresponding `P_none` operator is
+therefore equal to, and hence dominates, the fresh `Q_none` operator. -/
+lemma q_outcome_none_le_p_outcome_none_of_x_coisometry {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (data : QXPLayerData (Option Outcome) ι)
@@ -361,30 +360,6 @@ lemma fresh_outcome_le_of_qxpLayer_and_coisometry {Outcome : Type*}
   have hrow : XHatA data none = Xa data none :=
     xHatA_eq_xa_of_x_mul_conjTranspose_eq_one data none hx_left
   exact fresh_outcome_le_of_xHatA_eq_xa data hrow
-
-/-- **`XHat` squared** (`lem:X-hat-squared`).
-
-The unitary-part matrix `XHat` has `XHat XHat† = I` on the auxiliary space. -/
-lemma xHatSquared {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xHat * data.xHatᴴ =
-      (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
-  simpa using data.xHat_coisometry
-
-/-- **`X` times `XHat`** (`lem:X-times-X-hat`).
-
-Relates the surviving mixed product `X† XHat` to `sqrt Q`.  The complementary
-`X XHat†` formula from the paper is not stored as an SVD field; the later
-proofs derive the properties they need algebraically from this identity and the
-coisometry of `XHat`. -/
-lemma xTimesXHat {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xᴴ * data.xHat = CFC.sqrt (QTotal data.qLayer) := by
-  exact data.xHat_mixed
 
 private lemma xHat_mixed_adjoint {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
