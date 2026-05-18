@@ -16,8 +16,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-set_option maxHeartbeats 500000 in
--- The extracted paper move-chain telescope is a large calculation.
 /-- Internal form of `lem:from-H-to-G` after applying `cor:G-hat-facts` and
 `lem:commute-g-half-sandwich`.
 
