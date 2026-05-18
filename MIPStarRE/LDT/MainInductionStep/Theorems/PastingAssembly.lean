@@ -410,10 +410,11 @@ private lemma family_pointConsistencyError_eq_avg
             IdxProjMeas.toIdxSubMeas]
           rfl
 
-set_option maxHeartbeats 300000 in
+set_option maxHeartbeats 240000 in
 -- The record constructor unfolds the averaged slice error terms in the final
 -- telescoping estimate; the default heartbeat budget times out at the theorem
--- header before the field proof begins.
+-- header before the field proof begins. The smallest checked successful budget
+-- is 240000 heartbeats; 230000 still times out at whnf.
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:12-50`
 (`\label{thm:ld-pasting}`) and
 `references/ldt-paper/inductive_step.tex:239-342`.
