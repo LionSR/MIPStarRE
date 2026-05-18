@@ -410,11 +410,205 @@ private lemma family_pointConsistencyError_eq_avg
             IdxProjMeas.toIdxSubMeas]
           rfl
 
-set_option maxHeartbeats 240000 in
--- The record constructor unfolds the averaged slice error terms in the final
--- telescoping estimate; the default heartbeat budget times out at the theorem
--- header before the field proof begins. The smallest checked successful budget
--- is 240000 heartbeats; 230000 still times out at whnf.
+/-- Scalar telescoping from the induction-section pasting error to the next
+main-induction error.
+
+The lemma isolates the scalar inequality chain from the assembly of the averaged
+pasting data.  Its hypotheses are the three estimates supplied by the averaged
+slice data: the bound on `κ`, the comparison `ζ ≤ ν`, and the bound on the
+pasting-section `ν` term. -/
+private lemma ldPastingInInductionError_le_mainInductionError_of_bounds
+    (params : Parameters)
+    [FieldModel params.q]
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (kappa zeta : Error)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hkappa_le :
+      kappa ≤
+        ((params.m : Error) ^ (2 : ℕ)) *
+          (mainInductionNu params.next k eps delta gamma +
+            Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))))
+          + zeta)
+    (hzeta_le_nu : zeta ≤ mainInductionNu params.next k eps delta gamma)
+    (hnu_le :
+      ldPastingInInductionNu params k eps delta gamma zeta ≤
+        (1 / (5 : Error)) * mainInductionNu params.next k eps delta gamma) :
+    ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+      mainInductionError params.next k eps delta gamma := by
+  let ν : Error := mainInductionNu params.next k eps delta gamma
+  let E : Error :=
+    Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
+  let E' : Error :=
+    Real.exp (-((k : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ)))))
+  have hkappa_le' : kappa ≤ ((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta := by
+    simpa [ν, E] using hkappa_le
+  have hzeta_le_nu' : zeta ≤ ν := by
+    simpa [ν] using hzeta_le_nu
+  have hnu_le' :
+      ldPastingInInductionNu params k eps delta gamma zeta ≤
+        (1 / (5 : Error)) * ν := by
+    simpa [ν] using hnu_le
+  have hnu_nonneg : 0 ≤ ν := by
+    have heps_root_nonneg : 0 ≤ Real.rpow eps (1 / (1024 : Error)) :=
+      Real.rpow_nonneg heps_nonneg (1 / (1024 : Error))
+    have hdelta_root_nonneg : 0 ≤ Real.rpow delta (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hdelta_nonneg (1 / (1024 : Error))
+    have hgamma_root_nonneg : 0 ≤ Real.rpow gamma (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hgamma_nonneg (1 / (1024 : Error))
+    have hratio_nonneg :
+        0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) :=
+      Real.rpow_nonneg (by positivity : 0 ≤ ((params.d : Error) / (params.q : Error)))
+        (1 / (1024 : Error))
+    have hsumnn : 0 ≤ Real.rpow eps (1 / (1024 : Error)) +
+        Real.rpow delta (1 / (1024 : Error)) +
+        Real.rpow gamma (1 / (1024 : Error)) +
+        Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
+      nlinarith [heps_root_nonneg, hdelta_root_nonneg, hgamma_root_nonneg, hratio_nonneg]
+    dsimp [ν]
+    unfold mainInductionNu
+    exact mul_nonneg (by positivity) hsumnn
+  have hE_nonneg : 0 ≤ E := by
+    dsimp [E]
+    exact le_of_lt (Real.exp_pos _)
+  have hE_le : E ≤ E' := by
+    dsimp [E, E']
+    apply Real.exp_le_exp.mpr
+    have hm_sq_le : ((params.m : Error) ^ (2 : ℕ)) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
+      have hm_le_next : (params.m : Error) ≤ (params.next.m : Error) := by
+        exact_mod_cast Nat.le_succ params.m
+      nlinarith
+    have hdenom_pos : 0 < 80000 * ((params.m : Error) ^ (2 : ℕ)) := by
+      have hm_pos : (0 : Error) < (params.m : Error) := by
+        exact_mod_cast params.hm
+      nlinarith
+    have hdenom_le :
+        80000 * ((params.m : Error) ^ (2 : ℕ)) ≤
+          80000 * ((params.next.m : Error) ^ (2 : ℕ)) := by
+      nlinarith [hm_sq_le]
+    have h_one_div :
+        (1 / (80000 * ((params.next.m : Error) ^ (2 : ℕ))) : Error) ≤
+          1 / (80000 * ((params.m : Error) ^ (2 : ℕ))) := by
+      exact one_div_le_one_div_of_le hdenom_pos hdenom_le
+    have hdiv :
+        (k : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ))) ≤
+          (k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))) := by
+      simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using
+        (mul_le_mul_of_nonneg_left h_one_div (by positivity : 0 ≤ (k : Error)))
+    have hneg :
+        -((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))) ≤
+          -((k : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ)))) := by
+      nlinarith [hdiv]
+    exact hneg
+  -- The paper uses the stronger coefficient estimate
+  -- `(1 + 1 / (100m)) * (m^2 + 3) ≤ (m + 1)^2`, which requires `m ≥ 2`.
+  -- Here the comparison `ζ ≤ ν` is applied before telescoping.  This changes
+  -- the `2ν` contribution into `(2/5)ν`, so the weaker estimate below is
+  -- already valid for every `m ≥ 1`.
+  have hcoef_nu :
+      ((((params.m : Error) ^ (2 : ℕ)) + 1) *
+          (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) ≤
+        ((params.next.m : Error) ^ (2 : ℕ)) := by
+    have hm0 : (params.m : Error) ≠ 0 := by
+      exact_mod_cast Nat.ne_of_gt params.hm
+    have hm_one : (1 : Error) ≤ (params.m : Error) := by
+      exact_mod_cast params.hm
+    have hnext_eq : (params.next.m : Error) = (params.m : Error) + 1 := by
+      norm_num [Parameters.next]
+    rw [hnext_eq]
+    have hpoly : 0 ≤ 495 * ((params.m : Error) ^ (2 : ℕ)) - 200 * (params.m : Error) - 5 := by
+      nlinarith [hm_one]
+    field_simp [hm0]
+    nlinarith [hpoly]
+  have hcoef_E :
+      ((((params.m : Error) ^ (2 : ℕ)) *
+          (1 + 1 / (100 * (params.m : Error))) + 1 : Error)) ≤
+        ((params.next.m : Error) ^ (2 : ℕ)) := by
+    have hm0 : (params.m : Error) ≠ 0 := by
+      exact_mod_cast Nat.ne_of_gt params.hm
+    have hnext_eq : (params.next.m : Error) = (params.m : Error) + 1 := by
+      norm_num [Parameters.next]
+    rw [hnext_eq]
+    have hsq : 0 ≤ ((params.m : Error) ^ (2 : ℕ)) := by
+      positivity
+    field_simp [hm0]
+    nlinarith [hsq]
+  have hnu_bound :
+      ((((params.m : Error) ^ (2 : ℕ)) + 1) *
+          (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) * ν ≤
+        ((params.next.m : Error) ^ (2 : ℕ)) * ν := by
+    exact mul_le_mul_of_nonneg_right hcoef_nu hnu_nonneg
+  have hE_bound :
+      ((((params.m : Error) ^ (2 : ℕ)) *
+          (1 + 1 / (100 * (params.m : Error))) + 1 : Error)) * E ≤
+        ((params.next.m : Error) ^ (2 : ℕ)) * E := by
+    exact mul_le_mul_of_nonneg_right hcoef_E hE_nonneg
+  have herror_old :
+      ((((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
+          (1 + 1 / (100 * (params.m : Error))) +
+        (2 / 5 : Error) * ν + E) ≤
+        ((params.next.m : Error) ^ (2 : ℕ)) * (ν + E) := by
+    have hrewrite :
+        ((((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
+              (1 + 1 / (100 * (params.m : Error))) +
+            (2 / 5 : Error) * ν + E) =
+          ((((params.m : Error) ^ (2 : ℕ)) + 1) *
+              (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) * ν +
+            ((((params.m : Error) ^ (2 : ℕ)) *
+              (1 + 1 / (100 * (params.m : Error))) + 1 : Error) * E) := by
+      ring
+    rw [hrewrite]
+    nlinarith [hnu_bound, hE_bound]
+  have hkappa_scaled :
+      kappa * (1 + 1 / (100 * (params.m : Error))) ≤
+        (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta) *
+          (1 + 1 / (100 * (params.m : Error))) := by
+    exact mul_le_mul_of_nonneg_right hkappa_le' (by positivity)
+  have hnu_scaled :
+      2 * ldPastingInInductionNu params k eps delta gamma zeta ≤ (2 / 5 : Error) * ν := by
+    nlinarith [hnu_le']
+  have hzeta_scaled :
+      (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta) *
+          (1 + 1 / (100 * (params.m : Error))) ≤
+        (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
+          (1 + 1 / (100 * (params.m : Error))) := by
+    have hadd :
+        ((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta ≤
+          ((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν := by
+      simpa [add_assoc, add_left_comm, add_comm] using
+        add_le_add_left hzeta_le_nu' (((params.m : Error) ^ (2 : ℕ)) * (ν + E))
+    exact mul_le_mul_of_nonneg_right hadd (by positivity)
+  have hzeta_scaled_add :
+      (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta) *
+          (1 + 1 / (100 * (params.m : Error))) + (2 / 5 : Error) * ν + E ≤
+        (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
+          (1 + 1 / (100 * (params.m : Error))) + (2 / 5 : Error) * ν + E := by
+    simpa [add_assoc, add_left_comm, add_comm] using
+      add_le_add_right hzeta_scaled ((2 / 5 : Error) * ν + E)
+  have hE_scaled :
+      ((params.next.m : Error) ^ (2 : ℕ)) * E ≤ ((params.next.m : Error) ^ (2 : ℕ)) * E' := by
+    exact mul_le_mul_of_nonneg_left hE_le (by positivity)
+  calc
+    ldPastingInInductionError params k eps delta gamma kappa zeta
+      = kappa * (1 + 1 / (100 * (params.m : Error))) +
+          2 * ldPastingInInductionNu params k eps delta gamma zeta + E := by
+            dsimp [E]
+            simp [ldPastingInInductionError]
+    _ ≤ (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta) *
+          (1 + 1 / (100 * (params.m : Error))) + (2 / 5 : Error) * ν + E := by
+            nlinarith [hkappa_scaled, hnu_scaled]
+    _ ≤ (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
+          (1 + 1 / (100 * (params.m : Error))) + (2 / 5 : Error) * ν + E := by
+            exact hzeta_scaled_add
+    _ ≤ ((params.next.m : Error) ^ (2 : ℕ)) * (ν + E) := herror_old
+    _ ≤ ((params.next.m : Error) ^ (2 : ℕ)) * (ν + E') := by
+            nlinarith [hE_scaled]
+    _ = mainInductionError params.next k eps delta gamma := by
+            dsimp [ν, E']
+            simp [mainInductionError, Parameters.next]
+
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:12-50`
 (`\label{thm:ld-pasting}`) and
 `references/ldt-paper/inductive_step.tex:239-342`.
@@ -446,335 +640,172 @@ noncomputable def assembleAveragedPastingData
   let kappa : Error :=
     avgOver 𝒟 (fun x => hinduction.sliceError x) +
       avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x)
-  let ν : Error := mainInductionNu params.next k eps delta gamma
-  let E : Error :=
-    Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))))
-  let E' : Error :=
-    Real.exp (-((k : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ)))))
-  refine
-    { kappa := kappa
-      zeta := zeta
-      gamma_le_one := hgamma_le
-      zeta_le_one := hzeta_le
-      dq_le_q := hdq_le_q
-      complete := by
-        refine ⟨?_⟩
-        refine ⟨?_⟩
-        have hmass_eq := family_averagedMass_eq_avg params strategy hself
-        have havg_lower :
-            1 - kappa ≤
-              avgOver 𝒟
-                (fun x => subMeasMass strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)) := by
-          have hconst1 : avgOver 𝒟 (fun _ : Fq params => (1 : Error)) = 1 := by
-            simpa [𝒟] using (avgOver_uniform_const (α := Fq params) (1 : Error))
-          have hnegErr : avgOver 𝒟 (fun a => -hinduction.sliceError a)
-              = -avgOver 𝒟 hinduction.sliceError := by
-            simpa [avgOver_const_mul] using (avgOver_const_mul 𝒟 (-1) hinduction.sliceError)
-          have hnegZeta :
-              avgOver 𝒟 (fun a => -sliceSelfImprovementError params hrestrict a) =
-                -avgOver 𝒟 (fun a => sliceSelfImprovementError params hrestrict a) := by
-            simpa [avgOver_const_mul] using
-              (avgOver_const_mul 𝒟 (-1) (fun a => sliceSelfImprovementError params hrestrict a))
-          calc
-            1 - kappa = avgOver 𝒟
-                (fun x => (1 - hinduction.sliceError x) - sliceSelfImprovementError params
-                    hrestrict x) := by
-                  dsimp [kappa]
-                  rw [show (fun x => (1 - hinduction.sliceError x) -
-                        sliceSelfImprovementError params hrestrict x) =
-                      fun x => 1 + (-hinduction.sliceError x) +
-                        (-sliceSelfImprovementError params hrestrict x) by
-                        funext x
-                        ring]
-                  rw [avgOver_add, avgOver_add, hconst1, hnegErr, hnegZeta]
-                  ring
-            _ ≤ avgOver 𝒟
-                (fun x => subMeasMass strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)) := by
-                  apply avgOver_mono
-                  intro x
-                  exact (hself.completeness x).lowerBound
-        rw [hmass_eq]
-        exact havg_lower
-      consistent := by
-        refine ⟨?_⟩
-        refine ⟨?_⟩
-        calc
-          bipartiteConsError strategy.state (uniformDistribution (Point params.next))
-              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-              (IdxPolyFamily.evaluatedAtNextPoint hself.family)
-            = avgOver 𝒟
-                (fun x =>
-                  bipartiteConsError strategy.state (uniformDistribution (Point params))
-                    (IdxProjMeas.toIdxSubMeas
-                      (xRestrictedStrategy params strategy x).pointMeasurement)
-                    (polynomialEvaluationFamily params (hself.sliceProj x).toSubMeas)) :=
-                family_pointConsistencyError_eq_avg params strategy hself
-          _ ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by
-                exact avgOver_mono 𝒟 _ _ fun x => (hself.pointConsistency x).offDiagonalBound
-          _ ≤ zeta := by
-                simpa [zeta, 𝒟] using
-                  (average_sliceSelfImprovementError_le
-                    params strategy eps delta gamma hgood hrestrict)
-      selfConsistent := by
-        refine ⟨?_⟩
-        refine ⟨?_⟩
-        have hpointwise :
-            ∀ x,
+  refine AveragedPastingData.mk kappa zeta hgamma_le hzeta_le hdq_le_q ?_ ?_ ?_ ?_ ?_
+  · refine ⟨?_⟩
+    refine ⟨?_⟩
+    have hmass_eq := family_averagedMass_eq_avg params strategy hself
+    have havg_lower :
+        1 - kappa ≤
+          avgOver 𝒟
+            (fun x => subMeasMass strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)) := by
+      have hconst1 : avgOver 𝒟 (fun _ : Fq params => (1 : Error)) = 1 := by
+        simpa [𝒟] using (avgOver_uniform_const (α := Fq params) (1 : Error))
+      have hnegErr : avgOver 𝒟 (fun a => -hinduction.sliceError a)
+          = -avgOver 𝒟 hinduction.sliceError := by
+        simpa [avgOver_const_mul] using (avgOver_const_mul 𝒟 (-1) hinduction.sliceError)
+      have hnegZeta :
+          avgOver 𝒟 (fun a => -sliceSelfImprovementError params hrestrict a) =
+            -avgOver 𝒟 (fun a => sliceSelfImprovementError params hrestrict a) := by
+        simpa [avgOver_const_mul] using
+          (avgOver_const_mul 𝒟 (-1) (fun a => sliceSelfImprovementError params hrestrict a))
+      calc
+        1 - kappa = avgOver 𝒟
+            (fun x => (1 - hinduction.sliceError x) - sliceSelfImprovementError params
+                hrestrict x) := by
+              dsimp [kappa]
+              rw [show (fun x => (1 - hinduction.sliceError x) -
+                    sliceSelfImprovementError params hrestrict x) =
+                  fun x => 1 + (-hinduction.sliceError x) +
+                    (-sliceSelfImprovementError params hrestrict x) by
+                    funext x
+                    ring]
+              rw [avgOver_add, avgOver_add, hconst1, hnegErr, hnegZeta]
+              ring
+        _ ≤ avgOver 𝒟
+            (fun x => subMeasMass strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)) := by
+              apply avgOver_mono
+              intro x
+              exact (hself.completeness x).lowerBound
+    rw [hmass_eq]
+    exact havg_lower
+  · refine ⟨?_⟩
+    refine ⟨?_⟩
+    calc
+      bipartiteConsError strategy.state (uniformDistribution (Point params.next))
+          (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+          (IdxPolyFamily.evaluatedAtNextPoint hself.family)
+        = avgOver 𝒟
+            (fun x =>
+              bipartiteConsError strategy.state (uniformDistribution (Point params))
+                (IdxProjMeas.toIdxSubMeas
+                  (xRestrictedStrategy params strategy x).pointMeasurement)
+                (polynomialEvaluationFamily params (hself.sliceProj x).toSubMeas)) :=
+            family_pointConsistencyError_eq_avg params strategy hself
+      _ ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by
+            exact avgOver_mono 𝒟 _ _ fun x => (hself.pointConsistency x).offDiagonalBound
+      _ ≤ zeta := by
+            simpa [zeta, 𝒟] using
+              (average_sliceSelfImprovementError_le
+                params strategy eps delta gamma hgood hrestrict)
+  · refine ⟨?_⟩
+    refine ⟨?_⟩
+    have hpointwise :
+        ∀ x,
+          qSDD strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)
+            ((hself.sliceProj x).toSubMeas.liftRight) ≤
+          sliceSelfImprovementError params hrestrict x := by
+      intro x
+      simpa [sddError, avgOver_uniform_const, constSubMeasFamily] using
+        (hself.selfCloseness x).squaredDistanceBound
+    calc
+      sddError strategy.state 𝒟
+          (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas hself.family.meas))
+          (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas hself.family.meas))
+        = avgOver 𝒟
+            (fun x =>
               qSDD strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)
-                ((hself.sliceProj x).toSubMeas.liftRight) ≤
-              sliceSelfImprovementError params hrestrict x := by
-          intro x
-          simpa [sddError, avgOver_uniform_const, constSubMeasFamily] using
-            (hself.selfCloseness x).squaredDistanceBound
-        calc
-          sddError strategy.state 𝒟
-              (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas hself.family.meas))
-              (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas hself.family.meas))
-            = avgOver 𝒟
-                (fun x =>
-                  qSDD strategy.state ((hself.sliceProj x).toSubMeas.liftLeft)
-                    ((hself.sliceProj x).toSubMeas.liftRight)) := by
-                  rfl
-          _ ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by
-                exact avgOver_mono 𝒟 _ _ hpointwise
-          _ ≤ zeta := by
-                simpa [zeta, 𝒟] using
-                  (average_sliceSelfImprovementError_le
-                    params strategy eps delta gamma hgood hrestrict)
-      bounded := by
-        refine
-          { sliceOpPSD := ?_
-            sliceBoundedness := ?_
-            sliceDominatesAveragedPoint := ?_ }
-        · intro x
-          let g0 : Polynomial params :=
-            Classical.choice (inferInstance : Nonempty (Polynomial params))
-          have htarget_nonneg :
-              0 ≤ IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g0 := by
-            unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
-            exact Finset.sum_nonneg fun u hu =>
-              smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
-                ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_pos
-                  (g0 u))
-          exact le_trans htarget_nonneg (hself.dominatesAveragePointOperator x g0)
-        · have hswap :
-              avgOver 𝒟
-                  (fun x =>
-                    ev strategy.state
-                      (leftTensor (ι₂ := ι) (1 - (hself.family.meas x).toSubMeas.total) *
-                        rightTensor (ι₁ := ι) (hself.family.witness x))) =
-                avgOver 𝒟
-                  (fun x =>
-                    tensorFailureExpectation strategy.state (hself.sliceWitness x)
-                      (hself.sliceProj x).toSubMeas) := by
-            apply avgOver_congr
-            intro x
-            simpa [tensorFailureExpectation, SelfImprovementData.family,
-              leftTensor_mul_rightTensor_eq_opTensor] using
-              (ev_opTensor_swap_of_density_fixed strategy.state
-                strategy.permInvState.density_swap
-                (1 - (hself.sliceProj x).toSubMeas.total) (hself.sliceWitness x))
-          rw [hswap]
-          calc
+                ((hself.sliceProj x).toSubMeas.liftRight)) := by
+              rfl
+      _ ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by
+            exact avgOver_mono 𝒟 _ _ hpointwise
+      _ ≤ zeta := by
+            simpa [zeta, 𝒟] using
+              (average_sliceSelfImprovementError_le
+                params strategy eps delta gamma hgood hrestrict)
+  · refine
+      { sliceOpPSD := ?_
+        sliceBoundedness := ?_
+        sliceDominatesAveragedPoint := ?_ }
+    · intro x
+      let g0 : Polynomial params :=
+        Classical.choice (inferInstance : Nonempty (Polynomial params))
+      have htarget_nonneg :
+          0 ≤ IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g0 := by
+        unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
+        exact Finset.sum_nonneg fun u hu =>
+          smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
+            ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_pos
+              (g0 u))
+      exact le_trans htarget_nonneg (hself.dominatesAveragePointOperator x g0)
+    · have hswap :
+          avgOver 𝒟
+              (fun x =>
+                ev strategy.state
+                  (leftTensor (ι₂ := ι) (1 - (hself.family.meas x).toSubMeas.total) *
+                    rightTensor (ι₁ := ι) (hself.family.witness x))) =
             avgOver 𝒟
-                (fun x =>
-                  tensorFailureExpectation strategy.state (hself.sliceWitness x)
-                    (hself.sliceProj x).toSubMeas)
-              ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by
-                  exact avgOver_mono 𝒟 _ _ hself.bounded
-            _ ≤ zeta := by
-                  simpa [zeta, 𝒟] using
-                    (average_sliceSelfImprovementError_le
-                      params strategy eps delta gamma hgood hrestrict)
-        · intro x g
-          exact hself.dominatesAveragePointOperator x g
-      error_le := by
-        have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
-        have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
-        have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
-        have heps_le_one :=
-          eps_le_one_of_selfImprovementInInductionError_le_one
-            params strategy hgood hzeta_le
-        have hdelta_le_one :=
-          delta_le_one_of_selfImprovementInInductionError_le_one
-            params strategy hgood hzeta_le
-        have hkappa_le :
-            kappa ≤ ((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta := by
-          dsimp [kappa, zeta, ν, E]
-          nlinarith
-            [average_sliceError_le params strategy eps delta gamma k hgood hrestrict hinduction,
-              average_sliceSelfImprovementError_le
-                params strategy eps delta gamma hgood hrestrict]
-        have hzeta_le_nu : zeta ≤ ν := by
-          simpa [zeta, ν] using
-            selfImprovementInInductionError_le_mainInductionNu
-              params strategy eps delta gamma k
-              hgood hsmall heps_le_one hdelta_le_one hdq_le_q
-        have hnu_le :
-            ldPastingInInductionNu params k eps delta gamma zeta ≤
-              (1 / (5 : Error)) * ν := by
-          simpa [zeta, ν] using
-            ldPastingInInductionNu_le_fifth_mainInductionNu
-              params strategy eps delta gamma k
-              hgood hzeta_le hgamma_le hdq_le_q
-        have hnu_nonneg : 0 ≤ ν := by
-          have heps_root_nonneg : 0 ≤ Real.rpow eps (1 / (1024 : Error)) :=
-            Real.rpow_nonneg heps_nonneg (1 / (1024 : Error))
-          have hdelta_root_nonneg : 0 ≤ Real.rpow delta (1 / (1024 : Error)) :=
-            Real.rpow_nonneg hdelta_nonneg (1 / (1024 : Error))
-          have hgamma_root_nonneg : 0 ≤ Real.rpow gamma (1 / (1024 : Error)) :=
-            Real.rpow_nonneg hgamma_nonneg (1 / (1024 : Error))
-          have hratio_nonneg :
-              0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) :=
-            Real.rpow_nonneg (by positivity : 0 ≤ ((params.d : Error) / (params.q : Error)))
-              (1 / (1024 : Error))
-          have hsumnn : 0 ≤ Real.rpow eps (1 / (1024 : Error)) +
-              Real.rpow delta (1 / (1024 : Error)) +
-              Real.rpow gamma (1 / (1024 : Error)) +
-              Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
-            nlinarith [heps_root_nonneg, hdelta_root_nonneg, hgamma_root_nonneg, hratio_nonneg]
-          dsimp [ν]
-          unfold mainInductionNu
-          exact mul_nonneg (by positivity) hsumnn
-        have hE_nonneg : 0 ≤ E := by
-          dsimp [E]
-          exact le_of_lt (Real.exp_pos _)
-        have hE_le : E ≤ E' := by
-          dsimp [E, E']
-          apply Real.exp_le_exp.mpr
-          have hm_sq_le : ((params.m : Error) ^ (2 : ℕ)) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
-            have hm_le_next : (params.m : Error) ≤ (params.next.m : Error) := by
-              exact_mod_cast Nat.le_succ params.m
-            nlinarith
-          have hdenom_pos : 0 < 80000 * ((params.m : Error) ^ (2 : ℕ)) := by
-            have hm_pos : (0 : Error) < (params.m : Error) := by
-              exact_mod_cast params.hm
-            nlinarith
-          have hdenom_le :
-              80000 * ((params.m : Error) ^ (2 : ℕ)) ≤
-                80000 * ((params.next.m : Error) ^ (2 : ℕ)) := by
-            nlinarith [hm_sq_le]
-          have h_one_div :
-              (1 / (80000 * ((params.next.m : Error) ^ (2 : ℕ))) : Error) ≤
-                1 / (80000 * ((params.m : Error) ^ (2 : ℕ))) := by
-            exact one_div_le_one_div_of_le hdenom_pos hdenom_le
-          have hdiv :
-              (k : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ))) ≤
-                (k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))) := by
-            simpa [div_eq_mul_inv, mul_comm, mul_left_comm, mul_assoc] using
-              (mul_le_mul_of_nonneg_left h_one_div (by positivity : 0 ≤ (k : Error)))
-          have hneg :
-              -((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ)))) ≤
-                -((k : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ)))) := by
-            nlinarith [hdiv]
-          exact hneg
-        -- The paper uses the stronger coefficient estimate
-        -- `(1 + 1 / (100m)) * (m^2 + 3) ≤ (m + 1)^2`, which needs `m ≥ 2`.
-        -- Here we apply `ζ ≤ ν` (`hzeta_le_nu`) *before* telescoping, which
-        -- collapses the paper's `2ν` contribution to `(2/5)ν` and yields the
-        -- weaker `((m^2 + 1)(1 + 1/(100m)) + 2/5) ≤ (m + 1)^2`, already valid
-        -- for every `m ≥ 1`.
-        have hcoef_nu :
-            ((((params.m : Error) ^ (2 : ℕ)) + 1) *
-                (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) ≤
-              ((params.next.m : Error) ^ (2 : ℕ)) := by
-          have hm0 : (params.m : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hm
-          have hm_one : (1 : Error) ≤ (params.m : Error) := by
-            exact_mod_cast params.hm
-          have hnext_eq : (params.next.m : Error) = (params.m : Error) + 1 := by
-            norm_num [Parameters.next]
-          rw [hnext_eq]
-          have hpoly : 0 ≤ 495 * ((params.m : Error) ^ (2 : ℕ)) - 200 * (params.m : Error) - 5 := by
-            nlinarith [hm_one]
-          field_simp [hm0]
-          nlinarith [hpoly]
-        have hcoef_E :
-            ((((params.m : Error) ^ (2 : ℕ)) *
-                (1 + 1 / (100 * (params.m : Error))) + 1 : Error)) ≤
-              ((params.next.m : Error) ^ (2 : ℕ)) := by
-          have hm0 : (params.m : Error) ≠ 0 := by
-            exact_mod_cast Nat.ne_of_gt params.hm
-          have hnext_eq : (params.next.m : Error) = (params.m : Error) + 1 := by
-            norm_num [Parameters.next]
-          rw [hnext_eq]
-          have hsq : 0 ≤ ((params.m : Error) ^ (2 : ℕ)) := by
-            positivity
-          field_simp [hm0]
-          nlinarith [hsq]
-        have hnu_bound :
-            ((((params.m : Error) ^ (2 : ℕ)) + 1) *
-                (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) * ν ≤
-              ((params.next.m : Error) ^ (2 : ℕ)) * ν := by
-          exact mul_le_mul_of_nonneg_right hcoef_nu hnu_nonneg
-        have hE_bound :
-            ((((params.m : Error) ^ (2 : ℕ)) *
-                (1 + 1 / (100 * (params.m : Error))) + 1 : Error)) * E ≤
-              ((params.next.m : Error) ^ (2 : ℕ)) * E := by
-          exact mul_le_mul_of_nonneg_right hcoef_E hE_nonneg
-        have herror_old :
-            ((((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
-                (1 + 1 / (100 * (params.m : Error))) +
-              (2 / 5 : Error) * ν + E) ≤
-              ((params.next.m : Error) ^ (2 : ℕ)) * (ν + E) := by
-          have hrewrite :
-              ((((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
-                    (1 + 1 / (100 * (params.m : Error))) +
-                  (2 / 5 : Error) * ν + E) =
-                ((((params.m : Error) ^ (2 : ℕ)) + 1) *
-                    (1 + 1 / (100 * (params.m : Error))) + 2 / 5 : Error) * ν +
-                  ((((params.m : Error) ^ (2 : ℕ)) *
-                    (1 + 1 / (100 * (params.m : Error))) + 1 : Error) * E) := by
-            ring
-          rw [hrewrite]
-          nlinarith [hnu_bound, hE_bound]
-        have hkappa_scaled :
-            kappa * (1 + 1 / (100 * (params.m : Error))) ≤
-              (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta) *
-                (1 + 1 / (100 * (params.m : Error))) := by
-          exact mul_le_mul_of_nonneg_right hkappa_le (by positivity)
-        have hnu_scaled :
-            2 * ldPastingInInductionNu params k eps delta gamma zeta ≤ (2 / 5 : Error) * ν := by
-          nlinarith [hnu_le]
-        have hzeta_scaled :
-            (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta) *
-                (1 + 1 / (100 * (params.m : Error))) ≤
-              (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
-                (1 + 1 / (100 * (params.m : Error))) := by
-          have hadd :
-              ((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta ≤
-                ((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν := by
-            simpa [add_assoc, add_left_comm, add_comm] using
-              add_le_add_left hzeta_le_nu (((params.m : Error) ^ (2 : ℕ)) * (ν + E))
-          exact mul_le_mul_of_nonneg_right hadd (by positivity)
-        have hzeta_scaled_add :
-            (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta) *
-                (1 + 1 / (100 * (params.m : Error))) + (2 / 5 : Error) * ν + E ≤
-              (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
-                (1 + 1 / (100 * (params.m : Error))) + (2 / 5 : Error) * ν + E := by
-          simpa [add_assoc, add_left_comm, add_comm] using
-            add_le_add_right hzeta_scaled ((2 / 5 : Error) * ν + E)
-        have hE_scaled :
-            ((params.next.m : Error) ^ (2 : ℕ)) * E ≤ ((params.next.m : Error) ^ (2 : ℕ)) * E' := by
-          exact mul_le_mul_of_nonneg_left hE_le (by positivity)
-        calc
-          ldPastingInInductionError params k eps delta gamma kappa zeta
-            = kappa * (1 + 1 / (100 * (params.m : Error))) +
-                2 * ldPastingInInductionNu params k eps delta gamma zeta + E := by
-                  dsimp [E]
-                  simp [ldPastingInInductionError]
-          _ ≤ (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + zeta) *
-                (1 + 1 / (100 * (params.m : Error))) + (2 / 5 : Error) * ν + E := by
-                  nlinarith [hkappa_scaled, hnu_scaled]
-          _ ≤ (((params.m : Error) ^ (2 : ℕ)) * (ν + E) + ν) *
-                (1 + 1 / (100 * (params.m : Error))) + (2 / 5 : Error) * ν + E := by
-                  exact hzeta_scaled_add
-          _ ≤ ((params.next.m : Error) ^ (2 : ℕ)) * (ν + E) := herror_old
-          _ ≤ ((params.next.m : Error) ^ (2 : ℕ)) * (ν + E') := by
-                  nlinarith [hE_scaled]
-          _ = mainInductionError params.next k eps delta gamma := by
-                  dsimp [ν, E']
-                  simp [mainInductionError, Parameters.next] }
+              (fun x =>
+                tensorFailureExpectation strategy.state (hself.sliceWitness x)
+                  (hself.sliceProj x).toSubMeas) := by
+        apply avgOver_congr
+        intro x
+        simpa [tensorFailureExpectation, SelfImprovementData.family,
+          leftTensor_mul_rightTensor_eq_opTensor] using
+          (ev_opTensor_swap_of_density_fixed strategy.state
+            strategy.permInvState.density_swap
+            (1 - (hself.sliceProj x).toSubMeas.total) (hself.sliceWitness x))
+      rw [hswap]
+      calc
+        avgOver 𝒟
+            (fun x =>
+              tensorFailureExpectation strategy.state (hself.sliceWitness x)
+                (hself.sliceProj x).toSubMeas)
+          ≤ avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x) := by
+              exact avgOver_mono 𝒟 _ _ hself.bounded
+        _ ≤ zeta := by
+              simpa [zeta, 𝒟] using
+                (average_sliceSelfImprovementError_le
+                  params strategy eps delta gamma hgood hrestrict)
+    · intro x g
+      exact hself.dominatesAveragePointOperator x g
+  · have heps_nonneg := eps_nonneg_of_isGood params.next strategy hgood
+    have hdelta_nonneg := delta_nonneg_of_isGood params.next strategy hgood
+    have hgamma_nonneg := gamma_nonneg_of_isGood params.next strategy hgood
+    have heps_le_one :=
+      eps_le_one_of_selfImprovementInInductionError_le_one
+        params strategy hgood hzeta_le
+    have hdelta_le_one :=
+      delta_le_one_of_selfImprovementInInductionError_le_one
+        params strategy hgood hzeta_le
+    have hkappa_le :
+        kappa ≤
+          ((params.m : Error) ^ (2 : ℕ)) *
+              (mainInductionNu params.next k eps delta gamma +
+                Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))))
+            + zeta := by
+      dsimp [kappa, zeta]
+      nlinarith
+        [average_sliceError_le params strategy eps delta gamma k hgood hrestrict hinduction,
+          average_sliceSelfImprovementError_le
+            params strategy eps delta gamma hgood hrestrict]
+    have hzeta_le_nu :
+        zeta ≤ mainInductionNu params.next k eps delta gamma := by
+      simpa [zeta] using
+        selfImprovementInInductionError_le_mainInductionNu
+          params strategy eps delta gamma k
+          hgood hsmall heps_le_one hdelta_le_one hdq_le_q
+    have hnu_le :
+        ldPastingInInductionNu params k eps delta gamma zeta ≤
+          (1 / (5 : Error)) * mainInductionNu params.next k eps delta gamma := by
+      simpa [zeta] using
+        ldPastingInInductionNu_le_fifth_mainInductionNu
+          params strategy eps delta gamma k
+          hgood hzeta_le hgamma_le hdq_le_q
+    exact
+      ldPastingInInductionError_le_mainInductionError_of_bounds
+        params eps delta gamma k kappa zeta
+        heps_nonneg hdelta_nonneg hgamma_nonneg
+        hkappa_le hzeta_le_nu hnu_le
 
 
 end MIPStarRE.LDT.MainInductionStep
