@@ -30,7 +30,7 @@ namespace MIPStarRE.LDT.MainInductionStep
 open MIPStarRE.LDT
 open scoped MatrixOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-- Monotone postprocessing of an explicit witness for the main-induction conclusion.
 
@@ -153,8 +153,8 @@ Paper origin: `references/ldt-paper/self_improvement.tex:631-811`
 statement at `references/ldt-paper/inductive_step.tex:249-286` states the input
 as a submeasurement, while the proved form at
 `references/ldt-paper/self_improvement.tex:635-671` uses a measurement.  This
-Lean statement follows the proved measurement-valued form needed at the
-induction call site.
+Lean statement follows the proved measurement-valued form needed in the
+induction proof.
 
 The input \(G\) is a complete polynomial measurement, as in the paper's
 restated self-improvement theorem.  The conclusion is phrased in the Section 6
