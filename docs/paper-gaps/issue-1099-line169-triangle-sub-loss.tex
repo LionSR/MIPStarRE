@@ -134,14 +134,15 @@ completion scalar has been expanded.
 
 \section{Relation with the blueprint and Lean}
 
-The blueprint remark on the Lean line-169 interface now records three distinct
-routes:\footnote{See
+The blueprint remark on the Lean line-169 interface now records the active
+transport routes and the auxiliary completion fact they use:\footnote{See
 \path{blueprint/src/chapter/ch04_projective.tex}, the remark
 \path{rem:lean-line169-projectivization-match-mass}.}
-the exact route through the construction-level invariant
-\texttt{ProjectivizationMatchMassMonotonicity}, the generic
-$\zeta_1 + \sqrt{\zeta_2}$ substitution route, and the local repaired route
-$\zeta_1 + 10\zeta_1^{1/8}$ described above.
+the generic $\zeta_1 + \sqrt{\zeta_2}$ substitution route, the sharper local
+repaired route $\zeta_1 + 10\zeta_1^{1/8}$ described above, and the checked
+completion helper
+\texttt{ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj\_left\_matchMass\_ge}
+showing that canonical completion adds no further diagonal match-mass loss.
 
 The formal development proves the repaired route by checked declarations.\footnote{The
 generic pre-completion transport theorems are
@@ -165,16 +166,16 @@ envelope at the $1/65536$ scale.  The present formal base-case assembly instead
 uses the sharper local pre-completion repair, so the public final envelope keeps
 the older $1/40000$ scale.
 
-The separate exact-$\zeta_1$ formal interface remains the construction-level
-match-mass monotonicity invariant discussed in issue~\ghissue{1099}.  In other
-words, the formal development now cleanly distinguishes two questions:
+The former exact-$\zeta_1$ formal interface has now been retired from the active
+Lean development.  The formal development instead cleanly distinguishes two
+questions:
 
 \begin{itemize}
 \item the paper's printed use of \path{prop:triangle-sub}, which is incorrect as
   stated and has the checked local repair above; and
 \item the stronger exact-$\zeta_1$ replacement step, which would require an
   additional construction-specific monotonicity theorem not supplied by the
-  cited proof.
+  cited proof and is no longer represented by a live Lean interface.
 \end{itemize}
 
 \section{Conclusion}

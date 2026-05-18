@@ -24,12 +24,11 @@ surrounding projectivization argument is in
 line-169 replacement step is lines~167--173.}
 The broader discrepancy note
 \path{issue-1099-line169-triangle-sub-loss.tex} explains why the printed paper
-argument cannot yield the exact error $\zeta_1$. The present note isolates a
-sharper local repair that was considered for the repaired line-169 route.  The
-current \leanid{MIPStarRE.LDT.Test.mainFormal} assembly no longer uses this
-route: it keeps the exact line-169 match-mass preservation as a named proof
-obligation instead of introducing a repaired transport helper into the final
-theorem pipeline.
+argument cannot yield the exact error $\zeta_1$. The present note isolates the
+sharper local repair that is now used by the active
+\leanid{MIPStarRE.LDT.Test.mainFormal} assembly.  The older exact line-169
+match-mass interface has been retired; the live Lean route keeps the repaired
+transport helper in the final theorem pipeline instead.
 
 The point of this repair is that the generic corrected route
 \[
@@ -192,10 +191,9 @@ and its Bob-side mirror.}
 
 In the current code, the paper-facing theorem
 \leanid{MIPStarRE.LDT.Test.mainFormal} has a direct proof gap rather than a
-separate bridge or residual hypothesis.  The final transport that should be
-used once the projective-completion residual has been constructed is factored
-through
-\leanid{MIPStarRE.LDT.Test.mainFormal\_ofProjectiveCompletionResidual}.  The
+separate bridge or residual hypothesis.  The final transport used once the
+projective-completion witness has been constructed is factored through
+\leanid{MIPStarRE.LDT.Test.mainFormal\_ofProjectiveCompletionTransportWitness}.  The
 older repaired base-case assembly theorem has been removed from the current
 MainFormal route, and the repaired line-169 Step-8 absorption helper has also
 been deleted as dead code.  The generic corrected route
