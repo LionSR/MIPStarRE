@@ -98,7 +98,7 @@ lemma evaluatedSlice_phaseEight_tail_bound
             rw [hgonna_norm, htail_norm]
     _ ≤ Real.sqrt zeta := hclose
 
-set_option maxHeartbeats 10000000 in
+set_option maxHeartbeats 500000 in
 -- This adjoint tail comparison unfolds the second-coordinate tensor normalization.
 /-- Paper line 118--119: move the second-coordinate factor back to the left register. -/
 lemma evaluatedSlice_phaseNine_tail_bound
