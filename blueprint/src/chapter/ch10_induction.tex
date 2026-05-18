@@ -712,7 +712,7 @@ assembly witness:
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2}
 \lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2}
 \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency}
-\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
+\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge}
 \lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toPreProjectiveSelfConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.projectivizationSelfConsistencyHandoff, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.fullPolynomialConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.projectiveEvaluationConsistency}
 \lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointAConsistency_ofLine169Consistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointBConsistency_ofLine169Consistency}
@@ -750,21 +750,17 @@ line-169 estimate with error $\eta$ yields the final point error
 \[
   2\sigma + 2\sqrt{\eta+\zeta_3/2}.
 \]
-The paper-tight final route specializes this with $\eta=\zeta_1$; the checked
-local repair can be inserted with its explicit larger value of $\eta$ if the
-scalar cascade is widened accordingly.  The existing
+The active checked route specializes this with the repaired value
+$\eta=\zeta_1+10\zeta_1^{1/8}$.  The existing
 \texttt{pointAConsistency} and \texttt{pointBConsistency} declarations are the
-paper-tight specializations.  After the \#869 right-register
+corresponding repaired specializations.  After the \#869 right-register
 completion transport, the remaining active post-role witness asks only for
-Alice's line-146 completion closeness, Bob's left-register completion closeness
-as returned by orthonormalize-and-complete, and the construction-level
-match-mass monotonicity invariant needed for the exact polynomial-level
-$\zeta_1$ transport links from paper line~169 and its role-reversed analogue.
-Lean reconstructs pre-projective full-polynomial consistency from the concrete
-role witness, uses the match-mass invariant to derive the two line-169 links,
-and transports the Bob-side left-register completion estimate to the line-147
-right-register form before converting directly to the projective completion
-witness used by the final assembly.
+Alice's line-146 completion closeness, Bob's right-register completion
+closeness, and the two repaired polynomial line-169 links.  Lean reconstructs
+pre-projective full-polynomial consistency from the concrete role witness, uses
+those repaired line-169 links together with the evaluated line-164 projective
+consistency, and converts directly to the projective completion witness used by
+the final assembly.
 It no longer asks for an arbitrary role-measurement record or an arbitrary
 raw Section~6 witness as an independent field.  It also no longer asks for the two factor-two
 role-block estimates, the unused Section~6 consistency field inside
@@ -774,9 +770,7 @@ role witness, the selected role-measurement record, and \texttt{hpass}.  Lean th
 the projective converse of \texttt{simeq-to-approx} directly inside
 \texttt{MainFormalProjectiveCompletionTransportWitness.selfConsistency}.
 
-The exact line-169 transport fields are now derived from the stored match-mass
-monotonicity invariant rather than being independent witness data.  As stated in
-\texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
+As stated in \texttt{preliminaries.tex}, \texttt{prop:triangle-sub} gives a
 $\delta+\sqrt{\epsilon}$ loss, so applying it directly to
 $G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
 $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
@@ -785,7 +779,9 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
 	envelope.  The sharper local pre-completion repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
-	widening and is part of the match-mass witness route.
+	widening.  Its completion step uses only the checked monotonicity helper
+	\texttt{ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj\_left\_matchMass\_ge},
+	not a separate exact match-mass witness route.
 	No proof-level completeness tag is claimed here while \texttt{mainFormal}
 	itself has tracked proof debt for constructing the projective-completion
 	witness from the paper hypotheses: the Section~6 successor branch is tracked
