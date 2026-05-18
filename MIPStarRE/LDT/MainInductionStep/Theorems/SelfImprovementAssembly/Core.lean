@@ -30,7 +30,9 @@ namespace MIPStarRE.LDT.MainInductionStep
 open MIPStarRE.LDT
 open scoped MatrixOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+universe uι
+
+variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 /-- Monotone postprocessing of an explicit witness for the main-induction conclusion.
 
