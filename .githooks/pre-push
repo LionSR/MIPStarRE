@@ -71,9 +71,7 @@ if [ -s "$CHANGED_LEAN_FILE_LIST" ] ||
     grep -Eq '^scripts/(check_oversized_lean_files\.py|tests/test_check_oversized_lean_files\.py)$' \
       "$CHANGED_FILE_LIST"; then
   echo "MIPStarRE pre-push: checking Lean file length guard."
-  run_outside_git_env python3 scripts/check_oversized_lean_files.py \
-    --root . \
-    --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
+  run_outside_git_env python3 scripts/check_oversized_lean_files.py --root .
 fi
 
 if grep -Eq '^(MIPStarRE/LDT/.*\.lean|MIPStarRE/LDT\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST"; then

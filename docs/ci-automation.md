@@ -479,8 +479,7 @@ For ordinary Lean pushes, pre-push also runs the same oversized-file guard used
 by CI:
 
 ```bash
-python3 scripts/check_oversized_lean_files.py --root . \
-  --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
+python3 scripts/check_oversized_lean_files.py --root .
 ```
 
 For changed blueprint sources under `blueprint/src/`, pre-push now runs a
