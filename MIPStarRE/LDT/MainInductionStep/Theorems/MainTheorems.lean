@@ -217,21 +217,14 @@ Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, the induction
 step after the restricted-probability estimates and the slice-wise recursive
 calls have been set up.
 
-This theorem is the self-contained mathematical obligation left by the
-successor case.  Its assumptions are the corrected large-`k` hypotheses for
+This theorem is the parameter-decomposition form used by `mainInduction`.
+Its assumptions are the corrected large-`k` hypotheses for
 `thm:main-induction`, together with the branch condition `params.m ≠ 1`; it
 does not accept restricted-probability records, per-slice induction data,
-self-improvement data, pasting data, bridge hypotheses, residual inputs, or
-data record hypotheses.  The proof reduces the non-base branch to the native
-successor-step obligation `mainInductionSuccessorNext`.
-
-**Proof obligation:** Prove the successor branch from the corrected large-`k`
-theorem hypotheses by
-deriving the restricted slice profiles, the recursive slice measurements, the
-slice-wise self-improvement conclusions, and the averaged pasting input inside
-the proof.  This is tracked by issues #1507 and #1458.  Discharge: construct the
-four stage objects from `references/ldt-paper/inductive_step.tex:441-551` and
-close the scalar comparison using `mainInductionFromStageData`. -/
+self-improvement data, pasting data, auxiliary implication hypotheses, residual
+inputs, or data record hypotheses.  The proof decomposes the non-base parameter
+bundle as `pred.next` and then invokes the native successor-step obligation
+`mainInductionSuccessorNext`. -/
 theorem mainInductionSuccessor
     (params : Parameters)
     [FieldModel params.q]
@@ -240,13 +233,13 @@ theorem mainInductionSuccessor
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
     (hk : 400 * params.m * params.d ≤ k)
-    (_hm1 : params.m ≠ 1) :
+    (hm1 : params.m ≠ 1) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
-  rcases Parameters.successorDecompositionOfNeOne params _hm1 with ⟨pred, hnext⟩
+  rcases Parameters.successorDecompositionOfNeOne params hm1 with ⟨pred, hnext⟩
   have hq : pred.q = params.q := by
     simpa [Parameters.next] using congrArg Parameters.q hnext
   letI : FieldModel pred.q := hq.symm ▸ (inferInstance : FieldModel params.q)
