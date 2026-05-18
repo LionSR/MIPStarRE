@@ -7,7 +7,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
-# Section 6 — Ordinary Self-Improvement Assembly
+# Section 6 — Ordinary Self-Improvement Data
 
 Core public API for the ordinary self-improvement data: constructors for
 `SelfImprovementData`, the induction-section theorem
@@ -35,7 +35,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- Monotone postprocessing of an explicit witness for the main-induction conclusion.
 
 This helper is the final `error ≤ mainInductionError` cleanup step only; the
-actual Section 6 assembly is carried by `mainInductionBaseCase`,
+actual Section 6 construction is carried by `mainInductionBaseCase`,
 `mainInduction` and its successor proof gap. -/
 theorem mainInductionOfWitness
     (params : Parameters)
@@ -159,7 +159,15 @@ induction call site.
 The input \(G\) is a complete polynomial measurement, as in the paper's
 restated self-improvement theorem.  The conclusion is phrased in the Section 6
 record `SelfImprovementInInductionSectionConclusion`, whose fields are exactly
-the projective output estimates used by the successor-step construction. -/
+the projective output estimates used by the successor-step construction.
+
+**Unfaithful:** This proof currently depends transitively on
+`SelfImprovement.selfImprovement`, hence on `sdp_statement_with_slackness`, whose
+complementary-slackness proof is not yet derived from
+`references/ldt-paper/self_improvement.tex` (`lem:sdp`). Documented by issue
+#1230. Elimination: prove `sdp_statement_with_slackness` from the SDP
+strong-duality and complementary-slackness argument, then remove the inherited
+`sorryAx` dependency. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
@@ -179,8 +187,8 @@ theorem selfImprovementInInductionSection
     selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
       params strategy eps delta gamma nu G.toSubMeas G H Z hfinal⟩
 
-/-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
-into the bookkeeping object expected by the later induction-step assembly.
+/-- Convert the slice-wise outputs feeding `selfImprovementInInductionSection`
+into the bookkeeping object expected by the later successor-step construction.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`, using the
 self-improvement theorem restated in
@@ -273,10 +281,10 @@ derive the extra `SymStrat` fields (`permInvState`, `densityFixed`, or
 `isNormalized`) from the restricted strategy; those remain part of the supplied
 concrete slice strategies.
 
-The Section 9 analytic proof debt is not stored in this record.  The data record
+The Section 9 analytic proof debt is not stored in this record.  The data-record
 constructor below calls the paper-facing theorem
 `selfImprovementInInductionSection`; its proof applies the Section 9 theorem and
-then repackages the output estimates in the induction notation. -/
+then transports the output estimates to the induction notation. -/
 structure SelfImprovementData.SliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
@@ -478,9 +486,9 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 The construction assumes the concrete slice strategies and their structural
 measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
-across the recorded equalities to the restricted-slice interface.  The theorem
-itself is currently a tracked proof gap (#1503); this constructor does not carry
-the Section 9 proof debt as an additional data record hypothesis. -/
+across the recorded equalities to the restricted-slice interface.  The inherited
+Section 9 SDP proof debt is documented on `selfImprovementInInductionSection`;
+this constructor does not carry it as an additional data-record hypothesis. -/
 noncomputable def SelfImprovementData.ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
