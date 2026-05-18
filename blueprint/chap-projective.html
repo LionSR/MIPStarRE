@@ -2600,6 +2600,8 @@
     <span class="lemma_thmtitle">\(\widehat{X}\) squared</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -2647,7 +2649,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as a hypothesis for the future construction. The formal lemma <span class="ttfamily">orthonormal_normalized_image_of_adjoint_comp_eigenvectors</span> records the singular-vector normalization calculation, while <span class="ttfamily">normalized_matrix_image_rows_mul_conjTranspose</span> combines the corresponding row-coisometry identity, and <span class="ttfamily">positive_gram_spectrum_image_rows_transpose_mixed</span> records the adjoint action \(X^\dagger (\lambda ^{-1/2}Xv)=\lambda ^{1/2}v\) on the positive spectral part of the Gram operator. The formal lemma <span class="ttfamily">exists_unitary_with_positive_gram_spectrum_rows</span> records the next finite-dimensional step: after choosing distinct row positions for the positive spectrum, these normalized image rows extend to a square unitary matrix on the row space. The companion lemma <span class="ttfamily">exists_rectangular_coisometry_extending_orthonormal_rows</span> records the analogous rectangular completion for prescribed right rows when the dimension bound permits it. The formal lemma <span class="ttfamily">rectangularSvd_xHat_coisometry</span> records the corresponding matrix calculation, and <span class="ttfamily">exists_xHat_of_rectangularSvd</span> gives the resulting choice of \(\widehat X\) together with the mixed square-root identity below. </p>
+  <p>The paper proves this by multiplying out \(\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger \) and using the unitarity of \(U\) and \(V\). In Lean, the dimension hypothesis \(m\leq d\) already gives a rectangular matrix with orthonormal rows on the sigma auxiliary space; the chosen matrix <span class="ttfamily">sigmaFinXHatCoisometry</span> and its specification record this existence result as a hypothesis for the future construction. The formal lemma <span class="ttfamily">orthonormal_normalized_image_of_adjoint_comp_eigenvectors</span> records the singular-vector normalization calculation, while <span class="ttfamily">normalized_matrix_image_rows_mul_conjTranspose</span> combines the corresponding row-coisometry identity, and <span class="ttfamily">positive_gram_spectrum_image_rows_transpose_mixed</span> records the adjoint action \(X^\dagger (\lambda ^{-1/2}Xv)=\lambda ^{1/2}v\) on the positive spectral part of the Gram operator. The formal lemma <span class="ttfamily">exists_unitary_with_positive_gram_spectrum_rows</span> records the next finite-dimensional step: after choosing distinct row positions for the positive spectrum, these normalized image rows extend to a square unitary matrix on the row space. The companion lemma <span class="ttfamily">exists_rectangular_coisometry_extending_orthonormal_rows</span> records the analogous rectangular completion for prescribed right rows when the dimension bound permits it. The formal lemma <span class="ttfamily">rectangularSvd_xHat_coisometry</span> records the corresponding matrix calculation. The unconditional positive-Gram route is <span class="ttfamily">exists_xHat_of_sigmaFinRangeEmbedding_positiveGram</span>, which constructs \(\widehat X\) from the rank-reduction witness and proves \(\widehat X\widehat X^\dagger =I\) together with the mixed square-root identity below. </p>
 
   </div>
 </div>
@@ -2660,6 +2662,8 @@
     <span class="lemma_thmtitle">\(X\) times \(\widehat{X}\)</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -2707,7 +2711,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_x_mul_xHat_conjTranspose_raw</span> records the first displayed identity, with the middle factor \(S I_{m\times d}^\dagger \) serving as the formal square matrix \(\Sigma _{m\times m}\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> records the second matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced datum then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.37</a> and <a href="chap-projective.html#lem:P-Q-approx">4.39</a>. </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). In Lean, the unconditional QXP data first proves that \(X\widehat X^\dagger \) is Hermitian and positive. The formal lemma <span class="ttfamily">x_mul_xHat_adjoint_spectral_theorem</span> then applies Mathlib’s spectral theorem for Hermitian matrices, giving the displayed \(U\Sigma U^\dagger \) form with the Mathlib eigenvector unitary and the diagonal matrix of real eigenvalues. The auxiliary lemma <span class="ttfamily">rectangularSvd_x_mul_xHat_conjTranspose_raw</span> records the same calculation under explicit rectangular-SVD data, where the middle factor \(S I_{m\times d}^\dagger \) is the formal square matrix \(\Sigma _{m\times m}\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> records the second matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced datum then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.37</a> and <a href="chap-projective.html#lem:P-Q-approx">4.39</a>. </p>
 
   </div>
 </div>
@@ -2730,7 +2734,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The Lean declarations linked in Lemmas&#160;<a href="chap-projective.html#lem:X-squared">4.31</a>, <a href="chap-projective.html#lem:X-hat-squared">4.34</a>, and&#160;<a href="chap-projective.html#lem:X-times-X-hat">4.35</a> now expose the corresponding matrix identities as construction theorems. The <span class="ttfamily">QXPLayerData</span> structure still stores these identities for later algebraic use, but the Lean declarations listed above point to theorems proving the identities from the \(Q\)-layer, sigma-range, or rectangular-SVD hypotheses. The blueprint still refrains from declaring the full late-stage orthogonalization argument source-complete until these construction theorems are connected all the way to the preceding rounding-to-projectors and rank-reduction route. </p>
+  <p> The Lean declarations linked in Lemmas&#160;<a href="chap-projective.html#lem:X-squared">4.31</a>, <a href="chap-projective.html#lem:X-hat-squared">4.34</a>, and&#160;<a href="chap-projective.html#lem:X-times-X-hat">4.35</a> expose the corresponding matrix identities as construction theorems. These declarations prove the identities from the \(Q\)-layer, the sigma-range realization, and the positive-Gram spectral construction, with the rectangular-SVD calculation retained as an auxiliary comparison. Thus the local \(X/\widehat X/P\) algebra is formalized; the remaining chapter-level work is to compose this construction with the preceding orthonormalization step from the paper hypotheses. </p>
 
   </div>
 </div>
@@ -2872,6 +2876,8 @@
     <span class="lemma_thmtitle">\(P\) is close to&#160;\(Q\)</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -2919,7 +2925,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.35</a>. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used in the residual-domination argument for the fresh completed outcome. As in Remark&#160;<a href="chap-projective.html#rem:qxp-layer-lean-status">4.36</a>, the statement is left without a source-complete formalization marker until the displayed identities are connected to the preceding construction route. The quantity to bound is </p>
+  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.35</a>. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used in the residual-domination argument for the fresh completed outcome. The quantity to bound is </p>
 <div class="equation" id="eq:P-Q-thing-to-bound">
 <p>
   <div class="equation_content">
