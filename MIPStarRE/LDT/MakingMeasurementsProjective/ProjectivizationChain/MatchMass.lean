@@ -24,8 +24,8 @@ open MIPStarRE.LDT.Preliminaries (completeAtOutcome completeAtOutcomeProj)
 
 /-! ### Completion preserves diagonal match mass -/
 
-/-- The namespace is kept so the surviving helper retains its established
-qualified name in downstream references. -/
+-- The namespace is kept so the surviving helper retains its established
+-- qualified name in downstream references.
 namespace ProjectivizationMatchMassMonotonicity
 
 /-- Completing a projective submeasurement at one outcome can only increase its
