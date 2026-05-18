@@ -524,9 +524,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_exists_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_exists_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity}
@@ -592,6 +594,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_statementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement}
@@ -665,8 +668,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
   % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
   % proves only the reduced SdpStatement fragment, while the full slackness
-  % conclusion is recorded as the visible, deferred matrix-level obligation
-  % MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_statementWithSlackness.
+  % conclusion is recorded as the visible, deferred canonical optimal-pair
+  % obligation
+  % MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_canonicalOptimalPair.
+  % MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_statementWithSlackness
+  % is now a proved transport from this canonical obligation.
   % The abstract theorem
   % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness is proved by
   % transporting this obligation to the self-improvement notation, and the
