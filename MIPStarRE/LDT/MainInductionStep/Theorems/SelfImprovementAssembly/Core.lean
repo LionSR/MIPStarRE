@@ -150,7 +150,14 @@ The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
 the stated point-consistency hypothesis.  It does not assume that `G` is the
 underlying submeasurement of a complete measurement, and it does not assume the
 Section 7 helper, orthonormalization, or final-field proof stages as external
-inputs. -/
+inputs.
+
+**Proof gap:** The declaration has the paper hypotheses and conclusion, but its
+proof is still open.  Documented in issue `#1645`, downstream of `#1503`.
+Elimination plan: complete `G` by adjoining a fresh outcome `⊥`, apply the
+Section 9 self-improvement theorem to the completed measurement, and transport
+the resulting projective submeasurement and dual witness back to the original
+polynomial outcomes. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
@@ -163,10 +170,9 @@ theorem selfImprovementInInductionSection
         (polynomialEvaluationFamily params G) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
       SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  -- TODO(#1503): prove the induction-section theorem from the paper hypotheses.
-  -- In particular, do not replace the input-submeasurement completion and
-  -- Section 9 derivation by a bundled obligation hypothesis; such assumptions
-  -- are proof debt, not hypotheses of the paper statement.
+  -- Source-faithful proof gap (#1645, downstream of #1503): complete `G` by
+  -- adjoining a fresh outcome, apply Section 9 self-improvement, and restrict
+  -- the resulting conclusion back to polynomial outcomes.
   sorry
 
 /-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
