@@ -9,10 +9,6 @@ on:
       - 'scripts/tests/test_check_oversized_lean_files.py'
       - '.github/workflows/oversized-lean-files.yml'
 
-# NOTE: As of 2026-05-14, one known oversized file remains on main:
-#   MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean (1804 lines)
-# This file is tracked by issue #1127 (partial split).
-# Once it is split, remove the ``--known`` argument below.
 # New oversized files cause the check to fail.
 
 concurrency:
@@ -36,7 +32,4 @@ jobs:
           python-version: '3.12'
 
       - name: Run oversized-file guard
-        run: >
-          python3 scripts/check_oversized_lean_files.py
-          --root .
-          --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
+        run: python3 scripts/check_oversized_lean_files.py --root .
