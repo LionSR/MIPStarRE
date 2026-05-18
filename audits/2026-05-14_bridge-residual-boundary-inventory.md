@@ -1,5 +1,11 @@
 # Bridge, Residual, and Package Boundary Inventory (2026-05-14)
 
+**Status note (2026-05-18, issue #1649).**  This inventory predates the
+2026-05-16/17 proof-debt sweep.  References below to #1043, #1363, and #1566 as
+live children should be read historically.  The remaining live bridge-debt
+umbrella is #1458; the line-169 exact match-mass follow-up is now tracked by
+#1641, and the narrower residual-domination follow-up is #1642.
+
 ## Purpose
 
 This audit records the current state of bridge-like proof-data declarations for

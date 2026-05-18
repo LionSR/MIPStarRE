@@ -1,5 +1,14 @@
 # `sorryAx` and Explicit Axiom Placeholder Inventory (2026-05-14)
 
+**Status note (2026-05-18, issue #1649).**  Several issue references below were
+live when this inventory was written, but were closed in the 2026-05-16/17
+proof-debt sweep.  In particular, the former final-theorem and
+orthonormalization/projectivization children #1043, #1363, #1369, #1566, and
+#1610 are now historical; the live umbrella for any remaining source-statement
+bridge debt is #1458, with the current main-induction and self-improvement proof
+obligations tracked by #1507, #1503, and #1230.  The degree-zero pasting
+obligation formerly tracked by #1622 has been discharged.
+
 ## Purpose
 
 This note records the current status of `sorryAx` and explicit axiom-like
