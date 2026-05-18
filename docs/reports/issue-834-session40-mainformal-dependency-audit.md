@@ -25,10 +25,11 @@ explain the live local proof hole.  The actionable blockers are now:
 1. **Section 6 / role-residual construction:** PR #924 is open and depends on #931 for
    closed self-improvement inputs.  It touches `MIPStarRE/LDT/Test/MainTheorem.lean`,
    so this report deliberately avoids editing that file.
-2. **Exact line-169 match-mass input:** PR #950 is open.  It supplies the P-level
-   match-mass preservation bridge needed to produce the existing
-   `ProjectivizationMatchMassMonotonicity` field without using the generic
-   `triangleSub` route that loses an extra `sqrt ζ₂`.
+2. **Line-169 transport choice:** at the time of this audit, PR #950 was still
+   pursuing an exact P-level match-mass bridge instead of the generic
+   `triangleSub` route that loses an extra `sqrt ζ₂`.  The current tree has
+   since retired that exact bridge and uses the repaired pre-completion
+   line-169 route instead.
 3. **Signature churn:** PR #958 is open and rewrites `ProjStrat`/`MainTheorem` for
    separate Alice/Bob local spaces.  Any proof branch closing #834 should rebase
    after #958, or otherwise be prepared for substantial signature repair.
@@ -138,7 +139,7 @@ The live residual corresponds to the proof of `thm:main-formal` in
 | 130-133 | `eq:G-self-consistency`, polynomial $G^{\mathrm A}$ / $G^{\mathrm B}$ consistency at `ζ₁`. | Reconstructed from Step 5 wrappers and role-measurement data before line 156. |
 | 146-147 | `eq:G-with-Q-A`, completion closeness from $G$ to $Q$ at `ζ₂`. | Still part of `postRoleResidual`: Alice in left-register form, Bob in the left-register form returned by orthonormalize-and-complete. The #869 conversion to Bob's right-register paper form is already checked. |
 | 160-166 | `eq:third-goal` and data processing to evaluated $Q$ consistency. | Downstream conversions are checked once the residual fields are supplied. |
-| 167-173 | `prop:triangle-sub` line-169 transport to $Q^{\mathrm A}_g \otimes I \simeq_{ζ₁} I\otimes G^{\mathrm B}_g`, then data processing. | The paper's printed `ζ₁` cannot be obtained from generic `triangleSub` plus completion closeness without an extra `sqrt ζ₂`; the Lean residual therefore requires `ProjectivizationMatchMassMonotonicity`. |
+| 167-173 | `prop:triangle-sub` line-169 transport to $Q^{\mathrm A}_g \otimes I \simeq_{ζ₁} I\otimes G^{\mathrm B}_g`, then data processing. | The paper's printed `ζ₁` cannot be obtained from generic `triangleSub` plus completion closeness without an extra `sqrt ζ₂`; the current tree therefore uses the repaired pre-completion line-169 route instead of an exact match-mass invariant. |
 | 175-185 | Final two `ζ₄` point goals `eq:one-goal` and `eq:another-goal`. | Already formalized by the residual conversions and triangle wrapper. |
 | 186-234 | Error cascade into the theorem's `ν`. | Already formalized by `MainFormalCascadeScalars` and `MainFormalProjectiveCompletionTransportWitness.toMainFormal`. |
 
@@ -221,21 +222,12 @@ parallel with #924 unless #924 closes or merges.
 
 ### #950 / #903: exact line-169 match mass
 
-Issue #903 is closed, but PR #950 is still open.  It adds:
-
-- `MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation`, and
-- `MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion`.
-
-Those declarations are the intended bridge from P-level orthonormalization
-match-mass preservation plus canonical completion to the current residual field
-
-```lean
-line169MatchMassMonotonicity :
-  ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B
-```
-
-This is exactly the construction-level replacement for the generic `triangleSub`
-route at `inductive_step.tex:167-173`.
+Issue #903 is closed, and the later exact-match interface from PR #950 has now
+been retired as stale.  The current tree no longer carries a live exact
+match-mass bridge route.  The active Step-6 construction instead uses the
+repaired line-169 transport already recorded in
+`ProjectivizationLine169Repair` and in the projective completion transport
+witness.
 
 ### #958 / #560: separate local spaces in `ProjStrat`
 
