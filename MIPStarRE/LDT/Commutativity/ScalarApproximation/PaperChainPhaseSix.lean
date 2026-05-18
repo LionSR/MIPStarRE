@@ -16,7 +16,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-set_option maxHeartbeats 10000000 in
+set_option maxHeartbeats 500000 in
 -- This reverse insertion proof unfolds an adjoint `closenessOfIP` normalization.
 /-- Paper lines 99--102: reverse the first `eq:add-an-a` insertion after `eq:gcom10`. -/
 lemma evaluatedSlice_phaseSix_first_reverse_bound

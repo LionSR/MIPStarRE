@@ -136,7 +136,7 @@ Starting from `E[∑ ABAB]`, the proof applies ten approximation steps:
 8–9. `≈_{√ζ + √ζ}`: apply postprocessed self-consistency twice
 
 Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + √ζ)`. -/
-set_option maxHeartbeats 5000000 in
+set_option maxHeartbeats 500000 in
 -- The final scalar-chain assembly unfolds many named phase endpoints and closes
 -- the accumulated real-arithmetic budget; the larger cap keeps that calculation local.
 lemma evaluatedSlice_scalar_chain_bound
