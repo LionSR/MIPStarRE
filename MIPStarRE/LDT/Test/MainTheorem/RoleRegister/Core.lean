@@ -175,19 +175,6 @@ theorem ofMainInduction
   exact ofMainInductionWitness params strategy eps k hpass
     (strategySymmetrization_mainInduction params strategy eps hpass k hk)
 
-/-- Large-`k` constructor for the isolated role-register witness.
-
-This alias is retained for callers that are phrased in terms of the public
-Section 3 large-`k` boundary. -/
-theorem ofMainInductionLargeK
-    (params : Parameters) [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (hk_large : 400 * params.m * params.d ≤ k) :
-    Nonempty (MainFormalRoleInductionWitness params strategy eps hpass k) := by
-  exact ofMainInduction params strategy eps k hpass hk_large
-
 /-- Convert the isolated Section 6 role-register witness into the output consumed
 by unsymmetrization.
 
