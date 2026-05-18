@@ -1117,11 +1117,13 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
+		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		The paper proves this by multiplying out
 		$\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger$ and using the unitarity of
 		$U$ and $V$.  In Lean, the dimension hypothesis $m\leq d$ already gives a
@@ -1143,9 +1145,11 @@
 		records the analogous rectangular completion for prescribed right rows
 		when the dimension bound permits it.  The formal lemma
 		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
-		calculation, and \texttt{exists\_xHat\_of\_rectangularSvd} gives the
-		resulting choice of $\widehat X$ together with the mixed square-root identity
-		below.
+		calculation.  The unconditional positive-Gram route is
+		\texttt{exists\_xHat\_of\_sigmaFinRangeEmbedding\_positiveGram}, which
+		constructs $\widehat X$ from the rank-reduction witness and proves
+		$\widehat X\widehat X^\dagger=I$ together with the mixed square-root
+		identity below.
 	\end{proof}
 
 	\begin{lemma}[$X$ times $\widehat{X}$]\label{lem:X-times-X-hat}
@@ -1159,9 +1163,11 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_sigmaFinRangeEmbedding_positiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_middle_eq_sqrt_of_square}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.x_mul_xHat_adjoint_spectral_theorem}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
+		\leanok
 		\begin{equation*}
 			X \cdot \widehat{X}^\dagger =
 			U \cdot \Sigma_{m \times m} \cdot U^\dagger,
@@ -1170,15 +1176,22 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:X-squared}
 		The paper obtains this from the SVD formula for $X$ and the definition of
-		$\widehat X$.  The formal lemma
-		\texttt{rectangularSvd\_x\_mul\_xHat\_conjTranspose\_raw} records the first
-		displayed identity, with the middle factor \(S I_{m\times d}^\dagger\)
-		serving as the formal square matrix \(\Sigma_{m\times m}\).  The formal
-		lemma \texttt{rectangularSvd\_xHat\_mixed\_of\_sqrtQ} records the second
-		matrix calculation in the form whose square-root target is the operator
-		$Q$ supplied by the QXP construction.  The formal lemma
+		$\widehat X$.  In Lean, the unconditional QXP data first proves that
+		$X\widehat X^\dagger$ is Hermitian and positive.  The formal lemma
+		\texttt{x\_mul\_xHat\_adjoint\_spectral\_theorem} then applies Mathlib's
+		spectral theorem for Hermitian matrices, giving the displayed
+		$U\Sigma U^\dagger$ form with the Mathlib eigenvector unitary and the
+		diagonal matrix of real eigenvalues.  The auxiliary lemma
+		\texttt{rectangularSvd\_x\_mul\_xHat\_conjTranspose\_raw} records the same
+		calculation under explicit rectangular-SVD data, where the middle factor
+		\(S I_{m\times d}^\dagger\) is the formal square matrix
+		\(\Sigma_{m\times m}\).  The formal lemma
+		\texttt{rectangularSvd\_xHat\_mixed\_of\_sqrtQ} records the second matrix
+		calculation in the form whose square-root target is the operator $Q$
+		supplied by the QXP construction.  The formal lemma
 		\texttt{rectangularSvd\_middle\_eq\_sqrt\_of\_square} records the spectral
 		step: a positive middle factor whose square is $Q$ is the positive square
 		root of $Q$.  The reduced datum then records this mixed-product
@@ -1188,15 +1201,14 @@
 
 	\begin{remark}[Lean status for the QXP algebra]\label{rem:qxp-layer-lean-status}
 		The Lean declarations linked in Lemmas~\ref{lem:X-squared},
-		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} now expose the
-		corresponding matrix identities as construction theorems.  The
-		\texttt{QXPLayerData} structure still stores these identities for later
-		algebraic use, but the Lean declarations listed above point to theorems
-		proving the identities from the \(Q\)-layer, sigma-range, or
-		rectangular-SVD hypotheses.  The blueprint still refrains from declaring
-		the full late-stage orthogonalization argument source-complete until these
-		construction theorems are connected all the way to the preceding
-		rounding-to-projectors and rank-reduction route.
+		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} expose the
+		corresponding matrix identities as construction theorems.  These
+		declarations prove the identities from the \(Q\)-layer, the sigma-range
+		realization, and the positive-Gram spectral construction, with the
+		rectangular-SVD calculation retained as an auxiliary comparison.  Thus the
+		local \(X/\widehat X/P\) algebra is formalized; the remaining chapter-level
+		work is to compose this construction with the preceding orthonormalization
+		step from the paper hypotheses.
 	\end{remark}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
@@ -1262,11 +1274,13 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
+		\leanok
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
 		The formal proof follows this argument directly from the primitive
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
@@ -1277,9 +1291,7 @@
 		\(X X^\dagger=I\) for the original sigma embedding when the projective
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis
 		later used in the residual-domination argument for the fresh completed
-		outcome.  As in Remark~\ref{rem:qxp-layer-lean-status}, the statement is
-		left without a source-complete formalization marker until the displayed
-		identities are connected to the preceding construction route.
+		outcome.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}
