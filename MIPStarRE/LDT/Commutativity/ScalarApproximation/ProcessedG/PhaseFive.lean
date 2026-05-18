@@ -430,9 +430,8 @@ lemma phaseFive_bilinear_expand
     Finset.smul_sum, smul_smul, Finset.sum_mul, Finset.mul_sum, mul_assoc]
   ring_nf
 
-set_option linter.flexible false in
--- This finite-fiber expansion deliberately uses a broad `simp` to expose the
--- postprocessed slice outcome before applying the explicit fiber-collapse lemma.
+-- This finite-fiber expansion exposes the postprocessed slice outcome before
+-- applying the explicit fiber-collapse lemma.
 /-- Expand the question-level phase-5 defect after decomposing the first point as `(u, x)`. -/
 lemma evaluatedSlicePhaseFiveQuestionDefect_appendPoint_expansion
     (params : Parameters) [FieldModel params.q]
@@ -465,7 +464,7 @@ lemma evaluatedSlicePhaseFiveQuestionDefect_appendPoint_expansion
                 rightTensor (ι₁ := ι)
                   ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome
                     (g u))) := by
-          simp [evaluatedSlicePhaseFiveQuestionDefect, evaluatedSliceFirstFactor,
+          simp only [evaluatedSlicePhaseFiveQuestionDefect, evaluatedSliceFirstFactor,
             evaluatedSliceSecondFactor, evaluatedSlicePointMeas, pointHeight_appendPoint,
             evaluatedPointFamily_appendPoint_outcome, hG]
           rw [Finset.sum_comm]

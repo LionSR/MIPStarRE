@@ -227,8 +227,6 @@ lemma GlobalVarianceDecomposition.orthogonalComponent_eq_sub_average
   rw [eq_sub_iff_add_eq]
   simpa [add_comm, add_left_comm, add_assoc] using (decomp.decomposition u).symm
 
-set_option linter.style.setOption false
-set_option linter.flexible false in
 /-- The canonical decomposition from `lem:global-rewrite`.
 
 Its `averageComponent` is the paper's `A_avg = E_u A^u = (1/M) · ∑_u A^u`, and its
@@ -247,8 +245,10 @@ noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
     have hM_ne : (hypercubeVertexCount params : ℂ) ≠ 0 := by
       exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
     ext i j
-    simp [Matrix.sum_apply, Finset.sum_sub_distrib, smul_eq_mul,
-      Finset.mul_sum, hypercubeVertexCount]
+    simp only [Matrix.sum_apply, Finset.sum_sub_distrib, smul_eq_mul,
+      Finset.mul_sum, hypercubeVertexCount, Finset.sum_const, Finset.card_univ,
+      Fintype.card_pi, Fintype.card_fin, Finset.prod_const, nsmul_eq_mul,
+      Nat.cast_pow, Matrix.sub_apply, Matrix.smul_apply, Matrix.zero_apply]
     rw [sub_eq_zero]
     refine Finset.sum_congr rfl ?_
     intro x hx

@@ -358,8 +358,8 @@ theorem leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_m
             (fun _ => OpFamily.leftPlacedOpFamily (ιB := ιB) (A.toSubMeas : OpFamily Outcome ιA))
             (fun _ => OpFamily.leftPlacedOpFamily (ιB := ιB) (PFamily data))
             (orthonormalizationMainLemmaError ζ) := by
-        refine MIPStarRE.LDT.Preliminaries.sddOpRel_leftPlaced_of_ev_eq ψ φ
-          (uniformDistribution Unit)
+        refine MIPStarRE.LDT.Preliminaries.sddOpRel_leftPlaced_of_ev_eq
+          (ιA := ιA) (ιB := ιB) ψ φ (uniformDistribution Unit)
           (constOpFamily (A.toSubMeas : OpFamily Outcome ιA))
           (constOpFamily (PFamily data))
           (orthonormalizationMainLemmaError ζ) ?_ hAP_local
@@ -389,8 +389,8 @@ theorem leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_m
             (fun _ => OpFamily.leftPlacedOpFamily (ιB := ιB) (A.toSubMeas : OpFamily Outcome ιA))
             (fun _ => OpFamily.leftPlacedOpFamily (ιB := ιB) qLayer.q)
             (roundingToProjectiveError ζ) := by
-        refine MIPStarRE.LDT.Preliminaries.sddOpRel_leftPlaced_of_ev_eq ψ φ
-          (uniformDistribution Unit)
+        refine MIPStarRE.LDT.Preliminaries.sddOpRel_leftPlaced_of_ev_eq
+          (ιA := ιA) (ιB := ιB) ψ φ (uniformDistribution Unit)
           (constOpFamily (A.toSubMeas : OpFamily Outcome ιA))
           (constOpFamily qLayer.q) (roundingToProjectiveError ζ) ?_ hRank.closeness
         intro X

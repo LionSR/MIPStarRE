@@ -104,7 +104,6 @@ lemma matrixTensorOperator_mono_left {H K : FiniteHilbertSpace}
     matrixTensorOperator A₁ B ≤ matrixTensorOperator A₂ B := by
   simpa [matrixTensorOperator] using MIPStarRE.Quantum.kronecker_mono_left hA hB
 
-set_option linter.flexible false in
 /-- Adjoint sandwiching is monotone in the middle factor. -/
 lemma conjTranspose_mul_mul_mono {H K : FiniteHilbertSpace}
     (M : RectangularMatrixOperator H K) {A B : MatrixOperator K} (hAB : A ≤ B) :
@@ -115,8 +114,14 @@ lemma conjTranspose_mul_mul_mono {H K : FiniteHilbertSpace}
         (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hAB)) M).nonneg
   have hrewrite : Mᴴ * (B - A) * M = Mᴴ * (B * M) - Mᴴ * (A * M) := by
     ext i j
-    simp [Matrix.mul_apply, Finset.sum_add_distrib,
-      Finset.sum_mul, Finset.mul_sum, sub_eq_add_neg, mul_add, add_mul]
+    conv =>
+      lhs
+      simp [Matrix.mul_apply, Finset.sum_add_distrib,
+        Finset.sum_mul, Finset.mul_sum, sub_eq_add_neg, mul_add, add_mul]
+    conv =>
+      rhs
+      simp [Matrix.mul_apply, Finset.sum_add_distrib,
+        Finset.sum_mul, Finset.mul_sum, sub_eq_add_neg, mul_add, add_mul]
     congr 1 <;> (rw [Finset.sum_comm]; simp [mul_assoc])
   rw [hrewrite] at hpsd
   exact sub_nonneg.mp hpsd

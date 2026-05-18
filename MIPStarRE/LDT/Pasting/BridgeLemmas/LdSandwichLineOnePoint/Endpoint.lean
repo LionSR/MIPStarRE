@@ -105,10 +105,9 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon
       Function.comp] using hproc
   convert hprod' using 2
 
-set_option linter.flexible false in
 -- The proof compares the one-question equivalence with the endpoint
--- formulation; the broad simplification is confined to unfolding the two
--- equivalent presentations of the same postprocessed submeasurement.
+-- formulation; the chain of rewriting identities records the two equivalent
+-- presentations of the same postprocessed submeasurement.
 lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
     (params : Parameters)
     [FieldModel params.q]
@@ -137,15 +136,15 @@ lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
     (ldSandwichLineOnePointRightFamily params strategy family 1 0)
     (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))).2 <| by
       convert hux using 2
-      · simp [sandwichedLineQuestionOneEquiv, pointTupleOneEquiv,
-          ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas,
-          ldSandwichLineOnePointRightFamily]
+      · simp only [ldSandwichLineOnePointRightFamily, sandwichedLineQuestionOneEquiv,
+          pointTupleOneEquiv, Fin.isValue, Equiv.coe_fn_mk, Equiv.coe_fn_symm_mk,
+          Order.lt_one_iff, ↓reduceDIte, Fin.zero_eta,
+          ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas]
         exact (postprocess_postprocess _ _ _).symm
 
-set_option linter.flexible false in
 -- The proof lifts the endpoint consistency relation through the split
--- sandwiched-line equivalence; the simplification only unfolds this equivalence
--- and the endpoint-family definition.
+-- sandwiched-line equivalence; the chain of rewriting identities unfolds this
+-- equivalence and the endpoint-family definition.
 lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
     (params : Parameters)
     [FieldModel params.q]
@@ -202,9 +201,9 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
         convert hprod using 2
         · simp [e, endpointLeft, iFin,
             sandwichedLineQuestionSplitAtEquiv]
-        · simp [e, endpointRight, iFin, sandwichedLineQuestionSplitAtEquiv,
-            ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas,
-            ldSandwichLineOnePointRightFamily, hi]
+        · simp only [ne_eq, sandwichedLineQuestionSplitAtEquiv, Equiv.coe_fn_symm_mk,
+            ldSandwichLineOnePointRightFamily, hi, ↓reduceDIte, Equiv.funSplitAt_symm_apply,
+            ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas, endpointRight, iFin, e]
           exact (postprocess_postprocess _ _ _).symm)
   simpa [endpointLeft, endpointRight, iFin] using hlift
 

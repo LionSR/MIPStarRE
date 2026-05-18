@@ -251,7 +251,6 @@ private lemma opTensor_roleCond_BB {ι : Type*} [Fintype ι] [DecidableEq ι]
 -- gives the analogous statement.  These are trace identities, not operator
 -- identities: arbitrary off-diagonal role blocks of `Y` need not vanish, but
 -- they do not contribute to the paper's expectation calculation.
-set_option linter.flexible false in
 private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_A {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (D : MIPStarRE.Quantum.Op (ι × ι))
@@ -263,13 +262,14 @@ private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_A {ι : Type*}
           opTensor (roleCond Role.A X) (roleCond Role.B (roleBlock Role.B Y))) := by
   unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
   simp_rw [Fintype.sum_prod_type]
-  simp [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond, roleBlock,
-    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp only [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond, roleBlock,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single, Matrix.diag_apply,
+    Fintype.card_prod, Nat.cast_mul, ne_eq, mul_eq_zero, Nat.cast_eq_zero,
+    Fintype.card_ne_zero, or_self, not_false_eq_true, div_left_inj']
   simp_rw [Fintype.sum_prod_type]
   simp_rw [sum_role_eq_add]
   simp
 
-set_option linter.flexible false in
 private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_A {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (D : MIPStarRE.Quantum.Op (ι × ι))
@@ -278,13 +278,14 @@ private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_A {ι : Type*}
         (rolePairCond Role.B Role.A D * opTensor (roleCond Role.A X) Y) = 0 := by
   unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
   simp_rw [Fintype.sum_prod_type]
-  simp [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond,
-    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp only [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single, Matrix.diag_apply,
+    Fintype.card_prod, Nat.cast_mul, div_eq_zero_iff, mul_eq_zero, Nat.cast_eq_zero,
+    Fintype.card_ne_zero, or_self, or_false]
   simp_rw [Fintype.sum_prod_type]
   simp_rw [sum_role_eq_add]
   simp
 
-set_option linter.flexible false in
 private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_B {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (D : MIPStarRE.Quantum.Op (ι × ι))
@@ -296,13 +297,14 @@ private lemma normalizedTrace_rolePairCond_BA_mul_left_roleCond_B {ι : Type*}
           opTensor (roleCond Role.B X) (roleCond Role.A (roleBlock Role.A Y))) := by
   unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
   simp_rw [Fintype.sum_prod_type]
-  simp [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond, roleBlock,
-    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp only [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond, roleBlock,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single, Matrix.diag_apply,
+    Fintype.card_prod, Nat.cast_mul, ne_eq, mul_eq_zero, Nat.cast_eq_zero,
+    Fintype.card_ne_zero, or_self, not_false_eq_true, div_left_inj']
   simp_rw [Fintype.sum_prod_type]
   simp_rw [sum_role_eq_add]
   simp
 
-set_option linter.flexible false in
 private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_B {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (D : MIPStarRE.Quantum.Op (ι × ι))
@@ -311,8 +313,10 @@ private lemma normalizedTrace_rolePairCond_AB_mul_left_roleCond_B {ι : Type*}
         (rolePairCond Role.A Role.B D * opTensor (roleCond Role.B X) Y) = 0 := by
   unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
   simp_rw [Fintype.sum_prod_type]
-  simp [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond,
-    roleProj, opTensor, Matrix.mul_apply, Matrix.single]
+  simp only [rolePairCond, roleRegisterPairLocalEquiv, rolePairProj, roleCond,
+    roleProj, opTensor, Matrix.mul_apply, Matrix.single, Matrix.diag_apply,
+    Fintype.card_prod, Nat.cast_mul, div_eq_zero_iff, mul_eq_zero, Nat.cast_eq_zero,
+    Fintype.card_ne_zero, or_self, or_false]
   simp_rw [Fintype.sum_prod_type]
   simp_rw [sum_role_eq_add]
   simp
@@ -394,7 +398,6 @@ lemma ev_classicalRoleSymmState_rolePair_BB {ι : Type*}
 
 -- The `Role.A` block of the left tensor only sees the `Role.B` principal block
 -- of the right tensor against the classically role-symmetrized state.
-set_option linter.flexible false in
 private lemma ev_classicalRoleSymmState_opTensor_roleCond_A_ignore {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι))
@@ -425,7 +428,6 @@ lemma ev_classicalRoleSymmState_opTensor_roleCond_A {ι : Type*}
 
 -- The `Role.B` block of the left tensor only sees the `Role.A` principal block
 -- of the right tensor against the classically role-symmetrized state.
-set_option linter.flexible false in
 private lemma ev_classicalRoleSymmState_opTensor_roleCond_B_ignore {ι : Type*}
     [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : QuantumState (ι × ι))

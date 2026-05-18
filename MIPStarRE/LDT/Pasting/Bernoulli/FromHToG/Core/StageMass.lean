@@ -183,7 +183,6 @@ lemma fromHToG_averagedSandwichByType_total_eq_type_sum
   congr 1
   simp [restrictSubMeas, postprocess, fromHToG_outcomesByType_iff_type_eq]
 
-set_option linter.flexible false in
 -- This declaration expands a finite operator average into the corresponding
 -- scalar trace average; the displayed statement is less readable after writing
 -- the fully expanded finite-sum target as an intermediate `suffices`.
@@ -204,9 +203,8 @@ lemma fromHToG_avgOver_tail_type_ev
           rightTensor (ι₁ := ι) B) := by
   classical
   rw [fromHToG_averagedSandwichByType_total_eq_type_sum params family n τ]
-  simp [avgOver, gHatSandwichFamily, ev_finset_sum,
-    ← leftTensor_finset_sum, leftTensor_mul_rightTensor_real_smul_left,
-    Finset.sum_mul]
+  simp only [avgOver, gHatSandwichFamily, ← leftTensor_finset_sum, Finset.sum_mul,
+    leftTensor_mul_rightTensor_real_smul_left, Complex.coe_smul, ev_finset_sum]
   apply Finset.sum_congr rfl
   intro xs _hxs
   rw [← ev_finset_sum]
@@ -217,7 +215,6 @@ lemma fromHToG_avgOver_tail_type_ev
             (gHatHalfProductOutcomeOperator params family n xs i)ᴴ) *
         rightTensor (ι₁ := ι) B)).symm
 
-set_option linter.flexible false in
 -- This declaration is the right-register analogue of the preceding finite-sum
 -- expansion; spelling out the simplified scalar target obscures the average
 -- identity being proved.
@@ -235,8 +232,8 @@ lemma fromHToG_avgOver_head_ev
           (S * averageOperatorOverDistribution (uniformDistribution (Fq params)) F)) := by
   classical
   unfold avgOver averageOperatorOverDistribution
-  simp [ev_finset_sum, ← rightTensor_finset_sum,
-    leftTensor_mul_rightTensor_real_smul_right, Matrix.mul_sum]
+  simp only [Matrix.mul_sum, Algebra.mul_smul_comm, ← rightTensor_finset_sum,
+    leftTensor_mul_rightTensor_real_smul_right, Complex.coe_smul, ev_finset_sum]
   apply Finset.sum_congr rfl
   intro x _hx
   exact (ev_scale ψbi ((uniformDistribution (Fq params)).weight x)
