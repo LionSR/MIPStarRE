@@ -64,9 +64,9 @@ lemma fromHToGAdjacentStageExactFacts_of_weights
   tailWeightRecurrence :=
     fromHToGTailStageMass_succ_weight_recurrence params ψbi family
 
-set_option maxHeartbeats 800000 in
--- The scalar proof expands several `rpow` square identities and a nonlinear
--- square comparison mirroring `ld-pasting.tex:1372--1375`.
+set_option maxHeartbeats 220000 in
+-- This scalar absorption proof is just above the default budget because the final
+-- nonlinear comparison expands several fractional `rpow` identities.
 /-- The paper's scalar absorption line for `lem:from-H-to-G`.
 
 Under the side conditions needed for the `√(2ζ)` term (`γ, ζ ≥ 0` and
