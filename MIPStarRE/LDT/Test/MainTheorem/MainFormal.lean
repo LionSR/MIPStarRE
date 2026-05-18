@@ -151,7 +151,7 @@ theorem mainFormal
   · have hepsNN : 0 ≤ eps := SameSpaceProjStrat.eps_nonneg_of_passes hpass
     let scalars : MainFormalCascadeScalars params eps k :=
       MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 hlarge
-    rcases MainFormalRoleInductionWitness.ofMainInductionLargeK
+    rcases MainFormalRoleInductionWitness.ofMainInduction
         params strategy eps k hpass hk with ⟨roleInductionWitness⟩
     rcases
         MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness

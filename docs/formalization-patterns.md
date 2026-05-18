@@ -217,7 +217,7 @@ construction obligation for the paper theorem.  The proof must construct, from
 the hypotheses of `thm:main-formal`, the projective-completion witness consumed
 by `mainFormal_ofProjectiveCompletionTransportWitness`.  The Section 6 role witness is
 now obtained by applying the theorem `MainInductionStep.mainInduction`
-through `MainFormalRoleInductionWitness.ofMainInductionLargeK`; the successor
+through `MainFormalRoleInductionWitness.ofMainInduction`; the successor
 branch of that call remains the tracked `sorry` in the source Section 6 theorem,
 not an added hypothesis of `mainFormal`.  The remaining Section 3 work includes:
 

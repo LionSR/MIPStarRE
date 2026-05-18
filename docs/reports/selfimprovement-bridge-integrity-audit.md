@@ -155,7 +155,7 @@ projective-completion inputs.
 The current proof gap is direct: `mainFormal` must construct the Section 6 role
 residual and the post-role projective-completion residual from the paper
 hypotheses.  The Section 6 role residual is routed through
-`MainFormalRoleInductionWitness.ofMainInductionLargeK`, whose successor branch is
+`MainFormalRoleInductionWitness.ofMainInduction`, whose successor branch is
 the tracked `sorry` in `MainInductionStep.mainInduction`.  Once the role
 residual and post-role completion residual are available, the proved theorem
 `mainFormal_ofProjectiveCompletionTransportWitness` supplies the final three consistency
@@ -272,7 +272,7 @@ residual as hypotheses.
 
 The missing successor construction needs:
 
-- the Section 6 role residual, via `MainFormalRoleInductionWitness.ofMainInductionLargeK`;
+- the Section 6 role residual, via `MainFormalRoleInductionWitness.ofMainInduction`;
 - the post-role projective-completion residual, from the line-130
   orthonormalization and completion estimates.
 
