@@ -7,10 +7,10 @@ import MIPStarRE.LDT.Preliminaries.DistanceBounds
 import MIPStarRE.LDT.Preliminaries.Triangles
 
 /-!
-# Section 10 — basic projectivization data
+# Section 5 — basic projectivization data
 
 This module contains the scalar estimates and elementary transport lemmas used
-by the Step 6 projectivization chain.  The mathematical source is the
+by the orthonormalization projectivization chain.  The mathematical source is the
 orthonormalization-and-completion argument in `inductive_step.tex`, lines
 130--149, together with the orthonormalization theorem and the completion
 proposition cited there.
@@ -37,7 +37,7 @@ cascade uses the slightly widened absorbed scalar
 - The orthonormalization step uses the source theorem `orthonormalization`.
   The theorem has a tracked proof gap for the sharp paper constant; this file
   no longer exposes its proof-stage construction data as a hypothesis of the
-  Step 6 output statement.
+  orthonormalization projectivization output statement.
 - The completion step uses the **fully-formalized** `completingToMeasurement`
   (`\leanok` in `blueprint/src/chapter/ch03_preliminaries.tex`), so no new
   bridge is introduced here.
@@ -49,7 +49,7 @@ cascade uses the slightly widened absorbed scalar
 ## References
 
 - Paper: `references/ldt-paper/inductive_step.tex` lines 130–149
-  (Step 6 application of `lem:orthonormalization-main-lemma` +
+  (application of `lem:orthonormalization-main-lemma` +
   `prop:completing-to-measurement`).
 - Paper: `references/ldt-paper/orthonormalization.tex` lines 67–77
   (`thm:orthonormalization`).
@@ -69,7 +69,7 @@ open MIPStarRE.LDT
 
 /-! ### Error functions -/
 
-/-- The combined error of the orthonormalization + completion chain (Step 6).
+/-- The combined error of the orthonormalization and completion chain.
 
 Substituting `δ := orthonormalizationError ζ = 100·ζ^{1/4}` into the
 closeness conclusion of `prop:completing-to-measurement`
@@ -135,7 +135,7 @@ theorem orthonormalizeAndCompleteError_le_absorbedZeta2 {ζ : Error}
 /-- On a permutation-invariant bipartite state, the state-dependent distance between
 right-lifted local submeasurements equals the distance between their left lifts.
 
-This is the Step 6 bookkeeping needed for the Bob-side completion estimate in
+This is the bookkeeping needed for the Bob-side completion estimate in
 `inductive_step.tex` lines 140--147: `orthonormalizeAndComplete` naturally
 returns a left-register bound, and the paper also uses the corresponding
 right-register bound for $I \otimes G^{\mathrm B}$ and $I \otimes Q^{\mathrm B}$.
@@ -179,7 +179,7 @@ lemma sddRel_liftRight_of_liftLeft_permInv
 
 /-! ### Projective self-consistency handoff -/
 
-/-- Step 6 handoff data for the projective-measurement part of the proof.
+/-- Handoff data for the projective-measurement part of the orthonormalization proof.
 
 **Faithful encoding:** The three fields record the paper's pre-projective
 consistency and the two completion-closeness estimates from

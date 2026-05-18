@@ -5,10 +5,10 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169R
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 
 /-!
-# Section 10 — Step 6 projectivization chain
+# Section 5 — orthonormalization projectivization chain
 
-Compatibility module for the orthonormalize-and-complete chain used in Step 6
-of the main inductive step.  The scalar and transport facts, handoff lemmas,
-match-mass interfaces, line-169 repair, and output theorem are now separated
-into reviewable leaf modules under `ProjectivizationChain/`.
+Compatibility module for the orthonormalize-and-complete chain used in the main
+inductive step.  The scalar and transport facts, handoff lemmas, completion
+match-mass helper, repaired completion transport, and output theorem are now
+separated into reviewable leaf modules under `ProjectivizationChain/`.
 -/

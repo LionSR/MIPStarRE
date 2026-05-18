@@ -145,13 +145,9 @@
 
 \begin{remark}[Lean line-169 projectivization match-mass declarations]\label{rem:lean-line169-projectivization-match-mass}
 	\uses{thm:orthonormalization, prop:completing-to-measurement, prop:triangle-sub}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matchMass_le_of_outcome_le, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completion_and_outcome_le}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss}
 	Lean exposes the quantitative obstruction at the projectivization transition used
 	in the inductive step.  The existing line-156 transition gives only the generic
@@ -183,28 +179,19 @@
 	$\zeta_1+\sqrt{\zeta_2}$ route, but it is still not the paper's exact
 	$\zeta_1$.
 
-	The paper-tight line-169 estimate at exactly $\zeta_1$ therefore requires
-	more than state-dependent-distance closeness.  Lean records the missing
-	construction-level invariant as
-	\texttt{ProjectivizationMatchMassMonotonicity}: replacing
-	$G^{\mathrm A}$ by the completed projective measurement $Q^{\mathrm A}$, and
-	role-reversing on Bob's side, must not decrease the diagonal match mass against
-	the opposite pre-projective measurement.  Its two consistency theorems prove
-	that this primitive match-mass monotonicity is sufficient to recover the exact
-	line-169 \texttt{ConsRel} links.  Lean also proves that the canonical
-	completion step itself can only increase this match mass: once the repaired
-	projective sub-measurements preserve the relevant diagonal match mass, completing
-	them at a distinguished outcome produces the required invariant for the
-	completed projective measurements.  The remaining upstream projectivization work
-	is therefore the corresponding preservation inequality for the
-	orthonormalization repair output.  The pointwise-domination lemma records the
-	degenerate no-change situation in which the source measurement is already
-	dominated by the projective submeasurement.  The former expectation-preservation
-	structures have been removed: they merely restated the required match-mass
-	inequality and were not produced by the Section~5 construction.  The former
-	QXP-specialized target has likewise been removed, because the present Section~5
-	API supplies state-dependent distance estimates and QXP algebra, but not a
-	signed monotonicity statement against an arbitrary partner measurement.
+	Lean also isolates the completion fact used inside this sharper repair: the
+	canonical completion of a projective submeasurement can only increase its
+	diagonal match mass against a fixed partner submeasurement.  This is the formal
+	declaration
+	\texttt{ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj\_left\_matchMass\_ge}.
+	The sharper route therefore pays its square-root loss before completion and then
+	uses completion only in this monotone direction, with no additional match-mass
+	penalty.
+
+	The older exact-$\zeta_1$ construction-level monotonicity statement has been
+	retired.  The current Section~5 API proves the checked repaired transport above,
+	and the active orthonormalization route now uses those repaired completion-transport estimates rather
+	than a separate exact match-mass witness.
 \end{remark}
 
 \subsection{Naimark dilation}\label{sec:naimark}

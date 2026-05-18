@@ -1,12 +1,12 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 
 /-!
-# Section 10 — projectivization self-consistency handoff
+# Section 5 — projectivization self-consistency handoff
 
 This module contains the self-consistency handoff theorems for the
-orthonormalize-and-complete chain in Step 6 of the main inductive step.  The
-statements convert pre-projective consistency and completion closeness into the
-projective consistency estimates used after `Q^A` and `Q^B` have been built.
+orthonormalization projectivization chain in the main inductive step.  The statements
+convert pre-projective consistency and completion closeness into the projective
+consistency estimates used after `Q^A` and `Q^B` have been built.
 -/
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
@@ -83,7 +83,7 @@ theorem fullPolynomialConsistency {Outcome : Type*} {ι : Type*}
 projectivization handoff alone has the generic `triangleSub` loss
 `ζ₁ + sqrt ζ₂`.
 
-This theorem is useful as a checked comparison point for the Step 6
+This theorem is useful as a checked comparison point for the orthonormalization
 blocker: it shows exactly what the current SDD-closeness API provides without
 the stronger match-mass preservation invariant above. -/
 theorem leftConsistency_with_triangleSub_loss {Outcome : Type*} {ι : Type*}

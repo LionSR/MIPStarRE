@@ -5,7 +5,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebr
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.MatchMass
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
