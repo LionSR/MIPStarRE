@@ -204,9 +204,6 @@ private lemma gCommStabilityTwo_raw_left_sum_le
           _ = 1 - T - T + T * T := by noncomm_ring
           _ = 1 - T := by simp [hT_proj]
 
-set_option maxHeartbeats 1200000 in
--- The raw scalar proof expands the Cauchy--Schwarz argument and several finite
--- averages pointwise before collapsing to the stored boundedness residual.
 private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
     (params : Parameters)
     [FieldModel params.q]
