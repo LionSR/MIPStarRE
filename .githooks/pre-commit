@@ -17,8 +17,14 @@ fi
 echo "MIPStarRE pre-commit: checking staged whitespace."
 git diff --cached --check
 
+if printf '%s\n' "$STAGED_FILES" | grep -Eq \
+  '^(blueprint/src/|scripts/(check_blueprint_latex|tex_utils)\.py)'; then
+  echo "MIPStarRE pre-commit: checking blueprint LaTeX conventions."
+  python3 scripts/check_blueprint_latex.py --root blueprint/src
+fi
+
 if ! printf '%s\n' "$STAGED_FILES" | grep -Eq \
-  '^(MIPStarRE/|MIPStarRE\.lean|blueprint/src/|blueprint/lean_decls|scripts/(audit_new_proof_obligation_metadata|audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_paper_gap_note_style|check_statement_paper_origin|check_source_statement_changes|blueprint_lean_sync|lean_header_utils)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)'; then
+  '^(MIPStarRE/|MIPStarRE\.lean|blueprint/src/|blueprint/lean_decls|scripts/(audit_new_proof_obligation_metadata|audit_paper_facing_proof_debt|audit_conclusion_shaped_hypotheses|audit_unfaithful_markers|audit_lean_axiom_declarations|check_blueprint_latex|check_paper_gap_note_style|check_statement_paper_origin|check_source_statement_changes|blueprint_lean_sync|lean_header_utils|tex_utils)\.py|docs/(CONTRIBUTING|PROOF_INTEGRITY|anti_patterns|blueprint_style_guide|formalization-patterns|proof_frontier_review)\.md|docs/paper-gaps/|\.github/(actions|prompts|workflows)/|AGENTS\.md)'; then
   echo "MIPStarRE pre-commit: no statement-integrity files staged."
   exit 0
 fi

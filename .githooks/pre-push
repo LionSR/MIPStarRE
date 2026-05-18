@@ -140,6 +140,11 @@ if grep -Eq '^blueprint/src/' "$CHANGED_FILE_LIST"; then
   BLUEPRINT_WEB_SMOKE_RAN=1
 fi
 
+if grep -Eq '^(blueprint/src/|scripts/(check_blueprint_latex|tex_utils)\.py$)' "$CHANGED_FILE_LIST"; then
+  echo "MIPStarRE pre-push: checking blueprint LaTeX conventions."
+  run_outside_git_env python3 scripts/check_blueprint_latex.py --root blueprint/src
+fi
+
 if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/|scripts/(blueprint_lean_sync|blueprint_leanok_axioms|check_blueprint_latex|check_blueprint_sync|tex_utils)\.py$)' "$CHANGED_FILE_LIST"; then
   echo "MIPStarRE pre-push: regenerating blueprint/lean_decls."
   run_outside_git_env python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
