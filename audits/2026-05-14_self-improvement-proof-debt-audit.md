@@ -1,5 +1,12 @@
 # Self-Improvement Proof-Debt Audit (2026-05-14)
 
+**Status note (2026-05-18, issue #1649).**  This audit predates the
+2026-05-16/17 issue sweep.  References below to #1515 as a live proof obligation
+are historical: the projective self-improvement theorem has since been repaired
+through the current orthonormalization and final-fields route.  The SDP
+strong-duality and complementary-slackness theorem remains the live
+self-improvement proof obligation, tracked by #1230.
+
 ## Scope
 
 This note records the current status of issue #1595, a native subissue of the

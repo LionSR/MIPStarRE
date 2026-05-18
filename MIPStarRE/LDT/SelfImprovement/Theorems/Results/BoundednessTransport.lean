@@ -93,7 +93,7 @@ variable {ι : Type} [Fintype ι] [DecidableEq ι]
 
 /-! NOTE: This file has not yet been fully split.  The
 `BoundednessTransport/Agreement.lean` extraction exists, but the point-consistency
-declarations currently live in this file (see #1127).  Once the split is
+declarations currently live in this file (see #1647).  Once the split is
 complete, the private helpers below can be removed and replaced by imports of the
 submodules. -/
 

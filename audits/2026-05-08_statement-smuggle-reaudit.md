@@ -1,5 +1,13 @@
 # `*Statement`-structure re-audit (A6, 2026-05-08)
 
+**Status note (2026-05-18, issue #1649).**  This re-audit predates the
+2026-05-16/17 proof-debt sweep.  References below to #1359 and #1369 as open
+trackers should be read historically; their remaining mathematical content has
+been either discharged or folded into the live umbrella #1458 and the current
+Section 5 follow-ups #1641 and #1642.  The live `*Statement` ledger remains
+#1379, with #1435 tracking the still-actionable spectral-truncation input
+cleanup.
+
 ## Purpose
 
 Re-runs the audit prescribed by `docs/anti_patterns.md` §A6 ("External `*Statement`
