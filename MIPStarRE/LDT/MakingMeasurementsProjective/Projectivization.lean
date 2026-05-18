@@ -55,7 +55,8 @@ private lemma leftTensor_outcome_mul_conjTranspose_eq
   rw [leftTensor_outcome_conjTranspose_self (ιB := ιB) A a,
     leftTensor_mul_leftTensor]
 
-/-- `(rightTensor (B_a))ᴴ * rightTensor (B_a) = rightTensor (B_a * B_a)` for Hermitian outcomes. -/
+/-- The right-tensor analogue of
+`leftTensor_outcome_mul_conjTranspose_eq`. -/
 private lemma rightTensor_outcome_conjTranspose_mul_eq
     {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -197,7 +198,9 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
     sum_ev_leftTensor_outcome_sq_nonneg (ιB := ιB) ψ A.toSubMeas
   have hdiagB_nonneg : 0 ≤ diagB :=
     sum_ev_rightTensor_outcome_sq_nonneg (ιA := ιA) ψ B.toSubMeas
-  have hleft_one : ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) = totalMass := by
+  have hleft_one :
+      ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) =
+        totalMass := by
     simpa [totalMass] using congrArg (ev ψ) (leftTensor_one (ι₁ := ιA) (ι₂ := ιB))
   have hright_one :
       ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) = totalMass := by
@@ -418,6 +421,58 @@ def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
 
 /-- The zero projective submeasurement is within unit `qSDD` of any lifted
 submeasurement on a normalized state. -/
+lemma qSDD_leftPlaced_zeroProjSubMeas_le_one {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ιA) :
+    qSDD ψ (leftPlacedSubMeas (ιB := ιB) A)
+      (leftPlacedSubMeas (ιB := ιB)
+        (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas) ≤ 1 := by
+  have hq :
+      qSDD ψ (leftPlacedSubMeas (ιB := ιB) A)
+          (leftPlacedSubMeas (ιB := ιB)
+            (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas) =
+        ∑ a : Outcome,
+          ev ψ (((leftPlacedSubMeas (ιB := ιB) A).outcome a) *
+            ((leftPlacedSubMeas (ιB := ιB) A).outcome a)) := by
+    unfold qSDD qSDDCore
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    let Z : MIPStarRE.Quantum.Op (ιA × ιB) := (leftPlacedSubMeas (ιB := ιB) A).outcome a
+    have hzero :
+        (leftPlacedSubMeas (ιB := ιB)
+          (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas).outcome a = 0 := by
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [zeroProjSubMeas, leftPlacedSubMeas, leftTensor, h₁, h₂]
+    calc
+      ev ψ
+          ((Z -
+              (leftPlacedSubMeas (ιB := ιB)
+                (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas).outcome a)ᴴ *
+            (Z - (leftPlacedSubMeas (ιB := ιB)
+              (zeroProjSubMeas (Outcome := Outcome) (ι := ιA)).toSubMeas).outcome a))
+        = ev ψ (Zᴴ * Z) := by
+            rw [hzero]
+            simp
+      _ = ev ψ (Z * Z) := by
+            rw [SubMeas.outcome_hermitian (leftPlacedSubMeas (ιB := ιB) A) a]
+      _ = ev ψ (((leftPlacedSubMeas (ιB := ιB) A).outcome a) *
+            ((leftPlacedSubMeas (ιB := ιB) A).outcome a)) := by
+            rfl
+  rw [hq]
+  simpa using
+    MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ
+      (leftPlacedSubMeas (ιB := ιB) A)
+
+/-- Square-register specialization of
+`qSDD_leftPlaced_zeroProjSubMeas_le_one`.
+
+This is the compatibility form for the older `SubMeas.liftLeft` notation; its
+proof is just the heterogeneous left-placement estimate with `ιA = ιB`. -/
 lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -425,34 +480,8 @@ lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
     (A : SubMeas Outcome ι) :
     qSDD ψ A.liftLeft
       ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤ 1 := by
-  have hq :
-      qSDD ψ A.liftLeft
-          ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) =
-        ∑ a : Outcome, ev ψ ((A.liftLeft.outcome a) * (A.liftLeft.outcome a)) := by
-    unfold qSDD qSDDCore
-    refine Finset.sum_congr rfl ?_
-    intro a _
-    let Z : MIPStarRE.Quantum.Op (ι × ι) := A.liftLeft.outcome a
-    have hzero :
-        ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a = 0 := by
-      ext i j
-      rcases i with ⟨i₁, i₂⟩
-      rcases j with ⟨j₁, j₂⟩
-      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-        simp [zeroProjSubMeas, SubMeas.liftLeft, leftTensor, h₁, h₂]
-    calc
-      ev ψ
-          ((Z -
-              ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a)ᴴ *
-            (Z - ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft).outcome a))
-        = ev ψ (Zᴴ * Z) := by
-            rw [hzero]
-            simp
-      _ = ev ψ (Z * Z) := by
-            rw [SubMeas.outcome_hermitian A.liftLeft a]
-      _ = ev ψ ((A.liftLeft.outcome a) * (A.liftLeft.outcome a)) := by
-            rfl
-  rw [hq]
-  simpa using MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ A.liftLeft
+  simpa [SubMeas.liftLeft, leftPlacedSubMeas] using
+    qSDD_leftPlaced_zeroProjSubMeas_le_one
+      (Outcome := Outcome) (ιA := ι) (ιB := ι) ψ hψ A
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

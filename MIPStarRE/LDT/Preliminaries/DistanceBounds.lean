@@ -351,17 +351,18 @@ left-tensor placements in `ψ`.  Under this identity, the squared-distance
 defect of two local raw operator families is exactly the squared-distance
 defect of their left placements. -/
 lemma sddOpRel_leftPlaced_of_ev_eq
-    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {Question Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (φ : QuantumState ι)
+    (ψ : QuantumState (ιA × ιB)) (φ : QuantumState ιA)
     (𝒟 : Distribution Question)
-    (A B : IdxOpFamily Question Outcome ι) (δ : Error)
-    (hev : ∀ X : MIPStarRE.Quantum.Op ι,
-      ev ψ (leftTensor (ι₂ := ι) X) = ev φ X) :
+    (A B : IdxOpFamily Question Outcome ιA) (δ : Error)
+    (hev : ∀ X : MIPStarRE.Quantum.Op ιA,
+      ev ψ (leftTensor (ι₂ := ιB) X) = ev φ X) :
     SDDOpRel φ 𝒟 A B δ →
     SDDOpRel ψ 𝒟
-      (fun q => OpFamily.leftPlacedOpFamily (ιB := ι) (A q))
-      (fun q => OpFamily.leftPlacedOpFamily (ιB := ι) (B q)) δ := by
+      (fun q => OpFamily.leftPlacedOpFamily (ιB := ιB) (A q))
+      (fun q => OpFamily.leftPlacedOpFamily (ιB := ιB) (B q)) δ := by
   intro ⟨hAB⟩
   constructor
   unfold sddErrorOp at *
@@ -369,8 +370,8 @@ lemma sddOpRel_leftPlaced_of_ev_eq
     avgOver 𝒟
         (fun q =>
           qSDDOp ψ
-            (OpFamily.leftPlacedOpFamily (ιB := ι) (A q))
-            (OpFamily.leftPlacedOpFamily (ιB := ι) (B q)))
+            (OpFamily.leftPlacedOpFamily (ιB := ιB) (A q))
+            (OpFamily.leftPlacedOpFamily (ιB := ιB) (B q)))
       = avgOver 𝒟 (fun q => qSDDOp φ (A q) (B q)) := by
           refine avgOver_congr 𝒟 _ _ ?_
           intro q
