@@ -59,56 +59,181 @@ private lemma qSDDCore_option_pair_decompose
         qSDDCore ψ Lsn Rsn +
         qSDDCore ψ Lns Rns +
         qSDDCore ψ Lnn Rnn := by
-  -- Rewrite each summand so the match on `(ab.1, ab.2)` sits at the outermost
-  -- position. This lets us discharge the combinatorics via `sum_option_pair_match`
-  -- without re-expanding the algebraic payload four times.
-  have hsummand :
-      ∀ ab : Option α × Option β,
-        ev ψ
-            (((match ab.1, ab.2 with
-                | some a, some b => Lss (a, b)
-                | some a, none => Lsn a
-                | none, some b => Lns b
-                | none, none => Lnn ()) -
-              (match ab.1, ab.2 with
-                | some a, some b => Rss (a, b)
-                | some a, none => Rsn a
-                | none, some b => Rns b
-                | none, none => Rnn ()))ᴴ *
-            ((match ab.1, ab.2 with
-                | some a, some b => Lss (a, b)
-                | some a, none => Lsn a
-                | none, some b => Lns b
-                | none, none => Lnn ()) -
-              (match ab.1, ab.2 with
-                | some a, some b => Rss (a, b)
-                | some a, none => Rsn a
-                | none, some b => Rns b
-                | none, none => Rnn ()))) =
-          (match ab.1, ab.2 with
-            | some a, some b =>
-                ev ψ ((Lss (a, b) - Rss (a, b))ᴴ * (Lss (a, b) - Rss (a, b)))
-            | some a, none =>
-                ev ψ ((Lsn a - Rsn a)ᴴ * (Lsn a - Rsn a))
-            | none, some b =>
-                ev ψ ((Lns b - Rns b)ᴴ * (Lns b - Rns b))
-            | none, none =>
-                ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ()))) := by
-    rintro ⟨a, b⟩
-    cases a <;> cases b <;> rfl
   unfold qSDDCore
-  simp_rw [hsummand]
-  rw [sum_option_pair_match
+  trans
+    (∑ ab : Option α × Option β,
+      match ab.1, ab.2 with
+      | some a, some b =>
+          ev ψ ((Lss (a, b) - Rss (a, b))ᴴ * (Lss (a, b) - Rss (a, b)))
+      | some a, none => ev ψ ((Lsn a - Rsn a)ᴴ * (Lsn a - Rsn a))
+      | none, some b => ev ψ ((Lns b - Rns b)ᴴ * (Lns b - Rns b))
+      | none, none => ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())))
+  · apply Finset.sum_congr rfl
+    rintro ⟨oa, ob⟩ _ha
+    cases oa <;> cases ob <;> rfl
+  · simpa [Fintype.sum_unique] using
+      (sum_option_pair_match
         (fss := fun p => ev ψ ((Lss p - Rss p)ᴴ * (Lss p - Rss p)))
         (fsn := fun a => ev ψ ((Lsn a - Rsn a)ᴴ * (Lsn a - Rsn a)))
         (fns := fun b => ev ψ ((Lns b - Rns b)ᴴ * (Lns b - Rns b)))
-        (fnn := ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())))]
-  rw [show (∑ u : Unit, ev ψ ((Lnn u - Rnn u)ᴴ * (Lnn u - Rnn u))) =
-        ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())) from Fintype.sum_unique _]
+        (fnn := ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ()))))
 
-set_option maxHeartbeats 800000 in
--- The quadrant decomposition expands nested `Option × Option` sums whose
--- normalization exceeds the default local resource limit after the Lean 4.30 update.
+set_option maxHeartbeats 500000 in
+-- The proof expands the `Option × Option` indexing of `\widehat G` into four
+-- quadrant sums.  The explicit normalization remains above the default budget,
+-- but isolating it here keeps the Section 12 consequence at the default limit.
+/-- The pointwise `\widehat G` pair product splits into the complete-complete,
+complete-incomplete, incomplete-complete, and incomplete-incomplete quadrants. -/
+private lemma gHatPairProduct_qSDDOp_decompose
+    (params : Parameters)
+    [FieldModel params.q]
+    (ψbi : QuantumState (ι × ι))
+    (family : IdxPolyFamily params ι)
+    (q : SlicePairQuestion params) :
+    qSDDOp ψbi
+        (gHatPairProductLeft params family q)
+        (gHatPairProductRight params family q) =
+      qSDDOp ψbi
+          (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+            orderedProductOpFamily
+              ((family.meas q.1).toSubMeas)
+              ((family.meas q.2).toSubMeas))
+          (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+            reversedProductOpFamily
+              ((family.meas q.1).toSubMeas)
+              ((family.meas q.2).toSubMeas)) +
+        qSDDOp ψbi
+          (incompletePartPointProductLeft params family q)
+          (incompletePartPointProductRight params family q) +
+          qSDDOp ψbi
+            (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+              multiplyByTotalOnLeft
+                (incompletePartSubMeas params family q.1)
+                ((family.meas q.2).toSubMeas))
+            (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+              multiplyByTotalOnRight
+                ((family.meas q.2).toSubMeas)
+                (incompletePartSubMeas params family q.1)) +
+        qSDDOp ψbi
+          (incompletePartTotalProductLeft params family q)
+          (incompletePartTotalProductRight params family q) := by
+  rcases q with ⟨x, y⟩
+  let completeLeft :
+      (Polynomial params × Polynomial params) → MIPStarRE.Quantum.Op (ι × ι) :=
+    (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+      orderedProductOpFamily
+        ((family.meas x).toSubMeas)
+        ((family.meas y).toSubMeas)).outcome
+  let completeRight :
+      (Polynomial params × Polynomial params) → MIPStarRE.Quantum.Op (ι × ι) :=
+    (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+      reversedProductOpFamily
+        ((family.meas x).toSubMeas)
+        ((family.meas y).toSubMeas)).outcome
+  let incompleteLeft : Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+    (incompletePartPointProductLeft params family (x, y)).outcome
+  let incompleteRight : Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+    (incompletePartPointProductRight params family (x, y)).outcome
+  let swappedLeft : Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+    (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+      multiplyByTotalOnLeft
+        (incompletePartSubMeas params family x)
+        ((family.meas y).toSubMeas)).outcome
+  let swappedRight : Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
+    (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+      multiplyByTotalOnRight
+        ((family.meas y).toSubMeas)
+        (incompletePartSubMeas params family x)).outcome
+  let totalLeft : Unit → MIPStarRE.Quantum.Op (ι × ι) :=
+    (incompletePartTotalProductLeft params family (x, y)).outcome
+  let totalRight : Unit → MIPStarRE.Quantum.Op (ι × ι) :=
+    (incompletePartTotalProductRight params family (x, y)).outcome
+  let gHatLeft :
+      Option (Polynomial params) × Option (Polynomial params) →
+        MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ab =>
+      match ab.1, ab.2 with
+      | some g, some h => completeLeft (g, h)
+      | some g, none => incompleteLeft g
+      | none, some h => swappedLeft h
+      | none, none => totalLeft ()
+  let gHatRight :
+      Option (Polynomial params) × Option (Polynomial params) →
+        MIPStarRE.Quantum.Op (ι × ι) :=
+    fun ab =>
+      match ab.1, ab.2 with
+      | some g, some h => completeRight (g, h)
+      | some g, none => incompleteRight g
+      | none, some h => swappedRight h
+      | none, none => totalRight ()
+  have hgHatLeft :
+      (gHatPairProductLeft params family (x, y)).outcome = gHatLeft := by
+    funext ab
+    rcases ab with ⟨a, b⟩
+    cases a <;> cases b <;>
+      simp [gHatLeft, completeLeft, incompleteLeft, swappedLeft, totalLeft,
+        gHatPairProductLeft, gHatIdxMeas, completeSubMeas,
+        incompletePartPointProductLeft, incompletePartTotalProductLeft,
+        incompletePartSubMeas, multiplyByTotalOnLeft, multiplyByTotalOnRight,
+        orderedProductOpFamily, OpFamily.leftPlacedOpFamily]
+  have hgHatRight :
+      (gHatPairProductRight params family (x, y)).outcome = gHatRight := by
+    funext ab
+    rcases ab with ⟨a, b⟩
+    cases a <;> cases b <;>
+      simp [gHatRight, completeRight, incompleteRight, swappedRight, totalRight,
+        gHatPairProductRight, gHatIdxMeas, completeSubMeas,
+        incompletePartPointProductRight, incompletePartTotalProductRight,
+        incompletePartSubMeas, multiplyByTotalOnLeft, multiplyByTotalOnRight,
+        reversedProductOpFamily, OpFamily.leftPlacedOpFamily]
+  calc
+    qSDDOp ψbi
+        (gHatPairProductLeft params family (x, y))
+        (gHatPairProductRight params family (x, y))
+      = qSDDCore ψbi gHatLeft gHatRight := by
+          rw [qSDDOp, hgHatLeft, hgHatRight]
+    _ =
+        qSDDCore ψbi completeLeft completeRight +
+          qSDDCore ψbi incompleteLeft incompleteRight +
+          qSDDCore ψbi swappedLeft swappedRight +
+          qSDDCore ψbi totalLeft totalRight := by
+            dsimp [gHatLeft, gHatRight]
+            convert qSDDCore_option_pair_decompose ψbi
+              completeLeft completeRight
+              incompleteLeft incompleteRight
+              swappedLeft swappedRight
+              totalLeft totalRight using 1
+            · unfold qSDDCore
+              apply Finset.sum_congr rfl
+              intro a _ha
+              rcases a with ⟨oa, ob⟩
+              cases oa <;> cases ob <;> simp
+    _ =
+        qSDDOp ψbi
+            (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+              orderedProductOpFamily
+                ((family.meas x).toSubMeas)
+                ((family.meas y).toSubMeas))
+            (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+              reversedProductOpFamily
+                ((family.meas x).toSubMeas)
+                ((family.meas y).toSubMeas)) +
+          qSDDOp ψbi
+            (incompletePartPointProductLeft params family (x, y))
+            (incompletePartPointProductRight params family (x, y)) +
+            qSDDOp ψbi
+              (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+                multiplyByTotalOnLeft
+                  (incompletePartSubMeas params family x)
+                  ((family.meas y).toSubMeas))
+              (OpFamily.leftPlacedOpFamily (ιB := ι) <|
+                multiplyByTotalOnRight
+                  ((family.meas y).toSubMeas)
+                  (incompletePartSubMeas params family x)) +
+          qSDDOp ψbi
+            (incompletePartTotalProductLeft params family (x, y))
+            (incompletePartTotalProductRight params family (x, y)) := rfl
+
 /-- Internal form of `cor:G-hat-facts` after applying
 `lem:g-complete-self-consistency`, `cor:g-bot-self-consistency`,
 `cor:commuting-with-G-complete`, and `cor:commuting-with-G-incomplete`.
@@ -311,104 +436,10 @@ theorem gHatFacts_ofSelfConsistencyAndCommutation
               incompleteQuadrant q +
               swappedQuadrant q +
               totalQuadrant q := by
-      -- Historical note (#199): the explicit `Option × Option` sum rewrite is
-      -- now isolated in `qSDDCore_option_pair_decompose`; the local work below
-      -- specializes that reusable decomposition to the four quadrants.
       intro q
-      rcases q with ⟨x, y⟩
-      let completeLeft :
-          (Polynomial params × Polynomial params) → MIPStarRE.Quantum.Op (ι × ι) :=
-        (OpFamily.leftPlacedOpFamily (ιB := ι) <|
-          orderedProductOpFamily
-            ((family.meas x).toSubMeas)
-            ((family.meas y).toSubMeas)).outcome
-      let completeRight :
-          (Polynomial params × Polynomial params) → MIPStarRE.Quantum.Op (ι × ι) :=
-        (OpFamily.leftPlacedOpFamily (ιB := ι) <|
-          reversedProductOpFamily
-            ((family.meas x).toSubMeas)
-            ((family.meas y).toSubMeas)).outcome
-      let incompleteLeft :
-          Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
-        (incompletePartPointProductLeft params family (x, y)).outcome
-      let incompleteRight :
-          Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
-        (incompletePartPointProductRight params family (x, y)).outcome
-      let swappedLeft :
-          Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
-        (swappedIncompletePointLeft (x, y)).outcome
-      let swappedRight :
-          Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
-        (swappedIncompletePointRight (x, y)).outcome
-      let totalLeft : Unit → MIPStarRE.Quantum.Op (ι × ι) :=
-        (incompletePartTotalProductLeft params family (x, y)).outcome
-      let totalRight : Unit → MIPStarRE.Quantum.Op (ι × ι) :=
-        (incompletePartTotalProductRight params family (x, y)).outcome
-      let gHatLeft :
-          Option (Polynomial params) × Option (Polynomial params) →
-            MIPStarRE.Quantum.Op (ι × ι) :=
-        fun ab =>
-          match ab.1, ab.2 with
-          | some g, some h => completeLeft (g, h)
-          | some g, none => incompleteLeft g
-          | none, some h => swappedLeft h
-          | none, none => totalLeft ()
-      let gHatRight :
-          Option (Polynomial params) × Option (Polynomial params) →
-            MIPStarRE.Quantum.Op (ι × ι) :=
-        fun ab =>
-          match ab.1, ab.2 with
-          | some g, some h => completeRight (g, h)
-          | some g, none => incompleteRight g
-          | none, some h => swappedRight h
-          | none, none => totalRight ()
-      have hgHatLeft :
-          (gHatPairProductLeft params family (x, y)).outcome = gHatLeft := by
-        funext ab
-        rcases ab with ⟨a, b⟩
-        cases a <;> cases b <;>
-          simp [gHatLeft, completeLeft, incompleteLeft, swappedLeft, totalLeft,
-            gHatPairProductLeft, gHatIdxMeas, completeSubMeas,
-            incompletePartPointProductLeft, incompletePartTotalProductLeft,
-            swappedIncompletePointLeft, incompletePartSubMeas, multiplyByTotalOnLeft,
-            multiplyByTotalOnRight, orderedProductOpFamily, OpFamily.leftPlacedOpFamily]
-      have hgHatRight :
-          (gHatPairProductRight params family (x, y)).outcome = gHatRight := by
-        funext ab
-        rcases ab with ⟨a, b⟩
-        cases a <;> cases b <;>
-          simp [gHatRight, completeRight, incompleteRight, swappedRight, totalRight,
-            gHatPairProductRight, gHatIdxMeas, completeSubMeas,
-            incompletePartPointProductRight, incompletePartTotalProductRight,
-            swappedIncompletePointRight, incompletePartSubMeas, multiplyByTotalOnLeft,
-            multiplyByTotalOnRight, reversedProductOpFamily, OpFamily.leftPlacedOpFamily]
-      calc
-        qSDDOp ψbi
-            (gHatPairProductLeft params family (x, y))
-            (gHatPairProductRight params family (x, y))
-          = qSDDCore ψbi gHatLeft gHatRight := by
-              rw [qSDDOp, hgHatLeft, hgHatRight]
-        _ =
-            qSDDCore ψbi completeLeft completeRight +
-              qSDDCore ψbi incompleteLeft incompleteRight +
-              qSDDCore ψbi swappedLeft swappedRight +
-              qSDDCore ψbi totalLeft totalRight := by
-                dsimp [gHatLeft, gHatRight]
-                convert qSDDCore_option_pair_decompose ψbi
-                  completeLeft completeRight
-                  incompleteLeft incompleteRight
-                  swappedLeft swappedRight
-                  totalLeft totalRight using 1
-                · unfold qSDDCore
-                  apply Finset.sum_congr rfl
-                  intro a _ha
-                  rcases a with ⟨oa, ob⟩
-                  cases oa <;> cases ob <;> simp
-        _ =
-            completeQuadrant (x, y) +
-              incompleteQuadrant (x, y) +
-              swappedQuadrant (x, y) +
-              totalQuadrant (x, y) := rfl
+      simpa [completeQuadrant, incompleteQuadrant, swappedQuadrant, totalQuadrant,
+        swappedIncompletePointLeft, swappedIncompletePointRight] using
+        gHatPairProduct_qSDDOp_decompose params ψbi family q
     rcases hcommComplete.pairwiseCompletePartCommutation with ⟨hcomplete_bound⟩
     rcases hcommIncomplete.pointWithIncompletePartCommutation with ⟨hincomplete_point_bound⟩
     rcases hcommIncomplete.incompletePartCommutation with ⟨hincomplete_total_bound⟩

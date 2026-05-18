@@ -355,10 +355,6 @@ lemma weightedGeneralizeBRightOperatorAtPolynomial_point_eq
   simp [weightedGeneralizeBRightOperatorAtPolynomial,
     generalizeBRightOperatorAtPolynomial, generalizeBRightEventSubMeasAtPolynomial]
 
-set_option maxHeartbeats 800000 in
--- The transport-chain proof assembles seven operator families and six
--- single-outcome squared-distance relations; Lean 4.30 needs a larger
--- declaration-local resource limit for the resulting identities.
 private lemma localVarianceTransportLinePairBound
     (params : Parameters)
     [FieldModel params.q]

@@ -139,9 +139,6 @@ lemma localVarianceOfPoints
 
 /-! ## Strategy-state reductions -/
 
-set_option maxHeartbeats 800000 in
--- The statement contains the full strategy-state edge comparison data; Lean
--- 4.30 needs a larger local resource limit to check the record fields.
 /-- Strict reduction for `lem:local-variance-of-points` on the strategy state.
 
 Compared with the legacy theorem `localVarianceOfPoints`, this theorem no longer
@@ -195,7 +192,6 @@ lemma localVarianceOfPointsFromEdgeDeviation
               exact pointConditionedLocalVarianceAtPolynomial_le_of_deviation
                 params strategy G (hedge g)) }
 
-set_option maxHeartbeats 800000 in
 -- This lemma builds the global-variance record from the local record and the
 -- expansion transfer, expanding several indexed operator families.
 /-- Reduction for `lem:global-variance-of-points` on the strategy state.
@@ -263,7 +259,6 @@ lemma globalVarianceOfPointsFromLocalDeviation
             (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
             (globalVarianceOfPointsError params eps delta) hglobalVariance }
 
-set_option maxHeartbeats 800000 in
 -- The sum-level transfer expands both the global and local deviation families
 -- over all polynomials.
 /-- Sum-level local-to-global transfer for the polynomial-indexed squared-norm
@@ -297,7 +292,6 @@ lemma globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum
           localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
           rw [Finset.mul_sum]
 
-set_option maxHeartbeats 800000 in
 -- This polynomial-sum lemma combines the previous transfer with the public
 -- error normalization, and its expanded statement has a large checked form.
 /-- A polynomial-sum local-variance bound implies the corresponding sum-form
@@ -334,7 +328,6 @@ lemma globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
           simp only [globalVarianceOfPointsError, localVarianceOfPointsError]
           ring
 
-set_option maxHeartbeats 800000 in
 -- This theorem applies the post-triangle transport-chain bound to the
 -- strategy-state local-variance record.
 /-- Strategy-state reduction for `lem:local-variance-of-points` from the
@@ -363,7 +356,6 @@ lemma localVarianceOfPointsFromTransportChainBound
     (localVarianceTransportChainError_le_localVarianceOfPointsError
       params strategy hgood)
 
-set_option maxHeartbeats 800000 in
 -- This theorem composes the transport-chain bound with the global-variance
 -- reduction and therefore checks both record structures.
 /-- Strategy-state global-variance reduction from the post-triangle six-step
@@ -386,7 +378,6 @@ lemma globalVarianceOfPointsFromTransportChainBound
     (localVarianceTransportChainError_le_localVarianceOfPointsError
       params strategy hgood)
 
-set_option maxHeartbeats 800000 in
 -- This supplied-bounds lemma constructs the arbitrary-state global-variance
 -- record and expands the independent-point comparison families.
 /-- Auxiliary lemma for `lem:global-variance-of-points` with arbitrary
@@ -456,7 +447,6 @@ lemma globalVarianceOfPoints_ofSuppliedBounds
             (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
             (globalVarianceOfPointsError params eps delta) hglobal }
 
-set_option maxHeartbeats 800000 in
 -- The paper-facing theorem invokes the transport-chain theorem and the
 -- strategy-state global-variance record constructor.
 /-- Paper origin: `references/ldt-paper/expansion.tex:325-353`

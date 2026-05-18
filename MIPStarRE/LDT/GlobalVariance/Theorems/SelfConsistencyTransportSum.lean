@@ -109,10 +109,6 @@ private lemma liftRight_pointAnswerMeasurement_outcome_at_g
     pointConditionedOutcomeOperatorAtPolynomial,
     SubMeas.toMeasurement_toSubMeas, mkRightPlacedSubMeas_outcome]
 
-set_option maxHeartbeats 800000 in
--- The unnormalized polynomial-sum statement expands the `qSDD` and
--- `cabApproxDelta` operator families while checking the proof; after the
--- Lean 4.30 update this exceeds the default local resource limit.
 /-- Sum-level base-sample form of the `2ε` axis-parallel consistency move,
 oriented with the line event on the left register and the point event on the
 right register.
