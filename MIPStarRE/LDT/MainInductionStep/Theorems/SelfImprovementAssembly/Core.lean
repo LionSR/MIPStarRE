@@ -148,13 +148,18 @@ theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
 /-- `thm:self-improvement-in-induction-section`.
 
 Paper origin: `references/ldt-paper/self_improvement.tex:631-811`
-(`\label{thm:self-improvement}`), restated for the induction section in
-`references/ldt-paper/inductive_step.tex:461-551`.
+(`\label{thm:self-improvement}`), used in the induction section at
+`references/ldt-paper/inductive_step.tex:461-485`.  The labelled induction
+statement at `references/ldt-paper/inductive_step.tex:249-286` states the input
+as a submeasurement, while the proved form at
+`references/ldt-paper/self_improvement.tex:635-671` uses a measurement.  This
+Lean statement follows the proved measurement-valued form needed at the
+induction call site.
 
 The input \(G\) is a complete polynomial measurement, as in the paper's
 restated self-improvement theorem.  The conclusion is phrased in the Section 6
 record `SelfImprovementInInductionSectionConclusion`, whose fields are exactly
-the projective output estimates used by the successor-step assembly. -/
+the projective output estimates used by the successor-step construction. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]

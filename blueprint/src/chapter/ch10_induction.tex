@@ -64,6 +64,12 @@
 \begin{theorem}[Self-improvement]\label{thm:self-improvement-in-induction-section}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
+  The labelled theorem in `references/ldt-paper/inductive_step.tex:249-286`
+  states the input as a submeasurement, while the proved form in
+  `references/ldt-paper/self_improvement.tex:635-671` states it as a
+  measurement.  The blueprint and Lean follow the proved measurement-valued
+  form, which is also the form used at the call site in
+  `references/ldt-paper/inductive_step.tex:461-485`.
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
   \begin{enumerate}
     \item (Consistency with~$A$): \label{item:si-inductive-G-consistency} On average over $u \sim \F_q^m$,
@@ -101,7 +107,7 @@
 \end{theorem}
 \begin{proof}
 	\uses{thm:self-improvement, prop:two-notions-of-self-consistency}
-	This is Theorem~\ref{thm:self-improvement}, with the conclusions repackaged in the notation used by the induction step. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
+	This is Theorem~\ref{thm:self-improvement}, with the conclusions reformulated in the notation used by the induction step. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
 \end{proof}
 
 \begin{remark}[Lean realization of induction self-improvement]\label{rem:self-improvement-in-induction-section-conditional}
@@ -111,7 +117,7 @@
 	The proof applies
 	\texttt{SelfImprovement.selfImprovement} to \(G\), then uses
 	\texttt{selfImprovementInInductionSectionConclusion\_ofSelfImprovementConclusion}
-	to repackage the fields.
+	to transport the fields.
 \end{remark}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
