@@ -409,7 +409,6 @@ lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
       ≤ commuteGHalfSandwichError params gamma zeta (i + 1) := by
   simpa [sddErrorOp, qSDDOp] using hprefixRaw.squaredDistanceBound
 
-set_option maxHeartbeats 400000 in
 -- This arithmetic absorption proof expands several nested error estimates from the paper.
 /-- Scalar absorption for the post-tail-deletion one-point estimate.
 
