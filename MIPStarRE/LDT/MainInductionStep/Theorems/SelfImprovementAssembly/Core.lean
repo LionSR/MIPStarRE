@@ -161,7 +161,7 @@ induction proof.
 The input \(G\) is a complete polynomial measurement, as in the paper's
 restated self-improvement theorem.  The conclusion is phrased in the Section 6
 record `SelfImprovementInInductionSectionConclusion`, whose fields are exactly
-the projective output estimates used by the successor-step construction.
+the projective output estimates used in the inductive step.
 
 **Unfaithful:** This proof currently depends transitively on
 `SelfImprovement.selfImprovement`, hence on `sdp_statement_with_slackness`, whose
@@ -190,7 +190,7 @@ theorem selfImprovementInInductionSection
       params strategy eps delta gamma nu G.toSubMeas G H Z hfinal⟩
 
 /-- Convert the slice-wise outputs feeding `selfImprovementInInductionSection`
-into the bookkeeping object expected by the later successor-step construction.
+into the bookkeeping object expected by the later inductive step.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`, using the
 self-improvement theorem restated in
