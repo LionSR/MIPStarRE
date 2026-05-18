@@ -2,10 +2,10 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
 
 /-!
-# Section 10 — orthonormalize-and-complete output
+# Section 5 — orthonormalize-and-complete output
 
 This module contains the output structure and main theorem for the
-orthonormalize-and-complete chain in Step 6 of the main inductive step.  It
+orthonormalization projectivization chain in the main inductive step.  It
 packages the orthonormalized projective submeasurement, the canonical completed
 projective measurement, and the associated state-dependent-distance estimates.
 -/
@@ -26,8 +26,7 @@ set_option linter.unusedFintypeInType false in
 step from `references/ldt-paper/inductive_step.tex:130-149`
 (`eq:G-with-Q-A`).
 
-Output data for the orthonormalization + completion chain (Step 6 of
-the inductive step).
+Output data for the orthonormalization and completion chain in the inductive step.
 
 The chain takes a measurement `A : Measurement Outcome ι` together with a
 `ζ`-bipartite-self-consistency hypothesis on `A.toSubMeas`, and produces:
@@ -104,7 +103,7 @@ namespace ProjectivizationSelfConsistencyHandoff
 /-- Build the projective self-consistency handoff from the two
 orthonormalize-and-complete statements.
 
-This records the exact Step 6 proof obligations for the current
+This records the exact orthonormalization projectivization obligations for the current
 `mainFormal` residual outside `Test/MainTheorem.lean`: a pre-projective
 consistency proof, the Alice-side completion statement, and the Bob-side
 completion statement. The Bob-side statement is transported from left lifts to
@@ -148,7 +147,7 @@ end ProjectivizationSelfConsistencyHandoff
 /-! ### Main theorem -/
 
 set_option linter.unusedFintypeInType false in
-/-- **Step 6 of the inductive step**: orthonormalize-and-complete chain.
+/-- Orthonormalization and completion chain in the inductive step.
 
 Given:
 * a permutation-invariant, normalized bipartite state `ψ`;
@@ -166,9 +165,9 @@ measurement `Q` satisfying the chain bound
 The analytic part of the proof is a direct composition of the two existing
 lemmas:
 * `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization`
-  (Step 6a; `orthonormalization.tex` line 67);
+  (`orthonormalization.tex` line 67);
 * `MIPStarRE.LDT.Preliminaries.completingToMeasurement`
-  (Step 6b; `preliminaries.tex` line 1101).
+  (`preliminaries.tex` line 1101).
 
 The extra projective structure on `Q` comes from
 `MIPStarRE.LDT.Preliminaries.completeAtOutcomeProj`, which shows that the same
@@ -191,11 +190,11 @@ theorem orthonormalizeAndComplete
     ∃ P : ProjSubMeas Outcome ι, ∃ Q : ProjMeas Outcome ι,
       Q.toMeasurement = completeAtOutcome P.toSubMeas a0 ∧
         OrthonormalizeAndCompleteStatement ψ A P Q a0 ζ := by
-  -- Step 6a: apply orthonormalization to `A.toSubMeas`.
+  -- Apply orthonormalization to `A.toSubMeas`.
   obtain ⟨P, hClose⟩ :=
     orthonormalization (Outcome := Outcome) (ι := ι) ψ hperm hψ
       A.toSubMeas ζ hssc
-  -- Step 6b: use the existing completion bound for the canonical completion
+  -- Use the existing completion bound for the canonical completion
   -- of `P`, then repackage that same completed measurement as a `ProjMeas`.
   have hCompletedCloseness :
       SDDRel ψ (uniformDistribution Unit)

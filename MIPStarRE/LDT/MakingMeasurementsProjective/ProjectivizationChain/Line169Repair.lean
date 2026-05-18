@@ -2,12 +2,12 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.MatchMass
 
 /-!
-# Section 10 — local line-169 repair
+# Section 5 — repaired completion transport
 
-This module contains the local line-169 repair for the projectivization chain.
-It compares a pre-projective measurement with the orthonormalized
-submeasurement before completion, so that completion contributes no further
-loss to the relevant diagonal match mass.
+This module contains the repaired completion-transport estimates for the
+orthonormalization projectivization chain.  It compares a pre-projective measurement
+with the orthonormalized submeasurement before completion, so that completion
+contributes no further loss to the relevant diagonal match mass.
 -/
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
@@ -17,7 +17,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 open MIPStarRE.LDT
 open MIPStarRE.LDT.Preliminaries (completeAtOutcomeProj)
 
-/-! ### Local line-169 repair via pre-completion orthonormalization -/
+/-! ### Repaired completion transport via pre-completion orthonormalization -/
 
 namespace ProjectivizationLine169Repair
 
@@ -26,7 +26,7 @@ mass against a fixed partner measurement by the square root of the SDD error.
 
 This is the single-question `Unit` specialization of
 `prop:easy-approx-from-approx_delta`, written directly in the bipartite
-`qBipartiteMatchMass` notation used by the Step 6 projectivization chain. -/
+`qBipartiteMatchMass` notation used by the orthonormalization projectivization chain. -/
 theorem qBipartiteMatchMass_ge_sub_sqrt_of_sdd
     {Outcome : Type*} {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
@@ -60,8 +60,8 @@ theorem qBipartiteMatchMass_ge_sub_sqrt_of_sdd
   linarith
 
 /-- Completing the orthonormalized submeasurement after comparing it to the
-source measurement before completion yields a repaired line-169 transport with
-additive loss `√ε`.
+source measurement before completion yields a repaired completion-transport
+estimate with additive loss `√ε`.
 
 This avoids the larger `ζ + √ζ₂` loss that comes from applying `triangleSub`
 only after the completion step.  The completion itself contributes no further
@@ -204,7 +204,7 @@ theorem rightConsistency_of_completion_and_sdd
   simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefectQ
 
-/-- Checked local repair of the paper's line-169 Alice-side replacement step.
+/-- Checked local repair of the paper's Alice-side completion-transport replacement.
 
 Instead of applying `triangleSub` after completion, compare `G_A` directly with
 the orthonormalized submeasurement `P_A`, whose `≈`-error is
