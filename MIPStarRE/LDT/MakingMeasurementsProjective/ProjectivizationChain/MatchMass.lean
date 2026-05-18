@@ -1,15 +1,15 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 
 /-!
-# Section 10 — completion match-mass helper
+# Section 5 — completion match-mass helper
 
-This module contains the only match-mass fact still used by the active Step 6
-projectivization route.  Completing a projective submeasurement at one
+This module contains the only match-mass fact still used by the active
+orthonormalization projectivization route.  Completing a projective submeasurement at one
 distinguished outcome can only increase its diagonal match mass against a fixed
 partner submeasurement, because the completion adds a positive residual at a
 single outcome.
 
-The older exact line-169 monotonicity assertions no longer appear in the
+The older exact completion-transport monotonicity assertions no longer appear in the
 current development.  The active `mainFormal` route uses the repaired
 pre-completion transport in
 `ProjectivizationChain.Line169Repair`, and this file now keeps only the
