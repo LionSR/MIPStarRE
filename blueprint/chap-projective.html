@@ -2692,7 +2692,7 @@
   <div class="lemma_thmcontent">
   
 <div class="displaymath" id="a0000000233">
-  \begin{equation*}  X^\dagger \cdot \widehat{X} = \sqrt{Q}. \end{equation*}
+  \begin{equation*}  X \cdot \widehat{X}^\dagger = U \cdot \Sigma _{m \times m} \cdot U^\dagger , \quad X^\dagger \cdot \widehat{X} = \sqrt{Q}. \end{equation*}
 </div>
 
   </div>
@@ -2705,7 +2705,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> is the corresponding matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced datum then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.37</a> and <a href="chap-projective.html#lem:P-Q-approx">4.39</a>. The companion paper identity for \(X\widehat X^\dagger \) is not used downstream. </p>
+  <p> The paper obtains this from the SVD formula for \(X\) and the definition of \(\widehat X\). The formal lemma <span class="ttfamily">rectangularSvd_x_mul_xHat_conjTranspose_raw</span> records the first displayed identity, with the middle factor \(S I_{m\times d}^\dagger \) serving as the formal square matrix \(\Sigma _{m\times m}\). The formal lemma <span class="ttfamily">rectangularSvd_xHat_mixed_of_sqrtQ</span> records the second matrix calculation in the form whose square-root target is the operator \(Q\) supplied by the QXP construction. The formal lemma <span class="ttfamily">rectangularSvd_middle_eq_sqrt_of_square</span> records the spectral step: a positive middle factor whose square is \(Q\) is the positive square root of \(Q\). The reduced datum then records this mixed-product identity as a primitive consequence, which is exactly the part needed in <a href="chap-projective.html#lem:squared-difference">4.37</a> and <a href="chap-projective.html#lem:P-Q-approx">4.39</a>. </p>
 
   </div>
 </div>
