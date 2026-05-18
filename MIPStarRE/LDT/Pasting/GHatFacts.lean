@@ -18,7 +18,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- A sum over `Option α × Option β` of a four-way match pattern decomposes into
 the four quadrant contributions. This isolates the `Option × Option` combinatorics
-from the algebraic content of callers like `qSDDCore_option_pair_decompose`. -/
+from the algebraic content of the `\widehat G` quadrant expansion. -/
 private lemma sum_option_pair_match
     {α β M : Type*} [Fintype α] [Fintype β] [AddCommMonoid M]
     (fss : α × β → M) (fsn : α → M) (fns : β → M) (fnn : M) :
@@ -34,54 +34,6 @@ private lemma sum_option_pair_match
   rw [Finset.sum_add_distrib, ← Fintype.sum_prod_type']
   abel
 
-/-- Split the `Option × Option` squared-distance defect into its four quadrants. -/
-private lemma qSDDCore_option_pair_decompose
-    {α β : Type*} [Fintype α] [Fintype β]
-    (ψ : QuantumState ι)
-    (Lss Rss : α × β → MIPStarRE.Quantum.Op ι)
-    (Lsn Rsn : α → MIPStarRE.Quantum.Op ι)
-    (Lns Rns : β → MIPStarRE.Quantum.Op ι)
-    (Lnn Rnn : Unit → MIPStarRE.Quantum.Op ι) :
-    qSDDCore ψ
-      (fun ab : Option α × Option β =>
-        match ab.1, ab.2 with
-        | some a, some b => Lss (a, b)
-        | some a, none => Lsn a
-        | none, some b => Lns b
-        | none, none => Lnn ())
-      (fun ab : Option α × Option β =>
-        match ab.1, ab.2 with
-        | some a, some b => Rss (a, b)
-        | some a, none => Rsn a
-        | none, some b => Rns b
-        | none, none => Rnn ()) =
-      qSDDCore ψ Lss Rss +
-        qSDDCore ψ Lsn Rsn +
-        qSDDCore ψ Lns Rns +
-        qSDDCore ψ Lnn Rnn := by
-  unfold qSDDCore
-  trans
-    (∑ ab : Option α × Option β,
-      match ab.1, ab.2 with
-      | some a, some b =>
-          ev ψ ((Lss (a, b) - Rss (a, b))ᴴ * (Lss (a, b) - Rss (a, b)))
-      | some a, none => ev ψ ((Lsn a - Rsn a)ᴴ * (Lsn a - Rsn a))
-      | none, some b => ev ψ ((Lns b - Rns b)ᴴ * (Lns b - Rns b))
-      | none, none => ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ())))
-  · apply Finset.sum_congr rfl
-    rintro ⟨oa, ob⟩ _ha
-    cases oa <;> cases ob <;> rfl
-  · simpa [Fintype.sum_unique] using
-      (sum_option_pair_match
-        (fss := fun p => ev ψ ((Lss p - Rss p)ᴴ * (Lss p - Rss p)))
-        (fsn := fun a => ev ψ ((Lsn a - Rsn a)ᴴ * (Lsn a - Rsn a)))
-        (fns := fun b => ev ψ ((Lns b - Rns b)ᴴ * (Lns b - Rns b)))
-        (fnn := ev ψ ((Lnn () - Rnn ())ᴴ * (Lnn () - Rnn ()))))
-
-set_option maxHeartbeats 500000 in
--- The proof expands the `Option × Option` indexing of `\widehat G` into four
--- quadrant sums.  The conversion step still times out below 500000 heartbeats:
--- 450000 fails at weak-head normalization.
 /-- The pointwise `\widehat G` pair product splits into the complete-complete,
 complete-incomplete, incomplete-complete, and incomplete-incomplete quadrants. -/
 private lemma gHatPairProduct_qSDDOp_decompose
@@ -190,24 +142,69 @@ private lemma gHatPairProduct_qSDDOp_decompose
     qSDDOp ψbi
         (gHatPairProductLeft params family (x, y))
         (gHatPairProductRight params family (x, y))
-      = qSDDCore ψbi gHatLeft gHatRight := by
+      =
+        qSDDCore ψbi
+          (fun ab : Option (Polynomial params) × Option (Polynomial params) =>
+            match ab.1, ab.2 with
+            | some g, some h => completeLeft (g, h)
+            | some g, none => incompleteLeft g
+            | none, some h => swappedLeft h
+            | none, none => totalLeft ())
+          (fun ab : Option (Polynomial params) × Option (Polynomial params) =>
+            match ab.1, ab.2 with
+            | some g, some h => completeRight (g, h)
+            | some g, none => incompleteRight g
+            | none, some h => swappedRight h
+            | none, none => totalRight ()) := by
           rw [qSDDOp, hgHatLeft, hgHatRight]
     _ =
         qSDDCore ψbi completeLeft completeRight +
           qSDDCore ψbi incompleteLeft incompleteRight +
           qSDDCore ψbi swappedLeft swappedRight +
           qSDDCore ψbi totalLeft totalRight := by
-            dsimp [gHatLeft, gHatRight]
-            convert qSDDCore_option_pair_decompose ψbi
-              completeLeft completeRight
-              incompleteLeft incompleteRight
-              swappedLeft swappedRight
-              totalLeft totalRight using 1
-            · unfold qSDDCore
-              apply Finset.sum_congr rfl
-              intro a _ha
-              rcases a with ⟨oa, ob⟩
-              cases oa <;> cases ob <;> simp
+            unfold qSDDCore
+            trans
+              (∑ ab : Option (Polynomial params) × Option (Polynomial params),
+                match ab.1, ab.2 with
+                | some g, some h =>
+                    ev ψbi ((completeLeft (g, h) - completeRight (g, h))ᴴ *
+                      (completeLeft (g, h) - completeRight (g, h)))
+                | some g, none =>
+                    ev ψbi ((incompleteLeft g - incompleteRight g)ᴴ *
+                      (incompleteLeft g - incompleteRight g))
+                | none, some h =>
+                    ev ψbi ((swappedLeft h - swappedRight h)ᴴ *
+                      (swappedLeft h - swappedRight h))
+                | none, none =>
+                    ev ψbi ((totalLeft () - totalRight ())ᴴ *
+                      (totalLeft () - totalRight ())))
+            · apply Finset.sum_congr rfl
+              rintro ⟨og, oh⟩ _hmem
+              cases og <;> cases oh <;> rfl
+            · have htotal :
+                  (∑ a : Unit,
+                    ev ψbi ((totalLeft a - totalRight a)ᴴ *
+                      (totalLeft a - totalRight a))) =
+                  ev ψbi ((totalLeft () - totalRight ())ᴴ *
+                    (totalLeft () - totalRight ())) := by
+                simp
+              rw [htotal]
+              convert
+                (sum_option_pair_match
+                  (fss := fun p =>
+                    ev ψbi ((completeLeft p - completeRight p)ᴴ *
+                      (completeLeft p - completeRight p)))
+                  (fsn := fun g =>
+                    ev ψbi ((incompleteLeft g - incompleteRight g)ᴴ *
+                      (incompleteLeft g - incompleteRight g)))
+                  (fns := fun h =>
+                    ev ψbi ((swappedLeft h - swappedRight h)ᴴ *
+                      (swappedLeft h - swappedRight h)))
+                  (fnn := ev ψbi ((totalLeft () - totalRight ())ᴴ *
+                    (totalLeft () - totalRight ())))) using 1
+              · apply Finset.sum_congr rfl
+                rintro ⟨og, oh⟩ _hmem
+                cases og <;> cases oh <;> rfl
     _ =
         qSDDOp ψbi
             (OpFamily.leftPlacedOpFamily (ιB := ι) <|
