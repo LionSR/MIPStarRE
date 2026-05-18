@@ -157,10 +157,10 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram
                     xHat) := by
   obtain ⟨xHat, hxHat_coisometry, hxHat_mixed⟩ :=
     exists_xHat_of_sigmaFinRangeEmbedding_positiveGram hRank
-  obtain ⟨data, hq, hx, hxHat⟩ :=
-    exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities hRank xHat
-      hxHat_coisometry hxHat_mixed
-  exact ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat⟩
+  let data : QXPLayerData Outcome ι :=
+    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
+      hRank.projective hRank.sum_eq_total xHat hxHat_coisometry hxHat_mixed
+  exact ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl⟩
 
 end
 
