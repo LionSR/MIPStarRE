@@ -17,9 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-set_option maxHeartbeats 800000 in
--- The permutation-invariance rewrite unfolds `qSDDOp` through placed families and
--- normalizes tensor adjoints pointwise; the explicit expansion needs extra budget.
 private lemma qSDDOp_rightPlaced_eq_leftPlaced
     {Outcome : Type*} [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
@@ -65,9 +62,6 @@ private lemma qSDDOp_rightPlaced_eq_leftPlaced
               (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) D (1 : MIPStarRE.Quantum.Op ι))]
           rw [leftTensor_mul_leftTensor]
 
-set_option maxHeartbeats 3000000 in
--- This right-register variant of the point-swap bridge inlines the placed-family
--- congruence before applying `closenessOfIP`, which is heartbeat-heavy.
 lemma evaluatedSlice_phaseFour_pointSwap_right_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)

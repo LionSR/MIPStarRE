@@ -1,15 +1,14 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 
-set_option linter.style.setOption false
-set_option linter.flexible false
-
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+universe u
+
+variable {ι : Type u} [Fintype ι] [DecidableEq ι]
 
 /-! ## Statement packages and matrix realization bridge -/
 
@@ -35,7 +34,7 @@ structure GlobalRewriteStatement (params : Parameters)
     ∃ decomp : GlobalVarianceDecomposition params A,
       globalVariance params A ψ = globalVarianceTraceForm params A ψ decomp
 
-private def ambientHilbertSpaceOf (ι : Type) [Fintype ι] [DecidableEq ι] [Nonempty ι] :
+private def ambientHilbertSpaceOf (ι : Type u) [Fintype ι] [DecidableEq ι] [Nonempty ι] :
     FiniteHilbertSpace where
   carrier := ι
   instFintype := inferInstance
@@ -188,7 +187,16 @@ private lemma trace_combined_tensor_eq (params : Parameters)
       ∑ u, ∑ v,
         P u v * (model.state.matrix * ((model.family v)ᴴ * model.family u)).trace := by
   rw [Matrix.trace_mul_comm]
-  simp [Matrix.trace, Matrix.mul_apply, matrixCombinedOperator, matrixTensorOperator]
+  suffices
+      ∑ a : Point params × model.space.carrier, ∑ b : model.space.carrier,
+        (∑ c : Point params × model.space.carrier,
+          P a.1 c.1 * model.state.matrix a.2 c.2 *
+          (starRingEnd ℂ) (model.family c.1 b c.2)) *
+          model.family a.1 b a.2 =
+        ∑ u, ∑ v, P u v *
+          ∑ i, (model.state.matrix * ((model.family v)ᴴ * model.family u)).diag i by
+    simpa [Matrix.trace, Matrix.mul_apply, matrixCombinedOperator, matrixTensorOperator]
+      using this
   let f : (Point params × model.space.carrier) → model.space.carrier →
       (Point params × model.space.carrier) → ℂ :=
     fun x i z => P x.1 z.1 * model.state.matrix x.2 z.2 *
@@ -198,6 +206,9 @@ private lemma trace_combined_tensor_eq (params : Parameters)
   change ∑ a, ∑ b, (∑ c, f a b c) * g a b = _
   rw [sum_mul_sum_expand]
   simp_rw [f, g, Fintype.sum_prod_type, Finset.mul_sum]
+  conv =>
+    rhs
+    simp [Matrix.mul_apply, Matrix.conjTranspose_apply, Finset.mul_sum, mul_assoc]
   refine Finset.sum_congr rfl ?_
   intro x hx
   simpa [mul_assoc, mul_left_comm, mul_comm] using
@@ -275,9 +286,8 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
                 · subst huv
                   simp [model, abstractMatrixModel, matrixExpectation, ev]
                   rfl
-                · simp [huv, model, abstractMatrixModel, matrixExpectation]
-                  intro h
-                  exact (huv h).elim
+                · simp only [Matrix.one_apply, huv, ↓reduceIte, zero_mul, Complex.zero_re]
+                  exact (if_neg huv).symm
         _ = ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ *
               decomp.orthogonalComponent u) := by
               simp

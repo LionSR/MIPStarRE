@@ -23,7 +23,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Exact `Hhat` reindexing for the helper-stage left-tensor mass.
 
@@ -530,24 +530,6 @@ lemma sdp
     sub_nonneg.mpr
       (le_trans (averagedPointOperator_le_one params strategy g)
         (one_le_sdpStrictDualWitness (ι := ι)))
-
-/-- Canonical block-SDP data yields the complementary-slackness variant of
-`lem:sdp`.
-
-From a saturated canonical optimal pair in matrix SDP form, one obtains the
-abstract Section 9 SDP statement with complementary slackness. -/
-lemma sdp_with_slackness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
-      (matrixSdpPointRealizationOfStrategy params strategy)))
-    (Z : MIPStarRE.Quantum.Op ι)
-    (hsdp : MatrixSdpCanonicalOptimalPair params
-      (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
-    SdpStatementWithSlackness params strategy :=
-  sdpStatementWithSlackness_of_canonicalOptimalPair
-    params strategy X Z hsdp
 
 /-- Paper-origin statement for `lem:sdp` with complementary slackness.
 

@@ -24,7 +24,7 @@ namespace MIPStarRE.LDT.SelfImprovement
 open MIPStarRE.LDT
 open MIPStarRE.LDT.GlobalVariance
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Paper-faithful full statement of `lem:add-in-u`.
 

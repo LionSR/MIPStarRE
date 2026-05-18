@@ -251,8 +251,6 @@ lemma fromHToG_sum_averagedSandwichByType_total_eq_one
           simpa [averageOperatorOverDistribution] using
             (fromHToG_averageOperator_uniform_const_one (ι := ι) (α := PointTuple params n))
 
-set_option maxHeartbeats 1000000 in
--- This averaged-context bound expands nested filtered sums and tensor-product rewrites.
 omit [Fintype ι] [DecidableEq ι] in
 /-- Averaged first-root context bound for the `S U S` sandwich used in the
 second half-sandwich and final move-right Cauchy--Schwarz steps. -/

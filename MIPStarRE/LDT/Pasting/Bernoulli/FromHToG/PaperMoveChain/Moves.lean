@@ -17,9 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
--- These two paper moves are Cauchy--Schwarz arguments with explicit context rewrites.
-set_option maxHeartbeats 500000 in
--- The Cauchy--Schwarz move expands averaged-context tensor sums.
 /-- The second half-sandwich commutation move `M₂ → M₃` in the paper chain. -/
 lemma fromHToGAdjacentStageM2M3_paperMove
     (params : Parameters)
@@ -217,8 +214,6 @@ lemma fromHToGAdjacentStageM2M3_paperMove
         _ ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := hcsLR
     exact h₂₃_cauchySchwarz
 
-set_option maxHeartbeats 500000 in
--- The final move combines Cauchy--Schwarz with the collapse equalities.
 /-- The final analytic/collapse move `M₃ → E` in the paper chain. -/
 lemma fromHToGAdjacentStageM3E_paperMove
     (params : Parameters)

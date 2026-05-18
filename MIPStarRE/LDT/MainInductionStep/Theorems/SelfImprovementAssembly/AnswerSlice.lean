@@ -19,7 +19,9 @@ namespace MIPStarRE.LDT.MainInductionStep
 open MIPStarRE.LDT
 open scoped MatrixOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+universe uι
+
+variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 /-- Transport data for producing the answer-valued self-improvement data from
 concrete per-slice symmetric strategies.
@@ -36,9 +38,9 @@ and point-measurement transports needed to move the resulting conclusions back
 to the answer-valued restricted bookkeeping.
 
 The Section 9 analytic proof debt is not stored in this record.  The data record
-constructor below calls
-`selfImprovementInInductionSection`, whose present proof gap is the tracked
-place where that work belongs. -/
+constructor below calls the paper-facing theorem
+`selfImprovementInInductionSection`; its proof applies the Section 9 theorem and
+then transports the output estimates to the answer-valued induction notation. -/
 structure AnswerSelfImprovementData.SliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
@@ -245,9 +247,9 @@ noncomputable def AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurement
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalZeroCoord_eq)
 
-/-- Assemble the slice-wise outputs feeding the answer-valued restricted-strategy
-self-improvement stage into the bookkeeping object expected by answer-valued
-Section 6 assembly.
+/-- Convert the slice-wise outputs feeding the answer-valued restricted-strategy
+self-improvement stage into the bookkeeping object expected by the answer-valued
+successor-step construction.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`. -/
@@ -332,9 +334,9 @@ The construction assumes ordinary slice strategies and their structural
 measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
 back to the answer-valued restricted-slice interface via the recorded state and
-point-measurement equalities. The theorem itself is currently a tracked proof
-gap (#1503); this constructor does not carry the Section 9 proof debt as an
-additional data record hypothesis. -/
+point-measurement equalities. The inherited Section 9 SDP proof debt is
+documented on `selfImprovementInInductionSection`; this constructor does not
+carry it as an additional data-record hypothesis. -/
 noncomputable def AnswerSelfImprovementData.ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
@@ -369,7 +371,7 @@ noncomputable def AnswerSelfImprovementData.ofSliceStrategyTransport
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
       (sliceTransport.good x)
-      (inductionPkg.sliceMeasurement x).toSubMeas
+      (inductionPkg.sliceMeasurement x)
       hconsSlice with
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_, ?_, ?_, ?_, ?_, ?_⟩

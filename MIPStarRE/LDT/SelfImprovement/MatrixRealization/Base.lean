@@ -21,9 +21,11 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open MIPStarRE.Quantum
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
+universe u
+
 /-- A concrete finite-dimensional matrix realization of the SDP data. -/
 structure MatrixSdpRealization (params : Parameters) [FieldModel params.q] where
-  space : FiniteHilbertSpace
+  space : FiniteHilbertSpace.{u}
   state : PositiveMatrixState space
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
 

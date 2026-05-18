@@ -64,9 +64,8 @@ lemma fromHToGAdjacentStageExactFacts_of_weights
   tailWeightRecurrence :=
     fromHToGTailStageMass_succ_weight_recurrence params ψbi family
 
-set_option maxHeartbeats 800000 in
--- The scalar proof expands several `rpow` square identities and a nonlinear
--- square comparison mirroring `ld-pasting.tex:1372--1375`.
+-- Keep the final product rearrangement explicit; asking `nlinarith` to find it
+-- was the only part of this scalar absorption proof that needed extra heartbeats.
 /-- The paper's scalar absorption line for `lem:from-H-to-G`.
 
 Under the side conditions needed for the `√(2ζ)` term (`γ, ζ ≥ 0` and
@@ -252,7 +251,7 @@ lemma fromHToGPaperTotalError_le
       (k : Error) * (2 * Real.sqrt (commuteGHalfSandwichError params gamma zeta k)) ≤
         42 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * thirtysecondSum := by
     have hmul := mul_le_mul_of_nonneg_left hsecond hk_nonneg
-    nlinarith
+    simpa [pow_two, mul_assoc, mul_left_comm, mul_comm] using hmul
   calc
     fromHToGPaperTotalError params gamma zeta k
         = (k : Error) * (2 * Real.sqrt (2 * zeta)) +
