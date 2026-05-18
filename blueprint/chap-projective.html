@@ -722,6 +722,8 @@
     <span class="lemma_thmtitle">Orthogonalization lemma for measurements</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -887,7 +889,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   The formalized measurement-level version of Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> is the same-space specialization of the paper lemma, with the corrected public orthonormalization envelope \(100\zeta ^{1/4}\). Thus, if \(A=\{ A_a\} \) and \(B=\{ B_a\} \) are measurements on the same finite-dimensional space satisfying </p>
+  <p>   This same-space corollary weakens Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> to the public orthonormalization envelope \(100\zeta ^{1/4}\). Thus, if \(A=\{ A_a\} \) and \(B=\{ B_a\} \) are measurements on the same finite-dimensional space satisfying </p>
 <div class="displaymath" id="a0000000145">
   \[  A_a \otimes I \simeq _\zeta I \otimes B_a  \]
 </div>
@@ -895,7 +897,7 @@
 <div class="displaymath" id="a0000000146">
   \[  A_a \otimes I \approx _{100\zeta ^{1/4}} P_a \otimes I .  \]
 </div>
-<p> This is the corrected Lean theorem proved from the Section&#160;5 projectivization repair construction; it is not a replacement for the sharper source statement \(84\zeta ^{1/4}\) in Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a>. </p>
+<p> This is the corrected Lean theorem proved from the Section&#160;5 projectivization repair construction. The sharper heterogeneous source statement \(84\zeta ^{1/4}\) is now formalized as Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a>. </p>
 
   </div>
 </div>
@@ -942,7 +944,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  The Lean declaration <span class="ttfamily">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma</span> now states Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> without adding spectral-truncation or repair hypotheses. Those construction steps belong to the proof of the lemma, not to its assumptions. The current Lean proof is therefore recorded as a tracked proof gap. The separate Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma-formalized-envelope">4.10</a> records the already proved measurement-level statement with the corrected \(100\zeta ^{1/4}\) envelope. Internal conditional lemmas may still record the already-formalized descent from explicit construction data to the local conclusion, but they are not advertised as formalizations of the paper lemma. </p>
+  <p>  The Lean declaration <span class="ttfamily">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma</span> proves Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> without adding spectral-truncation or repair hypotheses. The proof first converts the cross-consistency hypothesis into the source almost-projective estimate for the left-lifted measurement, and then applies the locality-preserving \(Q/X/\widehat X/P\) construction in its heterogeneous left-register form. Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma-formalized-envelope">4.10</a> remains as the same-space corollary with the weaker public \(100\zeta ^{1/4}\) envelope. </p>
 
   </div>
 </div>
