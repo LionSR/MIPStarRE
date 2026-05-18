@@ -9,8 +9,8 @@ arguments; they are reported as warnings but do **not** cause the check to fail.
 Once a known file is split, remove it from the ``--known`` list.
 
 Note: as of 2026-05-03, ``main`` still had ~19 files exceeding the threshold.
-As of 2026-05-07, only 1 remains: ``BoundednessTransport.lean`` (tracked by
-#1127 partial split).
+After the boundedness-transport split tracked by #1647, there should be no
+known oversized Lean files.
 """
 
 from __future__ import annotations
