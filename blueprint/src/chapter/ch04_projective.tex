@@ -1202,14 +1202,13 @@
 	\begin{remark}[Lean status for the QXP algebra]\label{rem:qxp-layer-lean-status}
 		The Lean declarations linked in Lemmas~\ref{lem:X-squared},
 		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} expose the
-		corresponding matrix identities as construction theorems.  The
-		\texttt{QXPLayerData} structure still stores these identities for later
-		algebraic use, but the Lean declarations listed above point to theorems
-		proving the identities from the \(Q\)-layer, sigma-range, or
-		rectangular-SVD hypotheses.  Thus the local \(X/\widehat X/P\) algebra is
-		formalized; the remaining chapter-level work is to connect the completed
-		projectivization route to this construction without additional bridge
-		inputs.
+		corresponding matrix identities as construction theorems.  These
+		declarations prove the identities from the \(Q\)-layer, the sigma-range
+		realization, and the positive-Gram spectral construction, with the
+		rectangular-SVD calculation retained as an auxiliary comparison.  Thus the
+		local \(X/\widehat X/P\) algebra is formalized; the remaining chapter-level
+		work is to compose this construction with the preceding orthonormalization
+		step from the paper hypotheses.
 	\end{remark}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
