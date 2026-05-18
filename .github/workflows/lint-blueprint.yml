@@ -74,8 +74,9 @@ jobs:
       - name: Test blueprint Python helpers
         run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
 
-      - name: Check blueprint LaTeX conventions
-        run: python3 scripts/check_blueprint_latex.py --root blueprint/src
+      # Blueprint LaTeX convention lint (scripts/check_blueprint_latex.py) runs
+      # locally in .githooks/pre-commit. The unit tests above still exercise the
+      # checker, but the active blueprint/src scan is the pre-commit hook's job.
 
       - name: Run leanblueprint pdf (catches undefined macros and LaTeX errors)
         working-directory: blueprint

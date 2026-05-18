@@ -18,7 +18,7 @@ echo "MIPStarRE pre-commit: checking staged whitespace."
 git diff --cached --check
 
 if printf '%s\n' "$STAGED_FILES" | grep -Eq \
-  '^(blueprint/src/|scripts/(check_blueprint_latex|tex_utils)\.py)'; then
+  '^(blueprint/src/.*\.(tex|sty|cls)|scripts/(check_blueprint_latex|tex_utils)\.py|scripts/tests/test_check_blueprint_latex\.py|\.githooks/pre-commit)$'; then
   echo "MIPStarRE pre-commit: checking blueprint LaTeX conventions."
   python3 scripts/check_blueprint_latex.py --root blueprint/src
 fi
