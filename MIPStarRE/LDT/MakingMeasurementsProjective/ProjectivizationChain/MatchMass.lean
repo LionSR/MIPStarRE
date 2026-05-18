@@ -4,9 +4,9 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 # Section 10 — match-mass monotonicity for projectivization
 
 This module contains the match-mass monotonicity assertions used by the
-line-169 route in the projectivization chain described in the paper.  The statements
-isolate the additional monotonicity data needed to avoid replacing exact
-consistency by a generic triangle-loss estimate.
+line-169 route in the projectivization chain described in the paper.  The
+statements isolate the additional monotonicity data needed to avoid replacing
+exact consistency by a generic triangle-loss estimate.
 -/
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
@@ -195,48 +195,11 @@ theorem rightConsistency {Outcome : Type*} {ι : Type*}
 
 end ProjectivizationMatchMassMonotonicity
 
-/-! ### Orthonormalization match-mass preservation -/
-
-/-- Match-mass preservation input for the orthonormalization step.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:135-173`, where the
-orthonormalized submeasurements are completed and then used in the line-169
-consistency replacement.
-
-**Historical exact route:** This is the one-sided preservation assertion for the
-paper-tight line-169 replacement step.  It is below the source theorem
-boundary; a paper-facing theorem must construct it, not assume it as an added
-hypothesis.  The active `mainFormal` route no longer depends on this exact
-interface.
-
-Asserts that the projective submeasurement `P` produced by orthonormalization
-preserves at least as much bipartite correlation with a fixed partner
-measurement `B` as the original measurement `G` did.  This is a
-construction-level property of the specific orthonormalization used; it is not
-a consequence of `SDDRel` closeness alone.
-
-This structure states the exact mathematical assertion required for the
-line-169 route described in the paper.  It should be constructed by a named
-orthonormalization theorem for the chosen witnesses, not added as a hypothesis
-to a theorem cited as a paper statement.  The downstream `leftConsistency` and
-`rightConsistency` theorems explain why this assertion is exactly the input
-needed to recover the paper's `ζ₁` line-169 consistency links. -/
-structure OrthonormalizationMatchMassPreservation
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (G : Measurement Outcome ι) (P : ProjSubMeas Outcome ι)
-    (B : Measurement Outcome ι) : Prop where
-  /-- The projective submeasurement `P` has at least as much diagonal match mass
-  with `B` as the original `G` did. -/
-  matchMassPreservation :
-    qBipartiteMatchMass ψ P.toSubMeas B.toSubMeas ≥
-      qBipartiteMatchMass ψ G.toSubMeas B.toSubMeas
-
-namespace OrthonormalizationMatchMassPreservation
+/-! ### Match-mass inequality from pointwise domination -/
 
 /-- Pointwise domination of the source measurement by the orthonormalized
-projective submeasurement implies match-mass preservation.
+projective submeasurement implies match-mass preservation against any fixed
+right-side submeasurement.
 
 This is the local algebraic assertion needed by the line-169 route in the paper:
 once the concrete orthonormalization construction proves
@@ -255,58 +218,17 @@ Thus this theorem is only a sufficient tautological constructor for that
 degenerate scope.  It is not a nontrivial orthonormalization repair proof: the
 paper gives state-dependent-distance closeness, not the operator inequality
 `G.outcome a ≤ P.outcome a`. -/
-theorem of_outcome_le {Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
-    {ψ : QuantumState (ι × ι)} {G : Measurement Outcome ι}
-    {P : ProjSubMeas Outcome ι} {B : Measurement Outcome ι}
+theorem matchMass_le_of_outcome_le {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    {ψ : QuantumState (ιA × ιB)} {G : Measurement Outcome ιA}
+    {P : ProjSubMeas Outcome ιA} {B : Measurement Outcome ιB}
     (hpoint : ∀ a : Outcome, G.outcome a ≤ P.outcome a) :
-    OrthonormalizationMatchMassPreservation ψ G P B := by
-  constructor
+    qBipartiteMatchMass ψ G.toSubMeas B.toSubMeas ≤
+      qBipartiteMatchMass ψ P.toSubMeas B.toSubMeas := by
   unfold qBipartiteMatchMass
   exact Finset.sum_le_sum fun a _ =>
     ev_mono ψ _ _ <| opTensor_mono_left (hpoint a) (B.toSubMeas.outcome_pos a)
-
-/-- Outcomewise expectation-level preservation for the orthonormalization step.
-
-This is weaker than a pointwise operator inequality `G.outcome a ≤ P.outcome a`:
-it asks only for the diagonal contribution tested against the fixed partner
-measurement `B` and the ambient state `ψ`.  It supplies the exact match-mass
-preservation that generic state-dependent-distance closeness alone does not
-yield for the paper's line-169 `ζ₁` route, avoiding the `sqrt ζ₂` loss from
-`triangleSub`. -/
-structure OutcomeExpectationPreservation
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (G : Measurement Outcome ι) (P : ProjSubMeas Outcome ι)
-    (B : Measurement Outcome ι) : Prop where
-  /-- Each diagonal outcome contribution is preserved after replacing `G` by
-  the projective submeasurement `P`. -/
-  outcomeExpectation :
-    ∀ a : Outcome,
-      ev ψ (opTensor (G.outcome a) (B.outcome a)) ≤
-        ev ψ (opTensor (P.outcome a) (B.outcome a))
-
-/-- Summing the outcomewise expectation-level preservation inequalities gives
-the primitive match-mass preservation input consumed by the line-169 interface.
-
-This theorem is intentionally state- and partner-dependent.  It does not assert
-that orthonormalization is monotone in the operator order; rather, it isolates
-the exact non-degenerate expectation-level property that a concrete
-orthonormalization repair must supply to avoid the generic `triangleSub` loss. -/
-theorem of_outcome_expectation
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    {ψ : QuantumState (ι × ι)}
-    {G : Measurement Outcome ι} {P : ProjSubMeas Outcome ι}
-    {B : Measurement Outcome ι}
-    (hpreserve : OutcomeExpectationPreservation ψ G P B) :
-    OrthonormalizationMatchMassPreservation ψ G P B := by
-  refine ⟨?_⟩
-  unfold qBipartiteMatchMass
-  exact Finset.sum_le_sum fun a _ => hpreserve.outcomeExpectation a
-
-end OrthonormalizationMatchMassPreservation
 
 namespace ProjectivizationMatchMassMonotonicity
 
@@ -330,11 +252,11 @@ theorem of_submeasurement_match_mass_and_completion
     (Q_A Q_B : ProjMeas Outcome ι)
     (hQALeft : Q_A.toMeasurement = completeAtOutcome P_A.toSubMeas a_A)
     (hQBRight : Q_B.toMeasurement = completeAtOutcome P_B.toSubMeas a_B)
-    (hleftPreservation : OrthonormalizationMatchMassPreservation ψ G_A P_A G_B)
-    (hrightPreservation : OrthonormalizationMatchMassPreservation ψ G_B P_B G_A) :
+    (hleft : qBipartiteMatchMass ψ P_A.toSubMeas G_B.toSubMeas ≥
+      qBipartiteMatchMass ψ G_A.toSubMeas G_B.toSubMeas)
+    (hright : qBipartiteMatchMass ψ P_B.toSubMeas G_A.toSubMeas ≥
+      qBipartiteMatchMass ψ G_B.toSubMeas G_A.toSubMeas) :
     ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B := by
-  rcases hleftPreservation with ⟨hleft⟩
-  rcases hrightPreservation with ⟨hright⟩
   have hQALeftProj : Q_A = completeAtOutcomeProj P_A a_A :=
     ProjMeas.ext fun a =>
       congrArg (fun (M : Measurement Outcome ι) => M.outcome a)
@@ -349,14 +271,12 @@ theorem of_submeasurement_match_mass_and_completion
 /-- Construct the line-169 match-mass invariant from pointwise domination of the
 two orthonormalized submeasurements and the canonical completion equalities.
 
-This inherits the degenerate scope of
-`OrthonormalizationMatchMassPreservation.of_outcome_le`.  With
-`G_A G_B : Measurement Outcome ι` and `P_A P_B : ProjSubMeas Outcome ι`, the
-pointwise domination hypotheses are only expected when the source measurements
-already agree pointwise with the projective submeasurements (equivalently, in
-the no-change/projective-source case).  The theorem is therefore a sufficient
-constructor that composes the completion step with tautological preservation
-witnesses, not a nontrivial orthonormalization repair proof. -/
+With `G_A G_B : Measurement Outcome ι` and
+`P_A P_B : ProjSubMeas Outcome ι`, the pointwise domination hypotheses are
+only expected when the source measurements already agree pointwise with the
+projective submeasurements.  The theorem is therefore a sufficient constructor
+that composes the completion step with tautological preservation inequalities,
+not a nontrivial orthonormalization repair proof. -/
 theorem of_completion_and_outcome_le
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -370,8 +290,10 @@ theorem of_completion_and_outcome_le
     ProjectivizationMatchMassMonotonicity ψ G_A G_B Q_A Q_B :=
   of_submeasurement_match_mass_and_completion P_A P_B a_A a_B Q_A Q_B
     hQALeft hQBRight
-    (OrthonormalizationMatchMassPreservation.of_outcome_le hleftPoint)
-    (OrthonormalizationMatchMassPreservation.of_outcome_le hrightPoint)
+    (matchMass_le_of_outcome_le (ψ := ψ) (G := G_A) (P := P_A)
+      (B := G_B) hleftPoint)
+    (matchMass_le_of_outcome_le (ψ := ψ) (G := G_B) (P := P_B)
+      (B := G_A) hrightPoint)
 
 end ProjectivizationMatchMassMonotonicity
 

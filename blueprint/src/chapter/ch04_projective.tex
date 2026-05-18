@@ -147,9 +147,8 @@
 	\uses{thm:orthonormalization, prop:completing-to-measurement, prop:triangle-sub}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completeAtOutcomeProj}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_le, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completion_and_outcome_le}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.OutcomeExpectationPreservation, MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizationMatchMassPreservation.of_outcome_expectation}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matchMass_le_of_outcome_le, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_submeasurement_match_mass_and_completion}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.of_completion_and_outcome_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.leftConsistency, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.rightConsistency}
@@ -197,16 +196,15 @@
 	projective sub-measurements preserve the relevant diagonal match mass, completing
 	them at a distinguished outcome produces the required invariant for the
 	completed projective measurements.  The remaining upstream projectivization work
-	is therefore the corresponding preservation property for the orthonormalization
-	repair output.  The pointwise-domination constructor records the degenerate
-	no-change situation in which the source measurement is already dominated by the
-	projective submeasurement.  The expectation-level constructors refine the
-	non-degenerate residual without requiring operator domination: it is enough to
-	prove, for each outcome, that the diagonal match-mass contribution against the
-	fixed partner measurement is preserved.  The former QXP-specialized target has
-	been removed, because the present Section~5 API supplies state-dependent
-	distance estimates and QXP algebra, but not a signed monotonicity statement
-	against an arbitrary partner measurement.
+	is therefore the corresponding preservation inequality for the
+	orthonormalization repair output.  The pointwise-domination lemma records the
+	degenerate no-change situation in which the source measurement is already
+	dominated by the projective submeasurement.  The former expectation-preservation
+	structures have been removed: they merely restated the required match-mass
+	inequality and were not produced by the Section~5 construction.  The former
+	QXP-specialized target has likewise been removed, because the present Section~5
+	API supplies state-dependent distance estimates and QXP algebra, but not a
+	signed monotonicity statement against an arbitrary partner measurement.
 \end{remark}
 
 \subsection{Naimark dilation}\label{sec:naimark}
