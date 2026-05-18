@@ -72,6 +72,7 @@ lemma pointMeasurement_total_evalFamily_total_ev_eq_rightTensor
   rw [leftTensor_mul_rightTensor_eq_opTensor]
   exact pointMeasurement_total_evalFamily_total_opTensor_ev_eq_rightTensor
     params strategy S u
+
 /-- The helper-stage consistency defect is exactly the averaged off-diagonal
 mass appearing in the point-consistency `add-in-u` calculation.
 
