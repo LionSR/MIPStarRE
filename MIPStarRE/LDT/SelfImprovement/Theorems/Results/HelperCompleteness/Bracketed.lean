@@ -579,7 +579,6 @@ theorem sdp_slackness_measurement
   SdpStatementWithSlackness.exists_measurement_witness
     (sdp_statement_with_slackness params strategy)
 
-set_option maxHeartbeats 800000 in
 -- The reduced add-in-u lemma invokes the global-variance transport record and
 -- checks the full polynomial-indexed variance family.
 /-- Reduced version of `lem:add-in-u`.

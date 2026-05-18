@@ -518,7 +518,6 @@ lemma add_in_u_cs_chain_global_variance_steps_of_sum_bound_from_factor_bounds
     (add_in_u_cs_chain_q2_q3_le_sqrt_globalVarianceDeviation_sum params strategy T)
     (add_in_u_cs_chain_q3_q4_le_sqrt_globalVarianceDeviation_sum params strategy T)
 
-set_option maxHeartbeats 800000 in
 -- This bridge applies the global-variance sum transfer and the two
 -- Cauchy--Schwarz factor bounds, all over the polynomial-indexed family.
 /-- Local-variance-sum version of the combined Step 3/4 variance bridge.
@@ -558,7 +557,6 @@ lemma add_in_u_cs_chain_global_variance_steps_of_local_sum_bound
       params strategy eps delta T hlocal)
     h23cs h34cs
 
-set_option maxHeartbeats 800000 in
 -- This lemma composes the local-to-global sum transfer with the first
 -- projection-simplified Cauchy--Schwarz factor estimate.
 /-- Closed local-variance bridge for the first projection-simplified
@@ -583,7 +581,6 @@ lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_localVarianceDeviation_sum_le_from_fact
     (globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le
       params strategy eps delta T hlocal)
 
-set_option maxHeartbeats 800000 in
 -- This lemma composes the local-to-global sum transfer with the second
 -- projection-simplified Cauchy--Schwarz factor estimate.
 /-- Closed local-variance bridge for the second projection-simplified
