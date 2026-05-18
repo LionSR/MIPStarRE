@@ -108,7 +108,6 @@ def rebaseAt {params : Parameters} [FieldModel params.q]
   ext i
   simp [rebaseAt, pointAt, addPoint, smulPoint, addCoord, mulCoord, zeroCoord]
 
-set_option linter.style.setOption false
 theorem rebaseAt_pointAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) (t s : Fq params) :
     (rebaseAt ℓ t).pointAt s = ℓ.pointAt (addCoord t s) := by

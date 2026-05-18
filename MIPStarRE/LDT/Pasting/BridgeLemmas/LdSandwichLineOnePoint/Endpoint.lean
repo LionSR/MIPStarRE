@@ -106,7 +106,7 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon
   convert hprod' using 2
 
 -- The proof compares the one-question equivalence with the endpoint
--- formulation; the displayed `simp only` list records the two equivalent
+-- formulation; the chain of rewriting identities records the two equivalent
 -- presentations of the same postprocessed submeasurement.
 lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
     (params : Parameters)
@@ -143,7 +143,7 @@ lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
         exact (postprocess_postprocess _ _ _).symm
 
 -- The proof lifts the endpoint consistency relation through the split
--- sandwiched-line equivalence; the displayed `simp only` list unfolds this
+-- sandwiched-line equivalence; the chain of rewriting identities unfolds this
 -- equivalence and the endpoint-family definition.
 lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
     (params : Parameters)

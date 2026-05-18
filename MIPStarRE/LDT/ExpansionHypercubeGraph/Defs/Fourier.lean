@@ -227,7 +227,6 @@ lemma GlobalVarianceDecomposition.orthogonalComponent_eq_sub_average
   rw [eq_sub_iff_add_eq]
   simpa [add_comm, add_left_comm, add_assoc] using (decomp.decomposition u).symm
 
-set_option linter.style.setOption false
 /-- The canonical decomposition from `lem:global-rewrite`.
 
 Its `averageComponent` is the paper's `A_avg = E_u A^u = (1/M) · ∑_u A^u`, and its
