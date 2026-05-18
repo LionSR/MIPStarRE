@@ -129,6 +129,14 @@ example `ldt-basic`, `preliminaries`, `commutativity`, `pasting`,
 `documentation`, `ci`, `cleanup`, and/or `refactor` instead of
 `formalization`.
 
+When the work concerns content that exists only in the blueprint and not in
+the original paper (arXiv:2009.12982), apply the `blueprint-only` label
+alongside the chapter or theorem-family labels.  Omit `blueprint-only` when the
+work concerns a statement or definition that appears in the paper.  An issue
+may need both `2009.12982` and `blueprint-only` when it spans paper-present
+content and blueprint-exclusive scaffolding or auxiliary lemmas; in that case
+apply both labels so the scope is explicit.
+
 Every formalization issue must give enough mathematical source information to
 make the issue self-contained:
 
@@ -315,6 +323,12 @@ label set.
 | Label        | Description                                          |
 |--------------|------------------------------------------------------|
 | `2009.12982` | The main LDT paper tracked in this repository        |
+
+### Blueprint provenance
+
+| Label            | Description                                                      |
+|------------------|------------------------------------------------------------------|
+| `blueprint-only` | Content exclusive to the blueprint (not in the original paper)   |
 
 ### Tracking / follow-up labels
 
