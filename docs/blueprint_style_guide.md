@@ -196,7 +196,12 @@ Excerpt from `blueprint/src/chapter/ch08_commutativity.tex:8-19`:
 
 `leanblueprint` does not use distinct macro names for these two claims, so audits must distinguish them by environment context rather than by raw `\leanok` counts. A future split such as `\leanokstmt` / `\leanokproof` could make that distinction explicit, but that is only a possible later cleanup; the current convention is to keep `\leanok` and rely on placement.
 
-A recurring example is the chapter 4 `Q/X/\widehat X/P` witness layer: `lem:X-squared`, `lem:X-hat-squared`, `lem:X-times-X-hat`, and `lem:P-Q-approx` intentionally stop at statement-level `\leanok`. Their current Lean declarations only unpack identities or bounds stored on the chosen witness data, so proof-level `\leanok` would overclaim until a theorem actually constructs that data from the upstream hypotheses.
+A recurring historical example is the chapter 4 `Q/X/\widehat X/P` witness
+layer.  Once Lean has construction theorems deriving the displayed identities
+and estimates from the rank-reduction, sigma-range, positive-Gram, or
+rectangular-SVD hypotheses, the corresponding blueprint entries may carry
+`\leanok`.  A declaration that merely projects an identity from an opaque data
+record is not enough by itself.
 
 ## Dependency Graph Colors (web)
 - **Light green box**: definition with `\lean` + `\leanok` (defined in Lean)

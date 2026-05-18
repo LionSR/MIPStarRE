@@ -1117,11 +1117,13 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
+		\leanok
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		The paper proves this by multiplying out
 		$\widehat{X}=U\cdot I_{m\times d}\cdot V^\dagger$ and using the unitarity of
 		$U$ and $V$.  In Lean, the dimension hypothesis $m\leq d$ already gives a
@@ -1162,6 +1164,7 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
+		\leanok
 		\begin{equation*}
 			X \cdot \widehat{X}^\dagger =
 			U \cdot \Sigma_{m \times m} \cdot U^\dagger,
@@ -1170,6 +1173,7 @@
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:X-squared}
 		The paper obtains this from the SVD formula for $X$ and the definition of
 		$\widehat X$.  The formal lemma
@@ -1188,15 +1192,15 @@
 
 	\begin{remark}[Lean status for the QXP algebra]\label{rem:qxp-layer-lean-status}
 		The Lean declarations linked in Lemmas~\ref{lem:X-squared},
-		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} now expose the
+		\ref{lem:X-hat-squared}, and~\ref{lem:X-times-X-hat} expose the
 		corresponding matrix identities as construction theorems.  The
 		\texttt{QXPLayerData} structure still stores these identities for later
 		algebraic use, but the Lean declarations listed above point to theorems
 		proving the identities from the \(Q\)-layer, sigma-range, or
-		rectangular-SVD hypotheses.  The blueprint still refrains from declaring
-		the full late-stage orthogonalization argument source-complete until these
-		construction theorems are connected all the way to the preceding
-		rounding-to-projectors and rank-reduction route.
+		rectangular-SVD hypotheses.  Thus the local \(X/\widehat X/P\) algebra is
+		formalized; the remaining chapter-level work is to connect the completed
+		projectivization route to this construction without additional bridge
+		inputs.
 	\end{remark}
 
 	\begin{lemma}[Squared difference]\label{lem:squared-difference}
@@ -1262,11 +1266,13 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
+		\leanok
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
 		\end{equation*}
 	\end{lemma}
 	\begin{proof}
+		\leanok
 		\uses{lem:projective-low-rank-sum, lem:q-almost-projective, lem:sqrt-Q-completeness, lem:xa-t, lem:qa-restated, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity}
 		The formal proof follows this argument directly from the primitive
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
@@ -1277,9 +1283,7 @@
 		\(X X^\dagger=I\) for the original sigma embedding when the projective
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis
 		later used in the residual-domination argument for the fresh completed
-		outcome.  As in Remark~\ref{rem:qxp-layer-lean-status}, the statement is
-		left without a source-complete formalization marker until the displayed
-		identities are connected to the preceding construction route.
+		outcome.
 		The quantity to bound is
 		\begin{equation}\label{eq:P-Q-thing-to-bound}
 			\sum_a \bra{\psi} (Q_a-P_a)^2 \ot I \ket{\psi}
