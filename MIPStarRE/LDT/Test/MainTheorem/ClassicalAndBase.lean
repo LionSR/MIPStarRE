@@ -263,7 +263,7 @@ theorem strategySymmetrization_mainInduction
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps) (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params) (Role × ι),
       ConsRel (strategy.strategySymmetrization).state
         (uniformDistribution (Point params))

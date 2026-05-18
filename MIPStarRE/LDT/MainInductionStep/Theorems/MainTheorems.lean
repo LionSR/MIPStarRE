@@ -186,15 +186,16 @@ step after the restricted-probability estimates and the slice-wise recursive
 calls have been set up.
 
 This theorem is the self-contained mathematical obligation left by the
-successor case.  Its assumptions are the source assumptions of
+successor case.  Its assumptions are the corrected large-`k` hypotheses for
 `thm:main-induction`, together with the branch condition `params.m ≠ 1`; it
 does not accept restricted-probability records, per-slice induction data,
 self-improvement data, pasting data, bridge hypotheses, residual inputs, or
 data record hypotheses.  The intended proof is to construct these objects internally
-from the paper hypotheses, then apply the already checked assembly theorem
+from the theorem hypotheses, then apply the already checked assembly theorem
 `mainInductionFromStageData`.
 
-**Proof obligation:** Prove the successor branch from the paper hypotheses by
+**Proof obligation:** Prove the successor branch from the corrected large-`k`
+theorem hypotheses by
 deriving the restricted slice profiles, the recursive slice measurements, the
 slice-wise self-improvement conclusions, and the averaged pasting input inside
 the proof.  This is tracked by issues #1507 and #1458.  Discharge: construct the
@@ -207,7 +208,7 @@ theorem mainInductionSuccessor
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hk : params.m * params.d ≤ k)
+    (hk : 400 * params.m * params.d ≤ k)
     (_hm1 : params.m ≠ 1) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
@@ -215,15 +216,17 @@ theorem mainInductionSuccessor
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
   -- TODO(#1507, #1458): derive the successor-stage constructions from the
-  -- source hypotheses, rather than adding them as theorem assumptions.
+  -- corrected theorem hypotheses, rather than adding them as theorem assumptions.
   sorry
 
 /-- `thm:main-induction`.
 
-This is the statement from
+This is the corrected large-`k` Lean statement corresponding to
 `references/ldt-paper/inductive_step.tex`: a good symmetric strategy and an
-integer `k ≥ m d` produce a polynomial measurement consistent with the point
-measurement at error `mainInductionError`.
+integer `k ≥ 400 m d` produce a polynomial measurement consistent with the point
+measurement at error `mainInductionError`.  The strengthening from the printed
+`k ≥ m d` hypothesis is documented in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
 
 **Proof gap:** the base case is proved by `mainInductionBaseCase`. The
 successor case is isolated as the source-shaped theorem
@@ -240,7 +243,7 @@ theorem mainInduction
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)

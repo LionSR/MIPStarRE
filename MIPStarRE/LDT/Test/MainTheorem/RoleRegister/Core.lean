@@ -170,16 +170,15 @@ theorem ofMainInduction
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     Nonempty (MainFormalRoleInductionWitness params strategy eps hpass k) := by
   exact ofMainInductionWitness params strategy eps k hpass
     (strategySymmetrization_mainInduction params strategy eps hpass k hk)
 
 /-- Large-`k` constructor for the isolated role-register witness.
 
-The public Section 3 theorem currently assumes `400 * m * d ≤ k`.  This lemma
-uses only the weaker consequence `m * d ≤ k` needed by the
-Section 6 theorem. -/
+This alias is retained for callers that are phrased in terms of the public
+Section 3 large-`k` boundary. -/
 theorem ofMainInductionLargeK
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -187,12 +186,7 @@ theorem ofMainInductionLargeK
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (hk_large : 400 * params.m * params.d ≤ k) :
     Nonempty (MainFormalRoleInductionWitness params strategy eps hpass k) := by
-  have hk : params.m * params.d ≤ k := by
-    have hfactor : params.m * params.d ≤ 400 * params.m * params.d := by
-      have hmul := Nat.mul_le_mul_right (params.m * params.d) (by norm_num : 1 ≤ 400)
-      simpa [Nat.mul_assoc, Nat.mul_comm, Nat.mul_left_comm] using hmul
-    exact le_trans hfactor hk_large
-  exact ofMainInduction params strategy eps k hpass hk
+  exact ofMainInduction params strategy eps k hpass hk_large
 
 /-- Convert the isolated Section 6 role-register witness into the output consumed
 by unsymmetrization.
