@@ -9,7 +9,7 @@ distinguished outcome can only increase its diagonal match mass against a fixed
 partner submeasurement, because the completion adds a positive residual at a
 single outcome.
 
-The older exact line-169 monotonicity interfaces have been retired.  The active
+The older exact line-169 monotonicity assertions no longer appear in the active
 `mainFormal` route uses the repaired pre-completion transport in
 `ProjectivizationChain.Line169Repair`, and this file now keeps only the
 completion lemma that route consumes.

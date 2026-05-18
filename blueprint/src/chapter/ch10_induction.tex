@@ -750,7 +750,7 @@ line-169 estimate with error $\eta$ yields the final point error
 \[
   2\sigma + 2\sqrt{\eta+\zeta_3/2}.
 \]
-The active checked route specializes this with the repaired value
+The active formal route specializes this with the repaired value
 $\eta=\zeta_1+10\zeta_1^{1/8}$.  The existing
 \texttt{pointAConsistency} and \texttt{pointBConsistency} declarations are the
 corresponding repaired specializations.  After the \#869 right-register
@@ -779,7 +779,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
 	envelope.  The sharper local pre-completion repair from
 	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
-	widening.  Its completion step uses only the checked monotonicity helper
+	widening.  Its completion step uses only the formal monotonicity helper
 	\texttt{ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj\_left\_matchMass\_ge},
 	not a separate exact match-mass witness route.
 	No proof-level completeness tag is claimed here while \texttt{mainFormal}
