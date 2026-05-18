@@ -9,6 +9,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 
 Compatibility module for the orthonormalize-and-complete chain used in Step 6
 of the main inductive step.  The scalar and transport facts, handoff lemmas,
-match-mass interfaces, line-169 repair, and output theorem are now separated
-into reviewable leaf modules under `ProjectivizationChain/`.
+completion match-mass helper, repaired line-169 transport, and output theorem
+are now separated into reviewable leaf modules under `ProjectivizationChain/`.
 -/
