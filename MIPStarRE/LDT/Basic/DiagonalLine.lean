@@ -170,7 +170,7 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
       congr
       funext i
       by_cases hi : i.1 < params.m
-      · simp [appendPoint, addPoint, smulPoint, addCoord, mulCoord, hi]
+      · simp only [appendPoint, addPoint, smulPoint, addCoord, mulCoord, hi, ↓reduceDIte]
         rfl
       · simp only [appendPoint, hi, ↓reduceDIte, addPoint, addCoord, smulPoint, mulCoord,
           zeroCoord, decode_encodeScalar]
