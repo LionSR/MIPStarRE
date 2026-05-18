@@ -14,6 +14,44 @@
 \begin{document}
 \maketitle
 
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty.} Medium: the mathematical correction is elementary,
+  but it occurs inside the quantitative projectivization route for
+  \leanid{MIPStarRE.LDT.Test.mainFormal}.
+  \item \textbf{Estimated weight.} The correction is already formalized by one
+  completion monotonicity theorem and two transport theorems; no new theorem
+  interface is expected, and future maintenance should be at the level of tens
+  of lines rather than a new construction.
+  \item \textbf{Mathlib/project split.} About \textbf{20\% Mathlib} and
+  \textbf{80\% project-local}: Mathlib supplies positivity and real-arithmetic
+  facts, while the tensor-placement, consistency, and completion statements are
+  project-local.
+  \item \textbf{Key Mathlib inputs.} Positivity of sums and square roots,
+  elementary real arithmetic, and order reasoning for positive semidefinite
+  matrix operators.
+\end{itemize}
+
+\section{Key theorem forms}
+
+The formalization isolates the following statements.
+\begin{enumerate}
+  \item \textbf{Source theorem form.}  The paper uses the line-169 transport
+  step as if completion of the orthonormalized projective submeasurement caused
+  no additional loss beyond the original consistency error $\zeta_1$.
+  \item \textbf{Corrected theorem form.}  The formalized repair compares with
+  the pre-completion projective submeasurement, paying the square-root loss at
+  the orthonormalization scale
+  $\epsilon = 100\zeta_1^{1/4}$, and then proves that canonical completion does
+  not decrease the diagonal match mass.
+  \item \textbf{Downstream theorem form.}  The route consumed by
+  \leanid{MIPStarRE.LDT.Test.mainFormal} gives
+  \(Q^{\mathrm A}_g \otimes I
+    \simeq_{\zeta_1 + 10\zeta_1^{1/8}} I \otimes G^{\mathrm B}_g\)
+  and the Bob-side mirror.
+\end{enumerate}
+
 \section{Purpose}
 
 This note records the sharper local correction to the line-169 transport step in
@@ -27,8 +65,8 @@ The broader discrepancy note
 argument cannot yield the exact error $\zeta_1$. The present note isolates the
 sharper local repair that is now used by the active
 \leanid{MIPStarRE.LDT.Test.mainFormal} assembly.  The older exact line-169
-match-mass interface has been retired; the live Lean route keeps the repaired
-transport helper in the final theorem route instead.
+match-mass interface has been retired; the current formalization keeps the
+repaired transport helper in the final theorem route instead.
 
 The point of this repair is that the generic corrected route
 \[
@@ -170,9 +208,10 @@ is strictly better than
 for the present cascade.
 
 This quantitative distinction explains why the sharper repair was preferable
-to the generic corrected route.  It remains useful mathematical documentation,
-but it is not part of the active
-\leanid{MIPStarRE.LDT.Test.mainFormal} proof route.
+to the generic corrected route.  It is also the correction used in the active
+\leanid{MIPStarRE.LDT.Test.mainFormal} proof route: the square-root loss is
+taken before completion, and completion is then handled by the separate
+match-mass monotonicity lemma.
 
 \section{Relation with the formal development}
 
