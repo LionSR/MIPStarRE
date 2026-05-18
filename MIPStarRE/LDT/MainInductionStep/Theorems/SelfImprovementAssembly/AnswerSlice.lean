@@ -369,7 +369,7 @@ noncomputable def AnswerSelfImprovementData.ofSliceStrategyTransport
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
       (sliceTransport.good x)
-      (inductionPkg.sliceMeasurement x).toSubMeas
+      (inductionPkg.sliceMeasurement x)
       hconsSlice with
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_, ?_, ?_, ?_, ?_, ?_⟩

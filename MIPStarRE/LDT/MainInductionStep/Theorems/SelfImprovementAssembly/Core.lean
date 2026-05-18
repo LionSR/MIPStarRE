@@ -146,33 +146,33 @@ theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
 
 /-- `thm:self-improvement-in-induction-section`.
 
-The paper statement takes an arbitrary polynomial submeasurement `G` satisfying
-the stated point-consistency hypothesis.  It does not assume that `G` is the
-underlying submeasurement of a complete measurement, and it does not assume the
-Section 7 helper, orthonormalization, or final-field proof stages as external
-inputs.
+Paper origin: `references/ldt-paper/self_improvement.tex:631-811`
+(`\label{thm:self-improvement}`), restated for the induction section in
+`references/ldt-paper/inductive_step.tex:461-551`.
 
-**Proof gap:** The declaration has the paper hypotheses and conclusion, but its
-proof is still open.  Documented in issue `#1645`, downstream of `#1503`.
-Elimination plan: complete `G` by adjoining a fresh outcome `⊥`, apply the
-Section 9 self-improvement theorem to the completed measurement, and transport
-the resulting projective submeasurement and dual witness back to the original
-polynomial outcomes. -/
+The input \(G\) is a complete polynomial measurement, as in the paper's
+restated self-improvement theorem.  The conclusion is phrased in the Section 6
+record `SelfImprovementInInductionSectionConclusion`, whose fields are exactly
+the projective output estimates used by the successor-step assembly. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta gamma nu : Error)
     (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeas (Polynomial params) ι)
+    (G : Measurement (Polynomial params) ι)
     (hcons : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params G) nu) :
+        (polynomialEvaluationFamily params G.toSubMeas) nu) :
     ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementInInductionSectionConclusion params strategy G H Z eps delta gamma nu := by
-  -- Source-faithful proof gap (#1645, downstream of #1503): complete `G` by
-  -- adjoining a fresh outcome, apply Section 9 self-improvement, and restrict
-  -- the resulting conclusion back to polynomial outcomes.
+      SelfImprovementInInductionSectionConclusion params strategy G.toSubMeas H Z
+        eps delta gamma nu := by
+  -- Source-faithful proof gap (#1645, downstream of #1503): apply the Section 9
+  -- self-improvement theorem to the measurement `G` and transport its fields by
+  -- `selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion`.
+  -- The present obstruction is formal rather than mathematical: the completed
+  -- Section 9 proof stack is still specialized to universe level 0, while the
+  -- Section 6 strategy interface is universe-polymorphic.
   sorry
 
 /-- Assemble the slice-wise outputs feeding `selfImprovementInInductionSection`
@@ -510,7 +510,7 @@ noncomputable def SelfImprovementData.ofSliceStrategyTransport
       (restrictionPkg.profile.diagonal x)
       (inductionPkg.sliceError x)
       (sliceTransport.good x)
-      (inductionPkg.sliceMeasurement x).toSubMeas
+      (inductionPkg.sliceMeasurement x)
       hconsSlice with
     ⟨H, Z, hH⟩
   refine ⟨H, Z, ?_⟩
