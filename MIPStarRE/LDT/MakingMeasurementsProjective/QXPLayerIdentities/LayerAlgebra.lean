@@ -343,6 +343,24 @@ lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
     data.qLayer.q.outcome none ≤ Pa data none :=
   le_of_eq (qa_eq_pa_of_xHatA_eq_xa data none hrow)
 
+/-- Coisometry of the sigma-space embedding gives the fresh-row comparison
+`Q_none ≤ P_none`.
+
+If the source matrix `X` has orthonormal rows, then the polar replacement
+preserves the fresh `none` row.  The corresponding `P_none` operator is
+therefore equal to, and hence dominates, the fresh `Q_none` operator. -/
+lemma q_outcome_none_le_p_outcome_none_of_x_coisometry {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData (Option Outcome) ι)
+    (hx_left :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier)) :
+    data.qLayer.q.outcome none ≤ Pa data none := by
+  have hrow : XHatA data none = Xa data none :=
+    xHatA_eq_xa_of_x_mul_conjTranspose_eq_one data none hx_left
+  exact fresh_outcome_le_of_xHatA_eq_xa data hrow
+
 private lemma xHat_mixed_adjoint {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

@@ -471,8 +471,8 @@ lemma qSDD_leftPlaced_zeroProjSubMeas_le_one {Outcome : Type*}
 /-- Square-register specialization of
 `qSDD_leftPlaced_zeroProjSubMeas_le_one`.
 
-This is the compatibility form for the older `SubMeas.liftLeft` notation; its
-proof is just the heterogeneous left-placement estimate with `ιA = ιB`. -/
+This is the same bound expressed in the `SubMeas.liftLeft` notation; it follows
+from the heterogeneous left-placement estimate with `ιA = ιB`. -/
 lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
