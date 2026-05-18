@@ -540,17 +540,19 @@ this by Slater strong duality and complementary slackness after passing through
 the canonical SDP form.
 
 The proof is deferred to the formalized strong-duality argument for the Section
-9 SDP.  This theorem records the unconditional paper statement used by the
-strengthened self-improvement helper. -/
+9 SDP.  The remaining proof obligation is now isolated as the matrix-level
+statement `matrixSdpPointRealization_statementWithSlackness`; this theorem
+transports that saturated canonical SDP output to the abstract self-improvement
+interface. -/
 theorem sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatementWithSlackness params strategy := by
-  -- TODO(#1230): prove the Section 9 SDP strong-duality and complementary-slackness
-  -- statement from the paper hypotheses, rather than treating slackness as an
-  -- external input to the helper completeness argument.
-  sorry
+  exact
+    MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness
+      params strategy
+      (matrixSdpPointRealization_statementWithSlackness params strategy)
 
 /-- Displayed measurement and complementary-slackness conclusion of `lem:sdp`.
 

@@ -617,4 +617,34 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity
   sdpMeasurementWitness_of_canonicalOptimalPairWithDominance
     params strategy X Z (h.withDominance hOneLe)
 
+/-- Matrix-level strong-duality and complementary-slackness obligation for the
+point-measurement realization of the Section 9 SDP.
+
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
+(`\label{lem:sdp}` and the proof using Slater's condition).  The paper first
+rewrites the primal and dual SDPs in canonical block form, invokes strong
+duality, and then applies complementary slackness to obtain a saturated optimal
+pair.
+
+This is the remaining source-faithful proof obligation for the formalized SDP
+route.  Its conclusion is the matrix-level statement
+`MatrixSdpStatementWithSlackness` for the concrete point-measurement realization
+associated to the strategy.  It does not assume the auxiliary dominance
+condition `I ≤ Z`; the saturated slack block is part of the expected
+strong-duality output.  Once this theorem is proved, the abstract source theorem
+`sdp_statement_with_slackness` follows by
+`MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness`.
+
+Tracked by issue #1230 and documented in
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`. -/
+theorem matrixSdpPointRealization_statementWithSlackness
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι) :
+    MatrixSdpStatementWithSlackness params
+      (matrixSdpPointRealizationOfStrategy params strategy) := by
+  -- TODO(#1230): prove the finite-dimensional SDP strong-duality and
+  -- complementary-slackness theorem for the canonical block realization.
+  sorry
+
 end MIPStarRE.LDT.SelfImprovement

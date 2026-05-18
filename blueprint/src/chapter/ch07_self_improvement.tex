@@ -592,6 +592,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_statementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}
@@ -664,10 +665,14 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
   % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
   % proves only the reduced SdpStatement fragment, while the full slackness
-  % conclusion is recorded as the visible, deferred theorem
-  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness and its displayed
-  % measurement consequence MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement,
-  % whose proof is still \notready (see proof block below).
+  % conclusion is recorded as the visible, deferred matrix-level obligation
+  % MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_statementWithSlackness.
+  % The abstract theorem
+  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness is proved by
+  % transporting this obligation to the self-improvement notation, and the
+  % displayed measurement consequence
+  % MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement still depends on the
+  % same \notready matrix strong-duality step (see proof block below).
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
