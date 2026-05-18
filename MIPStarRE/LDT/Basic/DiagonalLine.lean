@@ -111,26 +111,9 @@ def rebaseAt {params : Parameters} [FieldModel params.q]
 theorem rebaseAt_pointAt {params : Parameters} [FieldModel params.q]
     (ℓ : DiagonalLine params) (t s : Fq params) :
     (rebaseAt ℓ t).pointAt s = ℓ.pointAt (addCoord t s) := by
-  funext i
-  suffices
-      addCoord (addCoord (ℓ.base i) (mulCoord t (ℓ.direction i)))
-          (mulCoord s (ℓ.direction i)) =
-        addCoord (ℓ.base i) (mulCoord (addCoord t s) (ℓ.direction i)) by
-    simpa [rebaseAt, pointAt, addPoint, smulPoint] using this
-  change
-    encodeScalar
-        (decodeScalar
-            (encodeScalar
-              (decodeScalar (ℓ.base i) +
-                decodeScalar (encodeScalar (decodeScalar t * decodeScalar (ℓ.direction i))))) +
-          decodeScalar (encodeScalar (decodeScalar s * decodeScalar (ℓ.direction i)))) =
-      encodeScalar
-        (decodeScalar (ℓ.base i) +
-          decodeScalar
-            (encodeScalar
-              (decodeScalar (encodeScalar (decodeScalar t + decodeScalar s)) *
-                decodeScalar (ℓ.direction i))))
-  simp only [decode_encodeScalar]
+  ext i
+  simp only [pointAt, addPoint, addCoord, rebaseAt, smulPoint, mulCoord, decode_encodeScalar]
+  rw [← encode_decodeScalar (ℓ.base i)]
   congr 1
   ring_nf
 
@@ -187,33 +170,20 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
       congr
       funext i
       by_cases hi : i.1 < params.m
-      · have hleft :
-            appendPoint params (addPoint base (smulPoint t direction)) x i =
-              addCoord (base ⟨i.1, hi⟩) (mulCoord t (direction ⟨i.1, hi⟩)) := by
-          simp [appendPoint, addPoint, smulPoint, hi]
-        have hright :
-            addPoint (appendPoint params base x)
-                (smulPoint t (appendPoint params direction zeroCoord)) i =
-              addCoord (base ⟨i.1, hi⟩) (mulCoord t (direction ⟨i.1, hi⟩)) := by
-          simp [appendPoint, addPoint, smulPoint, hi]
-          congr
-        rw [hleft, hright]
-      · have hleft :
-            appendPoint params (addPoint base (smulPoint t direction)) x i = x := by
-          simp [appendPoint, hi]
-        have hright :
-            addPoint (appendPoint params base x)
-                (smulPoint t (appendPoint params direction zeroCoord)) i =
-              addCoord x (mulCoord t zeroCoord) := by
-          simp [appendPoint, addPoint, smulPoint, hi]
-          rfl
-        rw [hleft, hright]
-        change x = addCoord x (mulCoord t zeroCoord)
+      · simp only [appendPoint, addPoint, smulPoint, addCoord, mulCoord, hi, ↓reduceDIte]
+        rfl
+      · simp only [appendPoint, hi, ↓reduceDIte, addPoint, addCoord, smulPoint, mulCoord,
+          zeroCoord, decode_encodeScalar]
         rw [← encode_decodeScalar x]
-        unfold addCoord mulCoord zeroCoord
-        simp only [decode_encodeScalar]
         congr 1
-        ring_nf
+        calc
+          decodeScalar x = decodeScalar x + decodeScalar t * (0 : Scalar params) := by ring
+          _ = decodeScalar (encodeScalar (decodeScalar x)) +
+                decodeScalar t * decodeScalar (encodeScalar 0) := by
+              rw [show decodeScalar (encodeScalar (decodeScalar x)) = decodeScalar x from
+                  decode_encodeScalar (decodeScalar x),
+                show decodeScalar (encodeScalar (0 : Scalar params)) = (0 : Scalar params) from
+                  decode_encodeScalar (0 : Scalar params)]
 
 end DiagonalLine
 
