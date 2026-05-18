@@ -228,7 +228,7 @@
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
   \]
@@ -249,8 +249,8 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated as the
 	source-shaped proof obligation
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor}.  This
-	declaration has the source assumptions of the successor branch, together with
-	the branch condition \(m\ne1\); it does not take restricted-probability,
+	declaration has the corrected large-\(k\) assumptions of the successor branch,
+	together with the branch condition \(m\ne1\); it does not take restricted-probability,
 	recursive-slice, self-improvement, or pasting records as hypotheses.  The
 	nearby formalization still names the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionData, MIPStarRE.LDT.MainInductionStep.PerSliceInductionData, MIPStarRE.LDT.MainInductionStep.SelfImprovementData, MIPStarRE.LDT.MainInductionStep.AveragedPastingData}
@@ -270,7 +270,7 @@
 	successor-step constructions, including the restricted-strategy
 	self-improvement and slice-transport construction
 	tracked by issues \#1507 and \#1503 under the bridge-debt tracker \#1458,
-	from the paper hypotheses; hence no proof-level \leanok is attached here.
+	from the corrected theorem hypotheses; hence no proof-level \leanok is attached here.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
