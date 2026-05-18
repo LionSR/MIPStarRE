@@ -176,15 +176,14 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
           zeroCoord, decode_encodeScalar]
         rw [← encode_decodeScalar x]
         congr 1
-        have hx' : decodeScalar (encodeScalar (decodeScalar x)) = decodeScalar x :=
-          decode_encodeScalar (decodeScalar x)
-        have hz' : decodeScalar (encodeScalar (0 : Scalar params)) = (0 : Scalar params) :=
-          decode_encodeScalar (0 : Scalar params)
         calc
           decodeScalar x = decodeScalar x + decodeScalar t * (0 : Scalar params) := by ring
-          _ = decodeScalar x + decodeScalar t * decodeScalar (encodeScalar 0) := by rw [hz']
           _ = decodeScalar (encodeScalar (decodeScalar x)) +
-                decodeScalar t * decodeScalar (encodeScalar 0) := by rw [hx']
+                decodeScalar t * decodeScalar (encodeScalar 0) := by
+              rw [show decodeScalar (encodeScalar (decodeScalar x)) = decodeScalar x from
+                  decode_encodeScalar (decodeScalar x),
+                show decodeScalar (encodeScalar (0 : Scalar params)) = (0 : Scalar params) from
+                  decode_encodeScalar (0 : Scalar params)]
 
 end DiagonalLine
 
