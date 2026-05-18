@@ -195,7 +195,7 @@ theorem rightConsistency {Outcome : Type*} {ι : Type*}
 
 end ProjectivizationMatchMassMonotonicity
 
-/-! ### Orthonormalization match-mass preservation -/
+/-! ### Match-mass inequality from pointwise domination -/
 
 /-- Pointwise domination of the source measurement by the orthonormalized
 projective submeasurement implies match-mass preservation against any fixed
