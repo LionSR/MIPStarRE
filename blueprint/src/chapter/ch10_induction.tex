@@ -559,11 +559,11 @@
 	\uses{def:main-formal-step6-obligations, thm:main-induction}
 	The role-register Section~6 measurement is obtained by applying the
 	paper-facing theorem \texttt{MainInductionStep.mainInduction} to the
-	role-register symmetrization.  The Lean constructor
+	role-register symmetrization.  The construction
 	\texttt{strategySymmetrization\_mainInduction} records this
 	application, and \texttt{MainFormalRoleInductionWitness.ofMainInduction}
 	builds the role-register witness from it.  Any successor proof gap is the
-	tracked \texttt{sorry} in \texttt{mainInduction} itself
+	remaining proof obligation in \texttt{mainInduction} itself
 	(Remark~\ref{rem:main-induction-successor-assembly}, tracked by
 	\ghissue{1507}).  These targets are not an added hypothesis of
 	Theorem~\ref{thm:main-formal} but internal proof steps whose completion
