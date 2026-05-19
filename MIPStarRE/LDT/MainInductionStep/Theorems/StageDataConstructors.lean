@@ -295,6 +295,34 @@ noncomputable def AnswerPerSliceInductionData.ofLegacy
     intro x
     simpa [SliceRestrictionData.ofAnswer] using legacyInduction.error_le x
 
+/-- View answer-valued recursive slice-wise induction witnesses as legacy
+per-slice induction data after forgetting the answer-valued diagonal alphabet.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.  The point
+measurements of `xRestrictedAnswerSymStrat` and `xRestrictedStrategy` are
+definitionally the same slice of the ambient point measurement, so the
+consistency witnesses and error bounds transport without changing the
+mathematical content. -/
+noncomputable def PerSliceInductionData.ofAnswer
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (answerInduction :
+      AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k) :
+    PerSliceInductionData params strategy eps delta gamma
+      (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k where
+  sliceError := answerInduction.sliceError
+  sliceMeasurement := answerInduction.sliceMeasurement
+  pointConsistency := by
+    intro x
+    simpa using answerInduction.pointConsistency x
+  error_le := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer] using answerInduction.error_le x
+
 /-- Forget an answer-valued self-improvement data record when the target legacy
 induction data record is the one used by the legacy assembly.
 
@@ -328,6 +356,60 @@ noncomputable def SelfImprovementData.ofAnswerForLegacy
   pointConsistency := by
     intro x
     simpa [AnswerPerSliceInductionData.ofLegacy, SliceRestrictionData.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using answerSelf.pointConsistency x
+  strongSelfConsistency := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.strongSelfConsistency x
+  selfCloseness := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.selfCloseness x
+  bounded := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.bounded x
+  dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
+
+/-- View answer-valued self-improvement data as the legacy self-improvement data
+over the answer-forgotten per-slice induction record.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`.  This is the
+direct conversion needed by the source proof of `thm:main-induction`: the
+recursive induction hypothesis naturally produces answer-valued restricted
+slices, while the existing pasting assembly consumes the legacy slice family.
+The conversion changes only the formal restricted-strategy interface, not the
+slice projective measurements, witnesses, or inequalities. -/
+noncomputable def SelfImprovementData.ofAnswer
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (answerInduction :
+      AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k)
+    (answerSelf :
+      AnswerSelfImprovementData params strategy eps delta gamma k restrictionPkg
+        answerInduction) :
+    SelfImprovementData params strategy eps delta gamma k
+      (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg)
+      (PerSliceInductionData.ofAnswer params strategy eps delta gamma k
+        restrictionPkg answerInduction) where
+  sliceProj := answerSelf.sliceProj
+  sliceWitness := answerSelf.sliceWitness
+  completeness := by
+    intro x
+    simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using answerSelf.completeness x
+  pointConsistency := by
+    intro x
+    simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.pointConsistency x
   strongSelfConsistency := by
