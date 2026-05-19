@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Witness
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Saturated
+import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality
 
 /-!
 # Section 9 — Matrix realization

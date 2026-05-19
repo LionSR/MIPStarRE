@@ -71,8 +71,7 @@ argument, together with the auxiliary dominance condition `I ≤ Z`.  The
 preceding saturation lemma supplies the primal normalization, while the
 polynomial-block projection of canonical complementary slackness supplies the
 defect equations `T_g (Z - A_g) = 0`.  The extra dominance hypothesis is part
-of the Lean-only route toward #1230, not an additional assumption in
-`lem:sdp`. -/
+of a Lean-only technical route, not an additional assumption in `lem:sdp`. -/
 theorem matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)
