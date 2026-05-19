@@ -458,6 +458,38 @@ theorem sdpStatementWithSlackness_of_canonicalOptimalPair
   MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness
     params strategy h.toMatrixSdpStatementWithSlackness
 
+/-- An existential canonical optimal pair gives the abstract Section 9 SDP
+statement with complementary slackness.
+
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
+(`\label{lem:sdp}`), documented by
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
+**Source-faithful transport:** This declaration assumes exactly the canonical
+optimal-pair output left as the proof obligation for `lem:sdp` and translates it
+without strengthening the paper hypotheses.
+
+This is the native transport from the canonical block-SDP output appearing in
+the proof of `lem:sdp` to the abstract self-improvement statement.  The
+existential hypothesis is precisely the remaining strong-duality and
+complementary-slackness obligation: it supplies a feasible canonical primal
+matrix, a dual-feasible operator with equal objective value, canonical
+complementary slackness, and a vanishing slack block. -/
+theorem sdpStatementWithSlackness_of_exists_canonicalOptimalPair
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (h :
+      ∃ X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+          (matrixSdpPointRealizationOfStrategy params strategy)),
+        ∃ Z : MIPStarRE.Quantum.Op ι,
+          MatrixSdpCanonicalOptimalPair params
+            (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
+    SdpStatementWithSlackness params strategy := by
+  rcases h with ⟨X, Z, hpair⟩
+  exact sdpStatementWithSlackness_of_canonicalOptimalPair
+    params strategy X Z hpair
+
 /-- A saturated canonical optimal pair, together with a separately proved
 dominance bound `I ≤ Z`, gives the abstract Section 9 SDP statement with
 complementary slackness.
@@ -521,6 +553,42 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPair
       matrixSdpComplementarySlacknessEquation,
       matrixAveragedPointOperator_ofPointRealization] using
         hopt.complementarySlacknessEquation g
+
+/-- An existential saturated canonical optimal pair gives the displayed
+abstract SDP measurement witness.
+
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
+(`\label{lem:sdp}`), documented by
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
+**Source-faithful transport:** This declaration assumes exactly the canonical
+optimal-pair output left as the proof obligation for `lem:sdp` and translates it
+without strengthening the paper hypotheses.
+
+This is the measurement-level counterpart of
+`sdpStatementWithSlackness_of_exists_canonicalOptimalPair`.  It avoids the
+dominance-carrying hypotheses and uses only the saturated canonical output
+asserted by the paper's strong-duality and complementary-slackness argument. -/
+theorem sdpMeasurementWitness_of_exists_canonicalOptimalPair
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (h :
+      ∃ X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+          (matrixSdpPointRealizationOfStrategy params strategy)),
+        ∃ Z : MIPStarRE.Quantum.Op ι,
+          MatrixSdpCanonicalOptimalPair params
+            (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
+    ∃ T : Measurement (Polynomial params) ι,
+      ∃ Z : MIPStarRE.Quantum.Op ι,
+        0 ≤ Z ∧
+        (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
+        ∀ g : Polynomial params,
+          sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
+  rcases h with ⟨X, Z, hpair⟩
+  obtain ⟨T, hZpos, hdual, hslack⟩ :=
+    sdpMeasurementWitness_of_canonicalOptimalPair params strategy X Z hpair
+  exact ⟨T, Z, hZpos, hdual, hslack⟩
 
 /-- Canonical block-SDP feasibility, objective equality, complementary
 slackness, and dual dominance give the displayed abstract SDP measurement
@@ -617,34 +685,61 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity
   sdpMeasurementWitness_of_canonicalOptimalPairWithDominance
     params strategy X Z (h.withDominance hOneLe)
 
-/-- Matrix-level strong-duality and complementary-slackness obligation for the
+/-- Canonical strong-duality and complementary-slackness obligation for the
 point-measurement realization of the Section 9 SDP.
 
 Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
 (`\label{lem:sdp}` and the proof using Slater's condition).  The paper first
 rewrites the primal and dual SDPs in canonical block form, invokes strong
-duality, and then applies complementary slackness to obtain a saturated optimal
-pair.
+duality, and then applies complementary slackness to obtain a saturated
+canonical optimal pair.
 
 This is the remaining source-faithful proof obligation for the formalized SDP
-route.  Its conclusion is the matrix-level statement
-`MatrixSdpStatementWithSlackness` for the concrete point-measurement realization
-associated to the strategy.  It does not assume the auxiliary dominance
-condition `I ≤ Z`; the saturated slack block is part of the expected
-strong-duality output.  Once this theorem is proved, the abstract source theorem
-`sdp_statement_with_slackness` follows by
-`MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness`.
+route.  Its conclusion is the native canonical block-SDP output: a feasible
+canonical primal matrix, a dual-feasible operator with equal objective value,
+canonical complementary slackness, and a vanishing slack block.  It does not
+assume the auxiliary dominance condition `I ≤ Z`; the saturated slack block is
+part of the expected strong-duality output.  Once this theorem is proved, the
+matrix statement `matrixSdpPointRealization_statementWithSlackness` follows by
+extracting the diagonal polynomial blocks.
 
 Tracked by issue #1230 and documented in
 `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`. -/
+theorem matrixSdpPointRealization_canonicalOptimalPair
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι) :
+    ∃ X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+        (matrixSdpPointRealizationOfStrategy params strategy)),
+      ∃ Z : MIPStarRE.Quantum.Op ι,
+        MatrixSdpCanonicalOptimalPair params
+          (matrixSdpPointRealizationOfStrategy params strategy) X Z := by
+  -- TODO(#1230): prove the finite-dimensional SDP strong-duality and
+  -- complementary-slackness theorem for the canonical block realization.
+  sorry
+
+/-- Matrix-level strong-duality and complementary-slackness statement for the
+point-measurement realization of the Section 9 SDP.
+
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
+(`\label{lem:sdp}`), documented by
+`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
+**Source-faithful transport:** This declaration is a proved extraction from the
+canonical optimal-pair proof obligation for `lem:sdp`; it is not a conditional
+replacement for the SDP strong-duality theorem.
+
+This theorem is now a proved transport from the native canonical optimal-pair
+obligation `matrixSdpPointRealization_canonicalOptimalPair`.  It contains no
+additional dominance, bridge, residual, or package hypothesis. -/
 theorem matrixSdpPointRealization_statementWithSlackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     MatrixSdpStatementWithSlackness params
       (matrixSdpPointRealizationOfStrategy params strategy) := by
-  -- TODO(#1230): prove the finite-dimensional SDP strong-duality and
-  -- complementary-slackness theorem for the canonical block realization.
-  sorry
+  rcases matrixSdpPointRealization_canonicalOptimalPair params strategy with
+    ⟨X, Z, hpair⟩
+  exact hpair.toMatrixSdpStatementWithSlackness
 
 end MIPStarRE.LDT.SelfImprovement

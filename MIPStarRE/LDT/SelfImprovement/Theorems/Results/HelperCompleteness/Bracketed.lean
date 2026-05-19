@@ -540,19 +540,17 @@ this by Slater strong duality and complementary slackness after passing through
 the canonical SDP form.
 
 The proof is deferred to the formalized strong-duality argument for the Section
-9 SDP.  The remaining proof obligation is now isolated as the matrix-level
-statement `matrixSdpPointRealization_statementWithSlackness`; this theorem
-transports that saturated canonical SDP output to the abstract self-improvement
-interface. -/
+9 SDP.  The remaining proof obligation is now isolated as the native canonical
+optimal-pair theorem `matrixSdpPointRealization_canonicalOptimalPair`; this
+theorem transports that saturated canonical SDP output to the abstract
+self-improvement statement. -/
 theorem sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatementWithSlackness params strategy := by
-  exact
-    MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness
-      params strategy
-      (matrixSdpPointRealization_statementWithSlackness params strategy)
+  exact sdpStatementWithSlackness_of_exists_canonicalOptimalPair params strategy
+    (matrixSdpPointRealization_canonicalOptimalPair params strategy)
 
 /-- Displayed measurement and complementary-slackness conclusion of `lem:sdp`.
 
@@ -578,8 +576,8 @@ theorem sdp_slackness_measurement
         (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
         ∀ g : Polynomial params,
           sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g :=
-  SdpStatementWithSlackness.exists_measurement_witness
-    (sdp_statement_with_slackness params strategy)
+  sdpMeasurementWitness_of_exists_canonicalOptimalPair params strategy
+    (matrixSdpPointRealization_canonicalOptimalPair params strategy)
 
 -- The reduced add-in-u lemma invokes the global-variance transport record and
 -- checks the full polynomial-indexed variance family.
