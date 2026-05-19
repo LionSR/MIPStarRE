@@ -12,10 +12,47 @@ induction-section pasting theorem is available.
 
 ## Classification
 
-| Item | Paper source | Lean declaration | Previous status | Classification | Repair |
-|---|---|---|---|---|---|
-| Pasting invocation inside `def:successor-pasting-data` | `references/ldt-paper/inductive_step.tex:528-551`; the averaged family is passed to `thm:ld-pasting-in-induction-section`. | `MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting`. | Proved, but routed through `ldPastingInInductionSectionNontrivial`, thereby carrying auxiliary side conditions `0 < d` and `1 ≤ k` that belong only to the nontrivial proof reduction. | Boundary-condition cleanup for an internal helper. | Invoke the unrestricted source-facing theorem `ldPastingInInductionSection` directly and remove the auxiliary side conditions from the internal assembly API. |
-| Four-stage successor assembly | `references/ldt-paper/inductive_step.tex:441-551`; restrict, apply induction, self-improve, and paste. | `MIPStarRE.LDT.MainInductionStep.mainInductionFromStageData`. | Proved conditional helper.  It accepted the same auxiliary `0 < d` and `1 ≤ k` side conditions only because its pasting invocation used the restricted helper. | Conditional helper, but with obsolete boundary side conditions. | Remove the side conditions.  The helper now assumes only the four paper-stage data records, the good-strategy hypothesis, and the large-`k` hypothesis. |
+### Pasting invocation inside `def:successor-pasting-data`
+
+Paper source:
+`references/ldt-paper/inductive_step.tex:528-551`; the averaged family is
+passed to `thm:ld-pasting-in-induction-section`.
+
+Lean declaration:
+`MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting`.
+
+Previous status:
+proved, but routed through `ldPastingInInductionSectionNontrivial`.  This
+carried the auxiliary side conditions `0 < d` and `1 ≤ k`, which belong only
+to the nontrivial proof reduction.
+
+Classification:
+boundary-condition cleanup for an internal helper.
+
+Repair:
+invoke the unrestricted source-facing theorem `ldPastingInInductionSection`
+directly and remove the auxiliary side conditions from the internal assembly
+API.
+
+### Four-stage successor assembly
+
+Paper source:
+`references/ldt-paper/inductive_step.tex:441-551`; restrict, apply induction,
+self-improve, and paste.
+
+Lean declaration:
+`MIPStarRE.LDT.MainInductionStep.mainInductionFromStageData`.
+
+Previous status:
+proved conditional helper.  It accepted the same auxiliary `0 < d` and `1 ≤ k`
+side conditions only because its pasting invocation used the restricted helper.
+
+Classification:
+conditional helper, but with obsolete boundary side conditions.
+
+Repair:
+remove the side conditions.  The helper now assumes only the four paper-stage
+data records, the good-strategy hypothesis, and the large-`k` hypothesis.
 
 ## Statement Integrity Audit
 
