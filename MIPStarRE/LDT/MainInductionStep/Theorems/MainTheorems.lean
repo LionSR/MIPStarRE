@@ -179,6 +179,37 @@ theorem mainInductionBaseCase
     mainInductionOfWitness params strategy eps delta gamma k
       ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩
 
+/-- Trivial branch of `thm:main-induction` when the target error is at least
+`1`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, where the
+successor proof reduces to the nontrivial small-error regime before invoking the
+pasting argument.  In the complementary branch the normalized consistency defect
+is bounded by `1`, so a distinguished trivial polynomial measurement suffices.
+-/
+theorem mainInductionOfOneLeError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (herror : 1 ≤ mainInductionError params k eps delta gamma) :
+    ∃ G : Measurement (Polynomial params) ι,
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas)
+        (mainInductionError params k eps delta gamma) := by
+  classical
+  let G : Measurement (Polynomial params) ι :=
+    Measurement.trivialDistinguishedOutcome
+      (Classical.choice (inferInstance : Nonempty (Polynomial params)))
+  refine ⟨G, ?_⟩
+  exact ⟨le_trans
+    (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas))
+    herror⟩
+
 /-- Native successor step for `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, where the proof
@@ -207,9 +238,12 @@ theorem mainInductionSuccessorNext
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
-  -- TODO(#1507, #1458): construct the four successor-stage objects and apply
-  -- `mainInductionFromStageData`.
-  sorry
+  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
+  · -- TODO(#1507, #1458): construct the four successor-stage objects and apply
+    -- `mainInductionFromStageData` in the nontrivial small-error regime.
+    sorry
+  · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
+      (le_of_not_gt hsmall)
 
 /-- Successor branch of `thm:main-induction`.
 

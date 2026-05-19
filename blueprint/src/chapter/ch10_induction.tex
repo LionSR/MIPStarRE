@@ -247,9 +247,25 @@
 	For $m=1$, there is only one axis-parallel line $\ell$ in $\F_q$, so the line measurement $B^\ell$ is already an element of $\polymeas{1}{q}{d}$. Because the strategy fails the axis-parallel lines test with probability at most $\eps$, the consistency bound follows directly from the axis-parallel consistency hypothesis.
 \end{proof}
 
+\begin{lemma}[Large-error branch of main induction]\label{lem:main-induction-large-error}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}
+	\leanok
+	\uses{def:polymeasurements, def:simeq}
+	If the target error parameter in Theorem~\ref{thm:main-induction} is at least
+	\(1\), then the conclusion follows from a distinguished trivial polynomial
+	measurement.
+\end{lemma}
+\begin{proof}
+	\leanok
+	The normalized bipartite consistency defect of two submeasurements is at most
+	\(1\).  Hence any polynomial measurement, in particular the measurement
+	concentrated on one polynomial, satisfies the claimed consistency relation when
+	the allowed error is at least \(1\).
+\end{proof}
+
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
-	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base, lem:main-induction-large-error}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
@@ -289,7 +305,9 @@
 	strategies without appealing to the public theorem `mainFormal`. The weighted
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
-	The remaining proof gap for Theorem~\ref{thm:main-induction} is to derive the
+	The Lean proof now closes the large-error branch by
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}.  The remaining
+	proof gap for Theorem~\ref{thm:main-induction} is to derive the
 	successor-step constructions, including the restricted-strategy
 	self-improvement and slice-transport construction
 	tracked by issues \#1507 and \#1503 under the bridge-debt tracker \#1458,
@@ -467,7 +485,7 @@
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionData}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRestrictionData, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass}
 	\leanok
-	\uses{lem:symmetrization-bridge, rem:main-induction-successor-assembly}
+	\uses{lem:symmetrization-bridge, thm:main-induction}
 	These Lean-only declarations name the restricted-probability and recursive-slice
 	targets appearing in the successor comparison with
 	Remark~\ref{rem:main-induction-successor-assembly}.  The public weighted-bound
