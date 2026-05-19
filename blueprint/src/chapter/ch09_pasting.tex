@@ -371,6 +371,20 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	postprocessing at a point agrees with evaluating the corresponding slice.
 	The same identities commute with averaging over indexed submeasurements.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.postprocess_hRestrictionToVerticalLine_eq_evaluateAt}
+	\lean{MIPStarRE.LDT.Pasting.restrictToAxisParallelLine_apply}
+	\lean{MIPStarRE.LDT.Pasting.interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem}
+	\lean{MIPStarRE.LDT.Pasting.evaluateAt_averageIdxSubMeas}
+	\lean{MIPStarRE.LDT.Pasting.hRestrictionToVerticalLine_averageIdxSubMeas}
+	\lean{MIPStarRE.LDT.Pasting.postprocess_restrictSubMeas_outcome}
+	\leanok
+	\uses{def:pasted-measurement}
+	The proof is the formal compatibility calculation for the restriction and
+	evaluation maps used in the construction of~$H$.  Lean unfolds the vertical
+	restriction, the interpolation support condition, postprocessing, and
+	averaging over indexed submeasurements.
+\end{proof}
 
 \subsection{Strong Self-Consistency and Commutation of $\widehat G$}
 \label{sec:hat-consistency}
@@ -660,6 +674,14 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	The contribution of the completed part in the squared-distance defect is
 	bounded by the corresponding slice contribution.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.qSDD_completePart_le_slice}
+	\leanok
+	\uses{def:G-hat, cor:G-hat-facts}
+	This is the monotonicity estimate for the completed part of~$\widehat G$:
+	the completed contribution is one summand of the corresponding slice
+	squared-distance defect, and the remaining summands are nonnegative.
+\end{proof}
 
 \subsection{Sandwiching Lemmas}
 \label{sec:ld-sandwiching}
@@ -672,6 +694,20 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	head--tail reindexing, and the corresponding sums of adjoint-products are
 	bounded above by the identity.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_outcome}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_total}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichRight_split_outcome}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichRight_split_total}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfProduct_sum_adjoint_mul_le_one}
+	\lean{MIPStarRE.LDT.Pasting.gHatReverseHalfProduct_sum_adjoint_mul_le_one}
+	\lean{MIPStarRE.LDT.Pasting.leftTensor_rightTensor_sum_adjoint_mul_le_one}
+	\leanok
+	\uses{def:G-hat, def:completed-outcome-reindexing}
+	The split identities follow from the completed-outcome equivalences.  The
+	normalization inequalities are the corresponding submeasurement bounds for
+	the left and right half-products after reindexing the sums.
+\end{proof}
 
 \begin{lemma}[One-step completed sandwich commutation]\label{lem:one-step-completed-sandwich-commutation}
 	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_step_commute, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_prefixFirstSliceLeft_move, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveSource_eq_split, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_move_recursive_zero, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_split_one_iff, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core_two, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveStepMid_toTarget, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
@@ -681,6 +717,23 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	provide the one-step estimates used to move a completed measurement through
 	a half-sandwich.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_step_commute}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_prefixFirstSliceLeft_move}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveSource_eq_split}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_move_recursive_zero}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_split_one_iff}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core_two}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveStepMid_toTarget}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
+	\leanok
+	\uses{cor:G-hat-facts, lem:completed-sandwich-normalization, prop:triangle-inequality-for-approx_delta}
+	The proof isolates the one-step commutation move.  Lean first rewrites the
+	relevant head--tail split, applies the self-consistency and commutation
+	estimates for~$\widehat G$, and then assembles the resulting comparison by
+	the triangle inequality for~$\approx_\delta$.
+\end{proof}
 
 \begin{lemma}[Commuting past multiple completed measurements]\label{lem:commute-g-half-sandwich}
 	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich}
@@ -948,6 +1001,15 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	with error $\nu_6$. Then the pointwise evaluations of $H$ are consistent with
 	Alice's point measurement with error $\nu$.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency}
+	\leanok
+	\uses{prop:triangle-sub}
+	The proof transports the vertical-line consistency estimate to point
+	evaluations and combines it with the good-strategy point-to-line comparison.
+	The displayed numerical assumptions are used only to absorb the intermediate
+	errors into the final parameter~$\nu$.
+\end{proof}
 
 \begin{corollary}[Consistency of the completed $H$ with $A$]
 	\label{cor:h-a-consistency-completed}
@@ -988,6 +1050,13 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	fallback polynomial preserves point consistency with the enlarged error
 	appearing in the induction statement.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
+	\leanok
+	The completed measurement differs from the original submeasurement only on
+	the fallback polynomial.  Lean bounds the additional term by the missing-mass
+	estimate and adds it to the given point-consistency error.
+\end{proof}
 
 \subsection{Completeness of $H$}
 \label{sec:completeness-of-h-low-degree}
