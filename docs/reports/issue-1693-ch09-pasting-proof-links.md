@@ -30,6 +30,13 @@ blueprint assertion, and has no `sorryAx` dependency.
   `MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency`.
 - `lem:h-a-consistency-completed-from-submeas`:
   `MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas`.
+- `lem:line-interpolation-mismatch-estimates`: the vertical-line interpolation
+  mismatch decomposition and bad-mass bound.
+- `lem:line-interpolation-averaging-estimates`: the distinct-to-independent
+  averaging step and the bad-mass estimate used in `lem:h-b-consistency`.
+- `lem:pasting-context-specializations`: context-specialized forms of the
+  `H`-with-`A` consistency estimate and the conversion from the pasted sum to
+  the polynomial in `G`.
 
 After rebuilding the blueprint web output, all six nodes are proof-filled in
 `blueprint/web/dep_graph_document.html`.  The nodes with all ancestors complete
@@ -53,8 +60,9 @@ the displayed numerical hypotheses used in the paper proof.
 
 Paper conclusions: the vertical restriction identities, the complete-part
 squared-distance bound, the completed sandwich normalization, the one-step
-completed-sandwich commutation estimates, and the two point-consistency
-completion transfers.
+completed-sandwich commutation estimates, the line-interpolation mismatch and
+averaging bounds, the two point-consistency completion transfers, and the
+context-specialized forms used by the final pasted-measurement assembly.
 
 Lean conclusions: the linked declarations prove exactly these identities,
 operator inequalities, or consistency transfers in the local notation of the
