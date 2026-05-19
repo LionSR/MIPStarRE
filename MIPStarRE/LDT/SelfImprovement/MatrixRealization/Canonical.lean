@@ -554,6 +554,50 @@ theorem matrixSdpCanonicalWeakDuality
   rw [matrixSdpCanonicalDualGap_trace params model X hX Z]
   exact MIPStarRE.Quantum.trace_mul_nonneg_of_nonneg hdual hX.nonnegative
 
+/-- Zero duality gap gives canonical complementary slackness.
+
+This is the local algebraic consequence used after the Watrous strong-duality
+theorem supplies an optimal feasible primal-dual pair with equal objective
+values.  The remaining hard part is producing such a pair from Slater's
+condition; once it is available, this theorem converts the zero gap into the
+product equation `X * (D(Z) - C) = 0`. -/
+theorem matrixSdpCanonicalComplementarySlackness_of_strongDuality
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (Z : MatrixOperator model.space)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g)
+    (hstrong :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params model * X)) =
+        matrixSdpDualObjective model Z) :
+    X * (matrixSdpCanonicalDualOperator params model Z -
+          matrixSdpCanonicalObjectiveOperator params model) =
+      0 := by
+  let S := matrixSdpCanonicalDualOperator params model Z -
+    matrixSdpCanonicalObjectiveOperator params model
+  have hS : 0 ≤ S := by
+    simpa [S] using
+      matrixSdpCanonicalDualConstraint_nonneg_of_dualFeasible params model Z hdual
+  have hgap_zero :
+      matrixSdpDualObjective model Z -
+          Complex.re (Matrix.trace
+            (matrixSdpCanonicalObjectiveOperator params model * X)) =
+        0 := by
+    rw [hstrong, sub_self]
+  have htrace_SX : Complex.re (Matrix.trace (S * X)) = 0 := by
+    rw [← matrixSdpCanonicalDualGap_trace params model X hX Z]
+    exact hgap_zero
+  have htrace_XS : Complex.re (Matrix.trace (X * S)) = 0 := by
+    rw [Matrix.trace_mul_comm X S]
+    exact htrace_SX
+  simpa [S] using
+    MIPStarRE.Quantum.mul_eq_zero_of_nonneg_of_trace_mul_eq_zero
+      hX.nonnegative hS htrace_XS
+
 /-- The diagonal block of a canonical primal-dual slack product is the product
 of the corresponding primal diagonal block and canonical dual slack block. -/
 theorem matrixSdpCanonicalDiagonalBlock_mul_dualSlack
