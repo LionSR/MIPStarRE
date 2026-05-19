@@ -595,9 +595,10 @@ Paper origin: `references/ldt-paper/inductive_step.tex:299-338`
 Chapter 6 restatement of `thm:ld-pasting`, with the error parameters named as
 they are used in the main-induction proof.
 
-**Proof obligation:** This theorem invokes `Pasting.ldPasting`; until the
-degree-zero branch of unrestricted pasting is discharged, it inherits the
-tracked proof obligation #1622. -/
+**Source-faithful transport:** This theorem invokes the unrestricted formal
+theorem `Pasting.ldPasting` and projects its point-consistency field into the
+induction-section conclusion record.  It carries no additional proof
+obligation beyond the already formalized pasting theorem. -/
 theorem ldPastingInInductionSection
     (params : Parameters)
     [FieldModel params.q]
