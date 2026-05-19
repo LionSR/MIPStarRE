@@ -1670,6 +1670,8 @@
     <span class="definition_thmtitle">Lean base-case Step&#160;6 obligations for the Section&#160;3 proof</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1721,9 +1723,75 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>         The role-register Section&#160;6 measurement is obtained by applying the paper-facing theorem <span class="ttfamily">MainInductionStep.mainInduction</span> to the role-register symmetrization. The Lean constructors <span class="ttfamily">MainFormalRoleInductionWitness.ofMainInduction</span> records this application of the paper theorem; any successor proof gap is the tracked gap in <span class="ttfamily">mainInduction</span> itself, not an added hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. The base-case role witness <span class="ttfamily">mainFormalBaseRoleInductionWitness</span> remains a named specialization for \(m=1\). </p>
-<p>From a line-130 consistency relation, the theorem <span class="ttfamily">MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency</span> constructs the pre-completion projective submeasurements using the Section&#160;5 locality-preserving repair construction. The completion theorem <span class="ttfamily">MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency</span> now derives the completion witness directly from the line-130 cross consistency and the orthonormalization closeness estimates. The exact construction-level match-mass monotonicity branch has been removed from the active ‘mainFormal‘ path; instead, the checked repaired route with an explicit additional loss is recorded in Remark&#160;<a href="chap-projective.html#rem:lean-line169-projectivization-match-mass">4.6</a>. </p>
-<p>The remaining proof gap is not represented by diagonal-consistency, match-mass, or other auxiliary input hypotheses. The paper-facing theorem itself remains unfinished. Once a <span class="ttfamily">MainFormalProjectiveCompletionTransportWitness</span> has been constructed from the paper hypotheses, the proved theorem <span class="ttfamily">mainFormal_ofProjectiveCompletionTransportWitness</span> derives the three consistency conclusions for Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. The witness is a construction target inside the proof, not an additional assumption in the public statement. </p>
+  <p>        From a line-130 consistency relation, the theorem <span class="ttfamily">MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency</span> constructs the pre-completion projective submeasurements using the Section&#160;5 locality-preserving repair construction. The completion theorem <span class="ttfamily">MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency</span> now derives the completion witness directly from the line-130 cross consistency and the orthonormalization closeness estimates. </p>
+<p>The base-case role witness <span class="ttfamily">mainFormalBaseRoleInductionWitness</span> is a named specialization for \(m=1\). Given a constructed role-register witness, the theorem <span class="ttfamily">MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness</span> constructs the Section&#160;6 projective-completion witness. The proved theorem <span class="ttfamily">mainFormal_ofProjectiveCompletionTransportWitness</span> derives the three consistency conclusions for Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> from a constructed Section&#160;6 projective-completion witness. The witness is a construction target inside the proof, not an additional assumption in the public statement. </p>
+<p>The successor-dependent targets that call Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> are recorded in Definition&#160;<a href="sec-induction.html#def:main-formal-step6-successor-targets">10.21</a>; they carry the tracked successor proof gap of . </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:main-formal-step6-successor-targets">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">10.21</span>
+    <span class="definition_thmtitle">Lean successor-dependent Step&#160;6 targets</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-induction.html#def:main-formal-step6-successor-targets">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-induction.html#def:main-formal-step6-obligations">Definition 10.20</a></li>
+          
+          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.14</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.strategySymmetrization_mainInduction" class="lean_decl">MIPStarRE.LDT.Test.strategySymmetrization_mainInduction</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction" class="lean_decl">MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>   The role-register Section&#160;6 measurement is obtained by applying the paper-facing theorem <span class="ttfamily">MainInductionStep.mainInduction</span> to the role-register symmetrization. The construction <span class="ttfamily">strategySymmetrization_mainInduction</span> records this application, and <span class="ttfamily">MainFormalRoleInductionWitness.ofMainInduction</span> builds the role-register witness from it. Any successor proof gap is the remaining proof obligation in <span class="ttfamily">mainInduction</span> itself (Remark&#160;<a href="sec-induction.html#rem:main-induction-successor-assembly">10.15</a>, tracked by ). These targets are not an added hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> but internal proof steps whose completion waits on the discharge of the Section&#160;6 successor proof. </p>
 
   </div>
 </div>
@@ -1732,7 +1800,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.21</span>
+    <span class="remark_thmlabel">10.22</span>
     <span class="remark_thmtitle">Successor projective-completion construction</span>
     <div class="thm_header_extras">
 
@@ -1755,7 +1823,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.22</span>
+    <span class="remark_thmlabel">10.23</span>
     <span class="remark_thmtitle">Lean measurement-unsymmetrization consistency</span>
     <div class="thm_header_extras">
 
@@ -1778,7 +1846,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.23</span>
+    <span class="definition_thmlabel">10.24</span>
     <span class="definition_thmtitle">Final error envelope</span>
     <div class="thm_header_extras">
 
@@ -1825,7 +1893,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.24</span>
+    <span class="theorem_thmlabel">10.25</span>
     <span class="theorem_thmtitle">Basic facts about the final error envelope</span>
     <div class="thm_header_extras">
 
@@ -1852,7 +1920,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.23</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
           
         </ul>
     
@@ -1910,7 +1978,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.25</span>
+    <span class="definition_thmlabel">10.26</span>
     <span class="definition_thmtitle">Cascade parameters and standing hypotheses</span>
     <div class="thm_header_extras">
 
@@ -1934,7 +2002,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.23</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
           
         </ul>
     
@@ -1991,7 +2059,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.26</span>
+    <span class="theorem_thmlabel">10.27</span>
     <span class="theorem_thmtitle">Bound for the first cascade term</span>
     <div class="thm_header_extras">
 
@@ -2018,9 +2086,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.23</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.25</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.26</a></li>
           
         </ul>
     
@@ -2079,7 +2147,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.27</span>
+    <span class="theorem_thmlabel">10.28</span>
     <span class="theorem_thmtitle">Cascade bounds for the later cascade terms</span>
     <div class="thm_header_extras">
 
@@ -2106,11 +2174,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.23</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.25</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.26</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.26</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.27</a></li>
           
         </ul>
     
@@ -2185,7 +2253,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.28</span>
+    <span class="theorem_thmlabel">10.29</span>
     <span class="theorem_thmtitle">Consolidated error cascade</span>
     <div class="thm_header_extras">
 
@@ -2212,13 +2280,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.23</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.25</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.26</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.26</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.27</a></li>
           
-          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.27</a></li>
+          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.28</a></li>
           
         </ul>
     
@@ -2276,7 +2344,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>This is the direct combination of Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.26</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.27</a>. The Lean declaration uses the explicit equalities naming \(\sigma ,\zeta _1,\zeta _2,\zeta _3\) as the corresponding cascade expressions. </p>
+  <p>This is the direct combination of Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.27</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.28</a>. The Lean declaration uses the explicit equalities naming \(\sigma ,\zeta _1,\zeta _2,\zeta _3\) as the corresponding cascade expressions. </p>
 
   </div>
 </div>
@@ -2285,7 +2353,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.29</span>
+    <span class="remark_thmlabel">10.30</span>
     <span class="remark_thmtitle">Lean Step 5 expansion theorem</span>
     <div class="thm_header_extras">
 
@@ -2308,7 +2376,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.30</span>
+    <span class="remark_thmlabel">10.31</span>
     <span class="remark_thmtitle">Lean witness structures for the main-formal assembly</span>
     <div class="thm_header_extras">
 
@@ -2473,8 +2541,8 @@
   <span class="equation_label">11</span>
 </p>
 </div>
-<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-witness-records">10.30</a> records the Lean witness structures that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 theorem now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining Lean witness is the completion-and-line-169 construction: supply the actual role-register measurement, Alice’s line-146 completion estimate, Bob’s left-register completion estimate, and the two exact polynomial-level \(\zeta _1\) links. Lean transports the Bob-side completion estimate to the line-147 right-register form, reconstructs the duplicated Step&#160;6 pre-projective consistency field from these inputs and <span class="ttfamily">hpass</span>, then data-processes the line-169 links to line&#160;172 and derives the two \(\zeta _4\) point goals and the \(\zeta _3/2\) self-consistency target. </p>
-<p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.23</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.25</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.26</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.27</a> give the final inflation to the scale \(100000k^2m^4 E\). The underlying estimates, with the formal widened \(\zeta _2\), are: </p>
+<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-witness-records">10.31</a> records the Lean witness structures that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 theorem now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining Lean witness is the completion-and-line-169 construction: supply the actual role-register measurement, Alice’s line-146 completion estimate, Bob’s left-register completion estimate, and the two exact polynomial-level \(\zeta _1\) links. Lean transports the Bob-side completion estimate to the line-147 right-register form, reconstructs the duplicated Step&#160;6 pre-projective consistency field from these inputs and <span class="ttfamily">hpass</span>, then data-processes the line-169 links to line&#160;172 and derives the two \(\zeta _4\) point goals and the \(\zeta _3/2\) self-consistency target. </p>
+<p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.24</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.26</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.27</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.28</a> give the final inflation to the scale \(100000k^2m^4 E\). The underlying estimates, with the formal widened \(\zeta _2\), are: </p>
 <div class="displaymath" id="a0000000646">
   \[  \sigma \le 10000k^2m^4\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).  \]
 </div>
