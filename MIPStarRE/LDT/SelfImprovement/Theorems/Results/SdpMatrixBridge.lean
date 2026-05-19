@@ -567,7 +567,7 @@ without strengthening the paper hypotheses.
 
 This is the measurement-level counterpart of
 `sdpStatementWithSlackness_of_exists_canonicalOptimalPair`.  It avoids the
-dominance-carrying interface and uses only the saturated canonical output
+dominance-carrying hypotheses and uses only the saturated canonical output
 asserted by the paper's strong-duality and complementary-slackness argument. -/
 theorem sdpMeasurementWitness_of_exists_canonicalOptimalPair
     (params : Parameters)

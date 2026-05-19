@@ -543,7 +543,7 @@ The proof is deferred to the formalized strong-duality argument for the Section
 9 SDP.  The remaining proof obligation is now isolated as the native canonical
 optimal-pair theorem `matrixSdpPointRealization_canonicalOptimalPair`; this
 theorem transports that saturated canonical SDP output to the abstract
-self-improvement interface. -/
+self-improvement statement. -/
 theorem sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
