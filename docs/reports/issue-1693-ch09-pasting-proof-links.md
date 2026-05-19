@@ -2,11 +2,11 @@
 
 ## Scope
 
-This note records a proof-status repair for nine Chapter 9 pasting nodes that
+This note records a proof-status repair for ten Chapter 9 pasting nodes that
 already had source-faithful Lean declarations.  The source material is
 `references/ldt-paper/ld-pasting.tex`, especially the construction of the
 pasted submeasurement, the completed-measurement sandwich estimates, and the
-final point-consistency transfer.
+switcheroo, interpolation, and final point-consistency transfer estimates.
 
 The repair changes only blueprint proof metadata and prose.  It does not alter
 Lean statements or proofs.
@@ -37,8 +37,10 @@ blueprint assertion, and has no `sorryAx` dependency.
 - `lem:pasting-context-specializations`: context-specialized forms of the
   `H`-with-`A` consistency estimate and the conversion from the pasted sum to
   the polynomial in `G`.
+- `lem:switcheroo-contraction-estimates`: the two contraction side conditions
+  used in the fourth-term switcheroo chain.
 
-After rebuilding the blueprint web output, all nine nodes are proof-filled in
+After rebuilding the blueprint web output, all ten nodes are proof-filled in
 `blueprint/web/dep_graph_document.html`.  The nodes with all ancestors complete
 use the dark-green fill `#1CAC78`; the nodes whose ancestors are still not all
 complete use the ordinary proof-green fill `#9CEC8B`.
@@ -60,8 +62,9 @@ the displayed numerical hypotheses used in the paper proof.
 
 Paper conclusions: the vertical restriction identities, the complete-part
 squared-distance bound, the completed sandwich normalization, the one-step
-completed-sandwich commutation estimates, the line-interpolation mismatch and
-averaging bounds, the two point-consistency completion transfers, and the
+completed-sandwich commutation estimates, the fourth-term switcheroo
+contraction side conditions, the line-interpolation mismatch and averaging
+bounds, the two point-consistency completion transfers, and the
 context-specialized forms used by the final pasted-measurement assembly.
 
 Lean conclusions: the linked declarations prove exactly these identities,

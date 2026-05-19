@@ -445,6 +445,19 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	family, the two fourth-term contractions are bounded by the same
 	self-consistency and commutation errors used in the switcheroo argument.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.switcherooAggregateFourthTerm_once_commuted_contraction_left}
+	\lean{MIPStarRE.LDT.Pasting.switcherooAggregateFourthTerm_once_commuted_contraction_right}
+	\leanok
+	After expanding the fourth switcheroo term, the inserted complete part
+	forms a positive contraction.  The left and right Cauchy--Schwarz
+	side conditions are therefore the corresponding sums of
+	$X_gX_g^\ast$ and $X_g^\ast X_g$, where
+	$X_g=\sum_o G_{\bot}^x M_o^yG_g^xM_o^y$.  Orthogonality of the
+	projective slice family and the submeasurement inequalities for $M$
+	and $G_{\bot}$ bound both sums by the identity.  These are precisely
+	the two contraction witnesses used in the fourth-term switcheroo chain.
+\end{proof}
 
 \begin{lemma}[Commutativity with $G_g^x$ implies commutativity with $G^x$]\label{lem:commutativity-switcheroo}
 	\lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo}
