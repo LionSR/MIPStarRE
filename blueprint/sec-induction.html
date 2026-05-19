@@ -838,30 +838,31 @@
 
   </div>
 </div>
-<div class="remark_thmwrapper theorem-style-remark" id="rem:ld-pasting-induction-restricted-lean-form">
+<div class="remark_thmwrapper theorem-style-remark" id="rem:ld-pasting-induction-unrestricted-lean-form">
   <div class="remark_thmheading">
     <span class="remark_thmcaption">
     Remark
     </span>
     <span class="remark_thmlabel">10.9</span>
-    <span class="remark_thmtitle">Restricted Lean form of induction-section pasting</span>
+    <span class="remark_thmtitle">Unrestricted Lean form of induction-section pasting</span>
     <div class="thm_header_extras">
 
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="sec-induction.html#rem:ld-pasting-induction-restricted-lean-form">#</a>
+    <a class="icon proof" href="sec-induction.html#rem:ld-pasting-induction-unrestricted-lean-form">#</a>
     
     
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The Lean declaration linked here is the restricted nontrivial-regime restatement of Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.8</a>. Its statement calls the formal Section&#160;<a href="sec-ld-pasting.html">9</a> pasting theorem and therefore assumes, in addition to the source hypotheses, </p>
+  <p> The Lean declaration linked to Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.8</a> is now the unrestricted source-facing restatement. It calls the formal Section&#160;<a href="sec-ld-pasting.html">9</a> theorem <span class="ttfamily">Pasting.ldPasting</span> and therefore carries exactly the source hypotheses displayed above, together with the faithful formal boundary hypotheses needed to interpret the objects in Lean. </p>
+<p>The auxiliary declaration <span class="ttfamily">ldPastingInInductionSectionNontrivial</span> remains available for the nontrivial-regime proof reduction. That helper assumes </p>
 <div class="displaymath" id="a0000000581">
   \[  \gamma \le 1,\qquad \zeta \le 1,\qquad d \le q,\qquad 0{\lt}d,\qquad 1\le k.  \]
 </div>
-<p> The corresponding paper theorem in <span class="ttfamily">references/ldt-paper/ld-pasting.tex</span>, lines 12–50, does not include these assumptions; lines 52–55 record them only as a proof reduction to the nontrivial regime. The trivial complementary cases remain to be formalized before this declaration can be marked as the unrestricted source theorem. </p>
+<p> These inequalities are not hypotheses of the paper theorem: in <span class="ttfamily">references/ldt-paper/ld-pasting.tex</span>, lines 12–50 state the unrestricted result, while lines 52–55 use the inequalities only to reduce the proof to the nontrivial regime. The formal theorem linked from the blueprint has already incorporated the complementary cases through <span class="ttfamily">Pasting.ldPasting</span>. </p>
 
   </div>
 </div>
