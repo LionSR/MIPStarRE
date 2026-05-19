@@ -383,7 +383,7 @@ theorem AveragedPastingData.invokeLdPasting
 one higher dimension.
 
 The construction applies the unrestricted induction-section pasting theorem
-through `AveragedPastingData.invokeLdPasting`, so its public hypotheses are
+through `AveragedPastingData.invokeLdPasting`, so its stated hypotheses are
 only the paper stage data and the large-`k` condition. -/
 theorem mainInductionFromStageData
     (params : Parameters)
