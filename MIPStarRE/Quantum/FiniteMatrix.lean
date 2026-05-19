@@ -141,6 +141,56 @@ theorem trace_mul_nonneg_of_nonneg {A B : Op d} (hA : 0 ≤ A) (hB : 0 ≤ B) :
         simp [Matrix.mul_assoc]
   simpa [htrace] using hre
 
+/-- If two positive semidefinite operators have zero trace pairing, then their
+product is zero.
+
+This is the finite-dimensional complementary-slackness algebra used after a
+zero duality gap has been obtained: for PSD operators `A` and `B`, the equality
+`Re Tr(A * B) = 0` forces `A * B = 0`. -/
+theorem mul_eq_zero_of_nonneg_of_trace_mul_eq_zero {A B : Op d}
+    (hA : 0 ≤ A) (hB : 0 ≤ B)
+    (htrace : Complex.re (Matrix.trace (A * B)) = 0) :
+    A * B = 0 := by
+  obtain ⟨Y, hY⟩ := CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hB
+  subst B
+  rw [Matrix.star_eq_conjTranspose] at htrace ⊢
+  have htrace_cycle :
+      Matrix.trace (A * (Yᴴ * Y)) = Matrix.trace (Y * A * Yᴴ) := by
+    calc
+      Matrix.trace (A * (Yᴴ * Y)) = Matrix.trace ((A * Yᴴ) * Y) := by
+        simp [Matrix.mul_assoc]
+      _ = Matrix.trace (Y * (A * Yᴴ)) := by
+        rw [Matrix.trace_mul_comm]
+      _ = Matrix.trace (Y * A * Yᴴ) := by
+        simp [Matrix.mul_assoc]
+  have hYA_nonneg : 0 ≤ Y * A * Yᴴ := by
+    simpa [Matrix.star_eq_conjTranspose] using star_right_conjugate_nonneg hA Y
+  have hYA_trace_nonneg : (0 : ℂ) ≤ Matrix.trace (Y * A * Yᴴ) :=
+    (Matrix.nonneg_iff_posSemidef.mp hYA_nonneg).trace_nonneg
+  have hYA_trace_re_zero : Complex.re (Matrix.trace (Y * A * Yᴴ)) = 0 := by
+    simpa [htrace_cycle] using htrace
+  have hYA_trace_zero : Matrix.trace (Y * A * Yᴴ) = 0 := by
+    apply Complex.ext
+    · exact hYA_trace_re_zero
+    · simpa using (Complex.nonneg_iff.mp hYA_trace_nonneg).2.symm
+  have hYA_zero : Y * A * Yᴴ = 0 :=
+    (Matrix.PosSemidef.trace_eq_zero_iff
+      (Matrix.nonneg_iff_posSemidef.mp hYA_nonneg)).mp hYA_trace_zero
+  obtain ⟨X, hX⟩ := CStarAlgebra.nonneg_iff_eq_star_mul_self.mp hA
+  subst A
+  rw [Matrix.star_eq_conjTranspose] at hYA_zero ⊢
+  have hXY : X * Yᴴ = 0 := by
+    have hself : (X * Yᴴ)ᴴ * (X * Yᴴ) = 0 := by
+      simpa [Matrix.conjTranspose_mul, Matrix.mul_assoc] using hYA_zero
+    exact Matrix.conjTranspose_mul_self_eq_zero.mp hself
+  calc
+    (Xᴴ * X) * (Yᴴ * Y) = Xᴴ * (X * (Yᴴ * Y)) := by
+      rw [Matrix.mul_assoc]
+    _ = Xᴴ * ((X * Yᴴ) * Y) := by
+      simp [Matrix.mul_assoc]
+    _ = 0 := by
+      rw [hXY, Matrix.zero_mul, Matrix.mul_zero]
+
 /-- An operator between `0` and `1` dominates its square. -/
 theorem sq_le_self [DecidableEq d] {X : Op d} (hX : 0 ≤ X) (hXle : X ≤ 1) :
     X * X ≤ X := by
