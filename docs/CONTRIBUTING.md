@@ -324,7 +324,7 @@ label set.
 |--------------|------------------------------------------------------|
 | `2009.12982` | The main LDT paper tracked in this repository        |
 
-### Blueprint provenance
+### Blueprint provenance labels
 
 | Label            | Description                                                      |
 |------------------|------------------------------------------------------------------|
