@@ -371,6 +371,20 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	postprocessing at a point agrees with evaluating the corresponding slice.
 	The same identities commute with averaging over indexed submeasurements.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.postprocess_hRestrictionToVerticalLine_eq_evaluateAt}
+	\lean{MIPStarRE.LDT.Pasting.restrictToAxisParallelLine_apply}
+	\lean{MIPStarRE.LDT.Pasting.interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem}
+	\lean{MIPStarRE.LDT.Pasting.evaluateAt_averageIdxSubMeas}
+	\lean{MIPStarRE.LDT.Pasting.hRestrictionToVerticalLine_averageIdxSubMeas}
+	\lean{MIPStarRE.LDT.Pasting.postprocess_restrictSubMeas_outcome}
+	\leanok
+	\uses{def:pasted-measurement}
+	The compatibility calculation for the restriction and evaluation maps used
+	in the construction of~$H$ expands the vertical
+	restriction, the interpolation support condition, postprocessing, and
+	averaging over indexed submeasurements.
+\end{proof}
 
 \subsection{Strong Self-Consistency and Commutation of $\widehat G$}
 \label{sec:hat-consistency}
@@ -431,6 +445,20 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	family, the two fourth-term contractions are bounded by the same
 	self-consistency and commutation errors used in the switcheroo argument.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.switcherooAggregateFourthTerm_once_commuted_contraction_left}
+	\lean{MIPStarRE.LDT.Pasting.switcherooAggregateFourthTerm_once_commuted_contraction_right}
+	\leanok
+	\uses{prop:switch-sandwich, lem:g-complete-self-consistency}
+	After expanding the fourth switcheroo term, the inserted complete part
+	forms a positive contraction.  The left and right Cauchy--Schwarz
+	side conditions are therefore the corresponding sums of
+	$X_gX_g^\ast$ and $X_g^\ast X_g$, where
+	$X_g=\sum_o G_{\bot}^x M_o^yG_g^xM_o^y$.  Orthogonality of the
+	projective slice family and the submeasurement inequalities for $M$
+	and $G_{\bot}$ bound both sums by the identity.  These are precisely
+	the two contraction witnesses used in the fourth-term switcheroo chain.
+\end{proof}
 
 \begin{lemma}[Commutativity with $G_g^x$ implies commutativity with $G^x$]\label{lem:commutativity-switcheroo}
 	\lean{MIPStarRE.LDT.Pasting.commutativitySwitcheroo}
@@ -660,6 +688,14 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	The contribution of the completed part in the squared-distance defect is
 	bounded by the corresponding slice contribution.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.qSDD_completePart_le_slice}
+	\leanok
+	\uses{def:G-hat, cor:G-hat-facts}
+	This is the monotonicity estimate for the completed part of~$\widehat G$:
+	the completed contribution is one summand of the corresponding slice
+	squared-distance defect, and the remaining summands are nonnegative.
+\end{proof}
 
 \subsection{Sandwiching Lemmas}
 \label{sec:ld-sandwiching}
@@ -672,6 +708,20 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	head--tail reindexing, and the corresponding sums of adjoint-products are
 	bounded above by the identity.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_outcome}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_total}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichRight_split_outcome}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichRight_split_total}
+	\lean{MIPStarRE.LDT.Pasting.gHatHalfProduct_sum_adjoint_mul_le_one}
+	\lean{MIPStarRE.LDT.Pasting.gHatReverseHalfProduct_sum_adjoint_mul_le_one}
+	\lean{MIPStarRE.LDT.Pasting.leftTensor_rightTensor_sum_adjoint_mul_le_one}
+	\leanok
+	\uses{def:G-hat, def:completed-outcome-reindexing}
+	The split identities follow from the completed-outcome equivalences.  The
+	normalization inequalities are the corresponding submeasurement bounds for
+	the left and right half-products after reindexing the sums.
+\end{proof}
 
 \begin{lemma}[One-step completed sandwich commutation]\label{lem:one-step-completed-sandwich-commutation}
 	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_step_commute, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_prefixFirstSliceLeft_move, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveSource_eq_split, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_move_recursive_zero, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_split_one_iff, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core_two, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveStepMid_toTarget, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
@@ -681,6 +731,23 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	provide the one-step estimates used to move a completed measurement through
 	a half-sandwich.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_step_commute}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_prefixFirstSliceLeft_move}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveSource_eq_split}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_move_recursive_zero}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_split_one_iff}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core_two}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveStepMid_toTarget}
+	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
+	\leanok
+	\uses{cor:G-hat-facts, lem:completed-sandwich-normalization, prop:triangle-inequality-for-approx_delta}
+	For the one-step commutation move, rewrite the relevant head--tail split,
+	apply the self-consistency and commutation estimates
+	for~$\widehat G$, and assemble the resulting comparison by the triangle
+	inequality for~$\approx_\delta$.
+\end{proof}
 
 \begin{lemma}[Commuting past multiple completed measurements]\label{lem:commute-g-half-sandwich}
 	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich}
@@ -744,6 +811,24 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 		families (Lemma~\ref{lem:ld-sandwich-line-one-point})
 		restricted to coordinate $i$, and $\operatorname{Bad}(\psi;u,\mathbf{x})\le 1$.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch}
+	\lean{MIPStarRE.LDT.Pasting.interpolationEligibleSandwich_mismatch_sum_mono}
+	\lean{MIPStarRE.LDT.Pasting.interpolationEligibleSandwich_exists_mismatch_sum_le_sum}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteConsDefect_postprocess_eq_singleOutcome}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteConsDefect_eq_sum_singleOutcome}
+	\lean{MIPStarRE.LDT.Pasting.ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum}
+	\lean{MIPStarRE.LDT.Pasting.hBConsistencyCoordMass_le_linePointDefect}
+	\lean{MIPStarRE.LDT.Pasting.hBConsistencyBadMass_le_one}
+	\lean{MIPStarRE.LDT.Pasting.pastedInterpolation_verticalLine_defect_le_badMass}
+	\leanok
+	\uses{lem:vertical-restriction-identities, lem:ld-gbcon}
+	The proof first identifies a failed vertical-line interpolation with a
+	particular active coordinate whose slice value disagrees with the line
+	answer. The operator sum over all such failures is then bounded by the sum
+	of the corresponding one-coordinate line defects, using the vertical
+	restriction identities above.
+\end{proof}
 
 \begin{lemma}[Averaging the line-interpolation defect]\label{lem:line-interpolation-averaging-estimates}
 	\lean{MIPStarRE.LDT.Pasting.avgOver_distinct_bounded_le_avgOver_uniform_add_tv, MIPStarRE.LDT.Pasting.qBipartiteMatchMass_averageIdxSubMeas_left, MIPStarRE.LDT.Pasting.ev_opTensor_total_averageIdxSubMeas_left, MIPStarRE.LDT.Pasting.qBipartiteConsDefect_averageIdxSubMeas_left_le, MIPStarRE.LDT.Pasting.hBConsistency_fixed_u_defect_le_avgOver_distinct, MIPStarRE.LDT.Pasting.one_div_q_le_rpow_degreeRatio, MIPStarRE.LDT.Pasting.avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError, MIPStarRE.LDT.Pasting.avgOver_distinct_badMass_le_hBConsistencyError, MIPStarRE.LDT.Pasting.qBipartiteConsDefect_eq_false_mass_of_bool_right_true, MIPStarRE.LDT.Pasting.avgOver_distinct_pasted_defect_le_badMass}
@@ -776,6 +861,26 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	$44k^2m(\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}+\zeta^{1/32}+(d/q)^{1/32})$
 	as used in Lemma~\ref{lem:h-b-consistency}.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.avgOver_distinct_bounded_le_avgOver_uniform_add_tv}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteMatchMass_averageIdxSubMeas_left}
+	\lean{MIPStarRE.LDT.Pasting.ev_opTensor_total_averageIdxSubMeas_left}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteConsDefect_averageIdxSubMeas_left_le}
+	\lean{MIPStarRE.LDT.Pasting.hBConsistency_fixed_u_defect_le_avgOver_distinct}
+	\lean{MIPStarRE.LDT.Pasting.one_div_q_le_rpow_degreeRatio}
+	\lean{MIPStarRE.LDT.Pasting.avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError}
+	\lean{MIPStarRE.LDT.Pasting.avgOver_distinct_badMass_le_hBConsistencyError}
+	\lean{MIPStarRE.LDT.Pasting.qBipartiteConsDefect_eq_false_mass_of_bool_right_true}
+	\lean{MIPStarRE.LDT.Pasting.avgOver_distinct_pasted_defect_le_badMass}
+	\leanok
+	\uses{prop:ld-dnoteq, lem:line-interpolation-mismatch-estimates}
+	The proof compares the distinct-tuple average with the independent-tuple
+	average, paying the total-variation cost from
+	Proposition~\ref{prop:ld-dnoteq}. The independent average separates into
+	the one-coordinate line defects from the previous lemma, and the scalar
+	inequality $1/q\le (d/q)^{1/32}$ absorbs the sampling error into the stated
+	pasting parameter.
+\end{proof}
 
 \begin{lemma}[Consistency of the sandwiched measurement with one line value]\label{lem:ld-sandwich-line-one-point}
 	\lean{MIPStarRE.LDT.Pasting.ldSandwichLineOnePoint}
@@ -948,6 +1053,15 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	with error $\nu_6$. Then the pointwise evaluations of $H$ are consistent with
 	Alice's point measurement with error $\nu$.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_from_lineConsistency}
+	\leanok
+	\uses{prop:triangle-sub}
+	The proof transports the vertical-line consistency estimate to point
+	evaluations and combines it with the good-strategy point-to-line comparison.
+	The displayed numerical assumptions are used only to absorb the intermediate
+	errors into the final parameter~$\nu$.
+\end{proof}
 
 \begin{corollary}[Consistency of the completed $H$ with $A$]
 	\label{cor:h-a-consistency-completed}
@@ -988,6 +1102,13 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	fallback polynomial preserves point consistency with the enlarged error
 	appearing in the induction statement.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
+	\leanok
+	The completed measurement differs from the original submeasurement only at
+	the fallback polynomial.  The additional term is bounded by the missing-mass
+	estimate and then added to the given point-consistency error.
+\end{proof}
 
 \subsection{Completeness of $H$}
 \label{sec:completeness-of-h-low-degree}
@@ -1445,6 +1566,15 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	the conversion from the pasted sum to the polynomial in $G$ to the parameters
 	and error bounds fixed in Definition~\ref{def:ld-pasting-context}.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.Pasting.hAConsistency_submeas_of_context}
+	\lean{MIPStarRE.LDT.Pasting.fromHToG_of_context}
+	\leanok
+	\uses{def:ld-pasting-context, cor:h-a-consistency, lem:from-H-to-G}
+	These are direct specializations of the two preceding construction theorems
+	to the notation and numerical hypotheses packaged in the nontrivial-regime
+	pasting context.
+\end{proof}
 
 \begin{lemma}[Matrix Chernoff bound for the Bernoulli polynomial]\label{lem:chernoff-bernoulli-matrix}
 	\lean{MIPStarRE.LDT.Pasting.chernoffBernoulliMatrix}
