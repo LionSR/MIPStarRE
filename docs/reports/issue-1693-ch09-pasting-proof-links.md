@@ -2,7 +2,7 @@
 
 ## Scope
 
-This note records a proof-status repair for six Chapter 9 pasting nodes that
+This note records a proof-status repair for nine Chapter 9 pasting nodes that
 already had source-faithful Lean declarations.  The source material is
 `references/ldt-paper/ld-pasting.tex`, especially the construction of the
 pasted submeasurement, the completed-measurement sandwich estimates, and the
@@ -38,7 +38,7 @@ blueprint assertion, and has no `sorryAx` dependency.
   `H`-with-`A` consistency estimate and the conversion from the pasted sum to
   the polynomial in `G`.
 
-After rebuilding the blueprint web output, all six nodes are proof-filled in
+After rebuilding the blueprint web output, all nine nodes are proof-filled in
 `blueprint/web/dep_graph_document.html`.  The nodes with all ancestors complete
 use the dark-green fill `#1CAC78`; the nodes whose ancestors are still not all
 complete use the ordinary proof-green fill `#9CEC8B`.

@@ -380,8 +380,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.postprocess_restrictSubMeas_outcome}
 	\leanok
 	\uses{def:pasted-measurement}
-	The proof is the formal compatibility calculation for the restriction and
-	evaluation maps used in the construction of~$H$.  Lean unfolds the vertical
+	The proof is the compatibility calculation for the restriction and
+	evaluation maps used in the construction of~$H$: expand the vertical
 	restriction, the interpolation support condition, postprocessing, and
 	averaging over indexed submeasurements.
 \end{proof}
@@ -729,10 +729,10 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
 	\leanok
 	\uses{cor:G-hat-facts, lem:completed-sandwich-normalization, prop:triangle-inequality-for-approx_delta}
-	The proof isolates the one-step commutation move.  Lean first rewrites the
-	relevant head--tail split, applies the self-consistency and commutation
-	estimates for~$\widehat G$, and then assembles the resulting comparison by
-	the triangle inequality for~$\approx_\delta$.
+	The proof isolates the one-step commutation move: rewrite the relevant
+	head--tail split, apply the self-consistency and commutation estimates
+	for~$\widehat G$, and assemble the resulting comparison by the triangle
+	inequality for~$\approx_\delta$.
 \end{proof}
 
 \begin{lemma}[Commuting past multiple completed measurements]\label{lem:commute-g-half-sandwich}
@@ -1092,8 +1092,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
 	\leanok
 	The completed measurement differs from the original submeasurement only on
-	the fallback polynomial.  Lean bounds the additional term by the missing-mass
-	estimate and adds it to the given point-consistency error.
+	the fallback polynomial.  The additional term is bounded by the missing-mass
+	estimate and then added to the given point-consistency error.
 \end{proof}
 
 \subsection{Completeness of $H$}
