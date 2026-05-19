@@ -380,8 +380,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.postprocess_restrictSubMeas_outcome}
 	\leanok
 	\uses{def:pasted-measurement}
-	The proof is the compatibility calculation for the restriction and
-	evaluation maps used in the construction of~$H$: expand the vertical
+	The compatibility calculation for the restriction and evaluation maps used
+	in the construction of~$H$ expands the vertical
 	restriction, the interpolation support condition, postprocessing, and
 	averaging over indexed submeasurements.
 \end{proof}
@@ -449,6 +449,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.switcherooAggregateFourthTerm_once_commuted_contraction_left}
 	\lean{MIPStarRE.LDT.Pasting.switcherooAggregateFourthTerm_once_commuted_contraction_right}
 	\leanok
+	\proves{lem:switcheroo-contraction-estimates}
+	\uses{prop:switch-sandwich, lem:g-complete-self-consistency}
 	After expanding the fourth switcheroo term, the inserted complete part
 	forms a positive contraction.  The left and right Cauchy--Schwarz
 	side conditions are therefore the corresponding sums of
@@ -742,8 +744,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
 	\leanok
 	\uses{cor:G-hat-facts, lem:completed-sandwich-normalization, prop:triangle-inequality-for-approx_delta}
-	The proof isolates the one-step commutation move: rewrite the relevant
-	head--tail split, apply the self-consistency and commutation estimates
+	For the one-step commutation move, rewrite the relevant head--tail split,
+	apply the self-consistency and commutation estimates
 	for~$\widehat G$, and assemble the resulting comparison by the triangle
 	inequality for~$\approx_\delta$.
 \end{proof}
@@ -1104,7 +1106,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{proof}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
 	\leanok
-	The completed measurement differs from the original submeasurement only on
+	The completed measurement differs from the original submeasurement only at
 	the fallback polynomial.  The additional term is bounded by the missing-mass
 	estimate and then added to the given point-consistency error.
 \end{proof}
