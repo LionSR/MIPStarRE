@@ -42,6 +42,28 @@ class BlueprintLeanokAxiomsTests(unittest.TestCase):
         self.assertTrue(results["Foo.bad"].sorry)
         self.assertFalse(results["Foo.missing"].exists)
 
+    def test_parse_axiom_output_accepts_single_quoted_primed_decls(self) -> None:
+        harness = Path("/tmp/BlueprintLeanokAxioms.lean")
+        decl = "MIPStarRE.LDT.Pasting.gHatTupleOutcomeConsEquiv'"
+        output = (
+            "'MIPStarRE.LDT.Pasting.gHatTupleOutcomeConsEquiv'' "
+            "depends on axioms: [propext, Classical.choice, Quot.sound]"
+        )
+        results = parse_axiom_output(
+            output,
+            [decl],
+            harness_path=harness,
+            line_to_decl={3: decl},
+            returncode=0,
+        )
+        self.assertIsNotNone(results)
+        self.assertTrue(results[decl].exists)
+        self.assertFalse(results[decl].sorry)
+        self.assertEqual(
+            results[decl].axioms,
+            ["propext", "Classical.choice", "Quot.sound"],
+        )
+
     def test_parse_axiom_output_returns_none_on_global_harness_failure(self) -> None:
         harness = Path("/tmp/BlueprintLeanokAxioms.lean")
         output = f"{harness}:1:0: error: import Foo.Bar failed"
