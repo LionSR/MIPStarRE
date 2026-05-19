@@ -225,6 +225,7 @@
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingDataOfSmallError}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one}
 	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
@@ -237,7 +238,14 @@
 	\(0<d\), \(1\le k\), \(\gamma\le 1\), \(\zeta\le 1\), or \(d\le q\) as
 	separate proof inputs.  The answer-valued small-error assembly then converts
 	the answer-valued slice data to this pasting interface and applies the
-	checked stage-data theorem.
+	checked stage-data theorem.  The Lean theorem
+	\texttt{mainInductionSuccessorNext\_ofAnswerSliceTransport} closes the
+	positive-degree successor branch once the two remaining internal
+	constructions are supplied: the predecessor answer-valued induction hypothesis
+	for the restricted slices and the slice-strategy transport needed to apply
+	Section~\ref{sec:self-improvement-and-pasting} to those slices.  This is an
+	internal assembly theorem, not an additional hypothesis in
+	Theorem~\ref{thm:main-induction}.
 \end{definition}
 
 \begin{lemma}[Base case of main induction]\label{lem:main-induction-base}
