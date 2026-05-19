@@ -522,21 +522,11 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
 	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency}
-	\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness}
-	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction}
 	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleInductionWitness}
+	\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
+	\leanok
 	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
-	The role-register Section~6 measurement is obtained by applying the
-	paper-facing theorem \texttt{MainInductionStep.mainInduction} to the
-	role-register symmetrization.  The Lean constructors
-	\texttt{MainFormalRoleInductionWitness.ofMainInduction} records this
-	application of the paper theorem; any successor proof gap is the tracked gap in
-	\texttt{mainInduction} itself, not an added hypothesis of
-	Theorem~\ref{thm:main-formal}.  The base-case role witness
-	\texttt{mainFormalBaseRoleInductionWitness} remains a named specialization for
-	$m=1$.
-
 	From a line-130 consistency relation, the theorem
 	\texttt{MainFormalDiagonalOrthonormalizationWitness.nonempty\_ofDiagonalConsistency}
 	constructs the pre-completion projective submeasurements using the Section~5
@@ -544,21 +534,40 @@
 	completion theorem
 	\texttt{MainFormalDiagonalCompletionWitness.nonempty\_ofDiagonalConsistency}
 	now derives the completion witness directly from the line-130 cross
-	consistency and the orthonormalization closeness estimates.  The exact
-	construction-level match-mass monotonicity branch has been removed from the
-	active `mainFormal` path; instead, the checked repaired route with an explicit
-	additional loss is recorded in
-	Remark~\ref{rem:lean-line169-projectivization-match-mass}.
+	consistency and the orthonormalization closeness estimates.
 
-	The remaining proof gap is not represented by diagonal-consistency,
-	match-mass, or other auxiliary input hypotheses.  The paper-facing theorem
-	itself remains unfinished.  Once a
-	\texttt{MainFormalProjectiveCompletionTransportWitness} has
-	been constructed from the paper hypotheses, the proved theorem
+	The base-case role witness
+	\texttt{mainFormalBaseRoleInductionWitness} is a named specialization for
+	$m=1$.  Given a constructed role-register witness, the theorem
+	\texttt{MainFormalProjectiveCompletionTransportWitness.nonempty\_ofRoleWitness}
+	constructs the Section~6 projective-completion witness.  The proved theorem
 	\texttt{mainFormal\_ofProjectiveCompletionTransportWitness} derives the three
-	consistency conclusions for Theorem~\ref{thm:main-formal}.  The witness is a
+	consistency conclusions for Theorem~\ref{thm:main-formal} from a constructed
+	Section~6 projective-completion witness.  The witness is a
 	construction target inside the proof, not an additional assumption in the
 	public statement.
+
+	The successor-dependent targets that call
+	Theorem~\ref{thm:main-induction} are recorded in
+	Definition~\ref{def:main-formal-step6-successor-targets}; they carry the
+	tracked successor proof gap of \ghissue{1507}.
+\end{definition}
+
+
+\begin{definition}[Lean successor-dependent Step~6 targets]\label{def:main-formal-step6-successor-targets}
+	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction}
+	\uses{def:main-formal-step6-obligations, thm:main-induction}
+	The role-register Section~6 measurement is obtained by applying the
+	paper-facing theorem \texttt{MainInductionStep.mainInduction} to the
+	role-register symmetrization.  The construction
+	\texttt{strategySymmetrization\_mainInduction} records this
+	application, and \texttt{MainFormalRoleInductionWitness.ofMainInduction}
+	builds the role-register witness from it.  Any successor proof gap is the
+	remaining proof obligation in \texttt{mainInduction} itself
+	(Remark~\ref{rem:main-induction-successor-assembly}, tracked by
+	\ghissue{1507}).  These targets are not an added hypothesis of
+	Theorem~\ref{thm:main-formal} but internal proof steps whose completion
+	waits on the discharge of the Section~6 successor proof.
 \end{definition}
 
 
