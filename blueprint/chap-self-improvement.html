@@ -221,6 +221,8 @@
     <span class="lemma_thmtitle">Self-improvement with non-projective output</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -603,7 +605,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The formalization records a strengthened helper theorem whose output carries the complementary-slackness equations used in the completeness chain. The previous top-level residual-domination assembly theorems have been removed: the full self-improvement conclusion is now stated only by the paper theorem below, whose incomplete proof explicitly records the remaining Section&#160;9 work. </p>
+  <p> The formalization records a strengthened helper theorem whose output carries the complementary-slackness equations used in the completeness chain. The previous top-level residual-domination assembly theorems have been removed: the full self-improvement conclusion is now stated only by the paper theorem below, and the slackness-carrying helper is obtained from the formalized Section&#160;9 SDP strong-duality statement. </p>
 
   </div>
 </div>
@@ -809,7 +811,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>                                 From a matrix-level strong-duality witness with complementary slackness of the shape asserted by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>, one obtains a complete measurement \(\{ T_g\} \), a feasible dual operator \(Z\), equality of the primal and dual objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\). Lean isolates the saturated canonical optimal-pair output required from strong duality: a feasible canonical primal matrix, a dual-feasible operator with equal objective value, canonical complementary slackness, and vanishing of the extra canonical slack block. This datum gives both the abstract slackness-carrying SDP statement and the displayed measurement witness without assuming \(I \le Z\). Lean also proves the converse saturation step for the dominance-carrying optimal pair: the canonical complementary-slackness equation on the extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\). Thus the dominance-carrying optimal pair canonically determines the saturated optimal pair, and hence also the matrix slackness statement without the dominance field. The paper-facing self-improvement helper consumes the resulting abstract SDP statement. </p>
+  <p>                                         From a matrix-level strong-duality witness with complementary slackness of the shape asserted by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>, one obtains a complete measurement \(\{ T_g\} \), a feasible dual operator \(Z\), equality of the primal and dual objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\). Lean isolates the saturated canonical optimal-pair output required from strong duality: a feasible canonical primal matrix, a dual-feasible operator with equal objective value, canonical complementary slackness, and vanishing of the extra canonical slack block. This datum gives both the abstract slackness-carrying SDP statement and the displayed measurement witness without assuming \(I \le Z\). Lean also proves the converse saturation step for the dominance-carrying optimal pair: the canonical complementary-slackness equation on the extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\). Thus the dominance-carrying optimal pair canonically determines the saturated optimal pair, and hence also the matrix slackness statement without the dominance field. The paper-facing self-improvement helper consumes the resulting abstract SDP statement. </p>
 
   </div>
 </div>
@@ -880,6 +882,8 @@
     <span class="lemma_thmtitle">Dual SDP and complementary slackness</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -912,7 +916,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>                                                                               Let </p>
+  <p>                                                                                   Let </p>
 <div class="displaymath" id="a0000000331">
   \[  A_g = \mathbb {E}_{u \sim \mathbb {F}_q^m} A^u_{g(u)}.  \]
 </div>
@@ -987,7 +991,8 @@
   <span class="equation_label">32</span>
 </p>
 </div>
-<p> We may assume that \(X\) is block diagonal. Translating&#160;<a href="chap-self-improvement.html#eq:complementary-slackness" class="eqref">32</a> back to the variables \(\{ T_g\} \) and&#160;\(Z\) yields \(T_g(Z-A_g)=0\) for every&#160;\(g\) and \(S Z=0\), where \(S=I-\sum _gT_g\) is the slack block. The paper then treats this as forcing \(S=0\). The current Lean development separates this point from the unconditional SDP statement: it proves the displayed saturation from the auxiliary dominance hypothesis \(I\le Z\). Thus, if the canonical complementary-slackness pair is supplied together with \(I\le Z\), Lean packages these conditional conclusions as a <span class="ttfamily">MatrixSdpOptimalWitnessWithDominance</span> once dual feasibility and equality of the paper primal and dual objectives have also been supplied. It also records the corresponding statement-level package, and an elimination theorem which exposes the complete measurement, the dual witness&#160;\(Z\), the retained dominance \(I\le Z\), dual feasibility, strong duality, and the equations&#160;<a href="chap-self-improvement.html#eq:slater" class="eqref">28</a>. The additional dominance requirement is not a consequence of the dual constraints \(Z\ge A_g\) alone; the discrepancy and the intended saturated-witness replacement are recorded in <span class="ttfamily">docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex</span>. In the concrete matrix realization, Lean records the defect-zero condition as <span class="ttfamily">matrixSdpComplementarySlacknessDefect</span>; the theorem <span class="ttfamily">MatrixSdpOptimalWitness.complementarySlacknessEquation</span> translates it to the displayed equation \(T_gZ=T_gA_g\), while <span class="ttfamily">MatrixSdpOptimalWitness.primalMeasurement</span> packages \(\sum _g T_g=I\) as a complete measurement. The statement <span class="ttfamily">MatrixSdpStatementWithSlackness</span> records this matrix-level strong-duality output without identifying it with the reduced feasible witness supplied by <span class="ttfamily">sdp</span>. The explicit Slater witnesses used above are separately recorded by <span class="ttfamily">matrixSdpStrictPrimalSubmeasurement</span>, <span class="ttfamily">matrixSdpStrictDualWitness</span>, and <span class="ttfamily">matrixSdpFeasibleBounds_canonical</span>; the dual feasibility of \(2I\) follows from <span class="ttfamily">matrixAveragedPointOperator_le_one</span>. The block-diagonal reduction is also recorded for arbitrary feasible canonical matrices: extracting the diagonal blocks preserves the objective and transfers canonical complementary slackness to the extracted paper primal submeasurement. </p>
+<p> Lean proves the strong-duality step by a finite-dimensional separation argument for the canonical primal image cone. Compactness gives attained primal and dual optima; if the optimal values differed, a normalized separating functional would be represented by a Hermitian trace-pairing matrix, producing a feasible dual operator with strictly smaller objective value and contradicting dual optimality. Weak duality then turns equality of the optimal values into the canonical complementary-slackness equation. </p>
+<p>The block-diagonal reduction is recorded for arbitrary feasible canonical matrices: extracting the diagonal blocks preserves the objective and transfers canonical complementary slackness to the extracted paper primal submeasurement. The formal proof then saturates the extra canonical slack block directly by replacing it with \(I-\sum _gT_g\). This preserves feasibility and the objective, gives a complete measurement, and translates the zero-defect condition to the displayed equations \(T_gZ=T_gA_g\) without assuming the auxiliary dominance bound \(I\le Z\). </p>
 
   </div>
 </div>
@@ -1177,7 +1182,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> Several auxiliary results are used to prove Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.11</a> from the helper output and the orthonormalization theorem. They record local intermediate estimates and final-field assembly lemmas. The orthonormalization obligation displayed here is only the spectral-truncation slice of the Section&#160;9 construction; it is not a locality-preserving repair theorem. The theorem below records the paper-facing conclusion; its proof is still not proof-complete because the current Lean route depends transitively on the SDP slackness statement tracked by issue&#160;#1230. </p>
+  <p> Several auxiliary results are used to prove Theorem&#160;<a href="chap-self-improvement.html#thm:self-improvement">7.11</a> from the helper output and the orthonormalization theorem. They record local intermediate estimates and final-field assembly lemmas. The orthonormalization obligation displayed here is only the spectral-truncation slice of the Section&#160;9 construction; it is not a locality-preserving repair theorem. The theorem below records the paper-facing conclusion. </p>
 
   </div>
 </div>
@@ -1190,6 +1195,8 @@
     <span class="theorem_thmtitle">Self-improvement</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
