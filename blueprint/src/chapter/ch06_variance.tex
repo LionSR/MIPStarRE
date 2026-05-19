@@ -23,8 +23,6 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{proof}
 
 \begin{remark}[Conditional variants for the collision-residual estimate]\label{rem:generalize-b-collision-residual-conditional}
-	\lean{MIPStarRE.LDT.GlobalVariance.generalizeBFromCollisionResidual, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_seedExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromSeedCollisionExpansion, MIPStarRE.LDT.GlobalVariance.generalizeBCollisionResidual_le_of_lineExpansion_eq, MIPStarRE.LDT.GlobalVariance.generalizeBFromLineCollisionExpansion}
-	\uses{lem:generalize-b, lem:schwartz-zippel-individual, lem:axis-line-polynomial-agreement-mdq}
 	The paper proof of Lemma~\ref{lem:generalize-b} bounds the collision event
 	directly by the Schwartz--Zippel estimate.  The following conditional variants
 	instead assume this collision estimate, or one of the reindexing identities
@@ -74,8 +72,6 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 \end{lemma}
 
 \begin{remark}[Polynomial-sum formalization for \ref{eq:equivalent-local-variance}]\label{rem:equivalent-local-variance-formalization-inputs}
-	\lean{MIPStarRE.LDT.GlobalVariance.axisParallelBaseEventApproximation_weighted_sample_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum, MIPStarRE.LDT.GlobalVariance.axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum}
-	\uses{lem:equivalent-local-variance, lem:local-variance-of-points, lem:generalize-b}
 	The three referenced declarations and Lemma~\ref{lem:equivalent-local-variance} together provide the full polynomial-sum (cardinality-free) chain proving the equation.  The chain assembly lemma \texttt{localVarianceDeviation\_sum\_le\_localVarianceOfPointsError} telescopes the six operator differences via \texttt{ev\_sum\_conjTranspose\_mul\_sum\_le}, sums over~$g$, and applies the six individual \texttt{\_sum} bounds (including the reverse~\texttt{generalizeB} sum) to avoid the per-polynomial cardinality blow-up.
 \end{remark}
 

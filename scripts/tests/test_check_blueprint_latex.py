@@ -63,6 +63,54 @@ class CheckBlueprintLatexTests(unittest.TestCase):
 
             self.assertEqual(check_blueprint_latex.find_cleveref_usage(root), [])
 
+    def test_finds_remark_metadata(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "chapter").mkdir()
+            (root / "chapter" / "test.tex").write_text(
+                textwrap.dedent(
+                    r"""
+                    \begin{remark}
+                      \lean{Foo.bar}
+                      \leanok
+                      \uses{lem:foo}
+                    \end{remark}
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            findings = check_blueprint_latex.find_remark_metadata(root)
+            self.assertEqual(
+                [finding.fragment for finding in findings],
+                [r"\lean{", r"\leanok", r"\uses{"],
+            )
+
+    def test_remark_metadata_check_ignores_theorems_and_comments(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "chapter").mkdir()
+            (root / "chapter" / "test.tex").write_text(
+                textwrap.dedent(
+                    r"""
+                    \begin{theorem}
+                      \lean{Foo.bar}
+                      \leanok
+                      \uses{lem:foo}
+                    \end{theorem}
+                    \begin{remark}
+                      % \lean{Foo.comment}
+                      This remark mentions Lean in prose without metadata.
+                    \end{remark}
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            self.assertEqual(check_blueprint_latex.find_remark_metadata(root), [])
+
 
 if __name__ == "__main__":
     unittest.main()
