@@ -295,48 +295,11 @@
     <a class="icon proof" href="chap-projective.html#rem:lean-questionwise-naimark">#</a>
     
     
-    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
-</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Uses</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="chap-projective.html#lem:naimark-helper">Lemma 4.7</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
-    
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-        </ul>
-    
-      </div>
-    </div>
-
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>   Lean currently proves the questionwise one-measurement interface obtained from Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.7</a>. For every indexed family \(A^x\) and \(B^y\), it produces local dilation data for each question and proves the corresponding single-outcome marginal-preservation identities. This is the interface used downstream in the formal development. It is not the full tensor-product correlation statement of Theorem&#160;<a href="chap-projective.html#thm:naimark">4.1</a>, whose simultaneous bipartite assembly remains recorded in <span class="ttfamily">docs/paper-gaps/naimark.tex</span>. </p>
+  <p> Lean currently proves the questionwise one-measurement interface obtained from Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.7</a>. For every indexed family \(A^x\) and \(B^y\), it produces local dilation data for each question and proves the corresponding single-outcome marginal-preservation identities. This is the interface used downstream in the formal development. It is not the full tensor-product correlation statement of Theorem&#160;<a href="chap-projective.html#thm:naimark">4.1</a>, whose simultaneous bipartite assembly remains recorded in <span class="ttfamily">docs/paper-gaps/naimark.tex</span>. </p>
 
   </div>
 </div>
@@ -429,27 +392,10 @@
     
     
     
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>   The following are Lean auxiliary declarations, not hypotheses in Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.3</a>. Let \(A=\{ A_a\} _{a\in \mathcal A}\) be a sub-measurement, and complete it to \(\widehat A\) on \(\mathcal A\cup \{ \bot \} \) by setting \(\widehat A_\bot =I-A_{\mathrm{tot}}\). Let \(\widehat P\) be a projective sub-measurement on the completed outcome set. If the completed projective family puts at least the original residual mass on the fresh outcome, </p>
+  <p> The following are Lean auxiliary declarations, not hypotheses in Theorem&#160;<a href="chap-projective.html#thm:orthonormalization">4.3</a>. Let \(A=\{ A_a\} _{a\in \mathcal A}\) be a sub-measurement, and complete it to \(\widehat A\) on \(\mathcal A\cup \{ \bot \} \) by setting \(\widehat A_\bot =I-A_{\mathrm{tot}}\). Let \(\widehat P\) be a projective sub-measurement on the completed outcome set. If the completed projective family puts at least the original residual mass on the fresh outcome, </p>
 <div class="displaymath" id="a0000000129">
   \[  \widehat A_\bot \leq \widehat P_\bot ,  \]
 </div>
@@ -480,50 +426,11 @@
     <a class="icon proof" href="chap-projective.html#rem:lean-right-register-completion-helpers">#</a>
     
     
-    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
-</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Uses</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="chap-projective.html#thm:orthonormalization">Theorem 4.3</a></li>
-          
-          <li><a href="sec-prelims.html#prop:completing-to-measurement">Lemma 3.42</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
-    
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-        </ul>
-    
-      </div>
-    </div>
-
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>    The inductive-step application of the orthogonalization lemma uses completion on both tensor factors. The formal development records the analytic completion statement on the left register; the shared preliminary helper compares right- and left-tensor placements at the level of the underlying state-dependent-distance form. Its submeasurement and indexed lemmas transport state-dependent distance to the right register under the permutation-invariance hypothesis on the state. The remaining two declarations combine this transport with the orthonormalize-and-complete output so that the line-156 projectivization transition can later be produced from the two completed measurements without restating the tensor-factor bookkeeping. </p>
+  <p> The inductive-step application of the orthogonalization lemma uses completion on both tensor factors. The formal development records the analytic completion statement on the left register; the shared preliminary helper compares right- and left-tensor placements at the level of the underlying state-dependent-distance form. Its submeasurement and indexed lemmas transport state-dependent distance to the right register under the permutation-invariance hypothesis on the state. The remaining two declarations combine this transport with the orthonormalize-and-complete output so that the line-156 projectivization transition can later be produced from the two completed measurements without restating the tensor-factor bookkeeping. </p>
 
   </div>
 </div>
@@ -542,52 +449,11 @@
     <a class="icon proof" href="chap-projective.html#rem:lean-line169-projectivization-match-mass">#</a>
     
     
-    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
-</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Uses</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="chap-projective.html#thm:orthonormalization">Theorem 4.3</a></li>
-          
-          <li><a href="sec-prelims.html#prop:completing-to-measurement">Lemma 3.42</a></li>
-          
-          <li><a href="sec-prelims.html#prop:triangle-sub">Lemma 3.20</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
-    
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-        </ul>
-    
-      </div>
-    </div>
-
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>      Lean exposes the quantitative obstruction at the projectivization transition used in the inductive step. The existing line-156 transition gives only the generic consequence of Proposition&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a>: from \(G^{\mathrm A}\simeq _{\zeta _1}G^{\mathrm B}\) and \(G^{\mathrm A}\approx _{\zeta _2}Q^{\mathrm A}\) one obtains \(Q^{\mathrm A}\simeq _{\zeta _1+\sqrt{\zeta _2}}G^{\mathrm B}\), and similarly on the other tensor factor. The declarations <span class="ttfamily">leftConsistency_with_triangleSub_loss</span> and <span class="ttfamily">rightConsistency_with_triangleSub_loss</span> are checked lemmas for this direct square-root-loss route. </p>
+  <p> Lean exposes the quantitative obstruction at the projectivization transition used in the inductive step. The existing line-156 transition gives only the generic consequence of Proposition&#160;<a href="sec-prelims.html#prop:triangle-sub">3.20</a>: from \(G^{\mathrm A}\simeq _{\zeta _1}G^{\mathrm B}\) and \(G^{\mathrm A}\approx _{\zeta _2}Q^{\mathrm A}\) one obtains \(Q^{\mathrm A}\simeq _{\zeta _1+\sqrt{\zeta _2}}G^{\mathrm B}\), and similarly on the other tensor factor. The declarations <span class="ttfamily">leftConsistency_with_triangleSub_loss</span> and <span class="ttfamily">rightConsistency_with_triangleSub_loss</span> are checked lemmas for this direct square-root-loss route. </p>
 <p>Lean also proves a more local repaired transport that keeps the comparison at the pre-completion stage. If \(P^{\mathrm A}\) is the orthonormalized projective sub-measurement with \(G^{\mathrm A}\approx _{\epsilon }P^{\mathrm A}\), then Proposition&#160;<a href="sec-prelims.html#prop:easy-approx-from-approx-delta">3.24</a> bounds the diagonal match-mass loss by \(\sqrt{\epsilon }\), and canonical completion can only add nonnegative diagonal match mass. Thus the declarations <span class="ttfamily">leftConsistency_of_completion_and_sdd</span> and <span class="ttfamily">rightConsistency_of_completion_and_sdd</span> prove \(Q^{\mathrm A}\simeq _{\zeta _1+\sqrt{\epsilon }}G^{\mathrm B}\) and its Bob-side mirror from the pre-projective \(\zeta _1\) consistency plus the pre-completion \(\approx _{\epsilon }\) comparison. In particular, substituting the checked orthonormalization error \(\epsilon =100\zeta _1^{1/4}\) yields the repaired line-169 bound \(\zeta _1+10\zeta _1^{1/8}\) recorded by <span class="ttfamily">leftConsistency_with_orthonormalization_loss</span> and its mirror. This is much sharper than the direct completion-level \(\zeta _1+\sqrt{\zeta _2}\) route, but it is still not the paper’s exact \(\zeta _1\). </p>
 <p>Lean also isolates the completion fact used inside this sharper repair: the canonical completion of a projective submeasurement can only increase its diagonal match mass against a fixed partner submeasurement. This is the formal declaration <span class="ttfamily">ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge</span>. The sharper route therefore pays its square-root loss before completion and then uses completion only in this monotone direction, with no additional match-mass penalty. </p>
 <p>The older exact-\(\zeta _1\) construction-level monotonicity statement has been retired. The current Section&#160;5 API proves the checked repaired transport above, and the active orthonormalization route now uses those repaired completion-transport estimates rather than a separate exact match-mass witness. </p>
@@ -917,35 +783,11 @@
     <a class="icon proof" href="chap-projective.html#rem:lean-orthonormalization-main-declarations">#</a>
     
     
-    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
-</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Uses</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.9</a></li>
-          
-          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma-formalized-envelope">Lemma 4.10</a></li>
-          
-          <li><a href="chap-projective.html#lem:left-lifted-projectivization-repair">Lemma 4.12</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  The Lean declaration <span class="ttfamily">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma</span> proves Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> without adding spectral-truncation or repair hypotheses. The proof first converts the cross-consistency hypothesis into the source almost-projective estimate for the measurement \(A_a \otimes I\), and then applies the locality-preserving \(Q/X/\widehat X/P\) construction in its heterogeneous left-register form. Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma-formalized-envelope">4.10</a> remains as the same-space corollary with the weaker public \(100\zeta ^{1/4}\) envelope. </p>
+  <p> The Lean declaration <span class="ttfamily">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma</span> proves Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> without adding spectral-truncation or repair hypotheses. The proof first converts the cross-consistency hypothesis into the source almost-projective estimate for the measurement \(A_a \otimes I\), and then applies the locality-preserving \(Q/X/\widehat X/P\) construction in its heterogeneous left-register form. Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma-formalized-envelope">4.10</a> remains as the same-space corollary with the weaker public \(100\zeta ^{1/4}\) envelope. </p>
 
   </div>
 </div>
@@ -1074,27 +916,10 @@
     
     
     
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  The declaration <span class="ttfamily">leftLiftedProjectivizationRepair</span> is the paper-labelled name for Lemma&#160;<a href="chap-projective.html#lem:left-lifted-projectivization-repair">4.12</a>. The older declaration <span class="ttfamily">leftLiftedProjectivizationRepairProducer</span> has the same public mathematical statement and is retained for compatibility with existing Section&#160;5 declarations. The word “producer” here refers to the construction theorem that produces the projective submeasurement; it is not a hypothesis added to the paper lemma. </p>
+  <p> The declaration <span class="ttfamily">leftLiftedProjectivizationRepair</span> is the paper-labelled name for Lemma&#160;<a href="chap-projective.html#lem:left-lifted-projectivization-repair">4.12</a>. The older declaration <span class="ttfamily">leftLiftedProjectivizationRepairProducer</span> has the same public mathematical statement and is retained for compatibility with existing Section&#160;5 declarations. The word “producer” here refers to the construction theorem that produces the projective submeasurement; it is not a hypothesis added to the paper lemma. </p>
 
   </div>
 </div>
@@ -1113,35 +938,11 @@
     <a class="icon proof" href="chap-projective.html#rem:conditional-orthonormalization-main-lemma-local">#</a>
     
     
-    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
-</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Uses</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
-          
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
-          
-          <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.9</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  This is the local Lean declaration recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.11</a>. Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency </p>
+  <p> This is the local Lean declaration recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.11</a>. Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency </p>
 <div class="displaymath" id="a0000000150">
   \[  \sum _a \langle \psi  \rvert  A_a \otimes A_a \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - \zeta ,  \]
 </div>
@@ -1168,33 +969,11 @@
     <a class="icon proof" href="chap-projective.html#rem:conditional-orthonormalization-measurement">#</a>
     
     
-    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
-</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Uses</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="sec-prelims.html#def:strong-self-consistency">Definition 3.34</a></li>
-          
-          <li><a href="sec-prelims.html#def:approx_delta">Definition 3.19</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>  This is the measurement-level Lean declaration recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.11</a>. Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency of \(A\) together with the spectral-truncation and locality-preserving repair witnesses for the left-lifted family \(\{ A_a \otimes I\} \). Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
+  <p> This is the measurement-level Lean declaration recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.11</a>. Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency of \(A\) together with the spectral-truncation and locality-preserving repair witnesses for the left-lifted family \(\{ A_a \otimes I\} \). Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
 <div class="displaymath" id="a0000000152">
   \[  A_a \otimes I \approx _{100 \zeta ^{1/4}} P_a \otimes I.  \]
 </div>
@@ -1211,59 +990,17 @@
     <span class="remark_thmtitle">Lean completion-route orthonormalization</span>
     <div class="thm_header_extras">
 
-    
-    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
     <a class="icon proof" href="chap-projective.html#rem:orthonormalization-completion-route">#</a>
     
     
-    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
-</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Uses</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="sec-prelims.html#prop:other-two-notions-of-self-consistency">Lemma 3.35</a></li>
-          
-          <li><a href="chap-projective.html#lem:left-lifted-projectivization-repair">Lemma 4.12</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
-    
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-        </ul>
-    
-      </div>
-    </div>
-
     
         </div>
   </div>
   <div class="remark_thmcontent">
-  
-<p>The paper theorem <a href="chap-projective.html#thm:orthonormalization">4.3</a> is proved in Lean with the \(100\zeta ^{1/4}\) constant. The declaration checked here is the completion-route theorem with the weaker bound \(120\zeta ^{1/4}\), recorded in <span class="ttfamily">orthonormalizationCompletionRouteError</span>. See <span class="ttfamily">docs/paper-gaps/issue-1032-orthonormalization-constant.tex</span>. </p>
+  <p> The paper theorem <a href="chap-projective.html#thm:orthonormalization">4.3</a> is proved in Lean with the \(100\zeta ^{1/4}\) constant. The declaration checked here is the completion-route theorem with the weaker bound \(120\zeta ^{1/4}\), recorded in <span class="ttfamily">orthonormalizationCompletionRouteError</span>. See <span class="ttfamily">docs/paper-gaps/issue-1032-orthonormalization-constant.tex</span>. </p>
 <p>Let \(A = \{ A_a\} \) be a sub-measurement with outcomes in \(\mathcal A\). Write \(A=\sum _a A_a\). The strong self-consistency assumption implies </p>
 <div class="displaymath" id="a0000000153">
   \[  \langle \psi  \rvert  A \otimes A \lvert \psi  \rangle  \geq \langle \psi  \rvert  A \otimes I \lvert \psi  \rangle  - \zeta ,  \]
@@ -1514,27 +1251,10 @@
     
     
     
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>         The source-facing Lean declarations for Lemma&#160;<a href="chap-projective.html#lem:projective-non-measurement">4.18</a> are the proposition <span class="ttfamily">projectiveNonMeasurement</span> and the construction theorem <span class="ttfamily">projectiveNonMeasurement_of_sourceAlmostProjective_full</span>. The declarations listed here are the endpoint and regime splits, the <span class="ttfamily">AlmostProjMeasStatement</span> witness forms, and the spectral-truncation input conversions used by later Section&#160;5 arguments. They are not additional hypotheses in the paper statement of Lemma&#160;<a href="chap-projective.html#lem:projective-non-measurement">4.18</a>. </p>
+  <p> The source-facing Lean declarations for Lemma&#160;<a href="chap-projective.html#lem:projective-non-measurement">4.18</a> are the proposition <span class="ttfamily">projectiveNonMeasurement</span> and the construction theorem <span class="ttfamily">projectiveNonMeasurement_of_sourceAlmostProjective_full</span>. The declarations listed here are the endpoint and regime splits, the <span class="ttfamily">AlmostProjMeasStatement</span> witness forms, and the spectral-truncation input conversions used by later Section&#160;5 arguments. They are not additional hypotheses in the paper statement of Lemma&#160;<a href="chap-projective.html#lem:projective-non-measurement">4.18</a>. </p>
 
   </div>
 </div>
@@ -2154,27 +1874,10 @@
     
     
     
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-        </ul>
-    
-      </div>
-    </div>
-
-    
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p>    If the family \(\{ Q_a\} \) were a projective measurement, then the vectors \(\lvert v_{a,i} \rangle \), over all \(a\) and all \(1 \leq i \leq m_a\), would be orthonormal. Then <a href="chap-projective.html#eq:looks-like-singular-value-decomposition" class="eqref">10</a> would already be a singular value decomposition of \(X\), with \(\Sigma = I_{m \times d}\). Equivalently, </p>
+  <p> If the family \(\{ Q_a\} \) were a projective measurement, then the vectors \(\lvert v_{a,i} \rangle \), over all \(a\) and all \(1 \leq i \leq m_a\), would be orthonormal. Then <a href="chap-projective.html#eq:looks-like-singular-value-decomposition" class="eqref">10</a> would already be a singular value decomposition of \(X\), with \(\Sigma = I_{m \times d}\). Equivalently, </p>
 <div class="displaymath" id="a0000000210">
   \[  X = U \cdot I_{m \times d} \cdot V^\dagger .  \]
 </div>
