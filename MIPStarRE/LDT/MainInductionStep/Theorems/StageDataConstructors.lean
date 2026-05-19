@@ -382,9 +382,9 @@ theorem AveragedPastingData.invokeLdPasting
 `restrict → induct → self-improve → paste` into the main-induction conclusion in
 one higher dimension.
 
-The assembly calls the unrestricted induction-section pasting theorem through
-`AveragedPastingData.invokeLdPasting`, so its public hypotheses are only the
-paper stage data and the large-`k` condition. -/
+The construction applies the unrestricted induction-section pasting theorem
+through `AveragedPastingData.invokeLdPasting`, so its public hypotheses are
+only the paper stage data and the large-`k` condition. -/
 theorem mainInductionFromStageData
     (params : Parameters)
     [FieldModel.{0} params.q]
