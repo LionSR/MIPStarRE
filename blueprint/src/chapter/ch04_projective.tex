@@ -96,6 +96,24 @@
 		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
 \end{theorem}
+\begin{proof}
+  \leanok
+  \uses{prop:completing-to-measurement, prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
+  Complete the sub-measurement $A$ to a measurement $\widehat A$ on the option
+  completion $\mathcal A \cup \{\bot\}$.  By
+  Proposition~\ref{prop:completing-to-measurement}, $\widehat A$ is
+  $2\zeta$-strongly self-consistent on the permutation-invariant state
+  $\ket{\psi}$.  Convert this to a $2\zeta$-consistency estimate for
+  $\widehat A$ with itself via
+  Proposition~\ref{prop:other-two-notions-of-self-consistency}, yielding the
+  source almost-projective estimate with error $4\zeta$.  Feed this into the
+  sharp locality-preserving repair route of
+  Lemma~\ref{lem:left-lifted-projectivization-repair} to obtain a projective
+  sub-measurement $\widehat P$ on the completed outcome set with error
+  $84(2\zeta)^{1/4}$.  Restrict $\widehat P$ to the original outcomes
+  $\mathcal A$ to obtain $P$.  Since $84 \cdot 2^{1/4} \leq 100$, this gives
+  $A_a \ot I \approx_{100\zeta^{1/4}} P_a \ot I$.
+\end{proof}
 
 \begin{remark}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
@@ -302,6 +320,13 @@
 	statement \(84\zeta^{1/4}\) is now formalized as
 	Lemma~\ref{lem:orthonormalization-main-lemma}.
 \end{lemma}
+\begin{proof}
+  \leanok
+  \uses{lem:orthonormalization-main-lemma}
+  Apply Lemma~\ref{lem:orthonormalization-main-lemma} to obtain a projective
+  sub-measurement $P$ with error $84\zeta^{1/4}$.  Since $84 \leq 100$, the
+  same $P$ satisfies the statement with the weaker $100\zeta^{1/4}$ envelope.
+\end{proof}
 
 \begin{remark}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
 	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
@@ -872,6 +897,16 @@
 		\end{equation}
 		Let $T = \{T_a\}$. Then $T$ is a projective measurement on $\C^m$.
 	\end{definition}
+	\begin{proof}
+		\leanok
+		\uses{lem:projective-low-rank-sum}
+		Given the rank-reduced projective family $\{Q_a\}$ from
+		Lemma~\ref{lem:projective-low-rank-sum}, the Lean construction assembles the
+		$Q$-layer datum: the projective operators $Q_a$, the auxiliary space
+		$\C^m$, the basis vectors $\ket{a,i}$, the auxiliary projective measurement
+		$T=\{T_a\}$, and the matrix $X = \sum_a X_a$ satisfying
+		$Q_a = X^\dagger T_a X$.
+	\end{proof}
 
 	\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
@@ -897,6 +932,18 @@
 		lemmas take explicit matrices $U,V,\Sigma,I_{m\times d}$ and derive the
 		two stored $\widehat X$ identities from the matrix calculation below.
 	\end{definition}
+	\begin{proof}
+		\leanok
+		\uses{def:matrix-decomposition-Q}
+		The Lean construction assembles the QXP-layer datum from the $Q$-layer and
+		the SVD-derived identities.  The existence lemmas
+		\texttt{exists\_qxpLayerData\_ofRankReductionSigmaRangeAndSvdIdentities}
+		and
+		\texttt{exists\_qxpLayerData\_ofRankReductionSigmaRangeAndRectangularSvd}
+		construct the datum from the rank-reduction witness, proving that
+		$\widehat X \widehat X^\dagger = I$ (Lemma~\ref{lem:X-hat-squared}) and
+		$X^\dagger \widehat X = \sqrt{Q}$ (Lemma~\ref{lem:X-times-X-hat}).
+	\end{proof}
 
 	\begin{remark}\label{rem:motivation-for-P}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_mul_eq_zero_of_ne_of_sum_le_one}
@@ -928,6 +975,13 @@
 			P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.
 		\]
 	\end{definition}
+	\begin{proof}
+		\leanok
+		\uses{def:svd-of-X, lem:P-projectivity}
+		From the QXP-layer datum, define $P_a = \widehat X_a^\dagger \widehat X_a$
+		where $\widehat X_a = T_a \widehat X$.  Lemma~\ref{lem:P-projectivity}
+		proves that $\{P_a\}$ is a projective sub-measurement.
+	\end{proof}
 
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
