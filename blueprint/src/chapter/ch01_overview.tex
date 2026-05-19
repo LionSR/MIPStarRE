@@ -10,16 +10,15 @@
 \end{theorem}
 \begin{remark}
 	The paper theorem is an external classical soundness input.  The nearby Lean
-	corollary below records the specialized conditional wrapper currently present
+	corollary below records the specialized conditional interface currently present
 	in the repository; it is not used to mark this source theorem as formalized.
 \end{remark}
 \begin{proof}
 	See Raz--Safra [RS97].
 \end{proof}
 
-\begin{proposition}[Lean Raz--Safra wrapper]\label{prop:lean-raz-safra-wrapper}
-	\lean{MIPStarRE.LDT.Test.SurfaceVsPointPassCondition}
-	\lean{MIPStarRE.LDT.Test.RazSafraSoundnessStatement, MIPStarRE.LDT.Test.razSafra}
+\begin{proposition}[Conditional Raz--Safra corollary]\label{prop:lean-raz-safra-interface}
+	\lean{MIPStarRE.LDT.Test.SurfaceVsPointPassCondition, MIPStarRE.LDT.Test.RazSafraSoundnessStatement, MIPStarRE.LDT.Test.razSafra}
 	\leanok
 	\uses{thm:raz-safra}
 	The Lean theorem \texttt{MIPStarRE.LDT.Test.razSafra} is a conditional
@@ -29,7 +28,7 @@
 	point-answer function, error parameter, and chosen slack bound, and assumes
 	the corresponding modeled surface-versus-point pass condition
 	\texttt{MIPStarRE.LDT.Test.SurfaceVsPointPassCondition}.  Under these two
-	inputs it returns a repository polynomial whose evaluations agree with the
+	hypotheses it returns a repository polynomial whose evaluations agree with the
 	point answers up to the specified slack.
 \end{proposition}
 \begin{proof}
@@ -49,17 +48,15 @@
 \end{theorem}
 \begin{remark}
 	The paper theorem is an external classical soundness input.  The nearby Lean
-	corollary below records the specialized conditional wrapper currently present
+	corollary below records the specialized conditional interface currently present
 	in the repository; it is not used to mark this source theorem as formalized.
 \end{remark}
 \begin{proof}
 	See Polishchuk--Spielman [PS94].
 \end{proof}
 
-\begin{proposition}[Lean Polishchuk--Spielman wrapper]\label{prop:lean-classical-test-soundness-wrapper}
-	\lean{MIPStarRE.LDT.Test.TwoProverClassicalLIDPassCondition}
-	\lean{MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement}
-	\lean{MIPStarRE.LDT.Test.classicalTestSoundness}
+\begin{proposition}[Conditional Polishchuk--Spielman corollary]\label{prop:lean-classical-test-soundness-interface}
+	\lean{MIPStarRE.LDT.Test.TwoProverClassicalLIDPassCondition, MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement, MIPStarRE.LDT.Test.classicalTestSoundness}
 	\leanok
 	\uses{thm:classical-test-soundness}
 	The Lean theorem \texttt{MIPStarRE.LDT.Test.classicalTestSoundness} is a
@@ -68,7 +65,7 @@
 	\texttt{MIPStarRE.LDT.Test.TwoProverClassicalLIDPassCondition} and a
 	specialized external hypothesis
 	\texttt{MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement}
-	at the caller's chosen slack bound.  Under these inputs it returns a
+	at the caller's chosen slack bound.  Under these hypotheses it returns a
 	repository polynomial whose evaluations agree with the point answers up to
 	that slack.
 \end{proposition}

@@ -7,8 +7,8 @@ classical soundness nodes.
 
 | Node | Public graph status | Paper source | Lean declaration | Classification | Repair |
 | --- | --- | --- | --- | --- | --- |
-| `thm:raz-safra` | Source theorem linked to a Lean declaration, but not formalized | `references/ldt-paper/introduction.tex:43-65` | `MIPStarRE.LDT.Test.razSafra` | Conditional wrapper | Remove the direct Lean link from the source theorem and add a separate Lean-only wrapper proposition with the explicit external hypothesis displayed. |
-| `thm:classical-test-soundness` | Source theorem linked to a Lean declaration, but not formalized | `references/ldt-paper/introduction.tex:69-92` | `MIPStarRE.LDT.Test.classicalTestSoundness` | Conditional wrapper | Remove the direct Lean link from the source theorem and add a separate Lean-only wrapper proposition with the explicit external hypothesis displayed. |
+| `thm:raz-safra` | Source theorem linked to a Lean declaration, but not formalized | `references/ldt-paper/introduction.tex:43-65` | `MIPStarRE.LDT.Test.razSafra` | Conditional interface | Remove the direct Lean link from the source theorem and add a separate Lean-only conditional corollary with the explicit external hypothesis displayed. |
+| `thm:classical-test-soundness` | Source theorem linked to a Lean declaration, but not formalized | `references/ldt-paper/introduction.tex:69-92` | `MIPStarRE.LDT.Test.classicalTestSoundness` | Conditional interface | Remove the direct Lean link from the source theorem and add a separate Lean-only conditional corollary with the explicit external hypothesis displayed. |
 
 ## Mathematical content
 
@@ -34,7 +34,7 @@ Paper assumptions:
 - a two-prover strategy passes the \(k=2\) surface-versus-point low-degree test
   with probability \(1-\varepsilon\).
 
-Lean wrapper assumptions:
+Lean conditional-interface assumptions:
 
 - `SurfaceVsPointPassCondition params a eps`;
 - `RazSafraSoundnessStatement params a eps (razSafraSlackBound params eps)`.
@@ -44,13 +44,14 @@ Paper conclusion:
 - there exists a degree-\(d\) polynomial agreeing with the point answers with
   error at most \(\varepsilon + \operatorname{poly}(m)\operatorname{poly}(d/q)\).
 
-Lean wrapper conclusion:
+Lean conditional-interface conclusion:
 
 - there exists `slack` satisfying
   `PointAnswerSoundnessConclusion params a (razSafraSlackBound params eps)
   slack`.
 
-Verdict: conditional wrapper, not the source theorem.
+Verdict: conditional interface, not the source theorem.
+
 ### `thm:classical-test-soundness`
 
 Paper assumptions:
@@ -58,7 +59,7 @@ Paper assumptions:
 - a two-prover strategy passes the low individual degree test with probability
   \(1-\varepsilon\).
 
-Lean wrapper assumptions:
+Lean conditional-interface assumptions:
 
 - `TwoProverClassicalLIDPassCondition params a eps`;
 - `PolishchukSpielmanClassicalSoundnessStatement params a eps slackBound`.
@@ -70,9 +71,9 @@ Paper conclusion:
   \(\operatorname{poly}(m)(\operatorname{poly}(\varepsilon)+
   \operatorname{poly}(d/q))\).
 
-Lean wrapper conclusion:
+Lean conditional-interface conclusion:
 
 - there exists `slack` satisfying
   `PointAnswerSoundnessConclusion params a slackBound slack`.
 
-Verdict: conditional wrapper, not the source theorem.
+Verdict: conditional interface, not the source theorem.
