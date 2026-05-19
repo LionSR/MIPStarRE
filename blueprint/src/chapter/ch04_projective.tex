@@ -56,8 +56,6 @@
 \end{proof}
 
 \begin{remark}[Lean questionwise Naimark interface]\label{rem:lean-questionwise-naimark}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark, MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
-	\uses{lem:naimark-helper}
 	Lean currently proves the questionwise one-measurement interface obtained
 	from Lemma~\ref{lem:naimark-helper}.  For every indexed family \(A^x\) and
 	\(B^y\), it produces local dilation data for each question and proves the
@@ -98,8 +96,6 @@
 \end{theorem}
 
 \begin{remark}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
 	The following are Lean auxiliary declarations, not hypotheses in
 	Theorem~\ref{thm:orthonormalization}.
 	Let \(A=\{A_a\}_{a\in\mathcal A}\) be a sub-measurement, and complete it to
@@ -127,9 +123,6 @@
 \end{remark}
 
 \begin{remark}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
-	\uses{thm:orthonormalization, prop:completing-to-measurement}
-	\lean{MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.qSDD_liftRight_eq_liftLeft_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement.completedCloseness_liftRight, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements}
 	The inductive-step application of the orthogonalization lemma uses
 	completion on both tensor factors.  The formal development records the
 	analytic completion statement on the left register; the shared preliminary
@@ -144,11 +137,6 @@
 \end{remark}
 
 \begin{remark}[Lean line-169 projectivization match-mass declarations]\label{rem:lean-line169-projectivization-match-mass}
-	\uses{thm:orthonormalization, prop:completing-to-measurement, prop:triangle-sub}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss}
 	Lean exposes the quantitative obstruction at the projectivization transition used
 	in the inductive step.  The existing line-156 transition gives only the generic
 	consequence of Proposition~\ref{prop:triangle-sub}: from
@@ -304,7 +292,6 @@
 \end{lemma}
 
 \begin{remark}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
-	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
 	The Lean declaration
 	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
 	proves Lemma~\ref{lem:orthonormalization-main-lemma} without adding
@@ -356,7 +343,6 @@
 \end{proof}
 
 	\begin{remark}[Lean implementation name for projectivization repair]\label{rem:lean-left-lifted-projectivization-repair-producer}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
 		The declaration \texttt{leftLiftedProjectivizationRepair} is the
 		paper-labelled name for
 	Lemma~\ref{lem:left-lifted-projectivization-repair}.  The older declaration
@@ -368,7 +354,6 @@
 \end{remark}
 
 \begin{remark}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
-	\uses{def:strong-self-consistency, def:approx_delta, lem:orthonormalization-main-lemma}
 	This is the local Lean declaration recorded in
 	Remark~\ref{rem:lean-orthonormalization-main-declarations}.
 	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
@@ -398,7 +383,6 @@
 \end{remark}
 
 \begin{remark}[Lean conditional declaration: measurement-level orthogonalization]\label{rem:conditional-orthonormalization-measurement}
-	\uses{def:strong-self-consistency, def:approx_delta}
 	This is the measurement-level Lean declaration recorded in
 	Remark~\ref{rem:lean-orthonormalization-main-declarations}.
 	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
@@ -416,9 +400,6 @@
 \end{remark}
 
 \begin{remark}[Lean completion-route orthonormalization]\label{rem:orthonormalization-completion-route}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}
-	\leanok
-	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
 
 	The paper theorem \ref{thm:orthonormalization} is proved in Lean with the
 	\(100\zeta^{1/4}\) constant.  The declaration checked here is the
@@ -575,14 +556,6 @@
 	\end{proof}
 
 	\begin{remark}[Lean auxiliary declarations for rounding to projectors]\label{rem:lean-projective-non-measurement-auxiliary}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_zero}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_sourceAlmostProjective_large}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement_full}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement.toRoundingToProjectorsWitness}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_projectiveNonMeasurement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective}
 		The source-facing Lean declarations for
 		Lemma~\ref{lem:projective-non-measurement} are the proposition
 		\texttt{projectiveNonMeasurement} and the construction theorem
@@ -899,9 +872,6 @@
 	\end{definition}
 
 	\begin{remark}\label{rem:motivation-for-P}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_mul_eq_zero_of_ne_of_sum_le_one}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one}
 		If the family $\{Q_a\}$ were a projective measurement, then the vectors
 		$\ket{v_{a,i}}$, over all $a$ and all $1 \leq i \leq m_a$, would be orthonormal.
 		Then \eqref{eq:looks-like-singular-value-decomposition} would already be a singular value
