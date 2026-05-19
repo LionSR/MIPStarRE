@@ -162,5 +162,5 @@ and suitable for downstream automation.
 
 - [`scripts/blueprint_lean_sync.py`](../scripts/blueprint_lean_sync.py)
   — blueprint ↔ Lean declaration sync.
-- [`scripts/check_blueprint_sync.py`](../scripts/check_blueprint_sync.py)
+- [`scripts/blueprint_leanok_axioms.py`](../scripts/blueprint_leanok_axioms.py)
   — axiom-level `\leanok` verification harness used by CI.

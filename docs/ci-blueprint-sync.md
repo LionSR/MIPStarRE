@@ -127,13 +127,15 @@ cache.
 ```bash
 lake exe cache get
 lake build
-python scripts/check_blueprint_sync.py
+python scripts/blueprint_lean_sync.py --root . --ci
+python scripts/blueprint_leanok_axioms.py --ci
 ```
 
-For a fast, parse-only smoke test that skips the Lean harness step:
+For fast parse-only smoke tests before the Lean proof-level check:
 
 ```bash
-python scripts/check_blueprint_sync.py --skip-axiom-check
+python scripts/check_blueprint_latex.py --root blueprint/src
+python scripts/blueprint_lean_sync.py --root . --ci
 ```
 
 To verify the check actually fails on drift, temporarily replace the proof of
@@ -146,11 +148,12 @@ a `\leanok`-tagged theorem with `sorry`, rerun, and confirm you see an
   documented support surface for blueprint Python helpers, including their
   unit-test coverage and workflow path-filter policy.
 * [`scripts/blueprint_lean_sync.py`](../scripts/blueprint_lean_sync.py) — the
-  older name-level (grep-based) sync checker. It reports missing or stale
+  name-level blueprint/Lean sync checker. It reports missing or stale
   entries in `blueprint/lean_decls` and decls referenced by name that don't
-  appear in the Lean source tree. The two scripts are complementary:
-  `blueprint_lean_sync.py` catches surface drift, `check_blueprint_sync.py`
-  catches proof-level dishonesty.
+  appear in the Lean source tree.
+* [`scripts/blueprint_leanok_axioms.py`](../scripts/blueprint_leanok_axioms.py)
+  — the proof-level `\leanok` checker. It rejects proof-level `\leanok` claims
+  whose Lean declarations depend on `sorryAx` or explicit axioms.
 
   Its per-chapter progress table and JSON report (`--report FILE`) expose
   statement-level and proof-level coverage separately:

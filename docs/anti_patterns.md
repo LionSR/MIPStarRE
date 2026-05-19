@@ -626,8 +626,9 @@ Mechanical detection is possible for many of these patterns:
   producing theorem should be required to carry a `/-- Grounded by: #NNN
   -/` docstring, enforced by a lint rule over `blueprint/`.
 
-The scripts in `scripts/` (notably `scripts/check_blueprint_sync.py` from
-PR [#438]) are the natural home for extensions that add these checks.
+The scripts in `scripts/` (notably `scripts/blueprint_lean_sync.py` and
+`scripts/blueprint_leanok_axioms.py`) are the natural home for extensions that
+add these checks.
 
 ## See also
 
