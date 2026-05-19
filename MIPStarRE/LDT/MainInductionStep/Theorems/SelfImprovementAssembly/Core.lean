@@ -161,15 +161,9 @@ induction proof.
 The input \(G\) is a complete polynomial measurement, as in the paper's
 restated self-improvement theorem.  The conclusion is phrased in the Section 6
 record `SelfImprovementInInductionSectionConclusion`, whose fields are exactly
-the projective output estimates used in the inductive step.
-
-**Unfaithful:** This proof currently depends transitively on
-`SelfImprovement.selfImprovement`, hence on `sdp_statement_with_slackness`, whose
-complementary-slackness proof is not yet derived from
-`references/ldt-paper/self_improvement.tex` (`lem:sdp`). Documented by issue
-#1230. Elimination: prove `sdp_statement_with_slackness` from the SDP
-strong-duality and complementary-slackness argument, then remove the inherited
-`sorryAx` dependency. -/
+the projective output estimates used in the inductive step.  The proof applies
+`SelfImprovement.selfImprovement` and transports the resulting fields into the
+Section 6 record. -/
 theorem selfImprovementInInductionSection
     (params : Parameters)
     [FieldModel params.q]
@@ -488,9 +482,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 The construction assumes the concrete slice strategies and their structural
 measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
-across the recorded equalities to the restricted-slice interface.  The inherited
-Section 9 SDP proof debt is documented on `selfImprovementInInductionSection`;
-this constructor does not carry it as an additional data-record hypothesis. -/
+across the recorded equalities to the restricted-slice interface. -/
 noncomputable def SelfImprovementData.ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]

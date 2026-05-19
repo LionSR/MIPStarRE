@@ -539,11 +539,10 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 62--88 state
 this by Slater strong duality and complementary slackness after passing through
 the canonical SDP form.
 
-The proof is deferred to the formalized strong-duality argument for the Section
-9 SDP.  The remaining proof obligation is now isolated as the native canonical
-optimal-pair theorem `matrixSdpPointRealization_canonicalOptimalPair`; this
-theorem transports that saturated canonical SDP output to the abstract
-self-improvement statement. -/
+The proof transports the formalized canonical optimal-pair output for the
+Section 9 SDP back to the paper's abstract notation.  That canonical optimal
+pair is obtained from the finite-dimensional strong-duality argument and the
+slack-block saturation step in the matrix realization. -/
 theorem sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
@@ -558,14 +557,9 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--88 state
 that the Section 9 SDP admits a primal family `{T_g}` with `∑ g, T_g = I` and
 a dual operator `Z` satisfying `T_g Z = T_g A_g` for every polynomial `g`.
 This theorem extracts exactly that complete-measurement and slackness form from
-the source-shaped SDP statement `sdp_statement_with_slackness`.
-
-**Unfaithful:** This proof currently relies on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230.  Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument. -/
+the source-shaped SDP statement `sdp_statement_with_slackness`, whose proof now
+derives the strong-duality and complementary-slackness witnesses from the
+canonical Section 9 SDP argument. -/
 theorem sdp_slackness_measurement
     (params : Parameters)
     [FieldModel params.q]

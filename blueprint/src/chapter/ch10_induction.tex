@@ -126,12 +126,10 @@
 	The proof applies
 	\texttt{SelfImprovement.selfImprovement} to \(G\), then uses
 	\texttt{selfImprovementInInductionSectionConclusion\_ofSelfImprovementConclusion}
-	to transport the fields.
-	It therefore inherits the Section~\ref{chap:self-improvement} SDP proof debt:
-	\texttt{SelfImprovement.selfImprovement} still depends on
-	\texttt{sdp\_statement\_with\_slackness}, whose complementary-slackness proof
-	is tracked by issue \#1230.  This is not an additional hypothesis of the
-	induction-section theorem.
+	to transport the fields.  The Section~\ref{chap:self-improvement} SDP
+	slackness input is supplied by the formalized theorem
+	\texttt{sdp\_statement\_with\_slackness}; it is not an additional hypothesis of
+	the induction-section theorem.
 \end{remark}
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
