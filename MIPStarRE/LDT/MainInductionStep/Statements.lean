@@ -649,12 +649,6 @@ structure AveragedPastingData (params : Parameters)
   kappa : Error
   /-- Averaged self-improvement / pasting interface parameter `ζ`. -/
   zeta : Error
-  /-- Small-parameter hypothesis for the diagonal test branch. -/
-  gamma_le_one : gamma ≤ 1
-  /-- Small-parameter hypothesis for the averaged self-improvement parameter. -/
-  zeta_le_one : zeta ≤ 1
-  /-- Source-style low-degree hypothesis for the field size. -/
-  dq_le_q : params.d ≤ params.q
   /-- Averaged completeness of the slice family. -/
   complete : selfPkg.family.Complete strategy.state kappa
   /-- Averaged point-consistency of the slice family. -/

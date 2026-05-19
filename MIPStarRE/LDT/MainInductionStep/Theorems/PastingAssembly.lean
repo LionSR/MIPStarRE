@@ -640,7 +640,7 @@ noncomputable def assembleAveragedPastingData
   let kappa : Error :=
     avgOver 𝒟 (fun x => hinduction.sliceError x) +
       avgOver 𝒟 (fun x => sliceSelfImprovementError params hrestrict x)
-  refine AveragedPastingData.mk kappa zeta hgamma_le hzeta_le hdq_le_q ?_ ?_ ?_ ?_ ?_
+  refine AveragedPastingData.mk kappa zeta ?_ ?_ ?_ ?_ ?_
   · refine ⟨?_⟩
     refine ⟨?_⟩
     have hmass_eq := family_averagedMass_eq_avg params strategy hself

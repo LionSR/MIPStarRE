@@ -347,7 +347,16 @@ noncomputable def SelfImprovementData.ofAnswerForLegacy
       using answerSelf.bounded x
   dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
 
-/-- Invoke `thm:ld-pasting-in-induction-section` from averaged pasting input. -/
+/-- Apply the unrestricted induction-section pasting theorem to averaged
+pasting input.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:528-551`, where the
+averaged slice family is passed directly to
+`\label{thm:ld-pasting-in-induction-section}`.
+
+This uses the source-facing theorem `ldPastingInInductionSection`, not the
+restricted nontrivial-regime theorem.  Consequently the successor construction does
+not require the auxiliary proof-reduction hypotheses `0 < d` or `1 ≤ k`. -/
 theorem AveragedPastingData.invokeLdPasting
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -361,20 +370,21 @@ theorem AveragedPastingData.invokeLdPasting
       SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg}
     (pkg : AveragedPastingData params strategy eps delta gamma k selfPkg)
     (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
-    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy selfPkg.family H
         eps delta gamma pkg.kappa pkg.zeta k := by
   exact
-    ldPastingInInductionSectionNontrivial params strategy eps delta gamma pkg.kappa pkg.zeta
-      hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q hd
-      selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
+    ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
+      hgood selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk
 
 /-- Compose the four paper-faithful induction-step inputs
 `restrict → induct → self-improve → paste` into the main-induction conclusion in
-one higher dimension. -/
+one higher dimension.
+
+The construction applies the unrestricted induction-section pasting theorem
+through `AveragedPastingData.invokeLdPasting`, so its stated hypotheses are
+only the paper stage data and the large-`k` condition. -/
 theorem mainInductionFromStageData
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -382,12 +392,10 @@ theorem mainInductionFromStageData
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
     (hrestrict : SliceRestrictionData params strategy eps delta gamma)
     (hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k)
     (hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction)
     (hpaste : AveragedPastingData params strategy eps delta gamma k hself)
-    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       ConsRel strategy.state (uniformDistribution (Point params.next))
@@ -410,7 +418,7 @@ theorem mainInductionFromStageData
             eps delta gamma kappa zeta k := by
       simpa [family, kappa, zeta] using
         hpaste.invokeLdPasting (params := params) (strategy := strategy)
-          (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hd hk_pos hk
+          (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hk
     rcases hpasted with ⟨H, hH⟩
     exact
       ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,
