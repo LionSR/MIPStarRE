@@ -334,9 +334,7 @@ The construction assumes ordinary slice strategies and their structural
 measurement transports. It applies the theorem
 `selfImprovementInInductionSection` slice-by-slice and transports its fields
 back to the answer-valued restricted-slice interface via the recorded state and
-point-measurement equalities. The inherited Section 9 SDP proof debt is
-documented on `selfImprovementInInductionSection`; this constructor does not
-carry it as an additional data-record hypothesis. -/
+point-measurement equalities. -/
 noncomputable def AnswerSelfImprovementData.ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]

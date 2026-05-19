@@ -23,10 +23,9 @@ axioms only: the locality-preserving repair obligation in
 documented completion-route construction and the paper-facing
 `100\zeta^{1/4}` theorem.
 
-The audit for `SelfImprovement.selfImprovement` now records only the transitive
-SDP slackness dependency from issue #1230: the source-facing theorem
-`thm:self-improvement` no longer carries a separate projective self-improvement
-proof gap.
+The audit for `SelfImprovement.selfImprovement` requires the standard Lean axioms
+only: the issue-#1230 SDP slackness dependency has been discharged by the
+canonical finite-dimensional SDP strong-duality argument.
 
 The audit for `Test.mainFormal` records the current tracked proof gap
 transitively: the paper-facing statement has no connection, residual, repair,
@@ -44,10 +43,9 @@ by `GlobalVariance.localVarianceTransportChainBound`, so the paper-facing theore
 no longer carries a `sorryAx` dependency.
 
 The audit for `MainInductionStep.selfImprovementInInductionSection` records
-the current proof obligation for the measurement-valued realization of
-`thm:self-improvement-in-induction-section`.  The remaining `sorryAx`
-dependency is inherited transitively from the issue-#1230 SDP slackness
-obligation used by `SelfImprovement.selfImprovement`.
+standard Lean axioms only: the measurement-valued realization of
+`thm:self-improvement-in-induction-section` no longer inherits the issue-#1230
+SDP slackness obligation.
 
 The audit for `MainInductionStep.mainInduction` records the current proof
 obligation for `thm:main-induction`: the theorem statement matches the paper
@@ -72,17 +70,14 @@ obligation should not change the audit status of the others.
 
 The audit for the helper strong self-consistency assembly now requires the
 standard Lean axioms only: the issue-#1514 local estimate is proved by the
-`HelperSSC` chain.  The audit for
-`SelfImprovement.selfImprovementHelper` still permits `sorryAx`, but that
-dependency is now transitive through `sdp_statement_with_slackness` and hence
-is tracked by issue #1230, not by an admitted helper strong self-consistency
-field.
+`HelperSSC` chain.  The audit for `SelfImprovement.selfImprovementHelper` also
+requires the standard Lean axioms only: the issue-#1230 SDP slackness dependency
+has been discharged.
 
-The audit for `SelfImprovement.sdp_statement_with_slackness` records the present
-state of issue #1230.  The theorem states the SDP strong-duality and
-complementary-slackness conclusion of `lem:sdp`; the missing proof is the
-finite-dimensional semidefinite-programming argument, not an additional
-hypothesis on a later paper theorem.
+The audit for `SelfImprovement.sdp_statement_with_slackness` requires the
+standard Lean axioms only.  The theorem states and proves the SDP strong-duality
+and complementary-slackness conclusion of `lem:sdp` from the canonical
+finite-dimensional semidefinite-programming argument.
 
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
@@ -109,15 +104,15 @@ the still-unproved heterogeneous `orthonormalizationMainLemma`. -/
 private def expectedOrthonormalizationAxioms : Array Name :=
   expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the transitive issue #1230 SDP
-slackness dependency used by `selfImprovement`. -/
+/-- Standard kernel axioms only: the issue #1230 SDP slackness dependency used
+by `selfImprovement` has been discharged. -/
 private def expectedSelfImprovementAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the transitive issue #1230
-SDP slackness dependency used by `selfImprovementInInductionSection`. -/
+/-- Standard kernel axioms only: the issue #1230 SDP slackness dependency used
+by `selfImprovementInInductionSection` has been discharged. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1507 derivation
 needed for `mainInduction`. -/
@@ -134,15 +129,15 @@ private def expectedLdPastingAxioms : Array Name :=
 private def expectedOrderedLaplacianGapAxioms : Array Name :=
   expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1230 SDP
-slackness derivation used by `selfImprovementHelper`. -/
+/-- Standard kernel axioms only: the issue #1230 SDP slackness derivation used
+by `selfImprovementHelper` has been discharged. -/
 private def expectedSelfImprovementHelperAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks the issue #1230 derivation
-needed for the SDP complementary-slackness statement (`lem:sdp`). -/
+/-- Standard kernel axioms only: the issue #1230 derivation needed for the SDP
+complementary-slackness statement (`lem:sdp`) has been discharged. -/
 private def expectedSdpSlacknessAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
 private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
     CommandElabM Unit := do
