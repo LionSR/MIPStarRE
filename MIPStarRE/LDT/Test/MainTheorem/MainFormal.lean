@@ -72,7 +72,8 @@ constructed Section 6 projective-completion witness.
 
 The witness contains the role-register output and the post-role completion
 data.  This theorem performs only the already-formalized final transport and
-scalar absorption steps; it does not introduce additional bridge hypotheses. -/
+scalar absorption steps; it does not introduce additional auxiliary
+hypotheses. -/
 theorem mainFormal_ofProjectiveCompletionTransportWitness
     {params : Parameters} [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -121,9 +122,9 @@ from `MainInductionStep.mainInduction` via `strategySymmetrization_mainInduction
 the base case is discharged by `mainInductionBaseCase`.  The Step 6 base-case
 transport uses the checked repaired line-169 estimate with its explicit
 additional loss, so the exact match-mass branch no longer lies on the active
-`mainFormal` path.  The remaining transitive `sorry` is therefore the
-successor branch of Section 6, isolated in `mainInductionSuccessor` and
-tracked by #1507 (umbrella tracking: #1458). -/
+`mainFormal` path.  The remaining transitive `sorry` is therefore the native
+successor-step obligation of Section 6, isolated in
+`mainInductionSuccessorNext` and tracked by #1507 (umbrella tracking: #1458). -/
 theorem mainFormal
     (params : Parameters) [FieldModel.{0} params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)

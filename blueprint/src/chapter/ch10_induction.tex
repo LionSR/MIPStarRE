@@ -257,14 +257,15 @@
 	\uses{lem:restricted-probabilities, lem:weighted-restricted-probability-bounds, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, def:successor-pasting-data}
 	In Lean, the base case is formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
-	The successor branch of
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated as the
-	source-shaped proof obligation
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor}.  This
-	declaration has the corrected large-\(k\) assumptions of the successor branch,
-	together with the branch condition \(m\ne1\); it does not take restricted-probability,
-	recursive-slice, self-improvement, or pasting records as hypotheses.  The
-	nearby formalization still names the stage data
+	The successor step of
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated in its
+	native \(m\to m+1\) form as the source-shaped proof obligation
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext}.  The
+	non-base branch
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor} only decomposes
+	an arbitrary parameter bundle with \(m\ne1\) into this successor form.  Neither
+	declaration takes restricted-probability, recursive-slice, self-improvement, or
+	pasting records as hypotheses.  The nearby formalization still names the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionData, MIPStarRE.LDT.MainInductionStep.PerSliceInductionData, MIPStarRE.LDT.MainInductionStep.SelfImprovementData, MIPStarRE.LDT.MainInductionStep.AveragedPastingData}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSliceStrategyTransport}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq}
@@ -402,10 +403,9 @@
 \end{proof}
 
 \begin{remark}[Lean proof gap for the successor-step assembly]\label{rem:main-induction-successor-assembly}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionData}
-	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
 	The Lean declaration for Theorem~\ref{thm:main-induction} has the source
-	hypotheses and carries a \texttt{sorry} in the successor branch.  The
+	hypotheses.  Its remaining proof obligation is the native successor step
+	\texttt{mainInductionSuccessorNext}.  The
 	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
 	still exposed through the public restriction-package constructor above, but
 	the recursive slice witnesses, the slice-wise self-improvement outputs, and

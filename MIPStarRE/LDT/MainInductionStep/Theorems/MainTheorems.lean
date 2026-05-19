@@ -179,28 +179,52 @@ theorem mainInductionBaseCase
     mainInductionOfWitness params strategy eps delta gamma k
       ⟨strategy.axisParallelFailureProbability, G, hconsG, herror_le⟩
 
+/-- Native successor step for `thm:main-induction`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, where the proof
+passes from dimension `m` to dimension `m + 1`.
+
+This is the source-facing induction step in its native form: the ambient
+strategy already lives in dimension `params.next`, so no predecessor
+compatibility record is introduced.  The proof should construct the four stage
+objects used by `mainInductionFromStageData` directly from the paper hypotheses.
+
+**Proof obligation:** Derive the restricted slice profiles, apply the recursive
+main-induction hypothesis on each slice, run the induction-section
+self-improvement theorem on the slice measurements, assemble the averaged
+pasting input, and close the scalar side conditions.  This is tracked by issue
+#1507 under the source-statement boundary tracker #1458. -/
+theorem mainInductionSuccessorNext
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hk : 400 * params.next.m * params.next.d ≤ k) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  -- TODO(#1507, #1458): construct the four successor-stage objects and apply
+  -- `mainInductionFromStageData`.
+  sorry
+
 /-- Successor branch of `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, the induction
 step after the restricted-probability estimates and the slice-wise recursive
 calls have been set up.
 
-This theorem is the self-contained mathematical obligation left by the
-successor case.  Its assumptions are the corrected large-`k` hypotheses for
+This theorem is the parameter-decomposition form used by `mainInduction`.
+Its assumptions are the corrected large-`k` hypotheses for
 `thm:main-induction`, together with the branch condition `params.m ≠ 1`; it
 does not accept restricted-probability records, per-slice induction data,
-self-improvement data, pasting data, bridge hypotheses, residual inputs, or
-data record hypotheses.  The intended proof is to construct these objects internally
-from the theorem hypotheses, then apply the already checked assembly theorem
-`mainInductionFromStageData`.
-
-**Proof obligation:** Prove the successor branch from the corrected large-`k`
-theorem hypotheses by
-deriving the restricted slice profiles, the recursive slice measurements, the
-slice-wise self-improvement conclusions, and the averaged pasting input inside
-the proof.  This is tracked by issues #1507 and #1458.  Discharge: construct the
-four stage objects from `references/ldt-paper/inductive_step.tex:441-551` and
-close the scalar comparison using `mainInductionFromStageData`. -/
+self-improvement data, pasting data, auxiliary implication hypotheses, residual
+inputs, or data record hypotheses.  The proof decomposes the non-base parameter
+bundle as `pred.next` and then invokes the native successor-step obligation
+`mainInductionSuccessorNext`. -/
 theorem mainInductionSuccessor
     (params : Parameters)
     [FieldModel params.q]
@@ -209,15 +233,18 @@ theorem mainInductionSuccessor
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
     (hk : 400 * params.m * params.d ≤ k)
-    (_hm1 : params.m ≠ 1) :
+    (hm1 : params.m ≠ 1) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
-  -- TODO(#1507, #1458): derive the successor-stage constructions from the
-  -- corrected theorem hypotheses, rather than adding them as theorem assumptions.
-  sorry
+  rcases Parameters.successorDecompositionOfNeOne params hm1 with ⟨pred, hnext⟩
+  have hq : pred.q = params.q := by
+    simpa [Parameters.next] using congrArg Parameters.q hnext
+  letI : FieldModel pred.q := hq.symm ▸ (inferInstance : FieldModel params.q)
+  cases hnext
+  exact mainInductionSuccessorNext pred strategy eps delta gamma k hgood hk
 
 /-- `thm:main-induction`.
 
