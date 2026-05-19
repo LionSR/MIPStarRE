@@ -539,18 +539,20 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 62--88 state
 this by Slater strong duality and complementary slackness after passing through
 the canonical SDP form.
 
-The proof is deferred to the formalized strong-duality argument for the Section
-9 SDP.  This theorem records the unconditional paper statement used by the
-strengthened self-improvement helper. -/
+The proof instantiates the formalized strong-duality argument for the Section 9
+canonical SDP, saturates the auxiliary canonical slack block, and transports the
+result back to the paper's abstract SDP notation. -/
 theorem sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatementWithSlackness params strategy := by
-  -- TODO(#1230): prove the Section 9 SDP strong-duality and complementary-slackness
-  -- statement from the paper hypotheses, rather than treating slackness as an
-  -- external input to the helper completeness argument.
-  sorry
+  let model := matrixSdpPointRealizationOfStrategy params strategy
+  obtain ⟨X, Z, hX, hdual, hstrong⟩ := matrixSdpCanonicalStrongDuality params model
+  exact sdpStatementWithSlackness_of_canonicalOptimalPair params strategy
+    (matrixSdpCanonicalSaturateSlackBlockMatrix params model X) Z
+    (MatrixSdpCanonicalOptimalPair.ofFeasibleStrongDualitySaturateSlackBlock
+      (params := params) (model := model) (X := X) (Z := Z) hX hdual hstrong)
 
 /-- Displayed measurement and complementary-slackness conclusion of `lem:sdp`.
 
@@ -558,14 +560,9 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--88 state
 that the Section 9 SDP admits a primal family `{T_g}` with `∑ g, T_g = I` and
 a dual operator `Z` satisfying `T_g Z = T_g A_g` for every polynomial `g`.
 This theorem extracts exactly that complete-measurement and slackness form from
-the source-shaped SDP statement `sdp_statement_with_slackness`.
-
-**Unfaithful:** This proof currently relies on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230.  Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument. -/
+the source-shaped SDP statement `sdp_statement_with_slackness`, whose proof now
+derives the strong-duality and complementary-slackness witnesses from the
+canonical Section 9 SDP argument. -/
 theorem sdp_slackness_measurement
     (params : Parameters)
     [FieldModel params.q]

@@ -11,8 +11,8 @@ The comparison is intentionally split into two interfaces.  The source-shaped
 matrix optimal witness supplies dual feasibility and complementary slackness.
 Some internal routes also retain the auxiliary dominance bound `I ≤ Z`, because
 that bound can be used to prove saturation of the extra canonical slack block.
-The dominance-carrying interfaces are Lean-only proof obligations toward #1230;
-they are not additional hypotheses in the paper SDP statement.
+The dominance-carrying interfaces are Lean-only technical routes; they are not
+additional hypotheses in the paper SDP statement.
 
 Mathlib 4.28.0 provides the underlying finite-dimensional matrix order and
 convex-cone infrastructure used throughout this project, but it does not yet
