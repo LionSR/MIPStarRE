@@ -78,8 +78,9 @@ scripts/install_git_hooks.sh --check
 ```
 
 The pre-commit hook runs whitespace, the `scripts/tests` unit tests when any
-helper under `scripts/` is staged, the blueprint LaTeX convention lint
-(`check_blueprint_latex.py`) when blueprint sources are staged, and the
+`scripts/**/*.py` or `scripts/tests/**` file is staged, the blueprint LaTeX
+convention lint (`check_blueprint_latex.py`) when blueprint sources or the
+lint helper are staged, and the
 paper-gap-note structure and proof-debt audits on relevant staged files,
 including agent prompts and actions under `.github/`.  The pre-push hook
 checks changed Lean files with `lake env lean`, repeats the fast

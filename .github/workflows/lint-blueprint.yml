@@ -12,8 +12,6 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
-      - 'scripts/check_blueprint_latex.py'
-      - 'scripts/tests/**'
       - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
@@ -26,8 +24,6 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
-      - 'scripts/check_blueprint_latex.py'
-      - 'scripts/tests/**'
       - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
 
@@ -73,9 +69,9 @@ jobs:
 
       # Blueprint helper unit tests (scripts/tests/test_*.py) and the blueprint
       # LaTeX convention lint (scripts/check_blueprint_latex.py) both run
-      # locally in .githooks/pre-commit. Broken helpers would still surface
-      # here through the integration steps below (blueprint_lean_sync.py,
-      # checkdecls, leanblueprint web/pdf).
+      # locally in .githooks/pre-commit. This workflow remains the render and
+      # blueprint-sync integration check; blueprint-sync.yml carries the CI path
+      # filter for helper unit tests.
 
       - name: Run leanblueprint pdf (catches undefined macros and LaTeX errors)
         working-directory: blueprint
