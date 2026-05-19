@@ -28,8 +28,8 @@ matrix produced from those choices, namely `Uᵀ * W`, together with the two QXP
 identities it satisfies.
 
 The explicit form is useful when a later argument needs to impose additional
-structure on the chosen rows, such as the fresh option-completion row
-preservation needed for residual domination. -/
+structure on the chosen rows, such as fresh option-completion row preservation
+used to derive the QXP-internal comparison `Q_none ≤ P_none`. -/
 theorem xHat_of_positive_gram_spectrum_choices
     {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
     (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
