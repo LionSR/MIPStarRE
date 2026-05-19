@@ -141,6 +141,82 @@ structure MatrixSdpCanonicalOptimalPair
 
 namespace MatrixSdpCanonicalOptimalPair
 
+/-- Build a saturated canonical optimal pair from feasible primal-dual data,
+zero duality gap, and an explicitly vanishing slack block.
+
+The product complementary-slackness equation is derived from zero duality gap by
+`matrixSdpCanonicalComplementarySlackness_of_strongDuality`.  Thus the only
+remaining Watrous/Slater producer obligations are existence of feasible witnesses
+with equal objective values and a saturated slack block. -/
+theorem ofFeasibleStrongDualitySlackBlock
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g)
+    (hstrong :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params model * X)) =
+        matrixSdpDualObjective model Z)
+    (hSlack : matrixSdpCanonicalDiagonalBlock params model X none = 0) :
+    MatrixSdpCanonicalOptimalPair params model X Z where
+  feasible := hX
+  dualFeasible := hdual
+  strongDuality := hstrong
+  complementarySlackness :=
+    matrixSdpCanonicalComplementarySlackness_of_strongDuality
+      params model X hX Z hdual hstrong
+  slackBlock_eq_zero := hSlack
+
+/-- Build a saturated canonical optimal pair by completing the primal slack
+block at `sdpDistinguishedPolynomial params`.
+
+Paper origin: `references/ldt-paper/self_improvement.tex:177-190`.  This is the
+source-faithful strong-duality slice: from a feasible canonical primal matrix,
+dual feasibility, and primal-dual objective equality, first move the `none`
+slack block into the distinguished polynomial block.  The saturated matrix is
+still feasible, has zero `none` block, and keeps objective equality by objective
+monotonicity plus canonical weak duality.  No auxiliary dominance hypothesis
+`I ≤ Z` is used. -/
+theorem ofFeasibleStrongDualitySaturateSlackBlock
+    {params : Parameters}
+    [FieldModel params.q]
+    {model : MatrixSdpRealization params}
+    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
+    {Z : MatrixOperator model.space}
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (hdual :
+      ∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model Z g)
+    (hstrong :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params model * X)) =
+        matrixSdpDualObjective model Z) :
+    MatrixSdpCanonicalOptimalPair params model
+      (matrixSdpCanonicalSaturateSlackBlockMatrix params model X) Z := by
+  let Xsat := matrixSdpCanonicalSaturateSlackBlockMatrix params model X
+  have hXsat : MatrixSdpCanonicalPrimalFeasible params model Xsat :=
+    matrixSdpCanonicalSaturateSlackBlockMatrix_feasible params model X hX
+  have hstrongSat :
+      Complex.re (Matrix.trace
+          (matrixSdpCanonicalObjectiveOperator params model * Xsat)) =
+        matrixSdpDualObjective model Z :=
+    matrixSdpCanonicalSaturateSlackBlockMatrix_strongDuality
+      params model X hX Z hdual hstrong
+  exact {
+    feasible := hXsat
+    dualFeasible := hdual
+    strongDuality := hstrongSat
+    complementarySlackness :=
+      matrixSdpCanonicalComplementarySlackness_of_strongDuality
+        params model Xsat hXsat Z hdual hstrongSat
+    slackBlock_eq_zero := by
+      simp }
+
 /-- A saturated canonical optimal pair gives the matrix-level slackness
 statement without adding the auxiliary dominance condition. -/
 theorem toMatrixSdpStatementWithSlackness
