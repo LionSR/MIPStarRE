@@ -94,6 +94,19 @@
 		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
 \end{theorem}
+\begin{proof}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+	\leanok
+	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair,
+		prop:other-two-notions-of-self-consistency,
+		prop:triangle-inequality-for-approx_delta}
+	Complete the sub-measurement by adding the missing outcome and use
+	permutation invariance to convert strong self-consistency into the
+	cross-consistency hypothesis of
+	Lemma~\ref{lem:orthonormalization-main-lemma}.  Applying the
+	locality-preserving projectivization repair gives the required projective
+	sub-measurement with the paper constant \(100\zeta^{1/4}\).
+\end{proof}
 
 \begin{remark}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
 	The following are Lean auxiliary declarations, not hypotheses in
@@ -290,6 +303,17 @@
 	statement \(84\zeta^{1/4}\) is now formalized as
 	Lemma~\ref{lem:orthonormalization-main-lemma}.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
+	\leanok
+	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair,
+		prop:simeq-for-measurements, prop:triangle-inequality-for-approx_delta}
+	The consistency hypothesis first gives the source almost-projective estimate
+	for \(A_a\ot I\).  The locality-preserving projectivization repair then
+	produces a projective sub-measurement on the original space, and the scalar
+	bounds convert the \(84\)-constant repair estimate into the public
+	\(100\zeta^{1/4}\) envelope.
+\end{proof}
 
 \begin{remark}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
 	The Lean declaration
@@ -845,6 +869,19 @@
 		\end{equation}
 		Let $T = \{T_a\}$. Then $T$ is a projective measurement on $\C^m$.
 	\end{definition}
+	\begin{proof}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaProjMeas,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinProjMeas,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaRangeEmbedding,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding}
+		\leanok
+		\uses{lem:projective-low-rank-sum}
+		Choose an orthonormal basis of the range of each projector \(Q_a\).
+		The rank-one expansion gives the displayed decomposition, and the
+		orthogonality of the labelled basis vectors makes the family \(T\)
+		a projective measurement.
+	\end{proof}
 
 	\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
@@ -870,6 +907,19 @@
 		lemmas take explicit matrices $U,V,\Sigma,I_{m\times d}$ and derive the
 		two stored $\widehat X$ identities from the matrix calculation below.
 	\end{definition}
+	\begin{proof}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvd,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd}
+		\leanok
+		\uses{def:matrix-decomposition-Q}
+		Apply the finite-dimensional singular value decomposition to \(X\) and
+		record exactly the consequences used later: the identities for
+		\(X^\dagger X\), \(\widehat X\widehat X^\dagger\),
+		\(X^\dagger\widehat X\), and the restatement of the \(Q_a\)'s.
+	\end{proof}
 
 	\begin{remark}\label{rem:motivation-for-P}
 		If the family $\{Q_a\}$ were a projective measurement, then the vectors
@@ -898,6 +948,15 @@
 			P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.
 		\]
 	\end{definition}
+	\begin{proof}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP}
+		\leanok
+		\uses{def:matrix-decomposition-Q, def:svd-of-X}
+		The definition is the formal \(Q/X/\widehat X/P\) construction: once
+		\(\widehat X\) is chosen from the stored singular-value data, each
+		\(P_a\) is defined as the positive operator
+		\(\widehat X_a^\dagger\widehat X_a\).
+	\end{proof}
 
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
