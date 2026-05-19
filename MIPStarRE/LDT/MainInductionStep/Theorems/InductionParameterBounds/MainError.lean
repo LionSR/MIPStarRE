@@ -40,6 +40,21 @@ private lemma k_ne_zero_of_mainInductionError_lt_one
             simp [mainInductionError, mainInductionNu]
   linarith
 
+/-- In the nontrivial main-induction branch, the integer parameter `k` is
+positive.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:486-551`, where the proof
+has reduced to the branch `mainInductionError < 1` before invoking the
+successor-stage estimates. -/
+lemma one_le_k_of_mainInductionError_lt_one
+    (params : Parameters)
+    (k : ℕ) (eps delta gamma : Error)
+    (hsmall : mainInductionError params k eps delta gamma < 1) :
+    1 ≤ k :=
+  Nat.succ_le_of_lt
+    (Nat.pos_of_ne_zero
+      (k_ne_zero_of_mainInductionError_lt_one params k eps delta gamma hsmall))
+
 /-- Internal helper: `mainInductionNu < 1` follows from `mainInductionError < 1`.
 
 Exposed for cross-module use in `MainTheorems`. -/

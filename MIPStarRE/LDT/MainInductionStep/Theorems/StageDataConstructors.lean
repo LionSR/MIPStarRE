@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
+import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.MainError
 import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities
 
 /-!
@@ -268,6 +269,31 @@ noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
         (restrictionPkg.profile.selfConsistency x)
         (restrictionPkg.profile.diagonal x)
         k hd (restrictionPkg.profile.restrictedGood x) hk_pos hk
+
+/-- Build answer-valued per-slice induction data in the nontrivial small-error
+branch without separately supplying `1 ≤ k`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454` together with
+the small-error reduction in `references/ldt-paper/inductive_step.tex:486-551`.
+The small-error hypothesis implies `1 ≤ k`; the degree positivity `0 < d`
+remains an explicit boundary hypothesis because it is not part of the
+`Parameters` record. -/
+noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesisOfSmallError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (hinduction : AnswerMainInductionHypothesis params)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (hd : 0 < params.d)
+    (hk : 400 * params.m * params.d ≤ k) :
+    AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k :=
+  AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+    restrictionPkg hinduction hd
+    (one_le_k_of_mainInductionError_lt_one params.next k eps delta gamma hsmall)
+    hk
 
 /-- View a legacy per-slice induction data record over an answer-forgotten restriction
 data record as an answer-valued data record.
