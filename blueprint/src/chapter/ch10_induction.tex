@@ -224,6 +224,7 @@
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingDataOfSmallError}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one}
 	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
@@ -234,7 +235,9 @@
 	\(\gamma\le 1\), \(\zeta\le 1\), and \(d\le q\) internally.  Thus the
 	successor proof can call the small-error pasting constructor without carrying
 	\(0<d\), \(1\le k\), \(\gamma\le 1\), \(\zeta\le 1\), or \(d\le q\) as
-	separate proof inputs.
+	separate proof inputs.  The answer-valued small-error assembly then converts
+	the answer-valued slice data to this pasting interface and applies the
+	checked stage-data theorem.
 \end{definition}
 
 \begin{lemma}[Base case of main induction]\label{lem:main-induction-base}

@@ -20,6 +20,7 @@ small-error hypothesis, not additional hypotheses of the successor step.
 | Blueprint node | Public graph status | Classification | Repair |
 | --- | --- | --- | --- |
 | `def:successor-pasting-data` | Green statement node | Boundary-condition discharge | Added `assembleAveragedPastingDataOfSmallError`, which derives \(\gamma\le 1\), \(\zeta\le 1\), and \(d\le q\) from `mainInductionError params.next k eps delta gamma < 1`. |
+| `def:successor-pasting-data` | Green statement node | Answer-valued successor assembly | Added `mainInductionFromAnswerStageDataOfSmallError`, which converts the answer-valued restriction, induction, and self-improvement data to the legacy pasting interface, builds the small-error averaged pasting data, and calls `mainInductionFromStageData`. |
 | `thm:main-induction` | Blue theorem node with proof hole | Stated with proof hole | Unchanged.  The remaining small-error successor proof still has a tracked `sorry`; this batch only removes scalar side-condition inputs from the pasting stage. |
 
 ## Statement Integrity Audit
@@ -54,3 +55,21 @@ small-error hypothesis, not additional hypotheses of the successor step.
 - Verdict: source-faithful internal constructor; it removes boundary side
   conditions from callers rather than moving a missing proof step into a paper
   theorem hypothesis.
+
+### `mainInductionFromAnswerStageDataOfSmallError`
+
+- Paper assumptions: the successor proof has already constructed the
+  answer-valued slice restriction data, recursive answer-valued slice
+  measurements, and answer-valued self-improvement data, and is in the
+  small-error branch.
+- Lean assumptions: the corresponding answer-valued data records,
+  `strategy.IsGood`, the small-error hypothesis, and the predecessor
+  large-\(k\) condition used by the Section 6 pasting theorem.
+- Paper conclusion: the four successor-stage objects imply the next-dimensional
+  main-induction consistency conclusion after pasting.
+- Lean conclusion: the same existential measurement and consistency conclusion
+  as `mainInductionFromStageData`, at
+  `mainInductionError params.next k eps delta gamma`.
+- Verdict: source-faithful internal assembly theorem.  It does not prove the
+  recursive slice data; it removes the answer-valued-to-legacy and scalar
+  pasting transport from the remaining small-error successor proof.
