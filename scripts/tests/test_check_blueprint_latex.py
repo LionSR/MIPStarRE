@@ -87,6 +87,31 @@ class CheckBlueprintLatexTests(unittest.TestCase):
                 [r"\lean{", r"\leanok", r"\uses{"],
             )
 
+    def test_finds_remark_metadata_with_tex_spacing_and_starred_form(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "chapter").mkdir()
+            (root / "chapter" / "test.tex").write_text(
+                textwrap.dedent(
+                    r"""
+                    \begin { remark }
+                      \lean{Foo.spaced}
+                    \end { remark }
+                    \begin{remark*}
+                      \uses{lem:starred}
+                    \end{remark*}
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            findings = check_blueprint_latex.find_remark_metadata(root)
+            self.assertEqual(
+                [finding.fragment for finding in findings],
+                [r"\lean{", r"\uses{"],
+            )
+
     def test_remark_metadata_check_ignores_theorems_and_comments(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

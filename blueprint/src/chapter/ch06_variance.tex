@@ -70,6 +70,17 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 		\label{eq:equivalent-local-variance}
 	\end{equation}
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.GlobalVariance.localVarianceDeviation_sum_le_localVarianceOfPointsError}
+	\leanok
+	\uses{lem:local-variance-of-points}
+	This is the squared-norm expansion of Lemma~\ref{lem:local-variance-of-points}
+	after summing over the polynomial outcome~$g$.  The Lean proof expands the
+	weighted operator difference, telescopes the six transports in the local
+	variance proof, sums the resulting bounds over~$g$, and absorbs the
+	transport-chain error into
+	$24\left(\eps+\delta+\frac{md}{q}\right)$.
+\end{proof}
 
 \begin{remark}[Polynomial-sum formalization for \ref{eq:equivalent-local-variance}]\label{rem:equivalent-local-variance-formalization-inputs}
 	The three referenced declarations and Lemma~\ref{lem:equivalent-local-variance} together provide the full polynomial-sum (cardinality-free) chain proving the equation.  The chain assembly lemma \texttt{localVarianceDeviation\_sum\_le\_localVarianceOfPointsError} telescopes the six operator differences via \texttt{ev\_sum\_conjTranspose\_mul\_sum\_le}, sums over~$g$, and applies the six individual \texttt{\_sum} bounds (including the reverse~\texttt{generalizeB} sum) to avoid the per-polynomial cardinality blow-up.

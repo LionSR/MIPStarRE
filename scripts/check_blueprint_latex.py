@@ -25,8 +25,8 @@ from tex_utils import strip_tex_comment
 BLUEPRINT_EXTENSIONS = {".tex", ".sty", ".cls"}
 FORBIDDEN_CLEVEREF = re.compile(r"cleveref|\\[cC]ref")
 FORBIDDEN_REMARK_METADATA = re.compile(r"\\lean\{|\\leanok\b|\\uses\{")
-BEGIN_REMARK = re.compile(r"\\begin\{remark\}")
-END_REMARK = re.compile(r"\\end\{remark\}")
+BEGIN_REMARK = re.compile(r"\\begin\s*\{\s*remark\*?\s*\}")
+END_REMARK = re.compile(r"\\end\s*\{\s*remark\*?\s*\}")
 
 
 @dataclass(frozen=True)
