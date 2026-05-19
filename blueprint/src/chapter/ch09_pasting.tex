@@ -659,19 +659,20 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.qSDD_completePart_le_slice}
 	\leanok
 	\uses{def:G-hat, cor:G-hat-facts}
-	For every $x \in \F_q$, the squared-distance defect of the complete part is
-	bounded by that of the unmodified slice submeasurement:
+	For every $x \in \F_q$, the squared-distance defect of the one-outcome
+	complete part is bounded by that of the original slice submeasurement:
 	\[
-		\operatorname{SDefect}_\psi\bigl(
-			\widehat G^x
-		\bigr)
+		\bigl\|
+		(G^x \ot I - I \ot G^x)\ket{\psi}
+		\bigr\|^2
 		\;\le\;
-		\operatorname{SDefect}_\psi\bigl(
-			M^x
-		\bigr),
+		\sum_g
+		\bigl\|
+		(G^x_g \ot I - I \ot G^x_g)\ket{\psi}
+		\bigr\|^2,
 	\]
-	where $\operatorname{SDefect}_\psi(N) = \E_o
-	\|(N_o \ot I - I \ot N_o)\ket{\psi}\|^2$ for a submeasurement~$N$.
+	where $G^x = \sum_g G^x_g$ is the total operator of the slice
+	submeasurement.
 \end{lemma}
 
 \subsection{Sandwiching Lemmas}
@@ -686,9 +687,14 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 			tuple $\bx = (x_1,\dots,x_{k+1})$, and outcome tuple
 			$\bg = (g_1,\dots,g_{k+1})$,
 			\[
-				\widehat G^{\bx}_{1\cdots k+1,\bg} =
+				\widehat G^{x_1}_{g_1}\cdots
+				\widehat G^{x_{k+1}}_{g_{k+1}}
+				=
 				\widehat G^{x_1}_{g_1}
-				\widehat G^{x_2,\dots,x_{k+1}}_{g_2,\dots,g_{k+1}},
+				\bigl(
+				\widehat G^{x_2}_{g_2}\cdots
+				\widehat G^{x_{k+1}}_{g_{k+1}}
+				\bigr),
 			\]
 			and the right half-sandwich analogously rotates the head to the tail.
 		\item \textbf{Sum-of-adjoint-products bounds.} For every $r\ge 0$ and
@@ -734,24 +740,31 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 				\E_{x,y}\E_{x_1,\dots,x_r}
 				\sum_{g,h}\sum_{g_1,\dots,g_r}
 				\bigl\|
-				\bigl(\widehat G^{x}_g \widehat G^{y}_h
-					\widehat G^{x_1}_{g_1} \cdots
-					\widehat G^{x_r}_{g_r}
-					\ot I \;-\;
+				\bigl(
+					\widehat G^{x}_g \widehat G^{y}_h
+					\ot
+					\widehat G^{x_r}_{g_r}\cdots
+					\widehat G^{x_1}_{g_1}
+					-
 					\widehat G^{y}_h \widehat G^{x}_g
-					\widehat G^{x_1}_{g_1} \cdots
-					\widehat G^{x_r}_{g_r}
-					\ot I\bigr)
+					\ot
+					\widehat G^{x_r}_{g_r}\cdots
+					\widehat G^{x_1}_{g_1}
+				\bigr)
 				\ket{\psi}
 				\bigr\|^2
 				\;\le\; \nu_3.
 			\]
 		\item \textbf{Two-factor base case.} For $k=2$, the commutation chain
-			reduces to the pairwise estimate~$\nu_3$.
+			reduces to the same tensor-placement convention with the reverse
+			tail product equal to the identity, hence to the pairwise
+			estimate~$\nu_3$.
 		\item \textbf{Split equivalences.} The half-sandwich families are
 			equivalent, under the head--tail reindexing of
 			Lemma~\ref{lem:completed-sandwich-normalization}, to the
-			chain-families used in the move estimates above.
+			chain-families used in the move estimates above, with ordered
+			products on the first tensor factor and reverse products on the
+			second tensor factor where these appear in the commutation step.
 	\end{enumerate}
 	These are the elementary building blocks assembled by the recursive chain
 	construction of Lemma~\ref{lem:commute-g-half-sandwich}.
