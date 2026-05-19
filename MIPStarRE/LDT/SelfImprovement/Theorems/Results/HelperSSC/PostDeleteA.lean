@@ -216,7 +216,6 @@ private lemma helperDeleteA_clone_mass_factor_le_one
       (sandwichedPolynomialSubMeasAt params strategy T uv.1) T
   exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
 
-set_option maxHeartbeats 800000 in
 -- This post-delete transport combines the clone variance factor estimate with
 -- the local-to-global variance transfer.
 /-- Paper `eq:swap-u-for-v-attack-of-the-clones`: after `delete-an-A`, the

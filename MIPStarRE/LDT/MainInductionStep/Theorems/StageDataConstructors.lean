@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly
+import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
 import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities
 
 /-!
@@ -295,6 +295,34 @@ noncomputable def AnswerPerSliceInductionData.ofLegacy
     intro x
     simpa [SliceRestrictionData.ofAnswer] using legacyInduction.error_le x
 
+/-- View answer-valued recursive slice-wise induction witnesses as legacy
+per-slice induction data after forgetting the answer-valued diagonal alphabet.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.  The point
+measurements of `xRestrictedAnswerSymStrat` and `xRestrictedStrategy` are
+definitionally the same slice of the ambient point measurement, so the
+consistency witnesses and error bounds transport without changing the
+mathematical content. -/
+noncomputable def PerSliceInductionData.ofAnswer
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (answerInduction :
+      AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k) :
+    PerSliceInductionData params strategy eps delta gamma
+      (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k where
+  sliceError := answerInduction.sliceError
+  sliceMeasurement := answerInduction.sliceMeasurement
+  pointConsistency := by
+    intro x
+    simpa using answerInduction.pointConsistency x
+  error_le := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer] using answerInduction.error_le x
+
 /-- Forget an answer-valued self-improvement data record when the target legacy
 induction data record is the one used by the legacy assembly.
 
@@ -347,7 +375,70 @@ noncomputable def SelfImprovementData.ofAnswerForLegacy
       using answerSelf.bounded x
   dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
 
-/-- Invoke `thm:ld-pasting-in-induction-section` from averaged pasting input. -/
+/-- View answer-valued self-improvement data as the legacy self-improvement data
+over the answer-forgotten per-slice induction record.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`.  This is the
+direct conversion needed by the source proof of `thm:main-induction`: the
+recursive induction hypothesis naturally produces answer-valued restricted
+slices, while the existing pasting assembly consumes the legacy slice family.
+The conversion changes only the formal restricted-strategy interface, not the
+slice projective measurements, witnesses, or inequalities. -/
+noncomputable def SelfImprovementData.ofAnswer
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (answerInduction :
+      AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k)
+    (answerSelf :
+      AnswerSelfImprovementData params strategy eps delta gamma k restrictionPkg
+        answerInduction) :
+    SelfImprovementData params strategy eps delta gamma k
+      (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg)
+      (PerSliceInductionData.ofAnswer params strategy eps delta gamma k
+        restrictionPkg answerInduction) where
+  sliceProj := answerSelf.sliceProj
+  sliceWitness := answerSelf.sliceWitness
+  completeness := by
+    intro x
+    simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using answerSelf.completeness x
+  pointConsistency := by
+    intro x
+    simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using answerSelf.pointConsistency x
+  strongSelfConsistency := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.strongSelfConsistency x
+  selfCloseness := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.selfCloseness x
+  bounded := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.bounded x
+  dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
+
+/-- Apply the unrestricted induction-section pasting theorem to averaged
+pasting input.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:528-551`, where the
+averaged slice family is passed directly to
+`\label{thm:ld-pasting-in-induction-section}`.
+
+This uses the source-facing theorem `ldPastingInInductionSection`, not the
+restricted nontrivial-regime theorem.  Consequently the successor construction does
+not require the auxiliary proof-reduction hypotheses `0 < d` or `1 ≤ k`. -/
 theorem AveragedPastingData.invokeLdPasting
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -361,20 +452,21 @@ theorem AveragedPastingData.invokeLdPasting
       SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg}
     (pkg : AveragedPastingData params strategy eps delta gamma k selfPkg)
     (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
-    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       LdPastingInInductionSectionConclusion params strategy selfPkg.family H
         eps delta gamma pkg.kappa pkg.zeta k := by
   exact
-    ldPastingInInductionSectionNontrivial params strategy eps delta gamma pkg.kappa pkg.zeta
-      hgood pkg.gamma_le_one pkg.zeta_le_one pkg.dq_le_q hd
-      selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk_pos hk
+    ldPastingInInductionSection params strategy eps delta gamma pkg.kappa pkg.zeta
+      hgood selfPkg.family pkg.complete pkg.consistent pkg.selfConsistent pkg.bounded k hk
 
 /-- Compose the four paper-faithful induction-step inputs
 `restrict → induct → self-improve → paste` into the main-induction conclusion in
-one higher dimension. -/
+one higher dimension.
+
+The construction applies the unrestricted induction-section pasting theorem
+through `AveragedPastingData.invokeLdPasting`, so its stated hypotheses are
+only the paper stage data and the large-`k` condition. -/
 theorem mainInductionFromStageData
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -382,12 +474,10 @@ theorem mainInductionFromStageData
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
     (hrestrict : SliceRestrictionData params strategy eps delta gamma)
     (hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k)
     (hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction)
     (hpaste : AveragedPastingData params strategy eps delta gamma k hself)
-    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     ∃ H : Measurement (Polynomial params.next) ι,
       ConsRel strategy.state (uniformDistribution (Point params.next))
@@ -410,7 +500,7 @@ theorem mainInductionFromStageData
             eps delta gamma kappa zeta k := by
       simpa [family, kappa, zeta] using
         hpaste.invokeLdPasting (params := params) (strategy := strategy)
-          (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hd hk_pos hk
+          (eps := eps) (delta := delta) (gamma := gamma) (k := k) hgood hk
     rcases hpasted with ⟨H, hH⟩
     exact
       ⟨ldPastingInInductionError params k eps delta gamma kappa zeta, H,

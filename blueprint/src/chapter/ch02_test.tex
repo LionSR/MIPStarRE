@@ -58,6 +58,13 @@
 	positive semidefinite, and the role-indexed blocks multiply according to the
 	Kronecker delta on roles.
 \end{lemma}
+\begin{proof}
+	\leanok
+	The assertions are the block-diagonal matrix calculations for the direct-sum
+	and role-register operators. Positivity follows by writing each positive
+	operator as $C^*C$ and placing the corresponding square root in the same
+	block decomposition.
+\end{proof}
 
 \begin{remark}\label{rem:strategy-convention}
 	Throughout this work, the term strategy refers to a projective strategy, and the term symmetric strategy refers to a symmetric projective strategy.
@@ -70,10 +77,7 @@
 	A strategy is $(\eps,\delta,\gamma)$-good if it passes the axis-parallel lines test with probability at least $1-\eps$, the self-consistency test with probability at least $1-\delta$, and the diagonal lines test with probability at least $1-\gamma$.
 \end{definition}
 
-\begin{proposition}[Good-strategy characterization]\label{rem:good-strat-characterization}
-		\lean{MIPStarRE.LDT.Preliminaries.goodStrategyCharacterization}
-		\leanok
-	\uses{def:simeq}
+\begin{remark}[Good-strategy characterization]\label{rem:good-strat-characterization}
 	Using notation which will be introduced in Chapter~\ref{chap:preliminaries} below, a symmetric strategy is $(\eps,\delta,\gamma)$-good if and only if it satisfies the following three conditions. For $\ell$ and $u$ as in the axis-parallel lines test,
 	\[
 		A_a^u \ot I \simeq_\eps I \ot B^\ell_{[f(u)=a]},
@@ -86,7 +90,7 @@
 	\[
 		A_a^u \ot I \simeq_\gamma I \ot L^\ell_{[f(u)=a]}.
 	\]
-\end{proposition}
+\end{remark}
 
 \begin{definition}[Last-direction line notation]\label{not:conditioned-on-last-direction}
 	\lean{MIPStarRE.LDT.lastDirectionLine, MIPStarRE.LDT.lastDirectionMeasurementFamily}
@@ -130,8 +134,6 @@
 \end{theorem}
 
 \begin{remark}[Internal witness form of the final transport]\label{rem:main-formal-conditional}
-	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
-	\uses{thm:main-formal, def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
 	The witness theorem is a Lean-only formally verified final-transport result: once the
 	Section~6 role witness and the post-role projective-completion witness have
 	been constructed from the hypotheses of Theorem~\ref{thm:main-formal}, it
@@ -141,8 +143,6 @@
 \end{remark}
 
 \begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}
-	\lean{MIPStarRE.LDT.Test.mainFormal_trivial_witness}
-	\uses{thm:main-formal, thm:error-cascade-main-formal, def:projective-strategy, def:simeq}
 	The paper statement uses the weaker hypothesis $k \ge md$, but the proof
 	invokes the Section~6 pasting theorem with side condition $k \ge 400\,md$.
 	This side condition is not implied by $k \ge md$. The Lean and blueprint

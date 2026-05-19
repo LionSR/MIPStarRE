@@ -539,20 +539,17 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 62--88 state
 this by Slater strong duality and complementary slackness after passing through
 the canonical SDP form.
 
-The proof instantiates the formalized strong-duality argument for the Section 9
-canonical SDP, saturates the auxiliary canonical slack block, and transports the
-result back to the paper's abstract SDP notation. -/
+The proof transports the formalized canonical optimal-pair output for the
+Section 9 SDP back to the paper's abstract notation.  That canonical optimal
+pair is obtained from the finite-dimensional strong-duality argument and the
+slack-block saturation step in the matrix realization. -/
 theorem sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatementWithSlackness params strategy := by
-  let model := matrixSdpPointRealizationOfStrategy params strategy
-  obtain ⟨X, Z, hX, hdual, hstrong⟩ := matrixSdpCanonicalStrongDuality params model
-  exact sdpStatementWithSlackness_of_canonicalOptimalPair params strategy
-    (matrixSdpCanonicalSaturateSlackBlockMatrix params model X) Z
-    (MatrixSdpCanonicalOptimalPair.ofFeasibleStrongDualitySaturateSlackBlock
-      (params := params) (model := model) (X := X) (Z := Z) hX hdual hstrong)
+  exact sdpStatementWithSlackness_of_exists_canonicalOptimalPair params strategy
+    (matrixSdpPointRealization_canonicalOptimalPair params strategy)
 
 /-- Displayed measurement and complementary-slackness conclusion of `lem:sdp`.
 
@@ -573,10 +570,9 @@ theorem sdp_slackness_measurement
         (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
         ∀ g : Polynomial params,
           sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g :=
-  SdpStatementWithSlackness.exists_measurement_witness
-    (sdp_statement_with_slackness params strategy)
+  sdpMeasurementWitness_of_exists_canonicalOptimalPair params strategy
+    (matrixSdpPointRealization_canonicalOptimalPair params strategy)
 
-set_option maxHeartbeats 800000 in
 -- The reduced add-in-u lemma invokes the global-variance transport record and
 -- checks the full polynomial-indexed variance family.
 /-- Reduced version of `lem:add-in-u`.

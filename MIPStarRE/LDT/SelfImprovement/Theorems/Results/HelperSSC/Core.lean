@@ -87,7 +87,6 @@ structure HelperStrongSelfConsistencyObligations
           ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
         addInUError params eps delta
 
-set_option maxHeartbeats 800000 in
 -- This constructor fills the helper SSC obligation record by composing the
 -- point self-consistency bounds with the local-to-global variance transfer.
 /-- Construct the helper-stage obligations from the remaining mathematical
@@ -445,7 +444,6 @@ theorem helperOffDiagonalSelectedCSChainQ2_eq_swappedIndicator
         intro h' _
         rw [avgOver_mul_const]
 
-set_option maxHeartbeats 800000 in
 -- The off-diagonal swap invokes the selected Step 3/4 bound and the
 -- local-to-global variance transfer.
 /-- The first off-diagonal variance swap, corresponding to
@@ -472,7 +470,6 @@ theorem helperOffDiagonalIndicatorQuantity_abs_sub_oneSidedSwappedIndicator_le_s
     helperOffDiagonalSelectedCSChainQ3_eq_oneSidedSwappedIndicator,
     abs_sub_comm, selfImprovementVarianceError] using hsteps.2
 
-set_option maxHeartbeats 800000 in
 -- This is the analogous second off-diagonal swap with the same variance
 -- transfer input.
 /-- The second off-diagonal variance swap, corresponding to

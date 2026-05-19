@@ -5,6 +5,12 @@ The blueprint intentionally avoids ``cleveref``.  The original paper uses
 ``\Cref`` and related commands extensively, but the blueprint should spell out
 the reference type explicitly and then use ordinary ``\ref`` or ``\eqref``.
 This keeps the print and web builds independent of ``cleveref``.
+
+Remark environments are also expository, not proof-bearing blueprint nodes.
+They should not carry ``\lean{}``, ``\leanok``, or ``\uses{}`` metadata; such
+metadata belongs on definitions, lemmas, propositions, theorems, and corollaries.
+Remark labels should likewise not occur as targets of ``\uses{}``, since a remark
+is not a theorem-like dependency.
 """
 
 from __future__ import annotations
@@ -20,6 +26,10 @@ from tex_utils import strip_tex_comment
 
 BLUEPRINT_EXTENSIONS = {".tex", ".sty", ".cls"}
 FORBIDDEN_CLEVEREF = re.compile(r"cleveref|\\[cC]ref")
+FORBIDDEN_REMARK_METADATA = re.compile(r"\\lean\{|\\leanok\b|\\uses\{")
+FORBIDDEN_REMARK_DEPENDENCY = re.compile(r"\\uses\{[^}\n]*\brem:[^}\n]*\}")
+BEGIN_REMARK = re.compile(r"\\begin\s*\{\s*remark\*?\s*\}")
+END_REMARK = re.compile(r"\\end\s*\{\s*remark\*?\s*\}")
 
 
 @dataclass(frozen=True)
@@ -61,6 +71,51 @@ def find_cleveref_usage(root: Path) -> list[Finding]:
     return findings
 
 
+def find_remark_metadata(root: Path) -> list[Finding]:
+    """Find Lean or dependency metadata inside remark environments."""
+
+    findings: list[Finding] = []
+    for path in iter_source_files(root):
+        remark_depth = 0
+        for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            active_line = strip_tex_comment(raw_line)
+            in_remark_at_line_start = remark_depth > 0
+            remark_depth += len(BEGIN_REMARK.findall(active_line))
+
+            if in_remark_at_line_start or remark_depth > 0:
+                for match in FORBIDDEN_REMARK_METADATA.finditer(active_line):
+                    findings.append(
+                        Finding(
+                            path=path,
+                            line=line_number,
+                            column=match.start() + 1,
+                            fragment=match.group(0),
+                        )
+                    )
+
+            remark_depth = max(0, remark_depth - len(END_REMARK.findall(active_line)))
+    return findings
+
+
+def find_remark_dependency_targets(root: Path) -> list[Finding]:
+    """Find uses-dependencies whose target is a remark label."""
+
+    findings: list[Finding] = []
+    for path in iter_source_files(root):
+        for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            active_line = strip_tex_comment(raw_line)
+            for match in FORBIDDEN_REMARK_DEPENDENCY.finditer(active_line):
+                findings.append(
+                    Finding(
+                        path=path,
+                        line=line_number,
+                        column=match.start() + 1,
+                        fragment=match.group(0),
+                    )
+                )
+    return findings
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -76,14 +131,29 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: blueprint source root does not exist: {root}", file=sys.stderr)
         return 2
 
-    findings = find_cleveref_usage(root)
-    if not findings:
-        print("Blueprint LaTeX convention check passed: no active cleveref usage.")
+    cleveref_findings = find_cleveref_usage(root)
+    remark_metadata_findings = find_remark_metadata(root)
+    remark_dependency_findings = find_remark_dependency_targets(root)
+    if not cleveref_findings and not remark_metadata_findings and not remark_dependency_findings:
+        print(
+            "Blueprint LaTeX convention check passed: no active cleveref usage "
+            "or remark metadata/dependency targets."
+        )
         return 0
 
-    print("Blueprint LaTeX convention check failed: cleveref usage is forbidden.")
-    for finding in findings:
-        print(f"{finding.path}:{finding.line}:{finding.column}: {finding.fragment}")
+    print("Blueprint LaTeX convention check failed.")
+    if cleveref_findings:
+        print("Active cleveref usage is forbidden:")
+        for finding in cleveref_findings:
+            print(f"{finding.path}:{finding.line}:{finding.column}: {finding.fragment}")
+    if remark_metadata_findings:
+        print(r"Remark environments must not contain \lean{}, \leanok, or \uses{}:")
+        for finding in remark_metadata_findings:
+            print(f"{finding.path}:{finding.line}:{finding.column}: {finding.fragment}")
+    if remark_dependency_findings:
+        print(r"Remark labels must not be dependency targets in \uses{}:")
+        for finding in remark_dependency_findings:
+            print(f"{finding.path}:{finding.line}:{finding.column}: {finding.fragment}")
     return 1
 
 

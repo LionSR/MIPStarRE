@@ -58,6 +58,13 @@
 	The weighted bounds from Lemma~\ref{lem:restricted-probabilities} imply the
 	restricted-probability data used in the successor step.
 \end{lemma}
+\begin{proof}
+	\leanok
+	The weighted axis-parallel and diagonal-line estimates are divided by the
+	transverse-direction weight, while the self-consistency estimate is exactly
+	the average restricted self-consistency probability. These three estimates
+	form the restricted-probability record used in the successor step.
+\end{proof}
 
 \section{The inductive construction}
 
@@ -127,6 +134,7 @@
 
 \begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
   \lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection}
+  \leanok
   \uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test. Let $\{G^x\}_{x \in \F_q}$ be projective submeasurements in $\polysub{m}{q}{d}$ with the following properties:
   \begin{enumerate}
@@ -168,17 +176,16 @@
   \end{enumerate}
 \end{theorem}
 \begin{proof}
+	\leanok
 	\uses{thm:ld-pasting}
 	This is exactly Theorem~\ref{thm:ld-pasting}, restated in the induction chapter
 	because it is the pasting input used in the proof of
-	Theorem~\ref{thm:main-induction}.  The Lean declaration linked above is
-	source-facing but is not marked \texttt{\textbackslash leanok}, since it
-	inherits the remaining degree-zero pasting proof obligation tracked by
-	issue~\#1622.
+	Theorem~\ref{thm:main-induction}.  The Lean declaration linked above applies
+	the unrestricted formal pasting theorem and transports its point-consistency
+	field to the induction-section conclusion record.
 \end{proof}
 
 \begin{remark}[Restricted Lean form of induction-section pasting]\label{rem:ld-pasting-induction-restricted-lean-form}
-	\lean{MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSectionNontrivial}
 	The Lean declaration linked here is the restricted nontrivial-regime
 	restatement of Theorem~\ref{thm:ld-pasting-in-induction-section}.  Its
 	statement calls the formal Section~\ref{chap:pasting} pasting theorem and
@@ -199,6 +206,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSliceStrategyTransport}
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
+	\leanok
 	\uses{thm:self-improvement-in-induction-section}
 	The successor step records the slice-wise self-improvement output in
 	\texttt{SelfImprovementData}, and the answer-valued route records the analogous
@@ -213,11 +221,21 @@
 \end{definition}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
-	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData}
+	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingDataOfSmallError}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
+	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one}
 	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
 	The successor step forms the pasting input by combining the restricted
-	probability estimates with the slice-wise self-improvement data.
+	probability estimates with the slice-wise self-improvement data.  The Lean
+	construction applies the unrestricted induction-section pasting theorem directly,
+	and the small-error constructor supplies the scalar side conditions
+	\(\gamma\le 1\), \(\zeta\le 1\), and \(d\le q\) internally.  Thus the
+	successor proof can call the small-error pasting constructor without carrying
+	\(0<d\), \(1\le k\), \(\gamma\le 1\), \(\zeta\le 1\), or \(d\le q\) as
+	separate proof inputs.  The answer-valued small-error assembly then converts
+	the answer-valued slice data to this pasting interface and applies the
+	checked stage-data theorem.
 \end{definition}
 
 \begin{lemma}[Base case of main induction]\label{lem:main-induction-base}
@@ -235,9 +253,25 @@
 	For $m=1$, there is only one axis-parallel line $\ell$ in $\F_q$, so the line measurement $B^\ell$ is already an element of $\polymeas{1}{q}{d}$. Because the strategy fails the axis-parallel lines test with probability at most $\eps$, the consistency bound follows directly from the axis-parallel consistency hypothesis.
 \end{proof}
 
+\begin{lemma}[Large-error branch of main induction]\label{lem:main-induction-large-error}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}
+	\leanok
+	\uses{def:polymeasurements, def:simeq}
+	If the target error parameter in Theorem~\ref{thm:main-induction} is at least
+	\(1\), then the conclusion follows from a distinguished trivial polynomial
+	measurement.
+\end{lemma}
+\begin{proof}
+	\leanok
+	The normalized bipartite consistency defect of two submeasurements is at most
+	\(1\).  Hence any polynomial measurement, in particular the measurement
+	concentrated on one polynomial, satisfies the claimed consistency relation when
+	the allowed error is at least \(1\).
+\end{proof}
+
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
-	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base, lem:main-induction-large-error}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
@@ -255,14 +289,15 @@
 	\uses{lem:restricted-probabilities, lem:weighted-restricted-probability-bounds, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, def:successor-pasting-data}
 	In Lean, the base case is formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
-	The successor branch of
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated as the
-	source-shaped proof obligation
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor}.  This
-	declaration has the corrected large-\(k\) assumptions of the successor branch,
-	together with the branch condition \(m\ne1\); it does not take restricted-probability,
-	recursive-slice, self-improvement, or pasting records as hypotheses.  The
-	nearby formalization still names the stage data
+	The successor step of
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated in its
+	native \(m\to m+1\) form as the source-shaped proof obligation
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext}.  The
+	non-base branch
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor} only decomposes
+	an arbitrary parameter bundle with \(m\ne1\) into this successor form.  Neither
+	declaration takes restricted-probability, recursive-slice, self-improvement, or
+	pasting records as hypotheses.  The nearby formalization still names the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionData, MIPStarRE.LDT.MainInductionStep.PerSliceInductionData, MIPStarRE.LDT.MainInductionStep.SelfImprovementData, MIPStarRE.LDT.MainInductionStep.AveragedPastingData}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSliceStrategyTransport}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq}
@@ -272,11 +307,16 @@
 	Theorem~\ref{thm:main-induction}. For the answer-valued restriction route
 	used in the successor branch of the main formal theorem, Lean now also exposes
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionData.ofMainInductionHypothesis},
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionData.ofLegacy, MIPStarRE.LDT.MainInductionStep.PerSliceInductionData.ofAnswer, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofAnswerForLegacy, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofAnswer},
 	which record the predecessor induction hypothesis for the restricted
-	strategies without appealing to the public theorem `mainFormal`. The weighted
+	strategies, transport induction data in both directions between the
+	answer-valued and legacy slice interfaces, and then forget only the
+	answer-valued diagonal alphabet before the existing pasting assembly. The weighted
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
-	The remaining proof gap for Theorem~\ref{thm:main-induction} is to derive the
+	The Lean proof now closes the large-error branch by
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}.  The remaining
+	proof gap for Theorem~\ref{thm:main-induction} is to derive the
 	successor-step constructions, including the restricted-strategy
 	self-improvement and slice-transport construction
 	tracked by issues \#1507 and \#1503 under the bridge-debt tracker \#1458,
@@ -400,10 +440,9 @@
 \end{proof}
 
 \begin{remark}[Lean proof gap for the successor-step assembly]\label{rem:main-induction-successor-assembly}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionPublicRestrictionData}
-	\uses{lem:restricted-probabilities, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, thm:main-induction}
 	The Lean declaration for Theorem~\ref{thm:main-induction} has the source
-	hypotheses and carries a \texttt{sorry} in the successor branch.  The
+	hypotheses.  Its remaining proof obligation is the native successor step
+	\texttt{mainInductionSuccessorNext}.  The
 	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
 	still exposed through the public restriction-package constructor above, but
 	the recursive slice witnesses, the slice-wise self-improvement outputs, and
@@ -427,7 +466,6 @@
 \end{proof}
 
 \begin{remark}[Lean auxiliary data for role-register symmetrization]\label{rem:symmetrization-data}
-	\lean{MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isGood, MIPStarRE.LDT.SameSpaceProjStrat.StrategySymmetrizationPackage.strategySymmetrization_isNormalized, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrizationPackage}
 	The formal proof of Theorem~\ref{thm:main-formal} also uses auxiliary data
 	containing the symmetrized strategy, its goodness proof, and its normalization
 	proof.  This auxiliary data supports the final assembly, not an
@@ -456,7 +494,7 @@
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionData}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRestrictionData, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass}
 	\leanok
-	\uses{lem:symmetrization-bridge, rem:main-induction-successor-assembly}
+	\uses{lem:symmetrization-bridge, thm:main-induction}
 	These Lean-only declarations name the restricted-probability and recursive-slice
 	targets appearing in the successor comparison with
 	Remark~\ref{rem:main-induction-successor-assembly}.  The public weighted-bound
@@ -518,7 +556,6 @@
 
 
 \begin{remark}[Successor projective-completion construction]\label{rem:main-formal-successor-completion-obligation}
-	\uses{def:main-formal-step6-obligations, thm:main-formal}
 	The remaining successor-case proof work is not named as an additional Lean
 	hypothesis of Theorem~\ref{thm:main-formal}.  Starting from a projective
 	strategy that passes the low individual degree test, the large-\(k\) bound
@@ -531,15 +568,6 @@
 \end{remark}
 
 \begin{remark}[Lean measurement-unsymmetrization consistency]\label{rem:main-formal-unsymmetrization-bridge}
-	\lean{MIPStarRE.LDT.extractRoleBlock, MIPStarRE.LDT.extractRoleBlock_apply, MIPStarRE.LDT.extractRoleBlock_zero, MIPStarRE.LDT.extractRoleBlock_add, MIPStarRE.LDT.extractRoleBlock_sub, MIPStarRE.LDT.extractRoleBlock_smul}
-	\lean{MIPStarRE.LDT.extractRoleBlock_finset_sum, MIPStarRE.LDT.extractRoleBlock_univ_sum, MIPStarRE.LDT.extractRoleBlock_one, MIPStarRE.LDT.extractRoleBlock_nonneg, MIPStarRE.LDT.extractRoleBlock_le}
-	\lean{MIPStarRE.LDT.SubMeas.extractRole, MIPStarRE.LDT.SubMeas.extractRole_outcome, MIPStarRE.LDT.SubMeas.extractRole_total, MIPStarRE.LDT.SubMeas.extractRole_postprocess}
-	\lean{MIPStarRE.LDT.Measurement.extractRole, MIPStarRE.LDT.Measurement.extractRole_toSubMeas, MIPStarRE.LDT.Measurement.extractRole_outcome}
-	\lean{MIPStarRE.LDT.extractRoleAMeasurement, MIPStarRE.LDT.extractRoleBMeasurement, MIPStarRE.LDT.unsymmetrizedLeftPOVM, MIPStarRE.LDT.unsymmetrizedRightPOVM}
-	\lean{MIPStarRE.LDT.extractRoleBlock_roleCond_same, MIPStarRE.LDT.extractRoleBlock_roleCond_A_B, MIPStarRE.LDT.extractRoleBlock_roleCond_B_A}
-	\lean{MIPStarRE.LDT.extractRole_symmetrizedIdxProjMeas_A, MIPStarRE.LDT.extractRole_symmetrizedIdxProjMeas_B, MIPStarRE.LDT.strategySymmetrization_point_extractRole_A, MIPStarRE.LDT.strategySymmetrization_point_extractRole_B}
-	\lean{MIPStarRE.LDT.polynomialEvaluationFamily_extractRole, MIPStarRE.LDT.polynomialEvaluationFamily_measurement_extractRole, MIPStarRE.LDT.UnsymmetrizationConsistency}
-	\uses{def:main-formal-step6-obligations, lem:symmetrization-bridge, thm:main-formal}
 	Lean now isolates the Step~3 extraction from \texttt{inductive\_step.tex}
 	lines 84--108.  The principal-block map \texttt{extractRoleBlock} turns a
 	role-register POVM $G$ into the two POVMs $G^{\mathrm A}$ and
@@ -681,13 +709,6 @@
 \end{proof}
 
 \begin{remark}[Lean Step 5 expansion theorem]\label{rem:main-formal-step5-sz-bound}
-	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollision_sandwichTensor_le_mdq}
-	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass}
-	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}
-	\lean{MIPStarRE.LDT.Test.MainFormalStep5ExpansionBound}
-	\lean{MIPStarRE.LDT.Test.mainFormalStep5_expansionBound}
-	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionBound}
-	\uses{lem:schwartz-zippel-individual, thm:main-formal}
 	For the Step~5 passage below, Lean now names the weighted polynomial-collision
 	mass, proves its $md/q$ bound by specializing the existing tensor
 	Schwartz--Zippel helper, and proves the algebraic expansion/reindexing
@@ -697,37 +718,8 @@
 \end{remark}
 
 \begin{remark}[Lean witness structures for the main-formal assembly]\label{rem:main-formal-lean-witness-records}
-\uses{thm:error-cascade-main-formal, thm:main-formal-envelope-basics}
 The following Lean declarations are bookkeeping infrastructure for the final
 assembly witness:
-\lean{MIPStarRE.LDT.SameSpaceProjStrat.axisParallelRoleAverage_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.diagonalRoleAverage_nonneg}
-\lean{MIPStarRE.LDT.SameSpaceProjStrat.lowIndividualDegreeFailureProbability_nonneg, MIPStarRE.LDT.SameSpaceProjStrat.eps_nonneg_of_passes}
-\lean{MIPStarRE.LDT.SameSpaceProjStrat.axisParallelRoleAverage_le_three_mul}
-\lean{MIPStarRE.LDT.SameSpaceProjStrat.diagonalRoleAverage_le_three_mul}
-\lean{MIPStarRE.LDT.SameSpaceProjStrat.point_agreement_le_three_mul}
-\lean{MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_le_envelope, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_one_lt_eps, MIPStarRE.LDT.Test.mainFormalError_ge_one_of_q_lt_d}
-\lean{MIPStarRE.LDT.Test.mainFormalInductionNu_bound, MIPStarRE.LDT.Test.cascadeHypotheses_of_not_mainFormalError_ge_one}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofCascadeHypotheses, MIPStarRE.LDT.Test.MainFormalCascadeScalars.ofNontrivialMainFormal, MIPStarRE.LDT.Test.MainFormalCascadeScalars.zeta3_div_two_le_mainFormalError}
-\lean{MIPStarRE.LDT.Test.MainFormalRoleMeasurementWitness, MIPStarRE.LDT.Test.MainFormalRoleMeasurementWitness.ofMainInductionWitness, MIPStarRE.LDT.Test.MainFormalRoleMeasurementWitness.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRoleMeasurementWitness.toUnsymmetrizationConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalRoleInductionWitness, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.toRoleMeasurementWitness, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofBaseCase, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.roleWitness}
-\lean{MIPStarRE.LDT.Parameters.next, MIPStarRE.LDT.Parameters.previous, MIPStarRE.LDT.Parameters.previous_next_eq, MIPStarRE.LDT.Parameters.SuccessorDecomposition, MIPStarRE.LDT.Parameters.successorDecompositionOfOneLtM, MIPStarRE.LDT.Parameters.one_lt_m_of_ne_one, MIPStarRE.LDT.Parameters.successorDecompositionOfNeOne}
-\lean{MIPStarRE.LDT.Test.fieldModelOfSuccessorDecomposition, MIPStarRE.LDT.Test.projStratTransportSuccessor, MIPStarRE.LDT.Test.passesLowIndividualDegreeTest_transportSuccessor}
-\lean{MIPStarRE.LDT.roleCond, MIPStarRE.LDT.roleBlock, MIPStarRE.LDT.opTensor_roleCond_sum, MIPStarRE.LDT.ev_classicalRoleSymmState_one, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AB, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_AA, MIPStarRE.LDT.ev_classicalRoleSymmState_rolePair_BB, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_A, MIPStarRE.LDT.ev_classicalRoleSymmState_opTensor_roleCond_B}
-\lean{MIPStarRE.LDT.classicalRoleSymmState_isNormalized, MIPStarRE.LDT.roleSymmetrizedMeasurement, MIPStarRE.LDT.roleSymmetrizedMeasurement_outcome, MIPStarRE.LDT.roleSymmetrizedMeasurement_total}
-\lean{MIPStarRE.LDT.qBipartiteConsDefect_of_measurements, MIPStarRE.LDT.qBipartiteMatchMass_roleSymmetrizedMeasurement_left, MIPStarRE.LDT.qBipartiteConsDefect_roleSymmetrizedMeasurement_left}
-\lean{MIPStarRE.LDT.qBipartiteConsDefect_extractRoleB_le_two_symm, MIPStarRE.LDT.qBipartiteConsDefect_extractRoleA_le_two_symm, MIPStarRE.LDT.UnsymmetrizationConsistency.ofSymConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency, MIPStarRE.LDT.Test.MainFormalCascadePreProjectiveSelfConsistency.fullSelfConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.ofUnsymmetrizationConsistency, MIPStarRE.LDT.Test.MainFormalCascadeUnsymmetrizedPOVMTargets.toPreProjectiveSelfConsistency}
-\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndComplete, MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2}
-\lean{MIPStarRE.LDT.Test.MainFormalCascadeScalars.orthonormalizeAndCompleteError_zeta1_le_zeta2}
-\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.fullPolynomialConsistency}
-\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj_left_matchMass_ge}
-\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toUnsymmetrizedPOVMTargets, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toPreProjectiveSelfConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.projectivizationSelfConsistencyHandoff, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.fullPolynomialConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.projectiveEvaluationConsistency}
-\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointAConsistency_ofLine169Consistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointBConsistency_ofLine169Consistency}
-\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointAConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.pointBConsistency, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.selfConsistency}
-\lean{MIPStarRE.LDT.Test.mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutcomeStatements, MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.toProjectiveCompletionTransportWitness}
-\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness, MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.toMainFormal}
 They split off the vacuous branch where the theorem error is at least $1$,
 derive the Step~8 scalar hypotheses in the non-vacuous branch, and isolate the
 role-register Section~6 measurement behind a concrete role-witness record.

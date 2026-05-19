@@ -109,7 +109,6 @@ theorem helper_residualLowerBound_of_paper_chain_bound
   rw [hrewrite]
   exact hoffdiag
 
-set_option maxHeartbeats 800000 in
 -- This transport lower bound expands the post-delete and move-over-v scalar
 -- quantities before applying the variance-transfer estimates.
 /-- Paper line `eq:move-over-v` yields a lower bound on the moved quantity in

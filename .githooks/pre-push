@@ -71,9 +71,7 @@ if [ -s "$CHANGED_LEAN_FILE_LIST" ] ||
     grep -Eq '^scripts/(check_oversized_lean_files\.py|tests/test_check_oversized_lean_files\.py)$' \
       "$CHANGED_FILE_LIST"; then
   echo "MIPStarRE pre-push: checking Lean file length guard."
-  run_outside_git_env python3 scripts/check_oversized_lean_files.py \
-    --root . \
-    --known MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean
+  run_outside_git_env python3 scripts/check_oversized_lean_files.py --root .
 fi
 
 if grep -Eq '^(MIPStarRE/LDT/.*\.lean|MIPStarRE/LDT\.lean|MIPStarRE\.lean)$' "$CHANGED_FILE_LIST"; then
@@ -140,6 +138,11 @@ if grep -Eq '^blueprint/src/' "$CHANGED_FILE_LIST"; then
   echo "MIPStarRE pre-push: running blueprint web smoke check."
   run_outside_git_env sh -c 'cd blueprint && leanblueprint web'
   BLUEPRINT_WEB_SMOKE_RAN=1
+fi
+
+if grep -Eq '^(blueprint/src/|scripts/(check_blueprint_latex|tex_utils)\.py$)' "$CHANGED_FILE_LIST"; then
+  echo "MIPStarRE pre-push: checking blueprint LaTeX conventions."
+  run_outside_git_env python3 scripts/check_blueprint_latex.py --root blueprint/src
 fi
 
 if grep -Eq '^(MIPStarRE/|MIPStarRE\.lean$|blueprint/|scripts/(blueprint_lean_sync|blueprint_leanok_axioms|check_blueprint_latex|check_blueprint_sync|tex_utils)\.py$)' "$CHANGED_FILE_LIST"; then

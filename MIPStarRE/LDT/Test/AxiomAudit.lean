@@ -33,8 +33,10 @@ data, or obligation hypotheses, and its proof is assembled from named
 construction targets.  After the projective-completion refactor, the active
 `mainFormal` cascade routes through `MainInductionStep.mainInduction` via
 `strategySymmetrization_mainInduction`.  The base case is proved by
-`mainInductionBaseCase`, so the only remaining transitive `sorryAx` dependency
-on the `mainFormal` path is the successor branch `mainInductionSuccessor`,
+`mainInductionBaseCase`, while the arbitrary non-base branch merely decomposes
+the parameters and invokes the native successor-step obligation
+`mainInductionSuccessorNext`.  Thus the only remaining transitive `sorryAx`
+dependency on the `mainFormal` path is this native successor-step obligation,
 tracked by issue #1507 (with #1458 as the umbrella tracking issue).
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
@@ -93,8 +95,9 @@ private def expectedStandardAxiomsWithSorry : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the transitive
-`mainFormal` construction gap, currently localized to `mainInductionSuccessor`
-via `MainInductionStep.mainInduction` (issue #1507; umbrella #1458). -/
+`mainFormal` construction gap, currently localized to
+`mainInductionSuccessorNext` via `MainInductionStep.mainInduction` (issue #1507;
+umbrella #1458). -/
 private def expectedMainFormalAxioms : Array Name :=
   expectedStandardAxiomsWithSorry
 
