@@ -9,6 +9,8 @@ This keeps the print and web builds independent of ``cleveref``.
 Remark environments are also expository, not proof-bearing blueprint nodes.
 They should not carry ``\lean{}``, ``\leanok``, or ``\uses{}`` metadata; such
 metadata belongs on definitions, lemmas, propositions, theorems, and corollaries.
+Remark labels should likewise not occur as targets of ``\uses{}``, since a remark
+is not a theorem-like dependency.
 """
 
 from __future__ import annotations
@@ -25,6 +27,7 @@ from tex_utils import strip_tex_comment
 BLUEPRINT_EXTENSIONS = {".tex", ".sty", ".cls"}
 FORBIDDEN_CLEVEREF = re.compile(r"cleveref|\\[cC]ref")
 FORBIDDEN_REMARK_METADATA = re.compile(r"\\lean\{|\\leanok\b|\\uses\{")
+FORBIDDEN_REMARK_DEPENDENCY = re.compile(r"\\uses\{[^}\n]*\brem:[^}\n]*\}")
 BEGIN_REMARK = re.compile(r"\\begin\s*\{\s*remark\*?\s*\}")
 END_REMARK = re.compile(r"\\end\s*\{\s*remark\*?\s*\}")
 
@@ -94,6 +97,25 @@ def find_remark_metadata(root: Path) -> list[Finding]:
     return findings
 
 
+def find_remark_dependency_targets(root: Path) -> list[Finding]:
+    """Find uses-dependencies whose target is a remark label."""
+
+    findings: list[Finding] = []
+    for path in iter_source_files(root):
+        for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            active_line = strip_tex_comment(raw_line)
+            for match in FORBIDDEN_REMARK_DEPENDENCY.finditer(active_line):
+                findings.append(
+                    Finding(
+                        path=path,
+                        line=line_number,
+                        column=match.start() + 1,
+                        fragment=match.group(0),
+                    )
+                )
+    return findings
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -111,10 +133,11 @@ def main(argv: list[str] | None = None) -> int:
 
     cleveref_findings = find_cleveref_usage(root)
     remark_metadata_findings = find_remark_metadata(root)
-    if not cleveref_findings and not remark_metadata_findings:
+    remark_dependency_findings = find_remark_dependency_targets(root)
+    if not cleveref_findings and not remark_metadata_findings and not remark_dependency_findings:
         print(
             "Blueprint LaTeX convention check passed: no active cleveref usage "
-            "or remark metadata."
+            "or remark metadata/dependency targets."
         )
         return 0
 
@@ -126,6 +149,10 @@ def main(argv: list[str] | None = None) -> int:
     if remark_metadata_findings:
         print(r"Remark environments must not contain \lean{}, \leanok, or \uses{}:")
         for finding in remark_metadata_findings:
+            print(f"{finding.path}:{finding.line}:{finding.column}: {finding.fragment}")
+    if remark_dependency_findings:
+        print(r"Remark labels must not be dependency targets in \uses{}:")
+        for finding in remark_dependency_findings:
             print(f"{finding.path}:{finding.line}:{finding.column}: {finding.fragment}")
     return 1
 
