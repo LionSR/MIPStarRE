@@ -41,8 +41,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-universe u
-variable {ι : Type u} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- A good strategy has a nonnegative final self-improvement error threshold. -/
 lemma selfImprovementError_nonneg_of_isGood
@@ -92,7 +91,7 @@ lemma selfImprovementHelperConstruction
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusion params strategy T H Z eps delta := by
-  obtain ⟨Tsub, Z, hsdp⟩ := (sdp (ι := ι) params strategy).witness
+  obtain ⟨Tsub, Z, hsdp⟩ := (sdp params strategy).witness
   let T : Measurement (Polynomial params) ι :=
     { toSubMeas := Tsub
       total_eq_one := hsdp.primalTotalOperator }
@@ -104,7 +103,7 @@ lemma selfImprovementHelperConstruction
       averagedConstruction := rfl
       addInUVarianceBound := ?_ }
   · simpa [T] using hsdp
-  · exact addInU (ι := ι) params strategy eps delta gamma hgood T
+  · exact addInU params strategy eps delta gamma hgood T
 
 /-- Conditional form of the helper lemma from a slackness-carrying SDP
 conclusion.
@@ -142,7 +141,7 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
         averagedConstruction := rfl
         addInUVarianceBound := ?_ }
     · simpa [T] using hsdpPair.toSdpOptimalPair
-    · exact addInU (ι := ι) params strategy eps delta gamma hgood T
+    · exact addInU params strategy eps delta gamma hgood T
   · intro g
     simpa [T] using hsdpPair.complementarySlackness g
 
@@ -152,16 +151,8 @@ slackness.
 This is the slackness-carrying companion to `selfImprovementHelperConstruction`:
 it applies the Section 9 statement `sdp_statement_with_slackness`, which records
 the strong-duality conclusion with complementary slackness.  The construction
-lemma remains separate, because its current `sdp` input has not yet formalized
-the strong-duality argument.
-
-**Unfaithful:** This proof currently relies on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230.  Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then replace this transitive `sorryAx`
-dependency. -/
+lemma remains separate, because its reduced `sdp` input intentionally carries
+only the measurement-total and dual-feasibility fragment. -/
 lemma self_improvement_helper_with_slackness
     (params : Parameters)
     [FieldModel params.q]
@@ -174,8 +165,7 @@ lemma self_improvement_helper_with_slackness
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
   self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
-    params strategy eps delta gamma
-    (sdp_statement_with_slackness (ι := ι) params strategy)
+    params strategy eps delta gamma (sdp_statement_with_slackness params strategy)
     hgood nu G
 
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:24-60`
@@ -188,16 +178,7 @@ completeness, consistency with `A`, strong self-consistency, and boundedness.
 The boundedness conclusion is split into positivity of `Z`, pointwise domination
 of the averaged point measurement, and the state-dependent gap estimate.  The
 strong-self-consistency branch is proved in this file and is not exposed as an
-additional public hypothesis; the remaining `sorryAx` dependency is transitive
-through the SDP slackness theorem tracked by #1230.
-
-**Unfaithful:** This proof currently relies on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230.  Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then replace the transitive `sorryAx`
-dependency in `self_improvement_helper_with_slackness`. -/
+additional public hypothesis. -/
 lemma selfImprovementHelper
     (params : Parameters)
     [FieldModel params.q]
@@ -226,7 +207,7 @@ lemma selfImprovementHelper
       simpa [SymStrat.selfConsistencyFailureProbability] using
         hgood.selfConsistencyTest⟩
   have haddInUFull : AddInUFullStatement params strategy T eps delta :=
-    addInUFullStatement_of_isGood (ι := ι) params strategy eps delta gamma hgood T
+    addInUFullStatement_of_isGood params strategy eps delta gamma hgood T
   have hpointTransfer :
       |addInULeftQuantity params strategy
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -395,65 +376,6 @@ lemma selfImprovement_of_error_ge_one
     rw [hgap_one]
     exact herror_ge_one
 
-/-- Helper-output-specific residual-preserving projectivization skeleton for the
-paper-faithful Section 9 route.
-
-This theorem isolates the missing construction step behind the operator-total
-route: after completing the helper output by a fresh `none` outcome, one needs
-an option-indexed projective repair whose fresh outcome still dominates the
-original residual operator.  The existing locality-preserving repair producer
-supplies the rounded projective family; the residual domination itself remains
-the hard helper-output-specific step. -/
-private theorem helper_output_residual_preserving_projectivization
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
-    (hhelperSSC :
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta)) :
-    ∃ P : ProjSubMeas (Option (Polynomial params)) ι,
-      RoundedProjMeasStatement strategy.state
-        (leftLiftedMeasurement (ιB := ι) (optionCompletion Hhat))
-        (ProjSubMeas.liftLeft P)
-        (orthonormalizationMainLemmaError
-          (2 * selfImprovementHelperError params eps delta)) ∧
-      (optionCompletion Hhat).outcome none ≤ P.outcome none := by
-  sorry
-
-/-- Helper-output orthonormalization route with operator total monotonicity.
-
-This packages the paper-faithful Section 9 route in the form needed by
-`selfImprovement`: it returns the restricted projective family `H`, the usual
-orthonormalization closeness statement, and the operator comparison
-`H.toSubMeas.total ≤ Hhat.total`.  The proof is reduced to the residual
-domination theorem `helper_output_residual_preserving_projectivization` above. -/
-private theorem helper_output_projectivization_with_total_le
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
-    (hhelperSSC :
-      BipartiteSSCRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat)
-        (selfImprovementHelperError params eps delta)) :
-    ∃ H : ProjSubMeas (Polynomial params) ι,
-      SDDRel strategy.state (uniformDistribution Unit)
-        (constSubMeasFamily Hhat.liftLeft)
-        (constSubMeasFamily H.toSubMeas.liftLeft)
-        (selfImprovementOrthogonalizationError params eps delta) ∧
-      H.toSubMeas.total ≤ Hhat.total := by
-  sorry
-
 /--
 Formal statement corresponding to the blueprint theorem `thm:self-improvement`,
 with the input consistency hypothesis from the LDT paper.
@@ -468,19 +390,6 @@ here as the explicit hypothesis `hgood`. The source-facing theorem remains
 visible with the paper statement; any remaining missing derivation is lowered to
 internal obligations rather than hidden in a conditional theorem with extra
 obligation hypotheses.
-
-**Unfaithful:** This proof currently depends transitively on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230. Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then remove the remaining transitive
-`sorryAx` dependency.
-
-The paper-faithful operator-total route also currently depends on the helper-
-output-specific residual-preserving projectivization theorem
-`helper_output_residual_preserving_projectivization`, which is the remaining
-Section 9 construction gap tracked by issue #1642.
 -/
 theorem selfImprovement
     (params : Parameters)
@@ -518,7 +427,7 @@ theorem selfImprovement
             simpa [SymStrat.selfConsistencyFailureProbability] using
               hgood.selfConsistencyTest⟩
         have haddInUFull : AddInUFullStatement params strategy T eps delta :=
-          addInUFullStatement_of_isGood (ι := ι) params strategy eps delta gamma hgood T
+          addInUFullStatement_of_isGood params strategy eps delta gamma hgood T
         have htransfer :
             |addInULeftQuantity params strategy
                 (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -576,9 +485,95 @@ theorem selfImprovement
               (selfImprovementHelperError params eps delta) :=
           helper_strong_self_consistency_of_helper_conclusion
             params strategy eps delta heps hdelta hd_le_q hhelper hsscObligations
-        obtain ⟨H, horth, hTotalLe⟩ :=
-          helper_output_projectivization_with_total_le
-            params strategy eps delta hhelper hhelperSSC
+        rcases MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
+            strategy.state strategy.permInvState strategy.isNormalized
+            Hhat (selfImprovementHelperError params eps delta) hhelperSSC with
+          ⟨H, horth⟩
+        have hprojectiveUpperGap :
+            ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+              ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) ≤
+                2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+          let Pconst : IdxProjSubMeas Unit (Polynomial params) (ι × ι) :=
+            fun _ => ProjSubMeas.liftLeft H
+          have hcomp :
+              Preliminaries.CompTransferStmt strategy.state
+                (uniformDistribution Unit)
+                (constSubMeasFamily Hhat.liftLeft)
+                Pconst
+                (selfImprovementOrthogonalizationError params eps delta) := by
+            apply Preliminaries.completenessTransferProjectiveP
+              strategy.state (uniformDistribution Unit) strategy.isNormalized
+              (uniformDistribution_weight_sum_le_one Unit)
+              (constSubMeasFamily Hhat.liftLeft)
+              Pconst
+              (selfImprovementOrthogonalizationError params eps delta)
+            simpa [Pconst, IdxProjSubMeas.toIdxSubMeas, constSubMeasFamily,
+              ProjSubMeas.liftLeft, SubMeas.liftLeft] using horth
+          have hleft :
+              ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) ≥
+                ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) -
+                  2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+            simpa [idxSubMeasMass, avgOver, uniformDistribution,
+              constSubMeasFamily, Pconst, IdxProjSubMeas.toIdxSubMeas,
+              ProjSubMeas.liftLeft, SubMeas.liftLeft] using
+              hcomp.completenessTransfer
+          have hleft' :
+              ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) -
+                ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) ≤
+                  2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+            linarith
+          rw [strategy.permInvState.swap_ev H.toSubMeas.total,
+            strategy.permInvState.swap_ev Hhat.total] at hleft'
+          exact hleft'
+        have hhelperUpperGap :
+            ev strategy.state (rightTensor (ι₁ := ι) Hhat.total) -
+              ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) ≤
+                selfImprovementHelperError params eps delta +
+                  2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+          have horthIdx :
+              SDDRel strategy.state (uniformDistribution Unit)
+                (IdxSubMeas.liftLeft (constSubMeasFamily Hhat))
+                (IdxSubMeas.liftLeft (constSubMeasFamily H.toSubMeas))
+                (selfImprovementOrthogonalizationError params eps delta) := by
+            simpa [IdxSubMeas.liftLeft, constSubMeasFamily] using horth
+          have hcomp :=
+            Preliminaries.completenessTransferSelfConsistentA
+              strategy.state strategy.permInvState strategy.isNormalized
+              (uniformDistribution Unit)
+              (uniformDistribution_weight_sum_le_one Unit)
+              (constSubMeasFamily Hhat)
+              (constSubMeasFamily H.toSubMeas)
+              (selfImprovementHelperError params eps delta)
+              (selfImprovementOrthogonalizationError params eps delta)
+              hhelperSSC horthIdx
+          have hleft :
+              ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) ≥
+                ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) -
+                  selfImprovementHelperError params eps delta -
+                    2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+            simpa [idxSubMeasMass, avgOver, uniformDistribution,
+              constSubMeasFamily, SubMeas.liftLeft] using hcomp
+          have hleft' :
+              ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) -
+                ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) ≤
+                  selfImprovementHelperError params eps delta +
+                    2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+            linarith
+          rw [strategy.permInvState.swap_ev Hhat.total,
+            strategy.permInvState.swap_ev H.toSubMeas.total] at hleft'
+          exact hleft'
+        have hhelperError_nonneg :
+            0 ≤ selfImprovementHelperError params eps delta :=
+          selfImprovementHelperError_nonneg params eps delta
+        have hTotalDiff :
+            |ev strategy.state (rightTensor (ι₁ := ι) H.toSubMeas.total) -
+              ev strategy.state (rightTensor (ι₁ := ι) Hhat.total)| ≤
+                selfImprovementHelperError params eps delta +
+                  2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
+          refine abs_le.mpr ?_
+          constructor
+          · linarith [hhelperUpperGap]
+          · linarith [hprojectiveUpperGap, hhelperError_nonneg]
         have hhelperSSCPoint :
             BipartiteSSCRel strategy.state (uniformDistribution (Point params))
               (fun _ : Point params => Hhat)
@@ -625,12 +620,24 @@ theorem selfImprovement
             ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
             ((polynomialEvaluationFamily params Hhat).liftLeft)
             (selfImprovementDataProcessingError params eps delta) hdataRev
+        have htotalAbsorb :
+            selfImprovementHelperError params eps delta +
+                Real.sqrt (selfImprovementDataProcessingError params eps delta) +
+                (selfImprovementHelperError params eps delta +
+                  2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta)) ≤
+              selfImprovementError params eps delta := by
+          have hbase :=
+            final_fields_point_consistency_total_difference_error_le_selfImprovementError
+              params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q
+          nlinarith
         have hfinal : SelfImprovementFinalFields params strategy H Z eps delta nu :=
-          final_fields_of_helper_outputs_of_total_operator_le
+          final_fields_of_helper_outputs_of_total_difference
             params strategy eps delta nu
+            (selfImprovementHelperError params eps delta +
+              2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta))
             heps heps_le_one hdelta hdelta_le_one hd_le_q
             hhelper hhelperCompleteness hhelperSSC hpointSSC hslack htransfer
-            horth hdata hTotalLe
+            horth hdata hTotalDiff htotalAbsorb
         exact ⟨H, Z,
           { completeness := hfinal.completeness
             pointConsistency := hfinal.pointConsistency

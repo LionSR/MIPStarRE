@@ -66,7 +66,7 @@ The current formal development establishes the following.
    `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities/ProjectorApprox.lean`,
    the theorem
    `pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry`
-   packages the extra hypothesis needed to deduce `Q_none ≤ P_none`, namely the
+   records the extra hypothesis needed to deduce `Q_none ≤ P_none`, namely the
    coisometry of the sigma-space embedding.  This theorem itself requires the
    subnormalization input `∑ q_a ≤ 1`, which is stronger than the current
    `RankReductionWitness.total_le` bound.

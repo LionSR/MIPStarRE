@@ -14,15 +14,14 @@ submeasurement, rather than a projective submeasurement. Once this non-projectiv
 statement is available, Theorem~\ref{thm:orthonormalization} upgrades~$H$ to a
 projective family without losing control of the four quantitative conclusions.
 
-Compared with the projective theorem, the helper lemma packages strong
+Compared with the projective theorem, the helper lemma states strong
 self-consistency using the explicit inequality from
 Definition~\ref{def:strong-self-consistency}, keeps the boundedness conclusion in
 terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelper}
-  % No \leanok is attached here while the proof still depends on the SDP
-  % slackness gap tracked by issue #1230.
+  \leanok
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
   \begin{enumerate}
@@ -60,6 +59,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{enumerate}
 \end{lemma}
 \begin{proof}
+  \leanok
   \uses{lem:sdp, lem:add-in-u, lem:global-variance-of-points, prop:simeq-to-approx, prop:simeq-for-measurements}
   Let $T=\{T_g\}$ and $Z$ be the optimal solutions to the SDPs~\eqref{eq:primal-objective} and~\eqref{eq:dual-objective} given by Lemma~\ref{lem:sdp}. Then $T$ is a measurement, and
   \begin{align}
@@ -433,8 +433,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   the complementary-slackness equations used in the completeness chain.  The
   previous top-level residual-domination assembly theorems have been removed:
   the full self-improvement conclusion is now stated only by the paper theorem
-  below, whose incomplete proof explicitly records the remaining Section~9
-  work.
+  below, and the slackness-carrying helper is obtained from the formalized
+  Section~9 SDP strong-duality statement.
 \end{remark}
 
 \subsection{A Semidefinite Program}
@@ -501,12 +501,20 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpOptimalWitnessWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_extracted_of_canonicalSlackBlock_eq_zero}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSaturateSlackBlockFamily}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSaturateSlackBlockMatrix}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSaturateSlackBlockMatrix_feasible}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_saturateSlackBlockMatrix}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalObjective_trace_le_saturateSlackBlockMatrix}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSaturateSlackBlockMatrix_strongDuality}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitness_of_canonicalFeasibleSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalFeasibleSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.ofFeasibleStrongDualitySlackBlock}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.ofFeasibleStrongDualitySaturateSlackBlock}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.toMatrixSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.withDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance}
@@ -521,9 +529,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_exists_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_exists_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity}
@@ -579,6 +589,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_canonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_statementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalBlockIndex}
@@ -641,7 +653,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualOperator_trace_feasible}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDualGap_trace}
   \lean{MIPStarRE.Quantum.trace_mul_nonneg_of_nonneg}
+  \lean{MIPStarRE.Quantum.mul_eq_zero_of_nonneg_of_trace_mul_eq_zero}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalWeakDuality}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalComplementarySlackness_of_strongDuality}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalDualOptima_exist}
+  \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalStrongDuality}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalDiagonalBlock_mul_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical}
@@ -649,12 +665,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_extracted_of_canonical}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness}
   \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
-  % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
-  % proves only the reduced SdpStatement fragment, while the full slackness
-  % conclusion is recorded as the visible, deferred theorem
-  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness and its displayed
-  % measurement consequence MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement,
-  % whose proof is still \notready (see proof block below).
+  \leanok
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -676,7 +687,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
 \end{lemma}
 \begin{proof}
-  \notready
+  \leanok
   Rewrite~\eqref{eq:primal-objective} in canonical block form. Let $r$ be the dimension of the space on which~$A$ acts, let $M = |\polyfunc{m}{q}{d}|$, and fix an ordering $g_1,\ldots,g_M$ of the polynomials. Consider
   \begin{align}
     \sup &\quad \Tr(C^\dagger X) \label{eq:primal-canonical}\\
@@ -735,41 +746,22 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \begin{equation}\label{eq:complementary-slackness}
     X\Big( \sum_{i,j} \,z_{ij} D_{ij} - C \Big) \,=\, 0.
   \end{equation}
-  We may assume that $X$ is block diagonal.
-  Translating~\eqref{eq:complementary-slackness} back to the variables
-  $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and \(S Z=0\), where
-  \(S=I-\sum_gT_g\) is the slack block.
-  The paper then treats this as forcing \(S=0\).  The current Lean development
-  separates this point from the unconditional SDP statement: it proves the
-  displayed saturation from the auxiliary dominance hypothesis \(I\le Z\).
-  Thus, if the canonical complementary-slackness pair is supplied together with
-  \(I\le Z\), Lean packages these conditional conclusions as a
-  \texttt{MatrixSdpOptimalWitnessWithDominance} once dual feasibility and
-  equality of the paper primal and dual objectives have also been supplied.
-  It also records the corresponding statement-level package, and an elimination
-  theorem which exposes the complete measurement, the dual witness~$Z$, the
-  retained dominance \(I\le Z\), dual feasibility, strong duality, and the
-  equations~\eqref{eq:slater}.  The additional dominance requirement is not a
-  consequence of the dual constraints \(Z\ge A_g\) alone; the discrepancy and
-  the intended saturated-witness replacement are recorded in
-  \texttt{docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex}.
-  In the concrete matrix realization, Lean records the defect-zero condition as
-  \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
-  \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it
-  to the displayed equation \(T_gZ=T_gA_g\), while
-  \texttt{MatrixSdpOptimalWitness.primalMeasurement} packages
-  \(\sum_g T_g=I\) as a complete measurement.  The statement
-  \texttt{MatrixSdpStatementWithSlackness} records this matrix-level
-  strong-duality output without identifying it with the reduced feasible
-  witness supplied by \texttt{sdp}.  The explicit Slater witnesses used above
-  are separately recorded by \texttt{matrixSdpStrictPrimalSubmeasurement},
-  \texttt{matrixSdpStrictDualWitness}, and
-  \texttt{matrixSdpFeasibleBounds\_canonical}; the dual feasibility of \(2I\)
-  follows from \texttt{matrixAveragedPointOperator\_le\_one}.
-  The block-diagonal reduction is also recorded for arbitrary feasible
-  canonical matrices: extracting the diagonal blocks preserves the objective
-  and transfers canonical complementary slackness to the extracted paper primal
-  submeasurement.
+  Lean proves the strong-duality step by a finite-dimensional separation
+  argument for the canonical primal image cone.  Compactness gives attained
+  primal and dual optima; if the optimal values differed, a normalized separating
+  functional would be represented by a Hermitian trace-pairing matrix, producing
+  a feasible dual operator with strictly smaller objective value and
+  contradicting dual optimality.  Weak duality then turns equality of the optimal
+  values into the canonical complementary-slackness equation.
+
+  The block-diagonal reduction is recorded for arbitrary feasible canonical
+  matrices: extracting the diagonal blocks preserves the objective and transfers
+  canonical complementary slackness to the extracted paper primal submeasurement.
+  The formal proof then saturates the extra canonical slack block directly by
+  replacing it with \(I-\sum_gT_g\).  This preserves feasibility and the
+  objective, gives a complete measurement, and translates the zero-defect
+  condition to the displayed equations \(T_gZ=T_gA_g\) without assuming the
+  auxiliary dominance bound \(I\le Z\).
 \end{proof}
 
 \begin{lemma}[Averaging over the evaluation point]\label{lem:add-in-u}
@@ -993,15 +985,12 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   local intermediate estimates and final-field assembly lemmas.  The
   orthonormalization obligation displayed here is only the spectral-truncation
   slice of the Section~9 construction; it is not a locality-preserving repair
-  theorem.  The theorem below records the paper-facing conclusion; its proof is
-  still not proof-complete because the current Lean route depends transitively
-  on the SDP slackness statement tracked by issue~\#1230.
+  theorem.  The theorem below records the paper-facing conclusion.
 \end{remark}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
-  % No \leanok is attached here: the current Lean proof still depends
-  % transitively on the SDP slackness statement tracked by issue #1230.
+  \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}
@@ -1039,6 +1028,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \end{enumerate}
 \end{theorem}
 \begin{proof}
+  \leanok
   \uses{lem:self-improvement-helper, thm:orthonormalization,
     prop:self-consistency-implies-data-processing,
     prop:completeness-transfer-self-consistent-A, prop:triangle-sub,
@@ -1099,12 +1089,12 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   has no larger right-register expectation in the strategy state.  Under this
   structural hypothesis the alphabet-size displacement term is not introduced.
   The QXP-layer interface used by the formalization records both the total
-  domination of the canonical projective family and the sharper
-  residual comparison for the fresh option-completion outcome.  At present the
-  formal QXP algebra only isolates the construction-level statement
-  \(Q_{\mathrm{none}} \leq P_{\mathrm{none}}\), obtained when the repair
-  preserves the fresh row block \(\widehat X_{\mathrm{none}}=X_{\mathrm{none}}\).
-  To turn this into the source-facing inequality
+  domination of the canonical projective family and the sharper residual
+  comparison for the fresh option-completion outcome.  At present the formal QXP
+  algebra only isolates the construction-level statement
+  \(Q_{\mathrm{none}} \leq P_{\mathrm{none}}\), obtained when the repair preserves
+  the fresh row block \(\widehat X_{\mathrm{none}}=X_{\mathrm{none}}\).  To turn
+  this into the source-facing inequality
   \(\widehat A_{\bot} \leq \widehat P_{\bot}\) needed by the conditional
   ``RestrictSome'' monotonicity lemmas, one would still need an additional
   comparison between the completed source residual and the ``Q''-layer fresh

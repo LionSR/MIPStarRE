@@ -400,7 +400,6 @@
 \end{remark}
 
 \begin{remark}[Lean completion-route orthonormalization]\label{rem:orthonormalization-completion-route}
-
 	The paper theorem \ref{thm:orthonormalization} is proved in Lean with the
 	\(100\zeta^{1/4}\) constant.  The declaration checked here is the
 	completion-route theorem with the weaker bound
@@ -445,6 +444,7 @@
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
 	\proves{lem:orthonormalization-main-lemma}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
 	\leanok
 	\uses{prop:simeq-for-measurements, lem:projective-non-measurement, lem:projective-low-rank-sum, lem:Q-completeness, lem:sqrt-Q-completeness, lem:q-almost-projective, lem:xa-t, lem:qa-restated, lem:X-squared, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity, lem:P-Q-approx, prop:triangle-inequality-for-approx_delta}
 	The statement is trivial when $\zeta > 1/4$, so assume
