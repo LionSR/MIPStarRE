@@ -347,7 +347,7 @@ noncomputable def SelfImprovementData.ofAnswerForLegacy
       using answerSelf.bounded x
   dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
 
-/-- Invoke the unrestricted induction-section pasting theorem from averaged
+/-- Apply the unrestricted induction-section pasting theorem to averaged
 pasting input.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:528-551`, where the
@@ -355,7 +355,7 @@ averaged slice family is passed directly to
 `\label{thm:ld-pasting-in-induction-section}`.
 
 This uses the source-facing theorem `ldPastingInInductionSection`, not the
-restricted nontrivial-regime helper.  Consequently the successor assembly does
+restricted nontrivial-regime helper.  Consequently the successor construction does
 not require the auxiliary proof-reduction hypotheses `0 < d` or `1 ≤ k`. -/
 theorem AveragedPastingData.invokeLdPasting
     (params : Parameters)
