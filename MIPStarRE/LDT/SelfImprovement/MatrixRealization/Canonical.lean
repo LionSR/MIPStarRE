@@ -560,7 +560,16 @@ This is the local algebraic consequence used after the Watrous strong-duality
 theorem supplies an optimal feasible primal-dual pair with equal objective
 values.  The remaining hard part is producing such a pair from Slater's
 condition; once it is available, this theorem converts the zero gap into the
-product equation `X * (D(Z) - C) = 0`. -/
+product equation `X * (D(Z) - C) = 0`.
+
+Paper source: `references/ldt-paper/self_improvement.tex:177-183`, especially
+the displayed equation `eq:complementary-slackness`.  The separation between
+this algebraic consequence and the existence of the optimal pair is documented
+in `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
+
+Source-faithful: this theorem formalizes only the algebraic implication from
+zero duality gap and dual feasibility to the canonical complementary-slackness
+equation; it does not assert existence of the optimal pair. -/
 theorem matrixSdpCanonicalComplementarySlackness_of_strongDuality
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)

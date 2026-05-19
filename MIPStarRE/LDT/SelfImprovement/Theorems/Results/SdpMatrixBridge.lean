@@ -233,6 +233,35 @@ theorem toMatrixSdpStatementWithSlackness
 
 end MatrixSdpCanonicalOptimalPair
 
+/-- Existence of a saturated canonical optimal pair for the Section 9 SDP.
+
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 168--190
+(`\label{lem:sdp}`).  The paper invokes Slater strong duality for the canonical
+semidefinite program and complementary slackness for an optimal primal-dual
+pair.  After the canonical slack block is moved into the distinguished
+polynomial outcome, the resulting witness is a feasible canonical primal
+matrix, a dual-feasible operator, equality of the canonical primal and dual
+objectives, canonical complementary slackness, and a zero `none` slack block.
+
+**Proof obligation:** Formalize the finite-dimensional SDP strong-duality
+theorem used in the paper, specialize it to
+`matrixSdpPointRealizationOfStrategy params strategy`, and then apply
+`MatrixSdpCanonicalOptimalPair.ofFeasibleStrongDualitySaturateSlackBlock` to
+obtain the saturated canonical witness.  This is the remaining mathematical
+content of issue #1230. -/
+theorem matrixSdpCanonicalOptimalPair_exists
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι) :
+    ∃ X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
+        (matrixSdpPointRealizationOfStrategy params strategy)),
+      ∃ Z : MIPStarRE.Quantum.Op ι,
+        MatrixSdpCanonicalOptimalPair params
+          (matrixSdpPointRealizationOfStrategy params strategy) X Z := by
+  -- TODO(#1230): specialize a finite-dimensional SDP strong-duality theorem
+  -- with complementary slackness to the canonical Section 9 SDP.
+  sorry
+
 /-- Canonical primal-dual data with complementary slackness and auxiliary dual
 dominance.
 

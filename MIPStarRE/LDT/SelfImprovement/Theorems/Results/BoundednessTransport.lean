@@ -1606,6 +1606,14 @@ theorem projective_boundedness_gap_le_helper_boundedness_gap
 
 /-- Natural-error projective-residual construction.
 
+Paper origin: `references/ldt-paper/self_improvement.tex:742-755`
+(`\label{thm:self-improvement}`), the final boundedness paragraph after
+orthonormalization.
+
+**Source-faithful:** This is an internal assembly lemma for the boundedness
+conclusion of the paper theorem; its hypotheses are the helper output and
+orthonormalization transport data constructed in the Section 9 proof.
+
 Given the helper-stage boundedness estimate for `Hhat`, the dual-slack
 comparator above and the existing data-processing transport produce the final
 projective residual at the paper's natural error
@@ -1642,6 +1650,14 @@ theorem final_fields_projective_residual_bound_natural
 
 /-- Literal-threshold projective-residual construction.
 
+Paper origin: `references/ldt-paper/self_improvement.tex:742-755`
+(`\label{thm:self-improvement}`), the final boundedness paragraph after
+orthonormalization.
+
+**Source-faithful:** This is an internal assembly lemma for the boundedness
+conclusion of the paper theorem; the extra numerical hypothesis is the
+separately stated threshold absorption used in the paper's final estimates.
+
 This theorem combines `final_fields_projective_residual_bound_natural` with a separately
 named numerical absorption lemma. The analytic inputs are only the helper-stage
 boundedness estimate, dual feasibility from `SelfImprovementHelperConclusion`,
@@ -1677,6 +1693,13 @@ theorem final_fields_projective_residual_bound
 /-- Literal-threshold projective-residual construction under the standard
 unit-interval smallness hypotheses.
 
+Paper origin: `references/ldt-paper/self_improvement.tex:742-755`
+(`\label{thm:self-improvement}`), the final boundedness paragraph after
+orthonormalization.
+
+**Source-faithful:** This is an internal assembly lemma for the boundedness
+conclusion of the paper theorem under the standard small-error regime.
+
 This is the convenience theorem following from
 `final_fields_projective_residual_bound`: the numerical absorption input is
 provided by
@@ -1711,6 +1734,14 @@ theorem final_fields_projective_residual_bound_of_small_errors
 
 /-- Final projective-residual construction from helper outputs and the
 point-consistency `add-in-u` transfer.
+
+Paper origin: `references/ldt-paper/self_improvement.tex:742-755`
+(`\label{thm:self-improvement}`), the final boundedness paragraph after
+orthonormalization.
+
+**Source-faithful:** This is an internal assembly lemma for the boundedness
+conclusion of the paper theorem, using the helper conclusions and the
+orthonormalization data-processing estimate already present in the proof.
 
 The theorem performs the boundedness part of the final-fields assembly once the
 orthonormalization data-processing estimate is available. It supplies the

@@ -541,16 +541,21 @@ the canonical SDP form.
 
 The proof is deferred to the formalized strong-duality argument for the Section
 9 SDP.  This theorem records the unconditional paper statement used by the
-strengthened self-improvement helper. -/
+strengthened self-improvement helper.
+
+**Unfaithful:** This proof currently relies on the named proof obligation
+`matrixSdpCanonicalOptimalPair_exists`, which is not yet derived from
+`references/ldt-paper/self_improvement.tex` lines 168--190.  Documented by
+issue #1230.  Elimination: prove the canonical finite-dimensional SDP
+strong-duality and complementary-slackness theorem, then discharge
+`matrixSdpCanonicalOptimalPair_exists`. -/
 theorem sdp_statement_with_slackness
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatementWithSlackness params strategy := by
-  -- TODO(#1230): prove the Section 9 SDP strong-duality and complementary-slackness
-  -- statement from the paper hypotheses, rather than treating slackness as an
-  -- external input to the helper completeness argument.
-  sorry
+  rcases matrixSdpCanonicalOptimalPair_exists params strategy with ⟨X, Z, hopt⟩
+  exact sdpStatementWithSlackness_of_canonicalOptimalPair params strategy X Z hopt
 
 /-- Displayed measurement and complementary-slackness conclusion of `lem:sdp`.
 

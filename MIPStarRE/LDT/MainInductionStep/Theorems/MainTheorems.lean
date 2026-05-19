@@ -195,10 +195,10 @@ from the theorem hypotheses, then apply the already checked assembly theorem
 `mainInductionFromStageData`.
 
 **Proof obligation:** Prove the successor branch from the corrected large-`k`
-theorem hypotheses by
-deriving the restricted slice profiles, the recursive slice measurements, the
-slice-wise self-improvement conclusions, and the averaged pasting input inside
-the proof.  This is tracked by issues #1507 and #1458.  Discharge: construct the
+hypotheses of the theorem by deriving the restricted slice profiles, the
+recursive slice measurements, the slice-wise self-improvement conclusions, and
+the averaged pasting input inside the proof.  This is tracked by issues #1507
+and #1458.  Discharge: construct the
 four stage objects from `references/ldt-paper/inductive_step.tex:441-551` and
 close the scalar comparison using `mainInductionFromStageData`. -/
 theorem mainInductionSuccessor
