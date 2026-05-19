@@ -185,19 +185,26 @@
 	field to the induction-section conclusion record.
 \end{proof}
 
-\begin{remark}[Restricted Lean form of induction-section pasting]\label{rem:ld-pasting-induction-restricted-lean-form}
-	The Lean declaration linked here is the restricted nontrivial-regime
-	restatement of Theorem~\ref{thm:ld-pasting-in-induction-section}.  Its
-	statement calls the formal Section~\ref{chap:pasting} pasting theorem and
-	therefore assumes, in addition to the source hypotheses,
+\begin{remark}[Unrestricted Lean form of induction-section pasting]\label{rem:ld-pasting-induction-restricted-lean-form}
+	The Lean declaration linked to
+	Theorem~\ref{thm:ld-pasting-in-induction-section} is now the unrestricted
+	source-facing restatement.  It calls the formal Section~\ref{chap:pasting}
+	theorem \texttt{Pasting.ldPasting} and therefore carries exactly the source
+	hypotheses displayed above, together with the faithful formal boundary
+	hypotheses needed to interpret the objects in Lean.
+
+	The auxiliary declaration
+	\texttt{ldPastingInInductionSectionNontrivial} remains available for the
+	nontrivial-regime proof reduction.  That helper assumes
 	\[
 		\gamma \le 1,\qquad \zeta \le 1,\qquad d \le q,\qquad 0<d,\qquad 1\le k.
 	\]
-	The corresponding paper theorem in
-	\texttt{references/ldt-paper/ld-pasting.tex}, lines 12--50, does not include
-	these assumptions; lines 52--55 record them only as a proof reduction to the
-	nontrivial regime.  The trivial complementary cases remain to be formalized
-	before this declaration can be marked as the unrestricted source theorem.
+	These inequalities are not hypotheses of the paper theorem: in
+	\texttt{references/ldt-paper/ld-pasting.tex}, lines 12--50 state the
+	unrestricted result, while lines 52--55 use the inequalities only to reduce
+	the proof to the nontrivial regime.  The formal theorem linked from the
+	blueprint has already incorporated the complementary cases through
+	\texttt{Pasting.ldPasting}.
 \end{remark}
 
 \begin{definition}[Self-improvement slice transport for the successor step]\label{def:self-improvement-slice-transport}
