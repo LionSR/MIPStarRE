@@ -500,6 +500,9 @@
 
     <a class="icon proof" href="sec-the-test.html#lem:bipartite-strategy-block-identities">#</a>
     
+    <a class="icon proof" href="sec-the-test.html#a0000000026"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
 </button>
@@ -549,6 +552,18 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   The block operators obtained from a bipartite projective strategy are positive semidefinite, and the role-indexed blocks multiply according to the Kronecker delta on roles. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000026">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The assertions are the block-diagonal matrix calculations for the direct-sum and role-register operators. Positivity follows by writing each positive operator as \(C^*C\) and placing the corresponding square root in the same block decomposition. </p>
 
   </div>
 </div>
@@ -658,11 +673,11 @@
   </div>
   <div class="remark_thmcontent">
   <p> Using notation which will be introduced in Chapter&#160;<a href="sec-prelims.html">3</a> below, a symmetric strategy is \((\varepsilon ,\delta ,\gamma )\)-good if and only if it satisfies the following three conditions. For \(\ell \) and \(u\) as in the axis-parallel lines test, </p>
-<div class="displaymath" id="a0000000026">
+<div class="displaymath" id="a0000000027">
   \[  A_a^u \otimes I \simeq _\varepsilon I \otimes B^\ell _{[f(u)=a]}, \quad \text{and} \quad A_a^u \otimes I \simeq _\delta I \otimes A_a^u.  \]
 </div>
 <p> And for \(\ell \) and \(u\) as in the diagonal lines test, </p>
-<div class="displaymath" id="a0000000027">
+<div class="displaymath" id="a0000000028">
   \[  A_a^u \otimes I \simeq _\gamma I \otimes L^\ell _{[f(u)=a]}.  \]
 </div>
 
@@ -731,7 +746,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>   For \(u \in \mathbb {F}_q^m\), the last-direction axis-parallel line in \(\mathbb {F}_q^{m+1}\) is </p>
-<div class="displaymath" id="a0000000028">
+<div class="displaymath" id="a0000000029">
   \[  \ell _u = \{ (u,x) \mid x \in \mathbb {F}_q\} .  \]
 </div>
 <p> If \((\psi ,A,B,L)\) is a symmetric strategy for the \((m+1,q,d)\) low individual degree test, we write \(B_f^u\) for the operator \(B_f^{\ell _u}\). For a function \(f \colon \ell _u \to \mathbb {F}_q\), we also write \(f(x)\) for \(f(u,x)\). </p>
@@ -799,7 +814,7 @@
 
     <a class="icon proof" href="sec-the-test.html#thm:main-formal">#</a>
     
-    <a class="icon proof" href="sec-induction.html#a0000000029"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-induction.html#a0000000030"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -881,17 +896,17 @@
   </div>
   <div class="theorem_thmcontent">
   <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Assume \(d {\gt} 0\). Let \(k {\gt} 0\) with \(k \ge 400\, md\) and set </p>
-<div class="displaymath" id="a0000000030">
+<div class="displaymath" id="a0000000031">
   \[  \nu = 100000 k^2 m^4\left(\varepsilon ^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).  \]
 </div>
 <p> Then there exist projective measurements \(G^{\mathrm A}, G^{\mathrm B} \in \mathrm{PolyMeas}(m,q,d)\) with the following properties: </p>
 <ol class="enumerate">
   <li><p>on average over \(u \sim \mathbb {F}_q^m\), </p>
-<div class="displaymath" id="a0000000031">
+<div class="displaymath" id="a0000000032">
   \[  A_a^{\mathrm A,u} \otimes I \simeq _\nu I \otimes G^{\mathrm B}_{[g(u)=a]}, \qquad I \otimes A_a^{\mathrm B,u} \simeq _\nu G^{\mathrm A}_{[g(u)=a]} \otimes I;  \]
 </div>
 </li>
-  <li><div class="displaymath" id="a0000000032">
+  <li><div class="displaymath" id="a0000000033">
   \[  G_g^{\mathrm A} \otimes I \simeq _\nu I \otimes G_g^{\mathrm B}.  \]
 </div>
 </li>
