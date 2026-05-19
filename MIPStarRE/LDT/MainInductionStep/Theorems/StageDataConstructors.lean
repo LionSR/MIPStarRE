@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly
+import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
 import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities
 
 /-!
