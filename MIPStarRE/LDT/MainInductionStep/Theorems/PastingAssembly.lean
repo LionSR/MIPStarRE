@@ -309,6 +309,38 @@ private lemma ldPastingInInductionNu_le_fifth_mainInductionNu
           simp [mainInductionNu, Parameters.next]
           ring
 
+/-- The nontrivial main-induction branch supplies the scalar side condition
+`ζ ≤ 1` needed by the averaged pasting assembly.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:486-551`, where the
+small-error branch is the one in which the averaged self-improvement and
+pasting estimates are used. -/
+lemma selfImprovementInInductionError_le_one_of_mainInductionError_lt_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    {eps delta gamma : Error}
+    {k : ℕ}
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1) :
+    selfImprovementInInductionError params.next eps delta gamma ≤ 1 := by
+  have heps_le_one :
+      eps ≤ 1 := eps_le_one_of_mainInductionError_lt_one params strategy hgood hsmall
+  have hdelta_le_one :
+      delta ≤ 1 := delta_le_one_of_mainInductionError_lt_one params strategy hgood hsmall
+  have hdq_le_q :
+      params.d ≤ params.q := dq_le_q_of_mainInductionError_lt_one params strategy hgood hsmall
+  have hzeta_le_nu :
+      selfImprovementInInductionError params.next eps delta gamma ≤
+        mainInductionNu params.next k eps delta gamma :=
+    selfImprovementInInductionError_le_mainInductionNu
+      params strategy eps delta gamma k hgood hsmall heps_le_one hdelta_le_one hdq_le_q
+  have hnu_lt_one :
+      mainInductionNu params.next k eps delta gamma < 1 :=
+    mainInductionNu_lt_one_of_mainInductionError_lt_one
+      params.next k eps delta gamma hsmall
+  exact le_trans hzeta_le_nu (le_of_lt hnu_lt_one)
+
 private lemma family_averagedMass_eq_avg
     (params : Parameters)
     [FieldModel params.q]
@@ -806,6 +838,73 @@ noncomputable def assembleAveragedPastingData
         params eps delta gamma k kappa zeta
         heps_nonneg hdelta_nonneg hgamma_nonneg
         hkappa_le hzeta_le_nu hnu_le
+
+/-- Assemble the averaged pasting data in the nontrivial small-error branch.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:486-551`.  The small-error
+hypothesis supplies `γ ≤ 1`, `ζ ≤ 1`, and `d ≤ q`, so callers do not carry
+those scalar estimates as separate proof inputs. -/
+noncomputable def assembleAveragedPastingDataOfSmallError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (hrestrict : SliceRestrictionData params strategy eps delta gamma)
+    (hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k)
+    (hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction)
+    (hk : 400 * params.m * params.d ≤ k) :
+    AveragedPastingData params strategy eps delta gamma k hself :=
+  assembleAveragedPastingData params strategy eps delta gamma k hgood hsmall
+    (gamma_le_one_of_mainInductionError_lt_one params strategy hgood hsmall)
+    (selfImprovementInInductionError_le_one_of_mainInductionError_lt_one
+      params strategy hgood hsmall)
+    (dq_le_q_of_mainInductionError_lt_one params strategy hgood hsmall)
+    hrestrict hinduction hself hk
+
+/-- Answer-valued small-error successor assembly.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.  This is the
+internal answer-valued route through the successor proof: answer-valued
+restricted slice data are converted to the legacy pasting interface, the
+small-error branch supplies the scalar side conditions for averaged pasting, and
+`mainInductionFromStageData` produces the next-dimensional measurement. -/
+theorem mainInductionFromAnswerStageDataOfSmallError
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (answerInduction :
+      AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k)
+    (answerSelf :
+      AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict
+        answerInduction)
+    (hk : 400 * params.m * params.d ≤ k) :
+    ∃ H : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  let hrestrict : SliceRestrictionData params strategy eps delta gamma :=
+    SliceRestrictionData.ofAnswer params strategy eps delta gamma answerRestrict
+  let hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k :=
+    PerSliceInductionData.ofAnswer params strategy eps delta gamma k answerRestrict
+      answerInduction
+  let hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction :=
+    SelfImprovementData.ofAnswer params strategy eps delta gamma k answerRestrict
+      answerInduction answerSelf
+  let hpaste : AveragedPastingData params strategy eps delta gamma k hself :=
+    assembleAveragedPastingDataOfSmallError params strategy eps delta gamma k hgood hsmall
+      hrestrict hinduction hself hk
+  exact
+    mainInductionFromStageData params strategy eps delta gamma k hgood
+      hrestrict hinduction hself hpaste hk
 
 
 end MIPStarRE.LDT.MainInductionStep
