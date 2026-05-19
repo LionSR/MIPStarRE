@@ -355,7 +355,7 @@ averaged slice family is passed directly to
 `\label{thm:ld-pasting-in-induction-section}`.
 
 This uses the source-facing theorem `ldPastingInInductionSection`, not the
-restricted nontrivial-regime helper.  Consequently the successor construction does
+restricted nontrivial-regime theorem.  Consequently the successor construction does
 not require the auxiliary proof-reduction hypotheses `0 < d` or `1 ≤ k`. -/
 theorem AveragedPastingData.invokeLdPasting
     (params : Parameters)
