@@ -172,14 +172,38 @@ is specialized.
    They were useful packaging around a stronger hypothesis, but they were not a
    proof of that hypothesis from the current helper-output construction.
 
-6. The most plausible remaining helper-specific route presently passes through a
-   stronger SDP witness carrying the auxiliary dominance fact \(I \le Z\).
-   The matrix-side bridge files already contain conditional theorems of that
-   shape, but the abstract `sdp_statement_with_slackness` interface used by the
-   current helper theorem does not expose the dominance field.  The SDP
-   slackness theorem itself has since been discharged; the remaining frontier is
-   therefore the helper-output-specific residual domination needed by issue
-   `#1642`, not the former SDP slackness obligation.
+6. A possible helper-specific route would have to pass through a stronger SDP
+   witness carrying the auxiliary dominance fact \(I \le Z\), together with a
+   proof that this dominance is transported to the particular helper-output
+   residual comparison.  The relevant dominance-carrying interfaces are
+   `MatrixSdpStatementWithSlacknessAndDominance` in
+   `MIPStarRE/LDT/SelfImprovement/MatrixRealization/Canonical/Witness.lean`
+   and the bridge theorem
+   `toMatrixSdpStatementWithSlacknessAndDominance` in
+   `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixBridge.lean`;
+   related constructors include
+   `matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness`
+   and
+   `matrixSdpOptimalWitnessWithDominance_of_canonicalFeasibleComplementarySlackness`.
+   These declarations are Lean-only dominance-carrying refinements, not the
+   abstract paper-facing SDP statement.
+
+   This does not contradict the scalar obstruction above.  The scalar example
+   rules out a generic theorem deriving
+   `(optionCompletion A).outcome none ≤ P.outcome none` from the present
+   Section 5 output alone.  The additional hypothesis \(I \le Z\) could only be
+   useful in a theorem which is specific to the Section 9 helper construction
+   and which proves that the same dual witness \(Z\), after the saturation and
+   helper-output translations, controls the actual fresh outcome of the
+   projective measurement being used.  That transport theorem is exactly the
+   remaining issue-`#1642` frontier.
+
+   The former SDP slackness obligation has been discharged: the declaration
+   `MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness` is audited by
+   `assert_sdp_slackness_axioms` in
+   `MIPStarRE/LDT/Test/AxiomAudit.lean` and prints only the standard Lean
+   axioms.  Thus the remaining frontier is the helper-output-specific residual
+   domination needed by issue `#1642`, not the former SDP slackness obligation.
 
 ---
 
