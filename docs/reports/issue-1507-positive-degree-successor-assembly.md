@@ -33,11 +33,14 @@ successor proof obligation.  It does not take restricted-probability packages,
 recursive slice witnesses, self-improvement data, or pasting data as hypotheses.
 It remains the proof hole for the successor branch.
 
-The new declaration `mainInductionSuccessorNext_ofAnswerSliceTransport` proves
-the positive-degree successor assembly once the two genuine internal
+The declaration
+`mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport` proves the
+small-error positive-degree successor construction once the two genuine internal
 constructions are supplied: the predecessor answer-valued induction hypothesis
 and the slice-strategy transport needed to apply Section 9 self-improvement to
-the answer-valued restricted slices.
+the answer-valued restricted slices.  The declaration
+`mainInductionSuccessorNext_ofAnswerSliceTransport` then combines this
+nontrivial branch with the already checked large-error branch.
 
 ## Classification
 
@@ -45,20 +48,28 @@ the answer-valued restricted slices.
 | --- | --- | --- |
 | `thm:main-induction` | Stated with proof hole | The blueprint and Lean statement match the paper theorem.  The successor proof still has a tracked `sorry`; no additional package or transport hypothesis is added to the paper theorem. |
 | `mainInductionSuccessorNext` | Source-shaped proof obligation | This is the native `m -> m + 1` branch corresponding to `inductive_step.tex:441--551`.  It remains unfinished because the slice construction and transport must be derived inside the proof. |
-| `def:successor-pasting-data` | Internal assembly node | The public graph marks this node green.  It records formal data and scalar bounds used by the successor assembly; it is not itself the paper theorem. |
+| `def:successor-pasting-data` | Internal construction node | The public graph marks this node green.  It records formal data and scalar bounds used by the successor construction; it is not itself the paper theorem. |
+| `mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport` | Conditional helper, proved | This theorem proves the nontrivial small-error branch from the predecessor answer-valued induction hypothesis and answer-valued slice transport.  It corresponds to the branch where `mainInductionSuccessorNextOfSmallError` still has to construct those inputs internally. |
 | `mainInductionSuccessorNext_ofAnswerSliceTransport` | Conditional helper, proved | This theorem is useful internal mathematics.  It proves that the already-formalized restricted probabilities, predecessor answer induction, answer-valued self-improvement transport, and small-error pasting theorem imply the successor conclusion.  Its extra hypotheses are internal obligations, not source hypotheses. |
 
 ## Repair
 
-The new Lean theorem removes one layer of successor proof debt by proving the
-answer-valued assembly from the remaining internal constructions.  It derives
-the predecessor side condition `400 * params.m * params.d <= k` from the
-successor hypothesis, obtains `1 <= k` from `0 < d` and `m >= 1`, constructs the
-answer-valued restricted-probability data from the good-strategy hypothesis,
-applies the predecessor answer-valued induction hypothesis slice by slice,
-constructs answer-valued self-improvement data from the supplied slice
-transport, and invokes the small-error answer-stage pasting theorem.  The
-large-error branch is closed by the existing trivial-measurement theorem.
+The Lean theorem
+`mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport` removes one
+layer of successor proof debt in the exact branch where the source-facing
+successor proof is still open.  It derives the predecessor side condition
+`400 * params.m * params.d <= k` from the successor hypothesis, obtains `1 <= k`
+inside `AnswerPerSliceInductionData.ofMainInductionHypothesis` from `0 < d`,
+`0 < m`, and the predecessor large-`k` bound, constructs the answer-valued
+restricted-probability data from the good-strategy hypothesis, applies the
+predecessor answer-valued induction hypothesis slice by slice, constructs
+answer-valued self-improvement data from the supplied slice transport, and
+invokes the small-error answer-stage pasting theorem.
+
+The wrapper `mainInductionSuccessorNext_ofAnswerSliceTransport` remains the
+full positive-degree conditional theorem.  It closes the large-error branch by
+the existing trivial-measurement theorem and delegates the small-error branch to
+`mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport`.
 
 No compatibility wrapper is introduced.  The new theorem calls the native
 answer-valued pasting constructor directly, and the blueprint link is attached
@@ -71,11 +82,17 @@ Paper assumptions: a good symmetric strategy for the `(m + 1, q, d)` test,
 `k >= 400 (m + 1) d`, and the predecessor induction hypothesis applied to the
 restricted strategies.
 
-Lean assumptions for `mainInductionSuccessorNext_ofAnswerSliceTransport`:
+Lean assumptions for
+`mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport`:
 `[FieldModel.{0} params.q]`, a good `SymStrat params.next ι`,
-`400 * params.next.m * params.next.d <= k`, `0 < params.d`, the
+`400 * params.next.m * params.next.d <= k`,
+`mainInductionError params.next k eps delta gamma < 1`, `0 < params.d`, the
 answer-valued predecessor induction hypothesis, and a slice-strategy transport
 for the answer-valued restricted slices.
+
+Lean assumptions for `mainInductionSuccessorNext_ofAnswerSliceTransport`: the
+same hypotheses except for the explicit small-error branch condition; it handles
+the complementary large-error case internally.
 
 Paper conclusion: a polynomial measurement in dimension `m + 1` consistent
 with the point measurement at the successor error.
@@ -83,7 +100,7 @@ with the point measurement at the successor error.
 Lean conclusion: the same polynomial-measurement consistency conclusion for
 `params.next`.
 
-Verdict: conditional helper, proved.  The conclusion is source-faithful, but
+Verdict: conditional helpers, proved.  The conclusion is source-faithful, but
 the predecessor answer-valued induction hypothesis and the slice-strategy
 transport are internal proof obligations.  They are not added to
 `thm:main-induction`; the source theorem remains a stated theorem with the
