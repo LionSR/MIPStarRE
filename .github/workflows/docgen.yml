@@ -81,9 +81,7 @@ jobs:
           extra-packages: texlive-xetex texlive-science latexmk
 
       - name: Install leanblueprint
-        run: |
-          pipx install leanblueprint
-          pipx inject --include-apps --force leanblueprint plastex
+        uses: ./.github/actions/setup-leanblueprint
 
       - name: Build blueprint
         working-directory: blueprint

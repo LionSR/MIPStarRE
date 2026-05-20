@@ -27,13 +27,6 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v6
 
-      - name: Install Python
-        uses: actions/setup-python@v6
-        with:
-          python-version: '3.12'
-          cache: 'pip'
-          cache-dependency-path: .github/workflows/blueprint-requirements.txt
-
       - name: Install system dependencies
         uses: ./.github/actions/setup-blueprint-system-deps
         with:
@@ -41,9 +34,7 @@ jobs:
           extra-packages: texlive-xetex texlive-science latexmk
 
       - name: Install leanblueprint
-        run: |
-          pipx install leanblueprint
-          pipx inject --include-apps --force leanblueprint plastex
+        uses: ./.github/actions/setup-leanblueprint
 
       - name: Build blueprint
         working-directory: blueprint
