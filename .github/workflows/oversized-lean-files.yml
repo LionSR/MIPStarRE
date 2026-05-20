@@ -32,6 +32,4 @@ jobs:
           python-version: '3.12'
 
       - name: Run oversized-file guard
-        run: >
-          python3 scripts/check_oversized_lean_files.py --root .
-          --known MIPStarRE/LDT/SelfImprovement/MatrixRealization/Canonical/StrongDuality.lean
+        run: python3 scripts/check_oversized_lean_files.py --root .
