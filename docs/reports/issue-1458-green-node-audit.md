@@ -105,6 +105,8 @@ The largest clusters are:
    vocabulary.  These are the highest-priority green informational nodes for
    continued #1458 review, because their names make explicit that the final
    theorem route still has internal construction obligations.
+   The Chapter 10 instances are classified in
+   `docs/reports/issue-1458-ch10-green-internal-nodes.md`.
 
 4. Chapter 7 self-improvement implementation remarks, including
    `SdpStatementWithSlackness`, `MatrixSdpStatementWithSlacknessAndDominance`,
