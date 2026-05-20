@@ -19,11 +19,11 @@ This file proves the locality-preserving repair route for the late Section 5
 
 The **spectral-truncation stage** (the first part of the proof of rounding
 to projectors) is already proved by
-`spectralTruncationInput_of_sourceAlmostProjective` in
+`spectralTruncationStatement_of_sourceAlmostProjective` in
 `MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean`,
 which is fully proved via
 `projectiveNonMeasurement_of_sourceAlmostProjective_full`. Proofs that
-require `SpectralTruncationInput` should call that declaration directly.
+require the spectral truncation statement should call that declaration directly.
 
 The main result recorded here:
 

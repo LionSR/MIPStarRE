@@ -193,6 +193,12 @@ Useful proof content should be kept as named construction lemmas, while missing
 orthonormalization or final-field arguments remain direct proof gaps on the
 source-facing theorem until proved from the paper hypotheses.
 
+The former `MakingMeasurementsProjective.SpectralTruncationInput` abbreviation
+has likewise been retired.  The spectral-truncation step is represented by the
+source-shaped statement `SpectralTruncationStatement` and by direct construction
+theorems such as `spectralTruncationStatement_of_sourceAlmostProjective`,
+rather than by an `Input` wrapper passed through later theorems.
+
 ### Retiring auxiliary declarations
 
 An auxiliary declaration should be removed from the main blueprint route, or

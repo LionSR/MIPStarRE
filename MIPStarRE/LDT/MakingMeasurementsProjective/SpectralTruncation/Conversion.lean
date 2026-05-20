@@ -2,12 +2,12 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
 
 /-!
-# Spectral Truncation Interface Conversions
+# Spectral truncation statement conversions
 
 This file contains the structural conversions from the paper witness
 `projectiveNonMeasurement` and the rounded-projector witness used by the QXP
-rank-reduction layer to the `SpectralTruncationStatement` and
-`SpectralTruncationInput` interfaces used by orthonormalization.
+rank-reduction layer to the `SpectralTruncationStatement` interface used by
+orthonormalization.
 
 The conversions are field-for-field copies.  The constructive spectral
 truncation theorem, which produces such a rounded projective family from the
@@ -97,55 +97,23 @@ lemma projectiveLowRankSum_of_spectralTruncationStatement
   projectiveLowRankSum_of_roundingWitness ψ A ζ hψ hζ hζ_le hSpectral.roundedFamily
     hSpectral.toRoundingToProjectorsWitness hsource
 
-/-- Feed a spectral-truncation input directly into the QXP rank-reduction
-layer.
-
-This is the constructor form most useful to downstream orthonormalization
-callers: the spectral input supplies the rounded projectors from the normalized
-state and source defect, and the same defect is then enlarged from `ζ` to
-`2ζ` for the rank-reduction witness. -/
-lemma projectiveLowRankSum_of_spectralTruncationInput
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
-    (hψ : ψ.IsNormalized)
-    (hζ : 0 ≤ ζ) (hζ_le : ζ ≤ 1 / 4)
-    (hspectral : SpectralTruncationInput ψ A ζ)
-    (hsource :
-      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
-    ∃ data : QLayerData Outcome ι,
-      RankReductionWitness ψ A ζ data := by
-  have hsource_two :
-      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ := by
-    linarith
-  exact projectiveLowRankSum_of_spectralTruncationStatement ψ A ζ hψ hζ hζ_le
-    (hspectral hψ hsource) hsource_two
-
-/-! ### Spectral input from the named paper witness -/
-
-/-- Build `SpectralTruncationInput` from the named
+/-- Build a `SpectralTruncationStatement` from the named
 `lem:projective-non-measurement` witness.
 
 The paper's spectral truncation step is represented in the QXP layer by
 `projectiveNonMeasurement`, which is a proposition asserting the existence of a
 rounded projective family with the same bounds as `SpectralTruncationStatement`.
-The `SpectralTruncationInput` interface is data-valued, so this conversion uses
-choice to extract the rounded family and then applies
-`spectralTruncationStatement_of_witness`.
-
-This does not prove `lem:projective-non-measurement`; it moves the remaining
-constructive obligation to that named paper statement instead of the raw
-`SpectralTruncationInput` shape. -/
-noncomputable def spectralTruncationInput_of_projectiveNonMeasurement
+This conversion uses choice to extract the rounded family and then applies
+`spectralTruncationStatement_of_witness`. -/
+noncomputable def spectralTruncationStatement_of_projectiveNonMeasurement
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
     (hprojective : projectiveNonMeasurement ψ A ζ) :
-    SpectralTruncationInput ψ A ζ :=
-  fun _hψ _halmostProjective =>
-    let R : OpFamily Outcome ι := Classical.choose hprojective
-    let hR : RoundingToProjectorsWitness ψ A ζ R :=
-      Classical.choose_spec hprojective
-    spectralTruncationStatement_of_witness ψ A ζ R hR
+    SpectralTruncationStatement ψ A ζ :=
+  let R : OpFamily Outcome ι := Classical.choose hprojective
+  let hR : RoundingToProjectorsWitness ψ A ζ R :=
+    Classical.choose_spec hprojective
+  spectralTruncationStatement_of_witness ψ A ζ R hR
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

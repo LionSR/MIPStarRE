@@ -268,7 +268,7 @@ Key Lean theorem names:
 - `orthonormalizationMainLemma`
 - `consistencyToAlmostProjective`
 - `spectralTruncateAlmostProjective`
-- `spectralTruncationInput_of_sourceAlmostProjective`
+- `spectralTruncationStatement_of_sourceAlmostProjective`
 - `leftLiftedProjectivizationRepairProducer`
 
 **Key definitions**

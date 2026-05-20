@@ -390,7 +390,9 @@ def spectralTruncateAlmostProjective {Outcome : Type*}
     (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
     (A : Measurement Outcome ι) (ζ : Error) :
     AlmostProjMeasStatement ψ A ζ →
-      SpectralTruncationInput ψ A ζ →
+      (ψ.IsNormalized →
+        (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
+          SpectralTruncationStatement ψ A ζ) →
       SpectralTruncationStatement ψ A ζ := by
   intro hAlmost hspectral
   exact hspectral hψ hAlmost.sourceAlmostProjective
