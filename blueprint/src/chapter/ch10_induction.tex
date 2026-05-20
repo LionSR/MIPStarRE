@@ -236,7 +236,9 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingDataOfSmallError}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one, MIPStarRE.LDT.MainInductionStep.one_le_k_of_mainInductionError_lt_one}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorBound_pred, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceSelfImprovement}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
 	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
 	The successor step forms the pasting input by combining the restricted
@@ -259,7 +261,18 @@
 	\texttt{mainInductionSuccessorNext\_ofAnswerSliceTransport} closes the
 	full positive-degree successor branch from the same two internal
 	constructions by combining this small-error theorem with the trivial
-	large-error theorem.  These declarations are internal theorems, not
+	large-error theorem.  The arithmetic lemma
+	\texttt{mainInductionSuccessorBound\_pred} derives the predecessor large-\(k\)
+	side condition from the successor one.  The degree-zero reduction
+	\texttt{mainInductionSuccessorNext\_degreeZero\_ofPastingFamily} shows that
+	the existing degree-zero pasting theorem suffices once a complete and
+	point-consistent slice family has been constructed and its scalar error is
+	absorbed into the main-induction error.  Finally,
+	\texttt{mainInductionSuccessorNext\_ofDegreeSplitPastingObligations} performs
+	the large-error and degree split explicitly: the positive-degree branch uses
+	the answer-valued slice transport route, while the degree-zero branch is
+	reduced to the family construction just described.  These declarations are
+	internal theorems, not
 	additional hypotheses in
 	Theorem~\ref{thm:main-induction}.
 \end{definition}
