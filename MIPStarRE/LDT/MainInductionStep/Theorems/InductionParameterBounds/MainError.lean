@@ -40,6 +40,23 @@ private lemma k_ne_zero_of_mainInductionError_lt_one
             simp [mainInductionError, mainInductionNu]
   linarith
 
+/-- In the nontrivial main-induction branch, the integer parameter `k` is
+positive.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, where the
+successor proof is reduced to the nontrivial small-error regime before the
+slice estimates are used.  The implication `mainInductionError < 1 → 1 ≤ k`
+is a formalization-only scalar consequence: if `k = 0`, then the main-induction
+error is at least `m^2`, hence at least `1`. -/
+lemma one_le_k_of_mainInductionError_lt_one
+    (params : Parameters)
+    (k : ℕ) (eps delta gamma : Error)
+    (hsmall : mainInductionError params k eps delta gamma < 1) :
+    1 ≤ k :=
+  Nat.succ_le_of_lt
+    (Nat.pos_of_ne_zero
+      (k_ne_zero_of_mainInductionError_lt_one params k eps delta gamma hsmall))
+
 /-- Internal helper: `mainInductionNu < 1` follows from `mainInductionError < 1`.
 
 Exposed for cross-module use in `MainTheorems`. -/
@@ -228,8 +245,8 @@ lemma three_le_k_sq_mul_next_m_of_hsmall
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1) :
     (3 : Error) ≤ ((k : Error) ^ (2 : ℕ)) * (params.next.m : Error) := by
-  have hk0 := k_ne_zero_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
-  have hk1_nat : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
+  have hk1_nat : 1 ≤ k :=
+    one_le_k_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
   by_cases hk1 : k = 1
   · subst hk1
     by_cases hnext_two : params.next.m = 2
