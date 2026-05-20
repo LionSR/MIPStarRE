@@ -138,24 +138,13 @@ noncomputable def rolePairCond {ι : Type*} [Fintype ι] [DecidableEq ι]
   Matrix.reindex (roleRegisterPairLocalEquiv ι) (roleRegisterPairLocalEquiv ι)
     (opTensor (rolePairProj rL rR) X)
 
-private lemma reindex_nonneg {α β : Type*} [Finite α] [Finite β]
-    (e : α ≃ β) {X : MIPStarRE.Quantum.Op α} (hX : 0 ≤ X) :
-    0 ≤ Matrix.reindex e e X := by
-  classical
-  let _ : Fintype α := Fintype.ofFinite α
-  let _ : Fintype β := Fintype.ofFinite β
-  refine Matrix.nonneg_iff_posSemidef.mpr ?_
-  rw [Matrix.reindex_apply]
-  exact (Matrix.posSemidef_submatrix_equiv (M := X) e.symm).2
-    (Matrix.nonneg_iff_posSemidef.mp hX)
-
 private lemma rolePairProj_nonneg (rL rR : Role) : 0 ≤ rolePairProj rL rR :=
   opTensor_nonneg (roleProj_nonneg rL) (roleProj_nonneg rR)
 
 private lemma rolePairCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) {X : MIPStarRE.Quantum.Op (ι × ι)} (hX : 0 ≤ X) :
     0 ≤ rolePairCond rL rR X :=
-  reindex_nonneg (roleRegisterPairLocalEquiv ι)
+  MIPStarRE.Quantum.reindex_nonneg (roleRegisterPairLocalEquiv ι)
     (opTensor_nonneg (rolePairProj_nonneg rL rR) hX)
 
 @[simp] private lemma swapDensity_real_smul {ι : Type*} (c : Error)
@@ -195,7 +184,7 @@ private lemma swapDensity_nonneg {ι : Type*} [Finite ι]
     {X : MIPStarRE.Quantum.Op (ι × ι)} (hX : 0 ≤ X) :
     0 ≤ swapDensity X := by
   simpa [swapDensity_eq_reindex] using
-    reindex_nonneg (Equiv.prodComm ι ι) hX
+    MIPStarRE.Quantum.reindex_nonneg (Equiv.prodComm ι ι) hX
 
 @[simp] private lemma swapDensity_rolePairCond {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) (X : MIPStarRE.Quantum.Op (ι × ι)) :
@@ -245,38 +234,11 @@ noncomputable def classicalRoleSymmState {ι : Type*} [Fintype ι] [DecidableEq 
     _ = (classicalRoleSymmState ψ).density := by
           simp [classicalRoleSymmState, add_comm]
 
-private lemma normalizedTrace_reindex {α β : Type*} [Fintype α] [Fintype β]
-    (e : α ≃ β) (X : MIPStarRE.Quantum.Op α) :
-    MIPStarRE.Quantum.normalizedTrace (Matrix.reindex e e X) =
-      MIPStarRE.Quantum.normalizedTrace X := by
-  classical
-  have hcard : Fintype.card β = Fintype.card α := Fintype.card_congr e.symm
-  unfold MIPStarRE.Quantum.normalizedTrace Matrix.trace
-  simp_rw [Matrix.diag_apply, Matrix.reindex_apply]
-  rw [← e.symm.sum_comp (fun i : α => X i i)]
-  simp [hcard]
-
 lemma normalizedTrace_swapDensity {ι : Type*} [Fintype ι]
     (X : MIPStarRE.Quantum.Op (ι × ι)) :
     MIPStarRE.Quantum.normalizedTrace (swapDensity X) = MIPStarRE.Quantum.normalizedTrace X := by
   simpa [swapDensity_eq_reindex] using
-    normalizedTrace_reindex (Equiv.prodComm ι ι) X
-
-private lemma normalizedTrace_opTensor {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (A : MIPStarRE.Quantum.Op α) (B : MIPStarRE.Quantum.Op β) :
-    MIPStarRE.Quantum.normalizedTrace (opTensor A B) =
-      MIPStarRE.Quantum.normalizedTrace A * MIPStarRE.Quantum.normalizedTrace B := by
-  unfold MIPStarRE.Quantum.normalizedTrace
-  rw [show Matrix.trace (opTensor A B) = Matrix.trace A * Matrix.trace B by
-    simpa [opTensor] using Matrix.trace_kronecker A B]
-  have hα : ((Fintype.card α : ℕ) : ℂ) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : ℂ) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  rw [Fintype.card_prod, Nat.cast_mul]
-  field_simp [hα, hβ]
+    MIPStarRE.Quantum.normalizedTrace_reindex (Equiv.prodComm ι ι) X
 
 private lemma normalizedTrace_rolePairProj (rL rR : Role) :
     MIPStarRE.Quantum.normalizedTrace (rolePairProj rL rR) = (1 / 4 : ℂ) := by
@@ -300,7 +262,7 @@ private lemma normalizedTrace_rolePairCond {ι : Type*} [Fintype ι] [DecidableE
     MIPStarRE.Quantum.normalizedTrace (rolePairCond rL rR X)
       = MIPStarRE.Quantum.normalizedTrace (opTensor (rolePairProj rL rR) X) := by
           rw [rolePairCond]
-          exact normalizedTrace_reindex (roleRegisterPairLocalEquiv ι) _
+          exact MIPStarRE.Quantum.normalizedTrace_reindex (roleRegisterPairLocalEquiv ι) _
     _ = MIPStarRE.Quantum.normalizedTrace (rolePairProj rL rR) *
           MIPStarRE.Quantum.normalizedTrace X := by
             simpa using normalizedTrace_opTensor (rolePairProj rL rR) X

@@ -566,6 +566,18 @@ theorem kronecker_mono_left
   rw [kronecker_sub_left]
   exact hpsd
 
+/-- Simultaneous reindexing of rows and columns preserves positive semidefiniteness. -/
+theorem reindex_nonneg {d₁ d₂ : Type*} [Finite d₁] [Finite d₂]
+    (e : d₁ ≃ d₂) {A : Op d₁} (hA : 0 ≤ A) :
+    0 ≤ Matrix.reindex e e A := by
+  classical
+  let _ : Fintype d₁ := Fintype.ofFinite d₁
+  let _ : Fintype d₂ := Fintype.ofFinite d₂
+  refine Matrix.nonneg_iff_posSemidef.mpr ?_
+  rw [Matrix.reindex_apply]
+  exact (Matrix.posSemidef_submatrix_equiv (M := A) e.symm).2
+    (Matrix.nonneg_iff_posSemidef.mp hA)
+
 variable {d : Type*} [Fintype d]
 
 /-! ### Normalized trace -/
@@ -606,6 +618,15 @@ theorem normalizedTrace_mul_comm (A B : Op d) :
     normalizedTrace (A * B) = normalizedTrace (B * A) := by
   simp only [normalizedTrace]
   rw [Matrix.trace_mul_comm]
+
+/-- Simultaneous reindexing of rows and columns preserves the normalized trace. -/
+theorem normalizedTrace_reindex {d₁ d₂ : Type*} [Fintype d₁] [Fintype d₂]
+    (e : d₁ ≃ d₂) (A : Op d₁) :
+    normalizedTrace (Matrix.reindex e e A) = normalizedTrace A := by
+  have hcard : Fintype.card d₂ = Fintype.card d₁ := Fintype.card_congr e.symm
+  unfold normalizedTrace
+  rw [Matrix.trace_reindex]
+  simp [hcard]
 
 /-! ### Squared τ-norm -/
 
