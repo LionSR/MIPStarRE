@@ -3,15 +3,18 @@
 
 % ORPHAN: standalone background theorem; the current downstream blueprint proofs do not call the Naimark dilation node.
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
-	% The current Lean declaration records questionwise local dilations, not the full tensor-product correlation statement, so this source theorem has no Lean declaration attached.
-	% Unproved — tracked by issue #103 (Ch4 orthonormalization).
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkTensorProductCorrelationStatement}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation}
+	% The Lean declaration is a source-shaped proof obligation for the full
+	% tensor-product correlation statement.  It is not marked \leanok until the
+	% auxiliary-register tensor assembly is formalized.  Tracked by issue #1697.
 	\uses{def:submeasurement}
 	Let $\ket{\psi}$ be a state in $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$.
 	Let $A = \{A^x_a\}$ be a sub-measurement acting on $\mathcal H_{\mathrm A}$
 	and $B=\{B^y_b\}$ be a sub-measurement acting on $\mathcal H_{\mathrm B}$.
 	Then there exist Hilbert spaces $\mathcal H_{\mathrm A_{\mathsf{aux}}}$ and $\mathcal H_{\mathrm B_{\mathsf{aux}}}$,
 	a state $\ket{\mathsf{aux}} \in \mathcal H_{\mathrm A_{\mathsf{aux}}} \ot \mathcal H_{\mathrm B_{\mathsf{aux}}}$,
-	and measurements $\widehat{A} = \{\widehat{A}^x_a\}$ and $\widehat{B}=\{\widehat{B}^y_b\}$
+	and projective measurements $\widehat{A} = \{\widehat{A}^x_a\}$ and $\widehat{B}=\{\widehat{B}^y_b\}$
 	acting on $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm A_{\mathsf{aux}}}$
 	and $\mathcal H_{\mathrm B} \ot \mathcal H_{\mathrm B_{\mathsf{aux}}}$, respectively,
 	such that, if $\ket{\widehat{\psi}} = \ket{\psi} \ot \ket{\mathsf{aux}}$, then for all $x,y,a,b$,
