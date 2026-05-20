@@ -440,6 +440,38 @@ theorem mainInductionSuccessorNext_degreeZero_ofPastingFamily
     ⟨H, _hH_eq, hH⟩
   exact ⟨H, ConsRel.mono herror hH⟩
 
+/-- Construction target for the degree-zero branch of the successor step.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, in the
+successor step of `\label{thm:main-induction}`.
+
+When Lean's successor proof is split by whether the predecessor degree is zero,
+this is the remaining datum needed in the degree-zero branch: a complete and
+point-consistent degree-zero slice family together with the scalar comparison
+which absorbs the pasting error into the next main-induction error.  The
+conditional assembly theorems below use only the fields of this datum; this
+definition is the named construction target that must eventually be proved from
+the source hypotheses.
+
+**Proof obligation:** This declaration is intentionally a `sorry`-bodied
+construction target, tracked by issue #1507.  Planned discharge: construct the
+degree-zero slice family from the hypotheses of
+`mainInductionSuccessorNextOfSmallError` under `params.d = 0`, then prove the
+displayed scalar inequality for the produced losses. -/
+noncomputable def DegreeZeroPastingFamilyObligation.ofSmallError
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (_hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (_hd_zero : params.d = 0) :
+    DegreeZeroPastingFamilyObligation params strategy eps delta gamma k := by
+  classical
+  sorry
+
 /-- Internal small-error successor assembly from the two degree branches.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, restricted to
@@ -502,53 +534,6 @@ theorem mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
         params strategy eps delta gamma k hgood family kappa zeta
         hcomplete hcons (Nat.eq_zero_of_not_pos hd) herror
 
-/-- Internal small-error successor assembly using the named degree-zero
-obligation package.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, restricted to
-the nontrivial branch in which
-`mainInductionError params.next k eps delta gamma < 1`.
-
-This is a wrapper around
-`mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations`.  It
-records the equivalent interface in which the degree-zero branch supplies
-`DegreeZeroPastingFamilyObligation` directly, and then projects that record to
-the existing existential interface.  It is not a paper theorem and is not an
-additional hypothesis of `thm:main-induction`.
-
-**Internal proof obligation:** This conditional assembly theorem is tracked by
-issue #1507.  Planned discharge: prove the degree-zero family construction and
-the positive-degree answer-slice transport from the hypotheses of
-`mainInductionSuccessorNextOfSmallError`, and then call this theorem. -/
-theorem mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligation
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hk_next : 400 * params.next.m * params.next.d ≤ k)
-    (hsmall : mainInductionError params.next k eps delta gamma < 1)
-    (degreeZeroPasting :
-      params.d = 0 →
-        DegreeZeroPastingFamilyObligation params strategy eps delta gamma k)
-    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
-    (hsliceTransport :
-      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-        (inductionPkg :
-          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
-        AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
-          restrictionPkg inductionPkg) :
-    ∃ G : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)
-        (mainInductionError params.next k eps delta gamma) :=
-  mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
-    params strategy eps delta gamma k hgood hk_next hsmall
-    (fun hd_zero => (degreeZeroPasting hd_zero).exists_family)
-    hinduction hsliceTransport
-
 /-- Internal successor assembly after the large-error and degree splits.
 
 This theorem is not the paper theorem and should not be linked as
@@ -606,49 +591,6 @@ theorem mainInductionSuccessorNext_ofDegreeSplitPastingObligations
         (degreeZeroPasting hsmall) hinduction hsliceTransport
   · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
       (le_of_not_gt hsmall)
-
-/-- Internal successor assembly using the named degree-zero obligation package.
-
-This is a wrapper around
-`mainInductionSuccessorNext_ofDegreeSplitPastingObligations`.  It records the
-same large-error and degree split while using
-`DegreeZeroPastingFamilyObligation` as the degree-zero input in the small-error
-branch.  It is not the paper theorem and should not be linked as
-`\label{thm:main-induction}`.
-
-**Proof obligation:** This is an internal conditional reduction for the
-successor proof of `thm:main-induction`, tracked by issue #1507 and the
-source-statement boundary tracker #1458.  Elimination: prove the degree-zero
-family construction and the positive-degree answer-valued slice realization
-from the source successor hypotheses. -/
-theorem mainInductionSuccessorNext_ofDegreeSplitPastingObligation
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hk_next : 400 * params.next.m * params.next.d ≤ k)
-    (degreeZeroPasting :
-      ∀ _hsmall : mainInductionError params.next k eps delta gamma < 1,
-        params.d = 0 →
-          DegreeZeroPastingFamilyObligation params strategy eps delta gamma k)
-    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
-    (hsliceTransport :
-      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-        (inductionPkg :
-          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
-        AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
-          restrictionPkg inductionPkg) :
-    ∃ G : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)
-        (mainInductionError params.next k eps delta gamma) :=
-  mainInductionSuccessorNext_ofDegreeSplitPastingObligations
-    params strategy eps delta gamma k hgood hk_next
-    (fun hsmall hd_zero => (degreeZeroPasting hsmall hd_zero).exists_family)
-    hinduction hsliceTransport
 
 /-- Small-error branch of the native successor step for `thm:main-induction`.
 

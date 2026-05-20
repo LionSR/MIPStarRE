@@ -628,11 +628,12 @@ noncomputable def family {params : Parameters}
 end AnswerSelfImprovementData
 
 /-- Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, in the
-degree-zero branch of the successor step of `\label{thm:main-induction}`.
+successor step of `\label{thm:main-induction}`.
 
 This record names the remaining construction needed when the predecessor degree
-is zero.  The paper obtains a family of degree-zero slice polynomials and then
-uses pasting to obtain the next-stage global measurement.  In Lean, the
+is zero in Lean's degree split of the successor proof.  The paper obtains the
+successor measurement by constructing slice polynomials and then using pasting
+to obtain the next-stage global measurement.  In Lean, the
 verified pasting reduction
 `mainInductionSuccessorNext_degreeZero_ofPastingFamily` already shows that such
 a complete and point-consistent family is sufficient.  This record is the
