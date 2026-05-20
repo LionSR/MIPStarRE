@@ -12,8 +12,6 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
-      - 'scripts/check_blueprint_latex.py'
-      - 'scripts/tests/**'
       - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
   pull_request:
@@ -26,8 +24,6 @@ on:
       - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
-      - 'scripts/check_blueprint_latex.py'
-      - 'scripts/tests/**'
       - 'scripts/tex_utils.py'
       - 'scripts/blueprint_lean_sync.py'
 
@@ -71,11 +67,11 @@ jobs:
           pip install leanblueprint
           pip install plastex
 
-      - name: Test blueprint Python helpers
-        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
-
-      - name: Check blueprint LaTeX conventions
-        run: python3 scripts/check_blueprint_latex.py --root blueprint/src
+      # Blueprint helper unit tests (scripts/tests/test_*.py) and the blueprint
+      # LaTeX convention lint (scripts/check_blueprint_latex.py) both run
+      # locally in .githooks/pre-commit. This workflow remains the render and
+      # blueprint-sync integration check; blueprint-sync.yml carries the CI path
+      # filter for helper unit tests.
 
       - name: Run leanblueprint pdf (catches undefined macros and LaTeX errors)
         working-directory: blueprint

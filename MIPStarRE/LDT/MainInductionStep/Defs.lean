@@ -58,9 +58,9 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
 
 namespace RestrictedSymStrat
 
--- TODO(#1649): These sampled answer families duplicate the `SymStrat` API in
--- `MIPStarRE.LDT.Test.Strategy`; refactor around shared helpers once the
--- restricted-slice bookkeeping has stabilized.
+-- Note: these sampled answer families duplicate the `SymStrat` API in
+-- `MIPStarRE.LDT.Test.Strategy`. A future refactor around shared helpers
+-- can be considered once the restricted-slice bookkeeping has stabilized.
 
 /-- Sampled point answers in the axis-parallel lines test.
 Point player receives `u` (base point) and answers at `u`. -/

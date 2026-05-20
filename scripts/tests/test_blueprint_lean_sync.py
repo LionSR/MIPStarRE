@@ -387,7 +387,11 @@ class CollectLeanDeclsTests(unittest.TestCase):
             lean_file.write_text("-- base file before public API additions\n")
 
             def git(*args: str) -> str:
-                return subprocess.check_output(["git", *args], cwd=root, text=True).strip()
+                return subprocess.check_output(
+                    ["git", "-c", "commit.gpgsign=false", "-c", "tag.gpgsign=false", *args],
+                    cwd=root,
+                    text=True,
+                ).strip()
 
             git("init", "-q")
             git("config", "user.email", "tests@example.invalid")
