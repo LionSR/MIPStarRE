@@ -30,6 +30,20 @@ The last two commands are broader inventories: the first scans theorem-like
 blueprint environments, and the second also scans green definition, remark, and
 example environments.
 
+On the current main-branch snapshot the ordinary blueprint synchronization
+report finds 647 statement-level green entries out of 653 Lean references and
+476 proof-level green entries out of 476 proof-bearing Lean references.  The
+axiom-closure checker then checks 630 unique declarations carrying at least one
+`\leanok` marker and reports no proof-level `\leanok` declaration depending on
+`sorryAx`.
+
+The broad-vocabulary theorem-like audit reports no strict proof-debt findings
+and no conditional declaration-name findings.  Its non-blocking classifications
+are 29 faithful-boundary inputs, 45 source-construction contexts, and two
+external citation interfaces.  When informational environments are included,
+the same broad vocabulary gives 92 raw findings and four conditional-name
+findings; these occur in definitions or remarks, not in source theorem claims.
+
 ## Theorem-like green nodes
 
 The theorem-like scan reported no strict proof-debt header findings and no
@@ -122,6 +136,14 @@ The largest clusters are:
 The exact active `\leanok` nodes whose Lean names contain high-risk vocabulary
 are recorded in
 `docs/reports/issue-1458-green-node-name-inventory.md`.
+
+After including the full trigger list from issue #1458, namely also `Data`,
+`Output`, `Completion`, and `Compatibility`, the active name scan contains 105
+green declaration links.  The added cases are mainly data-processing lemmas in
+Chapter 3, source-construction contexts for the \(Q,X,\hat X,P\) layer in
+Chapter 4, commutativity data in Chapter 8, and Chapter 10 internal induction
+and final-theorem construction interfaces.  They do not change the
+source-theorem verdict above.
 
 ### 2026-05-20 status update: Chapter 4 and Chapter 7
 
