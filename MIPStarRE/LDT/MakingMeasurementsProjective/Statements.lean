@@ -19,6 +19,13 @@ The questionwise **Naimark interface** (`NaimarkStatement`) records the
 per-question one-measurement dilations and their single-outcome marginal
 preservation identities.  It is not the full tensor-product statement of
 `\label{thm:naimark}`.
+
+The source theorem form is recorded separately as
+`NaimarkTensorProductCorrelationStatement` and
+`naimarkTensorProductCorrelation`.  This statement contains the full
+bipartite auxiliary-state and correlation-preservation conclusion of
+`\label{thm:naimark}`; its proof is the tensor-product assembly still tracked
+by issue #1697 and `docs/paper-gaps/naimark.tex`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -26,6 +33,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
+
+universe u
 
 /-! ### One-measurement Naimark statement -/
 
@@ -87,6 +96,135 @@ structure NaimarkStatement {QuestionA OutcomeA QuestionB OutcomeB : Type*}
       MIPStarRE.Quantum.normalizedTrace (ρ * (B y).outcome b) =
         MIPStarRE.Quantum.normalizedTrace
           (oneMeasLiftedDensity OutcomeB ρ * (data.right y).liftedEffect (some b))
+
+/-! ### Source-shaped tensor-product Naimark statement -/
+
+/-- The density matrix of `ψ ⊗ aux`, written in the register order used by the
+paper's dilated measurements:
+`(Alice × AliceAux) × (Bob × BobAux)`.
+
+The source paper writes the dilated vector as
+`\ket{\widehat{\psi}} = \ket{\psi} \otimes \ket{\mathsf{aux}}`.  Since the
+local dilated measurements act on `Alice × AliceAux` and `Bob × BobAux`, the
+matrix entries below are the corresponding tensor-product density after the
+canonical reassociation and permutation of the four finite registers. -/
+noncomputable def naimarkProductExtensionDensity
+    (HA HB HauxA HauxB : FiniteHilbertSpace.{u})
+    (ψ : QuantumState (HA.carrier × HB.carrier))
+    (aux : QuantumState (HauxA.carrier × HauxB.carrier)) :
+    MIPStarRE.Quantum.Op
+      ((HA.carrier × HauxA.carrier) × (HB.carrier × HauxB.carrier)) :=
+  fun r c =>
+    ψ.density (r.1.1, r.2.1) (c.1.1, c.2.1) *
+      aux.density (r.1.2, r.2.2) (c.1.2, c.2.2)
+
+/-- Witness data for the full tensor-product Naimark correlation theorem.
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:36-80`
+(`\label{thm:naimark}`), with the tensor-product assembly proof at
+`references/ldt-paper/orthonormalization.tex:161-187`.
+
+The data records the auxiliary Hilbert spaces, an auxiliary product state, the
+dilated state `ψ ⊗ aux`, and projective measurements on the enlarged Alice and
+Bob spaces.  The final field is the source theorem's correlation identity for
+all questions and outcomes. -/
+structure NaimarkTensorProductCorrelationData
+    {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    (HA HB HauxA HauxB : FiniteHilbertSpace.{u})
+    (ψ : QuantumState (HA.carrier × HB.carrier))
+    (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
+    (B : IdxSubMeas QuestionB OutcomeB HB.carrier) where
+  /-- The auxiliary state on the tensor product of the two auxiliary spaces. -/
+  auxState : QuantumState (HauxA.carrier × HauxB.carrier)
+  /-- The auxiliary state is normalized. -/
+  auxState_normalized : auxState.IsNormalized
+  /-- Alice's factor in the auxiliary product state. -/
+  auxLeft : QuantumState HauxA.carrier
+  /-- Bob's factor in the auxiliary product state. -/
+  auxRight : QuantumState HauxB.carrier
+  /-- Alice's auxiliary factor is normalized. -/
+  auxLeft_normalized : auxLeft.IsNormalized
+  /-- Bob's auxiliary factor is normalized. -/
+  auxRight_normalized : auxRight.IsNormalized
+  /-- The auxiliary state is the product of its Alice and Bob factors. -/
+  aux_product :
+    auxState.density = opTensor auxLeft.density auxRight.density
+  /-- The dilated bipartite state in the register order of the dilated measurements. -/
+  dilatedState :
+    QuantumState ((HA.carrier × HauxA.carrier) × (HB.carrier × HauxB.carrier))
+  /-- The dilated state is `ψ ⊗ aux`, with the four registers reassociated. -/
+  dilatedState_density :
+    dilatedState.density =
+      naimarkProductExtensionDensity HA HB HauxA HauxB ψ auxState
+  /-- Alice's projective measurements on the enlarged Alice space. -/
+  left : IdxProjMeas QuestionA OutcomeA (HA.carrier × HauxA.carrier)
+  /-- Bob's projective measurements on the enlarged Bob space. -/
+  right : IdxProjMeas QuestionB OutcomeB (HB.carrier × HauxB.carrier)
+  /-- Preservation of the bipartite correlations for every question and outcome. -/
+  correlation_preservation :
+    ∀ (x : QuestionA) (y : QuestionB) (a : OutcomeA) (b : OutcomeB),
+      ev ψ
+          (leftTensor (ι₂ := HB.carrier) ((A x).outcome a) *
+            rightTensor (ι₁ := HA.carrier) ((B y).outcome b)) =
+        ev dilatedState
+          (leftTensor (ι₂ := HB.carrier × HauxB.carrier) ((left x).outcome a) *
+            rightTensor (ι₁ := HA.carrier × HauxA.carrier) ((right y).outcome b))
+
+/-- Source-shaped statement of the full tensor-product Naimark theorem.
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:36-80`
+(`\label{thm:naimark}`).  The proof in the paper is the simultaneous
+tensor-product assembly of the one-measurement helper, described at
+`references/ldt-paper/orthonormalization.tex:161-187`.
+
+The explicit normalization hypothesis records the paper convention that
+`\ket{\psi}` is a state. -/
+def NaimarkTensorProductCorrelationStatement
+    {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    (HA HB : FiniteHilbertSpace.{u})
+    (ψ : QuantumState (HA.carrier × HB.carrier))
+    (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
+    (B : IdxSubMeas QuestionB OutcomeB HB.carrier) : Prop :=
+  ψ.IsNormalized →
+    ∃ HauxA HauxB : FiniteHilbertSpace.{u},
+      Nonempty (NaimarkTensorProductCorrelationData HA HB HauxA HauxB ψ A B)
+
+/-- Full tensor-product Naimark correlation theorem.
+
+This is the Lean statement corresponding to
+`references/ldt-paper/orthonormalization.tex:36-80`
+(`\label{thm:naimark}`).  It is intentionally separate from
+`questionwiseNaimark`, which proves only the per-question one-measurement
+interface.
+
+**Proof obligation:** The proof currently remains the tensor-product assembly
+of the questionwise Naimark dilations described in
+`references/ldt-paper/orthonormalization.tex:161-187`.  The missing
+formalization is documented in `docs/paper-gaps/naimark.tex` and tracked by
+issue #1697.  Elimination: construct the product auxiliary registers, lift each
+one-measurement dilation to the appropriate tensor factor, and prove the
+displayed correlation identity from the one-measurement compression identities. -/
+theorem naimarkTensorProductCorrelation
+    {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    (HA HB : FiniteHilbertSpace.{u})
+    (ψ : QuantumState (HA.carrier × HB.carrier))
+    (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
+    (B : IdxSubMeas QuestionB OutcomeB HB.carrier) :
+    NaimarkTensorProductCorrelationStatement HA HB ψ A B := by
+  intro _hψ
+  sorry
 
 /-! ### Orthonormalization statements -/
 
