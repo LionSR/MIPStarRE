@@ -57,6 +57,7 @@
 
 \begin{definition}[Lean questionwise Naimark interface]\label{rem:lean-questionwise-naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark, MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
+	\leanok
 	\uses{lem:naimark-helper}
 	Lean currently proves the questionwise one-measurement interface obtained
 	from Lemma~\ref{lem:naimark-helper}.  For every indexed family \(A^x\) and
@@ -96,10 +97,24 @@
 		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
 \end{theorem}
+\begin{proof}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
+	\leanok
+	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair,
+		prop:other-two-notions-of-self-consistency,
+		prop:triangle-inequality-for-approx_delta}
+	Complete the sub-measurement by adding the missing outcome and use
+	permutation invariance to convert strong self-consistency into the
+	cross-consistency hypothesis of
+	Lemma~\ref{lem:orthonormalization-main-lemma}.  Applying the
+	locality-preserving projectivization repair gives the required projective
+	sub-measurement with the paper constant \(100\zeta^{1/4}\).
+\end{proof}
 
 \begin{definition}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
+	\leanok
 	The following are Lean auxiliary declarations, not hypotheses in
 	Theorem~\ref{thm:orthonormalization}.
 	Let \(A=\{A_a\}_{a\in\mathcal A}\) be a sub-measurement, and complete it to
@@ -130,6 +145,7 @@
 	\uses{thm:orthonormalization, prop:completing-to-measurement}
 	\lean{MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.qSDD_liftRight_eq_liftLeft_of_permInv, MIPStarRE.LDT.MakingMeasurementsProjective.sddRel_liftRight_of_liftLeft_permInv}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OrthonormalizeAndCompleteStatement.completedCloseness_liftRight, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements}
+	\leanok
 	The inductive-step application of the orthogonalization lemma uses
 	completion on both tensor factors.  The formal development records the
 	analytic completion statement on the left register; the shared preliminary
@@ -149,6 +165,7 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.leftConsistency_with_triangleSub_loss, MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.rightConsistency_with_triangleSub_loss}
+	\leanok
 	Lean exposes the quantitative obstruction at the projectivization transition used
 	in the inductive step.  The existing line-156 transition gives only the generic
 	consequence of Proposition~\ref{prop:triangle-sub}: from
@@ -302,6 +319,17 @@
 	statement \(84\zeta^{1/4}\) is now formalized as
 	Lemma~\ref{lem:orthonormalization-main-lemma}.
 \end{lemma}
+\begin{proof}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
+	\leanok
+	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair,
+		prop:simeq-for-measurements, prop:triangle-inequality-for-approx_delta}
+	The consistency hypothesis first gives the source almost-projective estimate
+	for \(A_a\ot I\).  The locality-preserving projectivization repair then
+	produces a projective sub-measurement on the original space, and the scalar
+	bounds convert the \(84\)-constant repair estimate into the public
+	\(100\zeta^{1/4}\) envelope.
+\end{proof}
 
 \begin{definition}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
 	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
@@ -357,6 +385,7 @@
 
 	\begin{definition}[Lean implementation name for projectivization repair]\label{rem:lean-left-lifted-projectivization-repair-producer}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
+		\leanok
 		The declaration \texttt{leftLiftedProjectivizationRepair} is the
 		paper-labelled name for
 	Lemma~\ref{lem:left-lifted-projectivization-repair}.  The older declaration
@@ -583,6 +612,7 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement.toRoundingToProjectorsWitness}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_projectiveNonMeasurement}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective}
+		\leanok
 		The source-facing Lean declarations for
 		Lemma~\ref{lem:projective-non-measurement} are the proposition
 		\texttt{projectiveNonMeasurement} and the construction theorem
@@ -872,6 +902,19 @@
 		\end{equation}
 		Let $T = \{T_a\}$. Then $T$ is a projective measurement on $\C^m$.
 	\end{definition}
+	\begin{proof}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.matrixDecompositionQ,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaProjMeas,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinProjMeas,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaRangeEmbedding,
+			MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding}
+		\leanok
+		\uses{lem:projective-low-rank-sum}
+		Choose an orthonormal basis of the range of each projector \(Q_a\).
+		The rank-one expansion gives the displayed decomposition, and the
+		orthogonality of the labelled basis vectors makes the family \(T\)
+		a projective measurement.
+	\end{proof}
 
 	\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
@@ -897,11 +940,25 @@
 		lemmas take explicit matrices $U,V,\Sigma,I_{m\times d}$ and derive the
 		two stored $\widehat X$ identities from the matrix calculation below.
 	\end{definition}
+	\begin{proof}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvd,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd}
+		\leanok
+		\uses{def:matrix-decomposition-Q}
+		Apply the finite-dimensional singular value decomposition to \(X\) and
+		record exactly the consequences used later: the identities for
+		\(X^\dagger X\), \(\widehat X\widehat X^\dagger\),
+		\(X^\dagger\widehat X\), and the restatement of the \(Q_a\)'s.
+	\end{proof}
 
-		\begin{definition}\label{rem:motivation-for-P}
+	\begin{definition}[Formalization support for orthogonal projector families]\label{rem:motivation-for-P}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_mul_eq_zero_of_ne_of_sum_le_one}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one}
+		\leanok
 		If the family $\{Q_a\}$ were a projective measurement, then the vectors
 		$\ket{v_{a,i}}$, over all $a$ and all $1 \leq i \leq m_a$, would be orthonormal.
 		Then \eqref{eq:looks-like-singular-value-decomposition} would already be a singular value
@@ -910,7 +967,7 @@
 			X = U \cdot I_{m \times d} \cdot V^\dagger.
 		\]
 		This motivates replacing $\Sigma$ by $I$ in the definition of $\widehat X$ and $P$.
-		\end{definition}
+	\end{definition}
 
 	\begin{definition}[Definition of~$P$]\label{def:projective-P}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP}
@@ -928,6 +985,15 @@
 			P_a = \widehat{X}_a^\dagger \cdot \widehat{X}_a.
 		\]
 	\end{definition}
+	\begin{proof}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveP}
+		\leanok
+		\uses{def:matrix-decomposition-Q, def:svd-of-X}
+		The definition is the formal \(Q/X/\widehat X/P\) construction: once
+		\(\widehat X\) is chosen from the stored singular-value data, each
+		\(P_a\) is defined as the positive operator
+		\(\widehat X_a^\dagger\widehat X_a\).
+	\end{proof}
 
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
