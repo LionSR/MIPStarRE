@@ -440,6 +440,66 @@ theorem mainInductionSuccessorNext_degreeZero_ofPastingFamily
     ⟨H, _hH_eq, hH⟩
   exact ⟨H, ConsRel.mono herror hH⟩
 
+/-- Internal small-error successor assembly from the two degree branches.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, restricted to
+the nontrivial branch in which
+`mainInductionError params.next k eps delta gamma < 1`.
+
+This theorem is not a paper theorem.  It records that the small-error successor
+branch follows once the proof has supplied its two branch constructions: in
+degree zero, a complete and point-consistent slice family with scalar error
+absorbed into the next main-induction error; in positive degree, the
+answer-valued predecessor induction hypothesis and the slice-strategy transport
+needed to run the induction-section self-improvement theorem.
+
+No one of these objects is added as a hypothesis to `thm:main-induction`.  The
+source-facing theorem `mainInductionSuccessorNextOfSmallError` must still
+construct them from the displayed successor hypotheses.
+
+**Internal proof obligation:** This conditional assembly theorem is tracked by
+issue #1507.  Planned discharge: prove the degree-zero family construction and
+the positive-degree answer-slice transport from the hypotheses of
+`mainInductionSuccessorNextOfSmallError`, and then call this theorem. -/
+theorem mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (degreeZeroPasting :
+      params.d = 0 →
+        ∃ family : IdxPolyFamily params ι, ∃ kappa zeta : Error,
+          family.Complete strategy.state kappa ∧
+            family.ConsistentWithPoints strategy zeta ∧
+              ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+                mainInductionError params.next k eps delta gamma)
+    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
+    (hsliceTransport :
+      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+        (inductionPkg :
+          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
+        AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+          restrictionPkg inductionPkg) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  by_cases hd : 0 < params.d
+  · exact
+      mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport
+        params strategy eps delta gamma k hgood hk_next hsmall hd hinduction hsliceTransport
+  · rcases degreeZeroPasting (Nat.eq_zero_of_not_pos hd) with
+      ⟨family, kappa, zeta, hcomplete, hcons, herror⟩
+    exact
+      mainInductionSuccessorNext_degreeZero_ofPastingFamily
+        params strategy eps delta gamma k hgood family kappa zeta
+        hcomplete hcons (Nat.eq_zero_of_not_pos hd) herror
+
 /-- Internal successor assembly after the large-error and degree splits.
 
 This theorem is not the paper theorem and should not be linked as
@@ -490,16 +550,10 @@ theorem mainInductionSuccessorNext_ofDegreeSplitPastingObligations
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
   by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
-  · by_cases hd : 0 < params.d
-    · exact
-        mainInductionSuccessorNext_ofAnswerSliceTransport
-          params strategy eps delta gamma k hgood hk_next hd hinduction hsliceTransport
-    · rcases degreeZeroPasting hsmall (Nat.eq_zero_of_not_pos hd) with
-        ⟨family, kappa, zeta, hcomplete, hcons, herror⟩
-      exact
-        mainInductionSuccessorNext_degreeZero_ofPastingFamily
-          params strategy eps delta gamma k hgood family kappa zeta
-          hcomplete hcons (Nat.eq_zero_of_not_pos hd) herror
+  · exact
+      mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
+        params strategy eps delta gamma k hgood hk_next hsmall
+        (degreeZeroPasting hsmall) hinduction hsliceTransport
   · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
       (le_of_not_gt hsmall)
 
