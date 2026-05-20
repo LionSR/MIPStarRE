@@ -339,7 +339,7 @@ statements changed.
 **Validation.** Use the targeted Lean checks above plus:
 
 ```bash
-python scripts/check_blueprint_sync.py --skip-axiom-check
+python scripts/blueprint_lean_sync.py --root . --ci
 lake exe checkdecls blueprint/lean_decls
 ```
 

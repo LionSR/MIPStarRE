@@ -21,10 +21,6 @@ BLUEPRINT_SUPPORT_SCRIPTS = {
         "tests": {"scripts/tests/test_blueprint_leanok_axioms.py"},
         "workflows": {".github/workflows/blueprint-sync.yml"},
     },
-    "scripts/check_blueprint_sync.py": {
-        "tests": {"scripts/tests/test_check_blueprint_sync.py"},
-        "workflows": {".github/workflows/blueprint-sync.yml"},
-    },
     "scripts/check_blueprint_latex.py": {
         "tests": {"scripts/tests/test_check_blueprint_latex.py"},
         "workflows": set(),
@@ -47,7 +43,6 @@ WORKFLOW_REQUIRED_PATHS = {
     ".github/workflows/blueprint-sync.yml": {
         "scripts/blueprint_lean_sync.py",
         "scripts/blueprint_leanok_axioms.py",
-        "scripts/check_blueprint_sync.py",
         "scripts/tex_utils.py",
         "scripts/tests/**",
         ".github/workflows/blueprint-sync.yml",

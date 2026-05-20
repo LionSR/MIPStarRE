@@ -11,7 +11,6 @@ on:
       - 'lean-toolchain'
       - 'scripts/blueprint_lean_sync.py'
       - 'scripts/blueprint_leanok_axioms.py'
-      - 'scripts/check_blueprint_sync.py'
       - 'scripts/tex_utils.py'
       - 'scripts/tests/**'
       - '.github/actions/setup-lean/**'

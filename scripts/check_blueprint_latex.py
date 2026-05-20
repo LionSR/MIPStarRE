@@ -9,8 +9,11 @@ This keeps the print and web builds independent of ``cleveref``.
 Remark environments are also expository, not proof-bearing blueprint nodes.
 They should not carry ``\lean{}``, ``\leanok``, or ``\uses{}`` metadata; such
 metadata belongs on definitions, lemmas, propositions, theorems, and corollaries.
-Remark labels should likewise not occur as targets of ``\uses{}``, since a remark
-is not a theorem-like dependency.
+Labels declared inside remarks should likewise not occur as targets of
+``\uses{}``, since a remark is not a theorem-like dependency.  This rule is
+semantic in the modest sense needed here: it follows the labels actually
+declared in remark environments, rather than relying on a naming convention such
+as a ``rem:`` prefix.
 """
 
 from __future__ import annotations
@@ -27,9 +30,10 @@ from tex_utils import strip_tex_comment
 BLUEPRINT_EXTENSIONS = {".tex", ".sty", ".cls"}
 FORBIDDEN_CLEVEREF = re.compile(r"cleveref|\\[cC]ref")
 FORBIDDEN_REMARK_METADATA = re.compile(r"\\lean\{|\\leanok\b|\\uses\{")
-FORBIDDEN_REMARK_DEPENDENCY = re.compile(r"\\uses\{[^}\n]*\brem:[^}\n]*\}")
 BEGIN_REMARK = re.compile(r"\\begin\s*\{\s*remark\*?\s*\}")
 END_REMARK = re.compile(r"\\end\s*\{\s*remark\*?\s*\}")
+LABEL = re.compile(r"\\label\s*\{\s*([^}\s]+)\s*\}")
+USES_BEGIN = re.compile(r"\\uses\s*\{")
 
 
 @dataclass(frozen=True)
@@ -97,20 +101,97 @@ def find_remark_metadata(root: Path) -> list[Finding]:
     return findings
 
 
+def collect_remark_labels(root: Path) -> dict[str, Finding]:
+    """Return labels declared inside remark environments."""
+
+    labels: dict[str, Finding] = {}
+    for path in iter_source_files(root):
+        remark_depth = 0
+        for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            active_line = strip_tex_comment(raw_line)
+            in_remark_at_line_start = remark_depth > 0
+            remark_depth += len(BEGIN_REMARK.findall(active_line))
+
+            if in_remark_at_line_start or remark_depth > 0:
+                for match in LABEL.finditer(active_line):
+                    label = match.group(1)
+                    labels.setdefault(
+                        label,
+                        Finding(
+                            path=path,
+                            line=line_number,
+                            column=match.start(1) + 1,
+                            fragment=label,
+                        ),
+                    )
+
+            remark_depth = max(0, remark_depth - len(END_REMARK.findall(active_line)))
+    return labels
+
+
+def iter_uses_targets(path: Path) -> list[Finding]:
+    r"""Return dependency targets appearing in active ``\uses{...}`` commands."""
+
+    findings: list[Finding] = []
+    collecting = False
+    start_line = 0
+    start_column = 0
+    buffer: list[str] = []
+
+    for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        active_line = strip_tex_comment(raw_line)
+        index = 0
+        while index <= len(active_line):
+            if not collecting:
+                match = USES_BEGIN.search(active_line, index)
+                if match is None:
+                    break
+                collecting = True
+                start_line = line_number
+                start_column = match.start() + 1
+                buffer = []
+                index = match.end()
+
+            end_index = active_line.find("}", index)
+            if end_index == -1:
+                buffer.append(active_line[index:])
+                buffer.append("\n")
+                break
+
+            buffer.append(active_line[index:end_index])
+            uses_body = "".join(buffer)
+            for target in uses_body.split(","):
+                target = target.strip()
+                if target:
+                    findings.append(
+                        Finding(
+                            path=path,
+                            line=start_line,
+                            column=start_column,
+                            fragment=target,
+                        )
+                    )
+            collecting = False
+            buffer = []
+            index = end_index + 1
+
+    return findings
+
+
 def find_remark_dependency_targets(root: Path) -> list[Finding]:
     """Find uses-dependencies whose target is a remark label."""
 
+    remark_labels = set(collect_remark_labels(root))
     findings: list[Finding] = []
     for path in iter_source_files(root):
-        for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
-            active_line = strip_tex_comment(raw_line)
-            for match in FORBIDDEN_REMARK_DEPENDENCY.finditer(active_line):
+        for target in iter_uses_targets(path):
+            if target.fragment in remark_labels:
                 findings.append(
                     Finding(
                         path=path,
-                        line=line_number,
-                        column=match.start() + 1,
-                        fragment=match.group(0),
+                        line=target.line,
+                        column=target.column,
+                        fragment=target.fragment,
                     )
                 )
     return findings

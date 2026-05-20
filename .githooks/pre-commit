@@ -8,6 +8,15 @@ fi
 
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
+GIT_LOCAL_ENV_VARS="$(git rev-parse --local-env-vars)"
+
+run_without_git_local_env() (
+  # Git exports repository-local variables while running hooks.  Several script
+  # tests create temporary repositories; keep those tests independent of this
+  # checkout.
+  unset $GIT_LOCAL_ENV_VARS
+  "$@"
+)
 
 STAGED_FILES="$(git diff --cached --name-only --diff-filter=ACMR)"
 if [ -z "$STAGED_FILES" ]; then
@@ -19,7 +28,7 @@ git diff --cached --check
 
 if printf '%s\n' "$STAGED_FILES" | grep -Eq '^scripts/(.*\.py|tests/.*)$'; then
   echo "MIPStarRE pre-commit: running scripts/tests unit tests."
-  python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+  run_without_git_local_env python3 -m unittest discover -s scripts/tests -p 'test_*.py'
 fi
 
 if printf '%s\n' "$STAGED_FILES" | grep -Eq \
