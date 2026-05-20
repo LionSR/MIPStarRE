@@ -286,9 +286,8 @@ This is an internal proof obligation, not a separate paper theorem.  The
 additional hypothesis `hsmall` is the branch condition used by
 `mainInductionSuccessorNext`; it is discharged there by a case distinction and
 is not an additional assumption on the public induction theorem.  The statement
-does not introduce restricted-probability, recursive-slice, self-improvement,
-pasting, bridge, residual, repair, producer, package, or generic hypotheses as
-inputs.
+does not take any of the intermediate objects of the slice construction as
+hypotheses; those objects must be obtained from the displayed hypotheses.
 
 The declaration is temporary in the precise sense that, once the slice
 restriction, recursive induction, self-improvement, and pasting constructions
@@ -357,11 +356,9 @@ calls have been set up.
 This theorem is the parameter-decomposition form used by `mainInduction`.
 Its assumptions are the corrected large-`k` hypotheses for
 `thm:main-induction`, together with the branch condition `params.m ≠ 1`; it
-does not accept restricted-probability records, per-slice induction data,
-self-improvement data, pasting data, auxiliary implication hypotheses, residual
-inputs, or data record hypotheses.  The proof decomposes the non-base parameter
-bundle as `pred.next` and then invokes the native successor-step obligation
-`mainInductionSuccessorNext`. -/
+does not take the intermediate objects of the slice construction as hypotheses.
+The proof decomposes the non-base parameter bundle as `pred.next` and then
+invokes the native successor-step obligation `mainInductionSuccessorNext`. -/
 theorem mainInductionSuccessor
     (params : Parameters)
     [FieldModel params.q]
