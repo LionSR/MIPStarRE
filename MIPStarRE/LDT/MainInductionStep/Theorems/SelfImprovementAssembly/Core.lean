@@ -473,17 +473,18 @@ noncomputable def SelfImprovementData.SliceStrategyTransport.ofMeasurementEq
       params strategy eps delta gamma restrictionPkg sliceStrategy state_eq
       pointMeasurement_eq axisParallelMeasurement_eq diagonalMeasurement_eq)
 
-/-- Convert per-slice structural slice data into the Section 6
-self-improvement data.
+/-- Concrete slice strategies give the slice-wise Section 9 outputs used by the
+ordinary self-improvement data in the successor step.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
 `references/ldt-paper/self_improvement.tex:631-811`.
 
-The construction assumes the concrete slice strategies and their structural
-measurement transports. It applies the theorem
-`selfImprovementInInductionSection` slice-by-slice and transports its fields
-across the recorded equalities to the restricted-slice interface. -/
-noncomputable def SelfImprovementData.ofSliceStrategyTransport
+This is an internal transport theorem.  It applies
+`selfImprovementInInductionSection` to each ordinary slice strategy supplied by
+`SliceStrategyTransport`, and then rewrites the state, point-measurement, and
+averaged-point conclusions back into the restricted-slice notation used in the
+successor step. -/
+theorem SelfImprovementData.slice_outputs_ofSliceStrategyTransport
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -494,11 +495,27 @@ noncomputable def SelfImprovementData.ofSliceStrategyTransport
     (sliceTransport :
       SelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
         restrictionPkg inductionPkg) :
-    SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg := by
+    ∀ x,
+      ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+        CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
+          ((1 - inductionPkg.sliceError x) -
+            sliceSelfImprovementError params restrictionPkg x) ∧
+        ConsRel strategy.state (uniformDistribution (Point params))
+          (IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement)
+          (polynomialEvaluationFamily params H.toSubMeas)
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        BipartiteSSCRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily H.toSubMeas)
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        SDDRel strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+          (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
+          (sliceSelfImprovementError params restrictionPkg x) ∧
+        tensorFailureExpectation strategy.state Z H.toSubMeas ≤
+          sliceSelfImprovementError params restrictionPkg x ∧
+        (∀ h : Polynomial params,
+          IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ Z) := by
   classical
-  refine
-    SelfImprovementData.ofSelfImprovementInInductionSection
-      params strategy eps delta gamma k restrictionPkg inductionPkg ?_
   intro x
   let sliceStrategy := sliceTransport.sliceStrategy x
   have hconsSlice :
@@ -538,6 +555,35 @@ noncomputable def SelfImprovementData.ofSliceStrategyTransport
     simpa [sliceSelfImprovementError] using hbounded
   · intro h
     simpa [sliceTransport.averagedPoint_eq x h] using hH.dominatesAveragePointOperator h
+
+/-- Convert per-slice structural slice data into the Section 6
+self-improvement data.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551` and
+`references/ldt-paper/self_improvement.tex:631-811`.
+
+The construction assumes the concrete slice strategies and their structural
+measurement transports. It applies the theorem
+`selfImprovementInInductionSection` slice-by-slice and transports its fields
+across the recorded equalities to the restricted-slice interface. -/
+noncomputable def SelfImprovementData.ofSliceStrategyTransport
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : SliceRestrictionData params strategy eps delta gamma)
+    (inductionPkg : PerSliceInductionData params strategy eps delta gamma restrictionPkg k)
+    (sliceTransport :
+      SelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+        restrictionPkg inductionPkg) :
+    SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg := by
+  classical
+  exact
+    SelfImprovementData.ofSelfImprovementInInductionSection
+      params strategy eps delta gamma k restrictionPkg inductionPkg
+      (SelfImprovementData.slice_outputs_ofSliceStrategyTransport
+        params strategy eps delta gamma k restrictionPkg inductionPkg sliceTransport)
 
 /-- Restricted nontrivial-regime Lean restatement of
 `thm:ld-pasting-in-induction-section`.
