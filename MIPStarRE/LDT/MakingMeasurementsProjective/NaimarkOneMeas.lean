@@ -489,17 +489,10 @@ noncomputable def OneMeasNaimarkData.toProjSubMeas {α : Type*}
     outcome_pos := fun a => data.lifted_pos (some a)
     sum_eq_total := rfl
     total_le_one := by
-      have hnone_nonneg : 0 ≤ data.liftedEffect none :=
-        data.lifted_pos none
       have hsome_le :
           ∑ a : α, data.liftedEffect (some a) ≤
-            data.liftedEffect none + ∑ a : α, data.liftedEffect (some a) := by
-        calc
-          ∑ a : α, data.liftedEffect (some a)
-              = 0 + ∑ a : α, data.liftedEffect (some a) := by simp
-          _ ≤ data.liftedEffect none + ∑ a : α, data.liftedEffect (some a) := by
-              simpa [add_comm] using
-                add_le_add_left hnone_nonneg (∑ a : α, data.liftedEffect (some a))
+            data.liftedEffect none + ∑ a : α, data.liftedEffect (some a) :=
+        le_add_of_nonneg_left (data.lifted_pos none)
       have hoption :
           data.liftedEffect none + ∑ a : α, data.liftedEffect (some a) ≤ 1 := by
         simpa [Fintype.sum_option] using data.lifted_sum_le_one
