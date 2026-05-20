@@ -249,7 +249,9 @@ Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.
 The restriction data record already records that every `xRestrictedAnswerSymStrat`
 is good with the slice profile.  The large-`k` side condition is the predecessor
 side condition `400 * params.m * params.d ≤ k`, matching the application of the
-induction hypothesis in `inductive_step.tex`, lines 441--442. -/
+induction hypothesis in `inductive_step.tex`, lines 441--442.  The side
+condition `1 ≤ k` is then derived internally from `0 < params.d`,
+`0 < params.m`, and this large-`k` bound. -/
 noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
     (params : Parameters)
     [FieldModel params.q]
@@ -259,9 +261,12 @@ noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
     (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
     (hinduction : AnswerMainInductionHypothesis params)
     (hd : 0 < params.d)
-    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k :=
+  let hk_pos : 1 ≤ k := by
+    have hbound_pos : 0 < 400 * params.m * params.d :=
+      Nat.mul_pos (Nat.mul_pos (by decide : 0 < 400) params.hm) hd
+    exact le_trans (Nat.succ_le_of_lt hbound_pos) hk
   AnswerPerSliceInductionData.ofMainInductionConclusions params strategy eps delta gamma k
     restrictionPkg fun x =>
       hinduction ι (xRestrictedAnswerSymStrat params strategy x)
@@ -269,31 +274,6 @@ noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
         (restrictionPkg.profile.selfConsistency x)
         (restrictionPkg.profile.diagonal x)
         k hd (restrictionPkg.profile.restrictedGood x) hk_pos hk
-
-/-- Build answer-valued per-slice induction data in the nontrivial small-error
-branch without separately supplying `1 ≤ k`.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:441-454` together with
-the small-error reduction in `references/ldt-paper/inductive_step.tex:486-551`.
-The small-error hypothesis implies `1 ≤ k`; the degree positivity `0 < d`
-remains an explicit boundary hypothesis because it is not part of the
-`Parameters` record. -/
-noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesisOfSmallError
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-    (hinduction : AnswerMainInductionHypothesis params)
-    (hsmall : mainInductionError params.next k eps delta gamma < 1)
-    (hd : 0 < params.d)
-    (hk : 400 * params.m * params.d ≤ k) :
-    AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k :=
-  AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
-    restrictionPkg hinduction hd
-    (one_le_k_of_mainInductionError_lt_one params.next k eps delta gamma hsmall)
-    hk
 
 /-- View a legacy per-slice induction data record over an answer-forgotten restriction
 data record as an answer-valued data record.
