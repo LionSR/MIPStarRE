@@ -998,6 +998,8 @@
     <span class="definition_thmtitle">Lean auxiliary declarations for the orthogonalization lemma</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1029,10 +1031,29 @@
 
     
     
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>  The Lean declaration <span class="ttfamily">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma</span> proves Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> without adding spectral-truncation or repair hypotheses. The proof first converts the cross-consistency hypothesis into the source almost-projective estimate for the measurement \(A_a \otimes I\), and then applies the locality-preserving \(Q/X/\widehat X/P\) construction in its heterogeneous left-register form. Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma-formalized-envelope">4.10</a> remains as the same-space corollary with the weaker public \(100\zeta ^{1/4}\) envelope. </p>
+  <p>     The Lean declaration <span class="ttfamily">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma</span> proves Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> without adding spectral-truncation or repair hypotheses. The proof first converts the cross-consistency hypothesis into the source almost-projective estimate for the measurement \(A_a \otimes I\), and then applies the locality-preserving \(Q/X/\widehat X/P\) construction in its heterogeneous left-register form. Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma-formalized-envelope">4.10</a> remains as the same-space corollary with the weaker public \(100\zeta ^{1/4}\) envelope. The measurement-level declarations <span class="ttfamily">orthonormalizationMeasurement_of_consistency</span> and <span class="ttfamily">orthonormalizationMeasurement</span> are proved corollaries, not conditional wrappers: they derive the projective submeasurement from the displayed consistency or self-consistency hypotheses. </p>
 
   </div>
 </div>
@@ -1189,19 +1210,21 @@
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="rem:conditional-orthonormalization-main-lemma-local">
+<div class="definition_thmwrapper theorem-style-definition" id="rem:orthonormalization-main-lemma-local">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
     </span>
     <span class="definition_thmlabel">4.14</span>
-    <span class="definition_thmtitle">Lean conditional declaration: local orthogonalization</span>
+    <span class="definition_thmtitle">Lean consistency declaration: measurement-level orthogonalization</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="chap-projective.html#rem:conditional-orthonormalization-main-lemma-local">#</a>
+    <a class="icon proof" href="chap-projective.html#rem:orthonormalization-main-lemma-local">#</a>
     
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
@@ -1229,34 +1252,55 @@
 
     
     
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>  This is the local Lean declaration recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.11</a>. Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency </p>
+  <p>   This is the same-space measurement corollary recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.11</a>. Let \(\lvert \psi  \rangle \) be a normalized bipartite state, let \(A=\{ A_a\} \) and \(B=\{ B_a\} \) be measurements on the same finite-dimensional space, and let \(0 \leq \zeta \). Assume the bipartite consistency estimate </p>
 <div class="displaymath" id="a0000000155">
-  \[  \sum _a \langle \psi  \rvert  A_a \otimes A_a \lvert \psi  \rangle  \geq \sum _a \langle \psi  \rvert  A_a \otimes I \lvert \psi  \rangle  - \zeta ,  \]
+  \[  A_a \otimes I \simeq _{\zeta } I \otimes B_a .  \]
 </div>
-<p> together with a spectral-truncation witness for the left-lifted family \(\{ A_a \otimes I\} \) and a locality-preserving repair witness producing projective families of the form \(\widehat P_a = P_a \otimes I\). Then there exists a projective sub-measurement \(P = \{ P_a\} \) on the same space as \(A\) such that </p>
+<p> Then there exists a projective sub-measurement \(P=\{ P_a\} \) such that </p>
 <div class="displaymath" id="a0000000156">
-  \[  A_a \otimes I \approx _{84 \zeta ^{1/4}} P_a \otimes I.  \]
+  \[  A_a \otimes I \approx _{100\zeta ^{1/4}} P_a \otimes I .  \]
 </div>
-<p> Since \(A\) is a measurement, \(\sum _a A_a = I\), so bipartite strong self-consistency of \(A\) with itself is equivalent to bipartite consistency of \(A\) with itself. Feed this consistency hypothesis, together with the spectral-truncation and locality-preserving repair witnesses, into the measurement variant of <a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> with \(B = A\). The repair witness chooses the repaired family of the form \(P_a \otimes I\), so the conclusion descends to a local projective sub-measurement \(P = \{ P_a\} \) on the space of \(A\) with error bound \(84\zeta ^{1/4}\). </p>
+<p> The proof applies Lemma&#160;<a href="chap-projective.html#lem:orthonormalization-main-lemma">4.9</a> and weakens the \(84\zeta ^{1/4}\) estimate to the public orthonormalization envelope. The spectral-truncation and locality-preserving repair steps are internal to that proof; they are not hypotheses of this declaration. </p>
 
   </div>
 </div>
-<div class="definition_thmwrapper theorem-style-definition" id="rem:conditional-orthonormalization-measurement">
+<div class="definition_thmwrapper theorem-style-definition" id="rem:orthonormalization-measurement">
   <div class="definition_thmheading">
     <span class="definition_thmcaption">
     Definition
     </span>
     <span class="definition_thmlabel">4.15</span>
-    <span class="definition_thmtitle">Lean conditional declaration: measurement-level orthogonalization</span>
+    <span class="definition_thmtitle">Lean self-consistency declaration: measurement-level orthogonalization</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="chap-projective.html#rem:conditional-orthonormalization-measurement">#</a>
+    <a class="icon proof" href="chap-projective.html#rem:orthonormalization-measurement">#</a>
     
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
@@ -1282,14 +1326,33 @@
 
     
     
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>  This is the measurement-level Lean declaration recorded in Remark&#160;<a href="chap-projective.html#rem:lean-orthonormalization-main-declarations">4.11</a>. Let \(\lvert \psi  \rangle \) be a unit vector, let \(A = \{ A_a\} \) be a measurement, and let \(0 \leq \zeta \leq 1\). Assume bipartite strong self-consistency of \(A\) together with the spectral-truncation and locality-preserving repair witnesses for the left-lifted family \(\{ A_a \otimes I\} \). Then there exists a projective sub-measurement \(P = \{ P_a\} \) such that </p>
+  <p>   This is the self-consistency specialization of Remark&#160;<a href="chap-projective.html#rem:orthonormalization-main-lemma-local">4.14</a>. Let \(\lvert \psi  \rangle \) be a normalized bipartite state, let \(A=\{ A_a\} \) be a measurement, and let \(0\leq \zeta \). If \(A\) is bipartite strongly self-consistent with error \(\zeta \), then there exists a projective sub-measurement \(P=\{ P_a\} \) such that </p>
 <div class="displaymath" id="a0000000157">
   \[  A_a \otimes I \approx _{100 \zeta ^{1/4}} P_a \otimes I.  \]
 </div>
-<p> Using the bound stated in Remark&#160;<a href="chap-projective.html#rem:conditional-orthonormalization-main-lemma-local">4.14</a>, weaken the error using \(84 \leq 100\) and \(\zeta ^{1/4} \geq 0\). No completion step is needed because \(A\) is already a measurement. </p>
+<p> Since \(A\) is complete, the self-consistency defect is the consistency defect of \(A\) with itself. The proof therefore applies the consistency corollary with \(B=A\). No spectral-truncation witness or repair witness is assumed at this interface. </p>
 
   </div>
 </div>
