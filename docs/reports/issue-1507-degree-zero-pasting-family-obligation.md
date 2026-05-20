@@ -15,8 +15,10 @@ polynomial measurement.
 | `mainInductionSuccessorNextOfSmallError` | source-shaped proof obligation | The statement has the paper hypotheses for the small-error successor branch and remains the direct proof target. |
 | `mainInductionSuccessorNext_degreeZero_ofPastingFamily` | internal conditional reduction | This theorem proves that a complete and point-consistent degree-zero family suffices.  It is not the paper theorem. |
 | `DegreeZeroPastingFamilyObligation` | named internal proof obligation | This record names exactly the missing degree-zero family construction and the scalar error comparison. |
-| `mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations` | internal conditional assembly | The degree-zero input is now the named obligation rather than an anonymous existential hypothesis. |
-| `mainInductionSuccessorNext_ofDegreeSplitPastingObligations` | internal conditional assembly | The large-error split remains proved; the small-error degree split refers to the named obligation. |
+| `mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations` | internal conditional assembly | The stable interface still consumes the anonymous existential used before this PR. |
+| `mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligation` | internal conditional assembly | This wrapper consumes the named degree-zero obligation and projects it to the stable existential interface. |
+| `mainInductionSuccessorNext_ofDegreeSplitPastingObligations` | internal conditional assembly | The stable interface adds the large-error split while retaining the anonymous existential in the small-error branch. |
+| `mainInductionSuccessorNext_ofDegreeSplitPastingObligation` | internal conditional assembly | This wrapper adds the large-error split while consuming the named degree-zero obligation in the small-error branch. |
 
 ## Statement integrity audit
 

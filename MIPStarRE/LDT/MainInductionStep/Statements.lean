@@ -636,13 +636,15 @@ uses pasting to obtain the next-stage global measurement.  In Lean, the
 verified pasting reduction
 `mainInductionSuccessorNext_degreeZero_ofPastingFamily` already shows that such
 a complete and point-consistent family is sufficient.  This record is the
-source-faithful obligation to construct that family from the displayed
-successor hypotheses; it is not an additional hypothesis of the paper theorem.
+source-shaped data target for that construction; it is not an additional
+hypothesis of the paper theorem.
 
 **Proof obligation:** Construct the degree-zero slice family from the
 projective successor strategy and prove the scalar inequality comparing
 `ldPastingInInductionError` with the next-stage `mainInductionError`.  This is
-tracked by issue #1507. -/
+tracked by issue #1507.  Planned discharge: prove the degree-zero slice-family
+construction from the hypotheses of `mainInductionSuccessorNextOfSmallError`
+in the branch `params.d = 0`. -/
 structure DegreeZeroPastingFamilyObligation (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -679,9 +681,8 @@ theorem exists_family {params : Parameters}
       family.Complete strategy.state kappa ∧
         family.ConsistentWithPoints strategy zeta ∧
           ldPastingInInductionError params k eps delta gamma kappa zeta ≤
-            mainInductionError params.next k eps delta gamma := by
-  exact
-    ⟨pkg.family, pkg.kappa, pkg.zeta, pkg.complete, pkg.consistent, pkg.error_le⟩
+            mainInductionError params.next k eps delta gamma :=
+  ⟨pkg.family, pkg.kappa, pkg.zeta, pkg.complete, pkg.consistent, pkg.error_le⟩
 
 end DegreeZeroPastingFamilyObligation
 
