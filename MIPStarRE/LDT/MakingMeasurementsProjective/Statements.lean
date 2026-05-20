@@ -280,9 +280,12 @@ Paper origin: `references/ldt-paper/orthonormalization.tex:36-80`
 `references/ldt-paper/orthonormalization.tex:161-187`.
 
 The data records the auxiliary Hilbert spaces, an auxiliary product state, the
-dilated state `ψ ⊗ aux`, and projective measurements on the enlarged Alice and
-Bob spaces.  The final field is the source theorem's correlation identity for
-all questions and outcomes. -/
+dilated state `ψ ⊗ aux`, and projective submeasurements on the enlarged Alice
+and Bob spaces.  This is the form produced by
+`references/ldt-paper/orthonormalization.tex:121-187`: the fresh `⊥` outcome
+carries the residual mass, so the original outcome family is projective but not
+complete in general.  The final field is the source theorem's correlation
+identity for all questions and original outcomes. -/
 structure NaimarkTensorProductCorrelationData
     {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -317,10 +320,10 @@ structure NaimarkTensorProductCorrelationData
       naimarkProductExtensionDensity HA HB HauxA HauxB ψ auxState
   /-- The dilated state is normalized. -/
   dilatedState_normalized : dilatedState.IsNormalized
-  /-- Alice's projective measurements on the enlarged Alice space. -/
-  left : IdxProjMeas QuestionA OutcomeA (HA.carrier × HauxA.carrier)
-  /-- Bob's projective measurements on the enlarged Bob space. -/
-  right : IdxProjMeas QuestionB OutcomeB (HB.carrier × HauxB.carrier)
+  /-- Alice's projective submeasurements on the enlarged Alice space. -/
+  left : IdxProjSubMeas QuestionA OutcomeA (HA.carrier × HauxA.carrier)
+  /-- Bob's projective submeasurements on the enlarged Bob space. -/
+  right : IdxProjSubMeas QuestionB OutcomeB (HB.carrier × HauxB.carrier)
   /-- Preservation of the bipartite correlations for every question and outcome. -/
   correlation_preservation :
     ∀ (x : QuestionA) (y : QuestionB) (a : OutcomeA) (b : OutcomeB),
@@ -363,10 +366,19 @@ of the questionwise Naimark dilations described in
 `references/ldt-paper/orthonormalization.tex:161-187`.  The missing
 formalization is documented in `docs/paper-gaps/naimark.tex` and tracked by
 issue #1697.  Elimination: construct the product auxiliary registers, lift each
-one-measurement dilation to the appropriate tensor factor, include the
-`Option`-completion/perp-projector step needed to obtain projective
-measurements on the original outcomes, and prove the displayed correlation
-identity from the one-measurement compression identities. -/
+one-measurement dilation to the appropriate tensor factor, restrict the
+completed `Option`-outcome projective measurements to the original outcomes as
+projective submeasurements, and prove the displayed correlation identity from
+the one-measurement compression identities.
+
+**Unfaithful:** This proof currently contains the tracked `sorry` for the full
+tensor-product auxiliary-register assembly, so it uses `sorryAx` rather than
+deriving `references/ldt-paper/orthonormalization.tex:36-80` from the checked
+one-measurement Naimark helper.  Documented in `docs/paper-gaps/naimark.tex`
+and issue #1697.  Elimination: prove the simultaneous tensor-product
+correlation theorem, in the projective-submeasurement form produced by the
+paper's helper lemma, from the questionwise Naimark dilations and remove this
+marker. -/
 theorem naimarkTensorProductCorrelation
     {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]

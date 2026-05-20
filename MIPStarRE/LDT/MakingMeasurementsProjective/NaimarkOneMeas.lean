@@ -468,5 +468,44 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
               simp [oneMeasLiftedDensity, B, Q, auxProj, oneMeasNaimarkOutcomeProj,
                 oneMeasNaimarkAuxTransition, mul_assoc]
 
+/-! ### Projective submeasurement on the original outcomes -/
+
+/-- Restrict the completed one-measurement Naimark dilation to the original
+outcomes.
+
+The one-measurement construction gives a complete projective measurement on
+`Option α`; the extra outcome `none` carries the residual mass
+`1 - ∑ₐ Mₐ`.  Restricting to the `some a` outcomes gives the projective
+submeasurement on the original outcome type used by the tensor-product Naimark
+statement. -/
+noncomputable def OneMeasNaimarkData.toProjSubMeas {α : Type*}
+    [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (data : OneMeasNaimarkData α d) :
+    ProjSubMeas α (d × Option α) where
+  toSubMeas := {
+    outcome := fun a => data.liftedEffect (some a)
+    total := ∑ a, data.liftedEffect (some a)
+    outcome_pos := fun a => data.lifted_pos (some a)
+    sum_eq_total := rfl
+    total_le_one := by
+      have hnone_nonneg : 0 ≤ data.liftedEffect none :=
+        data.lifted_pos none
+      have hsome_le :
+          ∑ a : α, data.liftedEffect (some a) ≤
+            data.liftedEffect none + ∑ a : α, data.liftedEffect (some a) := by
+        calc
+          ∑ a : α, data.liftedEffect (some a)
+              = 0 + ∑ a : α, data.liftedEffect (some a) := by simp
+          _ ≤ data.liftedEffect none + ∑ a : α, data.liftedEffect (some a) := by
+              simpa [add_comm] using
+                add_le_add_left hnone_nonneg (∑ a : α, data.liftedEffect (some a))
+      have hoption :
+          data.liftedEffect none + ∑ a : α, data.liftedEffect (some a) ≤ 1 := by
+        simpa [Fintype.sum_option] using data.lifted_sum_le_one
+      exact le_trans hsome_le hoption
+  }
+  proj := fun a => (data.lifted_isProj (some a)).idempotent
+
 
 end MIPStarRE.LDT.MakingMeasurementsProjective

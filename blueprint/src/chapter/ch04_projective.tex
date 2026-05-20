@@ -14,7 +14,7 @@
 	and $B=\{B^y_b\}$ be a sub-measurement acting on $\mathcal H_{\mathrm B}$.
 	Then there exist Hilbert spaces $\mathcal H_{\mathrm A_{\mathsf{aux}}}$ and $\mathcal H_{\mathrm B_{\mathsf{aux}}}$,
 	a state $\ket{\mathsf{aux}} \in \mathcal H_{\mathrm A_{\mathsf{aux}}} \ot \mathcal H_{\mathrm B_{\mathsf{aux}}}$,
-	and projective measurements $\widehat{A} = \{\widehat{A}^x_a\}$ and $\widehat{B}=\{\widehat{B}^y_b\}$
+	and projective sub-measurements $\widehat{A} = \{\widehat{A}^x_a\}$ and $\widehat{B}=\{\widehat{B}^y_b\}$
 	acting on $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm A_{\mathsf{aux}}}$
 	and $\mathcal H_{\mathrm B} \ot \mathcal H_{\mathrm B_{\mathsf{aux}}}$, respectively,
 	such that, if $\ket{\widehat{\psi}} = \ket{\psi} \ot \ket{\mathsf{aux}}$, then for all $x,y,a,b$,
@@ -24,6 +24,11 @@
 		\bra{\widehat{\psi}} \widehat{A}^x_a \ot \widehat{B}^y_b \ket{\widehat{\psi}}.
 	\]
 	In addition, $\ket{\mathsf{aux}}$ is a product state.
+	The word ``measurement'' in the source statement is read here in the
+	projective-submeasurement sense used by Lemma~\ref{lem:naimark-helper}: for a
+	general sub-measurement, the residual mass is carried by the additional
+	\(\bot\) outcome in the auxiliary construction, so the original outcomes need
+	not sum to the identity.
 \end{theorem}
 \begin{proof}
 	\uses{lem:naimark-helper}
@@ -60,12 +65,15 @@
 
 \begin{definition}[Lean questionwise Naimark interface]\label{rem:lean-questionwise-naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark, MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeas}
 	\leanok
 	\uses{lem:naimark-helper}
 	Lean currently proves the questionwise one-measurement interface obtained
 	from Lemma~\ref{lem:naimark-helper}.  For every indexed family \(A^x\) and
 	\(B^y\), it produces local dilation data for each question and proves the
-	corresponding single-outcome marginal-preservation identities.  This is the
+	corresponding single-outcome marginal-preservation identities.  It also
+	restricts the completed \(\mathrm{Option}\)-outcome projective measurement to
+	a projective sub-measurement on the original outcomes.  This is the
 	interface used downstream in the formal development.  It is not the full
 	tensor-product correlation statement of Theorem~\ref{thm:naimark}, whose
 	simultaneous bipartite assembly remains recorded in

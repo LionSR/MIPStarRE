@@ -7,7 +7,7 @@
 
 \input{command}
 
-\title{Naimark dilation: deliberate paper-gap for the full bipartite assembly}
+\title{Naimark dilation: projective-submeasurement form and the full bipartite assembly}
 \author{}
 \date{2026-05-08}
 
@@ -18,9 +18,9 @@
 
 \begin{itemize}
   \item \textbf{Difficulty: hard if pursued, low if left as a paper-gap.}  The
-  one-measurement Naimark step is straightforward in finite dimensions, but the
-  full tensor-product assembly of per-question dilations into a single bipartite
-  Naimark statement is left out of this formalization by design.
+  one-measurement Naimark step is standard in finite dimensions and is already
+  formalized.  The remaining work is the full tensor-product assembly of
+  per-question dilations into a single bipartite Naimark statement.
   \item \textbf{Estimated weight, if formalized:} roughly \textbf{6--10 theorem
   interfaces} and \textbf{600--1200 lines}, dominated by tensor-product
   bookkeeping for ancillary registers and the lifting of states from the small
@@ -46,7 +46,7 @@ The formalization isolates two related but distinct theorem forms.
   submeasurements $\{A^x\}_{x\in Q_A}$, $\{B^y\}_{y\in Q_B}$ on a finite
   Hilbert space~$\mathcal H$, there is an enlarged Hilbert space $\widetilde
   {\mathcal H}\supseteq\mathcal H$, an isometry $V:\mathcal H\to\widetilde
-  {\mathcal H}$, and projective measurements $\{\widetilde A^x\}$,
+  {\mathcal H}$, and projective submeasurements $\{\widetilde A^x\}$,
   $\{\widetilde B^y\}$ on $\widetilde{\mathcal H}\otimes\widetilde{\mathcal H}$
   with
   \[
@@ -55,7 +55,10 @@ The formalization isolates two related but distinct theorem forms.
     \tag{\texttt{thm:naimark}}
   \]
   This is the displayed paper statement at
-  \path{references/ldt-paper/orthonormalization.tex}, lines~36--115.
+  \path{references/ldt-paper/orthonormalization.tex}, lines~36--115, read
+  through the helper lemma at lines~121--159.  The helper produces a
+  projective submeasurement on the original outcomes; the residual mass is the
+  additional $\bot$ outcome in the auxiliary register.
   \item \textbf{Adapter theorem form: per-question one-measurement
   Naimark.}  For each question $x$ and submeasurement $A^x$ there exists a
   one-measurement Naimark dilation on the enlarged space
@@ -67,7 +70,10 @@ The formalization isolates two related but distinct theorem forms.
   \]
   This is the form actually formalized; see the Lean structure
   \leanid{NaimarkStatement} and the Lean theorem
-  \leanid{questionwiseNaimark}.%
+  \leanid{questionwiseNaimark}.  The derived declaration
+  \leanid{OneMeasNaimarkData.toProjSubMeas} turns the checked
+  \(\mathrm{Option}\)-outcome dilation into the projective submeasurement on
+  the original outcomes.%
   \footnote{Defined at
   \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean}.}
   \item \textbf{Downstream theorem form.}  The downstream uses inside the LDT
@@ -107,7 +113,17 @@ In the notation of the paper, the source assumes
   \quad \{A^x\}_{x\in Q_A},\,\{B^y\}_{y\in Q_B}\text{ submeasurements on }\mathcal H,
 \]
 and concludes the bipartite preservation identity above.  The proof proceeds
-question by question via \texttt{lem:naimark-helper}; the example
+question by question via \texttt{lem:naimark-helper}.  That helper explicitly
+produces a projective submeasurement indexed by the original outcomes.  This is
+the mathematically necessary form for arbitrary submeasurements.  If one asks
+instead for a complete projective measurement indexed by the original outcomes,
+the assertion is false: take a one-outcome submeasurement $A_*=0$ on Alice's
+space and a one-outcome measurement $B_*=I$ on Bob's space.  The original
+correlation is zero.  But a one-outcome projective measurement on the enlarged
+Alice and Bob spaces must have its unique effect equal to the identity, so any
+normalized dilated state has correlation one.
+
+The example
 \texttt{ex:easy-but-long} demonstrates that the dilation does \emph{not}
 preserve the state-dependent distance $\approx_\delta$ defined just above,
 which is why downstream arguments in the LDT paper carry the dilation only as
@@ -118,6 +134,13 @@ far as the single-outcome marginals.
 The blueprint and formal development together record the per-question
 one-measurement dilations and the single-outcome marginal preservation, but
 omit the global tensor-product assembly into one bipartite statement.  The
+source-facing Lean statement has therefore been corrected to use projective
+submeasurements on the original outcome types.  Equivalently, one could state a
+completed version using projective measurements indexed by
+\(\mathrm{Option}(\mathsf{Outcome})\), but that is not the outcome type used in
+the source display.
+
+The
 formal development proves the adapter form
 \[
   \forall x,a,\rho,\;
@@ -160,9 +183,17 @@ formalization:
 The Lean structure \leanid{NaimarkStatement} and theorem
 \leanid{questionwiseNaimark} record the per-question one-measurement Naimark
 data and the single-outcome marginal-preservation conclusions used by
-downstream LDT lemmas.  The full bipartite tensor-product assembly of the
-paper's Naimark theorem is intentionally not formalized here; this note records
-that deliberate gap at the same paper origin cited by the
-\leanid{NaimarkStatement} declaration site.
+downstream LDT lemmas.  The declaration
+\leanid{OneMeasNaimarkData.toProjSubMeas} proves the local passage from the
+completed \(\mathrm{Option}\)-outcome projective measurement to the projective
+submeasurement on the original outcomes.  The source-facing tensor theorem
+should be read in the projective-submeasurement form supplied by the paper's
+helper lemma; the complete-measurement form on the original outcome type would
+be false for submeasurements.  The remaining formalization gap is the
+simultaneous bipartite tensor-product assembly, not the one-measurement
+Naimark theorem and not an additional hypothesis hidden in the statement.
+
+\bibliographystyle{alpha}
+\bibliography{references}
 
 \end{document}

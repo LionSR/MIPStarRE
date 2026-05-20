@@ -6,7 +6,7 @@ The source theorem is `thm:naimark` in
 `references/ldt-paper/orthonormalization.tex`, lines 36-80.  It starts with a
 state on `H_A tensor H_B` and submeasurements `A^x` and `B^y` on the two local
 Hilbert spaces.  It concludes that there are auxiliary Hilbert spaces, a product
-auxiliary state, and projective measurements on the enlarged local Hilbert
+auxiliary state, and projective submeasurements on the enlarged local Hilbert
 spaces preserving every bipartite correlation
 
 ```text
@@ -16,7 +16,11 @@ spaces preserving every bipartite correlation
 ```
 
 The paper proof at lines 161-187 applies the one-measurement Naimark helper to
-each question and tensors the resulting auxiliary registers.
+each question and tensors the resulting auxiliary registers.  The helper at
+lines 121-159 produces a projective submeasurement on the original outcomes:
+the missing mass is represented by the additional `⊥` outcome of the auxiliary
+construction.  Thus a complete projective measurement on the original outcome
+type is not the standard theorem for arbitrary submeasurements.
 
 ## Lean status
 
@@ -25,6 +29,7 @@ The formalization now separates three declarations.
 | Declaration | Role | Status |
 | --- | --- | --- |
 | `oneMeasNaimark` | one-measurement helper corresponding to `lem:naimark-helper` | proved |
+| `OneMeasNaimarkData.toProjSubMeas` | restriction of the completed `Option`-outcome dilation to the original outcomes | proved |
 | `questionwiseNaimark` | Lean-only interface for per-question marginal preservation | proved |
 | `naimarkTensorProductCorrelation` | source-shaped tensor-product correlation theorem | stated, proof obligation |
 
@@ -51,7 +56,7 @@ Paper conclusion:
 - auxiliary Hilbert spaces on Alice's and Bob's sides;
 - a normalized auxiliary product state;
 - a dilated state `psi_hat = psi tensor aux`;
-- projective measurements on the two enlarged local spaces;
+- projective submeasurements on the two enlarged local spaces;
 - preservation of all four-index bipartite correlations.
 
 Lean conclusion:
@@ -60,10 +65,16 @@ Lean conclusion:
 - normalized auxiliary product-state data;
 - a normalized dilated state whose density is the register-reordered tensor
   product of the source state and the auxiliary state;
-- indexed projective measurements on the enlarged local spaces;
+- indexed projective submeasurements on the enlarged local spaces;
 - the same four-index correlation identity, expressed with `opTensor`.
 
-Verdict: faithful boundary hypotheses.  The explicit finite carriers and
-normalization fields are Lean encodings of the paper's finite-dimensional
-state convention.  The proof is still absent and remains the tensor-register
-assembly tracked by issue #1697 and `docs/paper-gaps/naimark.tex`.
+Verdict: faithful boundary hypotheses with a documented local correction.  The
+explicit finite carriers and normalization fields are Lean encodings of the
+paper's finite-dimensional state convention.  The projective-submeasurement
+conclusion is the form supplied by the paper's helper lemma; the stronger
+complete-measurement conclusion on the original outcome type is false for
+arbitrary submeasurements.  The proof is still absent and remains the
+tensor-register assembly tracked by issue #1697 and
+`docs/paper-gaps/naimark.tex`; the local passage from completed
+`Option`-outcome measurements to original-outcome projective submeasurements is
+now proved by `OneMeasNaimarkData.toProjSubMeas`.
