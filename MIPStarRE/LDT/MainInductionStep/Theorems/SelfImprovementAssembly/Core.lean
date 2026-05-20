@@ -377,7 +377,7 @@ noncomputable def SelfImprovementData.SliceStrategyTransport.ofPointMeasurementE
 state and the measurements used by the three LDT subtests agree with
 `xRestrictedStrategy`.
 
-This is a structural helper for the #1503 successor route: it uses the
+This is a structural helper for the successor route: it uses the
 `restrictedGood` field already stored in `SliceRestrictionData.profile` and
 does not touch the remaining Section 9 analytic obligations. -/
 theorem SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood
