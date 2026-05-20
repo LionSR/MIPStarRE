@@ -160,7 +160,7 @@ def main() -> int:
         print("unexpected source-like warning links:")
         for path, label, declaration in unexpected_source:
             print(f"- {path}:{label}: {declaration}")
-        return 1
+        return 1 if args.ci else 0
 
     print("OK: no unexpected warning links in green source-like blueprint nodes.")
     return 0
