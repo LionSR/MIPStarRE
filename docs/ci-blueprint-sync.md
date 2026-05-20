@@ -151,9 +151,6 @@ a `\leanok`-tagged theorem with `sorry`, rerun, and confirm you see an
   name-level blueprint/Lean sync checker. It reports missing or stale
   entries in `blueprint/lean_decls` and decls referenced by name that don't
   appear in the Lean source tree.
-* [`scripts/blueprint_leanok_axioms.py`](../scripts/blueprint_leanok_axioms.py)
-  — the proof-level `\leanok` checker. It rejects proof-level `\leanok` claims
-  whose Lean declarations depend on `sorryAx` or explicit axioms.
 
   Its per-chapter progress table and JSON report (`--report FILE`) expose
   statement-level and proof-level coverage separately:
@@ -181,5 +178,8 @@ a `\leanok`-tagged theorem with `sorry`, rerun, and confirm you see an
   The legacy `formalized` field is kept as an alias of
   `statement_formalized` so existing consumers (badges, dashboards) keep
   working.
+* [`scripts/blueprint_leanok_axioms.py`](../scripts/blueprint_leanok_axioms.py)
+  — the proof-level `\leanok` checker. It rejects proof-level `\leanok` claims
+  whose Lean declarations depend on `sorryAx` or explicit axioms.
 * [`docs/PROOF_INTEGRITY.md`](PROOF_INTEGRITY.md) — full blocker list
   (`sorry`, `native_decide`, unexplained `axiom`, …) enforced elsewhere.
