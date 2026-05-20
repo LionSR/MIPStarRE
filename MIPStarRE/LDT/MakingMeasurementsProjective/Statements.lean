@@ -260,6 +260,8 @@ theorem naimarkAuxiliaryProductState_isNormalized
     (naimarkAuxiliaryState_isNormalized QuestionA OutcomeA)
     (naimarkAuxiliaryState_isNormalized QuestionB OutcomeB)
 
+/-- The product auxiliary density is the tensor product of its one-sided
+auxiliary densities. -/
 @[simp] theorem naimarkAuxiliaryProductState_density
     (QuestionA OutcomeA QuestionB OutcomeB : Type u)
     [Fintype QuestionA] [DecidableEq QuestionA]
