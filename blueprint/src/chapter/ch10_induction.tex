@@ -333,7 +333,12 @@
 	large-\(k\) bound and the degree-positivity hypothesis;
 	transport induction data in both directions between the answer-valued and
 	legacy slice interfaces; and then forget only the answer-valued diagonal
-	alphabet before the existing pasting assembly. The weighted
+	alphabet before the existing pasting assembly.  The corresponding internal
+	assembly theorem
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceSelfImprovement}
+	now proves the successor conclusion from the predecessor answer-valued
+	induction hypothesis and the direct slice-wise outputs of the
+	induction-section self-improvement theorem.  The weighted
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
 	The Lean proof now closes the large-error branch by
@@ -468,10 +473,13 @@
 	small-error branch \texttt{mainInductionSuccessorNextOfSmallError}.  The
 	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
 	still exposed through the public restriction-data constructor above, but
-	the recursive slice witnesses, the slice-wise self-improvement outputs, and
-	the pasting comparison must be derived inside the successor proof itself.
-	They are not represented by a separate theorem whose assumptions are added
-	to the paper statement.
+	the recursive slice witnesses and the slice-wise self-improvement outputs
+	must be derived inside the successor proof itself.  Once these direct
+	answer-valued slice outputs are available, the pasting comparison is now
+	formalized by
+	\texttt{mainInductionSuccessorNext\_ofAnswerSliceSelfImprovement}.  These
+	intermediate objects are not represented by a separate theorem whose
+	assumptions are added to the paper statement.
 \end{remark}
 
 \section{Proof of the main formal theorem}

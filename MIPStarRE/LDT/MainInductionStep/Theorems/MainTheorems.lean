@@ -212,6 +212,86 @@ theorem mainInductionOfOneLeError
       (polynomialEvaluationFamily params G.toSubMeas))
     herror⟩
 
+/-- Positive-degree successor assembly from direct answer-valued slice
+self-improvement outputs.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.  The paper
+successor proof invokes the induction hypothesis on each answer-valued slice,
+applies the induction-section self-improvement theorem to the resulting slice
+measurements, and then pastes the averaged family.
+
+This theorem is not a paper theorem.  It is the present formal proof frontier
+for the answer-valued route: once the predecessor answer-valued induction
+hypothesis and the slice-wise self-improvement conclusions have been obtained,
+the remaining successor assembly is formal.  The slice-wise conclusions are
+kept as direct outputs of the Section 9 theorem, rather than as an additional
+source-level hypothesis on `thm:main-induction`. -/
+theorem mainInductionSuccessorNext_ofAnswerSliceSelfImprovement
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (hd : 0 < params.d)
+    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
+    (hsliceSelf :
+      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+        (inductionPkg :
+          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
+        ∀ x,
+          ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+            CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
+              ((1 - inductionPkg.sliceError x) -
+                answerSliceSelfImprovementError params restrictionPkg x) ∧
+            ConsRel strategy.state (uniformDistribution (Point params))
+              (IdxProjMeas.toIdxSubMeas
+                (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
+              (polynomialEvaluationFamily params H.toSubMeas)
+              (answerSliceSelfImprovementError params restrictionPkg x) ∧
+            BipartiteSSCRel strategy.state (uniformDistribution Unit)
+              (constSubMeasFamily H.toSubMeas)
+              (answerSliceSelfImprovementError params restrictionPkg x) ∧
+            SDDRel strategy.state (uniformDistribution Unit)
+              (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
+              (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
+              (answerSliceSelfImprovementError params restrictionPkg x) ∧
+            tensorFailureExpectation strategy.state Z H.toSubMeas ≤
+              answerSliceSelfImprovementError params restrictionPkg x ∧
+            (∀ h : Polynomial params,
+              IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ Z)) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  have hk_pred : 400 * params.m * params.d ≤ k := by
+    have hm_le_next : params.m ≤ params.next.m := by
+      simp [Parameters.next]
+    exact le_trans
+      (Nat.mul_le_mul_right params.d (Nat.mul_le_mul_left 400 hm_le_next))
+      (by simpa [Parameters.next, Nat.mul_assoc] using hk_next)
+  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
+  · let answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma :=
+      AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+        (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+    let answerInduction :
+        AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k :=
+      AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+        answerRestrict hinduction hd hk_pred
+    let answerSelf :
+        AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict
+          answerInduction :=
+      AnswerSelfImprovementData.ofSelfImprovementInInductionSection
+        params strategy eps delta gamma k answerRestrict answerInduction
+        (hsliceSelf answerRestrict answerInduction)
+    exact
+      mainInductionFromAnswerStageDataOfSmallError params strategy eps delta gamma k
+        hgood hsmall answerRestrict answerInduction answerSelf hk_pred
+  · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
+      (le_of_not_gt hsmall)
+
 /-- Positive-degree successor assembly from the two remaining internal
 obligations.
 
