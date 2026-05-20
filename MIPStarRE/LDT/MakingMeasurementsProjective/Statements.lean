@@ -183,6 +183,94 @@ theorem naimarkProductExtensionState_isNormalized
     MIPStarRE.Quantum.normalizedTrace_reindex]
   simpa [QuantumState.IsNormalized] using hsource
 
+/-! #### Product auxiliary state for the full Naimark theorem -/
+
+/-- The auxiliary Hilbert space obtained by tensoring the one-measurement
+Naimark auxiliary registers over all questions on one side.
+
+Paper origin: in the proof of
+`references/ldt-paper/orthonormalization.tex:161-187`, the factor
+`\bigotimes_x |\mathsf{aux}_{A,x}\rangle` is represented by the finite
+function type `Question → Option Outcome`, with `none` the distinguished
+fresh outcome of the one-measurement construction. -/
+def naimarkAuxiliaryHilbertSpace (Question Outcome : Type u)
+    [Fintype Question] [DecidableEq Question]
+    [Fintype Outcome] [DecidableEq Outcome] :
+    FiniteHilbertSpace.{u} where
+  carrier := Question → Option Outcome
+  instFintype := inferInstance
+  instDecidableEq := inferInstance
+  instNonempty := ⟨fun _ => none⟩
+
+/-- The all-`none` auxiliary basis vector in the product auxiliary register. -/
+def naimarkAuxiliaryBase (Question Outcome : Type u)
+    [Fintype Question] [DecidableEq Question]
+    [Fintype Outcome] [DecidableEq Outcome] :
+    (naimarkAuxiliaryHilbertSpace Question Outcome).carrier :=
+  fun _ => none
+
+/-- The pure auxiliary state used before applying the questionwise Naimark
+dilations on one side. -/
+noncomputable def naimarkAuxiliaryPureState (Question Outcome : Type u)
+    [Fintype Question] [DecidableEq Question]
+    [Fintype Outcome] [DecidableEq Outcome] :
+    PureState (naimarkAuxiliaryHilbertSpace Question Outcome).carrier :=
+  PureState.basis (naimarkAuxiliaryBase Question Outcome)
+
+/-- The normalized one-sided auxiliary density state for the full Naimark
+assembly. -/
+noncomputable def naimarkAuxiliaryState (Question Outcome : Type u)
+    [Fintype Question] [DecidableEq Question]
+    [Fintype Outcome] [DecidableEq Outcome] :
+    QuantumState (naimarkAuxiliaryHilbertSpace Question Outcome).carrier :=
+  naimarkAuxiliaryPureState Question Outcome
+
+/-- The one-sided auxiliary state is normalized. -/
+theorem naimarkAuxiliaryState_isNormalized (Question Outcome : Type u)
+    [Fintype Question] [DecidableEq Question]
+    [Fintype Outcome] [DecidableEq Outcome] :
+    (naimarkAuxiliaryState Question Outcome).IsNormalized := by
+  exact PureState.toQuantumState_isNormalized
+    (naimarkAuxiliaryPureState Question Outcome)
+
+/-- The product auxiliary state appearing in `thm:naimark`, written as the
+tensor product of the Alice and Bob auxiliary states. -/
+noncomputable def naimarkAuxiliaryProductState
+    (QuestionA OutcomeA QuestionB OutcomeB : Type u)
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB] :
+    QuantumState
+      ((naimarkAuxiliaryHilbertSpace QuestionA OutcomeA).carrier ×
+        (naimarkAuxiliaryHilbertSpace QuestionB OutcomeB).carrier) :=
+  QuantumState.tensor
+    (naimarkAuxiliaryState QuestionA OutcomeA)
+    (naimarkAuxiliaryState QuestionB OutcomeB)
+
+/-- The product auxiliary state is normalized. -/
+theorem naimarkAuxiliaryProductState_isNormalized
+    (QuestionA OutcomeA QuestionB OutcomeB : Type u)
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB] :
+    (naimarkAuxiliaryProductState QuestionA OutcomeA QuestionB OutcomeB).IsNormalized := by
+  exact QuantumState.tensor_isNormalized
+    (naimarkAuxiliaryState_isNormalized QuestionA OutcomeA)
+    (naimarkAuxiliaryState_isNormalized QuestionB OutcomeB)
+
+@[simp] theorem naimarkAuxiliaryProductState_density
+    (QuestionA OutcomeA QuestionB OutcomeB : Type u)
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB] :
+    (naimarkAuxiliaryProductState QuestionA OutcomeA QuestionB OutcomeB).density =
+      opTensor
+        (naimarkAuxiliaryState QuestionA OutcomeA).density
+        (naimarkAuxiliaryState QuestionB OutcomeB).density := rfl
+
 /-- Witness data for the full tensor-product Naimark correlation theorem.
 
 Paper origin: `references/ldt-paper/orthonormalization.tex:36-80`
