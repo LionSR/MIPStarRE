@@ -151,16 +151,8 @@ slackness.
 This is the slackness-carrying companion to `selfImprovementHelperConstruction`:
 it applies the Section 9 statement `sdp_statement_with_slackness`, which records
 the strong-duality conclusion with complementary slackness.  The construction
-lemma remains separate, because its current `sdp` input has not yet formalized
-the strong-duality argument.
-
-**Unfaithful:** This proof currently relies on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230.  Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then replace this transitive `sorryAx`
-dependency. -/
+lemma remains separate, because its reduced `sdp` input intentionally carries
+only the measurement-total and dual-feasibility fragment. -/
 lemma self_improvement_helper_with_slackness
     (params : Parameters)
     [FieldModel params.q]
@@ -186,16 +178,7 @@ completeness, consistency with `A`, strong self-consistency, and boundedness.
 The boundedness conclusion is split into positivity of `Z`, pointwise domination
 of the averaged point measurement, and the state-dependent gap estimate.  The
 strong-self-consistency branch is proved in this file and is not exposed as an
-additional public hypothesis; the remaining `sorryAx` dependency is transitive
-through the SDP slackness theorem tracked by #1230.
-
-**Unfaithful:** This proof currently relies on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230.  Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then replace the transitive `sorryAx`
-dependency in `self_improvement_helper_with_slackness`. -/
+additional public hypothesis. -/
 lemma selfImprovementHelper
     (params : Parameters)
     [FieldModel params.q]
@@ -407,14 +390,6 @@ here as the explicit hypothesis `hgood`. The source-facing theorem remains
 visible with the paper statement; any remaining missing derivation is lowered to
 internal obligations rather than hidden in a conditional theorem with extra
 obligation hypotheses.
-
-**Unfaithful:** This proof currently depends transitively on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230. Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then remove the remaining transitive
-`sorryAx` dependency.
 -/
 theorem selfImprovement
     (params : Parameters)

@@ -64,8 +64,8 @@ bounds, linearized SDP rewrites, and bracketed mass identities.
   use the strengthened helper conclusion directly.
 - `sdp` and `addInU` are the reduced Section 9 statements used by the
   surrounding self-improvement theorem.
-- `sdp_statement_with_slackness` is the deferred Section 9 strong-duality statement
-  carrying complementary slackness.
+- `sdp_statement_with_slackness` is the formalized Section 9 strong-duality
+  statement carrying complementary slackness.
 
 ## References
 

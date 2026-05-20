@@ -289,7 +289,7 @@ Each of the geometric line branches picks a role `r ∈ {A, B}`:
 The self-consistency branch samples a shared point and checks cross-player point
 agreement there.
 
-TODO(#1649): `SameSpaceProjStrat` currently forces both provers onto the
+Note: `SameSpaceProjStrat` currently forces both provers onto the
 same index type `ι`; the paper allows `H_A ≠ H_B`. -/
 noncomputable def lowIndividualDegreeFailureProbability
     {params : Parameters} [FieldModel params.q]

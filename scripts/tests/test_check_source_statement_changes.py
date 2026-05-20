@@ -28,7 +28,12 @@ def _write(path: Path, text: str) -> None:
 
 
 def _git(repo: Path, *args: str) -> None:
-    subprocess.run(["git", *args], cwd=repo, check=True, stdout=subprocess.PIPE)
+    subprocess.run(
+        ["git", "-c", "commit.gpgsign=false", "-c", "tag.gpgsign=false", *args],
+        cwd=repo,
+        check=True,
+        stdout=subprocess.PIPE,
+    )
 
 
 def _make_repo(root: Path) -> Path:

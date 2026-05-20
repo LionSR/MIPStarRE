@@ -1,6 +1,6 @@
 # Issue #1507 main-induction native successor obligation
 
-Audit date: 2026-05-18
+Audit date: 2026-05-20
 
 ## Scope
 
@@ -35,11 +35,22 @@ Classification: stated with proof hole.  The Lean theorem has the
 source-shaped hypotheses, up to the documented large-`k` correction, and the
 successor branch remains unfinished.
 
-`mainInductionSuccessorNext`: new Lean obligation.
+`mainInductionSuccessorNext`: Lean branch theorem.
 
-Classification: stated with proof hole.  This is the native `m -> m + 1`
+Classification: source-shaped successor step.  This is the native `m -> m + 1`
 successor statement.  It carries no restricted-probability, recursive-slice,
-self-improvement, or pasting data as hypotheses.
+self-improvement, or pasting data as hypotheses.  The large-error branch is
+proved by `mainInductionOfOneLeError`; the small-error branch is delegated to
+the named proof obligation `mainInductionSuccessorNextOfSmallError`.
+
+`mainInductionSuccessorNextOfSmallError`: Lean proof obligation.
+
+Classification: stated with proof hole.  This is the nontrivial branch of the
+successor step after the case distinction
+`mainInductionError params.next k eps delta gamma < 1`.  The extra hypothesis is
+not a new source theorem assumption; it is discharged by the surrounding
+successor theorem.  The statement does not take restricted-probability,
+recursive-slice, self-improvement, or pasting data as hypotheses.
 
 `mainInductionSuccessor`: Lean branch theorem.
 
@@ -55,16 +66,19 @@ successor conclusion.  It is not advertised as `thm:main-induction`.
 
 ## Repair
 
-The direct `sorry` has been moved from the arbitrary non-base presentation to the
-native successor-step theorem `mainInductionSuccessorNext`.  This avoids making a
-compatibility or package wrapper into the mathematical target.  The public
-branch theorem `mainInductionSuccessor` now only performs the predecessor
-decomposition for `params.m != 1`; the missing mathematics is exactly the
-source proof step from `m` to `m + 1`.
+The direct `sorry` has been moved from the arbitrary non-base presentation to
+the small-error successor branch
+`mainInductionSuccessorNextOfSmallError`.  This avoids making a compatibility or
+data wrapper into the mathematical target, and it also separates the trivial
+large-error case from the actual induction argument.  The public branch theorem
+`mainInductionSuccessor` now only performs the predecessor decomposition for
+`params.m != 1`; the remaining mathematics is exactly the nontrivial source
+proof step from `m` to `m + 1`.
 
-The next proof work is to construct, inside `mainInductionSuccessorNext`, the
-restricted slice profiles, recursive slice measurements, self-improvement
-outputs, and averaged pasting input required by `mainInductionFromStageData`.
+The next proof work is to construct, inside
+`mainInductionSuccessorNextOfSmallError`, the restricted slice profiles,
+recursive slice measurements, self-improvement outputs, and averaged pasting
+input required by `mainInductionFromStageData`.
 
 ## Statement integrity audit
 
@@ -75,6 +89,11 @@ Lean assumptions in `mainInductionSuccessorNext`: a good symmetric strategy
 `strategy : SymStrat params.next ι`, the error parameters, and
 `400 * params.next.m * params.next.d <= k`.
 
+Lean assumptions in `mainInductionSuccessorNextOfSmallError`: the same
+successor-step hypotheses, together with
+`mainInductionError params.next k eps delta gamma < 1`, the nontrivial branch
+condition used internally by the proof of `mainInductionSuccessorNext`.
+
 Paper conclusion: a measurement in `PolyMeas(m + 1, q, d)` whose evaluations are
 consistent with the point measurement at the main-induction error.
 
@@ -84,5 +103,5 @@ Lean conclusion: an existential measurement
 `mainInductionError params.next k eps delta gamma`.
 
 Verdict: source-faithful modulo the documented large-`k` correction.  The
-remaining proof hole is a named source-faithful proof obligation, not an
-additional hypothesis on the paper theorem.
+remaining proof hole is a named small-error proof obligation, not an additional
+hypothesis on the paper theorem.

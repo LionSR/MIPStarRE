@@ -237,7 +237,7 @@ lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
     exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
       (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
   obtain ⟨P, hRounded⟩ :=
-    leftLiftedProjectivizationRepairProducer ψ hψ A
+    leftLiftedProjectivizationRepair ψ hψ A
       (consistencyToAlmostProjectiveError ζ) hAlmost.sourceAlmostProjective
   have hP :
       SDDRel ψ (uniformDistribution Unit)
@@ -311,7 +311,7 @@ theorem orthonormalizationCompletionRoute {Outcome : Type*}
     exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
       (ψ := ψ) (A := Ahat) (B := Ahat) (ζ := 2 * ζ) hCons
   obtain ⟨P, hRounded⟩ :=
-    leftLiftedProjectivizationRepairProducer ψ hψ Ahat
+    leftLiftedProjectivizationRepair ψ hψ Ahat
       (consistencyToAlmostProjectiveError (2 * ζ))
       hAlmost.sourceAlmostProjective
   have hP_local :

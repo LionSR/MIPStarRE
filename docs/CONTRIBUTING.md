@@ -77,9 +77,12 @@ scripts/install_git_hooks.sh
 scripts/install_git_hooks.sh --check
 ```
 
-The pre-commit hook runs whitespace, paper-gap-note structure, and proof-debt
-audits on relevant staged files, including agent prompts and actions under
-`.github/`.  The pre-push hook
+The pre-commit hook runs whitespace, the `scripts/tests` unit tests when any
+`scripts/**/*.py` or `scripts/tests/**` file is staged, the blueprint LaTeX
+convention lint (`check_blueprint_latex.py`) when blueprint sources or the
+lint helper are staged, and the
+paper-gap-note structure and proof-debt audits on relevant staged files,
+including agent prompts and actions under `.github/`.  The pre-push hook
 checks changed Lean files with `lake env lean`, repeats the fast
 statement-integrity audits for relevant policy or prompt surfaces, and checks
 blueprint declaration synchronization when Lean or blueprint surfaces changed.
@@ -128,6 +131,14 @@ example `ldt-basic`, `preliminaries`, `commutativity`, `pasting`,
 `blueprint-sync`). Documentation-only or tooling issues should use
 `documentation`, `ci`, `cleanup`, and/or `refactor` instead of
 `formalization`.
+
+When the work concerns content that exists only in the blueprint and not in
+the original paper (arXiv:2009.12982), apply the `blueprint-only` label
+alongside the chapter or theorem-family labels.  Omit `blueprint-only` when the
+work concerns a statement or definition that appears in the paper.  An issue
+may need both `2009.12982` and `blueprint-only` when it spans paper-present
+content and blueprint-exclusive scaffolding or auxiliary lemmas; in that case
+apply both labels so the scope is explicit.
 
 Every formalization issue must give enough mathematical source information to
 make the issue self-contained:
@@ -315,6 +326,12 @@ label set.
 | Label        | Description                                          |
 |--------------|------------------------------------------------------|
 | `2009.12982` | The main LDT paper tracked in this repository        |
+
+### Blueprint provenance labels
+
+| Label            | Description                                                      |
+|------------------|------------------------------------------------------------------|
+| `blueprint-only` | Content exclusive to the blueprint (not in the original paper)   |
 
 ### Tracking / follow-up labels
 
@@ -529,7 +546,7 @@ The following workflows run automatically:
 | **Lean CI** (`lean_action_ci.yml`) | Push to `main`, PRs touching `.lean`/`lakefile.toml`/`lean-toolchain` | Runs `lake build` with Mathlib cache |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/ready-for-review/reopened touching Lean files, blueprint `.tex` files, `docs/paper-gaps/`, `lakefile.toml`, or `lean-toolchain` | Automated review for proof integrity, Mathlib style, type safety, performance, modularity, mathematical exposition, and documentation |
 | **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened | Uses native sub-issue progress for tracking status, posts progress comments on linked issues when PRs merge, scans merged PRs for genuine deferred mathematical obligations, and creates `follow-up` issues when needed |
-| **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Validates LaTeX blueprint for broken labels and references |
+| **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Builds `leanblueprint pdf` / `web` to catch broken labels, undefined macros, and plasTeX errors, then runs the blueprint ↔ Lean sync checks. The LaTeX convention scan and the `scripts/tests` helper unit tests both run locally in the pre-commit hook. |
 | **Docs & Blueprint Sync** (`docs-blueprint-sync.md`) | Daily (weekdays) + manual dispatch | Detects stale documentation and opens a sync PR if needed |
 | **README Freshness Audit** (`readme-freshness-audit.yml`) | Weekly + manual dispatch | Report-only audit for README local paths, LDT submodule count, and hard-coded Lean/Mathlib versions |
 | **Lean Audit** (`lean-audit.yml`) | On demand | Audits Lean code for style and correctness |

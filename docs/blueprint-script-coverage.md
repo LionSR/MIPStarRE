@@ -10,10 +10,12 @@ A script is in scope when it directly parses or validates `blueprint/src/**/*.te
 |---|---|---|---|
 | `scripts/blueprint_lean_sync.py` | Name-level `\lean{...}` / `\leanok` sync and `blueprint/lean_decls` drift checker. | `scripts/tests/test_blueprint_lean_sync.py` | `.github/workflows/blueprint-sync.yml`, `.github/workflows/lint-blueprint.yml` |
 | `scripts/blueprint_leanok_axioms.py` | Lean axiom-closure checker for proof-level `\leanok` claims. | `scripts/tests/test_blueprint_leanok_axioms.py` | `.github/workflows/blueprint-sync.yml` |
-| `scripts/check_blueprint_latex.py` | Blueprint LaTeX convention lint, forbidding active `cleveref` / `\Cref` uses and proof-bearing metadata on remarks. | `scripts/tests/test_check_blueprint_latex.py` | `.github/workflows/lint-blueprint.yml` |
+| `scripts/check_blueprint_latex.py` | Blueprint LaTeX convention lint, forbidding active `cleveref` / `\Cref` uses and proof-bearing metadata on remarks. | `scripts/tests/test_check_blueprint_latex.py` | `.githooks/pre-commit` is the active gate (it runs the LaTeX scan and, when any `scripts/*.py` is staged, the helper unit tests). `.github/workflows/lint-blueprint.yml` is retained for blueprint render and sync, not for this lint. |
 | `scripts/tex_utils.py` | Shared active-TeX-line parsing helper used by both lint and sync scripts. | Covered through `scripts/tests/test_blueprint_lean_sync.py` and `scripts/tests/test_check_blueprint_latex.py`. | `.github/workflows/blueprint-sync.yml`, `.github/workflows/lint-blueprint.yml` |
 
-Both blueprint workflows also watch `scripts/tests/**` and their own workflow files, so changes to tests or path-filter policy re-run the relevant checks.
+`blueprint-sync.yml` watches `scripts/tests/**`, and both blueprint workflows
+watch their own workflow files, so changes to tests or path-filter policy re-run
+the relevant checks.
 
 ## Intentionally outside this surface
 

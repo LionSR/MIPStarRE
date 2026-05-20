@@ -182,7 +182,7 @@ def parse_axiom_output(
     # to match the opening one rather than treating `` ` `` and `'` as
     # interchangeable terminators.
     subject_re = re.compile(
-        r"^(?:`(?P<btick>[^`]+)`|'(?P<apos>[^']+)')\s+"
+        r"^(?:`(?P<btick>[^`]+)`|'(?P<apos>.+)')\s+"
         r"(depends on axioms:|does not depend on any axioms)"
     )
     decl_set = set(decls)

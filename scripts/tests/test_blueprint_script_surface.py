@@ -23,7 +23,7 @@ BLUEPRINT_SUPPORT_SCRIPTS = {
     },
     "scripts/check_blueprint_latex.py": {
         "tests": {"scripts/tests/test_check_blueprint_latex.py"},
-        "workflows": {".github/workflows/lint-blueprint.yml"},
+        "workflows": set(),
     },
     "scripts/tex_utils.py": {
         # Shared utility: the behavior is covered through both consumers rather
@@ -49,9 +49,7 @@ WORKFLOW_REQUIRED_PATHS = {
     },
     ".github/workflows/lint-blueprint.yml": {
         "scripts/blueprint_lean_sync.py",
-        "scripts/check_blueprint_latex.py",
         "scripts/tex_utils.py",
-        "scripts/tests/**",
         ".github/workflows/lint-blueprint.yml",
     },
 }

@@ -84,10 +84,9 @@ Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
 (`\label{lem:sdp}`).
 
 This is not the source-facing SDP theorem: it records only the measurement-total
-and dual-feasibility part that is presently proved without the strong-duality
-and complementary-slackness argument.  The source-shaped target is
-`SdpStatementWithSlackness`; its proof is the deferred SDP strong-duality and
-complementary-slackness obligation tracked by #1230. -/
+and dual-feasibility fragment used by earlier reduced helper interfaces.  The
+source-shaped target is `SdpStatementWithSlackness`, whose proof supplies the
+strong-duality and complementary-slackness conclusions. -/
 structure SdpStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
@@ -381,7 +380,7 @@ Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
 `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
 This is not an additional source-theorem hypothesis.  It is the internal
-helper-output record produced after the tracked SDP theorem
+helper-output record produced after the SDP theorem
 `sdp_statement_with_slackness` supplies strong duality.  It keeps all fields of
 the reduced helper conclusion and additionally records the consequence
 `T_g Z = T_g A_g`. -/
