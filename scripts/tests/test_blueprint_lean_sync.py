@@ -278,6 +278,39 @@ class CollectBlueprintEntriesTests(unittest.TestCase):
         self.assertTrue(inner.has_leanok)
         self.assertTrue(inner.proof_has_leanok)
 
+    def test_proves_credits_separated_proof_to_labelled_statement(self) -> None:
+        entries = self._collect_entries(
+            r"""
+\begin{lemma}[Orthogonalization lemma for measurements]\label{lem:orthonormalization-main-lemma}
+  \lean{OuterDecl}
+  \leanok
+\end{lemma}
+
+\begin{lemma}[Formalized envelope]\label{lem:formalized-envelope}
+  \lean{InterveningDecl}
+  \leanok
+\end{lemma}
+\begin{proof}
+  \leanok
+\end{proof}
+
+\begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
+  \proves{lem:orthonormalization-main-lemma}
+  \leanok
+\end{proof}
+"""
+        )
+
+        by_label = {entry.label: entry for entry in entries}
+
+        outer = by_label["lem:orthonormalization-main-lemma"]
+        intervening = by_label["lem:formalized-envelope"]
+
+        self.assertTrue(outer.has_leanok)
+        self.assertTrue(outer.proof_has_leanok)
+        self.assertTrue(intervening.has_leanok)
+        self.assertTrue(intervening.proof_has_leanok)
+
 
 class CollectLeanDeclsTests(unittest.TestCase):
     def test_collect_file_lean_decls_ignores_comments_and_marks_private(self) -> None:
