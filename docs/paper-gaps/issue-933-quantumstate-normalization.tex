@@ -220,13 +220,13 @@ than displaying an additional normalization hypothesis.
 
 The corresponding Lean declarations make the suppressed convention explicit.
 For example, the blueprint statements for the triangle transfer, inner-product
-transport, switch-sandwich lemma, completion theorem, spectral truncation input,
-and orthonormalization theorem all link to declarations whose signatures include
-an explicit normalized-state hypothesis.  Thus the blueprint and Lean are
-compatible, but they place the convention at different levels: the blueprint uses
-the standard mathematical meaning of $|\psi\rangle$ as a normalized state, while
-Lean records the hypothesis as data because its base state type contains all
-positive semidefinite matrices.
+transport, switch-sandwich lemma, completion theorem, spectral truncation
+statement, and orthonormalization theorem all link to declarations whose
+signatures include an explicit normalized-state hypothesis.  Thus the blueprint
+and Lean are compatible, but they place the convention at different levels: the
+blueprint uses the standard mathematical meaning of $|\psi\rangle$ as a
+normalized state, while Lean records the hypothesis as data because its base
+state type contains all positive semidefinite matrices.
 
 This note supplies the missing comparison.  Future blueprint edits should either
 continue to use the paper convention for $|\psi\rangle$, or state explicitly that

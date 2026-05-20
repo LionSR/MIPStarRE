@@ -808,7 +808,8 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement
 projector witness.
 
 The normalized-state hypothesis is exactly the one already required by the
-spectral-truncation input route. It is used only in the large-error branch. -/
+`spectralTruncationStatement_of_sourceAlmostProjective` route. It is used only
+in the large-error branch. -/
 theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
