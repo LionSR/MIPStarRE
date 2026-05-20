@@ -503,9 +503,11 @@ visible with the paper statement; any remaining missing derivation is lowered to
 internal obligations rather than hidden in a conditional theorem with extra
 obligation hypotheses.
 
-**Unfaithful:** The paper-faithful operator-total route currently depends on
-the helper-output-specific residual-preserving projective repair theorem
-`helper_output_residual_preserving_projectivization`, which is the remaining
+**Unfaithful:** The proof of `thm:self-improvement` in
+`references/ldt-paper/self_improvement.tex` is currently represented by the
+paper-faithful operator-total route, which depends on the helper-output-specific
+residual-preserving projective repair theorem
+`helper_output_residual_preserving_projectivization`.  This is the remaining
 Section 9 construction gap tracked by issue #1642.  Elimination: prove the
 residual domination for the projective repair constructed from the completed
 helper output. -/
