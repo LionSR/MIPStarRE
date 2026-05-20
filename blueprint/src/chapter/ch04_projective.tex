@@ -72,6 +72,26 @@
 	\texttt{docs/paper-gaps/naimark.tex}.
 \end{definition}
 
+\begin{definition}[Lean auxiliary declarations for Naimark]\label{rem:lean-naimark-auxiliary-declarations}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryHilbertSpace}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryState}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState}
+	\uses{thm:naimark}
+	The Lean construction represents the tensor product of the one-measurement
+	auxiliary registers on one side by the finite function type
+	\[
+		x \mapsto \mathrm{Option}(\mathcal A_x),
+	\]
+	with the all-\(\bot\) vector as the initial auxiliary state.  The declaration
+	\texttt{naimarkAuxiliaryHilbertSpace} records this one-sided product
+	register, \texttt{naimarkAuxiliaryState} records its normalized all-\(\bot\)
+	state, and \texttt{naimarkAuxiliaryProductState} records the Alice--Bob
+	product auxiliary state.  These are internal declarations for the tensor
+	assembly in Theorem~\ref{thm:naimark}; they do not by themselves prove the
+	correlation-preservation identity, and this node is therefore not marked
+	\texttt{\textbackslash leanok}.
+\end{definition}
+
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
 	\leanok

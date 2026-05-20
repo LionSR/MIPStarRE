@@ -68,6 +68,15 @@ structure PureState (ι : Type*) [Fintype ι] [DecidableEq ι] [Nonempty ι] whe
 
 namespace PureState
 
+/-- The coordinate-basis pure state at a distinguished basis vector. -/
+noncomputable def basis {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (i : ι) : PureState ι where
+  vector := fun j => if j = i then 1 else 0
+  unit := by
+    classical
+    rw [dotProduct]
+    simp
+
 /-- The density matrix represented by a pure-state witness. -/
 noncomputable def density {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (ψ : PureState ι) : MIPStarRE.Quantum.Op ι :=
