@@ -84,6 +84,7 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryHilbertSpace}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryState}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation_of_productSubmeasurements}
 	\uses{thm:naimark}
 	The Lean construction represents the tensor product of the one-measurement
 	auxiliary registers on one side by the finite function type
@@ -94,9 +95,13 @@
 	\texttt{naimarkAuxiliaryHilbertSpace} records this one-sided product
 	register, \texttt{naimarkAuxiliaryState} records its normalized all-\(\bot\)
 	state, and \texttt{naimarkAuxiliaryProductState} records the Alice--Bob
-	product auxiliary state.  These are internal declarations for the tensor
-	assembly in Theorem~\ref{thm:naimark}; they do not by themselves prove the
-	correlation-preservation identity, and this node is therefore not marked
+	product auxiliary state.  The reduction
+	\texttt{naimarkTensorProductCorrelation\_of\_productSubmeasurements} then
+	packages these auxiliary objects into the source-shaped theorem once the
+	product-register projective submeasurements and the four-index correlation
+	identity have been constructed.  These are internal declarations for the
+	tensor assembly in Theorem~\ref{thm:naimark}; they do not by themselves prove
+	the correlation-preservation identity, and this node is therefore not marked
 	\texttt{\textbackslash leanok}.
 \end{definition}
 

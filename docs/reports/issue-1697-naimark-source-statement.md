@@ -31,6 +31,7 @@ The formalization now separates three declarations.
 | `oneMeasNaimark` | one-measurement helper corresponding to `lem:naimark-helper` | proved |
 | `OneMeasNaimarkData.toProjSubMeas` | restriction of the completed `Option`-outcome dilation to the original outcomes | proved |
 | `questionwiseNaimark` | Lean-only interface for per-question marginal preservation | proved |
+| `naimarkTensorProductCorrelation_of_productSubmeasurements` | internal reduction from product-register projective submeasurements and the four-index correlation identity to the source-shaped theorem | proved |
 | `naimarkTensorProductCorrelation` | source-shaped tensor-product correlation theorem | stated, proof obligation |
 
 The new statement is deliberately not marked `\leanok` in the blueprint.  It
@@ -77,4 +78,8 @@ arbitrary submeasurements.  The proof is still absent and remains the
 tensor-register assembly tracked by issue #1697 and
 `docs/paper-gaps/naimark.tex`; the local passage from completed
 `Option`-outcome measurements to original-outcome projective submeasurements is
-now proved by `OneMeasNaimarkData.toProjSubMeas`.
+now proved by `OneMeasNaimarkData.toProjSubMeas`.  The auxiliary-state and
+dilated-state part of the final assembly is also packaged by
+`naimarkTensorProductCorrelation_of_productSubmeasurements`; the remaining
+proof obligation is precisely the construction of the product-register
+projective submeasurements and the four-index correlation identity.

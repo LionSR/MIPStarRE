@@ -353,6 +353,68 @@ def NaimarkTensorProductCorrelationStatement
     ∃ HauxA HauxB : FiniteHilbertSpace.{u},
       Nonempty (NaimarkTensorProductCorrelationData HA HB HauxA HauxB ψ A B)
 
+/-- Internal assembly reduction for the tensor-product Naimark theorem.
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:161-187`, where the
+one-question dilations are placed into the product auxiliary registers and then
+the correlation identity is checked for each quadruple `(x,y,a,b)`.
+
+This theorem records the part of the source theorem already supplied by the
+product auxiliary state construction: once the projective submeasurements on
+the product-register spaces and the displayed correlation identity are
+constructed, the source-shaped `NaimarkTensorProductCorrelationStatement`
+follows.  The remaining mathematical work is therefore exactly the construction
+of those projective submeasurements and the four-index correlation identity; no
+extra hypothesis is added to `thm:naimark`. -/
+theorem naimarkTensorProductCorrelation_of_productSubmeasurements
+    {QuestionA OutcomeA QuestionB OutcomeB : Type u}
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    (HA HB : FiniteHilbertSpace.{u})
+    (ψ : QuantumState (HA.carrier × HB.carrier))
+    (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
+    (B : IdxSubMeas QuestionB OutcomeB HB.carrier)
+    (left :
+      IdxProjSubMeas QuestionA OutcomeA
+        (HA.carrier × (naimarkAuxiliaryHilbertSpace QuestionA OutcomeA).carrier))
+    (right :
+      IdxProjSubMeas QuestionB OutcomeB
+        (HB.carrier × (naimarkAuxiliaryHilbertSpace QuestionB OutcomeB).carrier))
+    (hcorrelation :
+      ∀ (x : QuestionA) (y : QuestionB) (a : OutcomeA) (b : OutcomeB),
+        ev ψ (opTensor ((A x).outcome a) ((B y).outcome b)) =
+          ev (naimarkProductExtensionState HA HB
+              (naimarkAuxiliaryHilbertSpace QuestionA OutcomeA)
+              (naimarkAuxiliaryHilbertSpace QuestionB OutcomeB)
+              ψ (naimarkAuxiliaryProductState QuestionA OutcomeA QuestionB OutcomeB))
+            (opTensor ((left x).outcome a) ((right y).outcome b))) :
+    NaimarkTensorProductCorrelationStatement HA HB ψ A B := by
+  intro hψ
+  let HauxA := naimarkAuxiliaryHilbertSpace QuestionA OutcomeA
+  let HauxB := naimarkAuxiliaryHilbertSpace QuestionB OutcomeB
+  let auxState := naimarkAuxiliaryProductState QuestionA OutcomeA QuestionB OutcomeB
+  refine ⟨HauxA, HauxB, ⟨?_⟩⟩
+  exact {
+    auxState := auxState
+    auxState_normalized :=
+      naimarkAuxiliaryProductState_isNormalized QuestionA OutcomeA QuestionB OutcomeB
+    auxLeft := naimarkAuxiliaryState QuestionA OutcomeA
+    auxRight := naimarkAuxiliaryState QuestionB OutcomeB
+    auxLeft_normalized := naimarkAuxiliaryState_isNormalized QuestionA OutcomeA
+    auxRight_normalized := naimarkAuxiliaryState_isNormalized QuestionB OutcomeB
+    auxState_product := rfl
+    dilatedState := naimarkProductExtensionState HA HB HauxA HauxB ψ auxState
+    dilatedState_density := rfl
+    dilatedState_normalized :=
+      naimarkProductExtensionState_isNormalized HA HB HauxA HauxB hψ
+        (naimarkAuxiliaryProductState_isNormalized
+          QuestionA OutcomeA QuestionB OutcomeB)
+    left := left
+    right := right
+    correlation_preservation := hcorrelation }
+
 /-- Full tensor-product Naimark correlation theorem.
 
 This is the Lean statement corresponding to
