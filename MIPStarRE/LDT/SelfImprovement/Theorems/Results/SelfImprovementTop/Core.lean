@@ -402,7 +402,13 @@ route: after completing the helper output by a fresh `none` outcome, one needs
 an option-indexed projective repair whose fresh outcome still dominates the
 original residual operator.  The existing locality-preserving repair producer
 supplies the rounded projective family; the residual domination itself remains
-the hard helper-output-specific step. -/
+the hard helper-output-specific step.
+
+At present this frontier appears to depend on the stronger matrix-SDP route
+which also carries the auxiliary dominance fact `1 ≤ Z`.  The abstract
+`sdp_statement_with_slackness` interface used by the current helper theorem does
+not expose that dominance field, so the remaining construction gap sits partly
+above issue #1230 as well as issue #1642. -/
 private theorem helper_output_residual_preserving_projectivization
     (params : Parameters)
     [FieldModel params.q]
@@ -411,7 +417,8 @@ private theorem helper_output_residual_preserving_projectivization
     {T : Measurement (Polynomial params) ι}
     {Hhat : SubMeas (Polynomial params) ι}
     {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hhelperWithSlackness :
+      SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta)
     (hhelperSSC :
       BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
@@ -440,7 +447,8 @@ private theorem helper_output_projectivization_with_total_le
     {T : Measurement (Polynomial params) ι}
     {Hhat : SubMeas (Polynomial params) ι}
     {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
+    (hhelperWithSlackness :
+      SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta)
     (hhelperSSC :
       BipartiteSSCRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily Hhat)
@@ -451,7 +459,56 @@ private theorem helper_output_projectivization_with_total_le
         (constSubMeasFamily H.toSubMeas.liftLeft)
         (selfImprovementOrthogonalizationError params eps delta) ∧
       H.toSubMeas.total ≤ Hhat.total := by
-  sorry
+  let hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta :=
+    hhelperWithSlackness.toHelperConclusion
+  let ζhelper : Error := selfImprovementHelperError params eps delta
+  have hζ_nonneg : 0 ≤ ζhelper :=
+    selfImprovementHelperError_nonneg params eps delta
+  obtain ⟨P, hRounded, hresidual⟩ :=
+    helper_output_residual_preserving_projectivization
+      params strategy eps delta hhelperWithSlackness hhelperSSC
+  have hP_local :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily ((optionCompletion Hhat).toSubMeas.liftLeft))
+        (constSubMeasFamily P.toSubMeas.liftLeft)
+        (orthonormalizationMainLemmaError (2 * ζhelper)) := by
+    simpa [leftLiftedMeasurement, leftPlacedSubMeas, SubMeas.liftLeft,
+      ProjSubMeas.liftLeft] using hRounded.closeness
+  have hPq :
+      qSDD strategy.state (optionCompletion Hhat).toSubMeas.liftLeft
+        P.toSubMeas.liftLeft ≤
+        orthonormalizationMainLemmaError (2 * ζhelper) := by
+    simpa [ldt_simp] using hP_local.squaredDistanceBound
+  let H : ProjSubMeas (Polynomial params) ι := restrictSomeProjSubMeas P
+  have hHq :
+      qSDD strategy.state Hhat.liftLeft H.toSubMeas.liftLeft ≤
+        orthonormalizationMainLemmaError (2 * ζhelper) := by
+    exact le_trans
+      (Orthonormalization.Completion.qSDD_liftLeft_restrictSomeProjSubMeas_le
+          (ψ := strategy.state) (A := Hhat) (P := P))
+      hPq
+  have hcoeff :
+      orthonormalizationMainLemmaError (2 * ζhelper) ≤
+        selfImprovementOrthogonalizationError params eps delta := by
+    change orthonormalizationMainLemmaError (2 * ζhelper) ≤
+      orthonormalizationError ζhelper
+    open Orthonormalization.ErrorBounds in
+    exact
+      orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
+        ζhelper hζ_nonneg
+  have horth :
+      SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily Hhat.liftLeft)
+        (constSubMeasFamily H.toSubMeas.liftLeft)
+        (selfImprovementOrthogonalizationError params eps delta) := by
+    constructor
+    simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily, H] using
+      (le_trans hHq hcoeff)
+  have hTotalLe : H.toSubMeas.total ≤ Hhat.total := by
+    simpa [H] using
+      restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
+        Hhat P hresidual
+  exact ⟨H, horth, hTotalLe⟩
 
 /--
 Formal statement corresponding to the blueprint theorem `thm:self-improvement`,
@@ -479,7 +536,11 @@ complementary-slackness argument, then remove the remaining transitive
 The paper-faithful operator-total route also currently depends on the helper-
 output-specific residual-preserving projectivization theorem
 `helper_output_residual_preserving_projectivization`, which is the remaining
-Section 9 construction gap tracked by issue #1642.
+Section 9 construction gap tracked by issue #1642.  The currently visible
+helper interface may still be too weak for this step: the likely proof route
+needs the stronger internal SDP witness carrying the auxiliary dominance fact
+`1 ≤ Z`, which is part of the unresolved matrix-side strengthening tracked by
+issue #1230.
 -/
 theorem selfImprovement
     (params : Parameters)
@@ -577,7 +638,7 @@ theorem selfImprovement
             params strategy eps delta heps hdelta hd_le_q hhelper hsscObligations
         obtain ⟨H, horth, hTotalLe⟩ :=
           helper_output_projectivization_with_total_le
-            params strategy eps delta hhelper hhelperSSC
+            params strategy eps delta hhelperWithSlackness hhelperSSC
         have hhelperSSCPoint :
             BipartiteSSCRel strategy.state (uniformDistribution (Point params))
               (fun _ : Point params => Hhat)
