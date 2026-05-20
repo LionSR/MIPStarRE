@@ -152,6 +152,7 @@
 \begin{definition}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_requires_residual_hypothesis}
 	\leanok
 	The following are Lean auxiliary declarations, not hypotheses in
 	Theorem~\ref{thm:orthonormalization}.
@@ -177,6 +178,8 @@
 	option-completed orthonormalization output to the monotone-total route used in
 	the self-improvement theorem.  The invariant is recorded as a separate
 	order-theoretic fact; it is not added as an orthonormalization hypothesis.
+	Lean also proves a one-dimensional counterexample showing that the fresh-outcome
+	residual hypothesis cannot be omitted from this generic restriction lemma.
 \end{definition}
 
 \begin{definition}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}

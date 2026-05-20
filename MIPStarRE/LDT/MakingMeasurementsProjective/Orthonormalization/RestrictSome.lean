@@ -105,4 +105,97 @@ theorem restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_resi
     rightTensor_mono
       (restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le A P hresidual)
 
+/-! ### Necessity of the fresh-outcome residual hypothesis -/
+
+/-- The zero one-outcome submeasurement used in the scalar obstruction to an
+unconditional restriction theorem.
+
+This is a Lean-only obstruction example for issue #1642.  It compares the
+generic restriction interface with the completion-and-restriction step in
+`references/ldt-paper/orthonormalization.tex`, where the residual domination
+used by this interface is not asserted as a generic theorem.
+
+**Lean-only:** This declaration is not a paper object.  Elimination: keep it
+only while issue #1642 records the generic residual-domination obstruction; if
+that issue is replaced entirely by a helper-specific Section 9 dominance
+theorem, this example can be moved to the report or deleted. -/
+def residualDominationObstructionSubMeas : SubMeas Unit Unit where
+  outcome := fun _ => 0
+  total := 0
+  outcome_pos := fun _ => le_rfl
+  sum_eq_total := by simp
+  total_le_one := zero_le_one
+
+/-- A completed-outcome projective submeasurement which puts all mass on the
+original outcome and none on the fresh outcome.
+
+This is a Lean-only obstruction example for issue #1642.  It compares the
+generic restriction interface with the completion-and-restriction step in
+`references/ldt-paper/orthonormalization.tex`, where the residual domination
+used by this interface is not asserted as a generic theorem.
+
+**Lean-only:** This declaration is not a paper object.  Elimination: keep it
+only while issue #1642 records the generic residual-domination obstruction; if
+that issue is replaced entirely by a helper-specific Section 9 dominance
+theorem, this example can be moved to the report or deleted. -/
+def residualDominationObstructionProjSubMeas : ProjSubMeas (Option Unit) Unit where
+  toSubMeas :=
+    { outcome := fun oa => if oa = some () then 1 else 0
+      total := 1
+      outcome_pos := by
+        intro oa
+        by_cases h : oa = some () <;> simp [h]
+      sum_eq_total := by
+        simp
+      total_le_one := le_rfl }
+  proj := by
+    intro oa
+    by_cases h : oa = some () <;> simp [h]
+
+/-- The residual-domination hypothesis in
+`restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le` cannot be
+omitted.
+
+The example is one-dimensional.  The source submeasurement has a single
+outcome of mass zero, while the completed projective submeasurement has the
+identity on the original outcome and zero on the fresh outcome.  After
+restricting to original outcomes, the projective total is the identity, not
+dominated by the zero source total.  Equivalently, the missing hypothesis
+`(optionCompletion A).outcome none ≤ P.outcome none` is exactly the failed
+inequality `1 ≤ 0` in this example.
+
+This formalizes the generic obstruction recorded for issue #1642 in
+`docs/reports/issue-1642-restrictsome-residual-domination-obstruction.md`.
+The comparison point is the completion-and-restriction step in
+`references/ldt-paper/orthonormalization.tex`, which does not state a generic
+residual-domination theorem.  It does not address the possible
+helper-output-specific route through the Section 9 SDP dominance witness.
+
+**Lean-only:** This theorem is an obstruction theorem, not a paper theorem and
+not a substitute for the helper-specific issue #1642 dominance construction.
+Elimination: delete this theorem only after the public blueprint route no longer
+needs to explain why the generic `RestrictSome` implication is conditional. -/
+theorem restrictSomeProjSubMeas_total_le_requires_residual_hypothesis :
+    ∃ A : SubMeas Unit Unit, ∃ P : ProjSubMeas (Option Unit) Unit,
+      ¬ (restrictSomeProjSubMeas P).toSubMeas.total ≤ A.total ∧
+      ¬ (optionCompletion A).outcome none ≤ P.outcome none := by
+  refine ⟨residualDominationObstructionSubMeas,
+    residualDominationObstructionProjSubMeas, ?_, ?_⟩
+  · intro hle
+    have hone_le_zero : (1 : MIPStarRE.Quantum.Op Unit) ≤ 0 := by
+      simpa [residualDominationObstructionSubMeas,
+        residualDominationObstructionProjSubMeas, restrictSomeProjSubMeas] using hle
+    have hone_eq_zero : (1 : MIPStarRE.Quantum.Op Unit) = 0 :=
+      le_antisymm hone_le_zero zero_le_one
+    have hentry := congrFun (congrFun hone_eq_zero ()) ()
+    norm_num at hentry
+  · intro hle
+    have hone_le_zero : (1 : MIPStarRE.Quantum.Op Unit) ≤ 0 := by
+      simpa [residualDominationObstructionSubMeas,
+        residualDominationObstructionProjSubMeas, optionCompletion] using hle
+    have hone_eq_zero : (1 : MIPStarRE.Quantum.Op Unit) = 0 :=
+      le_antisymm hone_le_zero zero_le_one
+    have hentry := congrFun (congrFun hone_eq_zero ()) ()
+    norm_num at hentry
+
 end MIPStarRE.LDT.MakingMeasurementsProjective
