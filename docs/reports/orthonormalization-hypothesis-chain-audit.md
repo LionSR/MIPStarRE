@@ -80,11 +80,12 @@ submeasurement and SDD closeness required by the line-130 construction.
 ## Layer 2: Section 9 Self-Improvement
 
 The former `SelfImprovement.OrthonormalizationInput` bundle has also been
-removed.  The useful retained construction is
-`OrthonormalizationSpectralObligation`, whose source-almost-projective route is
-proved.  The locality-preserving repair and final-field arguments are no longer
-presented as bundled theorem inputs; the source-facing self-improvement theorem
-now checks without `sorry` or `axiom`.
+removed.  The later `OrthonormalizationSpectralObligation` abbreviation has now
+also been retired: its useful content is the direct construction
+`spectralTruncationStatement_of_sourceAlmostProjective`.  The
+locality-preserving repair and final-field arguments are no longer presented as
+bundled theorem inputs; the source-facing self-improvement theorem now checks
+without `sorry` or `axiom`.
 
 ## Layer 3: Section 6 Induction
 

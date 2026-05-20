@@ -20,8 +20,10 @@ proved.
 Status note, 2026-05-13 after PR #1547 and the follow-up orthonormalization
 cleanup: the residual-domination orthonormalization route and the bundled
 `OrthonormalizationInput` records have also been removed.  The retained Section
-9 orthonormalization proof content is the spectral-truncation conversion in
-`SelfImprovement/Theorems/OrthonormalizationSpectral.lean`.  Subsequent repairs
+9 orthonormalization proof content is the direct spectral-truncation statement
+`spectralTruncationStatement_of_sourceAlmostProjective`.  The temporary
+`SelfImprovement/Theorems/OrthonormalizationSpectral.lean` module has also been
+retired.  Subsequent repairs
 discharged the locality-preserving projectivization route inside the
 source-facing self-improvement theorem; it is no longer a live Section 9 proof
 gap.
@@ -245,20 +247,18 @@ obligations into larger orthonormalization input packages.  These constructors
 were not used outside their own module and have been removed so that the
 Section 9 API does not normalize unused proof-debt packages.
 
-### 2.3. Remaining orthonormalization spectral layer
+### 2.3. Retired orthonormalization spectral layer
 
 The former `SelfImprovement/Theorems/OrthonormalizationBridge.lean` module has
-been narrowed and renamed to
-`SelfImprovement/Theorems/OrthonormalizationSpectral.lean`.  It no longer
-exports repair-obligation or full-orthonormalization-input constructors.  Its
-only retained role is to record the spectral-truncation conversion for the
+since been retired after it was narrowed to a spectral-only module.  Its only
+substantive role was to repackage the already proved
+`spectralTruncationStatement_of_sourceAlmostProjective` construction for the
 option-completed helper measurement.
 
 ### 2.4. Used (NOT orphan)
 
 | Module | Used by |
 |--------|---------|
-| `SelfImprovement/Theorems/OrthonormalizationSpectral` | Re-exported by `SelfImprovement/Theorems.lean`; linked from the Section 9 auxiliary blueprint remark |
 | `SelfImprovement/Theorems/Results/HelperSSC` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
 | `SelfImprovement/Theorems/Results/BoundednessTransport` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
 | `SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `MainInductionStep/SelfImprovementAssembly/Core.lean` |
