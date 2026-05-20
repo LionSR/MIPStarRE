@@ -66,6 +66,27 @@
 	\texttt{docs/paper-gaps/naimark.tex}.
 \end{remark}
 
+\begin{proposition}[Lean questionwise Naimark wrapper]\label{prop:lean-questionwise-naimark}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark}
+	\leanok
+	\uses{lem:naimark-helper}
+	The Lean theorem
+	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark}
+	constructs, for each question on Alice's and Bob's sides, local
+	one-measurement Naimark dilation data.  The resulting structure
+	\texttt{NaimarkStatement} records the source submeasurements and the
+	single-outcome marginal-preservation identities.  It is a Lean-only
+	restricted interface, not the simultaneous tensor-product correlation
+	statement of Theorem~\ref{thm:naimark}.
+\end{proposition}
+\begin{proof}
+	\leanok
+	The proof applies Lemma~\ref{lem:naimark-helper} separately to every
+	question on Alice's side and on Bob's side, then packages the resulting
+	source and marginal-preservation identities into \texttt{NaimarkStatement}.
+\end{proof}
+
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
 	\leanok
