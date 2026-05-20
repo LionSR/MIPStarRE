@@ -14,7 +14,7 @@ submeasurement, rather than a projective submeasurement. Once this non-projectiv
 statement is available, Theorem~\ref{thm:orthonormalization} upgrades~$H$ to a
 projective family without losing control of the four quantitative conclusions.
 
-Compared with the projective theorem, the helper lemma packages strong
+Compared with the projective theorem, the helper lemma states strong
 self-consistency using the explicit inequality from
 Definition~\ref{def:strong-self-consistency}, keeps the boundedness conclusion in
 terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
@@ -1089,14 +1089,18 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   has no larger right-register expectation in the strategy state.  Under this
   structural hypothesis the alphabet-size displacement term is not introduced.
   The QXP-layer interface used by the formalization records both the total
-  domination of the canonical projective family and the sharper
-  residual-domination field for the fresh option-completion outcome.  Under
-  the identification of the Q-layer with the option-completed source
-  submeasurement, this residual-domination field is equivalent to the
-  fresh-outcome comparison \(Q_{\mathrm{none}} \leq P_{\mathrm{none}}\).
-  Algebraically, this fresh-outcome comparison follows as soon as the
-  construction of \(\widehat X\) preserves the corresponding fresh row block,
-  namely \(\widehat X_{\mathrm{none}}=X_{\mathrm{none}}\).
+  domination of the canonical projective family and the sharper residual
+  comparison for the fresh option-completion outcome.  At present the formal QXP
+  algebra only isolates the construction-level statement
+  \(Q_{\mathrm{none}} \leq P_{\mathrm{none}}\), obtained when the repair preserves
+  the fresh row block \(\widehat X_{\mathrm{none}}=X_{\mathrm{none}}\).  To turn
+  this into the source-facing inequality
+  \(\widehat A_{\bot} \leq \widehat P_{\bot}\) needed by the conditional
+  ``RestrictSome'' monotonicity lemmas, one would still need an additional
+  comparison between the completed source residual and the ``Q''-layer fresh
+  outcome.  The present formal development does not provide such a comparison in
+  general; see
+  \texttt{docs/reports/issue-1642-restrictsome-residual-domination-obstruction.md}.
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_totalGap}
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_total_le}
   \lean{MIPStarRE.LDT.MakingMeasurementsProjective.pa_eq_xHatA_adjoint_mul_xHatA}

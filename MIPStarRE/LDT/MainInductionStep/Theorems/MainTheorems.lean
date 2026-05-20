@@ -253,10 +253,6 @@ theorem mainInductionSuccessorNext_ofAnswerSliceTransport
     exact le_trans
       (Nat.mul_le_mul_right params.d (Nat.mul_le_mul_left 400 hm_le_next))
       (by simpa [Parameters.next, Nat.mul_assoc] using hk_next)
-  have hk_pos : 1 ≤ k := by
-    have hprod_pos : 0 < 400 * params.m * params.d := by
-      exact Nat.mul_pos (Nat.mul_pos (by decide) params.hm) hd
-    exact le_trans (Nat.succ_le_of_lt hprod_pos) hk_pred
   by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
   · let answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma :=
       AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
@@ -264,7 +260,7 @@ theorem mainInductionSuccessorNext_ofAnswerSliceTransport
     let answerInduction :
         AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k :=
       AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
-        answerRestrict hinduction hd hk_pos hk_pred
+        answerRestrict hinduction hd hk_pred
     let answerSelf :
         AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict
           answerInduction :=

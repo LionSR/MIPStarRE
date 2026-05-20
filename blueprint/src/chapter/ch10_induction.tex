@@ -231,8 +231,8 @@
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingDataOfSmallError}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
+	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one, MIPStarRE.LDT.MainInductionStep.one_le_k_of_mainInductionError_lt_one}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport}
-	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one}
 	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
 	The successor step forms the pasting input by combining the restricted
@@ -329,9 +329,11 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionData.ofMainInductionHypothesis},
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionData.ofLegacy, MIPStarRE.LDT.MainInductionStep.PerSliceInductionData.ofAnswer, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofAnswerForLegacy, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofAnswer},
 	which record the predecessor induction hypothesis for the restricted
-	strategies, transport induction data in both directions between the
-	answer-valued and legacy slice interfaces, and then forget only the
-	answer-valued diagonal alphabet before the existing pasting assembly. The weighted
+	strategies, deriving the side condition \(1\le k\) from the predecessor
+	large-\(k\) bound and the degree-positivity hypothesis;
+	transport induction data in both directions between the answer-valued and
+	legacy slice interfaces; and then forget only the answer-valued diagonal
+	alphabet before the existing pasting assembly. The weighted
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
 	The Lean proof now closes the large-error branch by

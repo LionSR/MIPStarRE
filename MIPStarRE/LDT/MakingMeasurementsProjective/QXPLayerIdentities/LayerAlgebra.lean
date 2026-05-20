@@ -332,9 +332,11 @@ lemma qa_eq_pa_of_xHatA_eq_xa {Outcome : Type*}
 /-- Fresh-outcome domination follows from preservation of the fresh row block
 in the option-completed QXP layer.
 
-The remaining construction-level task for the monotone-total route is thus
-reduced to proving `XHat_none = X_none` for the concrete positive-Gram
-construction of `XHat`. -/
+This is only a QXP-internal comparison: it upgrades fresh-row preservation to
+`Q_none ≤ P_none`.  To use the conditional `RestrictSome` monotonicity lemmas
+downstream one still needs an additional source-to-`Q` comparison
+`(optionCompletion A).outcome none ≤ Q_none`, and that comparison is not part of
+this lemma. -/
 lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -348,7 +350,10 @@ lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
 
 If the source matrix `X` has orthonormal rows, then the polar replacement
 preserves the fresh `none` row.  The corresponding `P_none` operator is
-therefore equal to, and hence dominates, the fresh `Q_none` operator. -/
+therefore equal to, and hence dominates, the fresh `Q_none` operator.  This does
+not by itself imply source-facing residual domination for `optionCompletion A`;
+see `docs/reports/issue-1642-restrictsome-residual-domination-obstruction.md`.
+-/
 lemma q_outcome_none_le_p_outcome_none_of_x_coisometry {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
