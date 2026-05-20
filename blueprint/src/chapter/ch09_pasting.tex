@@ -686,8 +686,20 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.qSDD_completePart_le_slice}
 	\leanok
 	\uses{def:G-hat, cor:G-hat-facts}
-	The contribution of the completed part in the squared-distance defect is
-	bounded by the corresponding slice contribution.
+	For every $x \in \F_q$, the squared-distance defect of the one-outcome
+	complete part is bounded by that of the original slice submeasurement:
+	\[
+		\bigl\|
+		(G^x \ot I - I \ot G^x)\ket{\psi}
+		\bigr\|^2
+		\;\le\;
+		\sum_g
+		\bigl\|
+		(G^x_g \ot I - I \ot G^x_g)\ket{\psi}
+		\bigr\|^2,
+	\]
+	where $G^x = \sum_g G^x_g$ is the total operator of the slice
+	submeasurement.
 \end{lemma}
 \begin{proof}
 	\lean{MIPStarRE.LDT.Pasting.qSDD_completePart_le_slice}
@@ -705,9 +717,39 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_outcome, MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_total, MIPStarRE.LDT.Pasting.gHatHalfSandwichRight_split_outcome, MIPStarRE.LDT.Pasting.gHatHalfSandwichRight_split_total, MIPStarRE.LDT.Pasting.gHatHalfProduct_sum_adjoint_mul_le_one, MIPStarRE.LDT.Pasting.gHatReverseHalfProduct_sum_adjoint_mul_le_one, MIPStarRE.LDT.Pasting.leftTensor_rightTensor_sum_adjoint_mul_le_one}
 	\leanok
 	\uses{def:G-hat, def:completed-outcome-reindexing}
-	The left and right completed half-sandwiches split under the
-	head--tail reindexing, and the corresponding sums of adjoint-products are
-	bounded above by the identity.
+	\begin{enumerate}
+		\item \textbf{Head--tail split identities.} For every $k \ge 0$, point
+			tuple $\bx = (x_1,\dots,x_{k+1})$, and outcome tuple
+			$\bg = (g_1,\dots,g_{k+1})$,
+			\[
+				\widehat G^{x_1}_{g_1}\cdots
+				\widehat G^{x_{k+1}}_{g_{k+1}}
+				=
+				\widehat G^{x_1}_{g_1}
+				\bigl(
+				\widehat G^{x_2}_{g_2}\cdots
+				\widehat G^{x_{k+1}}_{g_{k+1}}
+				\bigr),
+			\]
+			and the right half-sandwich analogously rotates the head to the tail.
+		\item \textbf{Sum-of-adjoint-products bounds.} For every $r\ge 0$ and
+			$\bx = (x_1,\dots,x_r) \in \F_q^r$,
+			\[
+				\sum_{g_1,\dots,g_r}
+				\bigl(\widehat G^{x_1}_{g_1} \cdots
+				\widehat G^{x_r}_{g_r}\bigr)^\dagger
+				\bigl(\widehat G^{x_1}_{g_1} \cdots
+				\widehat G^{x_r}_{g_r}\bigr)
+				\;\le\; I,
+			\]
+			and the same bound holds for the reverse-order product family.
+		\item \textbf{Generic tensor contraction.} If families~$\{A_a\}_a$
+			and~$\{B_b\}_b$ satisfy $\sum_a A_a^\dagger A_a \le I$ and
+			$\sum_b B_b^\dagger B_b \le I$, then
+			\[
+				\sum_{a,b} (A_a \ot B_b)^\dagger (A_a \ot B_b) \le I.
+			\]
+	\end{enumerate}
 \end{lemma}
 \begin{proof}
 	\lean{MIPStarRE.LDT.Pasting.gHatHalfSandwichLeft_split_outcome}
@@ -728,9 +770,53 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_step_commute, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_prefixFirstSliceLeft_move, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveSource_eq_split, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_move_recursive_zero, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_split_one_iff, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core_two, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveStepMid_toTarget, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
 	\leanok
 	\uses{cor:G-hat-facts, lem:completed-sandwich-normalization, prop:triangle-inequality-for-approx_delta}
-	The elementary head--tail moves, split equivalences, and two-factor case
-	provide the one-step estimates used to move a completed measurement through
-	a half-sandwich.
+	Given the completed-measurement self-consistency and commutation estimates
+	from Corollary~\ref{cor:G-hat-facts}, the following one-step estimates hold.
+	\begin{enumerate}
+		\item \textbf{Self-consistency step.} For every~$r\ge 0$,
+			\[
+				\E_{x,y,z}\E_{x_1,\dots,x_r}
+				\sum_{g}
+				\bigl\|
+				\bigl(\widehat G^{z}_g \ot I -
+					I \ot \widehat G^{z}_g\bigr)
+				\ket{\psi}
+				\bigr\|^2
+				\;\le\; 2\zeta.
+			\]
+		\item \textbf{Commutation step.} For every~$r\ge 0$,
+			\[
+				\E_{x,y}\E_{x_1,\dots,x_r}
+				\sum_{g,h}\sum_{g_1,\dots,g_r}
+				\bigl\|
+				\bigl(
+					\widehat G^{x}_g \widehat G^{y}_h
+					\ot
+					\widehat G^{x_r}_{g_r}\cdots
+					\widehat G^{x_1}_{g_1}
+					-
+					\widehat G^{y}_h \widehat G^{x}_g
+					\ot
+					\widehat G^{x_r}_{g_r}\cdots
+					\widehat G^{x_1}_{g_1}
+				\bigr)
+				\ket{\psi}
+				\bigr\|^2
+				\;\le\; \nu_3.
+			\]
+		\item \textbf{Two-factor base case.} For $k=2$, the commutation chain
+			reduces to the same tensor-placement convention with the reverse
+			tail product equal to the identity, hence to the pairwise
+			estimate~$\nu_3$.
+		\item \textbf{Split equivalences.} The half-sandwich families are
+			equivalent, under the head--tail reindexing of
+			Lemma~\ref{lem:completed-sandwich-normalization}, to the
+			chain-families used in the move estimates above, with ordered
+			products on the first tensor factor and reverse products on the
+			second tensor factor where these appear in the commutation step.
+	\end{enumerate}
+	These are the elementary building blocks assembled by the recursive chain
+	construction of Lemma~\ref{lem:commute-g-half-sandwich}.
 \end{lemma}
 \begin{proof}
 	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird}

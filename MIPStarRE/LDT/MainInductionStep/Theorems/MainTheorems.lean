@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.Core
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
-import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
+import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly
 
 /-!
 # Section 6 — Main Induction Theorems
@@ -21,7 +21,9 @@ namespace MIPStarRE.LDT.MainInductionStep
 open MIPStarRE.LDT
 open scoped MatrixOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+universe uι
+
+variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 /-- Direct base case of `thm:main-induction` when `m = 1`.
 
@@ -209,6 +211,70 @@ theorem mainInductionOfOneLeError
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (polynomialEvaluationFamily params G.toSubMeas))
     herror⟩
+
+/-- Positive-degree successor assembly from the two remaining internal
+obligations.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.  The paper
+successor proof first invokes the induction hypothesis on each answer-valued
+slice, then applies the induction-section self-improvement theorem to the slice
+measurements, and finally pastes the averaged family.
+
+This theorem proves the completed Lean assembly once those two genuine internal
+obligations are supplied: the predecessor answer-valued induction hypothesis and
+the slice-strategy transport needed to apply Section 9 to the answer-restricted
+slices.  It is not a paper theorem and is not an extra hypothesis for
+`thm:main-induction`; it records the precise remaining constructions needed to
+discharge the source-facing successor branch. -/
+theorem mainInductionSuccessorNext_ofAnswerSliceTransport
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (hd : 0 < params.d)
+    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
+    (hsliceTransport :
+      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+        (inductionPkg :
+          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
+        AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+          restrictionPkg inductionPkg) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  have hk_pred : 400 * params.m * params.d ≤ k := by
+    have hm_le_next : params.m ≤ params.next.m := by
+      simp [Parameters.next]
+    exact le_trans
+      (Nat.mul_le_mul_right params.d (Nat.mul_le_mul_left 400 hm_le_next))
+      (by simpa [Parameters.next, Nat.mul_assoc] using hk_next)
+  have hk_pos : 1 ≤ k := by
+    have hprod_pos : 0 < 400 * params.m * params.d := by
+      exact Nat.mul_pos (Nat.mul_pos (by decide) params.hm) hd
+    exact le_trans (Nat.succ_le_of_lt hprod_pos) hk_pred
+  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
+  · let answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma :=
+      AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+        (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+    let answerInduction :
+        AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k :=
+      AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+        answerRestrict hinduction hd hk_pos hk_pred
+    let answerSelf :
+        AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict
+          answerInduction :=
+      AnswerSelfImprovementData.ofSliceStrategyTransport params strategy eps delta gamma k
+        answerRestrict answerInduction (hsliceTransport answerRestrict answerInduction)
+    exact
+      mainInductionFromAnswerStageDataOfSmallError params strategy eps delta gamma k
+        hgood hsmall answerRestrict answerInduction answerSelf hk_pred
+  · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
+      (le_of_not_gt hsmall)
 
 /-- Small-error branch of the native successor step for `thm:main-induction`.
 
