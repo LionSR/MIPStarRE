@@ -335,6 +335,10 @@
 \end{proof}
 
 \begin{definition}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
+	\leanok
 	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
 	The Lean declaration
 	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
@@ -345,6 +349,11 @@
 	\(Q/X/\widehat X/P\) construction in its heterogeneous left-register form.
 	Lemma~\ref{lem:orthonormalization-main-lemma-formalized-envelope} remains as
 	the same-space corollary with the weaker public \(100\zeta^{1/4}\) envelope.
+	The measurement-level declarations
+	\texttt{orthonormalizationMeasurement\_of\_consistency} and
+	\texttt{orthonormalizationMeasurement} are proved corollaries, not
+	conditional wrappers: they derive the projective submeasurement from the
+	displayed consistency or self-consistency hypotheses.
 \end{definition}
 
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
@@ -399,52 +408,45 @@
 	added to the paper lemma.
 \end{definition}
 
-\begin{definition}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
+\begin{definition}[Lean consistency declaration: measurement-level orthogonalization]\label{rem:orthonormalization-main-lemma-local}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency}
+	\leanok
 	\uses{def:strong-self-consistency, def:approx_delta, lem:orthonormalization-main-lemma}
-	This is the local Lean declaration recorded in
-	Remark~\ref{rem:lean-orthonormalization-main-declarations}.
-	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
-	let $0 \leq \zeta \leq 1$. Assume bipartite strong self-consistency
+	This is the same-space measurement corollary recorded in
+	Remark~\ref{rem:lean-orthonormalization-main-declarations}.  Let
+	\(\ket{\psi}\) be a normalized bipartite state, let \(A=\{A_a\}\) and
+	\(B=\{B_a\}\) be measurements on the same finite-dimensional space, and
+	let \(0 \leq \zeta\).  Assume the bipartite consistency estimate
 	\[
-		\sum_a \bra{\psi} A_a \ot A_a \ket{\psi}
-		\geq
-		\sum_a \bra{\psi} A_a \ot I \ket{\psi} - \zeta,
+		A_a \ot I \simeq_{\zeta} I \ot B_a .
 	\]
-	together with a spectral-truncation witness for the left-lifted family
-	$\{A_a \ot I\}$ and a locality-preserving repair witness producing
-	projective families of the form $\widehat P_a = P_a \ot I$. Then there
-	exists a projective sub-measurement $P = \{P_a\}$ on the same space as
-	$A$ such that
+	Then there exists a projective sub-measurement \(P=\{P_a\}\) such that
 	\[
-		A_a \ot I \approx_{84 \zeta^{1/4}} P_a \ot I.
+		A_a \ot I \approx_{100\zeta^{1/4}} P_a \ot I .
 	\]
-	Since $A$ is a measurement, $\sum_a A_a = I$, so bipartite strong
-	self-consistency of $A$ with itself is equivalent to bipartite consistency
-	of $A$ with itself. Feed this consistency hypothesis, together with the
-	spectral-truncation and locality-preserving repair witnesses, into the
-	measurement variant of \ref{lem:orthonormalization-main-lemma} with
-	$B = A$. The repair witness chooses the repaired family of the form
-	$P_a \ot I$, so the conclusion descends to a local projective
-	sub-measurement $P = \{P_a\}$ on the space of $A$ with error bound
-	$84\zeta^{1/4}$.
+	The proof applies Lemma~\ref{lem:orthonormalization-main-lemma} and weakens
+	the \(84\zeta^{1/4}\) estimate to the public orthonormalization envelope.
+	The spectral-truncation and locality-preserving repair steps are internal to
+	that proof; they are not hypotheses of this declaration.
 \end{definition}
 
-\begin{definition}[Lean conditional declaration: measurement-level orthogonalization]\label{rem:conditional-orthonormalization-measurement}
+\begin{definition}[Lean self-consistency declaration: measurement-level orthogonalization]\label{rem:orthonormalization-measurement}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
+	\leanok
 	\uses{def:strong-self-consistency, def:approx_delta}
-	This is the measurement-level Lean declaration recorded in
-	Remark~\ref{rem:lean-orthonormalization-main-declarations}.
-	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
-	let $0 \leq \zeta \leq 1$. Assume bipartite strong self-consistency of $A$
-	together with the spectral-truncation and locality-preserving repair
-	witnesses for the left-lifted family $\{A_a \ot I\}$. Then there exists a
-	projective sub-measurement $P = \{P_a\}$ such that
+	This is the self-consistency specialization of
+	Remark~\ref{rem:orthonormalization-main-lemma-local}.  Let \(\ket{\psi}\)
+	be a normalized bipartite state, let \(A=\{A_a\}\) be a measurement, and
+	let \(0\leq\zeta\).  If \(A\) is bipartite strongly self-consistent with
+	error \(\zeta\), then there exists a projective sub-measurement
+	\(P=\{P_a\}\) such that
 	\[
 		A_a \ot I \approx_{100 \zeta^{1/4}} P_a \ot I.
 	\]
-	Using the bound stated in
-	Remark~\ref{rem:conditional-orthonormalization-main-lemma-local}, weaken the
-	error using $84 \leq 100$ and $\zeta^{1/4} \geq 0$. No completion step is
-	needed because $A$ is already a measurement.
+	Since \(A\) is complete, the self-consistency defect is the consistency
+	defect of \(A\) with itself.  The proof therefore applies the consistency
+	corollary with \(B=A\).  No spectral-truncation witness or repair witness is
+	assumed at this interface.
 \end{definition}
 
 \begin{definition}[Lean completion-route orthonormalization]\label{rem:orthonormalization-completion-route}
