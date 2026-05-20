@@ -70,6 +70,7 @@ _TEX_ENV_END_RE = re.compile(
 )
 _TEX_PROOF_BEGIN_RE = re.compile(r"\\begin\{proof\}")
 _TEX_PROOF_END_RE = re.compile(r"\\end\{proof\}")
+_TEX_PROVES_RE = re.compile(r"\\proves\{([^}]+)\}")
 
 def strip_lean_comments_preserve_lines(text: str) -> list[str]:
     """Strip Lean line and block comments while preserving line numbers."""
@@ -334,6 +335,7 @@ class ProofFrame:
     attach_entry_start: int | None
     attach_entry_end: int | None
     has_leanok: bool = False
+    proves_label: str | None = None
 
 
 def _set_proof_has_leanok(entries: list[BlueprintEntry], start: int, end: int) -> None:
@@ -498,6 +500,7 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
         env_stack: list[dict] = []
         proof_stack: list[ProofFrame] = []
         last_env: dict | None = None  # last closed environment with \lean{} refs
+        label_entry_ranges: dict[str, tuple[int, int]] = {}
 
         for i, raw_line in enumerate(lines, 1):
             line = _strip_tex_comment(raw_line)
@@ -539,6 +542,8 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
                     ))
                 env["_entry_start"] = env_entry_start
                 env["_entry_end"] = len(entries)
+                if env.get("label") and env_entry_start < len(entries):
+                    label_entry_ranges[env["label"]] = (env_entry_start, len(entries))
                 # Only track as last_env if it produced lean entries, so an
                 # intervening remark without \lean{} doesn't steal the proof.
                 if env_entry_start < len(entries):
@@ -577,21 +582,37 @@ def collect_blueprint_entries(blueprint_src: Path) -> list[BlueprintEntry]:
                 proof_stack[-1].has_leanok = True
                 continue
 
+            # A proof block may be separated from the statement that it proves.
+            # In that case leanblueprint records the target with \proves{label};
+            # credit the proof-level \leanok to that labelled environment rather
+            # than to the most recently closed environment.
+            if proof_stack:
+                proves_match = _TEX_PROVES_RE.search(line)
+                if proves_match:
+                    proof_stack[-1].proves_label = proves_match.group(1)
+                    continue
+
             # Proof end
             m = _TEX_PROOF_END_RE.search(line)
             if m and proof_stack:
                 current_proof = proof_stack.pop()
                 # Attach proof leanok to the environment that was current when
                 # this proof opened, not whichever one closed most recently.
+                attach_entry_start = current_proof.attach_entry_start
+                attach_entry_end = current_proof.attach_entry_end
+                if current_proof.proves_label in label_entry_ranges:
+                    attach_entry_start, attach_entry_end = label_entry_ranges[
+                        current_proof.proves_label
+                    ]
                 if (
                     current_proof.has_leanok
-                    and current_proof.attach_entry_start is not None
-                    and current_proof.attach_entry_end is not None
+                    and attach_entry_start is not None
+                    and attach_entry_end is not None
                 ):
                     _set_proof_has_leanok(
                         entries,
-                        current_proof.attach_entry_start,
-                        current_proof.attach_entry_end,
+                        attach_entry_start,
+                        attach_entry_end,
                     )
                 continue
 

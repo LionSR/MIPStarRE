@@ -75,16 +75,10 @@ jobs:
           build: true
 
       - name: Install TeX and graphviz
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            texlive-xetex \
-            texlive-latex-extra \
-            texlive-fonts-recommended \
-            texlive-science \
-            latexmk \
-            graphviz \
-            libgraphviz-dev
+        uses: ./.github/actions/setup-blueprint-system-deps
+        with:
+          cache-suffix: pdf-v1
+          extra-packages: texlive-xetex texlive-science latexmk
 
       - name: Install leanblueprint
         run: |
