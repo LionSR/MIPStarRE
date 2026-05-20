@@ -69,27 +69,6 @@
 	\texttt{docs/paper-gaps/naimark.tex}.
 \end{definition}
 
-\begin{proposition}[Lean questionwise Naimark wrapper]\label{prop:lean-questionwise-naimark}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark}
-	\leanok
-	\uses{lem:naimark-helper}
-	The Lean theorem
-	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark}
-	constructs, for each question on Alice's and Bob's sides, local
-	one-measurement Naimark dilation data.  The resulting structure
-	\texttt{NaimarkStatement} records the source submeasurements and the
-	single-outcome marginal-preservation identities.  It is a Lean-only
-	restricted interface, not the simultaneous tensor-product correlation
-	statement of Theorem~\ref{thm:naimark}.
-\end{proposition}
-\begin{proof}
-	\leanok
-	The proof applies Lemma~\ref{lem:naimark-helper} separately to every
-	question on Alice's side and on Bob's side, then packages the resulting
-	source and marginal-preservation identities into \texttt{NaimarkStatement}.
-\end{proof}
-
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
 	\leanok
@@ -352,7 +331,8 @@
 	\(100\zeta^{1/4}\) envelope.
 \end{proof}
 
-\begin{remark}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
+\begin{definition}[Lean auxiliary declarations for the orthogonalization lemma]\label{rem:lean-orthonormalization-main-declarations}
+	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
 	The Lean declaration
 	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
 	proves Lemma~\ref{lem:orthonormalization-main-lemma} without adding
@@ -362,7 +342,7 @@
 	\(Q/X/\widehat X/P\) construction in its heterogeneous left-register form.
 	Lemma~\ref{lem:orthonormalization-main-lemma-formalized-envelope} remains as
 	the same-space corollary with the weaker public \(100\zeta^{1/4}\) envelope.
-\end{remark}
+\end{definition}
 
 \begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepair}
@@ -416,7 +396,8 @@
 	added to the paper lemma.
 \end{definition}
 
-\begin{remark}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
+\begin{definition}[Lean conditional declaration: local orthogonalization]\label{rem:conditional-orthonormalization-main-lemma-local}
+	\uses{def:strong-self-consistency, def:approx_delta, lem:orthonormalization-main-lemma}
 	This is the local Lean declaration recorded in
 	Remark~\ref{rem:lean-orthonormalization-main-declarations}.
 	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
@@ -443,9 +424,10 @@
 	$P_a \ot I$, so the conclusion descends to a local projective
 	sub-measurement $P = \{P_a\}$ on the space of $A$ with error bound
 	$84\zeta^{1/4}$.
-\end{remark}
+\end{definition}
 
-\begin{remark}[Lean conditional declaration: measurement-level orthogonalization]\label{rem:conditional-orthonormalization-measurement}
+\begin{definition}[Lean conditional declaration: measurement-level orthogonalization]\label{rem:conditional-orthonormalization-measurement}
+	\uses{def:strong-self-consistency, def:approx_delta}
 	This is the measurement-level Lean declaration recorded in
 	Remark~\ref{rem:lean-orthonormalization-main-declarations}.
 	Let $\ket{\psi}$ be a unit vector, let $A = \{A_a\}$ be a measurement, and
@@ -460,9 +442,13 @@
 	Remark~\ref{rem:conditional-orthonormalization-main-lemma-local}, weaken the
 	error using $84 \leq 100$ and $\zeta^{1/4} \geq 0$. No completion step is
 	needed because $A$ is already a measurement.
-\end{remark}
+\end{definition}
 
-\begin{remark}[Lean completion-route orthonormalization]\label{rem:orthonormalization-completion-route}
+\begin{definition}[Lean completion-route orthonormalization]\label{rem:orthonormalization-completion-route}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}
+	\leanok
+	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
+
 	The paper theorem \ref{thm:orthonormalization} is proved in Lean with the
 	\(100\zeta^{1/4}\) constant.  The declaration checked here is the
 	completion-route theorem with the weaker bound
@@ -503,11 +489,10 @@
 		A_a \ot I \approx_{84(4\zeta)^{1/4}} P_a \ot I,
 	\]
 	and \(84 \cdot 4^{1/4} \leq 120\), so the completion-route bound follows.
-\end{remark}
+\end{definition}
 
 \begin{proof}[Proof of \ref{lem:orthonormalization-main-lemma}]
 	\proves{lem:orthonormalization-main-lemma}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
 	\leanok
 	\uses{prop:simeq-for-measurements, lem:projective-non-measurement, lem:projective-low-rank-sum, lem:Q-completeness, lem:sqrt-Q-completeness, lem:q-almost-projective, lem:xa-t, lem:qa-restated, lem:X-squared, lem:X-expression-to-Q-expression, lem:pa-restated, lem:X-hat-squared, lem:X-times-X-hat, lem:squared-difference, lem:P-projectivity, lem:P-Q-approx, prop:triangle-inequality-for-approx_delta}
 	The statement is trivial when $\zeta > 1/4$, so assume

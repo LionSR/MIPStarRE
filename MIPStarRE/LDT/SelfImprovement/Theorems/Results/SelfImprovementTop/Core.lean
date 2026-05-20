@@ -91,7 +91,7 @@ lemma selfImprovementHelperConstruction
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusion params strategy T H Z eps delta := by
-  obtain ⟨Tsub, Z, hsdp⟩ := (sdp params strategy).witness
+  obtain ⟨Tsub, Z, hsdp⟩ := (sdp (ι := ι) params strategy).witness
   let T : Measurement (Polynomial params) ι :=
     { toSubMeas := Tsub
       total_eq_one := hsdp.primalTotalOperator }
@@ -103,7 +103,7 @@ lemma selfImprovementHelperConstruction
       averagedConstruction := rfl
       addInUVarianceBound := ?_ }
   · simpa [T] using hsdp
-  · exact addInU params strategy eps delta gamma hgood T
+  · exact addInU (ι := ι) params strategy eps delta gamma hgood T
 
 /-- Conditional form of the helper lemma from a slackness-carrying SDP
 conclusion.
@@ -141,7 +141,7 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
         averagedConstruction := rfl
         addInUVarianceBound := ?_ }
     · simpa [T] using hsdpPair.toSdpOptimalPair
-    · exact addInU params strategy eps delta gamma hgood T
+    · exact addInU (ι := ι) params strategy eps delta gamma hgood T
   · intro g
     simpa [T] using hsdpPair.complementarySlackness g
 
@@ -151,8 +151,8 @@ slackness.
 This is the slackness-carrying companion to `selfImprovementHelperConstruction`:
 it applies the Section 9 statement `sdp_statement_with_slackness`, which records
 the strong-duality conclusion with complementary slackness.  The construction
-lemma remains separate, because its reduced `sdp` input intentionally carries
-only the measurement-total and dual-feasibility fragment. -/
+lemma remains separate from `selfImprovementHelperConstruction`, whose reduced
+`sdp` input records only the feasibility fragment. -/
 lemma self_improvement_helper_with_slackness
     (params : Parameters)
     [FieldModel params.q]
@@ -165,7 +165,8 @@ lemma self_improvement_helper_with_slackness
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta :=
   self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
-    params strategy eps delta gamma (sdp_statement_with_slackness params strategy)
+    params strategy eps delta gamma
+    (sdp_statement_with_slackness (ι := ι) params strategy)
     hgood nu G
 
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:24-60`
@@ -207,7 +208,7 @@ lemma selfImprovementHelper
       simpa [SymStrat.selfConsistencyFailureProbability] using
         hgood.selfConsistencyTest⟩
   have haddInUFull : AddInUFullStatement params strategy T eps delta :=
-    addInUFullStatement_of_isGood params strategy eps delta gamma hgood T
+    addInUFullStatement_of_isGood (ι := ι) params strategy eps delta gamma hgood T
   have hpointTransfer :
       |addInULeftQuantity params strategy
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -389,8 +390,7 @@ strategy condition as a standing hypothesis for the self-improvement section
 here as the explicit hypothesis `hgood`. The source-facing theorem remains
 visible with the paper statement; any remaining missing derivation is lowered to
 internal obligations rather than hidden in a conditional theorem with extra
-obligation hypotheses.
--/
+obligation hypotheses. -/
 theorem selfImprovement
     (params : Parameters)
     [FieldModel params.q]
@@ -427,7 +427,7 @@ theorem selfImprovement
             simpa [SymStrat.selfConsistencyFailureProbability] using
               hgood.selfConsistencyTest⟩
         have haddInUFull : AddInUFullStatement params strategy T eps delta :=
-          addInUFullStatement_of_isGood params strategy eps delta gamma hgood T
+          addInUFullStatement_of_isGood (ι := ι) params strategy eps delta gamma hgood T
         have htransfer :
             |addInULeftQuantity params strategy
                 (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -620,16 +620,6 @@ theorem selfImprovement
             ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
             ((polynomialEvaluationFamily params Hhat).liftLeft)
             (selfImprovementDataProcessingError params eps delta) hdataRev
-        have htotalAbsorb :
-            selfImprovementHelperError params eps delta +
-                Real.sqrt (selfImprovementDataProcessingError params eps delta) +
-                (selfImprovementHelperError params eps delta +
-                  2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta)) ≤
-              selfImprovementError params eps delta := by
-          have hbase :=
-            final_fields_point_consistency_total_difference_error_le_selfImprovementError
-              params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q
-          nlinarith
         have hfinal : SelfImprovementFinalFields params strategy H Z eps delta nu :=
           final_fields_of_helper_outputs_of_total_difference
             params strategy eps delta nu
@@ -637,7 +627,12 @@ theorem selfImprovement
               2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta))
             heps heps_le_one hdelta hdelta_le_one hd_le_q
             hhelper hhelperCompleteness hhelperSSC hpointSSC hslack htransfer
-            horth hdata hTotalDiff htotalAbsorb
+            horth hdata hTotalDiff
+            (by
+              have hbase :=
+                final_fields_point_consistency_total_difference_error_le_selfImprovementError
+                  params eps delta heps heps_le_one hdelta hdelta_le_one hd_le_q
+              nlinarith)
         exact ⟨H, Z,
           { completeness := hfinal.completeness
             pointConsistency := hfinal.pointConsistency

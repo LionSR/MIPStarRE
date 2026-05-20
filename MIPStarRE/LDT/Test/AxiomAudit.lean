@@ -108,12 +108,14 @@ private def expectedOrthonormalizationAxioms : Array Name :=
   expectedStandardAxioms
 
 /-- Standard kernel axioms only: the issue #1230 SDP slackness dependency used
-by `selfImprovement` has been discharged. -/
+by `selfImprovement` has been discharged, and the issue #1642 operator-total
+frontier is not on the public theorem's proof path. -/
 private def expectedSelfImprovementAxioms : Array Name :=
   expectedStandardAxioms
 
 /-- Standard kernel axioms only: the issue #1230 SDP slackness dependency used
-by `selfImprovementInInductionSection` has been discharged. -/
+by `selfImprovementInInductionSection` has been discharged, and it does not
+inherit the issue #1642 operator-total frontier. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
   expectedStandardAxioms
 
