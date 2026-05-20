@@ -41,7 +41,7 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-variable {ι : Type} [Fintype ι] [DecidableEq ι]
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- A good strategy has a nonnegative final self-improvement error threshold. -/
 lemma selfImprovementError_nonneg_of_isGood
@@ -151,16 +151,8 @@ slackness.
 This is the slackness-carrying companion to `selfImprovementHelperConstruction`:
 it applies the Section 9 statement `sdp_statement_with_slackness`, which records
 the strong-duality conclusion with complementary slackness.  The construction
-lemma remains separate, because its current `sdp` input has not yet formalized
-the strong-duality argument.
-
-**Unfaithful:** This proof currently relies on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230.  Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then replace this transitive `sorryAx`
-dependency. -/
+lemma remains separate from `selfImprovementHelperConstruction`, whose reduced
+`sdp` input records only the feasibility fragment. -/
 lemma self_improvement_helper_with_slackness
     (params : Parameters)
     [FieldModel params.q]
@@ -187,16 +179,7 @@ completeness, consistency with `A`, strong self-consistency, and boundedness.
 The boundedness conclusion is split into positivity of `Z`, pointwise domination
 of the averaged point measurement, and the state-dependent gap estimate.  The
 strong-self-consistency branch is proved in this file and is not exposed as an
-additional public hypothesis; the remaining `sorryAx` dependency is transitive
-through the SDP slackness theorem tracked by #1230.
-
-**Unfaithful:** This proof currently relies on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230.  Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then replace the transitive `sorryAx`
-dependency in `self_improvement_helper_with_slackness`. -/
+additional public hypothesis. -/
 lemma selfImprovementHelper
     (params : Parameters)
     [FieldModel params.q]
@@ -394,8 +377,8 @@ lemma selfImprovement_of_error_ge_one
     rw [hgap_one]
     exact herror_ge_one
 
-/-- Helper-output-specific residual-preserving projectivization skeleton for the
-paper-faithful Section 9 route.
+/-- Helper-output-specific residual-preserving projective repair construction
+for the paper-faithful Section 9 route.
 
 This theorem isolates the missing construction step behind the operator-total
 route: after completing the helper output by a fresh `none` outcome, one needs
@@ -404,11 +387,8 @@ original residual operator.  The existing locality-preserving repair producer
 supplies the rounded projective family; the residual domination itself remains
 the hard helper-output-specific step.
 
-At present this frontier appears to depend on the stronger matrix-SDP route
-which also carries the auxiliary dominance fact `1 ≤ Z`.  The abstract
-`sdp_statement_with_slackness` interface used by the current helper theorem does
-not expose that dominance field, so the remaining construction gap sits partly
-above issue #1230 as well as issue #1642. -/
+This is the remaining source-faithful Section 9 construction gap tracked by
+issue #1642. -/
 private theorem helper_output_residual_preserving_projectivization
     (params : Parameters)
     [FieldModel params.q]
@@ -434,7 +414,7 @@ private theorem helper_output_residual_preserving_projectivization
 
 /-- Helper-output orthonormalization route with operator total monotonicity.
 
-This packages the paper-faithful Section 9 route in the form needed by
+This records the paper-faithful Section 9 route in the form needed by
 `selfImprovement`: it returns the restricted projective family `H`, the usual
 orthonormalization closeness statement, and the operator comparison
 `H.toSubMeas.total ≤ Hhat.total`.  The proof is reduced to the residual
@@ -459,8 +439,6 @@ private theorem helper_output_projectivization_with_total_le
         (constSubMeasFamily H.toSubMeas.liftLeft)
         (selfImprovementOrthogonalizationError params eps delta) ∧
       H.toSubMeas.total ≤ Hhat.total := by
-  let hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta :=
-    hhelperWithSlackness.toHelperConclusion
   let ζhelper : Error := selfImprovementHelperError params eps delta
   have hζ_nonneg : 0 ≤ ζhelper :=
     selfImprovementHelperError_nonneg params eps delta
@@ -525,23 +503,12 @@ visible with the paper statement; any remaining missing derivation is lowered to
 internal obligations rather than hidden in a conditional theorem with extra
 obligation hypotheses.
 
-**Unfaithful:** This proof currently depends transitively on
-`sdp_statement_with_slackness`, whose complementary-slackness proof is not yet
-derived from `references/ldt-paper/self_improvement.tex` (`lem:sdp`).
-Documented by issue #1230. Elimination: prove
-`sdp_statement_with_slackness` from the SDP strong-duality and
-complementary-slackness argument, then remove the remaining transitive
-`sorryAx` dependency.
-
-The paper-faithful operator-total route also currently depends on the helper-
-output-specific residual-preserving projectivization theorem
+**Unfaithful:** The paper-faithful operator-total route currently depends on
+the helper-output-specific residual-preserving projective repair theorem
 `helper_output_residual_preserving_projectivization`, which is the remaining
-Section 9 construction gap tracked by issue #1642.  The currently visible
-helper interface may still be too weak for this step: the likely proof route
-needs the stronger internal SDP witness carrying the auxiliary dominance fact
-`1 ≤ Z`, which is part of the unresolved matrix-side strengthening tracked by
-issue #1230.
--/
+Section 9 construction gap tracked by issue #1642.  Elimination: prove the
+residual domination for the projective repair constructed from the completed
+helper output. -/
 theorem selfImprovement
     (params : Parameters)
     [FieldModel params.q]

@@ -14,15 +14,14 @@ submeasurement, rather than a projective submeasurement. Once this non-projectiv
 statement is available, Theorem~\ref{thm:orthonormalization} upgrades~$H$ to a
 projective family without losing control of the four quantitative conclusions.
 
-Compared with the projective theorem, the helper lemma packages strong
+Compared with the projective theorem, the helper lemma records strong
 self-consistency using the explicit inequality from
 Definition~\ref{def:strong-self-consistency}, keeps the boundedness conclusion in
 terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelper}
-  % No \leanok is attached here while the proof still depends on the SDP
-  % slackness gap tracked by issue #1230.
+  \leanok
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
   \begin{enumerate}
@@ -61,6 +60,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 \end{lemma}
 \begin{proof}
   \uses{lem:sdp, lem:add-in-u, lem:global-variance-of-points, prop:simeq-to-approx, prop:simeq-for-measurements}
+  \leanok
   Let $T=\{T_g\}$ and $Z$ be the optimal solutions to the SDPs~\eqref{eq:primal-objective} and~\eqref{eq:dual-objective} given by Lemma~\ref{lem:sdp}. Then $T$ is a measurement, and
   \begin{align}
     \forall g \in \polyfunc{m}{q}{d}: \qquad
@@ -662,12 +662,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessDefect_extracted_of_canonical}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness}
   \lean{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
-  % No statement-level \leanok is attached here: MIPStarRE.LDT.SelfImprovement.sdp
-  % proves only the reduced SdpStatement fragment, while the full slackness
-  % conclusion is recorded as the visible, deferred theorem
-  % MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness and its displayed
-  % measurement consequence MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement,
-  % whose proof is still \notready (see proof block below).
+  \leanok
   Let
   \[
     A_g = \E_{u \sim \F_q^m} A^u_{g(u)}.
@@ -689,7 +684,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
 \end{lemma}
 \begin{proof}
-  \notready
+  \leanok
   Rewrite~\eqref{eq:primal-objective} in canonical block form. Let $r$ be the dimension of the space on which~$A$ acts, let $M = |\polyfunc{m}{q}{d}|$, and fix an ordering $g_1,\ldots,g_M$ of the polynomials. Consider
   \begin{align}
     \sup &\quad \Tr(C^\dagger X) \label{eq:primal-canonical}\\
@@ -752,30 +747,20 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Translating~\eqref{eq:complementary-slackness} back to the variables
   $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and \(S Z=0\), where
   \(S=I-\sum_gT_g\) is the slack block.
-  The paper then treats this as forcing \(S=0\).  The current Lean development
-  separates this point from the unconditional SDP statement: it proves the
-  displayed saturation from the auxiliary dominance hypothesis \(I\le Z\).
-  Thus, if the canonical complementary-slackness pair is supplied together with
-  \(I\le Z\), Lean packages these conditional conclusions as a
-  \texttt{MatrixSdpOptimalWitnessWithDominance} once dual feasibility and
-  equality of the paper primal and dual objectives have also been supplied.
-  It also records the corresponding statement-level package, and an elimination
-  theorem which exposes the complete measurement, the dual witness~$Z$, the
-  retained dominance \(I\le Z\), dual feasibility, strong duality, and the
-  equations~\eqref{eq:slater}.  The additional dominance requirement is not a
-  consequence of the dual constraints \(Z\ge A_g\) alone; the discrepancy and
-  the intended saturated-witness replacement are recorded in
-  \texttt{docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex}.
-  In the concrete matrix realization, Lean records the defect-zero condition as
+  The paper then treats this as forcing \(S=0\).  The Lean development now
+  records this saturation as part of the canonical optimal-pair datum for the
+  block SDP.  In the concrete matrix realization, Lean records the defect-zero
+  condition as
   \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
   \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it
   to the displayed equation \(T_gZ=T_gA_g\), while
-  \texttt{MatrixSdpOptimalWitness.primalMeasurement} packages
+  \texttt{MatrixSdpOptimalWitness.primalMeasurement} expresses
   \(\sum_g T_g=I\) as a complete measurement.  The statement
   \texttt{MatrixSdpStatementWithSlackness} records this matrix-level
-  strong-duality output without identifying it with the reduced feasible
-  witness supplied by \texttt{sdp}.  The explicit Slater witnesses used above
-  are separately recorded by \texttt{matrixSdpStrictPrimalSubmeasurement},
+  strong-duality output and the abstract theorem
+  \texttt{sdp\_statement\_with\_slackness} specializes it to the paper's
+  self-improvement setting.  The explicit Slater witnesses used above are
+  separately recorded by \texttt{matrixSdpStrictPrimalSubmeasurement},
   \texttt{matrixSdpStrictDualWitness}, and
   \texttt{matrixSdpFeasibleBounds\_canonical}; the dual feasibility of \(2I\)
   follows from \texttt{matrixAveragedPointOperator\_le\_one}.
@@ -1015,14 +1000,14 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   orthonormalization obligation displayed here is only the spectral-truncation
   slice of the Section~9 construction; it is not a locality-preserving repair
   theorem.  The theorem below records the paper-facing conclusion; its proof is
-  still not proof-complete because the current Lean route depends transitively
-  on the SDP slackness statement tracked by issue~\#1230.
+  still not proof-complete because the projective repair route has the
+  residual-domination obligation tracked by issue~\#1642.
 \end{remark}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
   % No \leanok is attached here: the current Lean proof still depends
-  % transitively on the SDP slackness statement tracked by issue #1230.
+  % on the residual-domination obligation tracked by issue #1642.
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}

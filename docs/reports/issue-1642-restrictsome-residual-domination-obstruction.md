@@ -66,7 +66,7 @@ The current formal development establishes the following.
    `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities/ProjectorApprox.lean`,
    the theorem
    `pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry`
-   packages the extra hypothesis needed to deduce `Q_none ≤ P_none`, namely the
+   records the extra hypothesis needed to deduce `Q_none ≤ P_none`, namely the
    coisometry of the sigma-space embedding.  This theorem itself requires the
    subnormalization input `∑ q_a ≤ 1`, which is stronger than the current
    `RankReductionWitness.total_le` bound.
@@ -177,10 +177,10 @@ is specialized.
    stronger SDP witness carrying the auxiliary dominance fact \(I \le Z\).
    The matrix-side bridge files already contain conditional theorems of that
    shape, but the abstract `sdp_statement_with_slackness` interface used by the
-   current helper theorem does not expose the dominance field.  Consequently the
-   unresolved frontier is not purely a Section~5 projectivization problem; it
-   also depends on the older Section~9 SDP strengthening tracked by issue
-   `#1230`.
+   current helper theorem does not expose the dominance field.  The SDP
+   slackness theorem itself has since been discharged; the remaining frontier is
+   therefore the helper-output-specific residual domination needed by issue
+   `#1642`, not the former SDP slackness obligation.
 
 ---
 
