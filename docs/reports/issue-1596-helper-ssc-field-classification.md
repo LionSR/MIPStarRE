@@ -80,6 +80,7 @@ No source-labelled theorem currently exposes this record as a non-paper
 hypothesis.  No blueprint proof-level `\leanok` overclaim is associated with
 this obligation record.  The remaining work under #1596 should therefore move
 away from this record and toward the other open bundle sites: residual
-domination in `RestrictSome`, the remaining `SpectralTruncationInput` consumer
-rewire tracked by #1435, and any projectivization boundary that still appears
-as a live construction hypothesis.
+domination in `RestrictSome` and any projectivization boundary that still
+appears as a live construction hypothesis.  The former
+`SpectralTruncationInput` consumer rewire has been completed by replacing the
+wrapper with direct `SpectralTruncationStatement` construction theorems.

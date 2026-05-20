@@ -280,18 +280,6 @@ structure SpectralTruncationStatement {Outcome : Type*}
     roundedFamily.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
 
-/-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-531`
-(`\label{lem:projective-non-measurement}`).
-
-Explicit input exposing the paper's truncation-function stage. -/
-abbrev SpectralTruncationInput {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :=
-  ψ.IsNormalized →
-    (∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) →
-      SpectralTruncationStatement ψ A ζ
-
 /-- Paper origin: `references/ldt-paper/orthonormalization.tex:414-538`
 (`\label{lem:projective-non-measurement}`).
 

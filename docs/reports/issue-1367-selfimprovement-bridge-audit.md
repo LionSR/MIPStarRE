@@ -161,18 +161,21 @@ In the audited snapshot, `OrthonormalizationInput` was an `abbrev` that mapped
 `BipartiteSSCRel` to `MakingMeasurementsProjective.OrthonormalizationInput`.
 The latter had two sub-fields:
 
-1. **`spectral`** (`SpectralTruncationInput`): **PROVED** via `spectralTruncationInput_of_sourceAlmostProjective` in `ProjectiveNonMeasurement.lean:749`
+1. **`spectral`** (former `SpectralTruncationInput`): **PROVED** via
+   `spectralTruncationStatement_of_sourceAlmostProjective` in
+   `ProjectiveNonMeasurement.lean`
 2. **`repair`** (`LeftLiftedProjectivizationRepairInput`): **HYPOTHESIS** — requires QXP-layer data (`QXPLayerData` with a projective `P` family rounding-close to the source submeasurement)
 
 Bridge constructors:
 - Former `orthonormalizationSpectralObligation_of_sourceAlmostProjective`: **RETIRED**; its
-  proof content is the direct construction `spectralTruncationInput_of_sourceAlmostProjective`.
+  proof content is the direct construction
+  `spectralTruncationStatement_of_sourceAlmostProjective`.
 - `OrthonormalizationRepairObligation` (line 129-139): **HYPOTHESIS** — defined as a type `∀ Hhat, BipartiteSSCRel ... → LeftLiftedProjectivizationRepairInput ... (optionCompletion Hhat)`
 - `orthonormalizationInput_of_obligations` (line 684): Combines spectral + repair → full input
 
 **Current status:** the full input bundle and the old bridge module have been
 removed.  The spectral conversion is retained directly as
-`spectralTruncationInput_of_sourceAlmostProjective`.  The locality-preserving
+`spectralTruncationStatement_of_sourceAlmostProjective`.  The locality-preserving
 QXP repair construction from Sections 5.8-5.10 remains tracked by #1032 and
 should be proved directly, not supplied as a theorem hypothesis.
 
@@ -470,8 +473,8 @@ hypotheses.
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean` | `helperStrongSelfConsistency` conditional obligation |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationBridge.lean` | Spectral obligation (proved), repair obligation (hypothesis) |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/FinalFields.lean` | `finalFields` conditional obligation |
-| `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean` | `MMProj.OrthonormalizationInput`, `SpectralTruncationInput`, `LeftLiftedProjectivizationRepairInput` |
-| `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` | `spectralTruncationInput_of_sourceAlmostProjective` (PROVED) |
+| `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean` | Former `MMProj.OrthonormalizationInput`, `SpectralTruncationInput`, and `LeftLiftedProjectivizationRepairInput` wrappers |
+| `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` | `spectralTruncationStatement_of_sourceAlmostProjective` (PROVED) |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean` | `SelfImprovementData.SliceObligations`, `ofSliceObligations`, `selfImprovementInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/AnswerSlice.lean` | `AnswerSelfImprovementData.SliceObligations` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionByRecursionOnM` |

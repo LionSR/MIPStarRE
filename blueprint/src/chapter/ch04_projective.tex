@@ -613,8 +613,8 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveNonMeasurement_of_almostProjMeasStatement_full}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncationStatement.toRoundingToProjectorsWitness}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_projectiveNonMeasurement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationInput_of_sourceAlmostProjective}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationStatement_of_projectiveNonMeasurement}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.spectralTruncationStatement_of_sourceAlmostProjective}
 		\leanok
 		The source-facing Lean declarations for
 		Lemma~\ref{lem:projective-non-measurement} are the proposition
@@ -622,7 +622,7 @@
 		\texttt{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full}.
 		The declarations listed here are the endpoint and regime splits, the
 		\texttt{AlmostProjMeasStatement} witness forms, and the spectral-truncation
-		input conversions used by later Section~5 arguments.  They are not additional
+		statement conversions used by later Section~5 arguments.  They are not additional
 		hypotheses in the paper statement of
 		Lemma~\ref{lem:projective-non-measurement}.
 	\end{definition}
@@ -690,7 +690,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_projectors}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_rank_bound}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationStatement}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationInput}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.projectiveLowRankSum_truncate}
 		Let $\{R_a\}$ be given by \ref{lem:projective-non-measurement}. Write $r_a=\mathrm{rank}(R_a)$ and $r=\sum_a r_a$. If $r \leq d$, take $Q_a=R_a$. Otherwise,
 		\begin{equation}\label{eq:bound-on-r}

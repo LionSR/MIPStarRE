@@ -808,7 +808,8 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement
 projector witness.
 
 The normalized-state hypothesis is exactly the one already required by the
-spectral-truncation input route. It is used only in the large-error branch. -/
+`spectralTruncationStatement_of_sourceAlmostProjective` route. It is used only
+in the large-error branch. -/
 theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
@@ -819,17 +820,19 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
   projectiveNonMeasurement_of_sourceAlmostProjective_full ψ A ζ hψ
     halmost.sourceAlmostProjective
 
-/-- State the constructive spectral truncation proof directly as the
-`SpectralTruncationInput` consumed by the orthonormalization pipeline.
+/-- Construct the spectral truncation statement from the source almost-projective
+estimate.
 
-This integrates the constructive witness theorem with the
-direct spectral-truncation input used by the later Section 5 construction. -/
-noncomputable def spectralTruncationInput_of_sourceAlmostProjective
+This integrates the constructive witness theorem with the direct
+`SpectralTruncationStatement` used by the later Section 5 construction. -/
+noncomputable def spectralTruncationStatement_of_sourceAlmostProjective
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error) :
-    SpectralTruncationInput ψ A ζ := by
-  intro hψ hsource
+    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
+    (hψ : ψ.IsNormalized)
+    (hsource :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
+    SpectralTruncationStatement ψ A ζ := by
   have hprojective : projectiveNonMeasurement ψ A ζ :=
     projectiveNonMeasurement_of_sourceAlmostProjective_full ψ A ζ hψ hsource
   let R : OpFamily Outcome ι := Classical.choose hprojective

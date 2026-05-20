@@ -19,7 +19,8 @@ Status note, 2026-05-13 after PR #1547 and the follow-up orthonormalization
 cleanup: the residual-domination orthonormalization route and the bundled
 `OrthonormalizationInput` records have also been removed.  A later #1596 cleanup
 retired the temporary spectral-only Section 9 module; the retained proof content
-is the direct construction `spectralTruncationInput_of_sourceAlmostProjective`.
+is the direct construction
+`spectralTruncationStatement_of_sourceAlmostProjective`.
 The locality-preserving repair argument remains a proof gap on the source-facing
 self-improvement theorem, not an extra theorem input.
 
@@ -208,7 +209,7 @@ Section 9 API does not normalize unused proof-debt packages.
 The former `SelfImprovement/Theorems/OrthonormalizationBridge.lean` module has
 since been retired after it was narrowed to a spectral-only module.  Its only
 substantive role was to repackage the already proved
-`spectralTruncationInput_of_sourceAlmostProjective` construction for the
+`spectralTruncationStatement_of_sourceAlmostProjective` construction for the
 option-completed helper measurement.
 
 ### 2.4. Used (NOT orphan)

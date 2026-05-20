@@ -379,22 +379,6 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
             nlinarith [hζ_nonneg]
   · exact sourceAlmostProjective_of_ssc ψ A_lifted _ hsscBound
 
-/-- Apply a supplied spectral-truncation theorem to an almost-projective
-measurement.
-
-The normalization hypothesis remains explicit because the `√ζ`-scale error
-bound is state-dependent. -/
-def spectralTruncateAlmostProjective {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState ι) (hψ : ψ.IsNormalized)
-    (A : Measurement Outcome ι) (ζ : Error) :
-    AlmostProjMeasStatement ψ A ζ →
-      SpectralTruncationInput ψ A ζ →
-      SpectralTruncationStatement ψ A ζ := by
-  intro hAlmost hspectral
-  exact hspectral hψ hAlmost.sourceAlmostProjective
-
 /-- Increase the allowed error bound for a rounded-projective witness. -/
 lemma roundedProjMeasStatement_mono {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

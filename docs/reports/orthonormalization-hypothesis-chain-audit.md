@@ -56,7 +56,7 @@ submeasurement and SDD closeness required by the line-130 construction.
 The former `SelfImprovement.OrthonormalizationInput` bundle has also been
 removed.  The later `OrthonormalizationSpectralObligation` abbreviation has now
 been retired as well: its only substantive content was the unconditional
-construction `spectralTruncationInput_of_sourceAlmostProjective`.  The
+construction `spectralTruncationStatement_of_sourceAlmostProjective`.  The
 locality-preserving repair and final-field arguments are no longer presented as
 bundled theorem inputs; the source-facing self-improvement theorem keeps them
 as tracked proof gaps under #1514 and #1515.

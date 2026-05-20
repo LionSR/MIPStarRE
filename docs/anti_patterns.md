@@ -528,6 +528,11 @@ smuggle, 2 external citation, 1 paper-faithful packaging, 1 dead. Without a live
 ledger, **5 `*Statement` structures landed between 2026-04-18 and 2026-05-08
 without a tracker entry** — the gap this policy fixes.
 
+The Section 5 spectral-truncation chain is now an example of the preferred
+migration: the old `SpectralTruncationInput` abbreviation has been removed, and
+later arguments call direct constructors for `SpectralTruncationStatement`
+instead of carrying an `Input` wrapper.
+
 If you add a new `*Statement`-style structure to this codebase, include a
 def-site docstring with its paper origin (per the "earn your place" policy in
 [#1379]). If no construction theorem exists yet, file a sub-issue in [#1379]

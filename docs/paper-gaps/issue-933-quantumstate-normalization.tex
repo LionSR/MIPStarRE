@@ -17,19 +17,34 @@
 \begin{document}
 \maketitle
 
-\section{The normalization convention in the paper}
+\section{At a glance}
 
 This note concerns the use of normalized quantum states in
 \cite[Section~\emph{Preliminaries}]{Ji2020LowIndividualDegree}, and the
-corresponding state object in the formal development.
-\footnote{The issue record is
-\href{https://github.com/LionSR/MIPStarRE/issues/933}{GitHub issue \#933}.
-The paper passages consulted here are in
+corresponding state object in the formal development.  It is tracked by
+\ghissue{933}.  The paper passages consulted here are in
 \path{references/ldt-paper/preliminaries.tex}: the definition of consistency is
 at lines 255--268, the definition of state-dependent distance is at lines
 348--360, the Cauchy--Schwarz transport proposition is at lines 509--536, the
 switch-sandwich proposition is at lines 748--840, and the completion proposition
-is at lines 1101--1173.}
+is at lines 1101--1173.
+
+\begin{itemize}
+  \item \textbf{Difficulty.}  Low as a statement-alignment issue, but high
+  blast radius if one tried to bundle normalization into the base state type.
+  \item \textbf{Estimated weight.}  A local audit or citation repair is small;
+  a type-level migration would be a major project-wide refactor.
+  \item \textbf{Mathlib/project split.}  Mostly project-local.  Mathlib
+  supplies positive semidefinite matrices, trace, and Cauchy--Schwarz
+  infrastructure, while the project supplies the normalized-trace convention and
+  the LDT expectation notation.
+  \item \textbf{Key mathematical inputs.}  The paper's vector-state notation
+  assumes $\langle\psi,\psi\rangle = 1$; the formal density-matrix object
+  separates positivity from the predicate \leanid{QuantumState.IsNormalized}.
+\end{itemize}
+
+\section{Key theorem forms}
+
 The paper writes the shared state as a vector $|\psi\rangle$. In this
 notation a state is normalized: $\langle\psi,\psi\rangle=1$. This convention
 is used not only in the definitions of consistency and state-dependent distance,
@@ -172,13 +187,13 @@ the scalar marginalization bounds for full slices.
 Fourth, the completion and projectivization chain uses normalization when the
 paper writes that the total mass of a completed measurement is $1$, or when a
 truncation error is stated at the paper's scale. The formal completion theorem,
-the missing-mass estimate, the spectral-truncation input, and the
-orthonormalization theorem all expose the normalized-state hypothesis.
+the missing-mass estimate, the spectral-truncation statement construction, and
+the orthonormalization theorem all expose the normalized-state hypothesis.
 \footnote{See \path{completionMissingMassBound} in
 \path{MIPStarRE/LDT/Preliminaries/SelfConsistency/Core.lean}, lines 66--149;
 \path{completingToMeasurement} in
 \path{MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean}, lines 234--254;
-\path{spectralTruncationInput_of_sourceAlmostProjective} in
+\path{spectralTruncationStatement_of_sourceAlmostProjective} in
 \path{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean};
 \path{leftLiftedProjectivizationRepairProducer} in
 \path{MIPStarRE/LDT/MakingMeasurementsProjective/Producers.lean}; and
@@ -205,13 +220,13 @@ than displaying an additional normalization hypothesis.
 
 The corresponding Lean declarations make the suppressed convention explicit.
 For example, the blueprint statements for the triangle transfer, inner-product
-transport, switch-sandwich lemma, completion theorem, spectral truncation input,
-and orthonormalization theorem all link to declarations whose signatures include
-an explicit normalized-state hypothesis.  Thus the blueprint and Lean are
-compatible, but they place the convention at different levels: the blueprint uses
-the standard mathematical meaning of $|\psi\rangle$ as a normalized state, while
-Lean records the hypothesis as data because its base state type contains all
-positive semidefinite matrices.
+transport, switch-sandwich lemma, completion theorem, spectral truncation
+statement, and orthonormalization theorem all link to declarations whose
+signatures include an explicit normalized-state hypothesis.  Thus the blueprint
+and Lean are compatible, but they place the convention at different levels: the
+blueprint uses the standard mathematical meaning of $|\psi\rangle$ as a
+normalized state, while Lean records the hypothesis as data because its base
+state type contains all positive semidefinite matrices.
 
 This note supplies the missing comparison.  Future blueprint edits should either
 continue to use the paper convention for $|\psi\rangle$, or state explicitly that
@@ -249,6 +264,15 @@ the paper, it should assume that the state is normalized. Future audits should
 look especially for occurrences of $\ev_\rho(I)=1$, scalar conclusions bounded
 by $1$, and square-root transport bounds stated over an arbitrary
 \path{QuantumState} without a normalization hypothesis.
+
+\section{Conclusion}
+
+The normalization hypothesis is a faithful formal boundary condition whenever a
+Lean theorem is meant to reproduce a paper-scale estimate for a state
+$|\psi\rangle$.  The base \leanid{QuantumState} type should remain the positive
+cone; source-facing estimates should instead expose
+\leanid{QuantumState.IsNormalized} exactly at the points where the paper uses
+the unit-vector convention.
 
 \bibliographystyle{alpha}
 \bibliography{references}
