@@ -49,7 +49,10 @@ Linked Lean declarations include `AveragedPastingData.invokeLdPasting`,
 `assembleAveragedPastingDataOfSmallError`,
 `mainInductionFromAnswerStageDataOfSmallError`,
 `mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport`, and
-`mainInductionSuccessorNext_ofAnswerSliceTransport`.
+`mainInductionSuccessorNext_ofAnswerSliceTransport`.  The same blueprint node
+also links the degree-split reductions
+`mainInductionSuccessorNext_degreeZero_ofPastingFamily` and
+`mainInductionSuccessorNext_ofDegreeSplitPastingObligations`.
 
 Verdict: proved internal assembly interface with explicit remaining inputs.
 
@@ -60,6 +63,17 @@ induction hypothesis and the slice-strategy transport data; these are internal
 construction targets, not hypotheses of the paper theorem.  The source-facing
 theorem `mainInductionSuccessorNextOfSmallError` still contains the tracked
 proof obligation under issue #1507.
+
+The degree-zero part of the node is only a reduction.  The theorem
+`mainInductionSuccessorNext_degreeZero_ofPastingFamily` proves that, if a
+complete and point-consistent `IdxPolyFamily` in the predecessor parameters has
+already been constructed and its scalar error is bounded by the next-stage
+main-induction error, then the degree-zero successor branch follows from
+`Pasting.degreeZeroPastedPointConsistency`.  It does not construct this
+`IdxPolyFamily` from the hypotheses that the strategy is good.  Consequently the
+green status of `def:successor-pasting-data` should be read as a checked
+interface for the degree split, not as a proof that the degree-zero branch of
+`mainInductionSuccessorNextOfSmallError` has been discharged.
 
 ## `def:main-formal-successor-boundary`
 
@@ -114,5 +128,21 @@ they do not add bridge, residual, package, or witness assumptions to those
 paper-facing theorem statements.
 
 The remaining mathematical work is unchanged: discharge the source-facing
-successor proof obligation in `mainInductionSuccessorNextOfSmallError` and then
-use the resulting Section 6 theorem inside the final `mainFormal` route.
+successor proof obligation in `mainInductionSuccessorNextOfSmallError`, starting
+with the degree-zero `IdxPolyFamily` construction and the positive-degree
+answer-valued slice-transport construction, and then use the resulting Section 6
+theorem inside the final `mainFormal` route.
+
+## Verification
+
+The current audit command
+
+```bash
+python3 scripts/audit_paper_facing_proof_debt.py --root .
+```
+
+reports no missing Lean references, no proof-debt header findings, and no
+conditional declaration-name findings among 467 paper-facing Lean references.
+The remaining 29 findings are classified by the script as faithful boundary
+inputs, principally `SliceBoundednessInput` and `CascadeHypotheses`, rather than
+unproved bridge or obligation hypotheses on paper-facing theorem statements.
