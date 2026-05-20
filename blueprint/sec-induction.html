@@ -917,13 +917,9 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementData.slice_outputs_ofSliceStrategyTransport" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementData.slice_outputs_ofSliceStrategyTransport</a></li>
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofMeasurementEq" class="lean_decl">MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofMeasurementEq</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.slice_outputs_ofSliceStrategyTransport" class="lean_decl">MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.slice_outputs_ofSliceStrategyTransport</a></li>
           
         </ul>
     
@@ -934,7 +930,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>       The successor step records the slice-wise self-improvement output in <span class="ttfamily">SelfImprovementData</span>, and the answer-valued route records the analogous output in <span class="ttfamily">AnswerSelfImprovementData</span>. Their constructors call <span class="ttfamily">selfImprovementInInductionSection</span>; they no longer carry a separate bundle of Section&#160;<a href="chap-self-improvement.html">7</a> proof-stage data as an input. The <span class="ttfamily">SliceStrategyTransport</span> structures are narrow formal interfaces: they assume concrete per-slice symmetric strategies and measurement-transport data, while averaged point-operator compatibility is derived structurally from point-measurement transport. They then convert the remaining data into the ordinary or answer-valued self-improvement output. </p>
+  <p>        The successor step records the slice-wise self-improvement output in <span class="ttfamily">SelfImprovementData</span>, and the answer-valued route records the analogous output in <span class="ttfamily">AnswerSelfImprovementData</span>. Their constructors call <span class="ttfamily">selfImprovementInInductionSection</span>; they no longer carry a separate bundle of Section&#160;<a href="chap-self-improvement.html">7</a> proof-stage data as an input. The <span class="ttfamily">SliceStrategyTransport</span> structures are narrow formal interfaces: they assume concrete per-slice symmetric strategies and measurement-transport data, while averaged point-operator compatibility is derived structurally from point-measurement transport. The two slice-output theorems extract the per-slice conclusions of Theorem&#160;<a href="sec-induction.html#thm:self-improvement-in-induction-section">10.6</a> from these transport interfaces before the bookkeeping constructors package them as ordinary or answer-valued self-improvement data. </p>
 
   </div>
 </div>
