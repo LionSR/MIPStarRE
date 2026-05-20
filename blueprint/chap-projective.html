@@ -270,11 +270,11 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>    Let \(\lvert \psi  \rangle \) be a state in \(\mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm B}\). Let \(A = \{ A^x_a\} \) be a sub-measurement acting on \(\mathcal H_{\mathrm A}\) and \(B=\{ B^y_b\} \) be a sub-measurement acting on \(\mathcal H_{\mathrm B}\). Then there exist Hilbert spaces \(\mathcal H_{\mathrm A_{\mathsf{aux}}}\) and \(\mathcal H_{\mathrm B_{\mathsf{aux}}}\), a state \(\lvert \mathsf{aux} \rangle  \in \mathcal H_{\mathrm A_{\mathsf{aux}}} \otimes \mathcal H_{\mathrm B_{\mathsf{aux}}}\), and projective measurements \(\widehat{A} = \{ \widehat{A}^x_a\} \) and \(\widehat{B}=\{ \widehat{B}^y_b\} \) acting on \(\mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm A_{\mathsf{aux}}}\) and \(\mathcal H_{\mathrm B} \otimes \mathcal H_{\mathrm B_{\mathsf{aux}}}\), respectively, such that, if \(\lvert \widehat{\psi } \rangle  = \lvert \psi  \rangle  \otimes \lvert \mathsf{aux} \rangle \), then for all \(x,y,a,b\), </p>
+  <p>    Let \(\lvert \psi  \rangle \) be a state in \(\mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm B}\). Let \(A = \{ A^x_a\} \) be a sub-measurement acting on \(\mathcal H_{\mathrm A}\) and \(B=\{ B^y_b\} \) be a sub-measurement acting on \(\mathcal H_{\mathrm B}\). Then there exist Hilbert spaces \(\mathcal H_{\mathrm A_{\mathsf{aux}}}\) and \(\mathcal H_{\mathrm B_{\mathsf{aux}}}\), a state \(\lvert \mathsf{aux} \rangle  \in \mathcal H_{\mathrm A_{\mathsf{aux}}} \otimes \mathcal H_{\mathrm B_{\mathsf{aux}}}\), and projective sub-measurements \(\widehat{A} = \{ \widehat{A}^x_a\} \) and \(\widehat{B}=\{ \widehat{B}^y_b\} \) acting on \(\mathcal H_{\mathrm A} \otimes \mathcal H_{\mathrm A_{\mathsf{aux}}}\) and \(\mathcal H_{\mathrm B} \otimes \mathcal H_{\mathrm B_{\mathsf{aux}}}\), respectively, such that, if \(\lvert \widehat{\psi } \rangle  = \lvert \psi  \rangle  \otimes \lvert \mathsf{aux} \rangle \), then for all \(x,y,a,b\), </p>
 <div class="displaymath" id="a0000000127">
   \[  \langle \psi  \rvert  A^x_a \otimes B^y_b \lvert \psi  \rangle  = \langle \widehat{\psi } \rvert  \widehat{A}^x_a \otimes \widehat{B}^y_b \lvert \widehat{\psi } \rangle .  \]
 </div>
-<p> In addition, \(\lvert \mathsf{aux} \rangle \) is a product state. </p>
+<p> In addition, \(\lvert \mathsf{aux} \rangle \) is a product state. The word “measurement” in the source statement is read here in the projective-submeasurement sense used by Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.8</a>: for a general sub-measurement, the residual mass is carried by the additional \(\bot \) outcome in the auxiliary construction, so the original outcomes need not sum to the identity. </p>
 
   </div>
 </div>
@@ -348,9 +348,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark</a></li>
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeas" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeas</a></li>
           
         </ul>
     
@@ -361,7 +359,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>   Lean currently proves the questionwise one-measurement interface obtained from Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.8</a>. For every indexed family \(A^x\) and \(B^y\), it produces local dilation data for each question and proves the corresponding single-outcome marginal-preservation identities. This is the interface used downstream in the formal development. It is not the full tensor-product correlation statement of Theorem&#160;<a href="chap-projective.html#thm:naimark">4.1</a>, whose simultaneous bipartite assembly remains recorded in <span class="ttfamily">docs/paper-gaps/naimark.tex</span>. </p>
+  <p>     Lean currently proves the questionwise one-measurement interface obtained from Lemma&#160;<a href="chap-projective.html#lem:naimark-helper">4.8</a>. For every indexed family \(A^x\) and \(B^y\), it produces local dilation data for each question and proves the corresponding single-outcome marginal-preservation identities. It also first regards the completed \(\mathrm{Option}\)-outcome projective measurement as a projective sub-measurement, and then restricts it to a projective sub-measurement on the original outcomes. This is the interface used downstream in the formal development. It is not the full tensor-product correlation statement of Theorem&#160;<a href="chap-projective.html#thm:naimark">4.1</a>, whose simultaneous bipartite assembly remains recorded in <span class="ttfamily">docs/paper-gaps/naimark.tex</span>. </p>
 
   </div>
 </div>
@@ -412,7 +410,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation_of_productSubmeasurements" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation_of_productSubmeasurements</a></li>
           
         </ul>
     
@@ -423,11 +421,11 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>     The Lean construction represents the tensor product of the one-measurement auxiliary registers on one side by the finite function type </p>
+  <p>      The Lean construction represents the tensor product of the one-measurement auxiliary registers on one side by the finite function type </p>
 <div class="displaymath" id="a0000000130">
   \[  x \mapsto \mathrm{Option}(\mathcal A_x),  \]
 </div>
-<p> with the all-\(\bot \) vector as the initial auxiliary state. The declaration <span class="ttfamily">naimarkAuxiliaryHilbertSpace</span> records this one-sided product register, <span class="ttfamily">naimarkAuxiliaryState</span> records its normalized all-\(\bot \) state, and <span class="ttfamily">naimarkAuxiliaryProductState</span> records the Alice–Bob product auxiliary state. These are internal declarations for the tensor assembly in Theorem&#160;<a href="chap-projective.html#thm:naimark">4.1</a>; they do not by themselves prove the correlation-preservation identity, and this node is therefore not marked <span class="ttfamily">\leanok</span>. </p>
+<p> with the all-\(\bot \) vector as the initial auxiliary state. The declaration <span class="ttfamily">naimarkAuxiliaryHilbertSpace</span> records this one-sided product register, <span class="ttfamily">naimarkAuxiliaryState</span> records its normalized all-\(\bot \) state, and <span class="ttfamily">naimarkAuxiliaryProductState</span> records the Alice–Bob product auxiliary state. The reduction <span class="ttfamily">naimarkTensorProductCorrelation_of_productSubmeasurements</span> then packages these auxiliary objects into the source-shaped theorem once the product-register projective submeasurements and the four-index correlation identity have been constructed. These are internal declarations for the tensor assembly in Theorem&#160;<a href="chap-projective.html#thm:naimark">4.1</a>; they do not by themselves prove the correlation-preservation identity, and this node is therefore not marked <span class="ttfamily">\leanok</span>. </p>
 
   </div>
 </div>
