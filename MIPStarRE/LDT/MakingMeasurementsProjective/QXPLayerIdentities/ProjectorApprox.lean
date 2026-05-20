@@ -538,7 +538,11 @@ The additional hypothesis is the subnormalization of the projective `Q` family.
 Under this hypothesis the range basis vectors chosen for distinct outcomes are
 orthogonal, so the finite sigma-range embedding has orthonormal rows.  This is
 the construction-level coisometry condition later used to preserve the fresh
-option-completion row and hence to obtain residual domination. -/
+option-completion row and hence to obtain the QXP-internal comparison
+`Q_none ≤ P_none`.  An additional source-to-`Q` comparison is still required to
+recover `(optionCompletion A).outcome none ≤ P.outcome none`; see
+`docs/reports/issue-1642-restrictsome-residual-domination-obstruction.md`.
+-/
 lemma pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
