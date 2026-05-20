@@ -61,10 +61,13 @@ The current formal development establishes the following.
    `restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le`
    consume the stronger hypothesis
    `(optionCompletion A).outcome none ≤ P.outcome none`.
-   The theorem
-   `restrictSomeProjSubMeas_total_le_requires_residual_hypothesis` formalizes a
-   one-dimensional obstruction to omitting this hypothesis from the generic
-   restriction lemma: a zero one-outcome source submeasurement and a completed
+   The theorems
+   `restrictSomeProjSubMeas_total_not_le_obstruction` and
+   `optionCompletion_outcome_none_not_le_obstruction` formalize the two
+   one-dimensional failures obtained by omitting this hypothesis from the generic
+   restriction lemma.  The combined existential theorem
+   `restrictSomeProjSubMeas_total_le_requires_residual_hypothesis` packages the
+   same example: a zero one-outcome source submeasurement and a completed
    projective submeasurement with all mass on the original outcome give
    `P_total = I` and `A_total = 0`.
 
@@ -142,14 +145,16 @@ The problem is not merely that the current Lean proof is missing.  The route is
 mathematically too strong unless extra hypotheses are added or the construction
 is specialized.
 
-The Lean theorem
-`restrictSomeProjSubMeas_total_le_requires_residual_hypothesis` records a
-smaller formal obstruction directly at the `RestrictSome` interface.  It does
-not attempt to model the spectral-truncation construction above; instead it
-shows that the generic restriction lemma itself cannot drop the residual
-hypothesis.  In the example, the source total is zero and the restricted
-projective total is the identity, so the desired operator inequality would
-force `I ≤ 0`.
+The Lean theorems `restrictSomeProjSubMeas_total_not_le_obstruction` and
+`optionCompletion_outcome_none_not_le_obstruction` record the two smaller formal
+obstructions directly at the `RestrictSome` interface.  They do not attempt to
+model the spectral-truncation construction above; instead they show that the
+generic restriction lemma itself cannot drop the residual hypothesis.  In the
+example, the source total is zero, the restricted projective total is the
+identity, and the completed source residual is also the identity, so each
+failed inequality would force `I ≤ 0`.  The theorem
+`restrictSomeProjSubMeas_total_le_requires_residual_hypothesis` packages both
+negations as a single existential witness.
 
 ---
 
