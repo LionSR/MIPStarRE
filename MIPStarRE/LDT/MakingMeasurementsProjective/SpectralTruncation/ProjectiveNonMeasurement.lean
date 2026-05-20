@@ -823,7 +823,7 @@ theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
 `SpectralTruncationInput` consumed by the orthonormalization pipeline.
 
 This integrates the constructive witness theorem with the
-`OrthonormalizationSpectralObligation` statements. -/
+direct spectral-truncation input used by the later Section 5 construction. -/
 noncomputable def spectralTruncationInput_of_sourceAlmostProjective
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]

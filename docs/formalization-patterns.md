@@ -439,7 +439,6 @@ re-export file (e.g., `Theorems.lean`) that imports all the leaves:
 
 ```lean
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.OrthonormalizationSpectral
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 ```

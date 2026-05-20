@@ -37,12 +37,11 @@
 > The same day, the orthonormalization-input cleanup removed the former
 > `SelfImprovement.HelperStrongSelfConsistencyInput`,
 > `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`,
-> and `MakingMeasurementsProjective.OrthonormalizationInput` bundles.  It also
-> narrowed `SelfImprovement/Theorems/OrthonormalizationBridge.lean` to the
-> spectral-only module
-> `SelfImprovement/Theorems/OrthonormalizationSpectral.lean`.  Later mentions of
-> the removed input bundles or the old bridge module in this report should be
-> read only as historical diagnostics, not as live API guidance.
+> and `MakingMeasurementsProjective.OrthonormalizationInput` bundles.  It later
+> narrowed `SelfImprovement/Theorems/OrthonormalizationBridge.lean` to a
+> spectral-only module, which has now also been retired.  Later mentions of the
+> removed input bundles or the old bridge module in this report should be read
+> only as historical diagnostics, not as live API guidance.
 >
 > The Section 5 projectivization cleanup also removed the former
 > `ProjectivizationRepairInput` and `LeftLiftedProjectivizationRepairInput`
@@ -166,16 +165,16 @@ The latter had two sub-fields:
 2. **`repair`** (`LeftLiftedProjectivizationRepairInput`): **HYPOTHESIS** — requires QXP-layer data (`QXPLayerData` with a projective `P` family rounding-close to the source submeasurement)
 
 Bridge constructors:
-- `orthonormalizationSpectralObligation_of_sourceAlmostProjective` (line 851): **PROVED**
+- Former `orthonormalizationSpectralObligation_of_sourceAlmostProjective`: **RETIRED**; its
+  proof content is the direct construction `spectralTruncationInput_of_sourceAlmostProjective`.
 - `OrthonormalizationRepairObligation` (line 129-139): **HYPOTHESIS** — defined as a type `∀ Hhat, BipartiteSSCRel ... → LeftLiftedProjectivizationRepairInput ... (optionCompletion Hhat)`
 - `orthonormalizationInput_of_obligations` (line 684): Combines spectral + repair → full input
 
 **Current status:** the full input bundle and the old bridge module have been
-removed.  The retained file is
-`SelfImprovement/Theorems/OrthonormalizationSpectral.lean`, which records the
-proved spectral-truncation conversion.  The locality-preserving QXP repair
-construction from Sections 5.8-5.10 remains tracked by #1032 and should be
-proved directly, not supplied as a theorem hypothesis.
+removed.  The spectral conversion is retained directly as
+`spectralTruncationInput_of_sourceAlmostProjective`.  The locality-preserving
+QXP repair construction from Sections 5.8-5.10 remains tracked by #1032 and
+should be proved directly, not supplied as a theorem hypothesis.
 
 #### `finalFields` — historical conditional route
 
