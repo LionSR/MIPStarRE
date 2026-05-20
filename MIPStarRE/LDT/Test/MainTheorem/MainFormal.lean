@@ -39,10 +39,10 @@ module contains:
   Section 6 small-error successor construction, not an additional hypothesis of
   `mainFormal`.
 
-  ## References
+## References
 
-  * Paper: `references/ldt-paper/test_definition.tex`,
-    `\Cref{thm:main-formal}` at line 180; its proof is in
+* Paper: `references/ldt-paper/test_definition.tex`,
+  `\Cref{thm:main-formal}` at line 180; its proof is in
   `references/ldt-paper/inductive_step.tex` (lines 26–236).
 * Blueprint: `blueprint/src/chapter/ch02_test.tex`,
   `\label{thm:main-formal-current-interface}`; and
