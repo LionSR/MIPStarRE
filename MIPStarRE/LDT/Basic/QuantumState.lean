@@ -217,6 +217,54 @@ theorem opTensor_nonneg
     0 ≤ opTensor A B := by
   simpa [opTensor] using MIPStarRE.Quantum.kronecker_nonneg hA hB
 
+/-- The normalized trace of a tensor product is the product of the normalized traces. -/
+theorem normalizedTrace_opTensor
+    {ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Nonempty ι₁]
+    [Fintype ι₂] [DecidableEq ι₂] [Nonempty ι₂]
+    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    MIPStarRE.Quantum.normalizedTrace (opTensor A B) =
+      MIPStarRE.Quantum.normalizedTrace A * MIPStarRE.Quantum.normalizedTrace B := by
+  unfold MIPStarRE.Quantum.normalizedTrace
+  rw [show Matrix.trace (opTensor A B) = Matrix.trace A * Matrix.trace B by
+    simpa [opTensor] using Matrix.trace_kronecker A B]
+  have hι₁ : ((Fintype.card ι₁ : ℕ) : ℂ) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  have hι₂ : ((Fintype.card ι₂ : ℕ) : ℂ) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  rw [Fintype.card_prod, Nat.cast_mul]
+  field_simp [hι₁, hι₂]
+
+namespace QuantumState
+
+/-- Tensor product of two quantum states. -/
+noncomputable def tensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState ι₁) (φ : QuantumState ι₂) : QuantumState (ι₁ × ι₂) where
+  density := opTensor ψ.density φ.density
+  density_psd := opTensor_nonneg ψ.density_psd φ.density_psd
+
+@[simp] theorem tensor_density
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState ι₁) (φ : QuantumState ι₂) :
+    (ψ.tensor φ).density = opTensor ψ.density φ.density := rfl
+
+/-- Tensor products of normalized states are normalized. -/
+theorem tensor_isNormalized
+    {ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁]
+    [Fintype ι₂] [DecidableEq ι₂]
+    {ψ : QuantumState ι₁} {φ : QuantumState ι₂}
+    (hψ : ψ.IsNormalized) (hφ : φ.IsNormalized) :
+    (ψ.tensor φ).IsNormalized := by
+  have hι₁ : Nonempty ι₁ := hψ.nonempty
+  have hι₂ : Nonempty ι₂ := hφ.nonempty
+  letI := hι₁
+  letI := hι₂
+  rw [QuantumState.IsNormalized, tensor_density, normalizedTrace_opTensor, hψ, hφ, one_mul]
+
+end QuantumState
+
 /-- If `0 ≤ A` and `B ≤ 1`, then `A ⊗ B ≤ A ⊗ I`. -/
 theorem opTensor_le_leftTensor
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
