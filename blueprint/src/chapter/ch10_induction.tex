@@ -214,6 +214,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSliceStrategyTransport}
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
+	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.slice_outputs_ofSliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.slice_outputs_ofSliceStrategyTransport}
 	\leanok
 	\uses{thm:self-improvement-in-induction-section}
 	The successor step records the slice-wise self-improvement output in
@@ -224,8 +225,11 @@
 	The \texttt{SliceStrategyTransport} structures are narrow formal interfaces: they
 	assume concrete per-slice symmetric strategies and measurement-transport data,
 	while averaged point-operator compatibility is derived structurally from
-	point-measurement transport.  They then convert the remaining data into the
-	ordinary or answer-valued self-improvement output.
+	point-measurement transport.  The two slice-output theorems extract the
+	per-slice conclusions of
+	Theorem~\ref{thm:self-improvement-in-induction-section} from these transport
+	interfaces before the bookkeeping constructors package them as ordinary or
+	answer-valued self-improvement data.
 \end{definition}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
