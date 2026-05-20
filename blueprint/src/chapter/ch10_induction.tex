@@ -300,7 +300,11 @@
 	The successor step of
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated in its
 	native \(m\to m+1\) form as the source-shaped proof obligation
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext}.  The
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext}.  Its
+	nontrivial branch is named separately as
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextSmallError};
+	the complementary branch is supplied by the proved large-error lemma above.
+	The
 	non-base branch
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor} only decomposes
 	an arbitrary parameter bundle with \(m\ne1\) into this successor form.  Neither
@@ -450,9 +454,10 @@
 \begin{remark}[Lean proof gap for the successor-step assembly]\label{rem:main-induction-successor-assembly}
 	The Lean declaration for Theorem~\ref{thm:main-induction} has the source
 	hypotheses.  Its remaining proof obligation is the native successor step
-	\texttt{mainInductionSuccessorNext}.  The
+	\texttt{mainInductionSuccessorNext}; the only nontrivial case is now the
+	small-error branch \texttt{mainInductionSuccessorNextSmallError}.  The
 	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
-	still exposed through the public restriction-package constructor above, but
+	still exposed through the public restriction-data constructor above, but
 	the recursive slice witnesses, the slice-wise self-improvement outputs, and
 	the pasting comparison must be derived inside the successor proof itself.
 	They are not represented by a separate theorem whose assumptions are added

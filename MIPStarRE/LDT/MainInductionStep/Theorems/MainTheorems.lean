@@ -210,6 +210,43 @@ theorem mainInductionOfOneLeError
       (polynomialEvaluationFamily params G.toSubMeas))
     herror⟩
 
+/-- Small-error branch of the native successor step for `thm:main-induction`.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, where the proof
+passes from dimension `m` to dimension `m + 1` in the nontrivial regime where
+the target error is below `1`.
+
+This is an internal proof obligation, not a separate paper theorem.  The
+additional hypothesis `hsmall` is the branch condition used by
+`mainInductionSuccessorNext`; it is discharged there by a case distinction and
+is not an additional assumption on the public induction theorem.  The statement
+does not introduce restricted-probability, recursive-slice, self-improvement,
+pasting, bridge, residual, repair, producer, package, or generic hypotheses as
+inputs.
+
+**Proof obligation:** Derive the restricted slice profiles, apply the recursive
+main-induction hypothesis on each slice, run the induction-section
+self-improvement theorem on the slice measurements, assemble the averaged
+pasting input, and close the scalar side conditions, including the passage from
+the `params.next` large-`k` hypothesis to the predecessor side conditions needed
+inside the proof.  This is tracked by issue #1507 under the source-statement
+boundary tracker #1458. -/
+theorem mainInductionSuccessorNextSmallError
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hk : 400 * params.next.m * params.next.d ≤ k)
+    (_hsmall : mainInductionError params.next k eps delta gamma < 1) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  sorry
+
 /-- Native successor step for `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, where the proof
@@ -217,31 +254,26 @@ passes from dimension `m` to dimension `m + 1`.
 
 This is the source-facing induction step in its native form: the ambient
 strategy already lives in dimension `params.next`, so no predecessor
-compatibility record is introduced.  The proof should construct the four stage
-objects used by `mainInductionFromStageData` directly from the paper hypotheses.
-
-**Proof obligation:** Derive the restricted slice profiles, apply the recursive
-main-induction hypothesis on each slice, run the induction-section
-self-improvement theorem on the slice measurements, assemble the averaged
-pasting input, and close the scalar side conditions.  This is tracked by issue
-#1507 under the source-statement boundary tracker #1458. -/
+compatibility record is introduced.  In the large-error branch the normalized
+consistency defect is bounded by `1`; in the small-error branch the remaining
+source-faithful construction is isolated as
+`mainInductionSuccessorNextSmallError`. -/
 theorem mainInductionSuccessorNext
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
-    (_hgood : strategy.IsGood eps delta gamma)
-    (_hk : 400 * params.next.m * params.next.d ≤ k) :
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk : 400 * params.next.m * params.next.d ≤ k) :
     ∃ G : Measurement (Polynomial params.next) ι,
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
   by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
-  · -- TODO(#1507, #1458): construct the four successor-stage objects and apply
-    -- `mainInductionFromStageData` in the nontrivial small-error regime.
-    sorry
+  · exact mainInductionSuccessorNextSmallError params strategy eps delta gamma k
+      hgood hk hsmall
   · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
       (le_of_not_gt hsmall)
 
