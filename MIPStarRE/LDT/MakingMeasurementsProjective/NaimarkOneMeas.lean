@@ -1,5 +1,6 @@
 import MIPStarRE.Quantum.FiniteHilbert
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSome
 
 /-!
 # Section 5 — one-measurement Naimark
@@ -467,6 +468,43 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
               (auxProj (some a)) * Umat)) := by
               simp [oneMeasLiftedDensity, B, Q, auxProj, oneMeasNaimarkOutcomeProj,
                 oneMeasNaimarkAuxTransition, mul_assoc]
+
+/-! ### Projective submeasurement on the original outcomes -/
+
+/-- The completed one-measurement Naimark dilation as a projective
+submeasurement on the `Option α` outcome type.
+
+This is the direct submeasurement interface for the lifted projectors supplied
+by `OneMeasNaimarkData`.  The subsequent restriction to the original outcomes
+uses `restrictSomeProjSubMeas`. -/
+noncomputable def OneMeasNaimarkData.toProjSubMeasOption {α : Type*}
+    [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (data : OneMeasNaimarkData α d) :
+    ProjSubMeas (Option α) (d × Option α) where
+  toSubMeas := {
+    outcome := data.liftedEffect
+    total := ∑ oa, data.liftedEffect oa
+    outcome_pos := data.lifted_pos
+    sum_eq_total := rfl
+    total_le_one := data.lifted_sum_le_one
+  }
+  proj := fun oa => (data.lifted_isProj oa).idempotent
+
+/-- Restrict the completed one-measurement Naimark dilation to the original
+outcomes.
+
+The one-measurement construction gives a complete projective measurement on
+`Option α`; the extra outcome `none` carries the residual mass
+`1 - ∑ₐ Mₐ`.  Restricting to the `some a` outcomes gives the projective
+submeasurement on the original outcome type used by the tensor-product Naimark
+statement. -/
+noncomputable def OneMeasNaimarkData.toProjSubMeas {α : Type*}
+    [Fintype α] [DecidableEq α]
+    {d : Type*} [Fintype d] [DecidableEq d]
+    (data : OneMeasNaimarkData α d) :
+    ProjSubMeas α (d × Option α) :=
+  restrictSomeProjSubMeas data.toProjSubMeasOption
 
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
