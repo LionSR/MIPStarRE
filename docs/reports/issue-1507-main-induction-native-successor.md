@@ -52,6 +52,21 @@ not a new source theorem assumption; it is discharged by the surrounding
 successor theorem.  The statement does not take restricted-probability,
 recursive-slice, self-improvement, or pasting data as hypotheses.
 
+`mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations`:
+internal Lean assembly theorem.
+
+Classification: proved conditional assembly.  This theorem is not a paper
+theorem.  It proves the small-error successor branch from the two branch
+constructions which still have to be obtained from the source hypotheses: in
+degree zero, a complete and point-consistent `IdxPolyFamily` whose scalar
+pasting error is bounded by the next main-induction error; in positive degree,
+the answer-valued predecessor induction hypothesis together with the slice
+strategy transport used by the induction-section self-improvement theorem.
+The theorem does not move these constructions into the statement of
+`thm:main-induction`.  It is consumed by
+`mainInductionSuccessorNext_ofDegreeSplitPastingObligations`, which adds the
+large-error branch around this small-error reduction.
+
 `mainInductionSuccessor`: Lean branch theorem.
 
 Classification: boundary transport.  This handles the arbitrary non-base
@@ -78,7 +93,10 @@ proof step from `m` to `m + 1`.
 The next proof work is to construct, inside
 `mainInductionSuccessorNextOfSmallError`, the restricted slice profiles,
 recursive slice measurements, self-improvement outputs, and averaged pasting
-input required by `mainInductionFromStageData`.
+input required by `mainInductionFromStageData`.  The new theorem
+`mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations`
+separates this construction problem into its degree-zero family construction
+and its positive-degree answer-slice transport construction.
 
 ## Statement integrity audit
 
@@ -94,6 +112,12 @@ successor-step hypotheses, together with
 `mainInductionError params.next k eps delta gamma < 1`, the nontrivial branch
 condition used internally by the proof of `mainInductionSuccessorNext`.
 
+Lean assumptions in
+`mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations`: the
+small-error successor-step hypotheses, plus the two internal constructions
+described above.  These are proof obligations for the successor argument, not
+source hypotheses of the paper theorem.
+
 Paper conclusion: a measurement in `PolyMeas(m + 1, q, d)` whose evaluations are
 consistent with the point measurement at the main-induction error.
 
@@ -103,5 +127,7 @@ Lean conclusion: an existential measurement
 `mainInductionError params.next k eps delta gamma`.
 
 Verdict: source-faithful modulo the documented large-`k` correction.  The
-remaining proof hole is a named small-error proof obligation, not an additional
-hypothesis on the paper theorem.
+remaining proof hole is a named small-error proof obligation.  The new
+degree-split assembly theorem is green only as an internal reduction from
+explicit construction obligations, and it is not an additional hypothesis on
+the paper theorem.
