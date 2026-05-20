@@ -237,10 +237,6 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.DegreeZeroPastingFamilyObligation}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one, MIPStarRE.LDT.MainInductionStep.one_le_k_of_mainInductionError_lt_one}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorBound_pred, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceSelfImprovement}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
 	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
 	The successor step forms the pasting input by combining the restricted
@@ -256,8 +252,21 @@
 	family of degree-zero slice polynomials, together with the scalar comparison
 	needed to absorb the pasting error into the successor error.  This record is
 	an internal proof obligation and is not an additional hypothesis in
-	Theorem~\ref{thm:main-induction}.  The answer-valued small-error theorem then
-	converts the answer-valued slice data to this pasting datum and applies the
+	Theorem~\ref{thm:main-induction}.
+\end{definition}
+
+\begin{definition}[Lean successor obligation reductions]\label{def:successor-obligation-reductions}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorBound_pred, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceSelfImprovement}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
+	\leanok
+	\uses{def:successor-pasting-data, def:self-improvement-slice-transport}
+	The following Lean declarations are implementation reductions for the
+	successor proof.  They are green internal theorems, not additional
+	hypotheses in Theorem~\ref{thm:main-induction}.  The answer-valued
+	small-error theorem converts
+	the answer-valued slice data to this pasting datum and applies the
 	checked stage-data theorem.  The Lean theorem
 	\texttt{mainInductionSuccessorNextOfSmallError\_ofAnswerSliceTransport} is
 	the checked nontrivial branch: it assumes the small-error condition already
@@ -285,9 +294,8 @@
 	\texttt{DegreeZeroPastingFamilyObligation.ofSmallError}.  Finally,
 	\texttt{mainInductionSuccessorNext\_ofDegreeSplitPastingObligations} adds the
 	trivial large-error case and delegates its small-error branch to the
-	degree-split theorem just described.
-	These declarations are internal
-	theorems, not additional hypotheses in
+	degree-split theorem just described.  These declarations are internal
+	theorems, not source-labelled results and not additional hypotheses in
 	Theorem~\ref{thm:main-induction}.
 \end{definition}
 
