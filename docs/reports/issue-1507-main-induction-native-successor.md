@@ -41,9 +41,9 @@ Classification: source-shaped successor step.  This is the native `m -> m + 1`
 successor statement.  It carries no restricted-probability, recursive-slice,
 self-improvement, or pasting data as hypotheses.  The large-error branch is
 proved by `mainInductionOfOneLeError`; the small-error branch is delegated to
-the named proof obligation `mainInductionSuccessorNextSmallError`.
+the named proof obligation `mainInductionSuccessorNextOfSmallError`.
 
-`mainInductionSuccessorNextSmallError`: Lean proof obligation.
+`mainInductionSuccessorNextOfSmallError`: Lean proof obligation.
 
 Classification: stated with proof hole.  This is the nontrivial branch of the
 successor step after the case distinction
@@ -68,7 +68,7 @@ successor conclusion.  It is not advertised as `thm:main-induction`.
 
 The direct `sorry` has been moved from the arbitrary non-base presentation to
 the small-error successor branch
-`mainInductionSuccessorNextSmallError`.  This avoids making a compatibility or
+`mainInductionSuccessorNextOfSmallError`.  This avoids making a compatibility or
 data wrapper into the mathematical target, and it also separates the trivial
 large-error case from the actual induction argument.  The public branch theorem
 `mainInductionSuccessor` now only performs the predecessor decomposition for
@@ -76,7 +76,7 @@ large-error case from the actual induction argument.  The public branch theorem
 proof step from `m` to `m + 1`.
 
 The next proof work is to construct, inside
-`mainInductionSuccessorNextSmallError`, the restricted slice profiles,
+`mainInductionSuccessorNextOfSmallError`, the restricted slice profiles,
 recursive slice measurements, self-improvement outputs, and averaged pasting
 input required by `mainInductionFromStageData`.
 
@@ -89,7 +89,7 @@ Lean assumptions in `mainInductionSuccessorNext`: a good symmetric strategy
 `strategy : SymStrat params.next ι`, the error parameters, and
 `400 * params.next.m * params.next.d <= k`.
 
-Lean assumptions in `mainInductionSuccessorNextSmallError`: the same
+Lean assumptions in `mainInductionSuccessorNextOfSmallError`: the same
 successor-step hypotheses, together with
 `mainInductionError params.next k eps delta gamma < 1`, the nontrivial branch
 condition used internally by the proof of `mainInductionSuccessorNext`.

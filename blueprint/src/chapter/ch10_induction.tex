@@ -302,7 +302,7 @@
 	native \(m\to m+1\) form as the source-shaped proof obligation
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext}.  Its
 	nontrivial branch is named separately as
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextSmallError};
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError};
 	the complementary branch is supplied by the proved large-error lemma above.
 	The
 	non-base branch
@@ -455,7 +455,7 @@
 	The Lean declaration for Theorem~\ref{thm:main-induction} has the source
 	hypotheses.  Its remaining proof obligation is the native successor step
 	\texttt{mainInductionSuccessorNext}; the only nontrivial case is now the
-	small-error branch \texttt{mainInductionSuccessorNextSmallError}.  The
+	small-error branch \texttt{mainInductionSuccessorNextOfSmallError}.  The
 	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
 	still exposed through the public restriction-data constructor above, but
 	the recursive slice witnesses, the slice-wise self-improvement outputs, and

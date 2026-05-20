@@ -224,6 +224,11 @@ does not introduce restricted-probability, recursive-slice, self-improvement,
 pasting, bridge, residual, repair, producer, package, or generic hypotheses as
 inputs.
 
+The declaration is temporary in the precise sense that, once the slice
+restriction, recursive induction, self-improvement, and pasting constructions
+are supplied, this branch should be proved from its displayed hypotheses and
+remain only as the internal small-error case used by `mainInductionSuccessorNext`.
+
 **Proof obligation:** Derive the restricted slice profiles, apply the recursive
 main-induction hypothesis on each slice, run the induction-section
 self-improvement theorem on the slice measurements, assemble the averaged
@@ -231,7 +236,7 @@ pasting input, and close the scalar side conditions, including the passage from
 the `params.next` large-`k` hypothesis to the predecessor side conditions needed
 inside the proof.  This is tracked by issue #1507 under the source-statement
 boundary tracker #1458. -/
-theorem mainInductionSuccessorNextSmallError
+theorem mainInductionSuccessorNextOfSmallError
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -257,7 +262,7 @@ strategy already lives in dimension `params.next`, so no predecessor
 compatibility record is introduced.  In the large-error branch the normalized
 consistency defect is bounded by `1`; in the small-error branch the remaining
 source-faithful construction is isolated as
-`mainInductionSuccessorNextSmallError`. -/
+`mainInductionSuccessorNextOfSmallError`. -/
 theorem mainInductionSuccessorNext
     (params : Parameters)
     [FieldModel params.q]
@@ -272,7 +277,7 @@ theorem mainInductionSuccessorNext
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
   by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
-  · exact mainInductionSuccessorNextSmallError params strategy eps delta gamma k
+  · exact mainInductionSuccessorNextOfSmallError params strategy eps delta gamma k
       hgood hk hsmall
   · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
       (le_of_not_gt hsmall)
