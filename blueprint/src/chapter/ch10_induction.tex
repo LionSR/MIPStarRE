@@ -234,6 +234,7 @@
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingDataOfSmallError}
+	\lean{MIPStarRE.LDT.MainInductionStep.DegreeZeroPastingFamilyObligation}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one, MIPStarRE.LDT.MainInductionStep.one_le_k_of_mainInductionError_lt_one}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorBound_pred, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily}
@@ -249,8 +250,14 @@
 	\(\gamma\le 1\), \(\zeta\le 1\), and \(d\le q\) internally.  Thus the
 	successor proof can call the small-error pasting constructor without carrying
 	\(0<d\), \(1\le k\), \(\gamma\le 1\), \(\zeta\le 1\), or \(d\le q\) as
-	separate proof inputs.  The answer-valued small-error theorem then converts
-	the answer-valued slice data to this pasting datum and applies the
+	separate proof inputs.  In the degree-zero branch, Lean now names the precise
+	remaining construction as
+	\texttt{DegreeZeroPastingFamilyObligation}: a complete and point-consistent
+	family of degree-zero slice polynomials, together with the scalar comparison
+	needed to absorb the pasting error into the successor error.  This record is
+	an internal proof obligation and is not an additional hypothesis in
+	Theorem~\ref{thm:main-induction}.  The answer-valued small-error theorem then
+	converts the answer-valued slice data to this pasting datum and applies the
 	checked stage-data theorem.  The Lean theorem
 	\texttt{mainInductionSuccessorNextOfSmallError\_ofAnswerSliceTransport} is
 	the checked nontrivial branch: it assumes the small-error condition already

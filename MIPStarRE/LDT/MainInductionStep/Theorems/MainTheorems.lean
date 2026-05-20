@@ -451,7 +451,9 @@ branch follows once the proof has supplied its two branch constructions: in
 degree zero, a complete and point-consistent slice family with scalar error
 absorbed into the next main-induction error; in positive degree, the
 answer-valued predecessor induction hypothesis and the slice-strategy transport
-needed to run the induction-section self-improvement theorem.
+needed to run the induction-section self-improvement theorem.  The equivalent
+named degree-zero construction target is
+`DegreeZeroPastingFamilyObligation`.
 
 No one of these objects is added as a hypothesis to `thm:main-induction`.  The
 source-facing theorem `mainInductionSuccessorNextOfSmallError` must still
@@ -511,7 +513,8 @@ small-error branch, there are two cases:
   the predecessor answer-valued induction hypothesis and the concrete
   answer-valued slice transport;
 * if `params.d = 0`, the proof calls the degree-zero pasting reduction from a
-  constructed complete and point-consistent family.
+  constructed complete and point-consistent family.  This branch is now also
+  named as `DegreeZeroPastingFamilyObligation` in the statement file.
 
 Thus degree positivity is not being added to the public successor statement; it
 is only the branch condition for one internal construction route.

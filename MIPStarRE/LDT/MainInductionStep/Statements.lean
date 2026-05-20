@@ -627,6 +627,64 @@ noncomputable def family {params : Parameters}
 
 end AnswerSelfImprovementData
 
+/-- Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, in the
+degree-zero branch of the successor step of `\label{thm:main-induction}`.
+
+This record names the remaining construction needed when the predecessor degree
+is zero.  The paper obtains a family of degree-zero slice polynomials and then
+uses pasting to obtain the next-stage global measurement.  In Lean, the
+verified pasting reduction
+`mainInductionSuccessorNext_degreeZero_ofPastingFamily` already shows that such
+a complete and point-consistent family is sufficient.  This record is the
+source-faithful obligation to construct that family from the displayed
+successor hypotheses; it is not an additional hypothesis of the paper theorem.
+
+**Proof obligation:** Construct the degree-zero slice family from the
+projective successor strategy and prove the scalar inequality comparing
+`ldPastingInInductionError` with the next-stage `mainInductionError`.  This is
+tracked by issue #1507. -/
+structure DegreeZeroPastingFamilyObligation (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error) (k : ℕ) where
+  /-- The degree-zero family to be pasted. -/
+  family : IdxPolyFamily params ι
+  /-- Completeness loss of the family. -/
+  kappa : Error
+  /-- Point-consistency loss of the family. -/
+  zeta : Error
+  /-- Completeness of the family against the successor strategy state. -/
+  complete : family.Complete strategy.state kappa
+  /-- Consistency of the family with the successor point measurements. -/
+  consistent : family.ConsistentWithPoints strategy zeta
+  /-- Absorption of the degree-zero pasting error into the successor error. -/
+  error_le :
+    ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+      mainInductionError params.next k eps delta gamma
+
+namespace DegreeZeroPastingFamilyObligation
+
+/-- The named degree-zero obligation, unfolded as the existential interface used
+by the current conditional successor assembly lemmas.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.  This is only
+a projection from the internal record; it does not add a hypothesis to
+`\label{thm:main-induction}`. -/
+theorem exists_family {params : Parameters}
+    [FieldModel params.q]
+    {strategy : SymStrat params.next ι}
+    {eps delta gamma : Error} {k : ℕ}
+    (pkg : DegreeZeroPastingFamilyObligation params strategy eps delta gamma k) :
+    ∃ family : IdxPolyFamily params ι, ∃ kappa zeta : Error,
+      family.Complete strategy.state kappa ∧
+        family.ConsistentWithPoints strategy zeta ∧
+          ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+            mainInductionError params.next k eps delta gamma := by
+  exact
+    ⟨pkg.family, pkg.kappa, pkg.zeta, pkg.complete, pkg.consistent, pkg.error_le⟩
+
+end DegreeZeroPastingFamilyObligation
+
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:12-50`
 (`\label{thm:ld-pasting}`) and
 `references/ldt-paper/inductive_step.tex:239-342`.
