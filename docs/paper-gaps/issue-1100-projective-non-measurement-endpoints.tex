@@ -15,6 +15,47 @@
 \begin{document}
 \maketitle
 
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty.} Medium.  The small-error truncation argument is
+  the one printed in the paper, but an unconditional Lean theorem must also
+  supply the exact endpoint $\zeta = 0$ and the large-error branch.
+  \item \textbf{Estimated weight.} The endpoint and packaging branches require
+  roughly \textbf{3--5 theorem interfaces} and \textbf{200--400 lines} of
+  formal proof around spectral truncation and state-dependent distance.
+  \item \textbf{Mathlib/project split.} Approximately \textbf{35\% Mathlib}
+  and \textbf{65\% project-local}.  Mathlib supplies finite-dimensional
+  spectral projections and order facts; the project supplies the LDT
+  measurement interfaces and the tensor-positioned distance estimates.
+  \item \textbf{Key Mathlib inputs.} Spectral calculus for Hermitian operators,
+  positive semidefinite order, square-root inequalities, and finite matrix
+  trace positivity.
+\end{itemize}
+
+\section{Key theorem forms}
+
+The formalization separates the local theorem used in the paper from the
+unconditional theorem exposed to later Lean code.
+\begin{enumerate}
+  \item \textbf{Small-error source branch.}  Under the hypotheses of
+  \path{eq:A-looks-projective} and the standing assumption
+  $0 < \zeta \le 1/4$, construct projectors $R_a$ satisfying the
+  state-dependent-distance estimate and
+  $\sum_a R_a \leq (1 + 2\sqrt{\zeta}) I$.
+  \item \textbf{Endpoint branch.}  When $\zeta = 0$, replace the positive
+  truncation threshold by the spectral projector onto the $1$-eigenspace and
+  prove the exact state-dependent-distance conclusion.
+  \item \textbf{Unconditional packaging theorem.}  Combine the small-error
+  branch, the endpoint branch, and the trivial large-error branch into the
+  standalone projective-non-measurement witness consumed by the
+  orthonormalization construction.\footnote{The relevant declarations are
+  \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective},
+  \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full}, and
+  \leanid{spectralTruncationInput\_of\_sourceAlmostProjective} in
+  \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation.lean}.}
+\end{enumerate}
+
 \section{The cited statement}
 
 This note concerns the lemma ``Rounding to projectors'' in
