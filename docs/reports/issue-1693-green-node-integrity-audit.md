@@ -10,9 +10,11 @@ the classification below concerns the current mainline state.
 
 ## Method
 
-The audit parsed every theorem-like environment in `blueprint/src/chapter` that
-contains `\leanok`.  It then searched the attached Lean declarations for names
-containing the following warning terms:
+The audit is implemented by
+`scripts/audit_green_node_integrity.py`.  It parses every theorem-like
+environment in `blueprint/src/chapter` that contains `\leanok`.  It then
+searches the attached Lean declarations for names containing the following
+warning terms:
 
 - `Obligation`, `Bridge`, `Residual`, `Repair`, `Package`;
 - `Input`, `Producer`, `Hypotheses`, `Assumptions`;
@@ -25,8 +27,8 @@ This screen found 180 `\leanok` blueprint environments:
 | Source-like labels (`thm`, `lem`, `prop`, `cor`, `clm`) | 124 |
 | Definition or remark labels | 56 |
 
-Among the source-like labels, only four nodes contained one of the warning
-terms in an attached Lean declaration.  Each of those nodes was then checked
+Among the source-like labels, only four nodes, comprising six Lean declaration
+links, contained one of the warning terms.  Each of those nodes was then checked
 against its displayed blueprint statement and the surrounding documentation.
 
 ## Source-like green nodes with warning terms
@@ -110,7 +112,13 @@ nodes that are intentionally not marked `\leanok`.
 ## Follow-up
 
 This check should be repeated after each batch that changes source-labelled
-blueprint nodes or the Step 6 boundary.  A useful next automation would turn the
-warning-term screen above into a small script with an allow-list for the four
-audited source-like nodes.  That would make newly introduced bridge or
-obligation terms in green source-like nodes visible during review.
+blueprint nodes or the Step 6 boundary:
+
+```bash
+python3 scripts/audit_green_node_integrity.py --root . --ci
+```
+
+The script has an allow-list for the four audited source-like nodes.  It fails
+when a new green source-like node is linked to an obligation, bridge, residual,
+repair, input, producer, or hypothesis-style declaration without a fresh
+statement-integrity classification.
