@@ -299,22 +299,6 @@ theorem mainInductionSuccessorBound_pred
       Nat.mul_le_mul_right params.d hcoef
   exact le_trans hmul hk
 
-/-- If the degree is positive, the successor large-`k` hypothesis implies
-`k ≥ 1`.
-
-This supplies the nonzero-size side condition required by the answer-valued
-predecessor induction interface. -/
-theorem mainInductionSuccessorBound_k_pos
-    (params : Parameters) {k : ℕ}
-    (hd : 0 < params.d)
-    (hk : 400 * params.next.m * params.next.d ≤ k) :
-    1 ≤ k := by
-  have hdegree : 0 < params.next.d := by
-    simpa [Parameters.next] using hd
-  have hbase : 0 < 400 * params.next.m * params.next.d :=
-    Nat.mul_pos (Nat.mul_pos (by norm_num) params.next.hm) hdegree
-  exact Nat.succ_le_of_lt (lt_of_lt_of_le hbase hk)
-
 /-- Internal positive-degree successor assembly using the successor large-`k`
 hypothesis.
 

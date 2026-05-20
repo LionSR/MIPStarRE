@@ -267,7 +267,7 @@ theorem mainInduction_sourceStatement
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (_hk : params.m * params.d ≤ k) :
+    (hk : params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params) ι,
       ConsRel strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -276,7 +276,7 @@ theorem mainInduction_sourceStatement
   by_cases hlargeK : 400 * params.m * params.d ≤ k
   · exact mainInduction params strategy eps delta gamma k hgood hlargeK
   · exact
-      mainInduction_sourceRangeObligation params strategy eps delta gamma k hgood _hk
+      mainInduction_sourceRangeObligation params strategy eps delta gamma k hgood hk
         (lt_of_not_ge hlargeK)
 
 /-- Restricted-probabilities data built from the explicit weighted bounds in the

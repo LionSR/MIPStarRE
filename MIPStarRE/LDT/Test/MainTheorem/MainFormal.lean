@@ -266,9 +266,9 @@ theorem mainFormal_sourceStatement
     [Fintype ιB] [DecidableEq ιB]
     (strategy : ProjStrat params ιA ιB)
     (eps : Error)
-    (_hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (_hk : params.m * params.d ≤ k) :
+    (hk : params.m * params.d ≤ k) :
     ∃ G_A : ProjMeas (Polynomial params) ιA,
       ∃ G_B : ProjMeas (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))
@@ -283,7 +283,7 @@ theorem mainFormal_sourceStatement
             (constSubMeasFamily G_A.toSubMeas)
             (constSubMeasFamily G_B.toSubMeas)
             (mainFormalError params k eps) := by
-  exact mainFormal_sourceObligation params strategy eps _hpass k _hk
+  exact mainFormal_sourceObligation params strategy eps hpass k hk
 
 
 /-- The role-register witness used by the `m = 1` branch of
