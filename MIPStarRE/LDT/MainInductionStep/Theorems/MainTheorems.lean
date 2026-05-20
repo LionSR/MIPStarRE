@@ -327,30 +327,13 @@ theorem mainInductionSuccessorNext_ofAnswerSliceTransport
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
-  have hk_pred : 400 * params.m * params.d ≤ k := by
-    have hm_le_next : params.m ≤ params.next.m := by
-      simp [Parameters.next]
-    exact le_trans
-      (Nat.mul_le_mul_right params.d (Nat.mul_le_mul_left 400 hm_le_next))
-      (by simpa [Parameters.next, Nat.mul_assoc] using hk_next)
-  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
-  · let answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma :=
-      AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
-        (answerRestrictedProbabilities params strategy eps delta gamma hgood)
-    let answerInduction :
-        AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k :=
-      AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
-        answerRestrict hinduction hd hk_pred
-    let answerSelf :
-        AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict
-          answerInduction :=
-      AnswerSelfImprovementData.ofSliceStrategyTransport params strategy eps delta gamma k
-        answerRestrict answerInduction (hsliceTransport answerRestrict answerInduction)
-    exact
-      mainInductionFromAnswerStageDataOfSmallError params strategy eps delta gamma k
-        hgood hsmall answerRestrict answerInduction answerSelf hk_pred
-  · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
-      (le_of_not_gt hsmall)
+  exact
+    mainInductionSuccessorNext_ofAnswerSliceSelfImprovement
+      params strategy eps delta gamma k hgood hk_next hd hinduction
+      (fun restrictionPkg inductionPkg =>
+        AnswerSelfImprovementData.slice_outputs_ofSliceStrategyTransport
+          params strategy eps delta gamma k restrictionPkg inductionPkg
+          (hsliceTransport restrictionPkg inductionPkg))
 
 /-- Small-error branch of the native successor step for `thm:main-induction`.
 
