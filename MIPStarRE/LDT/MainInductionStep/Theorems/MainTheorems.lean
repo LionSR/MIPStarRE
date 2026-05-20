@@ -440,6 +440,38 @@ theorem mainInductionSuccessorNext_degreeZero_ofPastingFamily
     ⟨H, _hH_eq, hH⟩
   exact ⟨H, ConsRel.mono herror hH⟩
 
+/-- Construction target for the degree-zero branch of the successor step.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, in the
+successor step of `\label{thm:main-induction}`.
+
+When Lean's successor proof is split by whether the predecessor degree is zero,
+this is the remaining datum needed in the degree-zero branch: a complete and
+point-consistent degree-zero slice family together with the scalar comparison
+which absorbs the pasting error into the next main-induction error.  The
+conditional assembly theorems below use only the fields of this datum; this
+definition is the named construction target that must eventually be proved from
+the source hypotheses.
+
+**Proof obligation:** This declaration is intentionally a `sorry`-bodied
+construction target, tracked by issue #1507.  Planned discharge: construct the
+degree-zero slice family from the hypotheses of
+`mainInductionSuccessorNextOfSmallError` under `params.d = 0`, then prove the
+displayed scalar inequality for the produced losses. -/
+noncomputable def DegreeZeroPastingFamilyObligation.ofSmallError
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (_hgood : strategy.IsGood eps delta gamma)
+    (_hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (_hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (_hd_zero : params.d = 0) :
+    DegreeZeroPastingFamilyObligation params strategy eps delta gamma k := by
+  classical
+  sorry
+
 /-- Internal small-error successor assembly from the two degree branches.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, restricted to
@@ -451,7 +483,9 @@ branch follows once the proof has supplied its two branch constructions: in
 degree zero, a complete and point-consistent slice family with scalar error
 absorbed into the next main-induction error; in positive degree, the
 answer-valued predecessor induction hypothesis and the slice-strategy transport
-needed to run the induction-section self-improvement theorem.
+needed to run the induction-section self-improvement theorem.  The equivalent
+named degree-zero construction target is
+`DegreeZeroPastingFamilyObligation`.
 
 No one of these objects is added as a hypothesis to `thm:main-induction`.  The
 source-facing theorem `mainInductionSuccessorNextOfSmallError` must still
@@ -511,7 +545,8 @@ small-error branch, there are two cases:
   the predecessor answer-valued induction hypothesis and the concrete
   answer-valued slice transport;
 * if `params.d = 0`, the proof calls the degree-zero pasting reduction from a
-  constructed complete and point-consistent family.
+  constructed complete and point-consistent family.  This branch is now also
+  named as `DegreeZeroPastingFamilyObligation` in the statement file.
 
 Thus degree positivity is not being added to the public successor statement; it
 is only the branch condition for one internal construction route.
