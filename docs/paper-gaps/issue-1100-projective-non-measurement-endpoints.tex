@@ -52,7 +52,7 @@ unconditional theorem exposed to later Lean code.
   orthonormalization construction.\footnote{The relevant declarations are
   \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective},
   \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full}, and
-  \leanid{spectralTruncationInput\_of\_sourceAlmostProjective} in
+  \leanid{spectralTruncationStatement\_of\_sourceAlmostProjective} in
   \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation.lean}.}
 \end{enumerate}
 
@@ -177,8 +177,9 @@ The unconditional spectral-truncation producer
 \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full} combines
 that branch with the exact $\zeta = 0$ endpoint and the trivial large-error
 case, and
-\leanid{spectralTruncationInput\_of\_sourceAlmostProjective} packages the
-result as the input needed by the later Section~5 construction.}
+\leanid{spectralTruncationStatement\_of\_sourceAlmostProjective} records the
+result directly as the spectral-truncation statement used by the later
+Section~5 construction.}
 Thus the present formal development has discharged the unconditional
 spectral-truncation packaging.  The small-error proof still corresponds to the
 part of the cited argument in which one may set $\delta = \sqrt{\zeta}$ and
