@@ -148,11 +148,10 @@ is specialized.
    comparison `Q_none ≤ P_none`, but an additional source-to-`Q` comparison is
    still needed, and it is not available in general.
 
-3. The currently proved downstream `SelfImprovement` route may still rely on the
-   total-difference transport as a safe fallback, but this should not be treated
-   as the final paper-faithful end state.  The sharper target remains a
-   narrower, genuinely valid source-residual theorem for the specific helper-
-   output construction.
+3. The currently proved downstream `SelfImprovement` route follows the paper's
+   expectation-level total-difference transport.  The sharper operator-total
+   target remains a narrower Lean-only strengthening for the specific
+   helper-output construction, not a replacement for the source proof.
 
 4. Any future replacement for issue #1642 should be stated as one of the
    following, and not as generic residual domination for the present Section 5

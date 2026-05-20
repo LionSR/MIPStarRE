@@ -107,17 +107,17 @@ the still-unproved heterogeneous `orthonormalizationMainLemma`. -/
 private def expectedOrthonormalizationAxioms : Array Name :=
   expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; the issue #1230 SDP slackness
-dependency has been discharged, but `selfImprovement` now transitively depends on
-`helper_output_residual_preserving_projectivization` (issue #1642). -/
+/-- Standard kernel axioms only: the issue #1230 SDP slackness dependency used
+by `selfImprovement` has been discharged, and the issue #1642 operator-total
+frontier is not on the public theorem's proof path. -/
 private def expectedSelfImprovementAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; `selfImprovementInInductionSection`
-inherits the tracked `sorry` from `SelfImprovement.selfImprovement`
-(issue #1642). -/
+/-- Standard kernel axioms only: the issue #1230 SDP slackness dependency used
+by `selfImprovementInInductionSection` has been discharged, and it does not
+inherit the issue #1642 operator-total frontier. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
+  expectedStandardAxioms
 
 /-- Standard kernel axioms plus `sorryAx`; tracks the issue #1507 derivation
 needed for `mainInduction`. -/

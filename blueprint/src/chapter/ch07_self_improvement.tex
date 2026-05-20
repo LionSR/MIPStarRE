@@ -428,7 +428,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Together with~\eqref{eq:Z-greater-than-A}, this proves \ref{item:self-improvement-boundedness}.
 \end{proof}
 
-\begin{remark}[Slackness-carrying self-improvement helper]\label{rem:self-improvement-helper-with-slackness-theorem}
+\begin{definition}[Slackness-carrying self-improvement helper]\label{rem:self-improvement-helper-with-slackness-theorem}
   \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
@@ -438,7 +438,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   the full self-improvement conclusion is now stated only by the paper theorem
   below, whose incomplete proof explicitly records the remaining Section~9
   work.
-\end{remark}
+\end{definition}
 
 \subsection{A Semidefinite Program}
 
@@ -566,7 +566,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \texttt{MIPStarRE.LDT.SelfImprovement.selfImprovement}.
 \end{remark}
 
-\begin{remark}[Lean reduced SDP and dominance interfaces]\label{rem:lean-reduced-sdp-dominance-interfaces}
+\begin{definition}[Lean reduced SDP and dominance interfaces]\label{rem:lean-reduced-sdp-dominance-interfaces}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp, MIPStarRE.LDT.SelfImprovement.SdpStatement}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero}
@@ -583,7 +583,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   dominance-carrying declarations add the auxiliary condition \(I\le Z\) and
   are retained as technical routes to slackness-carrying data.  These
   declarations are not advertised as formalizations of Lemma~\ref{lem:sdp}.
-\end{remark}
+\end{definition}
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}
   \lean{MIPStarRE.LDT.SelfImprovement.averagedPointOperator_nonneg}
@@ -985,7 +985,7 @@ Lemma~\ref{lem:self-improvement-helper}. The bookkeeping here is entirely about
 showing that completeness, consistency, self-consistency, and boundedness survive
 the passage from~$\widehat H$ to a projective submeasurement~$H$.
 
-\begin{remark}[Auxiliary self-improvement lemmas]\label{rem:self-improvement-lean-interfaces}
+\begin{definition}[Auxiliary self-improvement lemmas]\label{rem:self-improvement-lean-interfaces}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementError_nonneg_of_isGood}
   \lean{MIPStarRE.LDT.SelfImprovement.OrthonormalizationSpectralObligation}
   \lean{MIPStarRE.LDT.SelfImprovement.orthonormalizationSpectralObligation_of_roundingWitnesses}
@@ -999,15 +999,15 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   local intermediate estimates and final-field assembly lemmas.  The
   orthonormalization obligation displayed here is only the spectral-truncation
   slice of the Section~9 construction; it is not a locality-preserving repair
-  theorem.  The theorem below records the paper-facing conclusion; its proof is
-  still not proof-complete because the projective repair route has the
-  residual-domination obligation tracked by issue~\#1642.
-\end{remark}
+  theorem.  The theorem below records the paper-facing conclusion.  Its proof
+  follows the expectation-level completeness argument from the paper; the
+  operator-total strengthening remains a separate Lean-only frontier tracked by
+  issue~\#1642.
+\end{definition}
 
 \begin{theorem}[Self-improvement]\label{thm:self-improvement}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovement}
-  % No \leanok is attached here: the current Lean proof still depends
-  % on the residual-domination obligation tracked by issue #1642.
+  \leanok
   \uses{def:polymeasurements, def:simeq, def:approx_delta, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following properties:
   \begin{enumerate}
@@ -1045,6 +1045,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   \end{enumerate}
 \end{theorem}
 \begin{proof}
+  \leanok
   \uses{lem:self-improvement-helper, thm:orthonormalization,
     prop:self-consistency-implies-data-processing,
     prop:completeness-transfer-self-consistent-A, prop:triangle-sub,
