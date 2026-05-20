@@ -365,7 +365,8 @@ the product-register spaces and the displayed correlation identity are
 constructed, the source-shaped `NaimarkTensorProductCorrelationStatement`
 follows.  The remaining mathematical work is therefore exactly the construction
 of those projective submeasurements and the four-index correlation identity; no
-extra hypothesis is added to `thm:naimark`. -/
+extra hypothesis is added to `thm:naimark`.  The remaining gap is documented in
+`docs/paper-gaps/naimark.tex` and tracked by issue #1697. -/
 theorem naimarkTensorProductCorrelation_of_productSubmeasurements
     {QuestionA OutcomeA QuestionB OutcomeB : Type u}
     [Fintype QuestionA] [DecidableEq QuestionA]
