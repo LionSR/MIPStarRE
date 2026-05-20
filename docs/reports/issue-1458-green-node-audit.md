@@ -123,6 +123,31 @@ The exact active `\leanok` nodes whose Lean names contain high-risk vocabulary
 are recorded in
 `docs/reports/issue-1458-green-node-name-inventory.md`.
 
+### 2026-05-20 status update: Chapter 4 and Chapter 7
+
+The Chapter 4 nodes formerly labelled as conditional orthonormalization
+interfaces have been reclassified in the blueprint.  The corresponding Lean
+declarations are now
+`MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency` and
+`MakingMeasurementsProjective.orthonormalizationMeasurement`.  Their public
+hypotheses are the displayed consistency and self-consistency hypotheses,
+together with the faithful boundary hypotheses for finite-dimensional spaces
+and normalized states.  They no longer assume spectral-truncation witnesses,
+repair witnesses, or producer inputs.
+
+The Chapter 7 auxiliary self-improvement interface has also been marked
+`\leanok`.  The linked declarations are not source theorem replacements; they
+are Lean-only auxiliary lemmas used in the proof of
+the source self-improvement theorem.  In particular,
+`spectralTruncationStatement_of_sourceAlmostProjective` is a proved
+construction from the source almost-projective estimate, while
+`final_fields_of_helper_outputs_of_total_expectation_le`,
+`final_fields_of_helper_outputs_of_total_difference`, and
+`final_fields_of_helper_outputs_of_total_operator_le` assemble the final-field
+conclusions from already produced helper outputs.  The operator-total
+strengthening remains a separate Lean-only frontier tracked by issue #1642 and
+is not presented as an extra hypothesis of the source self-improvement theorem.
+
 ## Verdict
 
 At the theorem, lemma, proposition, and corollary boundary, the current green

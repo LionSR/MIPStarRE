@@ -71,6 +71,7 @@ PY
 | `rem:lean-reduced-sdp-dominance-interfaces` | `SdpStatement`, `*WitnessWithDominance*`, `MatrixSdpStatementWithSlacknessAndDominance` | Lean-only dominance interfaces.  The blueprint states that these are not formalizations of `lem:sdp`. |
 | `lem:sdp` | `SdpStatementWithSlackness` | Source-facing SDP theorem with complementary slackness.  The slackness structure records the paper conclusion, not an extra public hypothesis. |
 | `lem:add-in-u` | `AddInUFullStatement` | Source-facing add-in-\(u\) statement package.  The package records the displayed conclusion of the lemma. |
+| `rem:self-improvement-lean-interfaces` | `spectralTruncationStatement_of_sourceAlmostProjective` | Lean-only auxiliary interface for the projective self-improvement proof.  The spectral-truncation declaration is a proved construction from the source almost-projective estimate, not a witness hypothesis added to Theorem `thm:self-improvement`. |
 | `clm:g-comm-stability` and `clm:g-comm-stability2` | `SliceBoundednessInput.*` | Faithful encoding of the paper boundedness hypothesis from the commutativity and pasting route. |
 | `lem:weighted-restricted-probability-bounds` | `RestrictedProbabilitiesStatement.ofWeightedBounds` | Internal weighted-probability statement constructor used in the induction assembly. |
 | `def:self-improvement-slice-transport` | `selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion` | Lean-only transport interface.  It does not prove `thm:main-induction`. |
