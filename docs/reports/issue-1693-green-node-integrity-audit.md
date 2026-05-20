@@ -1,8 +1,10 @@
 # Green Blueprint Node Integrity Audit
 
-This note records a first pass over the green blueprint nodes whose Lean links
-might conceal an obligation, bridge, residual, repair input, or other
+This note records the first name-based pass over the green blueprint nodes whose
+Lean links might conceal an obligation, bridge, residual, repair input, or other
 load-bearing hypothesis not present in the displayed mathematical statement.
+A second pass on May 21, 2026 also checks public Lean signatures; see
+`docs/reports/2026-05-21-green-node-signature-audit.md`.
 
 The audit was run on commit `e3d69726b` of `origin/main`, before the open PRs
 `#1763`--`#1766` were merged.  Those PRs further refine the same boundary, but
@@ -10,11 +12,10 @@ the classification below concerns the current mainline state.
 
 ## Method
 
-The audit is implemented by
-`scripts/audit_green_node_integrity.py`.  It parses every theorem-like
-environment in `blueprint/src/chapter` that contains `\leanok`.  It then
-searches the attached Lean declarations for names containing the following
-warning terms:
+The initial audit was implemented by `scripts/audit_green_node_integrity.py`.
+It parsed every theorem-like environment in `blueprint/src/chapter` that
+contains `\leanok`.  It then searched the attached Lean declarations for names
+containing the following warning terms:
 
 - `Obligation`, `Bridge`, `Residual`, `Repair`, `Package`;
 - `Input`, `Producer`, `Hypotheses`, `Assumptions`;
@@ -28,8 +29,11 @@ This screen found 180 `\leanok` blueprint environments:
 | Definition or remark labels | 56 |
 
 Among the source-like labels, only four nodes, comprising six Lean declaration
-links, contained one of the warning terms.  Each of those nodes was then checked
-against its displayed blueprint statement and the surrounding documentation.
+links, contained one of the warning terms in the declaration name.  Each of
+those nodes was then checked against its displayed blueprint statement and the
+surrounding documentation.  The later signature audit finds additional
+source-like links whose declarations have neutral names but public headers that
+mention `SliceBoundednessInput` or `CascadeHypotheses`.
 
 ## Source-like green nodes with warning terms
 
@@ -59,9 +63,10 @@ boundedness assumption.
 Its warning terms have the same status as in `clm:g-comm-stability`: they expose
 the displayed boundedness data rather than adding a hidden hypothesis.
 
-No source-like green node in this screen was found to be green only by assuming
-an undisplayed obligation, bridge, residual package, repair input, producer, or
-generic hypotheses bundle.
+No source-like green node in this name-based screen was found to be green only
+by assuming an undisplayed obligation, bridge, residual package, repair input,
+producer, or generic hypotheses bundle.  The stronger signature audit records
+the known obligation-shaped public signatures explicitly.
 
 ## Green nodes that are intentionally not source theorems
 
@@ -118,7 +123,8 @@ blueprint nodes or the Step 6 boundary:
 python3 scripts/audit_green_node_integrity.py --root . --ci
 ```
 
-The script has an allow-list for the four audited source-like nodes.  It fails
-when a new green source-like node is linked to an obligation, bridge, residual,
-repair, input, producer, or hypothesis-style declaration without a fresh
-statement-integrity classification.
+The script has allow-lists for the audited source-like nodes and for the current
+source-like signatures with obligation-shaped terms.  It fails when a new green
+source-like node is linked to an obligation, bridge, residual, repair, input,
+producer, or hypothesis-style declaration, or to such a public Lean signature,
+without a fresh statement-integrity classification.

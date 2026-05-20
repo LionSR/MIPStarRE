@@ -4,7 +4,9 @@
 The script scans `\\leanok` blueprint environments.  It reports all declarations
 whose names contain bridge, obligation, residual, repair, input, producer, or
 hypothesis terminology, and it fails when a source-like node has an unexpected
-warning declaration.
+warning declaration.  It also inspects the public Lean declaration header for
+source-like nodes, so that a theorem with a neutral name but an obligation-shaped
+hypothesis is not silently treated as genuinely green.
 """
 
 from __future__ import annotations
@@ -70,6 +72,129 @@ ALLOWED_SOURCE_WARNINGS = {
     ),
 }
 
+ALLOWED_SOURCE_SIGNATURE_WARNINGS = {
+    (
+        "lem:comm-data-processed-g",
+        "MIPStarRE.LDT.Commutativity.commDataProcessedG",
+    ),
+    (
+        "clm:g-comm-stability",
+        "MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput."
+        "storedBoundedResidualBound",
+    ),
+    (
+        "clm:g-comm-stability",
+        "MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput."
+        "averagedPoint_le_witness",
+    ),
+    (
+        "clm:g-comm-stability",
+        "MIPStarRE.LDT.Commutativity.gCommStability_scalar",
+    ),
+    (
+        "clm:g-comm-stability2",
+        "MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput."
+        "storedBoundedResidualBound",
+    ),
+    (
+        "clm:g-comm-stability2",
+        "MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput."
+        "averagedPoint_le_witness",
+    ),
+    (
+        "clm:g-comm-stability2",
+        "MIPStarRE.LDT.Commutativity.gCommStabilityTwo_scalar",
+    ),
+    (
+        "thm:com-main",
+        "MIPStarRE.LDT.Commutativity.comMain",
+    ),
+    (
+        "thm:ld-pasting",
+        "MIPStarRE.LDT.Pasting.ldPasting",
+    ),
+    (
+        "lem:ld-pasting-sub-measurement",
+        "MIPStarRE.LDT.Pasting.ldPastingSubMeas",
+    ),
+    (
+        "cor:commuting-with-G-complete",
+        "MIPStarRE.LDT.Pasting.commutingWithGComplete",
+    ),
+    (
+        "cor:commuting-with-G-incomplete",
+        "MIPStarRE.LDT.Pasting.commutingWithGIncomplete",
+    ),
+    (
+        "cor:G-hat-facts",
+        "MIPStarRE.LDT.Pasting.gHatFacts",
+    ),
+    (
+        "lem:commute-g-half-sandwich",
+        "MIPStarRE.LDT.Pasting.commuteGHalfSandwich",
+    ),
+    (
+        "lem:line-interpolation-averaging-estimates",
+        "MIPStarRE.LDT.Pasting.avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError",
+    ),
+    (
+        "lem:line-interpolation-averaging-estimates",
+        "MIPStarRE.LDT.Pasting.avgOver_distinct_badMass_le_hBConsistencyError",
+    ),
+    (
+        "lem:ld-sandwich-line-one-point",
+        "MIPStarRE.LDT.Pasting.ldSandwichLineOnePoint",
+    ),
+    (
+        "lem:h-b-consistency",
+        "MIPStarRE.LDT.Pasting.hBConsistency",
+    ),
+    (
+        "cor:h-a-consistency",
+        "MIPStarRE.LDT.Pasting.hAConsistency_submeas",
+    ),
+    (
+        "lem:over-all-outcomes",
+        "MIPStarRE.LDT.Pasting.overAllOutcomes",
+    ),
+    (
+        "lem:from-H-to-G",
+        "MIPStarRE.LDT.Pasting.fromHToG",
+    ),
+    (
+        "cor:ld-pasting-N-completeness",
+        "MIPStarRE.LDT.Pasting.ldPastingNCompleteness",
+    ),
+    (
+        "thm:ld-pasting-in-induction-section",
+        "MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection",
+    ),
+    (
+        "thm:sigma-bound-main-formal",
+        "MIPStarRE.LDT.Test.sigma_bound",
+    ),
+    (
+        "thm:zeta-bounds-main-formal",
+        "MIPStarRE.LDT.Test.zeta1_bound",
+    ),
+    (
+        "thm:zeta-bounds-main-formal",
+        "MIPStarRE.LDT.Test.zeta2_bound",
+    ),
+    (
+        "thm:zeta-bounds-main-formal",
+        "MIPStarRE.LDT.Test.zeta3_bound",
+    ),
+    (
+        "thm:zeta-bounds-main-formal",
+        "MIPStarRE.LDT.Test.zeta4_bound",
+    ),
+    (
+        "thm:error-cascade-main-formal",
+        "MIPStarRE.LDT.Test.errorCascade_le_mainFormalError",
+    ),
+}
+
 
 ENV_RE = re.compile(
     r"\\begin\{(definition|theorem|lemma|proposition|remark|corollary)\}"
@@ -78,6 +203,15 @@ ENV_RE = re.compile(
 )
 
 LEAN_RE = re.compile(r"\\lean\{([^}]*)\}", re.DOTALL)
+
+EVENT_RE = re.compile(
+    r"(?m)^(?:"
+    r"namespace\s+([A-Za-z0-9_'.]+)\s*$"
+    r"|end(?:\s+([A-Za-z0-9_'.]+))?\s*$"
+    r"|(?:@[^\n]*\n\s*)*(?:private\s+)?(?:noncomputable\s+)?"
+    r"(?:def|theorem|lemma|structure|class)\s+([A-Za-z0-9_'.]+)"
+    r")"
+)
 
 
 def lean_declarations(block: str) -> list[str]:
@@ -99,6 +233,54 @@ def warning_declarations(declarations: list[str]) -> list[str]:
         for declaration in declarations
         if any(term in declaration for term in WARNING_TERMS)
     ]
+
+
+def declaration_headers(root: Path) -> dict[str, list[tuple[Path, str]]]:
+    """Index Lean declaration headers by qualified and unqualified names."""
+    headers: dict[str, list[tuple[Path, str]]] = {}
+    for path in sorted((root / "MIPStarRE").rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        namespace_stack: list[str] = []
+        for match in EVENT_RE.finditer(text):
+            namespace_name, end_name, declaration_name = match.groups()
+            if namespace_name is not None:
+                namespace_stack.extend(namespace_name.split("."))
+                continue
+            if end_name is not None:
+                components = end_name.split(".")
+                if namespace_stack[-len(components) :] == components:
+                    del namespace_stack[-len(components) :]
+                elif namespace_stack:
+                    namespace_stack.pop()
+                continue
+            if declaration_name is None:
+                # Bare `end` commonly closes a `section`; all namespace closures
+                # in the current codebase are named.  Avoid corrupting the
+                # namespace stack when the closed block is not a namespace.
+                continue
+            header_start = match.start()
+            assignment = text.find(":=", match.end())
+            where = text.find(" where", match.end(), assignment if assignment != -1 else len(text))
+            stops = [stop for stop in (assignment, where) if stop != -1]
+            header_end = min(stops) if stops else text.find("\n\n", match.end())
+            if header_end == -1:
+                header_end = min(len(text), header_start + 2000)
+            header = text[header_start:header_end]
+            qualified_name = ".".join(namespace_stack + [declaration_name])
+            headers.setdefault(qualified_name, []).append((path, header))
+            headers.setdefault(declaration_name, []).append((path, header))
+    return headers
+
+
+def header_warning_terms(declaration: str, headers: dict[str, list[tuple[Path, str]]]) -> list[str]:
+    """Return warning terms appearing in the public header of a Lean declaration."""
+    short_name = declaration.rsplit(".", 1)[-1]
+    found: set[str] = set()
+    declaration_headers = headers.get(declaration) or headers.get(short_name, [])
+    for _path, header in declaration_headers:
+        signature = header.split(short_name, 1)[1] if short_name in header else header
+        found.update(term for term in WARNING_TERMS if term in signature)
+    return sorted(found)
 
 
 def iter_leanok_blocks(chapter_dir: Path):
@@ -130,7 +312,10 @@ def main() -> int:
     aux_count = 0
     allowed_source: list[tuple[Path, str, str]] = []
     unexpected_source: list[tuple[Path, str, str]] = []
+    allowed_signature: list[tuple[Path, str, str, list[str]]] = []
+    unexpected_signature: list[tuple[Path, str, str, list[str]]] = []
     aux_warning_count = 0
+    headers = declaration_headers(args.root)
 
     for path, _env, label, block in iter_leanok_blocks(chapter_dir):
         leanok_count += 1
@@ -150,16 +335,34 @@ def main() -> int:
             else:
                 aux_warning_count += 1
 
+        if source_like:
+            for declaration in lean_declarations(block):
+                terms = header_warning_terms(declaration, headers)
+                if not terms:
+                    continue
+                row_with_terms = (path, label, declaration, terms)
+                if (label, declaration) in ALLOWED_SOURCE_SIGNATURE_WARNINGS:
+                    allowed_signature.append(row_with_terms)
+                else:
+                    unexpected_signature.append(row_with_terms)
+
     print(f"leanok environments: {leanok_count}")
     print(f"source-like labels: {source_count}")
     print(f"definition or remark labels: {aux_count}")
     print(f"allowed source-like warning links: {len(allowed_source)}")
+    print(f"allowed source-like signature warnings: {len(allowed_signature)}")
     print(f"auxiliary warning links: {aux_warning_count}")
 
     if unexpected_source:
         print("unexpected source-like warning links:")
         for path, label, declaration in unexpected_source:
             print(f"- {path}:{label}: {declaration}")
+        return 1 if args.ci else 0
+
+    if unexpected_signature:
+        print("unexpected source-like signature warnings:")
+        for path, label, declaration, terms in unexpected_signature:
+            print(f"- {path}:{label}: {declaration} ({', '.join(terms)})")
         return 1 if args.ci else 0
 
     print("OK: no unexpected warning links in green source-like blueprint nodes.")
