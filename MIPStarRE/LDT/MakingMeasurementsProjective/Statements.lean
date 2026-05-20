@@ -151,7 +151,7 @@ structure NaimarkTensorProductCorrelationData
   /-- Bob's auxiliary factor is normalized. -/
   auxRight_normalized : auxRight.IsNormalized
   /-- The auxiliary state is the product of its Alice and Bob factors. -/
-  aux_product :
+  auxState_product :
     auxState.density = opTensor auxLeft.density auxRight.density
   /-- The dilated bipartite state in the register order of the dilated measurements. -/
   dilatedState :
@@ -160,6 +160,8 @@ structure NaimarkTensorProductCorrelationData
   dilatedState_density :
     dilatedState.density =
       naimarkProductExtensionDensity HA HB HauxA HauxB ψ auxState
+  /-- The dilated state is normalized. -/
+  dilatedState_normalized : dilatedState.IsNormalized
   /-- Alice's projective measurements on the enlarged Alice space. -/
   left : IdxProjMeas QuestionA OutcomeA (HA.carrier × HauxA.carrier)
   /-- Bob's projective measurements on the enlarged Bob space. -/
@@ -167,12 +169,8 @@ structure NaimarkTensorProductCorrelationData
   /-- Preservation of the bipartite correlations for every question and outcome. -/
   correlation_preservation :
     ∀ (x : QuestionA) (y : QuestionB) (a : OutcomeA) (b : OutcomeB),
-      ev ψ
-          (leftTensor (ι₂ := HB.carrier) ((A x).outcome a) *
-            rightTensor (ι₁ := HA.carrier) ((B y).outcome b)) =
-        ev dilatedState
-          (leftTensor (ι₂ := HB.carrier × HauxB.carrier) ((left x).outcome a) *
-            rightTensor (ι₁ := HA.carrier × HauxA.carrier) ((right y).outcome b))
+      ev ψ (opTensor ((A x).outcome a) ((B y).outcome b)) =
+        ev dilatedState (opTensor ((left x).outcome a) ((right y).outcome b))
 
 /-- Source-shaped statement of the full tensor-product Naimark theorem.
 
@@ -210,8 +208,10 @@ of the questionwise Naimark dilations described in
 `references/ldt-paper/orthonormalization.tex:161-187`.  The missing
 formalization is documented in `docs/paper-gaps/naimark.tex` and tracked by
 issue #1697.  Elimination: construct the product auxiliary registers, lift each
-one-measurement dilation to the appropriate tensor factor, and prove the
-displayed correlation identity from the one-measurement compression identities. -/
+one-measurement dilation to the appropriate tensor factor, include the
+`Option`-completion/perp-projector step needed to obtain projective
+measurements on the original outcomes, and prove the displayed correlation
+identity from the one-measurement compression identities. -/
 theorem naimarkTensorProductCorrelation
     {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]

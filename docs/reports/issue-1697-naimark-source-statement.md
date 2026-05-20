@@ -58,11 +58,10 @@ Lean conclusion:
 
 - finite auxiliary Hilbert-space carriers;
 - normalized auxiliary product-state data;
-- a dilated state whose density is the register-reordered tensor product of
-  the source state and the auxiliary state;
+- a normalized dilated state whose density is the register-reordered tensor
+  product of the source state and the auxiliary state;
 - indexed projective measurements on the enlarged local spaces;
-- the same four-index correlation identity, expressed with `leftTensor` and
-  `rightTensor`.
+- the same four-index correlation identity, expressed with `opTensor`.
 
 Verdict: faithful boundary hypotheses.  The explicit finite carriers and
 normalization fields are Lean encodings of the paper's finite-dimensional
