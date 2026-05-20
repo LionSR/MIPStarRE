@@ -119,6 +119,10 @@ The largest clusters are:
    include `hresidual`, `OrthonormalizeAndCompleteStatement`,
    `AlmostProjMeasStatement`, and `SpectralTruncationStatement`.
 
+The exact active `\leanok` nodes whose Lean names contain high-risk vocabulary
+are recorded in
+`docs/reports/issue-1458-green-node-name-inventory.md`.
+
 ## Verdict
 
 At the theorem, lemma, proposition, and corollary boundary, the current green
