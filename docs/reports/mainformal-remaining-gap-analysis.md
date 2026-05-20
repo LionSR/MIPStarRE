@@ -25,10 +25,95 @@ Date: 2026-05-07
 > `UnsymmetrizationConsistency`.  This is not a change of mathematical content:
 > the record is a proved consistency statement derived from the role-register
 > estimate, not an additional bridge hypothesis.
+>
+> **Status note, 2026-05-20.**  The analysis below is now a historical record
+> of the final-theorem repair.  The current source statement
+> `thm:main-formal` is no longer linked to a conditional Lean theorem; the
+> same-space Lean interface is recorded separately as
+> `thm:main-formal-current-interface`.  The same-space theorem
+> `MIPStarRE.LDT.Test.mainFormal` has no bridge, residual, package, or
+> obligation hypotheses.  Its only remaining `sorryAx` dependency is
+> transitive through `MIPStarRE.LDT.MainInductionStep.mainInduction`, and the
+> only construction proof hole on that same-space route is
+> `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
+> The source-labelled blueprint entry `thm:main-formal` is now recorded as
+> `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
+> wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation` for the printed
+> two-space, `k >= md` statement.  This wrapper proves the saturated-error
+> branch and leaves
+> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` as the direct
+> final-theorem source-boundary proof hole.
+> The former `MainFormalRolePackageBranchResidual`,
+> `successorSelfImprovementObligations`,
+> `answerSuccessorSelfImprovementObligations`, and recursive-slice input
+> records should therefore be read as removed intermediate interfaces, not as
+> current proof targets.
 
 ## 1. Exact sorry site
 
-**File:** `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:611`
+**Current direct file:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean:680`
+
+**Current direct theorem:**
+`MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
+
+The active goal is the small-error branch of the native successor step in
+`thm:main-induction`:
+
+```lean
+∃ G : Measurement (Polynomial params.next) ι,
+  ConsRel strategy.state (uniformDistribution (Point params.next))
+    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+    (polynomialEvaluationFamily params.next G.toSubMeas)
+    (mainInductionError params.next k eps delta gamma)
+```
+
+This theorem assumes precisely the successor branch hypotheses, including
+`strategy.IsGood eps delta gamma`,
+`400 * params.next.m * params.next.d ≤ k`, and
+`mainInductionError params.next k eps delta gamma < 1`.  It does not assume
+restricted-probability records, slice-induction data, self-improvement data,
+pasting data, residual packages, or arbitrary implication hypotheses.
+
+The older conditional direct `sorry` in `MainFormal.lean` has been removed.  A
+direct `sorry` remains in `mainFormal_sourceSmallErrorObligation`, but it is a
+named non-vacuous source-boundary obligation rather than the removed conditional
+bridge package.  The wrapper `mainFormal_sourceObligation` proves the
+saturated-error branch by a two-space trivial measurement construction.
+The historical goal displayed below records the earlier state of this report.
+
+## 1.1. Statement integrity audit
+
+Paper assumptions for `thm:main-formal`: a general projective strategy
+`(\psi, A^A, B^A, L^A, A^B, B^B, L^B)` for the `(m,q,d)` low individual degree
+test, passing probability at least `1 - eps`, and an integer `k >= md`.
+
+Lean assumptions in `MIPStarRE.LDT.Test.mainFormal`: a same-space projective
+strategy `strategy : SameSpaceProjStrat params ι`, the pass hypothesis
+`strategy.PassesLowIndividualDegreeTest eps`, an integer `k`, the corrected
+large-`k` bound `400 * params.m * params.d <= k`, and the scalar boundary
+`0 < k`.
+
+Paper conclusion: projective polynomial measurements `G^A` and `G^B` whose
+evaluations are consistent with the two point measurements, and which are
+mutually self-consistent, with error `nu`.
+
+Lean conclusion: projective measurements
+`G_A G_B : ProjMeas (Polynomial params) ι` satisfying the two point-consistency
+relations and the final self-consistency relation at `mainFormalError params k
+eps`.
+
+Verdict: the source theorem `thm:main-formal` is exact in the blueprint and is
+now linked to the source-faithful Lean statement
+`MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
+source-boundary wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation`.
+This wrapper proves the saturated-error branch and calls
+`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` in the remaining
+small-error branch.
+The Lean theorem `mainFormal` is a separate current interface with
+faithful boundary hypotheses for the present formal container and the
+documented large-`k` correction.  It has no bridge, residual, package, repair,
+producer, input, or obligation hypothesis.  Its only remaining proof debt is
+transitive through the Section 6 theorem `MainInductionStep.mainInduction`.
 
 **Historical goal type at the sorry:**
 ```lean
@@ -49,7 +134,7 @@ and the post-role diagonal completion theorem.
 | `roleInductionWitness` | `MainFormalRoleInductionWitness params strategy eps hpass k` | Section 6 witness |
 | `postRoleDiagonalCompletion` | `MainFormalDiagonalCompletionWitness params strategy eps k scalars (roleInductionWitness.roleWitness scalars)` | Post-role line-130 completion |
 
-## 2. Context at the sorry site
+## 2. Historical context at the removed `MainFormal.lean` sorry site
 
 ### Branch conditions
 - `herr : ¬ 1 ≤ mainFormalError params k eps` — error is non-trivial
@@ -61,25 +146,32 @@ and the post-role diagonal completion theorem.
 ### Available hypotheses
 - `scalars : MainFormalCascadeScalars params eps k` — constructed from
   `hepsNN`, `hk0`, `herr`.
-- The current theorem statement has no bridge-style hypothesis.  The
-  role-register witness, line-130 orthonormalization witness, and completion data are
+- The theorem statement had no bridge-style hypothesis.  The role-register
+  witness, line-130 orthonormalization witness, and completion data were
   internal proof obligations.
 
 The line-130 orthonormalization witness is now obtained from cross consistency
-through the Section 5 repair construction.  The remaining completion work is
-match-mass preservation and the successor role-register construction.
+through the Section 5 repair construction.  In the current code, this is no
+longer an open `MainFormal.lean` completion problem; the remaining dependency
+is the Section 6 successor construction described above.
 
 ### What's NOT in scope
 
-The comment at the historical `sorry` site states that the answer-valued
-recursive-slice adapter is available, but the predecessor per-slice induction
-data and answer-side self-improvement obligations are not in scope.
+The current successor theorem makes the missing constructions explicit in
+mathematical form, rather than as extra fields on `mainFormal`.  The remaining
+proof must construct the answer-valued restricted slice profile, apply the
+recursive predecessor induction conclusion to each slice, realize the
+induction-section self-improvement interface, assemble the pasting input, and
+prove the scalar absorption estimates.
 
-The missing inputs are:
-1. **Predecessor per-slice induction data** — providing a Section 6 witness for each restricted slice of the predecessor parameter
-2. **Answer-side self-improvement obligations** — providing the Section 9 self-improvement data for the predecessor
+The checked assembly theorems have reduced this to three concrete components:
 
-These are NOT hypotheses of `mainFormal`. The base case avoids them entirely by using `MainFormalRoleInductionWitness.ofBaseCase` (which calls the already-checked `strategySymmetrization_mainInductionBaseCase`).
+1. the degree-zero family-and-scalar construction;
+2. the predecessor induction argument for the answer-valued restricted slices;
+3. the positive-degree answer-valued slice realization.
+
+These are not hypotheses of `mainFormal`, nor of the paper-facing successor
+step.  They are the remaining internal proof obligations in Section 6.
 
 ## 3. Field analysis
 
@@ -100,21 +192,17 @@ structure MainFormalRoleInductionWitness ... where
 **Existing construction theorem for base case:** `MainFormalRoleInductionWitness.ofBaseCase` (RoleRegister/Core.lean:187-196)
 - Calls `strategySymmetrization_mainInductionBaseCase` — already checked ✅
 
-**Existing construction theorem for successor case:** `MainFormalRoleInductionWitness.ofSuccessorBoundary` (RoleRegister/Core.lean:205-216)
-- Requires `params.next`, `MainFormalSuccessorBoundary`, etc.
-- The successor boundary is NOT available in `mainFormal`'s context.
+The historical successor constructors in `RoleRegister.lean` have been removed
+from the active final-theorem route.  Their names recorded the missing
+predecessor-slice and self-improvement data as records.  The current repair
+does not present those records as acceptable public inputs.  Instead,
+`mainInductionSuccessorNext_ofSmallErrorConstruction` is the single named
+construction obligation: it must derive the required successor witness from the
+paper hypotheses by the induction argument of Section 6.
 
-**Alternative successor construction theorems** (all in RoleRegister.lean):
-
-| Constructor | Required inputs | Status |
-|------------|----------------|--------|
-| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofSuccessorObligations` | `successorRecursiveSlicesInput` + `successorSelfImprovementObligations` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorObligations` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorRecursiveSelfImprovement` | `answerSuccessorRecursiveSlicesInput` + `answerSuccessorSelfImprovementInput` | Neither in scope |
-| `MainFormalRolePackageBranchResidual.roleWitnessResidual_ofAnswerSuccessorInductionPackageAndObligations` | `answerSuccessorPerSliceInductionDataInput` + `answerSuccessorSelfImprovementObligations` | Neither in scope |
-
-**Status:** no construction theorem is available in scope. This is the primary
-gap.
+**Status:** the role-register construction is no longer a separate
+`mainFormal` gap.  It is part of the remaining native successor proof for
+`thm:main-induction`.
 
 ### Field 2: `postRoleDiagonalCompletion : MainFormalDiagonalCompletionWitness`
 
@@ -160,8 +248,9 @@ induction side rather than in a separate exact line-169 sub-obligation.
 ### Historical Route A: Mirror the base case
 
 The older proposed route was to replace the successor branch with the same
-shape as the base case: first construct a role-register witness, then call a conditional
-assembly theorem that also consumed bridge-style completion data.
+shape as the base case: first construct a role-register witness, then call an
+assembly theorem that also consumed bridge-style completion data as explicit
+inputs.
 
 This was the historical simple route.  It is rejected for the paper-facing
 theorem because it relies on additional non-paper inputs.
@@ -183,147 +272,57 @@ intermediate record and constructs the active
 structure.  Route B required more construction and preserved downstream code
 that has since been simplified.  Either route ultimately needs Field 1.
 
-## 5. What must be proved internally
+## 5. What must be proved internally now
 
-The successor case needs data that must be constructed inside the proof of
-`mainFormal`, not added to its parameter list.
+The remaining work is no longer a `mainFormal` parameter problem.  It is the
+small-error successor construction for `thm:main-induction`.
 
-### Historical rejected option: Add successor hypotheses
+The paper uses answer-restricted slices in the induction step.  In Lean this
+means the proof of
+`mainInductionSuccessorNext_ofSmallErrorConstruction` should construct, from
+the successor strategy and the good-strategy hypotheses, the restricted slice
+data needed by the checked answer-stage assembly.  The recursive predecessor
+induction should enter as the local induction hypothesis in the proof of
+`mainInduction`, not as an assumption of the final theorem.
 
-Historical rejected route: add parameters providing the predecessor induction
-data:
+The current internal proof obligations are:
+
+| Component | Mathematical role | Present status |
+|-----------|-------------------|----------------|
+| Degree-zero branch | Produce the family and scalar estimates when `params.d = 0` | Isolated by the checked degree-split assembly |
+| Predecessor induction | Apply `thm:main-induction` to each answer-valued restricted predecessor slice | Still the genuine recursive part |
+| Positive-degree slice realization | Build the answer-valued slice transport and self-improvement data when `0 < params.d` | Reduced to the checked stage interfaces |
+| Scalar absorption | Verify that the accumulated losses are bounded by `mainInductionError params.next k eps delta gamma` | Partly assembled; remaining estimates belong to #1507 |
+
+The rejected historical route was to add records encoding these objects to
+`mainFormal`, or to a paper-facing successor theorem.  That route would
+strengthen the source statement.  The present route keeps the objects internal
+to the Section 6 proof.
+
+## 6. Relationship to earlier trackers
+
+Several older issues named the missing data as final-theorem obligations.  They
+are useful for provenance, but they no longer describe the active public
+interface.
+
+| Issue | Current reading |
+|-------|-----------------|
+| #1507 | Live tracker for the native small-error successor construction |
+| #1458 | Source-statement boundary tracker for the final theorem route |
+| #1363 | Historical final-theorem successor-completion tracker |
+| #1565 | Historical line-130 diagonal completion tracker; the active route now derives this through checked completion lemmas |
+| #1566 | Historical line-169 exact match-mass tracker; superseded by the repaired line-169 transport estimate |
+| #1558 | Cleanup tracker for removing residual and package layers from the final theorem route |
+| #1035, #1036, #1041 | Historical names for recursive-slice and self-improvement obligations before the route was moved into Section 6 |
+| #1043 | Historical base-completion tracker; the current base branch is checked |
+| #1103, #1367 | Historical Section 9 closure and audit trackers; the self-improvement interface is now checked |
+| #1359 | Historical orthonormalization-input audit; the Section 5 route is now checked |
+
+Thus the active mathematical frontier is a single theorem:
 
 ```lean
-(hanswerObligations : answerSuccessorSelfImprovementObligations (k := k) hpass hm_one_ne)
-(hinductionPackage : answerSuccessorPerSliceInductionDataInput (k := k) hpass hm_one_ne)
+MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction
 ```
 
-Where:
-- `answerSuccessorSelfImprovementObligations` — per-slice Section 9 obligations
-- `answerSuccessorPerSliceInductionDataInput` — per-slice induction data
-
-This is useful only as a description of the missing internal obligations.  It
-should not be the public statement of `mainFormal`.
-
-### Alternative: Use ordinary (non-answer) successor route
-
-The ordinary route needs:
-- `successorRecursiveSlicesInput`
-- `successorSelfImprovementObligations`
-
-With construction theorems:
-```lean
-MainFormalRolePackageBranchResidual.roleWitnessResidual_ofSuccessorObligations
-  hpass hm1 hd hk0 hk hrec obligations
-```
-
-### Which route is paper-faithful?
-
-The paper uses the answer-restricted induction (Section 6 of the LDT paper goes through the answer alphabet restriction). The answer-valued route is the paper-faithful one. However, both routes are mathematically equivalent — the ordinary restriction and answer-valued restriction are both formalized.
-
-## 6. Relationship to active PRs
-
-| PR | Description | Overlap with this gap? |
-|----|-------------|----------------------|
-| #1355 | Absorb small-alphabet data-processing gap in SelfImprovement | ❌ Orthogonal (self-improvement pipeline — needed to eventually prove the obligations but doesn't provide them directly) |
-| #1353 | Residual-domination lemmas for SelfImprovement orthonormalization | ❌ Orthogonal (helps discharge orthonormalization obligations but doesn't provide the obligations themselves) |
-| #1352 | Slackness bridge for strong duality | Orthogonal (SDP infrastructure for self-improvement) |
-
-None of the active PRs directly fills the gap. They are building the
-self-improvement infrastructure that would eventually be consumed by
-`answerSuccessorSelfImprovementObligations` /
-`successorSelfImprovementObligations`, but the source-level obligation
-dischargers are not yet constructed.
-
-## 7. Summary of actionable sub-gaps
-
-### Gap 1 (CRITICAL): Successor role-register construction
-
-**What:** Need to produce `MainFormalRoleInductionWitness` for the `params.m ≠ 1` branch.
-
-**Why blocked:** `mainFormal` lacks the successor induction hypotheses needed to invoke any of the existing successor role-register constructors.
-
-**Resolution:** prove the recursive induction data and the corresponding
-self-improvement obligations inside the `mainFormal` proof, for example by
-embedding the final theorem in a recursion that supplies them from the
-predecessor induction hypothesis.  Adding
-`answerSuccessorPerSliceInductionDataInput`,
-`answerSuccessorSelfImprovementObligations`, `successorRecursiveSlicesInput`, or
-`successorSelfImprovementObligations` to the public `mainFormal` statement is
-the rejected historical route, not an acceptable repair.
-
-**Tracked by:** #931 (successor obligations), #834 (remaining witness construction), #422 (main-formal completion epic)
-
-### Gap 2 (follows from Gap 1): Post-role diagonal completion
-
-**What:** Need to derive `MainFormalDiagonalCompletionWitness`
-from the role-register witness and the paper's line-130 consistency data.
-
-**Why blocked:** Depends on Gap 1. Once the role-register witness is available, the
-current route derives the orthonormalization witness from cross consistency.
-The remaining pieces are the two match-mass preservation obligations.  The
-completion outcome and completion-closeness estimates are now produced by
-`MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency`
-from those obligations.
-
-**Resolution options:**
-- Build the completion witness directly from the role-register witness, the
-  line-130 orthonormalization witness, and match-mass preservation.
-- Keep the missing match-mass argument as an internal obligation until it is
-  proved from the paper hypotheses.
-
-### Gap 3 (INFRA): Base-case completion construction
-
-**Historical what:** the older conditional theorem shape took a bridge-style
-hypothesis as an unproved input.  In the current repair, no such input belongs
-to `mainFormal`; #1043 tracks the remaining base-case completion obligation.
-
-**Status:** the base completion construction is orthogonal to the successor
-case.  It must be produced from the paper hypotheses regardless of which
-successor route is chosen.
-
-**Tracked by:** #1043
-
-## 8. Which approach discharges the remaining obligations?
-
-**Historical minimum closure:** Add the missing hypotheses to `mainFormal`
-(Gap 1) and use Route A.  This would replace the proof holes with a call to the
-existing constructors, but it would also strengthen the source-facing theorem by
-adding non-paper assumptions.  The current repair policy rejects this route.
-
-**Complete closure:** Prove the base completion obligation (#1043), then prove
-the successor obligations (#931), then prove the per-slice induction data
-(which itself would need a recursive application of `mainFormal`). This closes
-`mainFormal` completely without extra hypotheses but requires a well-founded
-recursion setup.
-
-The old "extra-hypothesis" route is rejected for the paper-facing theorem.
-Missing work should appear as internal proof obligations, not as new assumptions
-of `mainFormal`.
-
-## 9. Existing tracking issues
-
-Several issues already cover the sub-gaps identified above:
-
-| Issue | Description | Covers Gap |
-|-------|-------------|------------|
-| #1363 | Historical tracker for closing the MainFormal successor-case projective completion gap | Primary tracker |
-| #1565 | Discharge the line-130 diagonal completion construction for `mainFormal` | Current post-role completion tracker |
-| #1566 | Historical line-169 match-mass tracker for the chosen `mainFormal` witnesses | Former exact branch, now superseded by the repaired route |
-| #1558 | Audit and reduce final-theorem residual and package layers | Current final-theorem cleanup branch under #1458 |
-| #1035 | Prove recursive mainFormal for successor restricted slices | `MainFormalSuccessorRecursiveSlices` |
-| #1036 | Construct successor-case self-improvement obligations | `MainFormalSuccessorSelfImprovementObligations` |
-| #1041 | Assemble successor-case mainFormal branch | Final wiring of #1035 + #1036 |
-| #1043 | Construct base-case completion data | Base-case completion |
-| #1103 | SelfImprovement: assemble closed obligations | Self-improvement closure |
-| #1104 | LDT/Test: assemble successor Step-6 witness from proved obligations | Step-6 assembly |
-| #931 | Close self-improvement inputs for Section 6 | Self-improvement → main induction bridge |
-| #1367 | SelfImprovement bridge: audit and close input-consistency orphans blocking mainFormal | Self-improvement audit |
-| #1359 | Trace OrthonormalizationInput extra-hypothesis chain | Orthonormalization hypothesis chain |
-
-The answer-valued successor route
-(`MainFormalSuccessorAnswerRecursiveSlices` plus
-`MainFormalSuccessorAnswerSelfImprovementObligations`, or
-`AnswerPerSliceInductionData` plus answer-valued obligations) is the
-paper-faithful route using answer alphabet restriction, and is tracked by
-#1369.
+Closing that theorem removes the remaining direct `sorry` and eliminates the
+transitive `sorryAx` dependency of `mainInduction` and `mainFormal`.

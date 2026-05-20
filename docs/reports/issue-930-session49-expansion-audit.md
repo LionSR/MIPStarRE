@@ -6,6 +6,15 @@ Base commit: `fee6f63d` (at branch creation, tracking `origin/main`)
 
 Branch: `gpt55/issue-930-expansion-audit`
 
+> **Status note, 2026-05-20.**  The coordination paragraph below records the
+> issue state at the May 1 audit snapshot.  The old `Test/MainTheorem.lean`
+> Step-6 residual and #931 self-improvement input-producer route are no longer
+> the current proof frontier.  The current direct LDT proof obligations are the
+> two source-boundary obligations for `thm:main-induction` and
+> `thm:main-formal`, together with the Section 6 small-error successor
+> construction tracked by #1507.  This historical audit remains valid as a
+> statement audit for the hypercube expansion slice.
+
 ## Executive summary
 
 I audited the already-formalized hypercube expansion slice against:
@@ -36,11 +45,11 @@ The only open PR at audit start was draft #889.  I made no Lean or
 blueprint changes that could interact with that upgrade.  The audit is
 documentation-only.
 
-Issue #931 remains open and assigned to `jizhengfeng`; it owns the
-self-improvement input producers for Section 6 and is outside this
-audit.  Issue #834 remains open for the `mainFormal` Step-6 witness
-residual.  This audit therefore does not attempt to construct any new
-proofs or modify any Lean sources.
+At the audited snapshot, issue #931 remained open and assigned to
+`jizhengfeng`; it owned the self-improvement input producers for Section 6 and
+was outside this audit.  Issue #834 then remained open for the `mainFormal`
+Step-6 witness residual.  This audit therefore did not attempt to construct any
+new proofs or modify any Lean sources.
 
 ## Statement and route audit
 

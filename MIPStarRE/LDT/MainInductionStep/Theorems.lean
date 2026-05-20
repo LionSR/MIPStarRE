@@ -5,6 +5,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors
 import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
+import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 
 /-!
 # Section 6 — Theorem imports
@@ -19,7 +20,8 @@ Compatibility module re-exporting all induction-step theorem leaf modules:
   skeletal assembly
 - `AvgSliceErrors`: averaged slice-error bounds
 - `PastingAssembly`: pasting assembly and `assembleAveragedPastingData`
-- `MainTheorems`: top-level induction theorems
+- `MainTheorems`: corrected large-`k` top-level induction theorems
+- `SourceTheorems`: printed source-range wrappers and public restriction data
 
 ## References
 

@@ -2,17 +2,62 @@
 
 Base commit: `68e3a1d9` (`origin/main` when the requested worktree was verified).
 
+Update, 2026-05-20: the positive-degree part of the finding below has been
+discharged.  The current declaration `MIPStarRE.LDT.Test.mainFormal` no longer
+assumes `0 < params.d`; the remaining interface restriction is that it is still
+stated for `SameSpaceProjStrat`, rather than the paper's general two-space
+projective strategy.  The live paper-gap note
+`docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex` records this
+current status.
+
+The same current declaration still assumes \(400md\le k\) and \(0<k\).  The
+factor-\(400\) strengthening and the nonzero sampling-parameter boundary are
+documented in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
+
+Update, later on 2026-05-20: the blueprint source theorem
+`thm:main-formal` has been restored to the printed paper statement.  The current
+Lean declaration `MIPStarRE.LDT.Test.mainFormal` is now linked from the separate
+Lean-only entry `thm:main-formal-current-interface`, whose statement explicitly
+displays the same-space interface and scalar-boundary restrictions.  Thus the
+source-labelled blueprint theorem no longer presents the restricted Lean
+interface as the paper statement.
+
+Update, final 2026-05-20 audit state: the source-labelled theorem now links to
+`MIPStarRE.LDT.Test.mainFormal_sourceStatement`, whose proof factors through
+the named wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation`.  That
+wrapper proves the saturated-error branch and leaves
+`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` as the current direct
+proof-term `sorry` frontier in the Test slice; the current same-space interface
+`mainFormal` inherits its proof debt transitively through the Section 6 successor theorem
+`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
+
 ## Executive summary
 
-I audited the already-formalized Test interfaces around the low individual degree test and the public `mainFormal` statement against `references/ldt-paper/test_definition.tex`, `references/ldt-paper/inductive_step.tex`, and blueprint chapters `ch02_test.tex` and `ch10_induction.tex`. I did not edit Lean statements or proof code, and I intentionally avoided the live residual at `MIPStarRE/LDT/Test/MainTheorem.lean:4117` and all #931-owned self-improvement producer assumptions.
+I audited the already-formalized Test interfaces around the low individual
+degree test and the public `mainFormal` statement against
+`references/ldt-paper/test_definition.tex`,
+`references/ldt-paper/inductive_step.tex`, and blueprint chapters
+`ch02_test.tex` and `ch10_induction.tex`.  In the original audit snapshot I
+did not edit Lean statements or proof code, and I intentionally avoided the
+then-live residual at `MIPStarRE/LDT/Test/MainTheorem.lean:4117` and the
+then-#931-owned self-improvement producer assumptions.  In the current code
+those residual and producer interfaces have been removed from the active route;
+the remaining proof frontier is the Section 6 theorem
+`MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
 
-Verdict: I found one real, previously undocumented formal-interface restriction. The paper's `thm:main-formal` starts from an arbitrary general projective strategy on possibly different local Hilbert spaces and does not impose `d > 0`; the current public Lean theorem `MIPStarRE.LDT.Test.mainFormal` is stated for `SameSpaceProjStrat`, a same-carrier special case carrying swap-invariance data, and assumes `0 < params.d`. I added `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex` to document this as a formalization deviation, separate from the already-documented large-`k` correction in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
+Verdict: I found one real, previously undocumented formal-interface restriction. The paper's `thm:main-formal` starts from an arbitrary general projective strategy on possibly different local Hilbert spaces. The current Lean interface `MIPStarRE.LDT.Test.mainFormal` is stated for `SameSpaceProjStrat`, a same-carrier special case carrying swap-invariance data. The earlier additional assumption `0 < params.d` has since been discharged; the remaining interface restriction is the same-space strategy input. I added `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex` to document this formalization deviation, separate from the already-documented large-`k` correction in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
 
 Other apparent discrepancies are already documented or are faithful formal bookkeeping: the `ProjStrat` container itself is now the paper-faithful two-space API, the branch failure probabilities match the paper's `1/3` subtest average and `1/2` role averages, the final `ConsRel` tensor placement in `mainFormal` now matches the paper's left/right content, the widened `ζ₂` coefficient is already documented in `docs/paper-gaps/issue-904-zeta2-completion.tex`, and strategy-level normalization is already covered by `docs/paper-gaps/issue-933-quantumstate-normalization.tex`.
 
 ## Overlap check
 
-Before auditing, I inspected the current open GitHub state. The only open PR was draft #889 (`chore: upgrade Lean/Mathlib to v4.29.1`), which touches `MIPStarRE/LDT/Test/StrategyBiProj.lean` among many upgrade files. I made no Lean edits and did not touch that file. Issue #931 remains open and assigned to `jizhengfeng`; I avoided the live `mainFormal` proof residual and the self-improvement producer assumptions listed in that issue. The only open issue involving Dengnifer in the inspected list was #888 about blueprint warning annotations, which does not overlap this documentation-only report.
+Before auditing, I inspected the then-current open GitHub state. The only open
+PR was draft #889 (`chore: upgrade Lean/Mathlib to v4.29.1`), which touched
+`MIPStarRE/LDT/Test/StrategyBiProj.lean` among many upgrade files. I made no
+Lean edits and did not touch that file.  At that time issue #931 owned the
+remaining self-improvement producer assumptions; this is historical context for
+the audit snapshot, not the current proof frontier.
 
 ## Scope audited
 
@@ -39,8 +84,8 @@ Paper and blueprint files inspected:
 
 Explicit exclusions:
 
-- the `sorry` at `MIPStarRE/LDT/Test/MainTheorem.lean:4117`;
-- #931-owned self-improvement producer closure work;
+- the then-live `sorry` at `MIPStarRE/LDT/Test/MainTheorem.lean:4117`;
+- the then-#931-owned self-improvement producer closure work;
 - Lean statement/proof edits;
 - draft #889 upgrade work.
 
@@ -50,17 +95,17 @@ The paper's general projective strategy has a state on `H_A ⊗ H_B` and separat
 
 The same-space API remains as `SameSpaceProjStrat` (`StrategyCore.lean:540-557`). That structure extends the two-space strategy at `ιA = ιB = ι` and adds permutation-invariance data. It is therefore a special case, not the paper's general strategy. This distinction is correctly stated near the blueprint definition of projective strategies (`ch02_test.tex:35-43`).
 
-## Finding 2: the public `mainFormal` theorem is still restricted to the same-space special case
+## Finding 2: the current `mainFormal` interface is still restricted to the same-space special case
 
-The paper's `thm:main-formal` starts from a general projective strategy and then symmetrizes it (`test_definition.tex:180-202`; `inductive_step.tex:26-66`). The current public theorem `mainFormal` instead takes
+The paper's `thm:main-formal` starts from a general projective strategy and then symmetrizes it (`test_definition.tex:180-202`; `inductive_step.tex:26-66`). The current Lean interface `mainFormal` instead takes
 
 ```lean
 (strategy : SameSpaceProjStrat params ι)
 ```
 
-and assumes `hd : 0 < params.d` (`MainTheorem.lean:4004-4012`). Its Step 1 bridge also lives in the `SameSpaceProjStrat` namespace and constructs the role-register symmetrized strategy only from that same-space input (`SymmetrizationBridge.lean:76-120`). Thus a paper-general strategy on different local spaces, or with a nonsymmetric starting state, is not presently an input to the formal theorem.
+and no longer assumes the historical hypothesis `hd : 0 < params.d`. Its Step 1 bridge also lives in the `SameSpaceProjStrat` namespace and constructs the role-register symmetrized strategy only from that same-space input (`SymmetrizationBridge.lean:76-120`). Thus a paper-general strategy on different local spaces, or with a nonsymmetric starting state, is not presently an input to the formal interface.
 
-This is not the #931 residual: it is a statement/interface restriction before the live proof hole. PR #958 closed the earlier #560 container mismatch by promoting the two-space container to `ProjStrat`, but the public main-formal statement and Step 1 bridge still need a heterogeneous role-register symmetrization wrapper to recover the full paper theorem. I documented this in `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`, together with the additional positive-degree assumption.
+The current declaration no longer assumes `hd : 0 < params.d`; this positive-degree restriction was discharged after the original audit. Its remaining non-source interface restriction is the same-space input. This is not the former #931 residual: it is a statement/interface restriction on the current same-space Lean theorem and is now separated from the source-boundary obligations for `thm:main-formal` and `thm:main-induction`. PR #958 closed the earlier #560 container mismatch by promoting the two-space container to `ProjStrat`, but the current main-formal interface and Step 1 bridge still need a heterogeneous role-register symmetrization wrapper to recover the full paper theorem. I documented this in `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`; that note now records the positive-degree condition as historical rather than current.
 
 ## Finding 3: known theorem-interface corrections are already documented
 
@@ -106,11 +151,11 @@ The last-direction notation and restricted diagonal samples also match the paper
 
 ## Finding 6: external classical soundness wrappers are explicit hypotheses, not ambient axioms
 
-The overview-level classical wrappers `razSafra` and `classicalTestSoundness` intentionally keep the external Raz--Safra and Polishchuk--Spielman soundness theorems as explicit specialized hypotheses (`MainTheorem.lean:24-151`). This differs from a direct formal proof of those classical theorems, but it is not an undocumented paper discrepancy: the blueprint chapter 1 explicitly says these wrappers are not marked `\leanok` as full formalizations of the cited results (`ch01_overview.tex:5-31`). The CI-facing `AxiomAudit.lean` regression checks confirm that the wrappers depend only on the standard Lean axioms once those explicit hypotheses are supplied.
+The overview-level classical wrappers `razSafra` and `classicalTestSoundness` intentionally keep the external Raz--Safra and Polishchuk--Spielman soundness theorems as explicit specialized hypotheses (`MainTheorem.lean:24-151`). This differs from a direct formal proof of those classical theorems. The current blueprint chapter 1 therefore leaves the source-labelled external theorems unlinked and records the wrappers separately as `thm:raz-safra-external-interface` and `thm:classical-test-soundness-external-interface`, whose statements display the specialized external hypotheses. The CI-facing `AxiomAudit.lean` regression checks confirm that the wrappers depend only on the standard Lean axioms once those explicit hypotheses are supplied.
 
 ## Finding 7: submeasurement/projective conventions are locally consistent
 
-The public `thm:main-formal` target returns projective measurements (`ProjMeas (Polynomial params) ι`) as in the paper. Intermediate Section 6 and pasting interfaces often use projective submeasurements or submeasurements because the paper itself passes through incomplete measurements before completion. In the audited Test slice, those intermediate APIs are exposed as residual packages rather than silently weakening the final theorem. The live completion and match-mass proof obligations remain exactly in the excluded #931/#834/#422 proof area; I did not audit or change them here.
+The source target `thm:main-formal` returns projective measurements (`ProjMeas (Polynomial params) ι`) as in the paper. Intermediate Section 6 and pasting interfaces often use projective submeasurements or submeasurements because the paper itself passes through incomplete measurements before completion. In the audited Test slice, those intermediate APIs are exposed as internal witness or construction targets rather than silently weakening the final theorem. The remaining completion and successor-stage proof obligations are tracked separately; this session-48 audit did not attempt to discharge them.
 
 ## Validation
 
@@ -132,22 +177,31 @@ lake env lean MIPStarRE/LDT/Test/MainTheorem.lean
 lake env lean MIPStarRE/LDT/Test/AxiomAudit.lean
 ```
 
-`MainTheorem.lean` emitted the expected warning that `mainFormal` uses `sorry`; the other targeted files were clean. A scratch check confirmed the key type signatures used in this audit: `ProjStrat` is two-space, `SameSpaceProjStrat` is same-space, `ProjStrat.PassesLowIndividualDegreeTest` is available from `StrategyBiProj`, and `mainFormal` takes `SameSpaceProjStrat`, `0 < params.d`, `400 * params.m * params.d ≤ k`, and `0 < k`.
+`MainTheorem.lean` emitted the expected warning that `mainFormal` uses `sorry`; the other targeted files were clean. A scratch check confirmed the key type signatures used in this audit at that time: `ProjStrat` is two-space, `SameSpaceProjStrat` is same-space, `ProjStrat.PassesLowIndividualDegreeTest` is available from `StrategyBiProj`, and `mainFormal` took `SameSpaceProjStrat`, `0 < params.d`, `400 * params.m * params.d ≤ k`, and `0 < k`.  The positive-degree hypothesis has since been removed from `mainFormal`; the same-space interface and scalar-boundary assumptions remain.
 
 Scratch `#print axioms` checks showed only `[propext, Classical.choice,
 Quot.sound]` for `razSafra`, `classicalTestSoundness`,
 `mainFormal_trivial_witness`, the final main-formal target weakening theorem,
 `SameSpaceProjStrat.strategySymmetrization_isGood_three_mul`, and
 `SameSpaceProjStrat.strategySymmetrizationPackage`. The same scratch file showed
-`sorryAx` for `mainFormal`, exactly as expected from the excluded live residual.
+`sorryAx` for `mainFormal`, exactly as expected from the excluded live residual
+in the audit snapshot.  The current `sorryAx` route is the transitive Section 6
+successor construction described at the start of this report.
 
-The audited-scope grep
+The audited-scope grep in the original snapshot
 
 ```text
 rg -n "\b(sorry|admit|axiom|unsafe|native_decide)\b" MIPStarRE/LDT/Test -g '*.lean'
 ```
 
-found only documentation mentions of the former ambient axiom and the expected `sorry` comment/proof term in `MainTheorem.lean`; the only actual proof-term `sorry` is at `MainTheorem.lean:4117`.
+found only documentation mentions of the former ambient axiom and the expected
+`sorry` comment/proof term in `MainTheorem.lean`; the only actual proof-term
+`sorry` was then at `MainTheorem.lean:4117`.  In the current tree, the direct
+Test-slice proof-term `sorry` is the named small-error source-boundary
+obligation `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`; its
+wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation` proves the
+saturated-error branch.  The current same-space interface inherits the
+Section 6 successor theorem named in the status update above.
 
 The new paper-gap note compiled successfully with:
 

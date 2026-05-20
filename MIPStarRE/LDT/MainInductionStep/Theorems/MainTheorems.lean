@@ -2,6 +2,7 @@ import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.Core
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
 import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly
+import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 import MIPStarRE.LDT.Pasting.Bernoulli.DegreeZero
 
 /-!
@@ -213,6 +214,72 @@ theorem mainInductionOfOneLeError
       (polynomialEvaluationFamily params G.toSubMeas))
     herror⟩
 
+/-- Internal positive-degree successor assembly from the answer-valued recursive
+obligations.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
+
+This theorem is not a paper theorem and should not be advertised as
+`\label{thm:main-induction}`.  It records the Lean reduction of the nontrivial
+successor branch after three inputs have been supplied internally by the
+induction proof:
+
+* the predecessor answer-valued induction hypothesis for the restricted slices;
+* the positive-degree side condition needed by the current answer-valued
+  predecessor interface; and
+* the concrete answer-valued slice-transport data needed to apply
+  `selfImprovementInInductionSection` slice by slice.
+
+The answer-valued restricted-probabilities data are derived here from
+`strategy.IsGood eps delta gamma`, and the final averaging and pasting step is
+delegated to `mainInductionFromAnswerStageDataOfSmallError`.
+
+**Proof obligation:** This is an internal conditional reduction for the
+successor proof of `thm:main-induction`, tracked by issue #1507 and the
+source-statement boundary tracker #1458.  Elimination: derive the predecessor
+answer-valued induction hypothesis and the answer-valued slice-transport
+construction from the induction hypotheses in the eventual proof of
+`mainInduction`. -/
+theorem mainInductionSuccessorNext_ofAnswerStageObligations
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
+    (hd : 0 < params.d)
+    (hk : 400 * params.m * params.d ≤ k)
+    (sliceTransport :
+      let answerRestrict :=
+        AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+          (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+      let answerInduction :=
+        AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+          answerRestrict hinduction hd hk
+      AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+        answerRestrict answerInduction) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  let answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma :=
+    AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+      (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+  let answerInduction :
+      AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k :=
+    AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+      answerRestrict hinduction hd hk
+  let answerSelf :
+      AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict answerInduction :=
+    AnswerSelfImprovementData.ofSliceStrategyTransport params strategy eps delta gamma k
+      answerRestrict answerInduction sliceTransport
+  exact
+    mainInductionFromAnswerStageDataOfSmallError params strategy eps delta gamma k
+      hgood hsmall answerRestrict answerInduction answerSelf hk
+
 /-- The successor large-`k` hypothesis implies the predecessor large-`k`
 hypothesis used by the recursive slice calls.
 
@@ -232,164 +299,109 @@ theorem mainInductionSuccessorBound_pred
       Nat.mul_le_mul_right params.d hcoef
   exact le_trans hmul hk
 
-/-- Positive-degree successor assembly from direct answer-valued slice
-self-improvement outputs.
+/-- If the degree is positive, the successor large-`k` hypothesis implies
+`k ≥ 1`.
 
-Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.  The paper
-successor proof invokes the induction hypothesis on each answer-valued slice,
-applies the induction-section self-improvement theorem to the resulting slice
-measurements, and then pastes the averaged family.
-
-This theorem is not a paper theorem.  It is the present formal proof frontier
-for the answer-valued route: once the predecessor answer-valued induction
-hypothesis and the slice-wise self-improvement conclusions have been obtained,
-the remaining successor assembly is formal.  The slice-wise conclusions are
-kept as direct outputs of the Section 9 theorem, rather than as an additional
-source-level hypothesis on `thm:main-induction`. -/
-theorem mainInductionSuccessorNext_ofAnswerSliceSelfImprovement
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+This supplies the nonzero-size side condition required by the answer-valued
+predecessor induction interface. -/
+theorem mainInductionSuccessorBound_k_pos
+    (params : Parameters) {k : ℕ}
     (hd : 0 < params.d)
-    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
-    (hsliceSelf :
-      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-        (inductionPkg :
-          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
-        ∀ x,
-          ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-            CompletenessAtLeast strategy.state H.toSubMeas.liftLeft
-              ((1 - inductionPkg.sliceError x) -
-                answerSliceSelfImprovementError params restrictionPkg x) ∧
-            ConsRel strategy.state (uniformDistribution (Point params))
-              (IdxProjMeas.toIdxSubMeas
-                (xRestrictedAnswerSymStrat params strategy x).pointMeasurement)
-              (polynomialEvaluationFamily params H.toSubMeas)
-              (answerSliceSelfImprovementError params restrictionPkg x) ∧
-            BipartiteSSCRel strategy.state (uniformDistribution Unit)
-              (constSubMeasFamily H.toSubMeas)
-              (answerSliceSelfImprovementError params restrictionPkg x) ∧
-            SDDRel strategy.state (uniformDistribution Unit)
-              (constSubMeasFamily (leftPlacedSubMeas (ιB := ι) H.toSubMeas))
-              (constSubMeasFamily (rightPlacedSubMeas (ιA := ι) H.toSubMeas))
-              (answerSliceSelfImprovementError params restrictionPkg x) ∧
-            tensorFailureExpectation strategy.state Z H.toSubMeas ≤
-              answerSliceSelfImprovementError params restrictionPkg x ∧
-            (∀ h : Polynomial params,
-              IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x h ≤ Z)) :
-    ∃ G : Measurement (Polynomial params.next) ι,
-      ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next G.toSubMeas)
-        (mainInductionError params.next k eps delta gamma) := by
-  have hk_pred : 400 * params.m * params.d ≤ k :=
-    mainInductionSuccessorBound_pred params hk_next
-  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
-  · let answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma :=
-      AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
-        (answerRestrictedProbabilities params strategy eps delta gamma hgood)
-    let answerInduction :
-        AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k :=
-      AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
-        answerRestrict hinduction hd hk_pred
-    let answerSelf :
-        AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict
-          answerInduction :=
-      AnswerSelfImprovementData.ofSelfImprovementInInductionSection
-        params strategy eps delta gamma k answerRestrict answerInduction
-        (hsliceSelf answerRestrict answerInduction)
-    exact
-      mainInductionFromAnswerStageDataOfSmallError params strategy eps delta gamma k
-        hgood hsmall answerRestrict answerInduction answerSelf hk_pred
-  · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
-      (le_of_not_gt hsmall)
+    (hk : 400 * params.next.m * params.next.d ≤ k) :
+    1 ≤ k := by
+  have hdegree : 0 < params.next.d := by
+    simpa [Parameters.next] using hd
+  have hbase : 0 < 400 * params.next.m * params.next.d :=
+    Nat.mul_pos (Nat.mul_pos (by norm_num) params.next.hm) hdegree
+  exact Nat.succ_le_of_lt (lt_of_lt_of_le hbase hk)
 
-/-- Small-error successor construction from answer-valued slice transport.
+/-- Internal positive-degree successor assembly using the successor large-`k`
+hypothesis.
 
-Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.  The paper
-successor proof first invokes the induction hypothesis on each answer-valued
-slice, then applies the induction-section self-improvement theorem to the slice
-measurements, and finally pastes the averaged family.
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
 
-This theorem is not a paper theorem and is not marked as
-`\label{thm:main-induction}`.  It records the checked part of the small-error
-successor branch: once the predecessor answer-valued induction hypothesis and
-the concrete slice-strategy transport are constructed inside the proof, the
-remaining pasting construction follows from the existing Section 6 theorems. -/
-theorem mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport
+This is the same answer-valued assembly as
+`mainInductionSuccessorNext_ofAnswerStageObligations`, but the elementary
+predecessor side condition `400md ≤ k` is derived here from the successor
+hypothesis `400(m+1)d ≤ k`.  The constructor for the answer-valued per-slice
+induction data then derives `k ≥ 1` internally from this predecessor bound and
+`d > 0`.  The remaining inputs are therefore exactly the mathematical
+predecessor induction hypothesis and the answer-valued slice-transport
+construction.
+
+**Proof obligation:** This is an internal conditional reduction for the
+positive-degree successor branch, tracked by issue #1507.  Elimination: prove
+the predecessor answer-valued induction and slice-transport inputs from the
+source successor hypotheses inside the induction proof. -/
+theorem mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hk_next : 400 * params.next.m * params.next.d ≤ k)
     (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (hinduction : AnswerMainInductionHypothesis params)
     (hd : 0 < params.d)
-    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
-    (hsliceTransport :
-      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-        (inductionPkg :
-          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
-        AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
-          restrictionPkg inductionPkg) :
+    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (sliceTransport :
+      let hk_pred := mainInductionSuccessorBound_pred params hk_next
+      let answerRestrict :=
+        AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+          (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+      let answerInduction :=
+        AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+          answerRestrict hinduction hd hk_pred
+      AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+        answerRestrict answerInduction) :
     ∃ G : Measurement (Polynomial params.next) ι,
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
-  have hk_pred : 400 * params.m * params.d ≤ k :=
-    mainInductionSuccessorBound_pred params hk_next
-  let answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma :=
-    AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
-      (answerRestrictedProbabilities params strategy eps delta gamma hgood)
-  let answerInduction :
-      AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k :=
-    AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
-      answerRestrict hinduction hd hk_pred
-  let answerSelf :
-      AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict
-        answerInduction :=
-    AnswerSelfImprovementData.ofSliceStrategyTransport
-      params strategy eps delta gamma k answerRestrict answerInduction
-      (hsliceTransport answerRestrict answerInduction)
   exact
-    mainInductionFromAnswerStageDataOfSmallError params strategy eps delta gamma k
-      hgood hsmall answerRestrict answerInduction answerSelf hk_pred
+    mainInductionSuccessorNext_ofAnswerStageObligations params strategy eps delta gamma k
+      hgood hsmall hinduction hd
+      (mainInductionSuccessorBound_pred params hk_next)
+      sliceTransport
 
-/-- Positive-degree successor construction from the two remaining internal
-obligations.
+/-- Internal successor assembly after the large-error split.
 
-Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.  This is the
-successor proof after its two genuine internal obligations have been supplied:
-the predecessor answer-valued induction hypothesis and the slice-strategy
-transport needed to apply Section 9 to the answer-restricted slices.
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
 
-This theorem proves the full positive-degree conditional successor theorem by
-combining the checked small-error branch with the trivial-measurement large-error
-case.  It is not a paper theorem and is not an extra hypothesis for
-`thm:main-induction`; it records the precise remaining constructions needed to
-discharge the source-facing successor branch. -/
-theorem mainInductionSuccessorNext_ofAnswerSliceTransport
+This theorem removes the already solved large-error branch from the successor
+frontier.  In the nontrivial branch it calls
+`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound`; in the
+complementary branch it uses the trivial-measurement theorem
+`mainInductionOfOneLeError`.  Thus the remaining positive-degree construction
+is exactly the small-error answer-valued slice transport and the predecessor
+answer-valued induction hypothesis.
+
+**Proof obligation:** This is an internal conditional reduction for the
+successor proof of `thm:main-induction`, tracked by issue #1507.  Elimination:
+construct the small-error slice-transport data from the paper hypotheses; the
+large-error branch is already discharged here. -/
+theorem mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (hinduction : AnswerMainInductionHypothesis params)
     (hd : 0 < params.d)
-    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
-    (hsliceTransport :
-      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-        (inductionPkg :
-          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
+    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (sliceTransport :
+      ∀ _hsmall : mainInductionError params.next k eps delta gamma < 1,
+        let hk_pred := mainInductionSuccessorBound_pred params hk_next
+        let answerRestrict :=
+          AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+            (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+        let answerInduction :=
+          AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+            answerRestrict hinduction hd hk_pred
         AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
-          restrictionPkg inductionPkg) :
+          answerRestrict answerInduction) :
     ∃ G : Measurement (Polynomial params.next) ι,
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -397,8 +409,76 @@ theorem mainInductionSuccessorNext_ofAnswerSliceTransport
         (mainInductionError params.next k eps delta gamma) := by
   by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
   · exact
-      mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport
-        params strategy eps delta gamma k hgood hk_next hsmall hd hinduction hsliceTransport
+      mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound
+        params strategy eps delta gamma k hgood hsmall hinduction hd hk_next
+        (sliceTransport hsmall)
+  · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
+      (le_of_not_gt hsmall)
+
+/-- Internal successor assembly after both the large-error and degree splits.
+
+This theorem is not the paper theorem and should not be linked as
+`\label{thm:main-induction}`.  It records the exact proof obligations that
+remain after the already checked large-error branch has been removed.  In the
+small-error branch, there are two cases:
+
+* if `0 < params.d`, the proof calls the answer-valued successor assembly from
+  the predecessor answer-valued induction hypothesis and the concrete
+  answer-valued slice transport;
+* if `params.d = 0`, the proof requires a separate degree-zero successor
+  construction, analogous in role to the degree-zero branch of the pasting
+  theorem.
+
+Thus the positivity of the degree is not being added to the public successor
+statement; it is only the branch condition for one internal construction route.
+
+**Proof obligation:** This is an internal conditional reduction for the
+successor proof of `thm:main-induction`, tracked by issue #1507 and documented
+in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` for the surrounding
+large-`k` interface correction.  Elimination: prove the degree-zero successor
+construction and the positive-degree answer-valued slice realization from the
+source successor hypotheses. -/
+theorem mainInductionSuccessorNext_ofDegreeSplitObligations
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hinduction : AnswerMainInductionHypothesis params)
+    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (degreeZeroSmall :
+      mainInductionError params.next k eps delta gamma < 1 →
+        params.d = 0 →
+          ∃ G : Measurement (Polynomial params.next) ι,
+            ConsRel strategy.state (uniformDistribution (Point params.next))
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              (polynomialEvaluationFamily params.next G.toSubMeas)
+              (mainInductionError params.next k eps delta gamma))
+    (sliceTransport :
+      ∀ (hd : 0 < params.d),
+        ∀ _hsmall : mainInductionError params.next k eps delta gamma < 1,
+          let hk_pred := mainInductionSuccessorBound_pred params hk_next
+          let answerRestrict :=
+            AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+              (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+          let answerInduction :=
+            AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+              answerRestrict hinduction hd hk_pred
+          AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+            answerRestrict answerInduction) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
+  · by_cases hd : 0 < params.d
+    · exact
+        mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound
+          params strategy eps delta gamma k hgood hsmall hinduction hd hk_next
+          (sliceTransport hd hsmall)
+    · exact degreeZeroSmall hsmall (Nat.eq_zero_of_not_pos hd)
   · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
       (le_of_not_gt hsmall)
 
@@ -474,9 +554,7 @@ noncomputable def DegreeZeroPastingFamilyObligation.ofSmallError
 
 /-- Internal small-error successor assembly from the two degree branches.
 
-Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, restricted to
-the nontrivial branch in which
-`mainInductionError params.next k eps delta gamma < 1`.
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
 
 This theorem is not a paper theorem.  It records that the small-error successor
 branch follows once the proof has supplied its two branch constructions: in
@@ -524,9 +602,20 @@ theorem mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
   by_cases hd : 0 < params.d
-  · exact
-      mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport
-        params strategy eps delta gamma k hgood hk_next hsmall hd hinduction hsliceTransport
+  · let answerRestrict :
+        AnswerSliceRestrictionData params strategy eps delta gamma :=
+        AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+          (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+    let answerInduction :
+        AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k :=
+        @AnswerPerSliceInductionData.ofMainInductionHypothesis
+          ι _ _ params _ strategy eps delta gamma k answerRestrict hinduction hd
+          (mainInductionSuccessorBound_pred params hk_next)
+    exact
+      @mainInductionSuccessorNext_ofAnswerStageObligations
+        ι _ _ params _ strategy eps delta gamma k hgood hsmall hinduction hd
+        (mainInductionSuccessorBound_pred params hk_next)
+        (hsliceTransport answerRestrict answerInduction)
   · rcases degreeZeroPasting (Nat.eq_zero_of_not_pos hd) with
       ⟨family, kappa, zeta, hcomplete, hcons, herror⟩
     exact
@@ -534,28 +623,23 @@ theorem mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
         params strategy eps delta gamma k hgood family kappa zeta
         hcomplete hcons (Nat.eq_zero_of_not_pos hd) herror
 
-/-- Internal successor assembly after the large-error and degree splits.
+/-- Internal successor reduction whose degree-zero branch is expressed by
+concrete pasting-family data.
 
-This theorem is not the paper theorem and should not be linked as
-`\label{thm:main-induction}`.  It records the proof obligations that remain
-after the already checked large-error branch has been removed.  In the
-small-error branch, there are two cases:
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
 
-* if `0 < params.d`, the proof calls the answer-valued successor assembly from
-  the predecessor answer-valued induction hypothesis and the concrete
-  answer-valued slice transport;
-* if `params.d = 0`, the proof calls the degree-zero pasting reduction from a
-  constructed complete and point-consistent family.  This branch is now also
-  named as `DegreeZeroPastingFamilyObligation` in the statement file.
-
-Thus degree positivity is not being added to the public successor statement; it
-is only the branch condition for one internal construction route.
+This theorem refines
+`mainInductionSuccessorNext_ofDegreeSplitObligations`: instead of assuming the
+degree-zero successor conclusion as a black box, it assumes the construction of
+a complete point-consistent slice family and the scalar absorption inequality
+needed by `mainInductionSuccessorNext_degreeZero_ofPastingFamily`.  The theorem
+is not a paper theorem; it records a checked composition of already isolated
+internal obligations.
 
 **Proof obligation:** This is an internal conditional reduction for the
-successor proof of `thm:main-induction`, tracked by issue #1507 and the
-source-statement boundary tracker #1458.  Elimination: prove the degree-zero
-family construction and the positive-degree answer-valued slice realization
-from the source successor hypotheses. -/
+degree-zero branch of the successor proof, tracked by issue #1507.  Elimination:
+construct the complete point-consistent slice family and prove the scalar
+absorption inequality from the source successor hypotheses. -/
 theorem mainInductionSuccessorNext_ofDegreeSplitPastingObligations
     (params : Parameters)
     [FieldModel.{0} params.q]
@@ -563,6 +647,7 @@ theorem mainInductionSuccessorNext_ofDegreeSplitPastingObligations
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
+    (hinduction : AnswerMainInductionHypothesis params)
     (hk_next : 400 * params.next.m * params.next.d ≤ k)
     (degreeZeroPasting :
       ∀ _hsmall : mainInductionError params.next k eps delta gamma < 1,
@@ -572,52 +657,132 @@ theorem mainInductionSuccessorNext_ofDegreeSplitPastingObligations
               family.ConsistentWithPoints strategy zeta ∧
                 ldPastingInInductionError params k eps delta gamma kappa zeta ≤
                   mainInductionError params.next k eps delta gamma)
-    (hinduction : AnswerMainInductionHypothesis.{0, uι} params)
-    (hsliceTransport :
-      ∀ (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-        (inductionPkg :
-          AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k),
-        AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
-          restrictionPkg inductionPkg) :
+    (sliceTransport :
+      ∀ (hd : 0 < params.d),
+        ∀ _hsmall : mainInductionError params.next k eps delta gamma < 1,
+          let hk_pred := mainInductionSuccessorBound_pred params hk_next
+          let answerRestrict :=
+            AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+              (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+          let answerInduction :=
+            AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+              answerRestrict hinduction hd hk_pred
+          AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+            answerRestrict answerInduction) :
     ∃ G : Measurement (Polynomial params.next) ι,
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
-  by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
+  refine
+    mainInductionSuccessorNext_ofDegreeSplitObligations
+      params strategy eps delta gamma k hgood hinduction hk_next ?_ sliceTransport
+  intro hsmall hd_zero
+  rcases degreeZeroPasting hsmall hd_zero with
+    ⟨family, kappa, zeta, hcomplete, hcons, herror⟩
+  exact
+    mainInductionSuccessorNext_degreeZero_ofPastingFamily
+      params strategy eps delta gamma k hgood family kappa zeta
+      hcomplete hcons hd_zero herror
+
+/-- Internal small-error successor reduction from the two remaining
+construction inputs and the predecessor induction hypothesis.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, restricted to
+the nontrivial regime
+`mainInductionError params.next k eps delta gamma < 1`.
+
+This theorem is not a paper theorem.  It records the precise point at which the
+eventual proof by induction on the dimension will use its predecessor
+induction hypothesis.  Once that hypothesis, the degree-zero family-and-scalar
+construction, and the positive-degree answer-valued slice transport have been
+constructed internally, the small-error successor conclusion follows by the
+checked degree split above.  None of these inputs should be added to
+`thm:main-induction` or `thm:main-formal` as source hypotheses. -/
+theorem mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hinduction : AnswerMainInductionHypothesis params)
+    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (degreeZeroPasting :
+      params.d = 0 →
+        ∃ family : IdxPolyFamily params ι, ∃ kappa zeta : Error,
+          family.Complete strategy.state kappa ∧
+            family.ConsistentWithPoints strategy zeta ∧
+              ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+                mainInductionError params.next k eps delta gamma)
+    (sliceTransport :
+      ∀ (hd : 0 < params.d),
+        let hk_pred := mainInductionSuccessorBound_pred params hk_next
+        let answerRestrict :=
+          AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+            (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+        let answerInduction :=
+          AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+            answerRestrict hinduction hd hk_pred
+        AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+          answerRestrict answerInduction) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  by_cases hd : 0 < params.d
   · exact
-      mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
-        params strategy eps delta gamma k hgood hk_next hsmall
-        (degreeZeroPasting hsmall) hinduction hsliceTransport
-  · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
-      (le_of_not_gt hsmall)
+      mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound
+        params strategy eps delta gamma k hgood hsmall hinduction hd hk_next
+        (sliceTransport hd)
+  · rcases degreeZeroPasting (Nat.eq_zero_of_not_pos hd) with
+      ⟨family, kappa, zeta, hcomplete, hcons, herror⟩
+    exact
+      mainInductionSuccessorNext_degreeZero_ofPastingFamily
+        params strategy eps delta gamma k hgood family kappa zeta hcomplete hcons
+        (Nat.eq_zero_of_not_pos hd) herror
 
-/-- Small-error branch of the native successor step for `thm:main-induction`.
+/-- Small-error construction for the native successor step of
+`thm:main-induction`.
 
-Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, where the proof
-passes from dimension `m` to dimension `m + 1` in the nontrivial regime where
-the target error is below `1`.
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, restricted to
+the nontrivial regime
+`mainInductionError params.next k eps delta gamma < 1`.
 
-This is an internal proof obligation, not a separate paper theorem.  The
-additional hypothesis `hsmall` is the branch condition used by
-`mainInductionSuccessorNext`; it is discharged there by a case distinction and
-is not an additional assumption on the public induction theorem.  The statement
-does not take any of the intermediate objects of the slice construction as
-hypotheses; those objects must be obtained from the displayed hypotheses.
+This theorem is the named closure obligation for the only remaining
+nontrivial branch of the successor proof.  Its public parameters are the
+successor strategy hypotheses and the branch condition
+`mainInductionError < 1`, so downstream users do not acquire
+restricted-probability records, slice-induction data, self-improvement data,
+pasting data, residual packages, or arbitrary implication hypotheses as
+assumptions of the theorem.
 
-The declaration is temporary in the precise sense that, once the slice
-restriction, recursive induction, self-improvement, and pasting constructions
-are supplied, this branch should be proved from its displayed hypotheses and
-remain only as the internal small-error case used by `mainInductionSuccessorNext`.
+**Proof obligation:** Construct the answer-valued restricted slice profile,
+obtain the recursive predecessor induction conclusion for each slice, realize
+the slice-wise self-improvement interface, assemble the pasting input, and prove
+the scalar absorption estimates.  The checked assembly theorems above reduce
+this to the degree-zero family-and-scalar construction, the predecessor
+induction argument, and the positive-degree answer-valued slice realization.
+The predecessor induction argument is the genuine recursive part of
+`thm:main-induction`: it should be supplied by the eventual proof by induction
+on the dimension and then consumed by the internal reduction
+`mainInductionSuccessorNext_ofDegreeSplitPastingObligations`, not postulated as
+an extra hypothesis of the paper-facing main induction theorem or the final
+soundness theorem.
 
-**Proof obligation:** Derive the restricted slice profiles, apply the recursive
-main-induction hypothesis on each slice, run the induction-section
-self-improvement theorem on the slice measurements, assemble the averaged
-pasting input, and close the scalar side conditions, including the passage from
-the `params.next` large-`k` hypothesis to the predecessor side conditions needed
-inside the proof.  This is tracked by issue #1507 under the source-statement
-boundary tracker #1458. -/
-theorem mainInductionSuccessorNextOfSmallError
+**Unfaithful:** This proof currently contains the tracked `sorry` for the
+small-error successor construction, so it uses `sorryAx` rather than deriving
+the construction from `references/ldt-paper/inductive_step.tex:441-551`.
+Documented in issue #1507 under #1458.  Elimination: prove this theorem by
+supplying the predecessor induction argument, the degree-zero family-and-scalar
+construction, and the positive-degree answer-valued slice realization, then
+apply
+`mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions`.
+This is tracked by issue #1507 under the source-statement boundary tracker
+#1458. -/
+theorem mainInductionSuccessorNext_ofSmallErrorConstruction
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -631,6 +796,9 @@ theorem mainInductionSuccessorNextOfSmallError
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
+  -- TODO(#1507, #1458): supply the predecessor induction hypothesis, construct
+  -- the degree-zero family/scalar branch, and realize the positive-degree
+  -- slice transport, then apply the checked small-error internal reduction.
   sorry
 
 /-- Native successor step for `thm:main-induction`.
@@ -638,12 +806,29 @@ theorem mainInductionSuccessorNextOfSmallError
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, where the proof
 passes from dimension `m` to dimension `m + 1`.
 
-This is the source-facing induction step in its native form: the ambient
-strategy already lives in dimension `params.next`, so no predecessor
-compatibility record is introduced.  In the large-error branch the normalized
-consistency defect is bounded by `1`; in the small-error branch the remaining
-source-faithful construction is isolated as
-`mainInductionSuccessorNextOfSmallError`. -/
+This is the native successor step for the corrected large-`k` Lean interface:
+the ambient strategy already lives in dimension `params.next`, so no predecessor
+compatibility record is introduced.  The checked reductions above show that the
+small-error branch now reduces to three internal inputs: the predecessor
+answer-valued induction hypothesis, the degree-zero family-and-scalar
+construction, and the positive-degree slice transport.
+
+**Proof obligation:** In the small-error regime, construct the degree-zero
+slice family and scalar absorption, obtain the recursive predecessor induction
+conclusion for the answer-valued restricted slices, and either realize the
+positive-degree answer-valued slice transport through ordinary `SymStrat`s or
+prove the corresponding self-improvement statement in the answer-valued
+interface.  The recursive predecessor conclusion should be supplied by the
+eventual induction proof, not added as a public hypothesis of this theorem.
+
+**Unfaithful:** The small-error branch currently calls
+`mainInductionSuccessorNext_ofSmallErrorConstruction`, whose proof is still a
+tracked `sorry`.  Thus this theorem transitively uses `sorryAx` for the
+successor construction in `references/ldt-paper/inductive_step.tex:441-551`.
+Documented in issue #1507 under #1458.  Elimination: replace the call by a proof
+of the named small-error construction from the theorem hypotheses.
+This is tracked by issue #1507 under the source-statement boundary tracker
+#1458. -/
 theorem mainInductionSuccessorNext
     (params : Parameters)
     [FieldModel params.q]
@@ -658,8 +843,9 @@ theorem mainInductionSuccessorNext
         (polynomialEvaluationFamily params.next G.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
   by_cases hsmall : mainInductionError params.next k eps delta gamma < 1
-  · exact mainInductionSuccessorNextOfSmallError params strategy eps delta gamma k
-      hgood hk hsmall
+  · exact
+      mainInductionSuccessorNext_ofSmallErrorConstruction
+        params strategy eps delta gamma k hgood hk hsmall
   · exact mainInductionOfOneLeError params.next strategy eps delta gamma k
       (le_of_not_gt hsmall)
 
@@ -672,9 +858,19 @@ calls have been set up.
 This theorem is the parameter-decomposition form used by `mainInduction`.
 Its assumptions are the corrected large-`k` hypotheses for
 `thm:main-induction`, together with the branch condition `params.m ≠ 1`; it
-does not take the intermediate objects of the slice construction as hypotheses.
-The proof decomposes the non-base parameter bundle as `pred.next` and then
-invokes the native successor-step obligation `mainInductionSuccessorNext`. -/
+does not accept restricted-probability records, per-slice induction data,
+self-improvement data, pasting data, auxiliary implication hypotheses, residual
+inputs, or data record hypotheses.  The proof decomposes the non-base parameter
+bundle as `pred.next` and then invokes the native successor-step obligation
+`mainInductionSuccessorNext`.
+
+**Unfaithful:** The proof transitively uses the tracked small-error successor
+construction
+`mainInductionSuccessorNext_ofSmallErrorConstruction`, which is not yet derived
+from `references/ldt-paper/inductive_step.tex:441-551`.  Documented in issue
+#1507 under #1458.  Elimination: prove the native successor step from the
+checked internal constructions and then this decomposition theorem becomes
+standard-axiom clean. -/
 theorem mainInductionSuccessor
     (params : Parameters)
     [FieldModel params.q]
@@ -696,23 +892,34 @@ theorem mainInductionSuccessor
   cases hnext
   exact mainInductionSuccessorNext pred strategy eps delta gamma k hgood hk
 
-/-- `thm:main-induction`.
+/-- Corrected large-`k` interface toward `thm:main-induction`.
 
-This is the corrected large-`k` Lean statement corresponding to
-`references/ldt-paper/inductive_step.tex`: a good symmetric strategy and an
-integer `k ≥ 400 m d` produce a polynomial measurement consistent with the point
-measurement at error `mainInductionError`.  The strengthening from the printed
-`k ≥ m d` hypothesis is documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
+This is not the printed source theorem.  It is the separate Lean interface
+linked from `thm:main-induction-current-interface`: a good symmetric strategy
+and an integer `k ≥ 400 m d` produce a polynomial measurement consistent with
+the point measurement at error `mainInductionError`.  The strengthening from
+the printed `k ≥ m d` hypothesis in
+`references/ldt-paper/inductive_step.tex` is documented in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`, and the printed source
+theorem remains unlinked in the blueprint.
 
 **Proof gap:** the base case is proved by `mainInductionBaseCase`. The
-successor case is isolated as the source-shaped theorem
+successor case is isolated as the corrected large-`k` theorem
 `mainInductionSuccessor`, corresponding to
 `references/ldt-paper/inductive_step.tex:441-551`.  This gap is tracked by
 #1507 and #1458.  The proof should derive the restricted probability estimates,
 recursive slice measurements, slice-wise self-improvement outputs, and pasting
 side condition internally, rather than adding any of them to the theorem
-statement. -/
+statement.
+
+**Unfaithful:** The successor branch transitively uses the tracked construction
+obligation `mainInductionSuccessorNext_ofSmallErrorConstruction`, so this
+corrected large-`k` interface still imports `sorryAx`.  Documented in issue
+#1507 under #1458 and in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  This is the successor
+construction of `references/ldt-paper/inductive_step.tex:441-551`.
+Elimination: prove the small-error successor construction from the assumptions
+of the corrected large-`k` interface. -/
 theorem mainInduction
     (params : Parameters)
     [FieldModel params.q]
@@ -729,57 +936,5 @@ theorem mainInduction
   by_cases hm1 : params.m = 1
   · exact mainInductionBaseCase params strategy eps delta gamma k hm1 hgood
   · exact mainInductionSuccessor params strategy eps delta gamma k hgood hk hm1
-
-/-- Restricted-probabilities data built from the explicit weighted bounds in the
-successor proof of `thm:main-induction`.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
-(`\label{lem:restricted-probabilities}`), used in the proof of
-`\label{thm:main-induction}` at
-`references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def mainInductionPublicRestrictionData
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (haxisWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
-    (hdiagonalWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma) :
-    SliceRestrictionData params strategy eps delta gamma :=
-  SliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
-    (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
-      hgood haxisWeightedBound hdiagonalWeightedBound)
-
-/-- Answer-valued restricted-probabilities data record built from explicit weighted
-answer-valued slice bounds.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
-(`\label{lem:restricted-probabilities}`), used in the proof of
-`\label{thm:main-induction}` at
-`references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def answerMainInductionPublicRestrictionData
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (haxisWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤ eps)
-    (hdiagonalWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability) ≤ gamma) :
-    AnswerSliceRestrictionData params strategy eps delta gamma :=
-  AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
-    (AnswerRestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
-      hgood haxisWeightedBound hdiagonalWeightedBound)
 
 end MIPStarRE.LDT.MainInductionStep

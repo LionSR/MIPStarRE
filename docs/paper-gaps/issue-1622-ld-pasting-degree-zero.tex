@@ -17,9 +17,17 @@
 \section{At a glance}
 
 \begin{itemize}
+  \item \textbf{Status: discharged.}  The degree-zero branch is now proved as
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}\), and the
+  unrestricted source-facing theorem
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPasting}\) assembles this branch with the
+  nontrivial, large-error, and \(k=0\) branches.  The axiom audit checks both
+  the degree-zero branch and the unrestricted theorem with standard Lean axioms
+  only.
   \item \textbf{Difficulty.}  Medium.  The obstruction is not a new analytic
   estimate, but the positive-degree proof uses a scalar absorption which is no
-  longer available when \(d=0\).
+  longer available when \(d=0\).  This was the obstruction before the
+  degree-zero proof was supplied.
   \item \textbf{Estimated weight.}  One branch theorem, probably 100--300 lines
   of formal proof, depending on how directly the existing slice-consistency and
   point-consistency interfaces can be reused.
@@ -57,27 +65,27 @@ boundedness hypotheses stated in the source theorem.
   This is the theorem form in the paper; it does not contain the hypothesis
   \(0<d\).
 
-  \item \textbf{Restricted construction theorem form.}  The formal proof
-  presently constructs such an \(H\) in the nontrivial regime
+  \item \textbf{Restricted construction theorem form.}  One formal construction
+  theorem constructs such an \(H\) in the nontrivial regime
   \[
     \gamma\le 1,\qquad \zeta\le 1,\qquad d\le q,\qquad 0<d,\qquad 1\le k.
   \]
   This is useful proof content, but it is a restricted construction theorem,
   not the source theorem.
 
-  \item \textbf{Remaining branch form.}  The complementary branch is the same
+  \item \textbf{Degree-zero branch form.}  The complementary branch is the same
   conclusion under the source hypotheses together with
   \[
     d=0,\qquad 1\le k.
   \]
-  Proving this branch restores the unrestricted theorem without changing its
-  public hypotheses.%
+  This branch has now been proved, restoring the unrestricted theorem without
+  changing its public hypotheses.%
   \footnote{The source-facing Lean theorem is
   \(\leanid{MIPStarRE.LDT.Pasting.ldPasting}\).  The restricted construction is
-  \(\leanid{MIPStarRE.LDT.Pasting.ldPastingNontrivial}\).  The open branch is
-  \(\leanid{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}\) in
+  \(\leanid{MIPStarRE.LDT.Pasting.ldPastingNontrivial}\).  The degree-zero
+  branch is \(\leanid{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}\) in
   \doclink{MIPStarRE/LDT/Pasting/Bernoulli/Final.lean}.  The repair is tracked
-  by \ghissue{1622} and currently documented in \ghpr{1633}.}
+  by \ghissue{1622} and documented in \ghpr{1633}.}
 \end{enumerate}
 
 \section{The source assertion}
@@ -100,8 +108,8 @@ the term \((d/q)^{1/32}\).
 
 \section{Why the positive-degree proof does not specialize}
 
-The current nontrivial proof follows the sampled distinct-tuple construction in
-the paper.  In the estimates corresponding to the \(H_B\)-consistency and
+The nontrivial proof follows the sampled distinct-tuple construction in the
+paper.  In the estimates corresponding to the \(H_B\)-consistency and
 overall-outcome steps, the argument passes between independently sampled
 heights and distinct sampled heights.  This passage introduces a distinctness
 loss of order \(k^2/q\).
@@ -118,19 +126,19 @@ so the same scalar argument cannot close the estimate.
 This is not evidence that the paper theorem should acquire the hypothesis
 \(0<d\).  Rather, it shows that the formal proof has separated two branches:
 the existing positive-degree argument and the remaining degree-zero argument.
-In the degree-zero branch, one expects to use that every degree-zero polynomial
-is constant, and then obtain point consistency from the line-test and
-slice-consistency hypotheses without paying a distinct-tuple loss that must be
-absorbed by \(d/q\).
+In the degree-zero branch, the formal proof uses that every degree-zero
+polynomial is constant, and obtains point consistency from the vertical
+line-test and slice-consistency hypotheses without paying a distinct-tuple loss
+that must be absorbed by \(d/q\).
 
 \section{Comparison with the blueprint and formalization}
 
-The formal development now keeps the unrestricted source-facing theorem form
+The formal development keeps the unrestricted source-facing theorem form
 visible.  Its proof dispatches the large-\(\gamma\), large-\(\zeta\),
-large-\(d/q\), \(k=0\), and positive-degree nontrivial cases.  The only
-remaining branch is the degree-zero case described above.  The branch is
-therefore recorded as a direct proof obligation, not as an additional public
-assumption of the theorem.
+large-\(d/q\), \(k=0\), positive-degree nontrivial, and degree-zero cases.  The
+degree-zero branch is proved by
+\(\leanid{MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch}\), not assumed as an
+additional public hypothesis of the theorem.
 
 This is the intended paper-realignment boundary.  The restricted
 positive-degree theorem remains useful proof content, but it should be cited
@@ -140,12 +148,12 @@ than the cited statement.
 
 \section{Conclusion}
 
-There is no current justification for adding \(0<d\) to the paper-facing
-low-degree pasting theorem.  The theorem-level statement should remain the
-unrestricted statement of the source.  The missing work is the separate
-degree-zero branch: prove the pasted measurement and point-consistency estimate
-from \(d=0\), \(1\le k\), and the source hypotheses, or keep that branch as a
-tracked \Lean{} proof obligation until the argument is supplied.
+There is no justification for adding \(0<d\) to the paper-facing low-degree
+pasting theorem.  The theorem-level statement remains the unrestricted
+statement of the source.  The formerly missing degree-zero branch is now proved:
+it constructs the pasted measurement and point-consistency estimate from
+\(d=0\), \(1\le k\), and the source hypotheses, and the unrestricted theorem
+assembles it with the nontrivial and large-error branches.
 
 \bibliographystyle{alpha}
 \bibliography{references}

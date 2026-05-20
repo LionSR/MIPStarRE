@@ -107,8 +107,8 @@
     \]
   \end{enumerate}
 \end{theorem}
-\begin{proof}
-	\leanok
+\begin{proof}\leanok
+	\proves{thm:self-improvement-in-induction-section}
 	\uses{thm:self-improvement, prop:two-notions-of-self-consistency}
 	This is Theorem~\ref{thm:self-improvement}, with the conclusions reformulated in the notation used by the induction step. Since the output is projective, Lemma~\ref{prop:two-notions-of-self-consistency} converts the strong self-consistency statement to the usual bipartite formulation.
 \end{proof}
@@ -212,9 +212,9 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSelfImprovementInInductionSection}
 	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSliceStrategyTransport}
-	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSelfImprovementInInductionSection, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
 	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.slice_outputs_ofSliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.slice_outputs_ofSliceStrategyTransport}
 	\leanok
 	\uses{thm:self-improvement-in-induction-section}
 	The successor step records the slice-wise self-improvement output in
@@ -222,14 +222,11 @@
 	output in \texttt{AnswerSelfImprovementData}.  Their constructors call
 	\texttt{selfImprovementInInductionSection}; they no longer carry a separate
 	bundle of Section~\ref{chap:self-improvement} proof-stage data as an input.
-	The \texttt{SliceStrategyTransport} structures are narrow formal hypotheses: they
+	The \texttt{SliceStrategyTransport} structures are narrow formal interfaces: they
 	assume concrete per-slice symmetric strategies and measurement-transport data,
 	while averaged point-operator compatibility is derived structurally from
-	point-measurement transport.  The two slice-output theorems extract the
-	per-slice conclusions of
-	Theorem~\ref{thm:self-improvement-in-induction-section} from these transport
-	hypotheses before the bookkeeping constructors record them as ordinary or
-	answer-valued self-improvement data.
+	point-measurement transport.  They then convert the remaining data into the
+	ordinary or answer-valued self-improvement output.
 \end{definition}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
@@ -331,9 +328,10 @@
 \end{proof}
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement}
+	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base, lem:main-induction-large-error}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400md$ and set
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
   \]
@@ -346,17 +344,58 @@
     A_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]}.
   \]
 \end{theorem}
+
+\begin{theorem}[Main induction, corrected large-\(k\) formal interface]\label{thm:main-induction-current-interface}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
+	\leanok
+	\uses{thm:main-induction, def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base, lem:main-induction-large-error}
+	This is the strengthened large-\(k\) Lean interface toward
+	Theorem~\ref{thm:main-induction}.  It is not the printed theorem.  The source
+	theorem assumes \(k\ge md\), while the proof route below invokes the pasting
+	theorem with the hypothesis \(k\ge 400md\); this side-condition gap is
+	documented in
+	\texttt{docs/paper-gaps/issue-906-main-formal-k-bound.tex}.
+	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400md$ and set
+	\[
+		\nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
+	\]
+	and
+	\[
+		\sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right).
+	\]
+	Then there exists a measurement $G \in \polymeas{m}{q}{d}$ such that, on average over $u \sim \F_q^m$,
+	\[
+		A_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]}.
+	\]
+\end{theorem}
 \begin{proof}
 	\uses{lem:restricted-probabilities, lem:weighted-restricted-probability-bounds, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, def:successor-pasting-data}
 	In Lean, the base case is formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
-	The successor step of
+		The remaining part of the printed source range \(md\le k<400md\) is recorded
+		as the named obligation
+		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation},
+		rather than being added as a hypothesis of the source theorem.  This wrapper
+		closes the large-error case by
+		\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}; its
+		remaining branch is the small-error source-range obligation
+		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorObligation}.
+		This small-error wrapper closes the base case by
+		\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}; the remaining
+		non-base wrapper is
+		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorNonBaseObligation}.
+		Its degree-zero branch is contradictory from \(k<400m\cdot0\), so the
+		positive-degree non-base wrapper is
+		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation}.
+		It derives \(1\le k\) from \(md\le k\) and \(0<d\); the direct
+		source-range proof hole is the corresponding \(k\)-positive obligation
+		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation}.
+		The successor step of
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated in its
-	native \(m\to m+1\) form as the source-shaped proof obligation
+	native \(m\to m+1\) form as the corrected large-\(k\) proof obligation
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext}.  Its
-	nontrivial branch is named separately as
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError};
-	the complementary branch is supplied by the proved large-error lemma above.
+	remaining nontrivial branch is now named as the small-error construction
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction}.
 	The
 	non-base branch
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor} only decomposes
@@ -374,25 +413,65 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerMainInductionConclusion, MIPStarRE.LDT.MainInductionStep.AnswerMainInductionHypothesis, MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionData.ofMainInductionHypothesis},
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerPerSliceInductionData.ofLegacy, MIPStarRE.LDT.MainInductionStep.PerSliceInductionData.ofAnswer, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofAnswerForLegacy, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofAnswer},
 	which record the predecessor induction hypothesis for the restricted
-	strategies, deriving the side condition \(1\le k\) from the predecessor
-	large-\(k\) bound and the degree-positivity hypothesis;
-		transport induction data in both directions between the answer-valued and
-		legacy slice data; and then forget only the answer-valued diagonal
-		alphabet before the existing pasting construction.  The corresponding internal
-		theorem
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceSelfImprovement}
-	now proves the successor conclusion from the predecessor answer-valued
-	induction hypothesis and the direct slice-wise outputs of the
-	induction-section self-improvement theorem.  The weighted
+	strategies, transport induction data in both directions between the
+	answer-valued and legacy slice interfaces, and then forget only the
+	answer-valued diagonal alphabet before the existing pasting assembly. The weighted
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
 	The Lean proof now closes the large-error branch by
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}.  The remaining
-	proof gap for Theorem~\ref{thm:main-induction} is to derive the
-	successor-step constructions, including the restricted-strategy
-	self-improvement and slice-transport construction
-	tracked by issue \#1507 under the bridge-debt tracker \#1458,
-	from the corrected theorem hypotheses; hence no proof-level \leanok is attached here.
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}.  It also
+	contains the internal reduction
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitObligations},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions},
+	which derives the nontrivial successor conclusion from the answer-valued
+	predecessor induction hypothesis and the concrete answer-valued
+	slice-transport data.  The second form also derives the predecessor
+	large-\(k\) and \(k\ge1\) side conditions from the successor large-\(k\)
+	hypothesis together with \(d>0\).  The split form then combines this
+	positive-degree small-error reduction with the trivial large-error theorem,
+	so these elementary arithmetic conditions and the large-error case are no
+	longer part of the remaining proof frontier.  The final form also separates
+	the \(d=0\) small-error successor branch from the positive-degree route; this
+	degree-zero branch is now an explicitly named construction obligation, rather
+	than a hidden positivity assumption on the theorem statement.  The
+	degree-zero helper routes that branch through the completed degree-zero
+	pasting construction, reducing it to the construction of a complete and
+	point-consistent slice family and the scalar absorption into
+	\texttt{mainInductionError}.  The last helper composes this degree-zero
+	pasting-family route with the degree split, so the degree-zero part of the
+	frontier is stated by the required family-and-scalar construction rather than
+	by an abstract successor conclusion.  The small-error internal-constructions
+	helper then closes the small-error branch once the predecessor induction
+	hypothesis, the degree-zero family construction, and the positive-degree
+	slice-transport construction are supplied inside the induction proof.  Thus
+	the remaining direct
+	\texttt{sorry} is attached to the named small-error construction rather than
+	to an anonymous branch in the public successor wrapper.  The genuine
+	interface mismatch in the
+	positive-degree branch is the slice-transport datum:
+	the recursive slice is represented by the answer-valued strategy
+	\texttt{xRestrictedAnswerSymStrat}, while the available induction-section
+	self-improvement theorem is stated for ordinary \texttt{SymStrat}s.  The
+	checked transport constructors
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSelfImprovementInInductionSection, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
+	show that, once such ordinary slice strategies and their verifier-visible
+	measurement equalities are supplied, the Section~9 theorem can be applied
+	slice by slice without importing the remaining \texttt{sorryAx}.  The
+	remaining proof gap for
+	Theorem~\ref{thm:main-induction-current-interface} is to supply the
+	predecessor induction argument, the degree-zero successor branch, and either
+	an ordinary covariant slice-strategy realization of the answer-valued
+	restriction or an answer-valued self-improvement theorem, internally from the
+	corrected theorem hypotheses.  The predecessor induction argument is the
+	local induction hypothesis for dimension \(m\), applied to the restricted
+	strategies at heights \(x \in \F_q\); it is not an additional hypothesis
+	about the successor strategy.  Hence no proof-level \leanok is attached here.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
@@ -512,19 +591,17 @@
 \end{proof}
 
 \begin{remark}[Lean proof gap for the successor-step assembly]\label{rem:main-induction-successor-assembly}
-	The Lean declaration for Theorem~\ref{thm:main-induction} has the source
-	hypotheses.  Its remaining proof obligation is the native successor step
-	\texttt{mainInductionSuccessorNext}; the only nontrivial case is now the
-	small-error branch \texttt{mainInductionSuccessorNextOfSmallError}.  The
+	The Lean declaration for
+	Theorem~\ref{thm:main-induction-current-interface} has the corrected
+	large-\(k\) theorem hypotheses and no additional stage-data hypotheses.  Its
+	remaining proof obligation is the native successor step
+	\texttt{mainInductionSuccessorNext}.  The
 	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
-	still exposed through the public restriction-data constructor above, but
-	the recursive slice witnesses and the slice-wise self-improvement outputs
-	must be derived inside the successor proof itself.  Once these direct
-	answer-valued slice outputs are available, the pasting comparison is now
-	formalized by
-	\texttt{mainInductionSuccessorNext\_ofAnswerSliceSelfImprovement}.  These
-	intermediate objects are not represented by a separate theorem whose
-	assumptions are added to the paper statement.
+	still exposed through the public restriction-package constructor above, but
+	the recursive slice witnesses, the slice-wise self-improvement outputs, and
+	the pasting comparison must be derived inside the successor proof itself.
+	They are not represented by a separate theorem whose assumptions are added
+	to the paper statement.
 \end{remark}
 
 \section{Proof of the main formal theorem}
@@ -570,7 +647,7 @@
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionData}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRestrictionData, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass}
 	\leanok
-	\uses{lem:symmetrization-bridge, thm:main-induction}
+	\uses{lem:symmetrization-bridge, thm:main-induction-current-interface}
 	These Lean-only declarations name the restricted-probability and recursive-slice
 	targets appearing in the successor comparison with
 	Remark~\ref{rem:main-induction-successor-assembly}.  The public weighted-bound
@@ -578,7 +655,8 @@
 	fields from the symmetrized passing strategy.  The former Lean boundary records,
 	which also required a supplied self-improvement input, have been removed:
 	that missing work is part of the proof of
-	Theorem~\ref{thm:main-induction}, not an additional assumption in
+	Theorem~\ref{thm:main-induction-current-interface}, not an additional
+	assumption in
 	Theorem~\ref{thm:main-formal}.  The former slice-data records, which supplied
 	concrete pinned same-space slice strategies and passing hypotheses as Lean
 	inputs, have also been removed.  The construction of those slices and the
@@ -617,26 +695,30 @@
 	public statement.
 
 	The successor-dependent targets that call
-	Theorem~\ref{thm:main-induction} are recorded in
+	Theorem~\ref{thm:main-induction-current-interface} are recorded in
 	Definition~\ref{def:main-formal-step6-successor-targets}; they carry the
-	tracked successor proof gap of \ghissue{1507}.
+	tracked successor proof gap of issue~\#1507.
 \end{definition}
 
 
 \begin{definition}[Lean successor-dependent Step~6 targets]\label{def:main-formal-step6-successor-targets}
 	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction}
-	\uses{def:main-formal-step6-obligations, thm:main-induction}
+	\leanok
+	\uses{def:main-formal-step6-obligations, thm:main-induction-current-interface}
 	The role-register Section~6 measurement is obtained by applying the
-	paper-facing theorem \texttt{MainInductionStep.mainInduction} to the
-	role-register symmetrization.  The construction
+	corrected large-\(k\) theorem \texttt{MainInductionStep.mainInduction} to
+	the role-register symmetrization.  The construction
 	\texttt{strategySymmetrization\_mainInduction} records this
 	application, and \texttt{MainFormalRoleInductionWitness.ofMainInduction}
 	builds the role-register witness from it.  Any successor proof gap is the
 	remaining proof obligation in \texttt{mainInduction} itself
 	(Remark~\ref{rem:main-induction-successor-assembly}, tracked by
-	\ghissue{1507}).  These targets are not an added hypothesis of
-	Theorem~\ref{thm:main-formal} but internal proof steps whose completion
-	waits on the discharge of the Section~6 successor proof.
+	issue~\#1507).  The \texttt{\textbackslash leanok} marker on this definition
+	records that these Lean targets are named and type-correct; it does not assert
+	that the successor-dependent witness is proof-closed independently of
+	\texttt{mainInduction}.  These targets are not an added hypothesis of
+	Theorem~\ref{thm:main-formal} but internal proof steps whose completion waits
+	on the discharge of the Section~6 successor proof.
 \end{definition}
 
 
@@ -644,9 +726,8 @@
 	The remaining successor-case proof work is not named as an additional Lean
 	hypothesis of Theorem~\ref{thm:main-formal}.  Starting from a projective
 	strategy that passes the low individual degree test, the large-\(k\) bound
-	\(k \ge 400md\) from Section~6, the positivity condition \(d > 0\), and the
-	non-base condition \(m \neq 1\), the proof must construct the
-	projective-completion witness consumed by
+	\(k \ge 400md\) from Section~6, and the non-base condition \(m \neq 1\), the
+	proof must construct the projective-completion witness consumed by
 	\texttt{mainFormal\_ofProjectiveCompletionTransportWitness}.  This is part of the
 	unfinished proof of the paper theorem, not a separate assumption in its
 	statement.
@@ -672,6 +753,11 @@
 		E = \eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}.
 	\]
 \end{definition}
+
+The remaining entries in this scalar-cascade subsection are Lean bookkeeping
+lemmas for the final proof of Theorem~\ref{thm:main-formal}.  They record
+explicit inequalities between the named error parameters; they are not
+independent source theorems from the paper.
 
 \begin{theorem}[Basic facts about the final error envelope]\label{thm:main-formal-envelope-basics}
 	\lean{MIPStarRE.LDT.Test.mainFormalError_eq_envelope, MIPStarRE.LDT.Test.mainFormalEnvelope_nonneg}\leanok
@@ -864,7 +950,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	$\zeta_1$ estimate.  The generic corrected route would degrade the final point
 	error to scale $t^{1/65536}$, outside the current \texttt{mainFormalError}
 	envelope.  The sharper local pre-completion repair from
-	Definition~\ref{rem:lean-line169-projectivization-match-mass} avoids that
+	Remark~\ref{rem:lean-line169-projectivization-match-mass} avoids that
 	widening.  Its completion step uses only the formal monotonicity helper
 	\texttt{ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj\_left\_matchMass\_ge},
 	not a separate exact match-mass witness route.

@@ -159,12 +159,24 @@ theorem ofMainInductionWitness
   rcases hsection6 with ⟨G, hG⟩
   exact ⟨{ roleMeasurement := G, section6Consistency := hG }⟩
 
-/-- Source-facing constructor for the isolated role-register witness.
+/-- Constructor for the isolated role-register witness from the Section 6 interface.
 
 This calls `MainInductionStep.mainInduction` through
 `strategySymmetrization_mainInduction`.  Thus the Section 3 role measurement is
 not conditional on a successor-boundary package; any remaining Section 6 proof
-gap is the tracked `sorry` in the source theorem `mainInduction` itself. -/
+gap is the tracked small-error successor construction behind the corrected
+large-`k` interface.
+
+**Unfaithful:** This proof transitively uses
+`strategySymmetrization_mainInduction`, hence
+`MainInductionStep.mainInduction`, and therefore still depends on the tracked
+construction obligation
+`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
+Documented in issue #1507 under #1458; this is part of the proof of
+`references/ldt-paper/inductive_step.tex:26-236`, and the transitive successor
+construction is `references/ldt-paper/inductive_step.tex:441-551`.
+Elimination: prove the Section 6 successor construction and then this witness
+constructor becomes standard-axiom clean. -/
 theorem ofMainInduction
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

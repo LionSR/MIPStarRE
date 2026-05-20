@@ -250,14 +250,24 @@ theorem strategySymmetrization_mainInductionBaseCase
       (SameSpaceProjStrat.strategySymmetrization_isGood_three_mul
         (strategy := strategy) (eps := eps) hpass)
 
-/-- Step 1 followed by the source-facing Section 6 theorem.
+/-- Step 1 followed by the corrected large-`k` Section 6 interface.
 
 This is the role-register handoff used by the paper proof of
 `\label{thm:main-formal}` at `references/ldt-paper/inductive_step.tex:68-83`.
-It calls the restored paper-facing theorem `MainInductionStep.mainInduction`
-directly.  Consequently the remaining successor proof gap is the `sorry` inside
-that source theorem, rather than an extra successor-boundary hypothesis in the
-Section 3 theorem. -/
+It calls the separate Lean interface `MainInductionStep.mainInduction`, whose
+large-`k` correction is recorded in `thm:main-induction-current-interface`.
+Consequently the remaining successor proof gap is the tracked Section 6
+small-error construction, not an extra successor-boundary hypothesis in the
+Section 3 theorem.
+
+**Unfaithful:** This proof transitively uses `MainInductionStep.mainInduction`,
+which still depends on the tracked small-error successor construction
+`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
+Documented in issue #1507 under #1458; the cited source proof is
+`references/ldt-paper/inductive_step.tex:68-83`, using the successor
+construction at `references/ldt-paper/inductive_step.tex:441-551`.
+Elimination: prove the Section 6 successor construction and then this handoff
+becomes standard-axiom clean. -/
 theorem strategySymmetrization_mainInduction
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
