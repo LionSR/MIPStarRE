@@ -14,6 +14,52 @@
 \begin{document}
 \maketitle
 
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty: medium.}  The remaining discrepancy is an interface
+  restriction: the formal theorem uses a same-space, swap-compatible strategy
+  object, while the paper starts from an arbitrary two-space projective
+  strategy and then symmetrizes it.
+  \item \textbf{Estimated weight:} about \textbf{5--10 theorem interfaces} and
+  \textbf{300--800 lines}, depending on whether the existing same-space
+  symmetrization bridge is generalized directly or wrapped by a two-space
+  reduction theorem.
+  \item \textbf{Mathlib/project split:} approximately \textbf{20\% Mathlib} and
+  \textbf{80\% project-local}.  Mathlib supplies finite type and matrix
+  bookkeeping; the role-register symmetrization is project-specific.
+  \item \textbf{Key Mathlib inputs:} finite direct sums or tagged products,
+  matrix block embeddings, and tensor-placement identities.  The project-local
+  inputs are \leanid{MIPStarRE.LDT.ProjStrat},
+  \leanid{MIPStarRE.LDT.SameSpaceProjStrat}, and the Step~1
+  symmetrization bridge.  Tracked in \ghissue{930}.
+\end{itemize}
+
+\section{Key theorem forms}
+
+The comparison separates the source theorem from the current formal interface.
+\begin{enumerate}
+  \item \textbf{Printed source form.}  The paper's main theorem starts from a
+  general projective strategy on
+  \(\mathcal H_{\mathrm A}\otimes\mathcal H_{\mathrm B}\), with no assumption
+  that the two local spaces coincide and no assumption that the original state
+  is already symmetric.  The Lean declaration
+  \leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement} records this source
+  statement and factors the remaining source-boundary work through the named
+  wrapper \leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation}.  This wrapper
+  proves the saturated-error branch and leaves the non-vacuous branch as
+  \leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}.
+  \item \textbf{Current formal-interface form.}  The Lean theorem
+  \leanid{MIPStarRE.LDT.Test.mainFormal} is stated for the same-space strategy
+  interface \leanid{MIPStarRE.LDT.SameSpaceProjStrat}.  The source-labelled
+  blueprint theorem remains separate from the current-interface entry.
+  \item \textbf{Expected adapter form.}  A future theorem should construct the
+  role-register symmetrized strategy directly from the two-space container
+  \leanid{MIPStarRE.LDT.ProjStrat}, or prove that the paper's general strategy
+  reduces to the same-space formal interface without changing the source
+  hypotheses.
+\end{enumerate}
+
 \section{The assertion}
 
 The main formal soundness theorem in \cite[Section~\emph{The test}]{Ji2020LowIndividualDegree}
@@ -23,7 +69,10 @@ $\mathcal H_{\mathrm A}\otimes\mathcal H_{\mathrm B}$ and separate projective
 measurement families for the two provers. The two local Hilbert spaces are not
 assumed to be the same, and the starting state is not assumed to be symmetric.
 The test definition takes $m$ and $d$ to be non-negative integers, and the
-main theorem as printed does not impose a separate hypothesis $d>0$.\footnote{This
+main theorem as printed does not impose a separate hypothesis $d>0$.\footnote{The
+earlier formal interface also carried such a positive-degree hypothesis.  This
+has now been removed from \leanid{MIPStarRE.LDT.Test.mainFormal}; the remaining
+restriction recorded in this note is the same-space strategy interface.  This
 note is part of the retrospective audit in \ghissue{930}. The paper passages are
 \path{references/ldt-paper/test_definition.tex}, lines~10--14, 98--115, and
 180--202, together with the reduction in
@@ -56,18 +105,22 @@ swap-compatible strategy object.\footnote{The two-space strategy container is
 \leanid{MIPStarRE.LDT.SameSpaceProjStrat}. Pull request \ghpr{958} closed
 \ghissue{560} by making \leanid{ProjStrat} two-space, but
 \leanid{MIPStarRE.LDT.Test.mainFormal} in
-\doclink{MIPStarRE/LDT/Test/MainTheorem.lean} and the Step~1 bridge
+\doclink{MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean} and the Step~1 bridge
 \leanid{MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization} in
 \doclink{MIPStarRE/LDT/Test/SymmetrizationBridge.lean} still take
 \leanid{SameSpaceProjStrat}.}
 
 The blueprint records the same interface boundary. It describes the paper's
-general projective strategy while noting that the formal strategy layer separates
-the two-space container from the same-space surrogate used by the present
-role-register symmetrization pipeline. Its current main-formal statement also
-includes the additional hypothesis $d>0$.\footnote{See
+general projective strategy in the source theorem
+\texttt{thm:main-formal}, links that entry to the source-faithful Lean
+statement \leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement}, and records
+the current same-space formal interface as a separate Lean-only entry,
+\texttt{thm:main-formal-current-interface}.  This keeps the source-labelled
+statement in the printed paper form while making the formal restriction
+explicit.\footnote{See
 \path{blueprint/src/chapter/ch02_test.tex}, lines~35--43 for the strategy split
-and lines~102--122 for the main-formal blueprint statement.}
+and the formal soundness target section for the source theorem and the separate
+current-interface entry.}
 
 Thus the formal theorem is not presently a theorem about every projective
 strategy in the sense of the paper. A general strategy on
@@ -77,25 +130,19 @@ but not an input to the current public formal statement. To reach the paper
 statement, the role-register construction must be carried out directly for the
 two-space strategy container, producing a symmetric strategy on the appropriate
 direct-sum role space without first assuming a common local carrier or
-swap-invariance of the original state.
-
-The formal theorem also assumes $d>0$. This is another statement-level
-restriction absent from the printed theorem. It is harmless for the nontrivial
-regime used by the current proof route, but it does not by itself establish the
-constant-degree case $d=0$ covered by the paper's non-negative-degree wording.
-A paper-exact public wrapper would need either to remove this hypothesis from
-the formal pipeline or to add a separate argument for $d=0$.
+swap-invariance of the original state.  The former positive-degree restriction
+is no longer present in the public Lean statement.
 
 \section{Conclusion}
 
 The discrepancy is a formal-interface restriction, not a flaw in the paper's
 strategy-reduction argument. The paper theorem starts from an arbitrary general
 projective strategy and then symmetrizes it. The current formal statement starts
-from a narrower same-space, swap-compatible strategy object, and it also assumes
-positive degree. These restrictions should remain visible until the Step~1
-symmetrization bridge and the main-formal theorem are generalized to the
-paper-faithful two-space strategy interface, or until separate wrappers prove
-that the omitted cases reduce to the formal statement.
+from a narrower same-space, swap-compatible strategy object. This restriction
+should remain visible until the Step~1 symmetrization bridge and the
+main-formal theorem are generalized to the paper-faithful two-space strategy
+interface, or until a wrapper proves that the paper's general strategy reduces
+to the formal statement.
 
 \bibliographystyle{alpha}
 \bibliography{references}

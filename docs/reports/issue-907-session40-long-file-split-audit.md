@@ -4,6 +4,18 @@ Audit date: 2026-04-30
 Base commit audited: `53443203` (`origin/main` at session40 dispatch)
 Scope: docs-only split plan for #907. No Lean files were edited.
 
+> **Status note, 2026-05-20.**  This report is a session-40 snapshot of file
+> sizes and active proof debt.  The old monolithic
+> `MIPStarRE/LDT/Test/MainTheorem.lean` proof hole at line 2950 has since been
+> removed from the active route.  The current direct LDT proof holes are the
+> source-boundary obligations
+> `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
+> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`, together with
+> `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
+> in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`, tracked by
+> #1507.  The split recommendations below should therefore be read as
+> historical refactor planning, not as a current proof-frontier inventory.
+
 ## Executive summary
 
 The current largest Lean files are proof-heavy LDT leaves, not the historical barrels from older
@@ -103,7 +115,7 @@ git diff --check
 | 29 | 658 | `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs/Fourier.lean` |
 | 30 | 648 | `MIPStarRE/LDT/Commutativity/GCommStability/Scalar/RawSecond.lean` |
 
-## Current sorry status
+## Historical sorry status
 
 The audited `origin/main` snapshot has exactly one Lean `sorry` token:
 
@@ -172,12 +184,12 @@ motion.
 
 ## Top-10 detailed audit
 
-| Rank | File | LOC | Direct imports | Direct dependents | Decl surface | Current status |
+| Rank | File | LOC | Direct imports | Direct dependents | Decl surface | Snapshot status |
 |---:|---|---:|---|---|---:|---|
 | 1 | `Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean` | 3827 | `Pasting.BridgeLemmas.CommuteGHalfSandwich` | `Pasting/BridgeLemmas.lean`, `HBConsistency.lean`, `ContextWrappers.lean`, `Pasting/Theorems.lean` | 2 public / 95 private | Largest, sorry-free, but high private-helper coupling. Defer. |
 | 2 | `MainInductionStep/Theorems.lean` | 3484 | Section 6 statements plus Test failures, commutativity core, Pasting final, self-improvement results | `LDT.lean`, `MainInductionStep.lean`, `Test/MainTheorem.lean` | 17 public / 56 private | Sorry-free but active Section 6 area. Wait for #924. |
 | 3 | `Commutativity/Transport/FullSlice.lean` | 3203 | `Transport.Pullback`, `Scaffold.Products`, `EvaluatedSliceCommutation.Averages`, `PolynomialAgreement` | `LDT.lean`, `Commutativity/Main/Auxiliary.lean`, `Commutativity/Theorems.lean`, `Commutativity/Transport.lean` | 20 public / 51 private | Best high-payoff split candidate. |
-| 4 | `Test/MainTheorem.lean` | 2971 | Main induction, projectivization, preliminaries, Test cascade/strategy files | `LDT.lean`, `Test/AxiomAudit.lean` | 103 public / 4 private | Contains the only live `sorry` at line 2950. Defer. |
+| 4 | `Test/MainTheorem.lean` | 2971 | Main induction, projectivization, preliminaries, Test cascade/strategy files | `LDT.lean`, `Test/AxiomAudit.lean` | 103 public / 4 private | In the snapshot, contained the only live `sorry` at line 2950. Defer. |
 | 5 | `GlobalVariance/Theorems/Results.lean` | 2950 | expansion results, Cauchy-Schwarz, completion transfer, GlobalVariance statements/averaging, Test failures | `LDT.lean`, `GlobalVariance/Theorems.lean`, `SelfImprovement/Theorems/Results.lean` | 42 public / 53 private | Good candidate after checking no GlobalVariance PR is active. |
 | 6 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2902 | `Pasting.BridgeLemmas.Common` | `Pasting/BridgeLemmas/HBConsistency.lean` | 64 public / 0 private | Good candidate; Pasting-nearby, so wait for Pasting PRs. |
 | 7 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` | 2409 | `CommuteGHalfSandwich.Setup` | `Pasting/BridgeLemmas/CommuteGHalfSandwich.lean` | 1 public / 61 private | Defer; private chain around one final theorem. |
@@ -303,9 +315,11 @@ This Section 6 file is sorry-free but should wait for active PR #924. Its natura
 
 ### `Test/MainTheorem.lean`
 
-This file contains the only live sorry at line 2950 and is in the active Test/main-theorem area. It
-should wait for #958, the session40 #834 residual work, and any related strategy-file PRs. Its
-existing namespace blocks provide good future split seams:
+In the audited snapshot this file contained the only live `sorry`, at line
+2950, and was in the active Test/main-theorem area.  The old residual route has
+since been removed from the current proof frontier, as recorded in the status
+note above.  Its historical namespace blocks nevertheless provide good future
+split seams:
 
 - lines 28--174: classical soundness and trivial witness wrappers;
 - lines 207--412: successor boundary machinery;

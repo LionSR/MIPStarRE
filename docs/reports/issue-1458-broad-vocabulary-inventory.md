@@ -1,6 +1,6 @@
 # Issue #1458 Source-Statement Boundary Audit
 
-Date: 2026-05-14.  Updated: 2026-05-15.
+Date: 2026-05-14.  Updated: 2026-05-20.
 
 This report records a source-statement audit for paper-facing Lean declarations
 whose public hypotheses contain names such as `Statement`, `Conclusion`,
@@ -19,6 +19,19 @@ cases require further formalization work at that boundary, and only the last
 case is a statement-drift problem for the paper theorem itself.
 
 ## Summary
+
+Update, 2026-05-20: the printed source statements for `thm:main-formal` and
+`thm:main-induction` are now linked to source-faithful Lean statements, and
+their remaining proof debt is factored through named obligations
+`Test.mainFormal_sourceObligation` and
+`MainInductionStep.mainInduction_sourceRangeObligation`.  These declarations
+are not public hypotheses of the source theorems.  They are explicit proof
+targets below the source theorem boundary, introduced so that the paper-facing
+statements do not acquire bridge, package, residual, repair, input,
+hypotheses, or obligation assumptions.
+The final-theorem wrapper proves its saturated-error branch and leaves only
+`Test.mainFormal_sourceSmallErrorObligation` as the direct final source-boundary
+proof hole.
 
 The current broad scan reports no unresolved proof-debt theorem boundaries.  It
 also records 39 uses of source-construction context and 2 quoted external
@@ -75,11 +88,13 @@ the paper statement.  Instead, `lem:sdp` points to the source-shaped theorem
 `sdp_statement_with_slackness` and to the displayed consequence
 `sdp_slackness_measurement`, whose proof is explicitly tied to #1230.
 
-The #1230 mathematical obligation remains: prove the SDP strong-duality and
-complementary-slackness statement from the paper's canonical SDP argument.  The
-current repair makes that obligation visible as a source-facing theorem with a
-specific measurement-and-slackness consequence; it no longer appears as an
-extra public hypothesis on later paper theorems.
+The former #1230 mathematical obligation has been discharged.  The current
+formalization proves the SDP strong-duality and complementary-slackness
+statement from the paper's canonical SDP argument, exposes it as the
+source-facing theorem `sdp_statement_with_slackness`, and records the displayed
+measurement-and-slackness consequence as `sdp_slackness_measurement`.  The
+dominance-carrying matrix routes remain internal construction material; they
+are not extra public hypotheses on later paper theorems.
 
 ## Chapter 10 Main Induction
 
@@ -165,9 +180,10 @@ theorem, lemma, proposition, or corollary entries.
 
 ## Repair Order
 
-1. Continue the #1230 SDP discharge path.  Prove
-   `sdp_statement_with_slackness`, and hence `sdp_slackness_measurement`, from
-   the canonical SDP strong-duality and complementary-slackness argument.
+1. Keep the discharged #1230 SDP path under axiom audit.  The current
+   declarations `sdp_statement_with_slackness` and
+   `sdp_slackness_measurement` are proved from the canonical SDP
+   strong-duality and complementary-slackness argument.
 2. Discharge the Section 6 successor target `mainInductionSuccessor` by
    constructing the restricted-probability package, recursive slice
    measurements, self-improvement outputs, and averaged pasting input from the

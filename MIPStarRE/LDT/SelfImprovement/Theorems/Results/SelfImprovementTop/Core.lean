@@ -18,8 +18,9 @@ to `thm:self-improvement` in the blueprint.
 
 ## Contents
 
-- **selfImprovementHelperConstruction** — construction lemma producing `T`, `Ĥ`,
-  `Z` and `SelfImprovementHelperConclusion` from `sdp` + `addInU`.
+- **selfImprovementHelperConstruction** — reduced construction lemma producing
+  `T`, `Ĥ`, `Z`, and `SelfImprovementHelperConclusion` from the feasibility
+  fragment `sdp` and the variance-bound specialization `addInU`.
 - **selfImprovementHelper** — `lem:self-improvement-helper`, with the paper's
   input consistency hypothesis and four helper conclusions.
 - **self_improvement_helper_with_slackness** — companion helper producing the

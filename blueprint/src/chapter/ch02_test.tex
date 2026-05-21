@@ -32,6 +32,14 @@
 	\]
 	where the five terms are the acceptance probabilities of the two axis-parallel role orderings, the self-consistency branch, and the two diagonal role orderings.
 \end{lemma}
+\begin{proof}\leanok
+	\proves{fig:test}
+	\uses{def:low-individual-degree-test}
+	Expand the definition of the total acceptance probability as the average of
+	the three subtests.  The axis-parallel and diagonal branches each first
+	choose one of the two role orderings uniformly, so their branch acceptance
+	probabilities are the corresponding averages displayed above.
+\end{proof}
 
 \begin{definition}[Symmetric projective strategy]\label{def:symmetric-projective-strategy}
 	\lean{MIPStarRE.LDT.SymStrat}
@@ -44,7 +52,7 @@
 	\leanok
 	% Lean separates the paper-faithful two-space container `ProjStrat ιA ιB`
 	% from the same-space, swap-symmetric surrogate `SameSpaceProjStrat ι` used by
-	% the current role-register symmetrization pipeline. Remaining follow-up work:
+	% the current role-register symmetrization construction. Remaining follow-up work:
 	% build the heterogeneous direct-sum role symmetrization replacing the same-space
 	% `Role × ι` target in the Step 1 bridge.
 	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
@@ -112,13 +120,19 @@
 \section{Formal soundness target}
 
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
-	\lean{MIPStarRE.LDT.Test.mainFormal}
+	\lean{MIPStarRE.LDT.Test.mainFormal_sourceStatement}
+	\leanok
 	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that passes the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Assume $d > 0$. Let $k > 0$ with $k \ge 400\,md$ and set
+	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A},
+	A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that
+	passes the $(m,q,d)$ low individual degree test with probability at least
+	$1-\eps$. Let \(k \ge md\) be an integer and set
 	\[
 		\nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
 	\]
-	Then there exist projective measurements $G^{\mathrm A}, G^{\mathrm B} \in \polymeas{m}{q}{d}$ with the following properties:
+	Then there exist projective measurements
+	$G^{\mathrm A}, G^{\mathrm B} \in \polymeas{m}{q}{d}$ with the following
+	properties:
 	\begin{enumerate}
 		\item on average over $u \sim \F_q^m$,
 		      \[
@@ -133,7 +147,27 @@
 	\end{enumerate}
 \end{theorem}
 
-\begin{remark}[Internal witness form of the final transport]\label{rem:main-formal-conditional}
+\begin{theorem}[Current same-space formal interface]\label{thm:main-formal-current-interface}
+	\lean{MIPStarRE.LDT.Test.mainFormal}
+	\leanok
+	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq, thm:main-formal}
+	This is the currently linked Lean interface toward Theorem~\ref{thm:main-formal}.
+	It is not the printed theorem.  Compared with the paper statement, it uses the
+	documented large-\(k\) correction \(k\ge 400md\) and the scalar boundary
+	\(k>0\), and it is represented in Lean by the same-space strategy container
+	used by the present role-register symmetrization bridge.  The full paper
+	interface is tracked in
+	\texttt{docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex}.
+	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A},
+	A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy in the
+	current same-space formal container that passes the $(m,q,d)$ low individual
+	degree test with probability at least \(1-\eps\). Let \(k>0\) with
+	\(k \ge 400\,md\), and define \(\nu\) by the same displayed expression as in
+	Theorem~\ref{thm:main-formal}.  Then the three consistency conclusions of
+	Theorem~\ref{thm:main-formal} hold for this restricted formal interface.
+\end{theorem}
+
+\begin{remark}[Internal witness form of the final transport]\label{rem:main-formal-final-transport}
 	The witness theorem is a Lean-only formally verified final-transport result: once the
 	Section~6 role witness and the post-role projective-completion witness have
 	been constructed from the hypotheses of Theorem~\ref{thm:main-formal}, it
@@ -145,10 +179,34 @@
 \begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}
 	The paper statement uses the weaker hypothesis $k \ge md$, but the proof
 	invokes the Section~6 pasting theorem with side condition $k \ge 400\,md$.
-	This side condition is not implied by $k \ge md$. The Lean and blueprint
-	public statement therefore records the stronger large-$k$ assumption required
-	by the pasting step rather than hiding the side-condition gap. The helper
+	This side condition is not implied by $k \ge md$. The current Lean interface,
+	Theorem~\ref{thm:main-formal-current-interface}, therefore records the
+	stronger large-$k$ assumption required by the pasting step, together with the
+	scalar-cascade boundary \(k>0\), rather than hiding the side-condition gap. The helper
 	\texttt{mainFormal\_trivial\_witness} remains only for already-saturated
 	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
-	it is not a replacement for a proof in the interval $md \le k < 400\,md$.
+	it is not a replacement for a proof in the interval $md \le k < 400\,md$ or
+	at the \(k=0\) boundary when \(md=0\).
+	The full source-boundary reduction is named in Lean as
+	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceObligation}; it proves the
+	saturated-error branch and leaves
+	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceSmallErrorObligation} as the
+	remaining non-vacuous internal obligation, not an extra hypothesis of
+	Theorem~\ref{thm:main-formal}.
+\end{remark}
+
+\begin{remark}[Formal-interface boundary for the public theorem]\label{rem:main-formal-interface-boundary}
+	The printed theorem starts from a general projective strategy on possibly
+	different prover spaces.  The Lean declaration linked in
+	Theorem~\ref{thm:main-formal-current-interface} is the same-space interface
+	documented in
+	\texttt{docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex}.
+	The source theorem, Theorem~\ref{thm:main-formal}, is linked to the
+	source-shaped Lean statement, but no proof-level \texttt{\textbackslash leanok}
+	is attached here.  Removing the same-space restriction requires a two-space
+	role-register symmetrization construction showing that the paper's general strategy
+	reduces to the current formal interface.  In addition, the proof of the
+	current same-space interface still runs through the Section~6 successor
+	construction tracked by issue~\#1507, so this interface is not marked with
+	proof-level \texttt{\textbackslash leanok}.
 \end{remark}

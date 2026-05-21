@@ -6,6 +6,15 @@ Base commit: `68e3a1d9` (`origin/main` when this worktree was created)
 
 Branch: `gpt55/session48-930-making-projective-audit`
 
+> **Status note, 2026-05-20.**  The coordination paragraphs below record the
+> issue state at the May 1 audit snapshot.  The old `Test/MainTheorem.lean`
+> Step-6 residual and #931 self-improvement input-producer route are no longer
+> the current proof frontier.  The current direct LDT proof obligations are the
+> two source-boundary obligations for `thm:main-induction` and
+> `thm:main-formal`, together with the Section 6 small-error successor
+> construction tracked by #1507.  This historical audit remains valid as a
+> statement audit for the projectivization support slice.
+
 ## Executive summary
 
 I audited the already-formalized projectivization support slice against:
@@ -17,7 +26,7 @@ I audited the already-formalized projectivization support slice against:
 
 The audited Lean scope was `MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkOneMeas.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkFull.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/Projectivization.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/**`, `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerData.lean`, and the completion/self-consistency support in `MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/**`, `MIPStarRE/LDT/Preliminaries/Completion.lean`, and `MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean`.
 
-This scope intentionally excludes `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean`, since a separate orthonormalization-only audit is active in session 48. It also avoids the live `Test/MainTheorem.lean` Step-6 witness residual (#834), the #931 self-improvement input producer work assigned to `jizhengfeng`, and draft PR #889, which is the Lean/Mathlib v4.29.1 upgrade. Current open PR inspection found only draft #889; open issue inspection found #931 and #834 as the live proof-work owners relevant to this slice.
+This scope intentionally excludes `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean`, since a separate orthonormalization-only audit was active in session 48. It also avoided the then-live `Test/MainTheorem.lean` Step-6 witness residual (#834), the then-#931 self-improvement input producer work assigned to `jizhengfeng`, and draft PR #889, which was the Lean/Mathlib v4.29.1 upgrade.  Open PR inspection at the audit snapshot found only draft #889; open issue inspection then found #931 and #834 as the live proof-work owners relevant to this slice.
 
 Verdict: no new `docs/paper-gaps/` note is warranted for this slice. The checked projectivization/completion/match-mass route is faithful where it claims a paper theorem, and the genuine differences I found are already documented: the completion scalar correction is recorded in `docs/paper-gaps/issue-904-zeta2-completion.tex`; the QXP combinatorial strengthening is recorded in `docs/paper-gaps/truncation-combinatorics-f-nonneg.tex`; normalized-state bookkeeping is recorded in `docs/paper-gaps/issue-933-quantumstate-normalization.tex`; and the orthonormalization bridge-status / projective-submeasurement packaging is documented in the blueprint after PR #945. At the time of this audit, the remaining line-169 exactness condition was still represented as an explicit internal exact-match interface. The current tree has since retired that exact interface in favor of the repaired line-169 route documented in the blueprint.
 
@@ -25,7 +34,12 @@ Verdict: no new `docs/paper-gaps/` note is warranted for this slice. The checked
 
 The only open PR at audit start was draft #889, `chore: upgrade Lean/Mathlib to v4.29.1`. I made no Lean or blueprint changes that could interact with that upgrade.
 
-Issue #931 remains open and assigned to `jizhengfeng`; it owns the self-improvement input producers for Section 6 and is outside this audit. Issue #834 remains open for the current `mainFormal` Step-6 witness residual. This audit therefore does not attempt to construct `MainFormalRoleInductionWitness`, line-130 orthonormalization inputs, completion producers, or match-mass witnesses for `mainFormal`.
+At the audited snapshot, issue #931 remained open and assigned to
+`jizhengfeng`; it owned the self-improvement input producers for Section 6 and
+was outside this audit.  Issue #834 then remained open for the `mainFormal`
+Step-6 witness residual.  This audit therefore did not attempt to construct
+`MainFormalRoleInductionWitness`, line-130 orthonormalization inputs,
+completion producers, or match-mass witnesses for `mainFormal`.
 
 The requested parallel orthonormalization audit has a separate worktree and branch. I read the blueprint comments needed to understand the boundary, but I did not audit or edit `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean`.
 
@@ -89,7 +103,7 @@ No new paper-gap note is needed because the discrepancies or packaging differenc
 
 ## Follow-up
 
-I did not open a new follow-up issue. At the time of this audit, the only live projectivization-related proof obligation was the already tracked #834 Step-6 witness residual. In the current tree that exact-match sub-obligation has been retired, so the active Step-6 proof work is the repaired line-169 transport plus the remaining Section~6 successor proof debt.
+I did not open a new follow-up issue. At the time of this audit, the only live projectivization-related proof obligation was the already tracked #834 Step-6 witness residual. In the current tree that exact-match sub-obligation has been retired.  The current direct LDT proof frontier consists of the two source-boundary obligations for `thm:main-induction` and `thm:main-formal`, together with the remaining Section~6 small-error successor construction.
 
 ## Validation
 

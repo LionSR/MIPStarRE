@@ -2,9 +2,11 @@
 
 ## Scope
 
-This note classifies the public dependency-graph node `lem:sdp` and records the
-repair made in the SDP comparison layer.  The public graph marks `lem:sdp` as a
-blue node: its prerequisites are represented, but the proof is not yet complete.
+This note classifies the formerly open dependency-graph node `lem:sdp` and
+records the repair made in the SDP comparison layer.  The native canonical SDP
+obligation has since been discharged: the current blueprint links the source
+lemma to the slackness-carrying statement and proof, and `AxiomAudit.lean`
+checks the relevant abstract, matrix, and measurement-witness declarations.
 
 ## Source comparison
 
@@ -27,18 +29,19 @@ Lean source:
 
 | Node | Status | Reason |
 | --- | --- | --- |
-| `lem:sdp` | Stated with proof hole | The source-shaped slackness statement is present, but its proof still depends on a tracked `sorry` for the finite-dimensional SDP strong-duality and complementary-slackness theorem specialized to the paper's canonical block SDP. |
+| `lem:sdp` | Proved in the current source | The source-shaped slackness statement `sdp_statement_with_slackness` is proved from the finite-dimensional canonical SDP strong-duality and complementary-slackness route, then exposed through the displayed measurement witness `sdp_slackness_measurement`. |
 | `matrixSdpPointRealization_statementWithSlackness` | Transport theorem, now proved | This theorem is not the missing SDP duality theorem itself.  It transports a native canonical optimal pair to the existing matrix-level statement. |
-| `matrixSdpPointRealization_canonicalOptimalPair` | Named proof obligation | This is now the unique local `sorry` for the SDP cluster.  Its statement matches the canonical optimal-pair output used in the paper proof: canonical feasibility, dual feasibility, equality of objectives, canonical complementary slackness, and vanishing of the slack block. |
+| `matrixSdpPointRealization_canonicalOptimalPair` | Proved construction theorem | This theorem now calls `matrixSdpCanonicalStrongDuality`, extracts canonical complementary slackness, saturates the auxiliary slack block, and returns the canonical optimal-pair output used in the paper proof. |
 
 ## Repair
 
-The broad matrix-level proof hole was replaced by the native canonical
-optimal-pair obligation `matrixSdpPointRealization_canonicalOptimalPair`.  The
-former matrix-level theorem `matrixSdpPointRealization_statementWithSlackness`
-is now a proved consequence of this canonical obligation.  Two additional
-transport theorems expose the same canonical obligation at the abstract
-self-improvement interface and at the displayed measurement-witness interface.
+The broad matrix-level proof hole was first replaced by the native canonical
+optimal-pair theorem `matrixSdpPointRealization_canonicalOptimalPair`, and that
+theorem has now been proved.  The former matrix-level theorem
+`matrixSdpPointRealization_statementWithSlackness` is a proved consequence of
+this canonical construction.  The abstract self-improvement interface
+`sdp_statement_with_slackness` and the displayed measurement-witness interface
+`sdp_slackness_measurement` are also proved consequences.
 
 No bridge, residual, repair, producer, input, generic hypotheses, or dominance
 assumption was added to a paper-facing theorem.  The auxiliary dominance route
@@ -62,6 +65,6 @@ Lean conclusion: the new proof obligation produces a canonical optimal pair in
 the block SDP with zero slack block; the proved transport theorems extract the
 complete primal measurement and the displayed complementary-slackness equations.
 
-Verdict: source-faithful proof obligation with proved transport.  The remaining
-mathematical gap is the finite-dimensional SDP strong-duality and complementary
-slackness theorem specialized to the canonical block SDP.
+Verdict: source-faithful theorem, now proved.  No SDP-specific `sorryAx`
+dependency remains; the dominance-carrying matrix route is retained only as an
+internal conditional construction and is not a hypothesis of the source lemma.

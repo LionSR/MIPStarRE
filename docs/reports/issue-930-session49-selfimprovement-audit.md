@@ -21,6 +21,21 @@ Branch: `gpt55/issue-930-selfimprovement-audit`
 > orthonormalization, and final-field derivations are tracked proof obligations
 > on the source-facing theorem and its named construction lemmas, especially
 > #1514 and #1515.
+>
+> **Status note, 2026-05-20.**  This final sentence is historical for the
+> current code.  The Section 9 theorem `selfImprovement` and the induction
+> wrapper `selfImprovementInInductionSection` are now checked without
+> `sorry` or `axiom`; the former #1514, #1515, and #1503 proof gaps are not
+> live Section 9 obligations.  The remaining transitive proof frontier for the
+> current same-space theorem `mainFormal` is the Section 6 small-error
+> successor construction
+> `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
+> tracked by #1507.  The source-labelled final-theorem route additionally
+> contains the named source-boundary obligations
+> `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
+> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`; the wrapper
+> `MIPStarRE.LDT.Test.mainFormal_sourceObligation` proves the saturated-error
+> branch.
 
 ## Executive summary
 
@@ -36,16 +51,22 @@ The audited Lean scope was `MIPStarRE/LDT/SelfImprovement/Defs.lean`,
 `MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean`, and
 `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean`.
 
-This scope intentionally avoids the live `Test/MainTheorem.lean` Step-6
-witness residual (#834), the #931 self-improvement input producer work
-assigned to `jizhengfeng`, and draft PR #889 (Lean/Mathlib v4.29.1 upgrade).
-The only open PR at audit start was draft #889.
+This historical audit intentionally avoided the then-live
+`Test/MainTheorem.lean` Step-6 witness residual (#834), the #931
+self-improvement input producer work, and draft PR #889 (Lean/Mathlib
+v4.29.1 upgrade).  In the current code, those names should be read as
+audit-snapshot context rather than as the live Section 9 frontier.
 
-**Verdict: One new `docs/paper-gaps/` note is warranted.**
+**Historical verdict: one new `docs/paper-gaps/` note was warranted in the
+audited snapshot.**
 The Lean `selfImprovement` theorem (`thm:self-improvement`) is missing the
 paper's `≃_ν` consistency hypothesis for the input measurement G. While this
 gap is explicitly surfaced by the obligation system and tracked by #931,
 the `\leanok` annotation on the blueprint node could mislead readers.
+
+In the current code this verdict has been superseded: the Section 9 theorem
+has the paper-shaped input-consistency hypothesis and checks without proof
+holes.
 
 ## Coordination and non-overlap
 
@@ -53,9 +74,9 @@ The only open PR at audit start was draft #889 (`chore: upgrade Lean/Mathlib
 to v4.29.1`). I made no Lean or blueprint changes that could interact with
 that upgrade.
 
-Issue #931 remains open and assigned to `jizhengfeng`; it owns the
-self-improvement input producers. This audit does not construct or edit
-any obligation proofs.
+At the audited snapshot, issue #931 remained open and assigned to
+`jizhengfeng`; it owned the self-improvement input producers.  This audit did
+not construct or edit any obligation proofs.
 
 The audit was performed directly in the main workspace on a clean `main`
 at `5e18073d`. No source files were modified; only documentation files
@@ -71,16 +92,25 @@ optimal pair satisfies `∑_g T_g = I` and complementary slackness
 `T_g Z = T_g A_g`. The proof uses Slater witnesses `T_g = (2M)⁻¹·I` and
 `Z = 2I`.
 
-**Lean** (Defs.lean:29--106, Results.lean:82--99): The `sdp` lemma only
-instantiates the explicit Slater witnesses and proves `T.total = 1`,
-`Z ≥ 0`, and `Z ≥ averagedPointOperator` for all g. Strong duality and
-complementary slackness are omitted from the formal statement. The
-`sdpPrimalWitness` completes the uniform Slater submeasurement at the zero
-polynomial to fit the downstream `Measurement` interface.
+**Lean** (`Theorems/Statements.lean`,
+`Theorems/Results/SdpMatrixBridge.lean`,
+`Theorems/Results/HelperCompleteness/Bracketed.lean`): The reduced theorem
+`sdp` still records only the older feasibility fragment, but it is no longer
+the paper-facing formalization of `lem:sdp`.  The source-shaped target is
+`SdpStatementWithSlackness`: it asserts the existence of a primal measurement
+and a dual operator satisfying primal total mass, dual feasibility, and the
+complementary-slackness equation.  The theorem
+`sdp_statement_with_slackness` proves this target by passing through the
+canonical block SDP, strong duality, and the saturated slack-block extraction.
+The theorem `sdp_slackness_measurement` records the displayed measurement and
+dual witness used by the helper proof.
 
-**Assessment**: Explicitly documented. The blueprint marks `lem:sdp` as
-`\leanok`. The `SdpOptimalPair` structure (Statements.lean:34--42) records
-only the facts consumed downstream. No undocumented discrepancy.
+**Assessment**: Formalized as a slackness-carrying construction theorem.  The
+blueprint marks `lem:sdp` as `\leanok` through
+`SdpStatementWithSlackness`, `sdp_statement_with_slackness`, and the associated
+matrix-realization lemmas.  The reduced `sdp` theorem remains only a retained
+interface for the earlier feasibility fragment; it is explicitly not advertised
+as the full paper lemma.  No undocumented discrepancy.
 
 ### `lem:add-in-u`
 
@@ -88,16 +118,21 @@ only the facts consumed downstream. No undocumented discrepancy.
 expectations involving an auxiliary submeasurement M, the averaged family H,
 a selection S, at error `4√ζ_variance`.
 
-**Lean** (Results.lean:112--127): The `addInU` lemma is reduced to the
-global-variance consequence: `pointConditionedGlobalVariance ≤
-selfImprovementVarianceError`. The selection-dependent transfer inequality
-is not formalized. The `AddInUStatement` structure (Statements.lean:175--182)
-only records `varianceBound`.
+**Lean** (`Theorems/AddInUFullStatement.lean`): The structure
+`AddInUFullStatement` states the full selection-dependent transfer inequality,
+universally quantified over the auxiliary outcome type, submeasurement family
+`M`, and selection rule `S`.  The theorem
+`addInUFullStatement_of_isGood` proves this statement from the standing
+`IsGood eps delta gamma` hypotheses by combining the selected
+Cauchy--Schwarz chain with the global-variance estimate.  The older `addInU`
+lemma remains a downstream variance-bound specialization used by the helper
+theorem.
 
-**Assessment**: Explicitly documented. The blueprint marks `lem:add-in-u`
-as `\leanok`. The variance bound is derived from the transport-chain
-infrastructure rather than the paper's Cauchy-Schwarz chain; this is a
-valid formalization route. No undocumented discrepancy.
+**Assessment**: Formalized as a construction theorem rather than as an
+assumption.  The blueprint marks `lem:add-in-u` as `\leanok` through
+`AddInUFullStatement` and `addInUFullStatement_of_isGood`; the reduced
+`addInU` theorem is explicitly recorded only as a specialization, not as the
+full counterpart of the paper lemma.  No undocumented discrepancy.
 
 ### `lem:self-improvement-helper`
 
@@ -105,21 +140,31 @@ valid formalization route. No undocumented discrepancy.
 conclusions (completeness, consistency, strong self-consistency,
 boundedness) at error `ζ = 100m(ε^{1/2} + δ^{1/2} + (d/q)^{1/2})`.
 
-**Lean** (Results.lean:137--164): `selfImprovementHelper` only packages the
-outputs of the reduced `sdp` and `addInU` lemmas: SDP witness, averaged
-construction of H, variance bound, PSD dual, and dual domination. It does
-not produce the four paper conclusions. The `SelfImprovementHelperConclusion`
-structure (Statements.lean:197--211) explicitly states that completeness,
-pointConsistency, strong self-consistency, and boundedness "do not yet come
-from these arguments alone."
+**Lean** (`Theorems/Results/SelfImprovementTop/Core.lean`):
+`selfImprovementHelper` now proves the four helper conclusions stated in the
+paper.  It first invokes the slackness-carrying companion
+`self_improvement_helper_with_slackness`, which is driven by
+`sdp_statement_with_slackness`.  It then applies the full
+`AddInUFullStatement` transfer theorem to obtain point consistency and the
+boundedness gap, combines complementary slackness with the helper completeness
+chain, and uses the `HelperSSC` estimates for strong self-consistency.  The
+record `SelfImprovementHelperStatement` contains the paper's completeness,
+point-consistency, strong self-consistency, positivity, dual-domination, and
+boundedness outputs.
 
 The error `selfImprovementHelperError` (Defs.lean:348--354) matches the
 paper's `ζ̂ = 100m(ε^{1/2} + δ^{1/2} + (d/q)^{1/2})` exactly.
 
-**Assessment**: Explicitly documented. The `_nu` and `_G` parameters are
-marked as kept for API compatibility. No undocumented discrepancy.
+**Assessment**: The earlier reduced helper interface has been superseded for
+the paper-facing lemma.  The reduced construction lemma remains useful
+internally, but `selfImprovementHelper` itself is the source-facing helper
+statement and is axiom-clean in `AxiomAudit.lean`.  No undocumented
+discrepancy.
 
-### `thm:self-improvement` (projective output)
+### Historical `thm:self-improvement` discrepancy (projective output)
+
+This subsection describes the May 1 audit snapshot, not the current Lean
+statement.
 
 **Paper** (self_improvement.tex:635--671): Takes G with `≃_ν` consistency,
 outputs projective H at error `ζ = 3000m(ε^{1/32} + δ^{1/32} + (d/q)^{1/32})`
@@ -156,22 +201,19 @@ apparent from the blueprint alone.
 
 **Paper-gap note**: Added `docs/paper-gaps/issue-930-self-improvement-missing-nu-consistency.tex`.
 
-### Bridge input system
+### Historical bridge input system
 
-The `SelfImprovementObligations` structure (Statements.lean:363--378)
-packages the three remaining unproven assumptions:
-- `helperStrongSelfConsistency`: The averaged `Hhat` is bipartite strongly
-  self-consistent at level `selfImprovementHelperError`.
-- `orthonormalization`: The strongly self-consistent `Hhat` admits the
-  spectral-truncation and locality-preserving repair witnesses.
-- `finalFields`: The completeness, point-consistency, self-closeness,
-  projective-residual, and boundedness conclusions follow from the helper +
-  orthonormalization + data-processing outputs.
+In the audited snapshot, the `SelfImprovementObligations` structure packaged
+three unproved assumptions: helper strong self-consistency, orthonormalization,
+and the final-field conclusions.  The theorems
+`selfImprovementFromObligations` and
+`selfImprovementFromObligationsSubMeas` unpacked those assumptions and called
+the main `selfImprovement` theorem.
 
-The `selfImprovementFromObligations` and
-`selfImprovementFromObligationsSubMeas` theorems (Results.lean:294--326)
-unpack these assumptions and call the main `selfImprovement` theorem.
-This bridge system is progress toward #931 and is explicitly documented.
+This bridge system has since been removed from the active route.  The current
+Section 9 theorem and the induction-section wrapper are checked directly, and
+the former obligation bundle is no longer a live Lean declaration or a
+permissible theorem hypothesis.
 
 ### Matrix realization (`MatrixRealization.lean`)
 
@@ -185,16 +227,15 @@ matrix-level definitions; they mirror the operator-level ones structurally.
 
 ## Existing documented bookkeeping
 
-- The obligation system (`SelfImprovementObligations`) and its three
-  sub-components are themselves the primary documentation of the
-  self-improvement formalization gap.
-- Issue #931 explicitly tracks the self-improvement input producer work.
-- The #930 main-induction audit (PR #1018) documented the successor-step
-  scalar absorption discrepancy; that audit touched the
-  `selfImprovementInInductionError` usage in the induction chapter but
-  did not audit `SelfImprovement/` directly.
-- No pre-existing `docs/paper-gaps/` notes specifically address the
-  SelfImprovement module.
+- The historical obligation system (`SelfImprovementObligations`) documented
+  the old Section 9 gap but is no longer part of the current Lean route.
+- Issue #1515 and #1503 are historical for the checked Section 9 and
+  induction-section self-improvement theorems.
+- The live downstream frontier is #1507, the Section 6 successor construction
+  that consumes the checked self-improvement interface.
+- The paper-gap note
+  `docs/paper-gaps/issue-930-self-improvement-missing-nu-consistency.tex`
+  now records this status explicitly.
 
 ## `sorry`/`admit`/`axiom` scan
 
@@ -203,13 +244,11 @@ files of `MIPStarRE/LDT/SelfImprovement/`. The module compiles cleanly.
 
 ## Follow-up
 
-The new paper-gap note `issue-930-self-improvement-missing-nu-consistency.tex`
-should be resolved by #931: once the obligation fields are proved, the
-`selfImprovement` theorem can either:
-1. Add the `≃_ν` hypothesis and use it in a proper proof (matching the
-   paper statement); or
-2. Document in the blueprint that the Lean version takes obligations
-   instead of the paper's ν consistency hypothesis.
+The historical follow-up for this audit was discharged by later repairs.  The
+paper-gap note `issue-930-self-improvement-missing-nu-consistency.tex` now
+records that the Section 9 theorem and its induction-section wrapper are
+checked, and that the remaining downstream work is the Section 6 successor
+construction #1507.
 
 ## Validation
 
@@ -241,7 +280,8 @@ python3 scripts/check_blueprint_latex.py
 git diff --check
 ```
 
-A scratch `#check` file was also run for the audited public declarations:
+A scratch `#check` file was also run, in the audit snapshot, for the audited
+public declarations:
 `selfImprovementHelperError`, `selfImprovementOrthogonalizationError`,
 `selfImprovementDataProcessingError`, `selfImprovementError`, `sdp`,
 `addInU`, `selfImprovementHelper`, `selfImprovement`,

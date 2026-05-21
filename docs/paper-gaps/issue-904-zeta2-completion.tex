@@ -17,7 +17,23 @@
 \begin{document}
 \maketitle
 
-\section{The estimate for the completion step}
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty.} Low.  The issue is a scalar bookkeeping
+  discrepancy in the completion step, not a missing operator-theoretic
+  construction.
+  \item \textbf{Estimated weight.} One local scalar calculation and the
+  downstream replacement of the affected cascade constant.
+  \item \textbf{Mathlib/project split.} Mostly project-local; Mathlib supplies
+  only the elementary real inequalities used after the project-specific
+  completion estimate has been instantiated.
+  \item \textbf{Key mathematical inputs.} The completion-to-measurement
+  proposition, the orthogonalization error estimate, and the square-root
+  absorption into the definition of \(\zeta_2\).
+\end{itemize}
+
+\section{Key theorem forms for the completion step}
 
 This note concerns the scalar in the completion estimate in
 \cite[Section~\emph{The main induction step}]{Ji2020LowIndividualDegree}.
@@ -25,6 +41,7 @@ This note concerns the scalar in the completion estimate in
 \href{https://github.com/LionSR/MIPStarRE/issues/904}{GitHub issue \#904}; the
 corresponding repair is
 \href{https://github.com/LionSR/MIPStarRE/pull/909}{GitHub pull request \#909}.
+In repository notation, these are \ghissue{904} and \ghpr{909}.
 In the TeX source consulted here, the estimate occurs in
 \path{references/ldt-paper/inductive_step.tex}, lines 135--149.}
 We write \(X\approx_\eta Y\) for the state-dependent squared-distance relation,
@@ -154,8 +171,9 @@ completion error, the absorption into the coefficient \(42\), and the downstream
 cascade bounds.
 
 The unfinished proof of the final theorem is not part of this scalar
-calculation.\footnote{At the date of this note, that unrelated unfinished proof is in
-\path{MIPStarRE/LDT/Test/MainTheorem.lean}.}  The calculation in
+calculation.\footnote{As of the 2026-05-20 audit, the remaining unfinished proof
+on the final-theorem route is the Section~6 small-error successor construction
+in \path{MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean}.}  The calculation in
 \href{https://github.com/LionSR/MIPStarRE/issues/904}{issue \#904} has been
 isolated and accounted for in the checked scalar and
 projectivization lemmas.

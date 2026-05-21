@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
+import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 
 /-!
 # Ordinary restricted-slice recursion: basic inputs

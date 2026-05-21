@@ -37,6 +37,14 @@ ordinary slice strategies on which Section 9 can run, together with the state
 and point-measurement transports needed to move the resulting conclusions back
 to the answer-valued restricted bookkeeping.
 
+The legacy restricted strategy `xRestrictedStrategy` is not such an ordinary
+slice strategy.  It is a `RestrictedSymStrat`, and its diagonal measurement is
+only the degree-bounded re-embedding of the sampled base-point value.  Thus it
+does not by itself supply the transport-covariant diagonal measurement required
+by `SymStrat`.  A proof of this transport obligation must either construct an
+ordinary covariant slice strategy or prove the self-improvement theorem directly
+for the answer-valued interface.
+
 The Section 9 analytic proof debt is not stored in this record.  The data record
 constructor below calls the paper-facing theorem
 `selfImprovementInInductionSection`; its proof applies the Section 9 theorem and

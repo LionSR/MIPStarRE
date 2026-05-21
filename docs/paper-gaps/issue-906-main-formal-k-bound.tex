@@ -14,18 +14,48 @@
 \begin{document}
 \maketitle
 
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty: medium.}  The issue is not a missing analytic
+  estimate, but a mismatch between the size hypothesis printed in the paper and
+  the size hypothesis consumed by the present pasting route.
+  \item \textbf{Estimated weight:} about \textbf{3--6 scalar or boundary
+  lemmas} if one proves a smaller-\(k\) saturation argument, or a theorem-level
+  correction if the present large-\(k\) route is retained.
+  \item \textbf{Mathlib/project split:} approximately \textbf{10\% Mathlib} and
+  \textbf{90\% project-local}.  The arithmetic is elementary; the substance is
+  deciding which LDT theorem statement is justified by the paper's pasting
+  pipeline.
+  \item \textbf{Key Mathlib inputs:} elementary order arithmetic on natural
+  numbers and nonnegative real error parameters.  The main inputs are the
+  project-local statements of the main induction, pasting, and final scalar
+  cascade.  Tracked in \ghissue{906}.
+\end{itemize}
+
+\section{Key theorem forms}
+
+The comparison involves three theorem forms.
+\begin{enumerate}
+  \item \textbf{Printed source form.}  The theorem in
+  \path{references/ldt-paper/inductive_step.tex} assumes \(k\ge md\), and its
+  successor proof assumes \(k\ge (m+1)d\).
+  \item \textbf{Pasting-input form.}  The pasting theorem used in the successor
+  proof requires \(k\ge 400md\) in the restricted \(m\)-dimensional slice.
+  \item \textbf{Current formal-interface form.}  The Lean theorem
+  \leanid{MIPStarRE.LDT.MainInductionStep.mainInduction} and the final theorem
+  \leanid{MIPStarRE.LDT.Test.mainFormal} use the corrected large-\(k\)
+  interface, displayed in the blueprint as separate current-interface entries.
+\end{enumerate}
+
 \section{The assertion}
 
 This note concerns the \(k\)-hypothesis in the main induction theorem of
 \cite[Section~\emph{The main induction step}]{Ji2020LowIndividualDegree}, and
 its use in the proof of the main formal soundness theorem.
-\footnote{The original discrepancy was recorded in
-\href{https://github.com/LionSR/MIPStarRE/issues/906}{GitHub issue \#906} and
-implemented in
-\href{https://github.com/LionSR/MIPStarRE/pull/912}{GitHub pull request \#912}.
-The documentation issue for this note is
-\href{https://github.com/LionSR/MIPStarRE/issues/928}{GitHub issue \#928}.  In
-the TeX source consulted here, the main induction theorem is in
+\footnote{The original discrepancy was recorded in \ghissue{906} and first
+implemented in \ghpr{912}.  The documentation issue for this note is
+\ghissue{928}.  In the TeX source consulted here, the main induction theorem is in
 \path{references/ldt-paper/inductive_step.tex}, lines 7--18; the successor step
 is in the same file, lines 429--568; and the pasting theorem used there is in
 lines 299--330.}
@@ -84,29 +114,54 @@ which is false for the relevant range of parameters.  The issue is therefore a
 missing side condition, not a notational convention or a peculiarity of the
 formal language.
 
-\section{The corrected hypothesis}
+\section{The corrected formal interface}
 
-The repair made in the blueprint and in the checked statements is to state
-explicitly the hypothesis used by the proof.  The main induction theorem is
-therefore stated with \(k\ge 400md\), and in the successor step from \(m\) to
-\(m+1\) one assumes \(k\ge 400(m+1)d\).  This immediately supplies the pasting
-hypothesis \(k\ge 400md\) needed for the restricted dimension.
+The repair made in the checked formal statements is to state explicitly the
+hypothesis used by the proof.  The source-labelled blueprint theorem is kept in
+the printed paper form, while the separate current formal interface is stated
+with \(k\ge 400md\).  In the successor step from \(m\) to \(m+1\), one assumes
+\(k\ge 400(m+1)d\).  This immediately supplies the pasting hypothesis
+\(k\ge 400md\) needed for the restricted dimension.
 
-The main formal theorem is adjusted in the same way: its hypothesis on \(k\) is
-\(k\ge 400md\), rather than \(k\ge md\).  This is a strengthening of the
-statement, not a new derivation from the original hypothesis.  The interval
-\(md\le k<400md\) is not treated as automatically vacuous.  A trivial
-construction is used only when the final error parameter is already at least
-\(1\), in which case the consistency conclusion is saturated.
-\footnote{After pull request \#912, the relevant blueprint statements are
-\path{blueprint/src/chapter/ch02_test.tex}, lines 107--140, and
-\path{blueprint/src/chapter/ch10_induction.tex}, lines 179--205.  The Lean
-public theorem \path{MIPStarRE.LDT.Test.mainFormal} assumes \(400\,md\le k\);
-the pasting theorem is \path{MIPStarRE.LDT.Pasting.Bernoulli.ldPastingNontrivial}, with
+The current formal interface to the main formal theorem is adjusted in the same
+way: its hypothesis on \(k\) is \(k\ge 400md\), rather than \(k\ge md\).  It
+also requires \(k>0\).  This positivity is not a bridge or
+measurement-construction hypothesis; it is a scalar boundary needed for the
+Step~8 cascade estimates, which use \(1\le k\) to absorb lower-order terms into
+the final envelope.  The printed theorem should therefore be read as missing,
+for the present proof route, both the factor-\(400\) strengthening and the
+nonzero sampling-parameter boundary.  This is a strengthening in the formal
+interface, not a derivation from the original hypothesis.  The interval
+\(md\le k<400md\), and the degenerate case \(k=0\) when \(md=0\), are not
+treated as automatically vacuous.  A trivial construction is used only when the
+final error parameter is already at least \(1\), in which case the consistency
+conclusion is saturated.
+\footnote{After the 2026-05-20 statement split, the source-labelled blueprint
+theorems keep the printed statements and link to the source-faithful Lean
+statements
+\leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement} and
+\leanid{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement}.  The
+final source theorem routes its source-boundary work through the named
+wrapper \leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation}; its
+saturated-error branch is proved, and its remaining branch is
+\leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}.  The
+induction source theorem routes the remaining interval through the named obligation
+\leanid{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation}.
+The separate entries
+\texttt{thm:main-formal-current-interface} and
+\texttt{thm:main-induction-current-interface} display the corrected formal
+interfaces.  The induction source statement calls the corrected interface on
+the range \(400\,md\le k\) and leaves the remaining source interval
+\(md\le k<400\,md\) to that named obligation.  The Lean theorem
+\leanid{MIPStarRE.LDT.Test.mainFormal} assumes \(400\,md\le k\) and \(0<k\);
+the pasting theorem is
+\leanid{MIPStarRE.LDT.Pasting.Bernoulli.ldPastingNontrivial}, with
 the corresponding large-\(k\) hypothesis.  The final assembly in
-\path{MIPStarRE/LDT/Test/MainTheorem.lean} still contains an unrelated
-unfinished proof; that unfinished proof is not the side-condition discrepancy
-described in this note.}
+\path{MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean} still depends
+transitively on the Section~6 small-error successor construction in
+\path{MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean}; that
+remaining proof obligation is not the side-condition discrepancy described in
+this note.}
 
 \section{Conclusion}
 
@@ -114,15 +169,19 @@ The verdict is that
 \href{https://github.com/LionSR/MIPStarRE/issues/906}{issue \#906} records a
 genuine theorem-level side-condition gap in the stated proof.  The hypothesis
 \(k\ge md\), or in the successor step \(k\ge (m+1)d\), does not imply the
-large-\(k\) hypothesis required by the pasting theorem.  Pull request
-\href{https://github.com/LionSR/MIPStarRE/pull/912}{\#912} repaired the formal
-and blueprint statements by requiring \(k\ge 400md\) in the theorem statement.
+large-\(k\) hypothesis required by the pasting theorem.  The current blueprint
+keeps the source-labelled statements in the printed form and records the
+corrected large-\(k\) and \(k>0\) hypotheses in separate formal-interface
+entries.
 
 This correction does not assert that the original theorem is false for
-\(md\le k<400md\).  It says that the proof route through the stated pasting
-theorem does not establish that range.  A proof of the smaller-\(k\) range would
-require an additional argument, such as a genuine saturation lemma for that
-interval or a pasting theorem with a correspondingly weaker size hypothesis.
+\(md\le k<400md\), nor the \(k=0\) boundary allowed by the printed inequality
+when \(md=0\).  It says that the proof route through the stated pasting theorem
+and the final scalar cascade does not establish those ranges.  A proof of the
+smaller-\(k\) range would require an additional argument, such as a genuine
+saturation lemma for that interval, a treatment of the zero sampling parameter,
+or a pasting theorem and cascade estimate with correspondingly weaker size
+hypotheses.
 
 \bibliographystyle{alpha}
 \bibliography{references}

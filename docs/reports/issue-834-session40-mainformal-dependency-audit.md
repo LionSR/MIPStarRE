@@ -6,9 +6,34 @@ Base commit: `53443203` (`origin/main`)
 
 Branch: `gpt55/issue-834-mainformal-residual-session40`
 
+> **Status note, 2026-05-20.**  This is a historical audit of the old
+> `Test/MainTheorem.lean` monolith and its role-package/completion residual.
+> The current code has split the final-theorem route, removed the residual
+> structures named below, and records the same-space Lean interface separately
+> as `thm:main-formal-current-interface`.  The source statement
+> `thm:main-formal` is no longer linked to a conditional Lean theorem.  The
+> current same-space theorem `MIPStarRE.LDT.Test.mainFormal` has no bridge,
+> residual, package, or obligation hypotheses; its only remaining `sorryAx`
+> dependency is transitive through
+> `MIPStarRE.LDT.MainInductionStep.mainInduction`.  The only construction proof
+> hole on this same-space route is
+> `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
+> in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`, tracked by
+> #1507.  The source-labelled blueprint entry `thm:main-formal` is now
+> represented by
+> `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
+> wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation` for the printed
+> two-space statement.  That wrapper proves the saturated-error branch and
+> leaves `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` as the
+> direct non-vacuous source-boundary proof hole.  All references below to the live
+> `MainTheorem.lean` residual, #834,
+> #924, #931, #950, or #958 describe the April 30 audit snapshot, not the
+> current proof frontier.
+
 ## Executive summary
 
-Current `origin/main` has exactly one Lean proof hole under `MIPStarRE/LDT`, at
+At the audited April 30 `origin/main` snapshot there was exactly one Lean proof
+hole under `MIPStarRE/LDT`, at
 `MIPStarRE/LDT/Test/MainTheorem.lean:2950`.  The proof obligation is the split
 role-package/completion residual
 
