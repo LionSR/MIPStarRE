@@ -119,6 +119,44 @@ class GreenNodeIntegrityAuditTests(unittest.TestCase):
             audit.has_unfaithful_marker("MIPStarRE.LDT.sourceStatement", docstrings)
         )
 
+    def test_plain_block_comment_does_not_reuse_previous_docstring(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            lean_file = root / "MIPStarRE" / "Foo.lean"
+            lean_file.parent.mkdir(parents=True)
+            lean_file.write_text(
+                textwrap.dedent(
+                    """
+                    namespace MIPStarRE.LDT
+
+                    /--
+                    **Unfaithful:** This marker belongs only to the first
+                    declaration.
+                    -/
+                    theorem firstSourceStatement (h : P) : Q := by
+                      sorry
+
+                    /- A plain implementation note immediately before the next
+                    declaration is not a docstring. -/
+                    theorem secondStatement (h : P) : Q := by
+                      sorry
+
+                    end MIPStarRE.LDT
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            docstrings = audit.declaration_docstrings(root)
+
+        self.assertTrue(
+            audit.has_unfaithful_marker("MIPStarRE.LDT.firstSourceStatement", docstrings)
+        )
+        self.assertFalse(
+            audit.has_unfaithful_marker("MIPStarRE.LDT.secondStatement", docstrings)
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
