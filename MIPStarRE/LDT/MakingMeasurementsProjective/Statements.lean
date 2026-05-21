@@ -416,6 +416,44 @@ theorem naimarkTensorProductCorrelation_of_productSubmeasurements
     right := right
     correlation_preservation := hcorrelation }
 
+/-- Construction target for the full tensor-product Naimark data.
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:161-187`, in the
+proof of `\label{thm:naimark}`.  After applying the one-measurement Naimark
+helper to each question, the paper tensors the auxiliary registers and lets the
+local dilations act on the selected question register and by the identity on all
+other auxiliary registers.  This theorem names the remaining formal
+construction of the auxiliary spaces, product auxiliary state, product-register
+projective submeasurements, and four-index correlation identity.
+
+This is not an extra hypothesis of the paper theorem.  It has the same
+mathematical inputs as `naimarkTensorProductCorrelation`, together with the
+normalization hypothesis already present in the source statement.
+
+**Proof obligation:** This declaration is intentionally a `sorry`-bodied
+construction target, tracked by issue #1697.  Planned discharge: construct the
+product-register projective submeasurements from the questionwise
+`oneMeasNaimark` dilations, transport the completed `Option`-outcome
+projective measurements to the original outcomes via
+`OneMeasNaimarkData.toProjSubMeas`, and prove the displayed correlation identity
+from the one-measurement compression identities and the product auxiliary
+state. -/
+theorem naimarkTensorProductCorrelationDataObligation
+    {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    (HA HB : FiniteHilbertSpace.{u})
+    (ψ : QuantumState (HA.carrier × HB.carrier))
+    (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
+    (B : IdxSubMeas QuestionB OutcomeB HB.carrier)
+    (_hψ : ψ.IsNormalized) :
+    ∃ HauxA HauxB : FiniteHilbertSpace.{u},
+      Nonempty (NaimarkTensorProductCorrelationData HA HB HauxA HauxB ψ A B) := by
+  classical
+  sorry
+
 /-- Full tensor-product Naimark correlation theorem.
 
 This is the Lean statement corresponding to
@@ -435,13 +473,14 @@ projective submeasurements, and prove the displayed correlation identity from
 the one-measurement compression identities.
 
 **Unfaithful:** This proof currently contains the tracked `sorry` for the full
-tensor-product auxiliary-register assembly, so it uses `sorryAx` rather than
-deriving `references/ldt-paper/orthonormalization.tex:36-80` from the checked
-one-measurement Naimark helper.  Documented in `docs/paper-gaps/naimark.tex`
-and issue #1697.  Elimination: prove the simultaneous tensor-product
-correlation theorem, in the projective-submeasurement form produced by the
-paper's helper lemma, from the questionwise Naimark dilations and remove this
-marker. -/
+tensor-product auxiliary-register assembly through
+`naimarkTensorProductCorrelationDataObligation`, so it uses `sorryAx` rather
+than deriving `references/ldt-paper/orthonormalization.tex:36-80` from the
+checked one-measurement Naimark helper.  Documented in
+`docs/paper-gaps/naimark.tex` and issue #1697.  Elimination: prove the
+simultaneous tensor-product correlation theorem, in the
+projective-submeasurement form produced by the paper's helper lemma, from the
+questionwise Naimark dilations and remove this marker. -/
 theorem naimarkTensorProductCorrelation
     {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -453,8 +492,8 @@ theorem naimarkTensorProductCorrelation
     (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
     (B : IdxSubMeas QuestionB OutcomeB HB.carrier) :
     NaimarkTensorProductCorrelationStatement HA HB ψ A B := by
-  intro _hψ
-  sorry
+  intro hψ
+  exact naimarkTensorProductCorrelationDataObligation HA HB ψ A B hψ
 
 /-! ### Orthonormalization statements -/
 

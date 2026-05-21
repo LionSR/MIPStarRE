@@ -24,19 +24,28 @@ type is not the standard theorem for arbitrary submeasurements.
 
 ## Lean status
 
-The formalization now separates three declarations.
+The formalization now separates the following declarations.
 
-| Declaration | Role | Status |
-| --- | --- | --- |
-| `oneMeasNaimark` | one-measurement helper corresponding to `lem:naimark-helper` | proved |
-| `OneMeasNaimarkData.toProjSubMeas` | restriction of the completed `Option`-outcome dilation to the original outcomes | proved |
-| `questionwiseNaimark` | Lean-only interface for per-question marginal preservation | proved |
-| `naimarkTensorProductCorrelation_of_productSubmeasurements` | internal reduction from product-register projective submeasurements and the four-index correlation identity to the source-shaped theorem | proved |
-| `naimarkTensorProductCorrelation` | source-shaped tensor-product correlation theorem | stated, proof obligation |
+- `oneMeasNaimark`: the one-measurement helper corresponding to
+  `lem:naimark-helper`; proved.
+- `OneMeasNaimarkData.toProjSubMeas`: the restriction of the completed
+  `Option`-outcome dilation to the original outcomes; proved.
+- `questionwiseNaimark`: the Lean-only interface for per-question marginal
+  preservation; proved.
+- `naimarkTensorProductCorrelation_of_productSubmeasurements`: the internal
+  reduction from product-register projective submeasurements and the four-index
+  correlation identity to the source-shaped theorem; proved.
+- `naimarkTensorProductCorrelationDataObligation`: the named construction target
+  for the auxiliary spaces, product auxiliary state, product-register projective
+  submeasurements, and four-index correlation identity; proof obligation.
+- `naimarkTensorProductCorrelation`: the source-shaped tensor-product
+  correlation theorem; proved from the named proof obligation.
 
-The new statement is deliberately not marked `\leanok` in the blueprint.  It
-records the missing mathematical object without claiming that the tensor
-assembly has been formalized.
+The source-shaped statement is deliberately not marked `\leanok` in the
+blueprint.  Its Lean proof now factors through the named construction target
+`naimarkTensorProductCorrelationDataObligation`, so the declaration records the
+source statement without claiming that the tensor assembly has been fully
+formalized.
 
 ## Statement integrity audit
 
@@ -74,12 +83,13 @@ explicit finite carriers and normalization fields are Lean encodings of the
 paper's finite-dimensional state convention.  The projective-submeasurement
 conclusion is the form supplied by the paper's helper lemma; the stronger
 complete-measurement conclusion on the original outcome type is false for
-arbitrary submeasurements.  The proof is still absent and remains the
-tensor-register assembly tracked by issue #1697 and
-`docs/paper-gaps/naimark.tex`; the local passage from completed
-`Option`-outcome measurements to original-outcome projective submeasurements is
-now proved by `OneMeasNaimarkData.toProjSubMeas`.  The auxiliary-state and
-dilated-state part of the final assembly is also packaged by
-`naimarkTensorProductCorrelation_of_productSubmeasurements`; the remaining
-proof obligation is precisely the construction of the product-register
-projective submeasurements and the four-index correlation identity.
+arbitrary submeasurements.  The local passage from completed `Option`-outcome
+measurements to original-outcome projective submeasurements is proved by
+`OneMeasNaimarkData.toProjSubMeas`.  The auxiliary-state and dilated-state part
+of the final assembly is packaged by
+`naimarkTensorProductCorrelation_of_productSubmeasurements`.  The remaining
+proof obligation is now the single named theorem
+`naimarkTensorProductCorrelationDataObligation`: construct the auxiliary
+spaces, product auxiliary state, product-register projective submeasurements,
+and four-index correlation identity from the questionwise one-measurement
+Naimark dilations.
