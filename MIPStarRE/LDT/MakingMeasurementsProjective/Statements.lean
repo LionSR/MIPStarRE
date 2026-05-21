@@ -25,7 +25,9 @@ The source theorem form is recorded separately as
 `naimarkTensorProductCorrelation`.  This statement contains the full
 bipartite auxiliary-state and correlation-preservation conclusion of
 `\label{thm:naimark}`; its proof is the tensor-product assembly still tracked
-by issue #1697 and `docs/paper-gaps/naimark.tex`.
+by issue #1697 and `docs/paper-gaps/naimark.tex`.  In the concrete
+same-universe product-register setting, the missing formal object is isolated
+as `NaimarkProductRegisterProjectorData`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -353,6 +355,89 @@ def NaimarkTensorProductCorrelationStatement
     ∃ HauxA HauxB : FiniteHilbertSpace.{u},
       Nonempty (NaimarkTensorProductCorrelationData HA HB HauxA HauxB ψ A B)
 
+/-- Product-register projective submeasurement data for the full Naimark
+correlation theorem.
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:161-187`, where the
+one-measurement Naimark dilations are placed in the auxiliary register indexed
+by the chosen question and act trivially on all other auxiliary registers.
+
+This structure records exactly the remaining finite product-register step: the
+construction of the projective submeasurements on the concrete auxiliary spaces
+and the four-index correlation identity.  It is a Lean-only proof-obligation
+object, not an additional hypothesis in the source theorem. -/
+structure NaimarkProductRegisterProjectorData
+    {QuestionA OutcomeA QuestionB OutcomeB : Type u}
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    (HA HB : FiniteHilbertSpace.{u})
+    (ψ : QuantumState (HA.carrier × HB.carrier))
+    (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
+    (B : IdxSubMeas QuestionB OutcomeB HB.carrier) where
+  /-- Alice's product-register projective submeasurements. -/
+  left :
+    IdxProjSubMeas QuestionA OutcomeA
+      (HA.carrier × (naimarkAuxiliaryHilbertSpace QuestionA OutcomeA).carrier)
+  /-- Bob's product-register projective submeasurements. -/
+  right :
+    IdxProjSubMeas QuestionB OutcomeB
+      (HB.carrier × (naimarkAuxiliaryHilbertSpace QuestionB OutcomeB).carrier)
+  /-- The source four-index bipartite correlations are preserved. -/
+  correlation_preservation :
+    ∀ (x : QuestionA) (y : QuestionB) (a : OutcomeA) (b : OutcomeB),
+      ev ψ (opTensor ((A x).outcome a) ((B y).outcome b)) =
+        ev (naimarkProductExtensionState HA HB
+            (naimarkAuxiliaryHilbertSpace QuestionA OutcomeA)
+            (naimarkAuxiliaryHilbertSpace QuestionB OutcomeB)
+            ψ (naimarkAuxiliaryProductState QuestionA OutcomeA QuestionB OutcomeB))
+          (opTensor ((left x).outcome a) ((right y).outcome b))
+
+/-- Assembly of the full Naimark witness data from product-register projectors.
+
+This theorem proves the auxiliary-state and packaging part of
+`references/ldt-paper/orthonormalization.tex:161-187`.  Once the concrete
+product-register projective submeasurements and their correlation identity are
+available, the source-shaped witness data follows without further
+mathematical assumptions. -/
+theorem naimarkTensorProductCorrelationData_of_productRegisterProjectors
+    {QuestionA OutcomeA QuestionB OutcomeB : Type u}
+    [Fintype QuestionA] [DecidableEq QuestionA]
+    [Fintype OutcomeA] [DecidableEq OutcomeA]
+    [Fintype QuestionB] [DecidableEq QuestionB]
+    [Fintype OutcomeB] [DecidableEq OutcomeB]
+    (HA HB : FiniteHilbertSpace.{u})
+    (ψ : QuantumState (HA.carrier × HB.carrier))
+    (A : IdxSubMeas QuestionA OutcomeA HA.carrier)
+    (B : IdxSubMeas QuestionB OutcomeB HB.carrier)
+    (projectors : NaimarkProductRegisterProjectorData HA HB ψ A B)
+    (hψ : ψ.IsNormalized) :
+    ∃ HauxA HauxB : FiniteHilbertSpace.{u},
+      Nonempty (NaimarkTensorProductCorrelationData HA HB HauxA HauxB ψ A B) := by
+  let HauxA := naimarkAuxiliaryHilbertSpace QuestionA OutcomeA
+  let HauxB := naimarkAuxiliaryHilbertSpace QuestionB OutcomeB
+  let auxState := naimarkAuxiliaryProductState QuestionA OutcomeA QuestionB OutcomeB
+  refine ⟨HauxA, HauxB, ⟨?_⟩⟩
+  exact {
+    auxState := auxState
+    auxState_normalized :=
+      naimarkAuxiliaryProductState_isNormalized QuestionA OutcomeA QuestionB OutcomeB
+    auxLeft := naimarkAuxiliaryState QuestionA OutcomeA
+    auxRight := naimarkAuxiliaryState QuestionB OutcomeB
+    auxLeft_normalized := naimarkAuxiliaryState_isNormalized QuestionA OutcomeA
+    auxRight_normalized := naimarkAuxiliaryState_isNormalized QuestionB OutcomeB
+    auxState_product := rfl
+    dilatedState := naimarkProductExtensionState HA HB HauxA HauxB ψ auxState
+    dilatedState_density := rfl
+    dilatedState_normalized :=
+      naimarkProductExtensionState_isNormalized HA HB HauxA HauxB hψ
+        (naimarkAuxiliaryProductState_isNormalized
+          QuestionA OutcomeA QuestionB OutcomeB)
+    left := projectors.left
+    right := projectors.right
+    correlation_preservation := projectors.correlation_preservation }
+
 /-- Internal assembly reduction for the tensor-product Naimark theorem.
 
 Paper origin: `references/ldt-paper/orthonormalization.tex:161-187`, where the
@@ -416,15 +501,17 @@ theorem naimarkTensorProductCorrelation_of_productSubmeasurements
     right := right
     correlation_preservation := hcorrelation }
 
-/-- Construction target for the full tensor-product Naimark data.
+/-- Construction of the full tensor-product Naimark data.
 
 Paper origin: `references/ldt-paper/orthonormalization.tex:161-187`, in the
-proof of `\label{thm:naimark}`.  After applying the one-measurement Naimark
-helper to each question, the paper tensors the auxiliary registers and lets the
-local dilations act on the selected question register and by the identity on all
-other auxiliary registers.  This theorem names the remaining formal
-construction of the auxiliary spaces, product auxiliary state, product-register
-projective submeasurements, and four-index correlation identity.
+proof of `\label{thm:naimark}`.
+
+The internal theorem
+`naimarkTensorProductCorrelationData_of_productRegisterProjectors` shows that,
+in the same-universe product-register setting, it is enough to construct a
+`NaimarkProductRegisterProjectorData`: the lifted questionwise projectors and
+their four-index correlation identity.  This declaration remains the
+source-shaped construction target for the fully universe-polymorphic statement.
 
 This is not an extra hypothesis of the paper theorem.  It has the same
 mathematical inputs as `naimarkTensorProductCorrelation`, together with the
@@ -432,12 +519,10 @@ normalization hypothesis already present in the source statement.
 
 **Proof obligation:** This declaration is intentionally a `sorry`-bodied
 construction target, tracked by issue #1697.  Planned discharge: construct the
-product-register projective submeasurements from the questionwise
-`oneMeasNaimark` dilations, transport the completed `Option`-outcome
-projective measurements to the original outcomes via
-`OneMeasNaimarkData.toProjSubMeas`, and prove the displayed correlation identity
-from the one-measurement compression identities and the product auxiliary
-state. -/
+product-register projectors recorded by `NaimarkProductRegisterProjectorData`
+from the questionwise `oneMeasNaimark` dilations, then apply
+`naimarkTensorProductCorrelationData_of_productRegisterProjectors` in the
+concrete finite product-register setting. -/
 theorem naimarkTensorProductCorrelationDataConstruction
     {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
@@ -472,10 +557,9 @@ completed `Option`-outcome projective measurements to the original outcomes as
 projective submeasurements, and prove the displayed correlation identity from
 the one-measurement compression identities.
 
-**Unfaithful:** This proof currently contains the tracked `sorry` for the full
-tensor-product auxiliary-register assembly through
+**Unfaithful:** This proof currently relies on the tracked `sorry` in
 `naimarkTensorProductCorrelationDataConstruction`, so it delegates to the
-still-unproved construction target rather than deriving
+still-unproved tensor-product construction target rather than deriving
 `references/ldt-paper/orthonormalization.tex:36-80` from the checked
 one-measurement Naimark helper.  Documented in
 `docs/paper-gaps/naimark.tex` and issue #1697.  Elimination: prove the

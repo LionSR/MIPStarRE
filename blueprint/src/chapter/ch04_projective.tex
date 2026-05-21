@@ -93,6 +93,8 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryHilbertSpace}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryState}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkProductRegisterProjectorData}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelationData_of_productRegisterProjectors}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelationDataConstruction}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation_of_productSubmeasurements}
 	\uses{thm:naimark}
@@ -109,11 +111,16 @@
 	\texttt{naimarkTensorProductCorrelation\_of\_productSubmeasurements} then
 	packages these auxiliary objects into the source-shaped theorem once the
 	product-register projective submeasurements and the four-index correlation
-	identity have been constructed.  The construction target
-	\texttt{naimarkTensorProductCorrelationDataConstruction} names the remaining
-	construction of the full Naimark data.  These are internal declarations for the
-	tensor assembly in Theorem~\ref{thm:naimark}; they do not by themselves prove
-	the correlation-preservation identity, and this node is therefore not marked
+	identity have been constructed.  The structure
+	\texttt{NaimarkProductRegisterProjectorData} records this last product-register
+	object, and \texttt{naimarkTensorProductCorrelationData\_of\_productRegisterProjectors}
+	constructs the full witness data from it.  The only remaining proof obligation
+	in this group is \texttt{naimarkTensorProductCorrelationDataConstruction};
+	the new product-register data structure identifies its missing mathematical
+	content as the construction of the lifted questionwise projectors and their
+	correlation identity.  These are internal declarations for the tensor assembly
+	in Theorem~\ref{thm:naimark}; they do not by themselves prove the
+	correlation-preservation identity, and this node is therefore not marked
 	\texttt{\textbackslash leanok}.
 \end{definition}
 

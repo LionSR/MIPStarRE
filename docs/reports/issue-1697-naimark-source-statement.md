@@ -32,20 +32,27 @@ The formalization now separates the following declarations.
   `Option`-outcome dilation to the original outcomes; proved.
 - `questionwiseNaimark`: the Lean-only interface for per-question marginal
   preservation; proved.
+- `NaimarkProductRegisterProjectorData`: the Lean-only object recording the
+  product-register projective submeasurements and the four-index correlation
+  identity; stated.
+- `naimarkTensorProductCorrelationData_of_productRegisterProjectors`: the
+  assembly of the full Naimark witness data from the product-register object;
+  proved.
 - `naimarkTensorProductCorrelation_of_productSubmeasurements`: the internal
   reduction from product-register projective submeasurements and the four-index
   correlation identity to the source-shaped theorem; proved.
-- `naimarkTensorProductCorrelationDataConstruction`: the named construction target
-  for the auxiliary spaces, product auxiliary state, product-register projective
-  submeasurements, and four-index correlation identity; proof obligation.
+- `naimarkTensorProductCorrelationDataConstruction`: the named construction
+  target for the universe-polymorphic source statement; proof obligation.  The
+  new product-register data structure identifies its missing mathematical
+  content as the lifted questionwise projectors and their correlation identity.
 - `naimarkTensorProductCorrelation`: the source-shaped tensor-product
   correlation theorem; proved from the named proof obligation.
 
 The source-shaped statement is deliberately not marked `\leanok` in the
-blueprint.  Its Lean proof now factors through the named construction target
-`naimarkTensorProductCorrelationDataConstruction`, so the declaration records the
-source statement without claiming that the tensor assembly has been fully
-formalized.
+blueprint.  Its Lean proof still factors through the named construction target
+`naimarkTensorProductCorrelationDataConstruction`, but that construction target
+now has a proved same-universe reduction from the concrete product-register
+object `NaimarkProductRegisterProjectorData`.
 
 ## Statement integrity audit
 
@@ -78,18 +85,27 @@ Lean conclusion:
 - indexed projective submeasurements on the enlarged local spaces;
 - the same four-index correlation identity, expressed with `opTensor`.
 
-Verdict: faithful boundary hypotheses with a documented local correction.  The
-explicit finite carriers and normalization fields are Lean encodings of the
-paper's finite-dimensional state convention.  The projective-submeasurement
-conclusion is the form supplied by the paper's helper lemma; the stronger
-complete-measurement conclusion on the original outcome type is false for
-arbitrary submeasurements.  The local passage from completed `Option`-outcome
+Verdict: exact source-facing theorem header with faithful boundary hypotheses
+and a documented local correction.  The explicit finite carriers and
+normalization fields are Lean encodings of the paper's finite-dimensional state
+convention.  The projective-submeasurement conclusion is the form supplied by
+the paper's helper lemma; the stronger complete-measurement conclusion on the
+original outcome type is false for arbitrary submeasurements.  The local
+passage from completed `Option`-outcome
 measurements to original-outcome projective submeasurements is proved by
 `OneMeasNaimarkData.toProjSubMeas`.  The auxiliary-state and dilated-state part
 of the final assembly is packaged by
+`naimarkTensorProductCorrelationData_of_productRegisterProjectors` and
 `naimarkTensorProductCorrelation_of_productSubmeasurements`.  The remaining
-proof obligation is now the single named theorem
-`naimarkTensorProductCorrelationDataConstruction`: construct the auxiliary
-spaces, product auxiliary state, product-register projective submeasurements,
-and four-index correlation identity from the questionwise one-measurement
-Naimark dilations.
+proof obligation is still the source-shaped declaration
+`naimarkTensorProductCorrelationDataConstruction`; within the concrete
+same-universe product-register setting, the unconstructed object has been
+isolated as `NaimarkProductRegisterProjectorData`.
+
+## Current non-green dependency nodes
+
+| Blueprint node | Lean declarations | Status |
+| --- | --- | --- |
+| `thm:naimark` | `NaimarkTensorProductCorrelationStatement`, `naimarkTensorProductCorrelation` | Source-shaped statement; not marked `\leanok` because the proof still depends on `naimarkTensorProductCorrelationDataConstruction`. |
+| `rem:lean-naimark-auxiliary-declarations` | Auxiliary-state declarations, `NaimarkProductRegisterProjectorData`, `naimarkTensorProductCorrelationData_of_productRegisterProjectors`, `naimarkTensorProductCorrelationDataConstruction`, `naimarkTensorProductCorrelation_of_productSubmeasurements` | Internal decomposition of the tensor assembly; not marked `\leanok` because the product-register projector construction remains a proof obligation. |
+| `rem:lean-questionwise-naimark` | `questionwiseNaimark`, `OneMeasNaimarkData.toProjSubMeas`, and related one-measurement declarations | Proved questionwise interface; this is not the full bipartite theorem. |
