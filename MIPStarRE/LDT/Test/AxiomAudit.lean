@@ -79,7 +79,7 @@ remaining source interval for `thm:main-induction` is isolated as
 `MainInductionStep.mainInduction_sourceRangeObligation`, whose large-error
 branch is now proved by `mainInductionOfOneLeError` and whose small-error branch
 is the named obligation
-`MainInductionStep.mainInduction_sourceRangeSmallErrorObligation`.  That wrapper
+`MainInductionStep.mainInduction_sourceRangeSmallErrorObligation`.  That theorem
 also proves the base case by `mainInductionBaseCase`; the remaining direct
 source-range proof hole is
 `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`,
@@ -183,7 +183,7 @@ degree-zero construction in `Pasting/Bernoulli/Final.lean`.
 
 The audits for `CommutativityPoints.commutativityPoints`,
 `Commutativity.commDataProcessedG`, and `Commutativity.comMain` require the
-standard Lean axioms only.  The boundedness package consumed by the latter two
+standard Lean axioms only.  The boundedness data consumed by the latter two
 is the formal record for the boundedness witnesses `Z^x` appearing explicitly
 in `references/ldt-paper/commutativity-G.tex`; it is not an additional bridge
 or residual hypothesis.

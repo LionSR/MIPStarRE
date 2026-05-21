@@ -740,7 +740,7 @@ nontrivial branch of the successor proof.  Its public parameters are the
 successor strategy hypotheses and the branch condition
 `mainInductionError < 1`, so downstream users do not acquire
 restricted-probability records, slice-induction data, self-improvement data,
-pasting data, residual packages, or arbitrary implication hypotheses as
+pasting data, or arbitrary implication hypotheses as
 assumptions of the theorem.
 
 **Proof obligation:** Construct the answer-valued restricted slice profile,

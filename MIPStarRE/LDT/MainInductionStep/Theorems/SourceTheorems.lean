@@ -3,9 +3,10 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 /-!
 # Section 6 — Source-boundary induction theorems
 
-This module contains the printed source-range wrappers for `thm:main-induction`,
-together with the public restricted-probability constructors used by the final
-soundness handoff.  The corrected large-`k` interface remains in `MainTheorems`.
+This module records the printed source-range statement of `thm:main-induction`
+and its companion source-range theorems, together with the public
+restricted-probability constructors used by the final soundness handoff.  The
+corrected large-`k` interface remains in `MainTheorems`.
 
 ## References
 
@@ -30,7 +31,7 @@ not covered by the corrected large-`k` interface: the positive-degree,
 non-base, small-error branch inside the interval
 `params.m * params.d ≤ k < 400 * params.m * params.d`, under the branch
 conditions `0 < params.d`, `params.m ≠ 1`, and the derived side condition
-`1 ≤ k`.  It is not an additional hypothesis of the paper theorem; the wrapper
+`1 ≤ k`.  It is not an additional hypothesis of the paper theorem; the reduction
 `mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation` proves `1 ≤ k`
 from `params.m * params.d ≤ k`, `params.hm`, and `0 < params.d`.  Rather, this
 records the missing scalar-range argument documented in
@@ -43,7 +44,7 @@ a weaker pasting-and-cascade route.  The base case is already proved by
 `mainInductionBaseCase`, and the large-error branch of the same interval is
 already proved by `mainInductionOfOneLeError`.  The degree-zero branch is empty
 because `k < 400 * params.m * 0` is impossible, and the `1 ≤ k` side condition
-is derived in the wrapper.  None of these branches is part of this
+is derived in this reduction.  None of these branches is part of this
 positive-degree non-base obligation.
 
 **Unfaithful:** This proof currently contains the tracked `sorry` for the source
@@ -73,7 +74,7 @@ theorem mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation
         (mainInductionError params k eps delta gamma) := by
   sorry
 
-/-- Positive-degree non-base small-error source-range wrapper for
+/-- Positive-degree non-base small-error source-range reduction for
 `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:7-18`.
@@ -113,7 +114,7 @@ theorem mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation
     mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation
       params strategy eps delta gamma k hgood hk hsmallK hsmall hd hk_pos hm1
 
-/-- Non-base small-error source-range wrapper for `thm:main-induction`.
+/-- Non-base small-error source-range reduction for `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:7-18`.
 
@@ -154,7 +155,7 @@ theorem mainInduction_sourceRangeSmallErrorNonBaseObligation
       have hd_zero : params.d = 0 := Nat.eq_zero_of_not_pos hd
       simp [hd_zero] at hsmallK
 
-/-- Small-error source-range wrapper for `thm:main-induction`.
+/-- Small-error source-range reduction for `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:7-18`.
 

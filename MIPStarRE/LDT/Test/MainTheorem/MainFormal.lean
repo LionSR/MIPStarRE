@@ -61,8 +61,8 @@ namespace Test
 
 The base branch of `mainFormal` needs a concrete Section 6 role witness and one
 post-role projective-completion witness.  Earlier scaffolding expressed this
-through separate bridge and obligation packages.  The current interface below
-does not keep such packages as hypotheses: the source theorem remains separate in
+through separate bridge and obligation records.  The current interface below
+does not keep such records as hypotheses: the source theorem remains separate in
 the blueprint, and the missing source-boundary work is represented by named
 obligations. -/
 
@@ -126,7 +126,7 @@ Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
 
 This theorem records the remaining non-vacuous source-boundary work needed to
 derive the paper theorem from the present formal infrastructure.  It is not an
-additional hypothesis of `thm:main-formal`; the source-boundary wrapper below
+additional hypothesis of `thm:main-formal`; the source-boundary theorem below
 calls this obligation only after the saturated-error branch has been discharged
 by `mainFormal_source_trivial_witness`.
 
@@ -179,7 +179,7 @@ theorem mainFormal_sourceSmallErrorObligation
   sorry
 
 /--
-Internal proof-obligation wrapper for the printed two-space theorem
+Internal proof-obligation theorem for the printed two-space theorem
 `thm:main-formal`.
 
 Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
@@ -187,7 +187,7 @@ Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
 This theorem removes the saturated-error branch from the source-boundary
 frontier.  If `mainFormalError params k eps ≥ 1`, the conclusion follows from
 `mainFormal_source_trivial_witness`; otherwise the proof is exactly the named
-small-error obligation `mainFormal_sourceSmallErrorObligation`.  The wrapper is
+small-error obligation `mainFormal_sourceSmallErrorObligation`.  This theorem is
 not an additional hypothesis of `thm:main-formal`.
 
 **Unfaithful:** The small-error branch calls the tracked obligation
@@ -247,9 +247,9 @@ inherits the Section 6 small-error successor construction gap through
 source theorem is therefore kept as a source-faithful statement and its proof is
 factored through the named internal obligation `mainFormal_sourceObligation`,
 rather than being replaced by a theorem with additional bridge, residual,
-repair, package, producer, or generic hypothesis fields.
+connection, repair, or generic constructed-input fields.
 
-**Unfaithful:** The proof currently calls the tracked wrapper
+**Unfaithful:** The proof currently calls the tracked source-boundary theorem
 `mainFormal_sourceObligation`; its saturated-error branch is proved, while its
 small-error branch calls `mainFormal_sourceSmallErrorObligation`, whose proof is
 not yet derived from the source theorem hypotheses.  Documented in
