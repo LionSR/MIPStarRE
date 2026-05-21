@@ -344,10 +344,13 @@ def preceding_docstring(text: str, start: int) -> str | None:
     if not stripped.endswith("-/"):
         return None
     doc_end = stripped.rfind("-/") + 2
-    doc_start = stripped.rfind("/--", 0, doc_end)
+    doc_start = stripped.rfind("/-", 0, doc_end)
     if doc_start == -1:
         return None
-    if text[doc_end:start].strip():
+    if not stripped.startswith("/--", doc_start):
+        return None
+    first_doc_end = stripped.find("-/", doc_start + 3)
+    if first_doc_end != doc_end - 2:
         return None
     return text[doc_start:doc_end]
 
