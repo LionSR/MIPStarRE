@@ -222,7 +222,7 @@
 	output in \texttt{AnswerSelfImprovementData}.  Their constructors call
 	\texttt{selfImprovementInInductionSection}; they no longer carry a separate
 	bundle of Section~\ref{chap:self-improvement} proof-stage data as an input.
-	The \texttt{SliceStrategyTransport} structures are narrow formal interfaces: they
+	The \texttt{SliceStrategyTransport} structures are auxiliary Lean records: they
 	assume concrete per-slice symmetric strategies and measurement-transport data,
 	while averaged point-operator compatibility is derived structurally from
 	point-measurement transport.  They then convert the remaining data into the
@@ -375,17 +375,17 @@
 		The remaining part of the printed source range \(md\le k<400md\) is recorded
 		as the named obligation
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation},
-		rather than being added as a hypothesis of the source theorem.  This wrapper
+		rather than being added as a hypothesis of the source theorem.  This reduction
 		closes the large-error case by
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}; its
 		remaining branch is the small-error source-range obligation
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorObligation}.
-		This small-error wrapper closes the base case by
+		This small-error reduction closes the base case by
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}; the remaining
-		non-base wrapper is
+		non-base reduction is
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorNonBaseObligation}.
 		Its degree-zero branch is contradictory from \(k<400m\cdot0\), so the
-		positive-degree non-base wrapper is
+		positive-degree non-base reduction is
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation}.
 		It derives \(1\le k\) from \(md\le k\) and \(0<d\); the direct
 		source-range proof hole is the corresponding \(k\)-positive obligation
@@ -451,7 +451,7 @@
 	slice-transport construction are supplied inside the induction proof.  Thus
 	the remaining direct
 	\texttt{sorry} is attached to the named small-error construction rather than
-	to an anonymous branch in the public successor wrapper.  The genuine
+	to an anonymous branch in the public successor theorem.  The genuine
 	interface mismatch in the
 	positive-degree branch is the slice-transport datum:
 	the recursive slice is represented by the answer-valued strategy
@@ -597,7 +597,7 @@
 	remaining proof obligation is the native successor step
 	\texttt{mainInductionSuccessorNext}.  The
 	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
-	still exposed through the public restriction-package constructor above, but
+	still exposed through the public restricted-probability constructor above, but
 	the recursive slice witnesses, the slice-wise self-improvement outputs, and
 	the pasting comparison must be derived inside the successor proof itself.
 	They are not represented by a separate theorem whose assumptions are added
