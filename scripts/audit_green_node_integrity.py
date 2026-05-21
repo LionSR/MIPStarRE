@@ -207,11 +207,42 @@ LEAN_RE = re.compile(r"\\lean\{([^}]*)\}", re.DOTALL)
 EVENT_RE = re.compile(
     r"(?m)^(?:"
     r"namespace\s+([A-Za-z0-9_'.]+)\s*$"
-    r"|end(?:\s+([A-Za-z0-9_'.]+))?\s*$"
+    r"|end\b(?:\s+([A-Za-z0-9_'.]+))?\s*$"
     r"|(?:@[^\n]*\n\s*)*(?:private\s+)?(?:noncomputable\s+)?"
     r"(?:def|theorem|lemma|structure|class)\s+([A-Za-z0-9_'.]+)"
     r")"
 )
+
+
+def mask_lean_comments(text: str) -> str:
+    """Replace Lean comments by spaces, preserving line and column positions."""
+    chars = list(text)
+    depth = 0
+    i = 0
+    while i < len(text):
+        if depth == 0 and text.startswith("--", i):
+            line_end = text.find("\n", i)
+            end = len(text) if line_end == -1 else line_end
+            for j in range(i, end):
+                chars[j] = " "
+            i = end
+            continue
+        if text.startswith("/-", i):
+            depth += 1
+            chars[i] = " "
+            chars[i + 1] = " "
+            i += 2
+            continue
+        if depth > 0 and text.startswith("-/", i):
+            depth -= 1
+            chars[i] = " "
+            chars[i + 1] = " "
+            i += 2
+            continue
+        if depth > 0 and chars[i] != "\n":
+            chars[i] = " "
+        i += 1
+    return "".join(chars)
 
 
 def lean_declarations(block: str) -> list[str]:
@@ -240,8 +271,9 @@ def declaration_headers(root: Path) -> dict[str, list[tuple[Path, str]]]:
     headers: dict[str, list[tuple[Path, str]]] = {}
     for path in sorted((root / "MIPStarRE").rglob("*.lean")):
         text = path.read_text(encoding="utf-8")
+        scan_text = mask_lean_comments(text)
         namespace_stack: list[str] = []
-        for match in EVENT_RE.finditer(text):
+        for match in EVENT_RE.finditer(scan_text):
             namespace_name, end_name, declaration_name = match.groups()
             if namespace_name is not None:
                 namespace_stack.extend(namespace_name.split("."))
@@ -314,7 +346,8 @@ def main() -> int:
     unexpected_source: list[tuple[Path, str, str]] = []
     allowed_signature: list[tuple[Path, str, str, list[str]]] = []
     unexpected_signature: list[tuple[Path, str, str, list[str]]] = []
-    aux_warning_count = 0
+    aux_warnings: list[tuple[Path, str, str]] = []
+    source_warning_labels: set[str] = set()
     headers = declaration_headers(args.root)
 
     for path, _env, label, block in iter_leanok_blocks(chapter_dir):
@@ -328,18 +361,20 @@ def main() -> int:
         for declaration in warning_declarations(lean_declarations(block)):
             row = (path, label, declaration)
             if source_like:
+                source_warning_labels.add(label)
                 if (label, declaration) in ALLOWED_SOURCE_WARNINGS:
                     allowed_source.append(row)
                 else:
                     unexpected_source.append(row)
             else:
-                aux_warning_count += 1
+                aux_warnings.append(row)
 
         if source_like:
             for declaration in lean_declarations(block):
                 terms = header_warning_terms(declaration, headers)
                 if not terms:
                     continue
+                source_warning_labels.add(label)
                 row_with_terms = (path, label, declaration, terms)
                 if (label, declaration) in ALLOWED_SOURCE_SIGNATURE_WARNINGS:
                     allowed_signature.append(row_with_terms)
@@ -349,9 +384,16 @@ def main() -> int:
     print(f"leanok environments: {leanok_count}")
     print(f"source-like labels: {source_count}")
     print(f"definition or remark labels: {aux_count}")
+    print(f"source-like labels without warning terms: {source_count - len(source_warning_labels)}")
+    print(f"source-like labels with warning terms: {len(source_warning_labels)}")
     print(f"allowed source-like warning links: {len(allowed_source)}")
     print(f"allowed source-like signature warnings: {len(allowed_signature)}")
-    print(f"auxiliary warning links: {aux_warning_count}")
+    print(f"auxiliary warning links: {len(aux_warnings)}")
+
+    if aux_warnings:
+        print("auxiliary warning links:")
+        for path, label, declaration in aux_warnings:
+            print(f"- {path}:{label}: {declaration}")
 
     if unexpected_source:
         print("unexpected source-like warning links:")
