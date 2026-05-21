@@ -72,6 +72,53 @@ class GreenNodeIntegrityAuditTests(unittest.TestCase):
 
         self.assertIn("MIPStarRE.LDT.afterLineComment", headers)
 
+    def test_tex_comment_does_not_mark_node_green(self) -> None:
+        block = textwrap.dedent(
+            r"""
+            \begin{theorem}\label{thm:commented}
+              \lean{Foo.bar}
+              % This source theorem is not marked \leanok.
+            \end{theorem}
+            """
+        )
+
+        masked = audit.mask_tex_comments(block)
+
+        self.assertNotIn(r"\leanok", masked)
+        self.assertIn(r"\lean{Foo.bar}", masked)
+
+    def test_unfaithful_docstring_is_indexed(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            lean_file = root / "MIPStarRE" / "Foo.lean"
+            lean_file.parent.mkdir(parents=True)
+            lean_file.write_text(
+                textwrap.dedent(
+                    """
+                    namespace MIPStarRE.LDT
+
+                    /--
+                    A source-shaped declaration.
+
+                    **Unfaithful:** This proof still depends on a tracked
+                    obligation.
+                    -/
+                    theorem sourceStatement (h : P) : Q := by
+                      sorry
+
+                    end MIPStarRE.LDT
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            docstrings = audit.declaration_docstrings(root)
+
+        self.assertTrue(
+            audit.has_unfaithful_marker("MIPStarRE.LDT.sourceStatement", docstrings)
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

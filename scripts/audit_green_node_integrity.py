@@ -195,6 +195,25 @@ ALLOWED_SOURCE_SIGNATURE_WARNINGS = {
     ),
 }
 
+ALLOWED_SOURCE_UNFAITHFUL = {
+    (
+        "thm:main-formal",
+        "MIPStarRE.LDT.Test.mainFormal_sourceStatement",
+    ),
+    (
+        "thm:main-formal-current-interface",
+        "MIPStarRE.LDT.Test.mainFormal",
+    ),
+    (
+        "thm:main-induction-current-interface",
+        "MIPStarRE.LDT.MainInductionStep.mainInduction",
+    ),
+    (
+        "thm:main-induction",
+        "MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement",
+    ),
+}
+
 
 ENV_RE = re.compile(
     r"\\begin\{(definition|theorem|lemma|proposition|remark|corollary)\}"
@@ -257,6 +276,20 @@ def lean_declarations(block: str) -> list[str]:
     return declarations
 
 
+def mask_tex_comments(text: str) -> str:
+    """Replace TeX line comments by spaces, preserving line structure."""
+    lines: list[str] = []
+    for line in text.splitlines(keepends=True):
+        comment = line.find("%")
+        if comment == -1:
+            lines.append(line)
+            continue
+        newline = "\n" if line.endswith("\n") else ""
+        body = line[:-1] if newline else line
+        lines.append(body[:comment] + " " * (len(body) - comment) + newline)
+    return "".join(lines)
+
+
 def warning_declarations(declarations: list[str]) -> list[str]:
     """Return declarations containing one of the warning terms."""
     return [
@@ -304,6 +337,51 @@ def declaration_headers(root: Path) -> dict[str, list[tuple[Path, str]]]:
     return headers
 
 
+def preceding_docstring(text: str, start: int) -> str | None:
+    """Return the docstring immediately preceding `start`, if there is one."""
+    prefix = text[:start]
+    stripped = prefix.rstrip()
+    if not stripped.endswith("-/"):
+        return None
+    doc_end = stripped.rfind("-/") + 2
+    doc_start = stripped.rfind("/--", 0, doc_end)
+    if doc_start == -1:
+        return None
+    if text[doc_end:start].strip():
+        return None
+    return text[doc_start:doc_end]
+
+
+def declaration_docstrings(root: Path) -> dict[str, list[tuple[Path, str]]]:
+    """Index immediate Lean docstrings by qualified and unqualified names."""
+    docstrings: dict[str, list[tuple[Path, str]]] = {}
+    for path in sorted((root / "MIPStarRE").rglob("*.lean")):
+        text = path.read_text(encoding="utf-8")
+        scan_text = mask_lean_comments(text)
+        namespace_stack: list[str] = []
+        for match in EVENT_RE.finditer(scan_text):
+            namespace_name, end_name, declaration_name = match.groups()
+            if namespace_name is not None:
+                namespace_stack.extend(namespace_name.split("."))
+                continue
+            if end_name is not None:
+                components = end_name.split(".")
+                if namespace_stack[-len(components) :] == components:
+                    del namespace_stack[-len(components) :]
+                elif namespace_stack:
+                    namespace_stack.pop()
+                continue
+            if declaration_name is None:
+                continue
+            docstring = preceding_docstring(text, match.start())
+            if docstring is None:
+                continue
+            qualified_name = ".".join(namespace_stack + [declaration_name])
+            docstrings.setdefault(qualified_name, []).append((path, docstring))
+            docstrings.setdefault(declaration_name, []).append((path, docstring))
+    return docstrings
+
+
 def header_warning_terms(declaration: str, headers: dict[str, list[tuple[Path, str]]]) -> list[str]:
     """Return warning terms appearing in the public header of a Lean declaration."""
     short_name = declaration.rsplit(".", 1)[-1]
@@ -315,6 +393,15 @@ def header_warning_terms(declaration: str, headers: dict[str, list[tuple[Path, s
     return sorted(found)
 
 
+def has_unfaithful_marker(
+    declaration: str, docstrings: dict[str, list[tuple[Path, str]]]
+) -> bool:
+    """Return true when the declaration's immediate docstring marks it unfaithful."""
+    short_name = declaration.rsplit(".", 1)[-1]
+    declaration_docstrings = docstrings.get(declaration) or docstrings.get(short_name, [])
+    return any("**Unfaithful:**" in docstring for _path, docstring in declaration_docstrings)
+
+
 def iter_leanok_blocks(chapter_dir: Path):
     for path in sorted(chapter_dir.glob("*.tex")):
         text = path.read_text(encoding="utf-8")
@@ -322,7 +409,7 @@ def iter_leanok_blocks(chapter_dir: Path):
             env, label = match.group(1), match.group(2)
             end_marker = f"\\end{{{env}}}"
             end = text.find(end_marker, match.end())
-            block = text[match.start() : end if end != -1 else match.end()]
+            block = mask_tex_comments(text[match.start() : end if end != -1 else match.end()])
             if "\\leanok" not in block:
                 continue
             yield path, env, label, block
@@ -346,9 +433,13 @@ def main() -> int:
     unexpected_source: list[tuple[Path, str, str]] = []
     allowed_signature: list[tuple[Path, str, str, list[str]]] = []
     unexpected_signature: list[tuple[Path, str, str, list[str]]] = []
+    allowed_unfaithful: list[tuple[Path, str, str]] = []
+    unexpected_unfaithful: list[tuple[Path, str, str]] = []
+    aux_unfaithful: list[tuple[Path, str, str]] = []
     aux_warnings: list[tuple[Path, str, str]] = []
     source_warning_labels: set[str] = set()
     headers = declaration_headers(args.root)
+    docstrings = declaration_docstrings(args.root)
 
     for path, _env, label, block in iter_leanok_blocks(chapter_dir):
         leanok_count += 1
@@ -381,18 +472,49 @@ def main() -> int:
                 else:
                     unexpected_signature.append(row_with_terms)
 
+        for declaration in lean_declarations(block):
+            if not has_unfaithful_marker(declaration, docstrings):
+                continue
+            row = (path, label, declaration)
+            if source_like:
+                source_warning_labels.add(label)
+                if (label, declaration) in ALLOWED_SOURCE_UNFAITHFUL:
+                    allowed_unfaithful.append(row)
+                else:
+                    unexpected_unfaithful.append(row)
+            else:
+                aux_unfaithful.append(row)
+
     print(f"leanok environments: {leanok_count}")
     print(f"source-like labels: {source_count}")
     print(f"definition or remark labels: {aux_count}")
-    print(f"source-like labels without warning terms: {source_count - len(source_warning_labels)}")
-    print(f"source-like labels with warning terms: {len(source_warning_labels)}")
+    print(
+        "source-like labels without warning terms or unfaithful markers: "
+        f"{source_count - len(source_warning_labels)}"
+    )
+    print(
+        "source-like labels with warning terms or unfaithful markers: "
+        f"{len(source_warning_labels)}"
+    )
     print(f"allowed source-like warning links: {len(allowed_source)}")
     print(f"allowed source-like signature warnings: {len(allowed_signature)}")
+    print(f"allowed source-like unfaithful markers: {len(allowed_unfaithful)}")
+    print(f"auxiliary unfaithful markers: {len(aux_unfaithful)}")
     print(f"auxiliary warning links: {len(aux_warnings)}")
 
     if aux_warnings:
         print("auxiliary warning links:")
         for path, label, declaration in aux_warnings:
+            print(f"- {path}:{label}: {declaration}")
+
+    if allowed_unfaithful:
+        print("allowed source-like unfaithful markers:")
+        for path, label, declaration in allowed_unfaithful:
+            print(f"- {path}:{label}: {declaration}")
+
+    if aux_unfaithful:
+        print("auxiliary unfaithful markers:")
+        for path, label, declaration in aux_unfaithful:
             print(f"- {path}:{label}: {declaration}")
 
     if unexpected_source:
@@ -407,7 +529,16 @@ def main() -> int:
             print(f"- {path}:{label}: {declaration} ({', '.join(terms)})")
         return 1 if args.ci else 0
 
-    print("OK: no unexpected warning links in green source-like blueprint nodes.")
+    if unexpected_unfaithful:
+        print("unexpected source-like unfaithful markers:")
+        for path, label, declaration in unexpected_unfaithful:
+            print(f"- {path}:{label}: {declaration}")
+        return 1 if args.ci else 0
+
+    print(
+        "OK: no unexpected warning links or unfaithful markers in green "
+        "source-like blueprint nodes."
+    )
     return 0
 
 
