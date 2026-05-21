@@ -207,11 +207,42 @@ LEAN_RE = re.compile(r"\\lean\{([^}]*)\}", re.DOTALL)
 EVENT_RE = re.compile(
     r"(?m)^(?:"
     r"namespace\s+([A-Za-z0-9_'.]+)\s*$"
-    r"|end(?:\s+([A-Za-z0-9_'.]+))?\s*$"
+    r"|end\b(?:\s+([A-Za-z0-9_'.]+))?\s*$"
     r"|(?:@[^\n]*\n\s*)*(?:private\s+)?(?:noncomputable\s+)?"
     r"(?:def|theorem|lemma|structure|class)\s+([A-Za-z0-9_'.]+)"
     r")"
 )
+
+
+def mask_lean_comments(text: str) -> str:
+    """Replace Lean comments by spaces, preserving line and column positions."""
+    chars = list(text)
+    depth = 0
+    i = 0
+    while i < len(text):
+        if depth == 0 and text.startswith("--", i):
+            line_end = text.find("\n", i)
+            end = len(text) if line_end == -1 else line_end
+            for j in range(i, end):
+                chars[j] = " "
+            i = end
+            continue
+        if text.startswith("/-", i):
+            depth += 1
+            chars[i] = " "
+            chars[i + 1] = " "
+            i += 2
+            continue
+        if depth > 0 and text.startswith("-/", i):
+            depth -= 1
+            chars[i] = " "
+            chars[i + 1] = " "
+            i += 2
+            continue
+        if depth > 0 and chars[i] != "\n":
+            chars[i] = " "
+        i += 1
+    return "".join(chars)
 
 
 def lean_declarations(block: str) -> list[str]:
@@ -240,8 +271,9 @@ def declaration_headers(root: Path) -> dict[str, list[tuple[Path, str]]]:
     headers: dict[str, list[tuple[Path, str]]] = {}
     for path in sorted((root / "MIPStarRE").rglob("*.lean")):
         text = path.read_text(encoding="utf-8")
+        scan_text = mask_lean_comments(text)
         namespace_stack: list[str] = []
-        for match in EVENT_RE.finditer(text):
+        for match in EVENT_RE.finditer(scan_text):
             namespace_name, end_name, declaration_name = match.groups()
             if namespace_name is not None:
                 namespace_stack.extend(namespace_name.split("."))
