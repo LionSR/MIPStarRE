@@ -254,9 +254,9 @@
 
 \begin{definition}[Lean successor obligation reductions]\label{def:successor-obligation-reductions}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorBound_pred, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceSelfImprovement}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
 	\leanok
 	\uses{def:successor-pasting-data, def:self-improvement-slice-transport}
 	The following Lean declarations are implementation reductions for the
@@ -265,17 +265,17 @@
 	small-error theorem converts
 	the answer-valued slice data to this pasting datum and applies the
 	proved stage-data theorem.  The Lean theorem
-	\texttt{mainInductionSuccessorNextOfSmallError\_ofAnswerSliceTransport} is
-	the proved nontrivial branch: it assumes the small-error condition already
-	obtained in the proof of
-	\texttt{mainInductionSuccessorNextOfSmallError}, constructs the answer-valued
-	restricted-probability data and self-improvement data from the supplied
-	transport, and invokes the small-error answer-stage pasting theorem.  The
-	Lean theorem
-	\texttt{mainInductionSuccessorNext\_ofAnswerSliceTransport} closes the
-	full positive-degree successor branch from the same two internal
-	constructions by combining this small-error theorem with the trivial
-	large-error theorem.  The arithmetic lemma
+	\texttt{mainInductionSuccessorNext\_ofAnswerStageObligations} is the
+	proved nontrivial branch: it assumes the small-error condition already
+	obtained in the proof of \texttt{mainInductionSuccessorNextOfSmallError},
+	constructs the answer-valued restricted-probability data and
+	self-improvement data from the supplied transport, and invokes the
+	small-error answer-stage pasting theorem.  The theorem
+	\texttt{mainInductionSuccessorNext\_ofAnswerStageObligationsFromSuccessorBound}
+	derives the predecessor large-\(k\) side condition from the successor one,
+	and
+	\texttt{mainInductionSuccessorNext\_ofAnswerStageObligationsFromSuccessorBoundSplit}
+	adds the trivial large-error branch.  The arithmetic lemma
 	\texttt{mainInductionSuccessorBound\_pred} derives the predecessor large-\(k\)
 	side condition from the successor one.  The degree-zero reduction
 	\texttt{mainInductionSuccessorNext\_degreeZero\_ofPastingFamily} shows that
