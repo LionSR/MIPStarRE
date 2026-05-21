@@ -2,6 +2,7 @@ import Lean
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
+import MIPStarRE.LDT.MainInductionStep.Theorems.SmallErrorRecordStatement
 import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
@@ -166,6 +167,12 @@ The theorem
 then records the exact small-error closure from these internal constructions
 and the predecessor induction hypothesis; it is checked and does not import the
 remaining `sorryAx`.
+The record-valued variant
+`MainInductionStep.MainInductionSuccessorSmallErrorRecordConstructionStatement`
+uses the named record `DegreeZeroPastingFamilyObligation` for the degree-zero
+branch.  Its conversion theorem and small-error reduction are also
+standard-axiom clean; they only project the named record back to the
+existential family-and-scalar interface used by the existing assembly theorem.
 The named stage-data constructors used by these reductions are also checked not
 to import `sorryAx`; they are bookkeeping and transport constructions, not
 hidden proof assumptions for the paper theorem.
@@ -446,6 +453,16 @@ assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations
 assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions
+
+namespace MIPStarRE.LDT.MainInductionStep
+
+assert_no_sorry_axiom MainInductionSuccessorSmallErrorRecordConstructionStatement
+assert_standard_axioms MainInductionSuccessorSmallErrorConstructionStatement.ofRecord
+assert_standard_axioms
+  mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecordConstructionStatement
+
+end MIPStarRE.LDT.MainInductionStep
+
 assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.SliceRestrictionData
 assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.AnswerSliceRestrictionData
 assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.PerSliceInductionData
