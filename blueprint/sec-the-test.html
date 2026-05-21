@@ -340,6 +340,9 @@
 
     <a class="icon proof" href="sec-the-test.html#fig:test">#</a>
     
+    <a class="icon proof" href="sec-the-test.html#a0000000027"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
 </button>
@@ -352,6 +355,8 @@
         </header>
         
         <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:low-individual-degree-test">Definition 2.2</a></li>
           
           <li><a href="sec-the-test.html#def:low-individual-degree-test">Definition 2.2</a></li>
           
@@ -385,10 +390,22 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   For every classical strategy, the acceptance probability of the low individual degree test is </p>
-<div class="displaymath" id="a0000000027">
+<div class="displaymath" id="a0000000028">
   \[  \frac13\left(\frac{P^{\mathrm{line,point}}_{\mathrm{axis}}+P^{\mathrm{point,line}}_{\mathrm{axis}}}{2} +P_{\mathrm{self}} +\frac{P^{\mathrm{line,point}}_{\mathrm{diag}}+P^{\mathrm{point,line}}_{\mathrm{diag}}}{2}\right),  \]
 </div>
 <p> where the five terms are the acceptance probabilities of the two axis-parallel role orderings, the self-consistency branch, and the two diagonal role orderings. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000027">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>  Expand the definition of the total acceptance probability as the average of the three subtests. The axis-parallel and diagonal branches each first choose one of the two role orderings uniformly, so their branch acceptance probabilities are the corresponding averages displayed above. </p>
 
   </div>
 </div>
@@ -500,7 +517,7 @@
 
     <a class="icon proof" href="sec-the-test.html#lem:bipartite-strategy-block-identities">#</a>
     
-    <a class="icon proof" href="sec-the-test.html#a0000000028"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-the-test.html#a0000000029"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -555,7 +572,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000028">
+<div class="proof_wrapper" id="a0000000029">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -673,11 +690,11 @@
   </div>
   <div class="remark_thmcontent">
   <p> Using notation which will be introduced in Chapter&#160;<a href="sec-prelims.html">3</a> below, a symmetric strategy is \((\varepsilon ,\delta ,\gamma )\)-good if and only if it satisfies the following three conditions. For \(\ell \) and \(u\) as in the axis-parallel lines test, </p>
-<div class="displaymath" id="a0000000029">
+<div class="displaymath" id="a0000000030">
   \[  A_a^u \otimes I \simeq _\varepsilon I \otimes B^\ell _{[f(u)=a]}, \quad \text{and} \quad A_a^u \otimes I \simeq _\delta I \otimes A_a^u.  \]
 </div>
 <p> And for \(\ell \) and \(u\) as in the diagonal lines test, </p>
-<div class="displaymath" id="a0000000030">
+<div class="displaymath" id="a0000000031">
   \[  A_a^u \otimes I \simeq _\gamma I \otimes L^\ell _{[f(u)=a]}.  \]
 </div>
 
@@ -746,7 +763,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>   For \(u \in \mathbb {F}_q^m\), the last-direction axis-parallel line in \(\mathbb {F}_q^{m+1}\) is </p>
-<div class="displaymath" id="a0000000031">
+<div class="displaymath" id="a0000000032">
   \[  \ell _u = \{ (u,x) \mid x \in \mathbb {F}_q\} .  \]
 </div>
 <p> If \((\psi ,A,B,L)\) is a symmetric strategy for the \((m+1,q,d)\) low individual degree test, we write \(B_f^u\) for the operator \(B_f^{\ell _u}\). For a function \(f \colon \ell _u \to \mathbb {F}_q\), we also write \(f(x)\) for \(f(u,x)\). </p>
@@ -814,7 +831,7 @@
 
     <a class="icon proof" href="sec-the-test.html#thm:main-formal">#</a>
     
-    <a class="icon proof" href="sec-induction.html#a0000000032"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-induction.html#a0000000033"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -840,7 +857,7 @@
           
           <li><a href="sec-induction.html#thm:main-induction">Theorem 10.15</a></li>
           
-          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.17</a></li>
+          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.18</a></li>
           
           <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.10</a></li>
           
@@ -858,13 +875,100 @@
           
           <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.25</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.26</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.27</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.28</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.28</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.29</a></li>
           
-          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.29</a></li>
+          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.30</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormal_sourceStatement" class="lean_decl">MIPStarRE.LDT.Test.mainFormal_sourceStatement</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="theorem_thmcontent">
+  <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Let \(k \ge md\) be an integer and set </p>
+<div class="displaymath" id="a0000000034">
+  \[  \nu = 100000 k^2 m^4\left(\varepsilon ^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).  \]
+</div>
+<p> Then there exist projective measurements \(G^{\mathrm A}, G^{\mathrm B} \in \mathrm{PolyMeas}(m,q,d)\) with the following properties: </p>
+<ol class="enumerate">
+  <li><p>on average over \(u \sim \mathbb {F}_q^m\), </p>
+<div class="displaymath" id="a0000000035">
+  \[  A_a^{\mathrm A,u} \otimes I \simeq _\nu I \otimes G^{\mathrm B}_{[g(u)=a]}, \qquad I \otimes A_a^{\mathrm B,u} \simeq _\nu G^{\mathrm A}_{[g(u)=a]} \otimes I;  \]
+</div>
+</li>
+  <li><div class="displaymath" id="a0000000036">
+  \[  G_g^{\mathrm A} \otimes I \simeq _\nu I \otimes G_g^{\mathrm B}.  \]
+</div>
+</li>
+</ol>
+
+  </div>
+</div>
+<div class="theorem_thmwrapper theorem-style-plain" id="thm:main-formal-current-interface">
+  <div class="theorem_thmheading">
+    <span class="theorem_thmcaption">
+    Theorem
+    </span>
+    <span class="theorem_thmlabel">2.13</span>
+    <span class="theorem_thmtitle">Current same-space formal interface</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#thm:main-formal-current-interface">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:low-individual-degree-test">Definition 2.2</a></li>
+          
+          <li><a href="sec-the-test.html#def:projective-strategy">Definition 2.5</a></li>
+          
+          <li><a href="sec-prelims.html#def:polymeasurements">Definition 3.11</a></li>
+          
+          <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
+          
+          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.12</a></li>
           
         </ul>
     
@@ -895,38 +999,23 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Assume \(d {\gt} 0\). Let \(k {\gt} 0\) with \(k \ge 400\, md\) and set </p>
-<div class="displaymath" id="a0000000033">
-  \[  \nu = 100000 k^2 m^4\left(\varepsilon ^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).  \]
-</div>
-<p> Then there exist projective measurements \(G^{\mathrm A}, G^{\mathrm B} \in \mathrm{PolyMeas}(m,q,d)\) with the following properties: </p>
-<ol class="enumerate">
-  <li><p>on average over \(u \sim \mathbb {F}_q^m\), </p>
-<div class="displaymath" id="a0000000034">
-  \[  A_a^{\mathrm A,u} \otimes I \simeq _\nu I \otimes G^{\mathrm B}_{[g(u)=a]}, \qquad I \otimes A_a^{\mathrm B,u} \simeq _\nu G^{\mathrm A}_{[g(u)=a]} \otimes I;  \]
-</div>
-</li>
-  <li><div class="displaymath" id="a0000000035">
-  \[  G_g^{\mathrm A} \otimes I \simeq _\nu I \otimes G_g^{\mathrm B}.  \]
-</div>
-</li>
-</ol>
+  <p>   This is the currently linked Lean interface toward Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. It is not the printed theorem. Compared with the paper statement, it uses the documented large-\(k\) correction \(k\ge 400md\) and the scalar boundary \(k{\gt}0\), and it is represented in Lean by the same-space strategy container used by the present role-register symmetrization bridge. The full paper interface is tracked in <span class="ttfamily">docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex</span>. Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy in the current same-space formal container that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Let \(k{\gt}0\) with \(k \ge 400\, md\), and define \(\nu \) by the same displayed expression as in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. Then the three consistency conclusions of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> hold for this restricted formal interface. </p>
 
   </div>
 </div>
-<div class="remark_thmwrapper theorem-style-remark" id="rem:main-formal-conditional">
+<div class="remark_thmwrapper theorem-style-remark" id="rem:main-formal-final-transport">
   <div class="remark_thmheading">
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">2.13</span>
+    <span class="remark_thmlabel">2.14</span>
     <span class="remark_thmtitle">Internal witness form of the final transport</span>
     <div class="thm_header_extras">
 
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="sec-the-test.html#rem:main-formal-conditional">#</a>
+    <a class="icon proof" href="sec-the-test.html#rem:main-formal-final-transport">#</a>
     
     
     
@@ -942,7 +1031,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">2.14</span>
+    <span class="remark_thmlabel">2.15</span>
     <span class="remark_thmtitle">\(k\)-bound boundary for the public theorem</span>
     <div class="thm_header_extras">
 
@@ -956,7 +1045,30 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The paper statement uses the weaker hypothesis \(k \ge md\), but the proof invokes the Section&#160;6 pasting theorem with side condition \(k \ge 400\, md\). This side condition is not implied by \(k \ge md\). The Lean and blueprint public statement therefore records the stronger large-\(k\) assumption required by the pasting step rather than hiding the side-condition gap. The helper <span class="ttfamily">mainFormal_trivial_witness</span> remains only for already-saturated branches where \(\nu \ge 1\) makes the three \(\simeq _\nu \) conclusions vacuous; it is not a replacement for a proof in the interval \(md \le k {\lt} 400\, md\). </p>
+  <p> The paper statement uses the weaker hypothesis \(k \ge md\), but the proof invokes the Section&#160;6 pasting theorem with side condition \(k \ge 400\, md\). This side condition is not implied by \(k \ge md\). The current Lean interface, Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.13</a>, therefore records the stronger large-\(k\) assumption required by the pasting step, together with the scalar-cascade boundary \(k{\gt}0\), rather than hiding the side-condition gap. The helper <span class="ttfamily">mainFormal_trivial_witness</span> remains only for already-saturated branches where \(\nu \ge 1\) makes the three \(\simeq _\nu \) conclusions vacuous; it is not a replacement for a proof in the interval \(md \le k {\lt} 400\, md\) or at the \(k=0\) boundary when \(md=0\). The full source-boundary reduction is named in Lean as <span class="ttfamily">MIPStarRE.LDT.Test.mainFormal_sourceObligation</span>; it proves the saturated-error branch and leaves <span class="ttfamily">MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation</span> as the remaining non-vacuous internal obligation, not an extra hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. </p>
+
+  </div>
+</div>
+<div class="remark_thmwrapper theorem-style-remark" id="rem:main-formal-interface-boundary">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
+    </span>
+    <span class="remark_thmlabel">2.16</span>
+    <span class="remark_thmtitle">Formal-interface boundary for the public theorem</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#rem:main-formal-interface-boundary">#</a>
+    
+    
+    
+        </div>
+  </div>
+  <div class="remark_thmcontent">
+  <p> The printed theorem starts from a general projective strategy on possibly different prover spaces. The Lean declaration linked in Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.13</a> is the same-space interface documented in <span class="ttfamily">docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex</span>. The source theorem, Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>, is linked to the source-shaped Lean statement, but no proof-level <span class="ttfamily">\leanok</span> is attached here. Removing the same-space restriction requires a two-space role-register symmetrization construction showing that the paper’s general strategy reduces to the current formal interface. In addition, the proof of the current same-space interface still runs through the Section&#160;6 successor construction tracked by issue&#160;#1507, so this interface is not marked with proof-level <span class="ttfamily">\leanok</span>. </p>
 
   </div>
 </div>
