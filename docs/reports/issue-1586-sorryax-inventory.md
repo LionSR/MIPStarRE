@@ -1,6 +1,6 @@
 # Issue #1586: `sorryAx` Inventory
 
-Date: 2026-05-20.
+Date: 2026-05-21.
 
 This note records the current `sorryAx` frontier in the LDT formalization.  In
 Lean, a source-level `sorry` elaborates to the kernel axiom `sorryAx`.  Thus
@@ -17,11 +17,13 @@ The command
 rg -n '^\s*sorry\b' MIPStarRE/LDT --glob '*.lean'
 ```
 
-currently reports three direct proof holes.
+currently reports five direct proof holes.
 
 | Site | Declaration | Tracking issue | Mathematical obligation |
 |---|---|---|---|
-| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean:680` | `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction` | #1507, under #1458 | Prove the nontrivial small-error successor construction for the corrected large-`k` interface to `thm:main-induction`, deriving the restricted probability estimates, recursive slice measurements, self-improvement outputs, averaged pasting data, and scalar side conditions internally. |
+| `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean:441` | `MakingMeasurementsProjective.naimarkTensorProductCorrelationDataConstruction` | #1697, under #1458 | Construct the tensor-product projective measurement data from the one-measurement Naimark dilations and prove the displayed correlation identity. |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean:525` | `MainInductionStep.DegreeZeroPastingFamilyObligation.ofSmallError` | #1507, under #1458 | Construct the degree-zero complete point-consistent slice family and prove the scalar comparison placing the degree-zero pasting error below `mainInductionError`. |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean:843` | `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction` | #1507, under #1458 | Prove the nontrivial small-error successor construction for the corrected large-`k` interface to `thm:main-induction`, deriving the restricted probability estimates, recursive slice measurements, self-improvement outputs, averaged pasting data, and scalar side conditions internally.  The internal statement `MainInductionSuccessorSmallErrorConstructionStatement` now names the predecessor answer-valued induction hypothesis, the degree-zero family-and-scalar construction, and the positive-degree answer-valued slice transport; the checked conditional reduction `mainInductionSuccessorNext_ofSmallErrorConstruction_ofConstructionStatement` closes the successor conclusion once those constructions are supplied. |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SourceTheorems.lean:56` | `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` | #906, under #1458 | Prove the positive-degree non-base small-error branch of the source interval `md ≤ k < 400md` for `thm:main-induction`, after the derived side condition `1 ≤ k` has been supplied by the wrapper.  The large-error branch is closed by `mainInductionOfOneLeError`, the base case is closed by `mainInductionBaseCase`, the degree-zero branch is contradictory, and the checked large-`k` range `400md ≤ k` is handled by `MainInductionStep.mainInduction`. |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:153` | `Test.mainFormal_sourceSmallErrorObligation` | #906, #930, #1507, under #1458 | Derive the non-vacuous branch of the printed two-space source theorem `thm:main-formal`, with a general projective strategy, the paper hypothesis `k ≥ md`, and `mainFormalError params k eps < 1`.  The wrapper `Test.mainFormal_sourceObligation` now proves the saturated-error branch by `Test.mainFormal_source_trivial_witness`, so only this small-error source-boundary branch remains as a direct final-theorem proof hole. |
 

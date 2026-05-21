@@ -2,7 +2,7 @@
 
 Audit date: 2026-05-18.
 
-Last status update: 2026-05-20.  The classifications below incorporate the
+Last status update: 2026-05-21.  The classifications below incorporate the
 current split between the printed source theorem `thm:main-induction` and the
 separate corrected large-`k` Lean interface
 `thm:main-induction-current-interface`, together with the axiom-audit evidence
@@ -64,6 +64,25 @@ unfinished.
 Classification: stated with proof hole.  This is the native `m -> m + 1`
 successor statement.  It carries no restricted-probability, recursive-slice,
 self-improvement, or pasting data as hypotheses.
+
+`MainInductionSuccessorSmallErrorConstructionStatement`: internal construction
+statement.
+
+Classification: Lean-only proof obligation.  This proposition names the three
+remaining ingredients for the small-error successor proof: the predecessor
+answer-valued induction hypothesis, the degree-zero family-and-scalar
+construction, and the positive-degree answer-valued slice transport.  It is not
+linked as a paper theorem and is not a permissible additional hypothesis of the
+source theorem.
+
+`mainInductionSuccessorNext_ofSmallErrorConstruction_ofConstructionStatement`:
+checked conditional reduction.
+
+Classification: internal assembly theorem.  It proves the small-error successor
+conclusion from
+`MainInductionSuccessorSmallErrorConstructionStatement` by calling the checked
+degree-split and internal-constructions reductions.  Its conditional hypothesis
+is an internal proof obligation, not a hypothesis of `thm:main-induction`.
 
 `mainInductionSuccessor`: Lean branch theorem.
 
@@ -167,6 +186,18 @@ constructions and the predecessor answer-valued induction hypothesis.  It is
 not a source theorem and is not linked as the proof of
 `thm:main-induction`; it records where the eventual induction proof will use
 its local hypothesis for dimension `m`.
+
+The Lean-only proposition
+`MainInductionSuccessorSmallErrorConstructionStatement` now packages these
+three remaining mathematical ingredients as a single statement, and the proved
+conditional theorem
+`mainInductionSuccessorNext_ofSmallErrorConstruction_ofConstructionStatement`
+closes the small-error successor conclusion from that statement.  This is a
+sharpening of the proof frontier, not a weakening of the public theorem:
+`mainInductionSuccessorNext_ofSmallErrorConstruction` retains its source-shaped
+successor hypotheses and its tracked proof hole, while the new checked theorem
+records exactly what must be constructed internally before the existing
+degree-split assembly applies.
 
 The remaining missing data are therefore the recursive predecessor argument and
 the small-error successor constructions from

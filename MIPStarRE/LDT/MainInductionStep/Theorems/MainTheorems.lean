@@ -728,6 +728,80 @@ theorem mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructi
         params strategy eps delta gamma k hgood family kappa zeta hcomplete hcons
         (Nat.eq_zero_of_not_pos hd) herror
 
+/-- Internal construction statement for the small-error successor branch.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
+
+This proposition records the three mathematical ingredients which the source
+successor proof must provide in the nontrivial small-error regime:
+the predecessor induction hypothesis for the restricted answer-valued slices,
+the degree-zero family-and-scalar construction, and the positive-degree
+transport from answer-valued slice data to the ordinary self-improvement
+interface.  It is an internal proof-obligation statement, not an added hypothesis
+of `thm:main-induction` or `thm:main-formal`. -/
+def MainInductionSuccessorSmallErrorConstructionStatement
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk_next : 400 * params.next.m * params.next.d ≤ k) : Prop :=
+  ∃ predecessor : AnswerMainInductionHypothesis params,
+    (params.d = 0 →
+        ∃ family : IdxPolyFamily params ι, ∃ kappa zeta : Error,
+          family.Complete strategy.state kappa ∧
+          family.ConsistentWithPoints strategy zeta ∧
+            ldPastingInInductionError params k eps delta gamma kappa zeta ≤
+              mainInductionError params.next k eps delta gamma) ∧
+    Nonempty
+      (∀ (hd : 0 < params.d),
+        let hk_pred := mainInductionSuccessorBound_pred params hk_next
+        let answerRestrict :=
+          AnswerSliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
+            (answerRestrictedProbabilities params strategy eps delta gamma hgood)
+        let answerInduction :=
+          AnswerPerSliceInductionData.ofMainInductionHypothesis params strategy eps delta gamma k
+            answerRestrict predecessor hd hk_pred
+        AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
+          answerRestrict answerInduction)
+
+/-- Conditional reduction from the internal construction statement needed by
+the small-error successor branch.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
+
+This theorem is not a paper theorem.  It says that, once the predecessor
+answer-valued induction hypothesis, the degree-zero family-and-scalar
+construction, and the positive-degree answer-valued slice transport have been
+constructed in the form stated by
+`MainInductionSuccessorSmallErrorConstructionStatement`, the small-error
+successor conclusion follows from the checked degree split.  The hypothesis
+`constructions` is an internal proof obligation and must not be added to the
+paper-facing induction theorem. -/
+theorem mainInductionSuccessorNext_ofSmallErrorConstruction_ofConstructionStatement
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk_next : 400 * params.next.m * params.next.d ≤ k)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1)
+    (constructions :
+      MainInductionSuccessorSmallErrorConstructionStatement
+        params strategy eps delta gamma k hgood hk_next) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  rcases constructions with ⟨predecessor, degreeZeroPasting, ⟨sliceTransport⟩⟩
+  exact
+    @mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions
+      ι _ _ params _ strategy eps delta gamma k hgood predecessor
+      hk_next hsmall degreeZeroPasting sliceTransport
+
 /-- Small-error construction for the native successor step of
 `thm:main-induction`.
 

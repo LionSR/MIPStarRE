@@ -257,6 +257,8 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions}
+	\lean{MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionStatement, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofConstructionStatement}
 	\leanok
 	\uses{def:successor-pasting-data, def:self-improvement-slice-transport}
 	The following Lean declarations are implementation reductions for the
@@ -291,7 +293,14 @@
 	\texttt{DegreeZeroPastingFamilyObligation.ofSmallError}.  Finally,
 	\texttt{mainInductionSuccessorNext\_ofDegreeSplitPastingObligations} adds the
 	trivial large-error case and delegates its small-error branch to the
-	degree-split theorem just described.  These declarations are internal
+	degree-split theorem just described.  The proposition
+	\texttt{MainInductionSuccessorSmallErrorConstructionStatement} names the three
+	remaining small-error ingredients: the predecessor answer-valued induction
+	hypothesis, the degree-zero family-and-scalar construction, and the
+	positive-degree answer-valued slice transport.  The conditional reduction
+	\texttt{mainInductionSuccessorNext\_ofSmallErrorConstruction\_ofConstructionStatement}
+	proves the small-error successor conclusion from precisely that internal
+	construction statement.  These declarations are internal
 	theorems, not results stated in the paper and not additional hypotheses in
 	Theorem~\ref{thm:main-induction}.
 \end{definition}
@@ -428,6 +437,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions},
+	\lean{MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionStatement, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofConstructionStatement},
 	which derives the nontrivial successor conclusion from the answer-valued
 	predecessor induction hypothesis and the concrete answer-valued
 	slice-transport data.  The second form also derives the predecessor
