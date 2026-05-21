@@ -259,7 +259,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions}
 	\lean{MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionStatement, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofConstructionStatement}
-	\lean{MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorRecordConstructionStatement, MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionStatement.ofRecord, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecordConstructionStatement}
+	\lean{MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionData, MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorRecordConstructionStatement, MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionStatement.ofRecord, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecordConstructionStatement}
 	\leanok
 	\uses{def:successor-pasting-data, def:self-improvement-slice-transport}
 	The following Lean declarations are implementation reductions for the
@@ -303,8 +303,10 @@
 	proves the small-error successor conclusion from precisely that internal
 	construction statement.  The record-valued variant
 	\texttt{MainInductionSuccessorSmallErrorRecordConstructionStatement} states the
-	same frontier with the degree-zero component expressed as the named record
-	\texttt{DegreeZeroPastingFamilyObligation}, and the corresponding checked
+	same frontier by the named record
+	\texttt{MainInductionSuccessorSmallErrorConstructionData}, whose degree-zero
+	component is the named record
+	\texttt{DegreeZeroPastingFamilyObligation}; the corresponding checked
 	reduction converts this record form back to the existential interface.  These
 	declarations are internal
 	theorems, not results stated in the paper and not additional hypotheses in
@@ -444,7 +446,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions},
 	\lean{MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionStatement, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofConstructionStatement},
-	\lean{MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorRecordConstructionStatement, MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionStatement.ofRecord, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecordConstructionStatement},
+	\lean{MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionData, MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorRecordConstructionStatement, MIPStarRE.LDT.MainInductionStep.MainInductionSuccessorSmallErrorConstructionStatement.ofRecord, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecordConstructionStatement},
 	which derives the nontrivial successor conclusion from the answer-valued
 	predecessor induction hypothesis and the concrete answer-valued
 	slice-transport data.  The second form also derives the predecessor

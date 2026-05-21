@@ -21,28 +21,31 @@ universe uι
 
 variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
-/-- Record-valued internal construction statement for the small-error successor branch.
+/-- Named construction data for the small-error successor branch.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
 
-This is the same internal proof frontier as
-`MainInductionSuccessorSmallErrorConstructionStatement`, but its degree-zero
-component is expressed by the named record
-`DegreeZeroPastingFamilyObligation` rather than by an anonymous existential.
-This makes the degree-zero construction target visible as a mathematical
-object.  It is not a paper theorem and is not an additional hypothesis of
+This record names the three internal inputs used by the small-error successor
+assembly: the predecessor answer-valued induction hypothesis, the degree-zero
+pasting-family construction, and the positive-degree slice-transport
+construction.  It is not a paper theorem and is not an additional hypothesis of
 `thm:main-induction` or `thm:main-formal`. -/
-def MainInductionSuccessorSmallErrorRecordConstructionStatement
+structure MainInductionSuccessorSmallErrorConstructionData
     (params : Parameters)
     [FieldModel.{0} params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hk_next : 400 * params.next.m * params.next.d ≤ k) : Prop :=
-  ∃ predecessor : AnswerMainInductionHypothesis params,
-    (params.d = 0 →
-        Nonempty (DegreeZeroPastingFamilyObligation params strategy eps delta gamma k)) ∧
+    (hk_next : 400 * params.next.m * params.next.d ≤ k) where
+  /-- The predecessor induction hypothesis for answer-valued restricted slices. -/
+  predecessor : AnswerMainInductionHypothesis params
+  /-- The degree-zero pasting-family construction, needed only when `params.d = 0`. -/
+  degreeZeroPasting :
+    params.d = 0 →
+      Nonempty (DegreeZeroPastingFamilyObligation params strategy eps delta gamma k)
+  /-- The positive-degree answer-valued slice transport construction. -/
+  sliceTransport :
     Nonempty
       (∀ (hd : 0 < params.d),
         let hk_pred := mainInductionSuccessorBound_pred params hk_next
@@ -54,6 +57,29 @@ def MainInductionSuccessorSmallErrorRecordConstructionStatement
             answerRestrict predecessor hd hk_pred
         AnswerSelfImprovementData.SliceStrategyTransport params strategy eps delta gamma k
           answerRestrict answerInduction)
+
+/-- Record-valued internal construction statement for the small-error successor branch.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
+
+This is the same internal proof frontier as
+`MainInductionSuccessorSmallErrorConstructionStatement`, but its degree-zero
+component is expressed by the named record
+`DegreeZeroPastingFamilyObligation`, and the three construction stages are
+collected in `MainInductionSuccessorSmallErrorConstructionData`.  It is not a
+paper theorem and is not an additional hypothesis of `thm:main-induction` or
+`thm:main-formal`. -/
+def MainInductionSuccessorSmallErrorRecordConstructionStatement
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hk_next : 400 * params.next.m * params.next.d ≤ k) : Prop :=
+  Nonempty
+    (MainInductionSuccessorSmallErrorConstructionData
+      params strategy eps delta gamma k hgood hk_next)
 
 /-- The record-valued construction statement implies the earlier existential
 construction statement.
@@ -73,12 +99,12 @@ theorem MainInductionSuccessorSmallErrorConstructionStatement.ofRecord
         params strategy eps delta gamma k hgood hk_next) :
     MainInductionSuccessorSmallErrorConstructionStatement
       params strategy eps delta gamma k hgood hk_next := by
-  rcases constructions with ⟨predecessor, degreeZeroPasting, sliceTransport⟩
+  rcases constructions with ⟨data⟩
   exact
-    ⟨predecessor,
+    ⟨data.predecessor,
       fun hd_zero =>
-        (degreeZeroPasting hd_zero).elim fun pkg => pkg.exists_family,
-      sliceTransport⟩
+        (data.degreeZeroPasting hd_zero).elim fun pkg => pkg.exists_family,
+      data.sliceTransport⟩
 
 /-- Conditional reduction from the record-valued internal construction
 statement needed by the small-error successor branch.

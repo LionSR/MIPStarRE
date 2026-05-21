@@ -169,8 +169,9 @@ and the predecessor induction hypothesis; it is checked and does not import the
 remaining `sorryAx`.
 The record-valued variant
 `MainInductionStep.MainInductionSuccessorSmallErrorRecordConstructionStatement`
-uses the named record `DegreeZeroPastingFamilyObligation` for the degree-zero
-branch.  Its conversion theorem and small-error reduction are also
+uses `MainInductionStep.MainInductionSuccessorSmallErrorConstructionData`,
+whose degree-zero field is the named record `DegreeZeroPastingFamilyObligation`.
+Its conversion theorem and small-error reduction are also
 standard-axiom clean; they only project the named record back to the
 existential family-and-scalar interface used by the existing assembly theorem.
 The named stage-data constructors used by these reductions are also checked not
@@ -456,6 +457,7 @@ assert_standard_axioms
 
 namespace MIPStarRE.LDT.MainInductionStep
 
+assert_no_sorry_axiom MainInductionSuccessorSmallErrorConstructionData
 assert_no_sorry_axiom MainInductionSuccessorSmallErrorRecordConstructionStatement
 assert_standard_axioms MainInductionSuccessorSmallErrorConstructionStatement.ofRecord
 assert_standard_axioms
