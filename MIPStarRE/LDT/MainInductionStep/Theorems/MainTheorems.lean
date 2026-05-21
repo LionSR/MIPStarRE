@@ -504,6 +504,45 @@ theorem mainInductionSuccessorNext_degreeZero_ofPastingFamily
     ⟨H, _hH_eq, hH⟩
   exact ⟨H, ConsRel.mono herror hH⟩
 
+/-- Degree-zero successor assembly from averaged pasting data.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:486-551`, in the
+successor proof of `\label{thm:main-induction}`.
+
+This theorem identifies the degree-zero branch data used by
+`DegreeZeroPastingFamilyObligation` with the already established averaged
+pasting-data interface.  It is not a source theorem: the construction of the
+averaged pasting data from the successor hypotheses remains the source-facing
+work. -/
+theorem mainInductionSuccessorNext_degreeZero_ofAveragedPastingData
+    (params : Parameters)
+    [FieldModel.{0} params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (hgood : strategy.IsGood eps delta gamma)
+    {restrictionPkg : SliceRestrictionData params strategy eps delta gamma}
+    {inductionPkg :
+      PerSliceInductionData params strategy eps delta gamma restrictionPkg k}
+    {selfPkg :
+      SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg}
+    (pastingData :
+      AveragedPastingData params strategy eps delta gamma k selfPkg)
+    (hd_zero : params.d = 0) :
+    ∃ G : Measurement (Polynomial params.next) ι,
+      ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next G.toSubMeas)
+        (mainInductionError params.next k eps delta gamma) := by
+  let degreeZeroData :
+      DegreeZeroPastingFamilyObligation params strategy eps delta gamma k :=
+    DegreeZeroPastingFamilyObligation.ofAveragedPastingData pastingData
+  exact
+    mainInductionSuccessorNext_degreeZero_ofPastingFamily
+      params strategy eps delta gamma k hgood degreeZeroData.family
+      degreeZeroData.kappa degreeZeroData.zeta degreeZeroData.complete
+      degreeZeroData.consistent hd_zero degreeZeroData.error_le
+
 /-- Construction target for the degree-zero branch of the successor step.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`, in the

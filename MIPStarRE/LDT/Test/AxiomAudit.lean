@@ -161,6 +161,14 @@ checked composition theorem
 `MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations`
 therefore states the remaining degree-zero input in terms of exactly that
 family-and-scalar construction, rather than as an abstract successor conclusion.
+The constructor
+`MainInductionStep.DegreeZeroPastingFamilyObligation.ofAveragedPastingData`
+and the theorem
+`MainInductionStep.mainInductionSuccessorNext_degreeZero_ofAveragedPastingData`
+also show that the already formalized averaged pasting data supplies precisely
+the degree-zero record fields.  These are standard-axiom-clean comparisons
+between internal data records, not additional hypotheses of
+`thm:main-induction`.
 The theorem
 `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions`
 then records the exact small-error closure from these internal constructions

@@ -722,4 +722,36 @@ structure AveragedPastingData (params : Parameters)
     ldPastingInInductionError params k eps delta gamma kappa zeta ≤
       mainInductionError params.next k eps delta gamma
 
+namespace DegreeZeroPastingFamilyObligation
+
+/-- Convert averaged pasting data into the degree-zero pasting-family record.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:486-551`, in the
+successor proof of `\label{thm:main-induction}`.
+
+The averaged pasting data already contains the family, completeness,
+point-consistency, and scalar absorption fields required by the degree-zero
+pasting-family obligation.  This constructor is a Lean-only comparison between
+two internal data records; it does not assert that the data have been
+constructed from the source hypotheses. -/
+noncomputable def ofAveragedPastingData {params : Parameters}
+    [FieldModel params.q]
+    {strategy : SymStrat params.next ι}
+    {eps delta gamma : Error} {k : ℕ}
+    {restrictionPkg : SliceRestrictionData params strategy eps delta gamma}
+    {inductionPkg :
+      PerSliceInductionData params strategy eps delta gamma restrictionPkg k}
+    {selfPkg :
+      SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg}
+    (pkg : AveragedPastingData params strategy eps delta gamma k selfPkg) :
+    DegreeZeroPastingFamilyObligation params strategy eps delta gamma k where
+  family := selfPkg.family
+  kappa := pkg.kappa
+  zeta := pkg.zeta
+  complete := pkg.complete
+  consistent := pkg.consistent
+  error_le := pkg.error_le
+
+end DegreeZeroPastingFamilyObligation
+
 end MIPStarRE.LDT.MainInductionStep
