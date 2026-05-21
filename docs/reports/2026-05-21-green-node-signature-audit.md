@@ -25,7 +25,7 @@ source-like labels: 124
 definition or remark labels: 56
 allowed source-like warning links: 6
 allowed source-like signature warnings: 29
-auxiliary warning links: 12
+auxiliary warning links: 13
 OK: no unexpected warning links in green source-like blueprint nodes.
 ```
 
@@ -37,6 +37,10 @@ The 29 signature warnings are current, explicit exceptions.  They consist of:
   and should remain visible rather than hidden behind a green node.
 - 6 scalar-cascade links whose statements use `CascadeHypotheses`, the standing
   numerical regime for the cascade estimates.
+
+After the #1642 residual-domination obstruction split, one additional auxiliary
+warning link is expected: the Lean-only residual-obstruction declaration under
+`rem:lean-residual-domination-declarations`.  It is not a source theorem.
 
 Thus the present graph is not being certified as "green with no obligations".
 It is certified as "green with the current known obligation-shaped signatures
