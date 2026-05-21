@@ -22,7 +22,9 @@ namespace MIPStarRE.LDT.MainInductionStep
 open MIPStarRE.LDT
 open scoped MatrixOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+universe uι
+
+variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 /-- Paper `inductive_step.tex:552-566`: in the small-parameter regime, the
 induction-side `ldPastingInInductionNu` constructed from `ζ =
@@ -871,39 +873,43 @@ internal answer-valued route through the successor proof: answer-valued
 restricted slice data are converted to the legacy pasting interface, the
 small-error branch supplies the scalar side conditions for averaged pasting, and
 `mainInductionFromStageData` produces the next-dimensional measurement. -/
-theorem mainInductionFromAnswerStageDataOfSmallError
+theorem mainInductionFromAnswerStageDataOfSmallError.{uι', uF}
+    {ι' : Type uι'} [Fintype ι'] [DecidableEq ι']
     (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
+    [FieldModel.{uF} params.q]
+    (strategy : SymStrat params.next ι')
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
     (hsmall : mainInductionError params.next k eps delta gamma < 1)
-    (answerRestrict : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (answerRestrict : AnswerSliceRestrictionData.{uι', uF} params strategy eps delta gamma)
     (answerInduction :
-      AnswerPerSliceInductionData params strategy eps delta gamma answerRestrict k)
+      AnswerPerSliceInductionData.{uι', uF} params strategy eps delta gamma answerRestrict k)
     (answerSelf :
-      AnswerSelfImprovementData params strategy eps delta gamma k answerRestrict
+      AnswerSelfImprovementData.{uι', uF} params strategy eps delta gamma k answerRestrict
         answerInduction)
     (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : Measurement (Polynomial params.next) ι,
+    ∃ H : Measurement (Polynomial params.next) ι',
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next H.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
-  let hrestrict : SliceRestrictionData params strategy eps delta gamma :=
+  let hrestrict : SliceRestrictionData.{uι', uF} params strategy eps delta gamma :=
     SliceRestrictionData.ofAnswer params strategy eps delta gamma answerRestrict
-  let hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k :=
+  let hinduction : PerSliceInductionData.{uι', uF} params strategy eps delta gamma hrestrict k :=
     PerSliceInductionData.ofAnswer params strategy eps delta gamma k answerRestrict
       answerInduction
-  let hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction :=
+  let hself : SelfImprovementData.{uι', uF} params strategy eps delta gamma k hrestrict
+      hinduction :=
     SelfImprovementData.ofAnswer params strategy eps delta gamma k answerRestrict
       answerInduction answerSelf
-  let hpaste : AveragedPastingData params strategy eps delta gamma k hself :=
+  let hpaste : AveragedPastingData.{uι', uF} params strategy eps delta gamma k hself :=
     assembleAveragedPastingDataOfSmallError params strategy eps delta gamma k hgood hsmall
       hrestrict hinduction hself hk
   exact
-    mainInductionFromStageData params strategy eps delta gamma k hgood
+    mainInductionFromStageData.{uι', uF} (_fieldUniverse := ULift.{uF} PUnit)
+      (ULift.up PUnit.unit)
+      params strategy eps delta gamma k hgood
       hrestrict hinduction hself hpaste hk
 
 

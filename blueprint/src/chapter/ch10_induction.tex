@@ -243,13 +243,12 @@
 	\(\gamma\le 1\), \(\zeta\le 1\), and \(d\le q\) internally.  Thus the
 	successor proof can call the small-error pasting constructor without carrying
 	\(0<d\), \(1\le k\), \(\gamma\le 1\), \(\zeta\le 1\), or \(d\le q\) as
-	separate proof inputs.  In the degree-zero branch, Lean now names the precise
-	remaining construction as
-	\texttt{DegreeZeroPastingFamilyObligation}: a complete and point-consistent
-	family of degree-zero slice polynomials, together with the scalar comparison
-	needed to absorb the pasting error into the successor error.  This record is
-	an internal proof obligation and is not an additional hypothesis in
-	Theorem~\ref{thm:main-induction}.
+	separate proof inputs.  The older record
+	\texttt{DegreeZeroPastingFamilyObligation} remains as an alternative
+	degree-zero route through the completed degree-zero pasting theorem.  It is no
+	longer the active successor frontier: the current reduction applies the
+	predecessor induction hypothesis also when \(d=0\), deriving the needed
+	condition \(1\le k\) from the small-error hypothesis.
 \end{definition}
 
 \begin{definition}[Lean successor obligation reductions]\label{def:successor-obligation-reductions}
@@ -257,6 +256,7 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport}
 	\leanok
 	\uses{def:successor-pasting-data, def:self-improvement-slice-transport}
 	The following Lean declarations are implementation reductions for the
@@ -281,14 +281,16 @@
 	\texttt{mainInductionSuccessorNext\_degreeZero\_ofPastingFamily} shows that
 	the existing degree-zero pasting theorem suffices once a complete and
 	point-consistent slice family has been constructed and its scalar error is
-	absorbed into the main-induction error; it does not itself construct that
-	degree-zero family from the successor-step hypotheses.  The small-error
+	absorbed into the main-induction error.  This is a retained alternative route,
+	not the active proof frontier.  The small-error
 	degree-split theorem
 	\texttt{mainInductionSuccessorNextOfSmallError\_ofDegreeSplitPastingObligations}
 	combines the positive-degree answer-valued route with this degree-zero
-	reduction under the nontrivial small-error assumption.  The corresponding
-	named construction target is
-	\texttt{DegreeZeroPastingFamilyObligation.ofSmallError}.  Finally,
+	reduction under the nontrivial small-error assumption.  The recursive-slice
+	reduction
+	\texttt{mainInductionSuccessorNext\_ofSmallErrorConstruction\_ofRecursiveSliceTransport}
+	applies the predecessor induction hypothesis also at \(d=0\), deriving
+	\(1\le k\) from \(\texttt{mainInductionError}<1\).  Finally,
 	\texttt{mainInductionSuccessorNext\_ofDegreeSplitPastingObligations} adds the
 	trivial large-error case and delegates its small-error branch to the
 	degree-split theorem just described.  These declarations are internal
@@ -428,26 +430,20 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport},
 	which derives the nontrivial successor conclusion from the answer-valued
 	predecessor induction hypothesis and the concrete answer-valued
 	slice-transport data.  The second form also derives the predecessor
-	large-\(k\) and \(k\ge1\) side conditions from the successor large-\(k\)
-	hypothesis together with \(d>0\).  The split form then combines this
+	large-\(k\) side condition from the successor large-\(k\)
+	hypothesis, while \(k\ge1\) is derived from the small-error hypothesis.  The
+	split form then combines this
 	positive-degree small-error reduction with the trivial large-error theorem,
 	so these elementary arithmetic conditions and the large-error case are no
-	longer part of the remaining proof frontier.  The final form also separates
-	the \(d=0\) small-error successor branch from the positive-degree route; this
-	degree-zero branch is now an explicitly named construction obligation, rather
-	than a hidden positivity assumption on the theorem statement.  The
-	degree-zero helper routes that branch through the completed degree-zero
-	pasting construction, reducing it to the construction of a complete and
-	point-consistent slice family and the scalar absorption into
-	\texttt{mainInductionError}.  The last helper composes this degree-zero
-	pasting-family route with the degree split, so the degree-zero part of the
-	frontier is stated by the required family-and-scalar construction rather than
-	by an abstract successor conclusion.  The small-error internal-constructions
-	helper then closes the small-error branch once the predecessor induction
-	hypothesis, the degree-zero family construction, and the positive-degree
+	longer part of the remaining proof frontier.  The recursive-slice helper
+	shows that no separate degree-zero family construction is needed for the
+	active route: the predecessor induction hypothesis covers all degrees, and
+	the nontrivial small-error branch supplies \(k\ge1\).  The small-error helper
+	then closes once the predecessor induction hypothesis and the answer-valued
 	slice-transport construction are supplied inside the induction proof.  Thus
 	the remaining direct
 	\texttt{sorry} is attached to the named small-error construction rather than
@@ -465,7 +461,7 @@
 	slice by slice without importing the remaining \texttt{sorryAx}.  The
 	remaining proof gap for
 	Theorem~\ref{thm:main-induction-current-interface} is to supply the
-	predecessor induction argument, the degree-zero successor branch, and either
+	predecessor induction argument and either
 	an ordinary covariant slice-strategy realization of the answer-valued
 	restriction or an answer-valued self-improvement theorem, internally from the
 	corrected theorem hypotheses.  The predecessor induction argument is the

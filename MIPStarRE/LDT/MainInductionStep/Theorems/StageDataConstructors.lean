@@ -21,7 +21,9 @@ namespace MIPStarRE.LDT.MainInductionStep
 open MIPStarRE.LDT
 open scoped MatrixOrder
 
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+universe uι
+
+variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 /-! ## Stage-data constructors and theorem composition -/
 
@@ -248,9 +250,10 @@ Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.
 The restriction data record already records that every `xRestrictedAnswerSymStrat`
 is good with the slice profile.  The large-`k` side condition is the predecessor
 side condition `400 * params.m * params.d ≤ k`, matching the application of the
-induction hypothesis in `inductive_step.tex`, lines 441--442.  The side
-condition `1 ≤ k` is then derived internally from `0 < params.d`,
-`0 < params.m`, and this large-`k` bound. -/
+induction hypothesis in `inductive_step.tex`, lines 441--442.  The condition
+`1 ≤ k` is supplied by the surrounding nontrivial branch; in the successor proof
+it follows from `mainInductionError < 1`, not from an artificial assumption
+`0 < params.d`. -/
 noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
     (params : Parameters)
     [FieldModel params.q]
@@ -259,20 +262,16 @@ noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
     (k : ℕ)
     (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
     (hinduction : AnswerMainInductionHypothesis params)
-    (hd : 0 < params.d)
+    (hk_pos : 1 ≤ k)
     (hk : 400 * params.m * params.d ≤ k) :
     AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k :=
-  let hk_pos : 1 ≤ k := by
-    have hbound_pos : 0 < 400 * params.m * params.d :=
-      Nat.mul_pos (Nat.mul_pos (by decide : 0 < 400) params.hm) hd
-    exact le_trans (Nat.succ_le_of_lt hbound_pos) hk
   AnswerPerSliceInductionData.ofMainInductionConclusions params strategy eps delta gamma k
     restrictionPkg fun x =>
       hinduction ι (xRestrictedAnswerSymStrat params strategy x)
         (restrictionPkg.profile.axisParallel x)
         (restrictionPkg.profile.selfConsistency x)
         (restrictionPkg.profile.diagonal x)
-        k hd (restrictionPkg.profile.restrictedGood x) hk_pos hk
+        k (restrictionPkg.profile.restrictedGood x) hk_pos hk
 
 /-- View a legacy per-slice induction data record over an answer-forgotten restriction
 data record as an answer-valued data record.
@@ -444,21 +443,23 @@ averaged slice family is passed directly to
 This uses the source-facing theorem `ldPastingInInductionSection`, not the
 restricted nontrivial-regime theorem.  Consequently the successor construction does
 not require the auxiliary proof-reduction hypotheses `0 < d` or `1 ≤ k`. -/
-theorem AveragedPastingData.invokeLdPasting
+theorem AveragedPastingData.invokeLdPasting.{uι', uF}
+    {ι' : Type uι'} [Fintype ι'] [DecidableEq ι']
     (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
+    [FieldModel.{uF} params.q]
+    (strategy : SymStrat params.next ι')
     (eps delta gamma : Error)
     (k : ℕ)
-    {restrictionPkg : SliceRestrictionData params strategy eps delta gamma}
+    {restrictionPkg : SliceRestrictionData.{uι', uF} params strategy eps delta gamma}
     {inductionPkg :
-      PerSliceInductionData params strategy eps delta gamma restrictionPkg k}
+      PerSliceInductionData.{uι', uF} params strategy eps delta gamma restrictionPkg k}
     {selfPkg :
-      SelfImprovementData params strategy eps delta gamma k restrictionPkg inductionPkg}
-    (pkg : AveragedPastingData params strategy eps delta gamma k selfPkg)
+      SelfImprovementData.{uι', uF} params strategy eps delta gamma k restrictionPkg
+        inductionPkg}
+    (pkg : AveragedPastingData.{uι', uF} params strategy eps delta gamma k selfPkg)
     (hgood : strategy.IsGood eps delta gamma)
     (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : Measurement (Polynomial params.next) ι,
+    ∃ H : Measurement (Polynomial params.next) ι',
       LdPastingInInductionSectionConclusion params strategy selfPkg.family H
         eps delta gamma pkg.kappa pkg.zeta k := by
   exact
@@ -472,35 +473,39 @@ one higher dimension.
 The construction applies the unrestricted induction-section pasting theorem
 through `AveragedPastingData.invokeLdPasting`, so its stated hypotheses are
 only the paper stage data and the large-`k` condition. -/
-theorem mainInductionFromStageData
+theorem mainInductionFromStageData.{uι', uF}
+    {ι' : Type uι'} [Fintype ι'] [DecidableEq ι']
+    {_fieldUniverse : Type uF}
+    (_fieldPoint : _fieldUniverse)
     (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
+    [FieldModel.{uF} params.q]
+    (strategy : SymStrat params.next ι')
     (eps delta gamma : Error)
     (k : ℕ)
     (hgood : strategy.IsGood eps delta gamma)
-    (hrestrict : SliceRestrictionData params strategy eps delta gamma)
-    (hinduction : PerSliceInductionData params strategy eps delta gamma hrestrict k)
-    (hself : SelfImprovementData params strategy eps delta gamma k hrestrict hinduction)
-    (hpaste : AveragedPastingData params strategy eps delta gamma k hself)
+    (hrestrict : SliceRestrictionData.{uι', uF} params strategy eps delta gamma)
+    (hinduction : PerSliceInductionData.{uι', uF} params strategy eps delta gamma hrestrict k)
+    (hself : SelfImprovementData.{uι', uF} params strategy eps delta gamma k hrestrict
+      hinduction)
+    (hpaste : AveragedPastingData.{uι', uF} params strategy eps delta gamma k hself)
     (hk : 400 * params.m * params.d ≤ k) :
-    ∃ H : Measurement (Polynomial params.next) ι,
+    ∃ H : Measurement (Polynomial params.next) ι',
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next H.toSubMeas)
         (mainInductionError params.next k eps delta gamma) := by
-  let family : IdxPolyFamily params ι := hself.family
+  let family : IdxPolyFamily params ι' := hself.family
   let kappa : Error := hpaste.kappa
   let zeta : Error := hpaste.zeta
   have hwitness :
-      ∃ error : Error, ∃ H : Measurement (Polynomial params.next) ι,
+      ∃ error : Error, ∃ H : Measurement (Polynomial params.next) ι',
         ConsRel strategy.state (uniformDistribution (Point params.next))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
           (polynomialEvaluationFamily params.next H.toSubMeas)
           error ∧
         error ≤ mainInductionError params.next k eps delta gamma := by
     have hpasted :
-        ∃ H : Measurement (Polynomial params.next) ι,
+        ∃ H : Measurement (Polynomial params.next) ι',
           LdPastingInInductionSectionConclusion params strategy family H
             eps delta gamma kappa zeta k := by
       simpa [family, kappa, zeta] using
