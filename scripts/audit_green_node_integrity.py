@@ -343,16 +343,32 @@ def preceding_docstring(text: str, start: int) -> str | None:
     stripped = prefix.rstrip()
     if not stripped.endswith("-/"):
         return None
-    doc_end = stripped.rfind("-/") + 2
-    doc_start = stripped.rfind("/-", 0, doc_end)
+    doc_start = matching_comment_start(stripped, len(stripped) - 2)
     if doc_start == -1:
         return None
     if not stripped.startswith("/--", doc_start):
         return None
-    first_doc_end = stripped.find("-/", doc_start + 3)
-    if first_doc_end != doc_end - 2:
-        return None
-    return text[doc_start:doc_end]
+    return stripped[doc_start:]
+
+
+def matching_comment_start(text: str, close_start: int) -> int:
+    """Return the opening `/-` matching the close marker at `close_start`."""
+    depth = 1
+    i = close_start - 1
+    while i >= 1:
+        token_start = i - 1
+        if text.startswith("-/", token_start):
+            depth += 1
+            i -= 2
+            continue
+        if text.startswith("/-", token_start):
+            depth -= 1
+            if depth == 0:
+                return token_start
+            i -= 2
+            continue
+        i -= 1
+    return -1
 
 
 def declaration_docstrings(root: Path) -> dict[str, list[tuple[Path, str]]]:
