@@ -346,7 +346,8 @@ def main() -> int:
     unexpected_source: list[tuple[Path, str, str]] = []
     allowed_signature: list[tuple[Path, str, str, list[str]]] = []
     unexpected_signature: list[tuple[Path, str, str, list[str]]] = []
-    aux_warning_count = 0
+    aux_warnings: list[tuple[Path, str, str]] = []
+    source_warning_labels: set[str] = set()
     headers = declaration_headers(args.root)
 
     for path, _env, label, block in iter_leanok_blocks(chapter_dir):
@@ -360,18 +361,20 @@ def main() -> int:
         for declaration in warning_declarations(lean_declarations(block)):
             row = (path, label, declaration)
             if source_like:
+                source_warning_labels.add(label)
                 if (label, declaration) in ALLOWED_SOURCE_WARNINGS:
                     allowed_source.append(row)
                 else:
                     unexpected_source.append(row)
             else:
-                aux_warning_count += 1
+                aux_warnings.append(row)
 
         if source_like:
             for declaration in lean_declarations(block):
                 terms = header_warning_terms(declaration, headers)
                 if not terms:
                     continue
+                source_warning_labels.add(label)
                 row_with_terms = (path, label, declaration, terms)
                 if (label, declaration) in ALLOWED_SOURCE_SIGNATURE_WARNINGS:
                     allowed_signature.append(row_with_terms)
@@ -381,9 +384,16 @@ def main() -> int:
     print(f"leanok environments: {leanok_count}")
     print(f"source-like labels: {source_count}")
     print(f"definition or remark labels: {aux_count}")
+    print(f"source-like labels without warning terms: {source_count - len(source_warning_labels)}")
+    print(f"source-like labels with warning terms: {len(source_warning_labels)}")
     print(f"allowed source-like warning links: {len(allowed_source)}")
     print(f"allowed source-like signature warnings: {len(allowed_signature)}")
-    print(f"auxiliary warning links: {aux_warning_count}")
+    print(f"auxiliary warning links: {len(aux_warnings)}")
+
+    if aux_warnings:
+        print("auxiliary warning links:")
+        for path, label, declaration in aux_warnings:
+            print(f"- {path}:{label}: {declaration}")
 
     if unexpected_source:
         print("unexpected source-like warning links:")

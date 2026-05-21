@@ -20,16 +20,35 @@ checks two surfaces.
 On the current `main` snapshot, the script reports:
 
 ```text
-leanok environments: 180
+leanok environments: 181
 source-like labels: 124
-definition or remark labels: 56
+definition or remark labels: 57
+source-like labels without warning terms: 101
+source-like labels with warning terms: 23
 allowed source-like warning links: 6
 allowed source-like signature warnings: 29
 auxiliary warning links: 13
+auxiliary warning links:
+- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
+- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
+- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_requires_residual_hypothesis
+- blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd
+- blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd
+- blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss
+- blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss
+- blueprint/src/chapter/ch04_projective.tex:rem:lean-left-lifted-projectivization-repair-producer: MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer
+- blueprint/src/chapter/ch10_induction.tex:def:successor-pasting-data: MIPStarRE.LDT.MainInductionStep.DegreeZeroPastingFamilyObligation
+- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
+- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations
+- blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-obligations: MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
+- blueprint/src/chapter/ch10_induction.tex:def:main-formal-error-cascade: MIPStarRE.LDT.Test.CascadeHypotheses
 OK: no unexpected warning links in green source-like blueprint nodes.
 ```
 
-The 29 signature warnings are current, explicit exceptions.  They consist of:
+Thus 101 source-like green nodes have no warning-shaped declaration name and no
+warning-shaped public Lean header under this audit.  The other 23 source-like
+green nodes are not hidden: their warning-shaped dependencies are current,
+explicit exceptions.  The 29 signature warnings consist of:
 
 - 23 Section 8 and Section 9 commutativity/pasting links whose statements use
   `IdxPolyFamily.SliceBoundednessInput` or its residual projections.  These are
@@ -126,10 +145,11 @@ scalar-regime assumptions explicitly.
 
 ## Auxiliary green nodes
 
-The audit also found twelve warning-term links in green definition or remark
-nodes.  They are intentionally auxiliary: they record internal Lean interfaces,
-construction targets, or bookkeeping lemmas.  They are green in the sense that
-the attached Lean declarations exist and the local interface is checked; they
-are not green source theorems.  In particular, the successor-pasting and
-main-formal Step 6 obligation nodes belong to this auxiliary class until their
-source-facing theorems are proved without the named internal obligations.
+The audit also found the thirteen warning-term links listed in the command output
+above in green definition or remark nodes.  They are intentionally auxiliary:
+they record internal Lean interfaces, construction targets, or bookkeeping
+lemmas.  They are green in the sense that the attached Lean declarations exist
+and the local interface is checked; they are not green source theorems.  In
+particular, the successor-pasting and main-formal Step 6 obligation nodes
+belong to this auxiliary class until their source-facing theorems are proved
+without the named internal obligations.
