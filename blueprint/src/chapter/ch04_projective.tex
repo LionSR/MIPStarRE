@@ -5,9 +5,10 @@
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkTensorProductCorrelationStatement}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation}
-	% The Lean declaration is a source-shaped proof obligation for the full
-	% tensor-product correlation statement.  It is not marked \leanok until the
-	% auxiliary-register tensor assembly is formalized.  Tracked by issue #1697.
+	\leanok
+	% The Lean declaration constructs the Naimark data from the checked
+	% one-measurement theorem and the two-sided trace identity
+	% OneMeasNaimarkData.twoSidedCorrelationPreservation.
 	\uses{def:submeasurement}
 	Let $\ket{\psi}$ be a state in $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$.
 	Let $A = \{A^x_a\}$ be a sub-measurement acting on $\mathcal H_{\mathrm A}$
@@ -32,6 +33,7 @@
 \end{theorem}
 \begin{proof}
 	\uses{lem:naimark-helper}
+	\leanok
 
 	For each question $x$, choose a local auxiliary state
 	$\ket{\mathsf{aux}_{\mathrm A,x}}$ of dimension one larger than the number of
@@ -65,11 +67,6 @@
 
 \begin{definition}[Lean questionwise Naimark interface]\label{rem:lean-questionwise-naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark, MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseOneMeasNaimarkData}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseOneMeasNaimarkData_source_effect}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimarkProjSubMeas}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimarkProjSubMeas_expectation_preservation}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeasOption}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeas}
 	\leanok
 	\uses{lem:naimark-helper}
@@ -77,52 +74,31 @@
 	from Lemma~\ref{lem:naimark-helper}.  For every indexed family \(A^x\) and
 	\(B^y\), it produces local dilation data for each question and proves the
 	corresponding single-outcome marginal-preservation identities.  It also
-	first regards the completed \(\mathrm{Option}\)-outcome projective measurement
-	as a projective sub-measurement, and then restricts it to a projective
-	sub-measurement on the original outcomes.  The declarations
-	\texttt{questionwiseOneMeasNaimarkData} and
-	\texttt{questionwiseNaimarkProjSubMeas} expose this local construction
-	without duplicating the choice of Naimark data.  This is the
+	restricts the completed \(\mathrm{Option}\)-outcome projective measurement to
+	a projective sub-measurement on the original outcomes.  This is the
 	interface used downstream in the formal development.  It is not the full
-	tensor-product correlation statement of Theorem~\ref{thm:naimark}, whose
-	simultaneous bipartite assembly remains recorded in
-	\texttt{docs/paper-gaps/naimark.tex}.
+	tensor-product correlation statement of Theorem~\ref{thm:naimark}.
 \end{definition}
 
-\begin{definition}[Lean auxiliary declarations for Naimark]\label{rem:lean-naimark-auxiliary-declarations}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryHilbertSpace}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryState}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkProductRegisterProjectorData}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelationData_of_productRegisterProjectors}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelationDataConstruction}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation_of_productSubmeasurements}
-	\uses{thm:naimark}
-	The Lean construction represents the tensor product of the one-measurement
-	auxiliary registers on one side by the finite function type
+	\begin{definition}[Lean auxiliary declarations for Naimark]\label{rem:lean-naimark-auxiliary-declarations}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryHilbertSpace}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryState}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState}
+		\leanok
+		\uses{thm:naimark}
+		The Lean construction represents the tensor product of the one-measurement
+		auxiliary registers on one side by the finite function type
 	\[
 		x \mapsto \mathrm{Option}(\mathcal A_x),
 	\]
 	with the all-\(\bot\) vector as the initial auxiliary state.  The declaration
 	\texttt{naimarkAuxiliaryHilbertSpace} records this one-sided product
-	register, \texttt{naimarkAuxiliaryState} records its normalized all-\(\bot\)
-	state, and \texttt{naimarkAuxiliaryProductState} records the Alice--Bob
-	product auxiliary state.  The reduction
-	\texttt{naimarkTensorProductCorrelation\_of\_productSubmeasurements} then
-	packages these auxiliary objects into the source-shaped theorem once the
-	product-register projective submeasurements and the four-index correlation
-	identity have been constructed.  The structure
-	\texttt{NaimarkProductRegisterProjectorData} records this last product-register
-	object, and \texttt{naimarkTensorProductCorrelationData\_of\_productRegisterProjectors}
-	constructs the full witness data from it.  The only remaining proof obligation
-	in this group is \texttt{naimarkTensorProductCorrelationDataConstruction};
-	the new product-register data structure identifies its missing mathematical
-	content as the construction of the lifted questionwise projectors and their
-	correlation identity.  These are internal declarations for the tensor assembly
-	in Theorem~\ref{thm:naimark}; they do not by themselves prove the
-	correlation-preservation identity, and this node is therefore not marked
-	\texttt{\textbackslash leanok}.
-\end{definition}
+		register, \texttt{naimarkAuxiliaryState} records its normalized all-\(\bot\)
+		state, and \texttt{naimarkAuxiliaryProductState} records the Alice--Bob
+		product auxiliary state.  These are internal declarations for the tensor
+		assembly in Theorem~\ref{thm:naimark}; the correlation-preservation identity
+		itself is proved by \texttt{naimarkTensorProductCorrelation}.
+	\end{definition}
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
@@ -167,12 +143,8 @@
 \end{proof}
 
 \begin{definition}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_not_le_obstruction}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.optionCompletion_outcome_none_not_le_obstruction}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_requires_residual_hypothesis}
 	\leanok
 	The following are Lean auxiliary declarations, not hypotheses in
 	Theorem~\ref{thm:orthonormalization}.
@@ -198,8 +170,6 @@
 	option-completed orthonormalization output to the monotone-total route used in
 	the self-improvement theorem.  The invariant is recorded as a separate
 	order-theoretic fact; it is not added as an orthonormalization hypothesis.
-	Lean also proves a one-dimensional counterexample showing that the fresh-outcome
-	residual hypothesis cannot be omitted from this generic restriction lemma.
 \end{definition}
 
 \begin{definition}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
