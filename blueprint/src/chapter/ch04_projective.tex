@@ -65,6 +65,10 @@
 
 \begin{definition}[Lean questionwise Naimark interface]\label{rem:lean-questionwise-naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark, MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseOneMeasNaimarkData}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseOneMeasNaimarkData_source_effect}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimarkProjSubMeas}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimarkProjSubMeas_expectation_preservation}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeasOption}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeas}
 	\leanok
@@ -75,7 +79,10 @@
 	corresponding single-outcome marginal-preservation identities.  It also
 	first regards the completed \(\mathrm{Option}\)-outcome projective measurement
 	as a projective sub-measurement, and then restricts it to a projective
-	sub-measurement on the original outcomes.  This is the
+	sub-measurement on the original outcomes.  The declarations
+	\texttt{questionwiseOneMeasNaimarkData} and
+	\texttt{questionwiseNaimarkProjSubMeas} expose this local construction
+	without duplicating the choice of Naimark data.  This is the
 	interface used downstream in the formal development.  It is not the full
 	tensor-product correlation statement of Theorem~\ref{thm:naimark}, whose
 	simultaneous bipartite assembly remains recorded in
@@ -86,6 +93,7 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryHilbertSpace}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryState}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelationDataConstruction}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation_of_productSubmeasurements}
 	\uses{thm:naimark}
 	The Lean construction represents the tensor product of the one-measurement
@@ -101,7 +109,9 @@
 	\texttt{naimarkTensorProductCorrelation\_of\_productSubmeasurements} then
 	packages these auxiliary objects into the source-shaped theorem once the
 	product-register projective submeasurements and the four-index correlation
-	identity have been constructed.  These are internal declarations for the
+	identity have been constructed.  The construction target
+	\texttt{naimarkTensorProductCorrelationDataConstruction} names the remaining
+	construction of the full Naimark data.  These are internal declarations for the
 	tensor assembly in Theorem~\ref{thm:naimark}; they do not by themselves prove
 	the correlation-preservation identity, and this node is therefore not marked
 	\texttt{\textbackslash leanok}.
