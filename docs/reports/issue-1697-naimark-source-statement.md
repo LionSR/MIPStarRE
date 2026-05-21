@@ -35,7 +35,7 @@ The formalization now separates the following declarations.
 - `naimarkTensorProductCorrelation_of_productSubmeasurements`: the internal
   reduction from product-register projective submeasurements and the four-index
   correlation identity to the source-shaped theorem; proved.
-- `naimarkTensorProductCorrelationDataObligation`: the named construction target
+- `naimarkTensorProductCorrelationDataConstruction`: the named construction target
   for the auxiliary spaces, product auxiliary state, product-register projective
   submeasurements, and four-index correlation identity; proof obligation.
 - `naimarkTensorProductCorrelation`: the source-shaped tensor-product
@@ -43,7 +43,7 @@ The formalization now separates the following declarations.
 
 The source-shaped statement is deliberately not marked `\leanok` in the
 blueprint.  Its Lean proof now factors through the named construction target
-`naimarkTensorProductCorrelationDataObligation`, so the declaration records the
+`naimarkTensorProductCorrelationDataConstruction`, so the declaration records the
 source statement without claiming that the tensor assembly has been fully
 formalized.
 
@@ -89,7 +89,7 @@ measurements to original-outcome projective submeasurements is proved by
 of the final assembly is packaged by
 `naimarkTensorProductCorrelation_of_productSubmeasurements`.  The remaining
 proof obligation is now the single named theorem
-`naimarkTensorProductCorrelationDataObligation`: construct the auxiliary
+`naimarkTensorProductCorrelationDataConstruction`: construct the auxiliary
 spaces, product auxiliary state, product-register projective submeasurements,
 and four-index correlation identity from the questionwise one-measurement
 Naimark dilations.

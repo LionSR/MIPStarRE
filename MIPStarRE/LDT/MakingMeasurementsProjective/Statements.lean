@@ -438,7 +438,7 @@ projective measurements to the original outcomes via
 `OneMeasNaimarkData.toProjSubMeas`, and prove the displayed correlation identity
 from the one-measurement compression identities and the product auxiliary
 state. -/
-theorem naimarkTensorProductCorrelationDataObligation
+theorem naimarkTensorProductCorrelationDataConstruction
     {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
     [Fintype OutcomeA] [DecidableEq OutcomeA]
@@ -474,9 +474,10 @@ the one-measurement compression identities.
 
 **Unfaithful:** This proof currently contains the tracked `sorry` for the full
 tensor-product auxiliary-register assembly through
-`naimarkTensorProductCorrelationDataObligation`, so it uses `sorryAx` rather
-than deriving `references/ldt-paper/orthonormalization.tex:36-80` from the
-checked one-measurement Naimark helper.  Documented in
+`naimarkTensorProductCorrelationDataConstruction`, so it delegates to the
+still-unproved construction target rather than deriving
+`references/ldt-paper/orthonormalization.tex:36-80` from the checked
+one-measurement Naimark helper.  Documented in
 `docs/paper-gaps/naimark.tex` and issue #1697.  Elimination: prove the
 simultaneous tensor-product correlation theorem, in the
 projective-submeasurement form produced by the paper's helper lemma, from the
@@ -493,7 +494,7 @@ theorem naimarkTensorProductCorrelation
     (B : IdxSubMeas QuestionB OutcomeB HB.carrier) :
     NaimarkTensorProductCorrelationStatement HA HB ψ A B := by
   intro hψ
-  exact naimarkTensorProductCorrelationDataObligation HA HB ψ A B hψ
+  exact naimarkTensorProductCorrelationDataConstruction HA HB ψ A B hψ
 
 /-! ### Orthonormalization statements -/
 

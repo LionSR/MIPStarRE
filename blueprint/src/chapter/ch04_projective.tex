@@ -86,7 +86,7 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryHilbertSpace}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryState}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelationDataObligation}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelationDataConstruction}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation_of_productSubmeasurements}
 	\uses{thm:naimark}
 	The Lean construction represents the tensor product of the one-measurement
@@ -102,8 +102,8 @@
 	\texttt{naimarkTensorProductCorrelation\_of\_productSubmeasurements} then
 	packages these auxiliary objects into the source-shaped theorem once the
 	product-register projective submeasurements and the four-index correlation
-	identity have been constructed.  The obligation
-	\texttt{naimarkTensorProductCorrelationDataObligation} names the remaining
+	identity have been constructed.  The construction target
+	\texttt{naimarkTensorProductCorrelationDataConstruction} names the remaining
 	construction of the full Naimark data.  These are internal declarations for the
 	tensor assembly in Theorem~\ref{thm:naimark}; they do not by themselves prove
 	the correlation-preservation identity, and this node is therefore not marked
