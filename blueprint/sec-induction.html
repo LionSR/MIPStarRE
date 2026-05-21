@@ -836,7 +836,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> This is exactly Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a>, restated in the induction chapter because it is the pasting input used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. The Lean declaration linked above applies the unrestricted formal pasting theorem and transports its point-consistency field to the induction-section conclusion record. </p>
+  <p> This is exactly Theorem&#160;<a href="sec-ld-pasting.html#thm:ld-pasting">9.1</a>, restated in the induction chapter because it is the pasting input used in the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a>. The Lean declaration linked above applies the unrestricted formal pasting theorem and transports its point-consistency field to the induction-section conclusion record. </p>
 
   </div>
 </div>
@@ -985,6 +985,74 @@
         
         <ul class="uses">
           
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one" class="lean_decl">MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.one_le_k_of_mainInductionError_lt_one" class="lean_decl">MIPStarRE.LDT.MainInductionStep.one_le_k_of_mainInductionError_lt_one</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="definition_thmcontent">
+  <p>      The successor step forms the pasting input by combining the restricted probability estimates with the slice-wise self-improvement data. The Lean construction applies the unrestricted induction-section pasting theorem directly, and the small-error constructor supplies the scalar side conditions \(\gamma \le 1\), \(\zeta \le 1\), and \(d\le q\) internally. Thus the successor proof can call the small-error pasting constructor without carrying \(0{\lt}d\), \(1\le k\), \(\gamma \le 1\), \(\zeta \le 1\), or \(d\le q\) as separate proof inputs. In the degree-zero branch, Lean now names the precise remaining construction as <span class="ttfamily">DegreeZeroPastingFamilyObligation</span>: a complete and point-consistent family of degree-zero slice polynomials, together with the scalar comparison needed to absorb the pasting error into the successor error. This record is an internal proof obligation and is not an additional hypothesis in Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a>. </p>
+
+  </div>
+</div>
+<div class="definition_thmwrapper theorem-style-definition" id="def:successor-obligation-reductions">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
+    </span>
+    <span class="definition_thmlabel">10.12</span>
+    <span class="definition_thmtitle">Lean successor obligation reductions</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-induction.html#def:successor-obligation-reductions">#</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-induction.html#def:successor-pasting-data">Definition 10.11</a></li>
+          
+          <li><a href="sec-induction.html#def:self-improvement-slice-transport">Definition 10.10</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport" class="lean_decl">MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerSliceTransport</a></li>
           
           <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations" class="lean_decl">MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations</a></li>
@@ -998,7 +1066,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>          The successor step forms the pasting input by combining the restricted probability estimates with the slice-wise self-improvement data. The Lean construction applies the unrestricted induction-section pasting theorem directly, and the small-error constructor supplies the scalar side conditions \(\gamma \le 1\), \(\zeta \le 1\), and \(d\le q\) internally. Thus the successor proof can call the small-error pasting constructor without carrying \(0{\lt}d\), \(1\le k\), \(\gamma \le 1\), \(\zeta \le 1\), or \(d\le q\) as separate proof inputs. In the degree-zero branch, Lean now names the precise remaining construction as <span class="ttfamily">DegreeZeroPastingFamilyObligation</span>: a complete and point-consistent family of degree-zero slice polynomials, together with the scalar comparison needed to absorb the pasting error into the successor error. This record is an internal proof obligation and is not an additional hypothesis in Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. The answer-valued small-error theorem then converts the answer-valued slice data to this pasting datum and applies the checked stage-data theorem. The Lean theorem <span class="ttfamily">mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport</span> is the checked nontrivial branch: it assumes the small-error condition already obtained in the proof of <span class="ttfamily">mainInductionSuccessorNextOfSmallError</span>, constructs the answer-valued restricted-probability data and self-improvement data from the supplied transport, and invokes the small-error answer-stage pasting theorem. The Lean theorem <span class="ttfamily">mainInductionSuccessorNext_ofAnswerSliceTransport</span> closes the full positive-degree successor branch from the same two internal constructions by combining this small-error theorem with the trivial large-error theorem. The arithmetic lemma <span class="ttfamily">mainInductionSuccessorBound_pred</span> derives the predecessor large-\(k\) side condition from the successor one. The degree-zero reduction <span class="ttfamily">mainInductionSuccessorNext_degreeZero_ofPastingFamily</span> shows that the existing degree-zero pasting theorem suffices once a complete and point-consistent slice family has been constructed and its scalar error is absorbed into the main-induction error; it does not itself construct that degree-zero family from the successor-step hypotheses. The small-error degree-split theorem <span class="ttfamily">mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations</span> combines the positive-degree answer-valued route with this degree-zero reduction under the nontrivial small-error assumption. The corresponding named construction target is <span class="ttfamily">DegreeZeroPastingFamilyObligation.ofSmallError</span>. Finally, <span class="ttfamily">mainInductionSuccessorNext_ofDegreeSplitPastingObligations</span> adds the trivial large-error case and delegates its small-error branch to the degree-split theorem just described. These declarations are internal theorems, not additional hypotheses in Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. </p>
+  <p>      The following Lean declarations are implementation reductions for the successor proof. They are proved internal theorems, not additional hypotheses in Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a>. The answer-valued small-error theorem converts the answer-valued slice data to this pasting datum and applies the proved stage-data theorem. The Lean theorem <span class="ttfamily">mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport</span> is the proved nontrivial branch: it assumes the small-error condition already obtained in the proof of <span class="ttfamily">mainInductionSuccessorNextOfSmallError</span>, constructs the answer-valued restricted-probability data and self-improvement data from the supplied transport, and invokes the small-error answer-stage pasting theorem. The Lean theorem <span class="ttfamily">mainInductionSuccessorNext_ofAnswerSliceTransport</span> closes the full positive-degree successor branch from the same two internal constructions by combining this small-error theorem with the trivial large-error theorem. The arithmetic lemma <span class="ttfamily">mainInductionSuccessorBound_pred</span> derives the predecessor large-\(k\) side condition from the successor one. The degree-zero reduction <span class="ttfamily">mainInductionSuccessorNext_degreeZero_ofPastingFamily</span> shows that the existing degree-zero pasting theorem suffices once a complete and point-consistent slice family has been constructed and its scalar error is absorbed into the main-induction error; it does not itself construct that degree-zero family from the successor-step hypotheses. The small-error degree-split theorem <span class="ttfamily">mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations</span> combines the positive-degree answer-valued route with this degree-zero reduction under the nontrivial small-error assumption. The corresponding named construction target is <span class="ttfamily">DegreeZeroPastingFamilyObligation.ofSmallError</span>. Finally, <span class="ttfamily">mainInductionSuccessorNext_ofDegreeSplitPastingObligations</span> adds the trivial large-error case and delegates its small-error branch to the degree-split theorem just described. These declarations are internal theorems, not results stated in the paper and not additional hypotheses in Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a>. </p>
 
   </div>
 </div>
@@ -1007,7 +1075,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">10.12</span>
+    <span class="lemma_thmlabel">10.13</span>
     <span class="lemma_thmtitle">Base case of main induction</span>
     <div class="thm_header_extras">
 
@@ -1069,11 +1137,11 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   Under the hypotheses of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> with \(m=1\), there exists a measurement \(G \in \mathrm{PolyMeas}(1,q,d)\) such that, on average over \(u \sim \mathbb {F}_q\), </p>
+  <p>   Under the hypotheses of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a> with \(m=1\), there exists a measurement \(G \in \mathrm{PolyMeas}(1,q,d)\) such that, on average over \(u \sim \mathbb {F}_q\), </p>
 <div class="displaymath" id="a0000000597">
   \[  A_a^u \otimes I \simeq _\varepsilon I \otimes G_{[g(u)=a]},  \]
 </div>
-<p> which is stronger than the bound required by Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> for \(m=1\). </p>
+<p> which is stronger than the bound required by Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a> for \(m=1\). </p>
 
   </div>
 </div>
@@ -1094,7 +1162,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">10.13</span>
+    <span class="lemma_thmlabel">10.14</span>
     <span class="lemma_thmtitle">Large-error branch of main induction</span>
     <div class="thm_header_extras">
 
@@ -1154,7 +1222,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   If the target error parameter in Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> is at least \(1\), then the conclusion follows from a distinguished trivial polynomial measurement. </p>
+  <p>   If the target error parameter in Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a> is at least \(1\), then the conclusion follows from a distinguished trivial polynomial measurement. </p>
 
   </div>
 </div>
@@ -1175,7 +1243,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.14</span>
+    <span class="theorem_thmlabel">10.15</span>
     <span class="theorem_thmtitle">Main induction</span>
     <div class="thm_header_extras">
 
@@ -1206,15 +1274,15 @@
           
           <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-induction.html#lem:main-induction-base">Lemma 10.12</a></li>
+          <li><a href="sec-induction.html#lem:main-induction-base">Lemma 10.13</a></li>
           
-          <li><a href="sec-induction.html#lem:main-induction-large-error">Lemma 10.13</a></li>
+          <li><a href="sec-induction.html#lem:main-induction-large-error">Lemma 10.14</a></li>
           
           <li><a href="sec-induction.html#lem:restricted-probabilities">Lemma 10.3</a></li>
           
           <li><a href="sec-induction.html#lem:weighted-restricted-probability-bounds">Lemma 10.5</a></li>
           
-          <li><a href="sec-induction.html#lem:main-induction-base">Lemma 10.12</a></li>
+          <li><a href="sec-induction.html#lem:main-induction-base">Lemma 10.13</a></li>
           
           <li><a href="sec-induction.html#thm:self-improvement-in-induction-section">Theorem 10.6</a></li>
           
@@ -1274,8 +1342,8 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> In Lean, the base case is formalized through . The successor step of  is isolated in its native \(m\to m+1\) form as the source-shaped proof obligation . Its nontrivial branch is named separately as ; the complementary branch is supplied by the proved large-error lemma above. The non-base branch  only decomposes an arbitrary parameter bundle with \(m\ne 1\) into this successor form. Neither declaration takes restricted-probability, recursive-slice, self-improvement, or pasting records as hypotheses. The nearby formalization still names the stage data    that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\), but no theorem with these data as additional source-level hypotheses is advertised as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes , , which record the predecessor induction hypothesis for the restricted strategies, deriving the side condition \(1\le k\) from the predecessor large-\(k\) bound and the degree-positivity hypothesis; transport induction data in both directions between the answer-valued and legacy slice data; and then forget only the answer-valued diagonal alphabet before the existing pasting construction. The corresponding internal theorem  now proves the successor conclusion from the predecessor answer-valued induction hypothesis and the direct slice-wise outputs of the induction-section self-improvement theorem. The weighted restricted-probability estimates are now public via , The Lean proof now closes the large-error branch by . The remaining proof gap for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> is to derive the successor-step constructions, including the restricted-strategy self-improvement and slice-transport construction tracked by issue #1507 under the bridge-debt tracker #1458, from the corrected theorem hypotheses; hence no proof-level is attached here. We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
-<p>The proof is by induction on \(m\). The base case \(m=1\) is Lemma&#160;<a href="sec-induction.html#lem:main-induction-base">10.12</a>. </p>
+  <p> In Lean, the base case is formalized through . The successor step of  is isolated in its native \(m\to m+1\) form as the source-shaped proof obligation . Its nontrivial branch is named separately as ; the complementary branch is supplied by the proved large-error lemma above. The non-base branch  only decomposes an arbitrary parameter bundle with \(m\ne 1\) into this successor form. Neither declaration takes restricted-probability, recursive-slice, self-improvement, or pasting records as hypotheses. The nearby formalization still names the stage data    that mirror the four paper stages \(\text{restrict} \to \text{induct} \to \text{self-improve} \to \text{paste}\), but no theorem with these data as additional source-level hypotheses is advertised as Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a>. For the answer-valued restriction route used in the successor branch of the main formal theorem, Lean now also exposes , , which record the predecessor induction hypothesis for the restricted strategies, deriving the side condition \(1\le k\) from the predecessor large-\(k\) bound and the degree-positivity hypothesis; transport induction data in both directions between the answer-valued and legacy slice data; and then forget only the answer-valued diagonal alphabet before the existing pasting construction. The corresponding internal theorem  now proves the successor conclusion from the predecessor answer-valued induction hypothesis and the direct slice-wise outputs of the induction-section self-improvement theorem. The weighted restricted-probability estimates are now public via , The Lean proof now closes the large-error branch by . The remaining proof gap for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a> is to derive the successor-step constructions, including the restricted-strategy self-improvement and slice-transport construction tracked by issue #1507 under the bridge-debt tracker #1458, from the corrected theorem hypotheses; hence no proof-level is attached here. We may assume \(\varepsilon ,\delta ,\gamma ,d/q \le 1\), since otherwise \(\nu \ge 1\) and the bound is trivial. </p>
+<p>The proof is by induction on \(m\). The base case \(m=1\) is Lemma&#160;<a href="sec-induction.html#lem:main-induction-base">10.13</a>. </p>
 <p>For the step from \(m\) to \(m+1\), let \((\psi ,A,B,L)\) be an \((\varepsilon ,\delta ,\gamma )\)-good symmetric strategy for the \((m+1,q,d)\) test, and let \(k \ge 400(m+1)d\). For each \(x \in \mathbb {F}_q\), let \((\psi ,A^x,B^x,L^x)\) be the \(x\)-restricted strategy, with failure parameters \(\varepsilon _x,\delta _x,\gamma _x\). Apply the induction hypothesis to each restricted strategy with the same integer \(k\) and define </p>
 <div class="displaymath" id="a0000000603">
   \[  \nu _x = 1000k^2m^2\left(\varepsilon _x^{1/1024}+\delta _x^{1/1024}+\gamma _x^{1/1024}+(d/q)^{1/1024}\right), \qquad \sigma _x = m^2\left(\nu _x + e^{-k/(80000m^2)}\right).  \]
@@ -1371,7 +1439,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.15</span>
+    <span class="remark_thmlabel">10.16</span>
     <span class="remark_thmtitle">Lean proof gap for the successor-step assembly</span>
     <div class="thm_header_extras">
 
@@ -1385,7 +1453,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> has the source hypotheses. Its remaining proof obligation is the native successor step <span class="ttfamily">mainInductionSuccessorNext</span>; the only nontrivial case is now the small-error branch <span class="ttfamily">mainInductionSuccessorNextOfSmallError</span>. The weighted slice bounds feeding Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a> are still exposed through the public restriction-data constructor above, but the recursive slice witnesses and the slice-wise self-improvement outputs must be derived inside the successor proof itself. Once these direct answer-valued slice outputs are available, the pasting comparison is now formalized by <span class="ttfamily">mainInductionSuccessorNext_ofAnswerSliceSelfImprovement</span>. These intermediate objects are not represented by a separate theorem whose assumptions are added to the paper statement. </p>
+  <p> The Lean declaration for Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a> has the source hypotheses. Its remaining proof obligation is the native successor step <span class="ttfamily">mainInductionSuccessorNext</span>; the only nontrivial case is now the small-error branch <span class="ttfamily">mainInductionSuccessorNextOfSmallError</span>. The weighted slice bounds feeding Lemma&#160;<a href="sec-induction.html#lem:restricted-probabilities">10.3</a> are still exposed through the public restriction-data constructor above, but the recursive slice witnesses and the slice-wise self-improvement outputs must be derived inside the successor proof itself. Once these direct answer-valued slice outputs are available, the pasting comparison is now formalized by <span class="ttfamily">mainInductionSuccessorNext_ofAnswerSliceSelfImprovement</span>. These intermediate objects are not represented by a separate theorem whose assumptions are added to the paper statement. </p>
 
   </div>
 </div>
@@ -1395,7 +1463,7 @@
     <span class="lemma_thmcaption">
     Lemma
     </span>
-    <span class="lemma_thmlabel">10.16</span>
+    <span class="lemma_thmlabel">10.17</span>
     <span class="lemma_thmtitle">Role-register symmetrization bridge</span>
     <div class="thm_header_extras">
 
@@ -1486,7 +1554,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.17</span>
+    <span class="remark_thmlabel">10.18</span>
     <span class="remark_thmtitle">Lean auxiliary data for role-register symmetrization</span>
     <div class="thm_header_extras">
 
@@ -1500,7 +1568,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The formal proof of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> also uses auxiliary data containing the symmetrized strategy, its goodness proof, and its normalization proof. This auxiliary data supports the final assembly, not an additional hypothesis in Lemma&#160;<a href="sec-induction.html#lem:symmetrization-bridge">10.16</a>. </p>
+  <p> The formal proof of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> also uses auxiliary data containing the symmetrized strategy, its goodness proof, and its normalization proof. This auxiliary data supports the final assembly, not an additional hypothesis in Lemma&#160;<a href="sec-induction.html#lem:symmetrization-bridge">10.17</a>. </p>
 
   </div>
 </div>
@@ -1509,7 +1577,7 @@
     <span class="proposition_thmcaption">
     Proposition
     </span>
-    <span class="proposition_thmlabel">10.18</span>
+    <span class="proposition_thmlabel">10.19</span>
     <span class="proposition_thmtitle">Lean base-case handoff for the Section 3 proof</span>
     <div class="thm_header_extras">
 
@@ -1536,9 +1604,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.16</a></li>
+          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.17</a></li>
           
-          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.14</a></li>
+          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.15</a></li>
           
         </ul>
     
@@ -1569,7 +1637,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>   If \(m=1\), then for every \(k\) the role-register symmetrization of a projective strategy passing the low individual degree test with error \(\varepsilon \) admits a measurement \(G\) satisfying the base-case conclusion of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> with parameters \((3\varepsilon ,3\varepsilon ,3\varepsilon )\). </p>
+  <p>   If \(m=1\), then for every \(k\) the role-register symmetrization of a projective strategy passing the low individual degree test with error \(\varepsilon \) admits a measurement \(G\) satisfying the base-case conclusion of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a> with parameters \((3\varepsilon ,3\varepsilon ,3\varepsilon )\). </p>
 
   </div>
 </div>
@@ -1581,7 +1649,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>This is a Lean-only construction theorem: combine Lemma&#160;<a href="sec-induction.html#lem:symmetrization-bridge">10.16</a> with the \(m=1\) clause of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>, formalized as . </p>
+  <p>This is a Lean-only construction theorem: combine Lemma&#160;<a href="sec-induction.html#lem:symmetrization-bridge">10.17</a> with the \(m=1\) clause of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a>, formalized as . </p>
 
   </div>
 </div>
@@ -1590,7 +1658,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.19</span>
+    <span class="definition_thmlabel">10.20</span>
     <span class="definition_thmtitle">Lean successor restricted-recursion targets for the Section 3 proof</span>
     <div class="thm_header_extras">
 
@@ -1614,9 +1682,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.16</a></li>
+          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.17</a></li>
           
-          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.14</a></li>
+          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.15</a></li>
           
         </ul>
     
@@ -1657,7 +1725,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>      These Lean-only declarations name the restricted-probability and recursive-slice targets appearing in the successor comparison with Remark&#160;<a href="sec-induction.html#rem:main-induction-successor-assembly">10.15</a>. The public weighted-bound helper lemmas discharge the weighted restricted-axis and restricted-diagonal fields from the symmetrized passing strategy. The former Lean boundary records, which also required a supplied self-improvement input, have been removed: that missing work is part of the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>, not an additional assumption in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. The former slice-data records, which supplied concrete pinned same-space slice strategies and passing hypotheses as Lean inputs, have also been removed. The construction of those slices and the transport of their restricted point, axis-parallel, and diagonal measurements should be proved in the successor branch rather than represented as a hypothesis in the statement of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. </p>
+  <p>      These Lean-only declarations name the restricted-probability and recursive-slice targets appearing in the successor comparison with Remark&#160;<a href="sec-induction.html#rem:main-induction-successor-assembly">10.16</a>. The public weighted-bound helper lemmas discharge the weighted restricted-axis and restricted-diagonal fields from the symmetrized passing strategy. The former Lean boundary records, which also required a supplied self-improvement input, have been removed: that missing work is part of the proof of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a>, not an additional assumption in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. The former slice-data records, which supplied concrete pinned same-space slice strategies and passing hypotheses as Lean inputs, have also been removed. The construction of those slices and the transport of their restricted point, axis-parallel, and diagonal measurements should be proved in the successor branch rather than represented as a hypothesis in the statement of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. </p>
 
   </div>
 </div>
@@ -1666,7 +1734,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.20</span>
+    <span class="definition_thmlabel">10.21</span>
     <span class="definition_thmtitle">Lean base-case Step&#160;6 obligations for the Section&#160;3 proof</span>
     <div class="thm_header_extras">
 
@@ -1690,7 +1758,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-successor-boundary">Definition 10.19</a></li>
+          <li><a href="sec-induction.html#def:main-formal-successor-boundary">Definition 10.20</a></li>
           
           <li><a href="chap-projective.html#thm:orthonormalization">Theorem 4.4</a></li>
           
@@ -1725,7 +1793,7 @@
   <div class="definition_thmcontent">
   <p>        From a line-130 consistency relation, the theorem <span class="ttfamily">MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency</span> constructs the pre-completion projective submeasurements using the Section&#160;5 locality-preserving repair construction. The completion theorem <span class="ttfamily">MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency</span> now derives the completion witness directly from the line-130 cross consistency and the orthonormalization closeness estimates. </p>
 <p>The base-case role witness <span class="ttfamily">mainFormalBaseRoleInductionWitness</span> is a named specialization for \(m=1\). Given a constructed role-register witness, the theorem <span class="ttfamily">MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness</span> constructs the Section&#160;6 projective-completion witness. The proved theorem <span class="ttfamily">mainFormal_ofProjectiveCompletionTransportWitness</span> derives the three consistency conclusions for Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> from a constructed Section&#160;6 projective-completion witness. The witness is a construction target inside the proof, not an additional assumption in the public statement. </p>
-<p>The successor-dependent targets that call Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> are recorded in Definition&#160;<a href="sec-induction.html#def:main-formal-step6-successor-targets">10.21</a>; they carry the tracked successor proof gap of . </p>
+<p>The successor-dependent targets that call Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a> are recorded in Definition&#160;<a href="sec-induction.html#def:main-formal-step6-successor-targets">10.22</a>; they carry the tracked successor proof gap of . </p>
 
   </div>
 </div>
@@ -1734,7 +1802,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.21</span>
+    <span class="definition_thmlabel">10.22</span>
     <span class="definition_thmtitle">Lean successor-dependent Step&#160;6 targets</span>
     <div class="thm_header_extras">
 
@@ -1756,9 +1824,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-step6-obligations">Definition 10.20</a></li>
+          <li><a href="sec-induction.html#def:main-formal-step6-obligations">Definition 10.21</a></li>
           
-          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.14</a></li>
+          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.15</a></li>
           
         </ul>
     
@@ -1791,7 +1859,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>   The role-register Section&#160;6 measurement is obtained by applying the paper-facing theorem <span class="ttfamily">MainInductionStep.mainInduction</span> to the role-register symmetrization. The construction <span class="ttfamily">strategySymmetrization_mainInduction</span> records this application, and <span class="ttfamily">MainFormalRoleInductionWitness.ofMainInduction</span> builds the role-register witness from it. Any successor proof gap is the remaining proof obligation in <span class="ttfamily">mainInduction</span> itself (Remark&#160;<a href="sec-induction.html#rem:main-induction-successor-assembly">10.15</a>, tracked by ). These targets are not an added hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> but internal proof steps whose completion waits on the discharge of the Section&#160;6 successor proof. </p>
+  <p>   The role-register Section&#160;6 measurement is obtained by applying the paper-facing theorem <span class="ttfamily">MainInductionStep.mainInduction</span> to the role-register symmetrization. The construction <span class="ttfamily">strategySymmetrization_mainInduction</span> records this application, and <span class="ttfamily">MainFormalRoleInductionWitness.ofMainInduction</span> builds the role-register witness from it. Any successor proof gap is the remaining proof obligation in <span class="ttfamily">mainInduction</span> itself (Remark&#160;<a href="sec-induction.html#rem:main-induction-successor-assembly">10.16</a>, tracked by ). These targets are not an added hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> but internal proof steps whose completion waits on the discharge of the Section&#160;6 successor proof. </p>
 
   </div>
 </div>
@@ -1800,7 +1868,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.22</span>
+    <span class="remark_thmlabel">10.23</span>
     <span class="remark_thmtitle">Successor projective-completion construction</span>
     <div class="thm_header_extras">
 
@@ -1823,7 +1891,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.23</span>
+    <span class="remark_thmlabel">10.24</span>
     <span class="remark_thmtitle">Lean measurement-unsymmetrization consistency</span>
     <div class="thm_header_extras">
 
@@ -1846,7 +1914,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.24</span>
+    <span class="definition_thmlabel">10.25</span>
     <span class="definition_thmtitle">Final error envelope</span>
     <div class="thm_header_extras">
 
@@ -1893,7 +1961,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.25</span>
+    <span class="theorem_thmlabel">10.26</span>
     <span class="theorem_thmtitle">Basic facts about the final error envelope</span>
     <div class="thm_header_extras">
 
@@ -1920,7 +1988,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.25</a></li>
           
         </ul>
     
@@ -1978,7 +2046,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">10.26</span>
+    <span class="definition_thmlabel">10.27</span>
     <span class="definition_thmtitle">Cascade parameters and standing hypotheses</span>
     <div class="thm_header_extras">
 
@@ -2002,7 +2070,7 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.25</a></li>
           
         </ul>
     
@@ -2059,7 +2127,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.27</span>
+    <span class="theorem_thmlabel">10.28</span>
     <span class="theorem_thmtitle">Bound for the first cascade term</span>
     <div class="thm_header_extras">
 
@@ -2086,9 +2154,9 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.25</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.26</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.27</a></li>
           
         </ul>
     
@@ -2147,7 +2215,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.28</span>
+    <span class="theorem_thmlabel">10.29</span>
     <span class="theorem_thmtitle">Cascade bounds for the later cascade terms</span>
     <div class="thm_header_extras">
 
@@ -2174,11 +2242,11 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.25</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.26</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.27</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.27</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.28</a></li>
           
         </ul>
     
@@ -2253,7 +2321,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">10.29</span>
+    <span class="theorem_thmlabel">10.30</span>
     <span class="theorem_thmtitle">Consolidated error cascade</span>
     <div class="thm_header_extras">
 
@@ -2280,13 +2348,13 @@
         
         <ul class="uses">
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.24</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.25</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.26</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.27</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.27</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.28</a></li>
           
-          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.28</a></li>
+          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.29</a></li>
           
         </ul>
     
@@ -2344,7 +2412,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>This is the direct combination of Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.27</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.28</a>. The Lean declaration uses the explicit equalities naming \(\sigma ,\zeta _1,\zeta _2,\zeta _3\) as the corresponding cascade expressions. </p>
+  <p>This is the direct combination of Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.28</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.29</a>. The Lean declaration uses the explicit equalities naming \(\sigma ,\zeta _1,\zeta _2,\zeta _3\) as the corresponding cascade expressions. </p>
 
   </div>
 </div>
@@ -2353,7 +2421,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.30</span>
+    <span class="remark_thmlabel">10.31</span>
     <span class="remark_thmtitle">Lean Step 5 expansion theorem</span>
     <div class="thm_header_extras">
 
@@ -2376,7 +2444,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">10.31</span>
+    <span class="remark_thmlabel">10.32</span>
     <span class="remark_thmtitle">Lean witness structures for the main-formal assembly</span>
     <div class="thm_header_extras">
 
@@ -2424,7 +2492,7 @@
 <div class="displaymath" id="a0000000648">
   \[  \nu = 10000k^2m^2\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}\right), \qquad \sigma = m^2\left(\nu +e^{-k/(80000m^2)}\right).  \]
 </div>
-<p> Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> applied to the symmetrized strategy produces a measurement \(G=\{ G_g\}  \in \mathrm{PolyMeas}(m,q,d)\) such that </p>
+<p> Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.15</a> applied to the symmetrized strategy produces a measurement \(G=\{ G_g\}  \in \mathrm{PolyMeas}(m,q,d)\) such that </p>
 <div class="equation" id="eq:just-applied-induction">
 <p>
   <div class="equation_content">
@@ -2541,8 +2609,8 @@
   <span class="equation_label">11</span>
 </p>
 </div>
-<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-witness-records">10.31</a> records the Lean witness structures that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 theorem now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining Lean witness is the completion-and-line-169 construction: supply the actual role-register measurement, Alice’s line-146 completion estimate, Bob’s left-register completion estimate, and the two exact polynomial-level \(\zeta _1\) links. Lean transports the Bob-side completion estimate to the line-147 right-register form, reconstructs the duplicated Step&#160;6 pre-projective consistency field from these inputs and <span class="ttfamily">hpass</span>, then data-processes the line-169 links to line&#160;172 and derives the two \(\zeta _4\) point goals and the \(\zeta _3/2\) self-consistency target. </p>
-<p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.24</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.26</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.27</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.28</a> give the final inflation to the scale \(100000k^2m^4 E\). The underlying estimates, with the formal widened \(\zeta _2\), are: </p>
+<p>Remark&#160;<a href="sec-induction.html#rem:main-formal-lean-witness-records">10.32</a> records the Lean witness structures that separate the scalar cascade and the Step&#160;5 Schwartz–Zippel handoff from the remaining projective-stage transport work. The scalar side discharges the paper’s line&#160;71–73 coarsening and the Step&#160;8 hypotheses in the non-vacuous branch; the Step&#160;5 theorem now turns the evaluated estimate at line&#160;116 into full-polynomial consistency at \(\zeta _1\). The remaining Lean witness is the completion-and-line-169 construction: supply the actual role-register measurement, Alice’s line-146 completion estimate, Bob’s left-register completion estimate, and the two exact polynomial-level \(\zeta _1\) links. Lean transports the Bob-side completion estimate to the line-147 right-register form, reconstructs the duplicated Step&#160;6 pre-projective consistency field from these inputs and <span class="ttfamily">hpass</span>, then data-processes the line-169 links to line&#160;172 and derives the two \(\zeta _4\) point goals and the \(\zeta _3/2\) self-consistency target. </p>
+<p>With \(E\) as in Definition&#160;<a href="sec-induction.html#def:main-formal-envelope">10.25</a>, the quantities \(\sigma ,\zeta _1,\zeta _2,\zeta _3,\zeta _4\) form the cascade of Definition&#160;<a href="sec-induction.html#def:main-formal-error-cascade">10.27</a>. Theorem&#160;<a href="sec-induction.html#thm:sigma-bound-main-formal">10.28</a> and Theorem&#160;<a href="sec-induction.html#thm:zeta-bounds-main-formal">10.29</a> give the final inflation to the scale \(100000k^2m^4 E\). The underlying estimates, with the formal widened \(\zeta _2\), are: </p>
 <div class="displaymath" id="a0000000660">
   \[  \sigma \le 10000k^2m^4\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}+e^{-k/(80000m^2)}\right).  \]
 </div>
