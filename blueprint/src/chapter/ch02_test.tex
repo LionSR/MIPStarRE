@@ -52,7 +52,7 @@
 	\leanok
 	% Lean separates the paper-faithful two-space container `ProjStrat ιA ιB`
 	% from the same-space, swap-symmetric surrogate `SameSpaceProjStrat ι` used by
-	% the current role-register symmetrization pipeline. Remaining follow-up work:
+	% the current role-register symmetrization construction. Remaining follow-up work:
 	% build the heterogeneous direct-sum role symmetrization replacing the same-space
 	% `Role × ι` target in the Step 1 bridge.
 	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
@@ -187,7 +187,7 @@
 	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
 	it is not a replacement for a proof in the interval $md \le k < 400\,md$ or
 	at the \(k=0\) boundary when \(md=0\).
-	The full source-boundary wrapper is named in Lean as
+	The full source-boundary reduction is named in Lean as
 	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceObligation}; it proves the
 	saturated-error branch and leaves
 	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceSmallErrorObligation} as the
@@ -204,7 +204,7 @@
 	The source theorem, Theorem~\ref{thm:main-formal}, is linked to the
 	source-shaped Lean statement, but no proof-level \texttt{\textbackslash leanok}
 	is attached here.  Removing the same-space restriction requires a two-space
-	role-register symmetrization wrapper showing that the paper's general strategy
+	role-register symmetrization construction showing that the paper's general strategy
 	reduces to the current formal interface.  In addition, the proof of the
 	current same-space interface still runs through the Section~6 successor
 	construction tracked by issue~\#1507, so this interface is not marked with
