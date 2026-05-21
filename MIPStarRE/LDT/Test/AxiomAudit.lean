@@ -39,6 +39,18 @@ not to import `sorryAx`; the latter is the formal construction linked from
 `\label{lem:projective-non-measurement}`, not an additional hypothesis of that
 source lemma.
 
+The Naimark audit separates the public dependency-graph nodes around
+`thm:naimark`.  The one-measurement helper and the questionwise interface are
+standard-axiom clean.  The full source-shaped theorem
+`MakingMeasurementsProjective.naimarkTensorProductCorrelation` still carries
+exactly the tracked `sorryAx` through
+`naimarkTensorProductCorrelationDataConstruction`; the proved packaging
+theorems `naimarkTensorProductCorrelationData_of_productRegisterProjectors`
+and `naimarkTensorProductCorrelation_of_productSubmeasurements` verify that
+the remaining mathematical step is the product-register projector construction
+and four-index correlation identity, not an additional hypothesis of
+`\label{thm:naimark}`.
+
 The audit for `SelfImprovement.selfImprovement` requires the standard Lean axioms
 only: the issue-#1230 SDP slackness dependency has been discharged by the
 canonical finite-dimensional SDP strong-duality argument.
@@ -356,7 +368,19 @@ elab "assert_sdp_slackness_axioms " id:ident : command => do
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
-assert_standard_axioms MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark
+
+namespace MIPStarRE.LDT.MakingMeasurementsProjective
+
+assert_standard_axioms questionwiseNaimark
+assert_no_sorry_axiom NaimarkTensorProductCorrelationStatement
+assert_no_sorry_axiom NaimarkProductRegisterProjectorData
+assert_standard_axioms naimarkTensorProductCorrelationData_of_productRegisterProjectors
+assert_standard_axioms naimarkTensorProductCorrelation_of_productSubmeasurements
+assert_source_statement_gap_axioms naimarkTensorProductCorrelationDataConstruction
+assert_source_statement_gap_axioms naimarkTensorProductCorrelation
+
+end MIPStarRE.LDT.MakingMeasurementsProjective
+
 assert_source_statement_gap_axioms
   MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation
 assert_source_statement_gap_axioms

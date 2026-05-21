@@ -109,3 +109,24 @@ isolated as `NaimarkProductRegisterProjectorData`.
 | `thm:naimark` | `NaimarkTensorProductCorrelationStatement`, `naimarkTensorProductCorrelation` | Source-shaped statement; not marked `\leanok` because the proof still depends on `naimarkTensorProductCorrelationDataConstruction`. |
 | `rem:lean-naimark-auxiliary-declarations` | Auxiliary-state declarations, `NaimarkProductRegisterProjectorData`, `naimarkTensorProductCorrelationData_of_productRegisterProjectors`, `naimarkTensorProductCorrelationDataConstruction`, `naimarkTensorProductCorrelation_of_productSubmeasurements` | Internal decomposition of the tensor assembly; not marked `\leanok` because the product-register projector construction remains a proof obligation. |
 | `rem:lean-questionwise-naimark` | `questionwiseNaimark`, `OneMeasNaimarkData.toProjSubMeas`, and related one-measurement declarations | Proved questionwise interface; this is not the full bipartite theorem. |
+
+## Public graph batch audit
+
+The public dependency graph inspected from the `origin/github-pages` worktree on
+2026-05-21 still displays the Naimark cluster as non-green.  The following table
+records the mathematical status of that cluster after the source-shaped
+statement split.
+
+| Public graph node | Mathematical role | Lean status | Axiom audit |
+| --- | --- | --- | --- |
+| `lem:naimark-helper` | One-measurement dilation used in the proof of the source theorem. | Proved by `oneMeasNaimark`, with the original-outcome projective submeasurement supplied by `OneMeasNaimarkData.toProjSubMeas`. | Standard Lean axioms only through the questionwise wrapper. |
+| `rem:lean-questionwise-naimark` | Lean-only interface collecting the per-question helper for all questions. | Proved by `questionwiseNaimark`; it preserves one-sided marginal expectations, not the full bipartite correlation. | `AxiomAudit.lean` checks `questionwiseNaimark` with standard Lean axioms only. |
+| `rem:lean-naimark-auxiliary-declarations` | Product auxiliary state, dilated state, product-register projector data, and assembly reductions. | The auxiliary-state declarations and the two reductions from product-register data are proved.  The construction of the product-register projectors and four-index correlation identity is still the named proof obligation. | `AxiomAudit.lean` checks `NaimarkProductRegisterProjectorData` without `sorryAx`, checks the proved reductions with standard Lean axioms only, and checks `naimarkTensorProductCorrelationDataConstruction` as the expected `sorryAx` site. |
+| `thm:naimark` | Source theorem: simultaneous tensor-product Naimark dilation preserving all bipartite correlations. | `NaimarkTensorProductCorrelationStatement` has the source-shaped conclusion.  `naimarkTensorProductCorrelation` remains proof-ready but depends on the named construction target. | `AxiomAudit.lean` checks the statement without `sorryAx` and checks the theorem as carrying exactly the tracked source-statement proof gap. |
+
+Thus the non-green graph color is not caused by an additional assumption in the
+source theorem.  It records the remaining product-register calculation: place
+each questionwise one-measurement projector in the corresponding finite-function
+auxiliary register, let it act trivially on the other auxiliary coordinates,
+and derive the four-index correlation identity from the one-measurement
+compression identities.
