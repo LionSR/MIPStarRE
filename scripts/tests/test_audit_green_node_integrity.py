@@ -157,6 +157,40 @@ class GreenNodeIntegrityAuditTests(unittest.TestCase):
             audit.has_unfaithful_marker("MIPStarRE.LDT.secondStatement", docstrings)
         )
 
+    def test_nested_block_comment_inside_docstring_is_indexed(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            lean_file = root / "MIPStarRE" / "Foo.lean"
+            lean_file.parent.mkdir(parents=True)
+            lean_file.write_text(
+                textwrap.dedent(
+                    """
+                    namespace MIPStarRE.LDT
+
+                    /--
+                    A source-shaped declaration whose docstring contains a
+                    nested implementation aside: /- nested note -/.
+
+                    **Unfaithful:** The marker still belongs to this declaration.
+                    -/
+                    theorem nestedDocstringStatement (h : P) : Q := by
+                      sorry
+
+                    end MIPStarRE.LDT
+                    """
+                ).strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            docstrings = audit.declaration_docstrings(root)
+
+        self.assertTrue(
+            audit.has_unfaithful_marker(
+                "MIPStarRE.LDT.nestedDocstringStatement", docstrings
+            )
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
