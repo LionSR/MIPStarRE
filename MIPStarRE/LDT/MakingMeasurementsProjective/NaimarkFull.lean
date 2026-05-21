@@ -220,22 +220,6 @@ theorem OneMeasNaimarkData.twoSidedCorrelationPreservation
         rightData.liftedEffect (some b) (i, none) (j, none) =
           rightData.source.effect b i j :=
     OneMeasNaimarkData.compression_none_none rightData b
-  have hleft_comp' :
-      ∀ i j : HA.carrier,
-        leftData.liftedEffect (some a)
-            (i, (none : (oneNaimarkAuxHilbertSpace OutcomeA).carrier))
-            (j, (none : (oneNaimarkAuxHilbertSpace OutcomeA).carrier)) =
-          leftData.source.effect a i j := by
-    intro i j
-    exact hleft_comp i j
-  have hright_comp' :
-      ∀ i j : HB.carrier,
-        rightData.liftedEffect (some b)
-            (i, (none : (oneNaimarkAuxHilbertSpace OutcomeB).carrier))
-            (j, (none : (oneNaimarkAuxHilbertSpace OutcomeB).carrier)) =
-          rightData.source.effect b i j := by
-    intro i j
-    exact hright_comp i j
   unfold ev
   congr 1
   unfold MIPStarRE.Quantum.normalizedTrace
