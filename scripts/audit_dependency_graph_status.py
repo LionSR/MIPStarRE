@@ -32,11 +32,14 @@ from typing import Sequence
 PROOF_FILLED_COLORS = {"#1CAC78", "#9CEC8B"}
 
 ABSENT_LABELS = {
+    "def:main-induction-successor-answer-valued-pasting",
     "def:main-formal-successor-boundary",
     "def:main-formal-step6-successor-targets",
     "def:successor-obligation-reductions",
+    "prop:main-induction-source-range-obligation",
     "prop:main-induction-successor-degree-zero-family",
     "prop:main-formal-source-successor-construction",
+    "thm:main-induction-current-interface",
 }
 
 NOT_PROOF_FILLED_LABELS = {

@@ -56,20 +56,27 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
 
         self.assertEqual(result.findings, ())
 
-    def test_flags_retired_successor_node(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            graph = write_graph(
-                Path(tmp),
-                GOOD_DOT
-                + '"def:successor-obligation-reductions" '
-                '[color=green, fillcolor="#B0ECA3", shape=box, style=filled];',
-            )
+    def test_flags_retired_successor_nodes(self) -> None:
+        retired_labels = [
+            "def:successor-obligation-reductions",
+            "def:main-induction-successor-answer-valued-pasting",
+            "prop:main-induction-source-range-obligation",
+            "thm:main-induction-current-interface",
+        ]
+        for label in retired_labels:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as tmp:
+                graph = write_graph(
+                    Path(tmp),
+                    GOOD_DOT
+                    + f'"{label}" '
+                    '[color=green, fillcolor="#B0ECA3", shape=box, style=filled];',
+                )
 
-            result = run_audit(graph)
+                result = run_audit(graph)
 
-        self.assertEqual(len(result.findings), 1)
-        self.assertEqual(result.findings[0].label, "def:successor-obligation-reductions")
-        self.assertEqual(result.findings[0].kind, "retired-node-present")
+            self.assertEqual(len(result.findings), 1)
+            self.assertEqual(result.findings[0].label, label)
+            self.assertEqual(result.findings[0].kind, "retired-node-present")
 
     def test_flags_proof_filled_frontier_node(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

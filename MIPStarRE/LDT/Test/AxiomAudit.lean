@@ -137,8 +137,8 @@ The audit for `MainInductionStep.mainInduction` records that the corrected
 large-`k` Lean interface to `thm:main-induction` is now proved.  The
 source-labelled blueprint theorem uses the same corrected hypothesis
 `k ≥ 400 m d`.  The scalar side-condition discrepancy is recorded in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex` as a confirmed bug in the
-printed theorem statement.
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` as a confirmed statement
+gap in the printed theorem statement.
 
 The audit for
 `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction` records
