@@ -131,24 +131,23 @@ the final envelope.  The printed theorem should therefore be read as missing
 both the factor-\(400\) strengthening and the nonzero sampling-parameter
 boundary for the present proof route.  The factor-\(400\) strengthening is now
 treated as a confirmed statement correction, not as a proof obligation for the
-interval \(md\le k<400md\).  The degenerate case \(k=0\) when \(d=0\) remains a
-separate final-theorem boundary.  A trivial construction is used only when the
-final error parameter is already at least \(1\), in which case the consistency
-conclusion is saturated.
+interval \(md\le k<400md\).  The degenerate case \(k=0\) when \(d=0\) is handled
+as the separate statement correction documented in
+\path{docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex}.  A trivial
+construction is used only when the final error parameter is already at least
+\(1\), in which case the consistency conclusion is saturated.
 \footnote{After the 2026-05-22 statement correction, the source-labelled
 blueprint theorem for main induction links to the corrected Lean statement
 \leanid{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement}.  The
 main formal source theorem links to
 \leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement}.  The final source
-theorem routes its remaining boundary work through the named
+theorem routes through the named
 wrapper \leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation}; its
-saturated-error branch is proved, and its remaining branch is
+saturated-error branch is proved, and its non-vacuous branch is
 \leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}.  The
-nonzero-\(k\) branch of this remaining final-theorem wrapper is reduced to the
-checked role-register scalar absorption theorem
+small-error branch is reduced to the checked role-register scalar absorption
+theorem under the corrected nonzero sampling hypothesis
 \leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary};
-the direct final-theorem proof hole is now the zero-sampling boundary
-\leanid{MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation}.
 The scalar lemma \leanid{MIPStarRE.LDT.Test.mainFormalError_zero_k} records
 that the displayed final-theorem error is exactly zero at \(k=0\).
 The Lean theorem \leanid{MIPStarRE.LDT.Test.mainFormal} assumes
@@ -157,9 +156,8 @@ The Lean theorem \leanid{MIPStarRE.LDT.Test.mainFormal} assumes
 the corresponding large-\(k\) hypothesis.  The final assembly in
 \path{MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean} no longer depends on an
 unfinished corrected large-\(k\) Section~6 successor construction.  The
-remaining direct proof obligation in this neighborhood is the final
-zero-sampling boundary; it is distinct from the checked nonzero-\(k\)
-role-register scalar absorption.}
+zero-sampling boundary has likewise been removed from the source statement by
+the explicit hypothesis \(0<k\).}
 
 \section{Non-vacuity of the discarded printed interval}
 
@@ -199,7 +197,8 @@ Taking again \(m=2\), \(k=2d\), \(d\) sufficiently large, and then \(q\)
 sufficiently large, with \(\varepsilon=0\), gives examples in the printed
 interval \(md\le k<400md\) where this final error is below \(1\).  Hence the
 factor-\(400\) correction is also necessary for the final theorem route; after
-this correction, the remaining final boundary is the zero-sampling case.
+this correction, the zero-sampling boundary is handled by the separate
+nonzero-\(k\) correction.
 
 \section{Conclusion}
 
@@ -210,14 +209,16 @@ genuine theorem-level side-condition gap in the stated proof.  The hypothesis
 large-\(k\) hypothesis required by the pasting theorem.  The current blueprint
 therefore records the confirmed correction directly in the source-labelled
 main-induction statement.  The final theorem route records the same large-\(k\)
-correction and keeps the \(k>0\) scalar-cascade boundary as a separate remaining
-issue.
+correction; the zero-sampling obstruction is handled by the separate nonzero
+sampling correction recorded in
+\texttt{docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex}.
 
 This correction does not assert that the mathematical conclusion is false for
 \(md\le k<400md\).  It says that the cited proof route through the stated
 pasting theorem does not establish that range.  The formalization therefore
 uses the large-\(k\) theorem that the proof actually supports.  The separate
-\(k=0\) boundary allowed when \(d=0\) remains tracked for the final theorem.
+\(k=0\) boundary allowed when \(d=0\) is excluded from the corrected final
+theorem statement by the hypothesis \(0<k\).
 
 \bibliographystyle{alpha}
 \bibliography{references}

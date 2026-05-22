@@ -104,18 +104,18 @@ including the term involving \(\eps\).
 
 \section{Comparison with the blueprint and formalization}
 
-The formalization currently keeps the printed theorem visible as a
-source-shaped statement and isolates this boundary as the declaration
-\leanid{mainFormal\_sourceZeroKBoundaryObligation}.  The scalar equality
-\leanid{mainFormalError\_zero\_k} records the formal calculation that the
-advertised error is zero at \(k=0\).
+The formalization now treats this boundary as a source-statement correction.
+The corrected Lean declaration
+\leanid{MIPStarRE.LDT.Test.mainFormal\_sourceStatement} assumes \(0<k\), in
+addition to the separately confirmed large-\(k\) condition recorded in
+\path{docs/paper-gaps/issue-906-main-formal-k-bound.tex}.  Under this corrected
+statement the source wrapper and its small-error branch are proved by the
+two-space role-register route and the scalar-cascade absorption theorem.
 
-The nonzero branch is of a different nature.  Once \(0<k\) is available, the
-current role-register and scalar-cascade route gives the final source-shaped
-conclusion, up to the inherited Section~6 source-range issue documented in
-\path{docs/paper-gaps/issue-906-main-formal-k-bound.tex}.  The zero-sampling
-boundary is therefore not another request for a package or bridge input; it is
-a statement-level boundary case.
+The scalar equality \leanid{mainFormalError\_zero\_k} remains as the formal
+calculation explaining why the excluded boundary is singular: the advertised
+error is zero at \(k=0\).  Thus the zero-sampling boundary is not another
+request for a package or bridge input; it is a statement-level correction.
 
 \section{Conclusion}
 
@@ -125,9 +125,9 @@ test-passing hypothesis with arbitrary \(\eps\) does not force exact agreement
 with a constant polynomial measurement.  A source-faithful formal theorem must
 therefore either include a justified nonzero sampling condition, such as
 \(0<k\), or replace the zero-boundary conclusion by a statement whose error
-does not vanish at \(k=0\).  The existing Lean declaration
-\leanid{mainFormal\_sourceZeroKBoundaryObligation} should not be treated as a
-proof obligation dischargeable by further packaging.
+does not vanish at \(k=0\).  The present formalization takes the first route:
+the corrected source theorem assumes \(0<k\), and the former zero-boundary
+obligation has been removed rather than discharged by further packaging.
 
 \bibliographystyle{alpha}
 \bibliography{references}

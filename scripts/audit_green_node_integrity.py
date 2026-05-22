@@ -70,6 +70,14 @@ ALLOWED_SOURCE_WARNINGS = {
         "MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput."
         "averagedPoint_le_witness",
     ),
+    (
+        "prop:main-formal-source-obligation",
+        "MIPStarRE.LDT.Test.mainFormal_sourceObligation",
+    ),
+    (
+        "prop:main-formal-source-small-error-obligation",
+        "MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation",
+    ),
 }
 
 ALLOWED_SOURCE_SIGNATURE_WARNINGS = {
@@ -200,16 +208,7 @@ ALLOWED_SOURCE_SIGNATURE_WARNINGS = {
     ),
 }
 
-ALLOWED_SOURCE_UNFAITHFUL = {
-    (
-        "thm:main-formal",
-        "MIPStarRE.LDT.Test.mainFormal_sourceStatement",
-    ),
-    (
-        "thm:main-formal-current-interface",
-        "MIPStarRE.LDT.Test.mainFormal",
-    ),
-}
+ALLOWED_SOURCE_UNFAITHFUL = set()
 
 
 ENV_RE = re.compile(

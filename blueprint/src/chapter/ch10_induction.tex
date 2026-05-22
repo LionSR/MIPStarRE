@@ -1070,12 +1070,13 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	widening.  Its completion step uses only the formal monotonicity helper
 	\texttt{ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj\_left\_matchMass\_ge},
 	not a separate exact match-mass witness route.
-	No proof-level completeness tag is claimed here while \texttt{mainFormal}
-	itself has tracked source-boundary proof debt in the final theorem boundary
-	tracked in issue~\#422.
+	For the corrected boundary assumptions \(k \ge 400md\) and \(k>0\), the
+	source theorem now has a checked proof-level route.
 
 \end{remark}
 \begin{proof}
+	\lean{MIPStarRE.LDT.Test.mainFormal_sourceStatement}
+	\leanok
 	\proves{thm:main-formal}
 	\uses{thm:main-induction, lem:role-register-symmetrization, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual, def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
 	Let
