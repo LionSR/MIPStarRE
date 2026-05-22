@@ -121,24 +121,27 @@ The largest clusters are:
    `SelfImprovementData`, and `AveragedPastingData`.  This node is a checked
    assembly boundary, not the source theorem itself.
 
-3. `def:main-formal-step6-constructions`, the base-case Step 6
-   constructions, with role-measurement, orthonormalization, and
-   projective-completion witness vocabulary.  The former
-   `def:main-formal-successor-boundary` node has been retired from the local
-   blueprint graph; its recursive-slice targets are now described only in an
-   unnumbered remark.  The Chapter 10 instances are classified in
+3. The former base-case Step 6 construction list, now
+   `rem:main-formal-step6-constructions`, with role-measurement,
+   orthonormalization, and projective-completion witness vocabulary.  This is
+   now an ordinary remark rather than a green definition node.  The former
+   `def:main-formal-successor-boundary` node has also been retired from the
+   local blueprint graph; its recursive-slice targets are now described only in
+   an unnumbered remark.  The Chapter 10 instances are classified in
    `docs/reports/issue-1458-ch10-green-internal-nodes.md`.
 
-4. Chapter 7 self-improvement implementation remarks, including
+4. Chapter 7 self-improvement implementation remarks, formerly including
    `SdpStatementWithSlackness`, `MatrixSdpStatementWithSlacknessAndDominance`,
    `SelfImprovementHelperConclusion`, and the final-field helper declarations.
-   These are implementation interfaces for the self-improvement proof.  They
-   should stay separated from the source theorem boundary.
+   These are now ordinary remarks without active Lean metadata, separated from
+   the source theorem boundary.
 
 5. Chapter 4 implementation remarks around residual domination, right-register
    completion, and projective-non-measurement auxiliary conversions.  These
    include `hresidual`, `OrthonormalizeAndCompleteStatement`,
-   `AlmostProjMeasStatement`, and `SpectralTruncationStatement`.
+   `AlmostProjMeasStatement`, and `SpectralTruncationStatement`.  The
+   entries whose labels begin with `rem:` are now ordinary remarks rather than
+   green definition nodes.
 
 The exact active `\leanok` nodes whose Lean names contain high-risk vocabulary
 are recorded in

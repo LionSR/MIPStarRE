@@ -366,7 +366,7 @@
 	internal answer-valued induction theorem.  That theorem supplies the
 	predecessor induction argument for the restricted slices by a genuine strong
 	induction on the dimension.  The answer-valued pasting invocation is recorded
-	in Definition~\ref{def:main-induction-successor-answer-valued-pasting},
+	in Proposition~\ref{prop:main-induction-successor-answer-valued-pasting},
 	and the answer-valued self-improvement construction is checked by
 	Proposition~\ref{prop:main-induction-successor-answer-slice-realization}.
 	This is a construction internal to the proof, not an assumption of
@@ -376,7 +376,9 @@
 \end{proposition}
 \begin{proof}
 	\leanok
-	\uses{prop:main-induction-successor-predecessor-induction, prop:main-induction-successor-answer-slice-realization, def:main-induction-successor-answer-valued-pasting}
+	\uses{prop:main-induction-successor-predecessor-induction,
+		prop:main-induction-successor-answer-slice-realization,
+		prop:main-induction-successor-answer-valued-pasting}
 	The checked assembly theorem
 	\texttt{mainInductionSuccessorNext\_ofSmallErrorConstruction\_ofAnswerCarrier}
 	reduces the ordinary branch to the answer-valued induction theorem.  The
@@ -449,7 +451,7 @@
 	restricted slice.
 \end{proof}
 
-\begin{definition}[Lean answer-valued pasting construction for the successor step]\label{def:main-induction-successor-answer-valued-pasting}
+\begin{proposition}[Answer-valued pasting construction for the successor step]\label{prop:main-induction-successor-answer-valued-pasting}
 	\uses{thm:ld-pasting-in-induction-section, prop:main-induction-successor-predecessor-induction, prop:main-induction-successor-answer-slice-realization}
 	\lean{MIPStarRE.LDT.MainInductionStep.answerLdPastingInInductionSectionOfSmallError}
 	\leanok
@@ -471,7 +473,7 @@
 	construction for the simultaneous successor proof, not a new hypothesis of
 	Theorem~\ref{thm:main-induction} and not a replacement for
 	Theorem~\ref{thm:ld-pasting-in-induction-section}.
-\end{definition}
+\end{proposition}
 \begin{proof}
 	\leanok
 	\uses{thm:ld-pasting-in-induction-section}
@@ -852,15 +854,7 @@
 	should be proved in the successor branch rather than represented as a
 	hypothesis in the statement of Theorem~\ref{thm:main-formal}.
 
-\begin{definition}[Lean base-case Step~6 constructions for the Section~3 proof]\label{def:main-formal-step6-constructions}
-	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
-	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency}
-	\lean{MIPStarRE.LDT.Test.mainFormalBaseRoleInductionWitness}
-	\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness}
-	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
-	\leanok
-	\uses{thm:orthonormalization}
+\begin{remark}[Lean base-case Step~6 constructions for the Section~3 proof]\label{rem:main-formal-step6-constructions}
 	From a line-130 consistency relation, the theorem
 	\texttt{MainFormalDiagonalOrthonormalizationWitness.nonempty\_ofDiagonalConsistency}
 	constructs the pre-completion projective submeasurements using the Section~5
@@ -884,7 +878,7 @@
 	The successor-dependent targets that call
 	Theorem~\ref{thm:main-induction-current-interface} are described below; they carry the
 	checked successor construction for the corrected large-\(k\) interface.
-\end{definition}
+\end{remark}
 
 
 \paragraph{Lean successor-dependent Step~6 targets.}

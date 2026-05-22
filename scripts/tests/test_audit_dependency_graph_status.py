@@ -33,7 +33,6 @@ graphContainer.graphviz().renderDot(`strict digraph "" {{ {dot} }}`).on("end", i
 
 GOOD_DOT = r'''
 "thm:naimark" [color=green, fillcolor="#1CAC78", label=naimark, shape=ellipse, style=filled];
-"rem:lean-naimark-auxiliary-declarations" [color=green, fillcolor="#B0ECA3", label="lean-naimark-auxiliary-declarations", shape=box, style=filled];
 "thm:main-formal" [color=blue, label="main-formal", shape=ellipse];
 "thm:main-induction" [color=blue, label="main-induction", shape=ellipse];
 "thm:main-formal-current-interface" [color=green, fillcolor="#1CAC78", label="main-formal-current-interface", shape=ellipse, style=filled];
@@ -47,7 +46,6 @@ GOOD_DOT = r'''
 "prop:main-induction-successor-predecessor-induction" [color=green, fillcolor="#1CAC78", label="main-induction-successor-predecessor-induction", shape=ellipse, style=filled];
 "prop:main-induction-successor-answer-valued-pasting" [color=green, fillcolor="#1CAC78", label="main-induction-successor-answer-valued-pasting", shape=ellipse, style=filled];
 "prop:main-induction-successor-answer-slice-realization" [color=blue, label="main-induction-successor-answer-slice-realization", shape=ellipse];
-"thm:naimark" -> "rem:lean-naimark-auxiliary-declarations" [style=dashed];
 '''
 
 

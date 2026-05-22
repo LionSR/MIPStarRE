@@ -61,7 +61,6 @@ PROOF_FILLED_LABELS = {
 }
 
 GREEN_BORDER_LABELS = {
-    "rem:lean-naimark-auxiliary-declarations",
     "thm:naimark",
 }
 
