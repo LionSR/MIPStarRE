@@ -1487,7 +1487,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>   This is the nontrivial successor branch in the corrected large-\(k\) induction interface. The ordinary successor theorem now reduces to the internal answer-valued induction theorem. That theorem supplies the predecessor induction argument for the restricted slices by a genuine strong induction on the dimension. The answer-valued pasting invocation is recorded in Proposition&#160;<a href="sec-induction.html#prop:main-induction-successor-answer-valued-pasting">10.20</a>, and the answer-valued self-improvement construction is checked by Proposition&#160;<a href="sec-induction.html#prop:main-induction-successor-answer-slice-realization">10.19</a>. This is a construction internal to the proof, not an assumption of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. The recursive slice route applies also when \(d=0\); there is no longer a separate degree-zero family obligation in this successor reduction. </p>
+  <p>   This is the nontrivial successor branch in the corrected large-\(k\) induction interface. The ordinary successor theorem now reduces to the internal answer-valued induction theorem. That theorem supplies the predecessor induction argument for the restricted slices by a genuine strong induction on the dimension. The answer-valued pasting invocation is recorded in Definition&#160;<a href="sec-induction.html#def:main-induction-successor-answer-valued-pasting">10.20</a>, and the answer-valued self-improvement construction is checked by Proposition&#160;<a href="sec-induction.html#prop:main-induction-successor-answer-slice-realization">10.19</a>. This is a construction internal to the proof, not an assumption of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. The recursive slice route applies also when \(d=0\); there is no longer a separate degree-zero family obligation in this successor reduction. </p>
 
   </div>
 </div>
@@ -1499,7 +1499,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The checked assembly theorem <span class="ttfamily">mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier</span> reduces the ordinary branch to the answer-valued induction theorem. The answer-valued induction theorem supplies the predecessor argument internally; the answer-valued slice self-improvement construction and the averaged family-field assembly are checked, and the answer-valued pasting proposition below supplies the final pasting input. </p>
+  <p> The checked assembly theorem <span class="ttfamily">mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier</span> reduces the ordinary branch to the answer-valued induction theorem. The answer-valued induction theorem supplies the predecessor argument internally; the answer-valued slice self-improvement construction and the averaged family-field assembly are checked, and the answer-valued pasting construction below supplies the final pasting input. </p>
 
   </div>
 </div>
@@ -1663,13 +1663,13 @@
 
   </div>
 </div>
-<div class="proposition_thmwrapper theorem-style-plain" id="prop:main-induction-successor-answer-valued-pasting">
-  <div class="proposition_thmheading">
-    <span class="proposition_thmcaption">
-    Proposition
+<div class="definition_thmwrapper theorem-style-definition" id="def:main-induction-successor-answer-valued-pasting">
+  <div class="definition_thmheading">
+    <span class="definition_thmcaption">
+    Definition
     </span>
-    <span class="proposition_thmlabel">10.20</span>
-    <span class="proposition_thmtitle">Answer-valued pasting for the successor step</span>
+    <span class="definition_thmlabel">10.20</span>
+    <span class="definition_thmtitle">Lean answer-valued pasting construction for the successor step</span>
     <div class="thm_header_extras">
 
     
@@ -1677,7 +1677,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="sec-induction.html#prop:main-induction-successor-answer-valued-pasting">#</a>
+    <a class="icon proof" href="sec-induction.html#def:main-induction-successor-answer-valued-pasting">#</a>
     
     <a class="icon proof" href="sec-induction.html#a0000000626"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
@@ -1731,9 +1731,9 @@
     
         </div>
   </div>
-  <div class="proposition_thmcontent">
+  <div class="definition_thmcontent">
   <p>   After the recursive answer-valued slice measurements and the slice-wise self-improvement outputs have been averaged, Lean has a polynomial family which is complete, point-consistent with the actual answer-valued point measurement, strongly self-consistent, and bounded by the witnesses obtained from self-improvement. The boundedness input is presently typed through the point-equivalent ordinary carrier, because the existing boundedness interface for pasting is an ordinary-strategy interface. </p>
-<p>The final induction-section pasting invocation is proved by first deriving the answer-valued Section&#160;10 point-commutativity estimate from the answer-valued diagonal-line verifier relation, then invoking the Section&#160;11 scalar chain in the form which assumes this point-commutativity estimate. The proof does not replace the answer-valued strategy by the ordinary carrier for the diagonal-line test; the carrier is used only for the ordinary boundedness interface. This proposition is therefore a Lean-only internal construction for the simultaneous successor proof, not a new hypothesis of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> and not a replacement for Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.8</a>. </p>
+<p>The final induction-section pasting invocation is proved by first deriving the answer-valued Section&#160;10 point-commutativity estimate from the answer-valued diagonal-line verifier relation, then invoking the Section&#160;11 scalar chain in the form which assumes this point-commutativity estimate. The proof does not replace the answer-valued strategy by the ordinary carrier for the diagonal-line test; the carrier is used only for the ordinary boundedness interface. This construction is therefore a Lean-only internal construction for the simultaneous successor proof, not a new hypothesis of Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> and not a replacement for Theorem&#160;<a href="sec-induction.html#thm:ld-pasting-in-induction-section">10.8</a>. </p>
 
   </div>
 </div>
