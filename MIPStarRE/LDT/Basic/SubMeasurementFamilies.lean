@@ -353,6 +353,25 @@ noncomputable def transport {α β : Type*} {ι : Type*}
     intro b
     simpa using A.proj (e.symm b)
 
+@[simp] theorem transport_trivialDistinguishedOutcome {α ι : Type*}
+    [Fintype α] [Fintype ι] [DecidableEq ι]
+    (e : α ≃ α) (a₀ : α) :
+    transport e (trivialDistinguishedOutcome (ι := ι) a₀) =
+      trivialDistinguishedOutcome (e a₀) := by
+  classical
+  ext a i j
+  by_cases h : a = e a₀
+  · simp [transport, Measurement.transport, SubMeas.transport,
+      trivialDistinguishedOutcome, Measurement.trivialDistinguishedOutcome, h]
+  · have hs : e.symm a ≠ a₀ := by
+      intro hs
+      apply h
+      calc
+        a = e (e.symm a) := by simp
+        _ = e a₀ := by rw [hs]
+    simp [transport, Measurement.transport, SubMeas.transport,
+      trivialDistinguishedOutcome, Measurement.trivialDistinguishedOutcome, h, hs]
+
 @[simp] theorem transport_toSubMeas {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
     (e : α ≃ β) (A : ProjMeas α ι) :

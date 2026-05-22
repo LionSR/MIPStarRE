@@ -38,7 +38,7 @@ variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 This helper is the final `error ≤ mainInductionError` cleanup step only; the
 actual Section 6 construction is carried by `mainInductionBaseCase`,
-`mainInduction` and its successor proof gap. -/
+`mainInduction`, and the source-range wrappers in `SourceTheorems.lean`. -/
 theorem mainInductionOfWitness
     (params : Parameters)
     [FieldModel params.q]
@@ -178,6 +178,38 @@ theorem selfImprovementInInductionSection
       SelfImprovementInInductionSectionConclusion params strategy G.toSubMeas H Z
         eps delta gamma nu := by
   rcases SelfImprovement.selfImprovement params strategy eps delta gamma nu hgood G hcons with
+    ⟨H, Z, hfinal⟩
+  exact ⟨H, Z,
+    selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
+      params strategy eps delta gamma nu G.toSubMeas G H Z hfinal⟩
+
+/-- Induction-section self-improvement using only the two strategy bounds
+consumed by Section 9.
+
+Paper origin: `references/ldt-paper/self_improvement.tex:631-811`.
+
+This is a formalization-only strengthening of
+`selfImprovementInInductionSection`.  The paper states the theorem in the
+standing context of an `(eps, delta, gamma)`-good strategy, but the displayed
+self-improvement construction uses the axis-parallel and point
+self-consistency bounds and its conclusion is independent of the diagonal-line
+error parameter. -/
+theorem selfImprovementInInductionSection_of_axisParallel_selfConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself : strategy.selfConsistencyFailureProbability ≤ delta)
+    (G : Measurement (Polynomial params) ι)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementInInductionSectionConclusion params strategy G.toSubMeas H Z
+        eps delta gamma nu := by
+  rcases SelfImprovement.selfImprovement_of_axisParallel_selfConsistency
+      params strategy eps delta gamma nu haxis hself G hcons with
     ⟨H, Z, hfinal⟩
   exact ⟨H, Z,
     selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion

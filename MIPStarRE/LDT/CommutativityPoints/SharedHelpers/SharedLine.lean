@@ -163,7 +163,7 @@ private noncomputable def pointPairSharedDiagonalLine_ignore_second_equiv
       congrArg (fun q => (q.1, q.2.1))
         (sharedDiagonalLineQuestionOfPointPair_of_line params ℓ t)
 
-private lemma avgOver_pointPairSharedDiagonalLine_ignore_first
+lemma avgOver_pointPairSharedDiagonalLine_ignore_first
     (params : Parameters)
     [FieldModel params.q]
     (f : PointDiagonalLineQuestion params → Error) :
@@ -185,7 +185,7 @@ private lemma avgOver_pointPairSharedDiagonalLine_ignore_first
     _ = avgOver (pointWithDiagonalLineDistribution params) f := by
           simp [pointWithDiagonalLineDistribution]
 
-private lemma avgOver_pointPairSharedDiagonalLine_ignore_second
+lemma avgOver_pointPairSharedDiagonalLine_ignore_second
     (params : Parameters)
     [FieldModel params.q]
     (f : PointDiagonalLineQuestion params → Error) :

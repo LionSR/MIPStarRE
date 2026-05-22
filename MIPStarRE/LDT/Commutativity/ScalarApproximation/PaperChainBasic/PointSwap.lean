@@ -13,6 +13,7 @@ namespace MIPStarRE.LDT.Commutativity
 open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
+open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -62,12 +63,17 @@ private lemma qSDDOp_rightPlaced_eq_leftPlaced
               (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) D (1 : MIPStarRE.Quantum.Op ι))]
           rw [leftTensor_mul_leftTensor]
 
-lemma evaluatedSlice_phaseFour_pointSwap_right_bound
+lemma evaluatedSlice_phaseFour_pointSwap_right_bound_of_commutativityPoints
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
+    (gamma : Error)
     (hnorm : strategy.state.IsNormalized)
-    (hgood : strategy.IsGood eps delta gamma)
+    (hcomm :
+      SDDOpRel strategy.state
+        (uniformDistribution (PointPairQuestion params.next))
+        (pointMeasurementProductLeft params.next strategy)
+        (pointMeasurementProductRight params.next strategy)
+        (commutativityPointsError params.next gamma))
     (C : EvaluatedSliceQuestion params →
       EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι))
     (hC : ∀ q, ∑ ab : EvaluatedSliceOutcome params, C q ab * (C q ab)ᴴ ≤ 1) :
@@ -117,8 +123,7 @@ lemma evaluatedSlice_phaseFour_pointSwap_right_bound
   have hleft :
       SDDOpRel strategy.state 𝒟 Lord Lrev (commutativityPointsError params.next gamma) := by
     simpa [𝒟, Lord, Lrev, pointMeasurementProductLeft, pointMeasurementProductRight,
-      EvaluatedSliceQuestion, EvaluatedSliceOutcome, Parameters.next] using
-      (commutativityPoints (params := params.next) strategy eps delta gamma hgood)
+      EvaluatedSliceQuestion, EvaluatedSliceOutcome, Parameters.next] using hcomm
   have hleft_symm :
       SDDOpRel strategy.state 𝒟 Lrev Lord (commutativityPointsError params.next gamma) := by
     exact sddOpRel_symm strategy.state 𝒟 Lord Lrev
@@ -173,5 +178,37 @@ lemma evaluatedSlice_phaseFour_pointSwap_right_bound
           rw [hring, Real.sqrt_mul (show 0 ≤ (32 : Error) by positivity)]
     _ ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
           exact mul_le_mul_of_nonneg_right hsqrt32_le_six (Real.sqrt_nonneg _)
+
+lemma evaluatedSlice_phaseFour_pointSwap_right_bound
+    (params : Parameters) [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (C : EvaluatedSliceQuestion params →
+      EvaluatedSliceOutcome params → MIPStarRE.Quantum.Op (ι × ι))
+    (hC : ∀ q, ∑ ab : EvaluatedSliceOutcome params, C q ab * (C q ab)ᴴ ≤ 1) :
+    let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
+    let inserted : EvaluatedSliceQuestion params → Error := fun q =>
+      ∑ ab : EvaluatedSliceOutcome params,
+        ev strategy.state
+          (C q ab *
+            rightTensor (ι₁ := ι)
+              (((evaluatedSlicePointMeas params strategy q.2).outcome ab.2) *
+               ((evaluatedSlicePointMeas params strategy q.1).outcome ab.1)))
+    let swapped : EvaluatedSliceQuestion params → Error := fun q =>
+      ∑ ab : EvaluatedSliceOutcome params,
+        ev strategy.state
+          (C q ab *
+            rightTensor (ι₁ := ι)
+              (((evaluatedSlicePointMeas params strategy q.1).outcome ab.1) *
+               ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2)))
+    |avgOver 𝒟 inserted - avgOver 𝒟 swapped| ≤
+      6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
+  exact
+    evaluatedSlice_phaseFour_pointSwap_right_bound_of_commutativityPoints
+      params strategy gamma hnorm
+      (commutativityPoints (params := params.next) strategy eps delta gamma hgood)
+      C hC
 
 end MIPStarRE.LDT.Commutativity

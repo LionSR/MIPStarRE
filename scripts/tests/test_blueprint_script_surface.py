@@ -21,6 +21,14 @@ BLUEPRINT_SUPPORT_SCRIPTS = {
         "tests": {"scripts/tests/test_blueprint_leanok_axioms.py"},
         "workflows": {".github/workflows/blueprint-sync.yml"},
     },
+    "scripts/audit_blueprint_high_risk_links.py": {
+        "tests": {"scripts/tests/test_audit_blueprint_high_risk_links.py"},
+        "workflows": set(),
+    },
+    "scripts/audit_dependency_graph_status.py": {
+        "tests": {"scripts/tests/test_audit_dependency_graph_status.py"},
+        "workflows": set(),
+    },
     "scripts/check_blueprint_latex.py": {
         "tests": {"scripts/tests/test_check_blueprint_latex.py"},
         "workflows": set(),
@@ -212,7 +220,11 @@ class BlueprintScriptSurfaceTests(unittest.TestCase):
         candidates = {
             path.relative_to(PROJECT_ROOT).as_posix()
             for path in (PROJECT_ROOT / "scripts").glob("*.py")
-            if "blueprint" in path.name or path.name == "tex_utils.py"
+            if (
+                "blueprint" in path.name
+                or path.name == "audit_dependency_graph_status.py"
+                or path.name == "tex_utils.py"
+            )
         }
 
         self.assertEqual(candidates, set(BLUEPRINT_SUPPORT_SCRIPTS))

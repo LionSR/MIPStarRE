@@ -51,6 +51,15 @@
 > theorem statements visible and to represent the remaining Section 6 analytic
 > derivation by the tracked `sorry` site until it is proved.
 >
+> **Status note, 2026-05-22.**  The Section 6 corrected large-\(k\) successor
+> construction has since been proved.  Later table rows that describe
+> `answerMainInductionSuccessorNext_ofSmallErrorConstruction` as a remaining
+> proof obligation are historical.  The current live direct proof holes are the
+> printed source-range obligation
+> `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`
+> and the final two-space source-boundary obligation
+> `Test.mainFormal_sourceSmallErrorObligation`.
+>
 > The same day, the orthonormalization-input cleanup removed the former
 > `SelfImprovement.HelperStrongSelfConsistencyInput`,
 > `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`,
@@ -76,7 +85,9 @@ This executive summary is historical.  The
 old downstream Section 3/6 wiring have been removed.  The current invariant is
 that paper-facing theorem statements retain the paper hypotheses.  The Section
 9 and induction-section self-improvement derivations are now checked in Lean;
-the live proof gap lies in the Section 6 small-error successor construction.
+the corrected large-\(k\) Section 6 small-error successor construction is also
+now checked.  The live proof gaps are the printed source range for
+`thm:main-induction` and the final two-space source-boundary theorem.
 
 In the audited snapshot, the `SelfImprovementObligations` record (the three
 Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and
@@ -406,7 +417,7 @@ These were the obligation constructors for the two historical proposed
 | `self_improvement_helper_with_slackness` variants | Internal SelfImprovement route; not a public substitute for `selfImprovement` |
 | Internal SelfImprovement sub-lemmas (HelperCompleteness, PointConsistency, etc.) | All proved (conditional) |
 | Pasting theorem (`ldPasting`) | Fully proved, fully wired |
-| MainInductionStep assembly (`mainInductionSuccessorNext_ofSmallErrorConstruction`) | Remaining Section 6 small-error successor proof obligation |
+| MainInductionStep assembly (`answerMainInductionSuccessorNext_ofSmallErrorConstruction`) | Historical Section 6 answer-valued small-error successor obligation; now proved in the corrected large-\(k\) route |
 
 ---
 
@@ -498,13 +509,16 @@ hypotheses.
 
 5. **Fix #1377** (universe mismatch) — prerequisite for #1035, likely a small type-level fix.
 
-6. **Prove #1375** (concrete `SymStrat` construction) — the construction from answer-valued restricted strategies to ordinary symmetric strategies. This is the most load-bearing missing piece for the answer-valued slice interface.
+6. **Answer-valued slice self-improvement interface** — discharged by the
+   carrier route `AnswerSelfImprovementData.ofAnswerCarrier`.  A low-degree
+   support theorem would still be needed for the stronger ordinary-realization
+   route, but it is not needed for the active successor reduction.
 
 7. **Continue the Section 6 successor construction** (#1507), including the
-   degree-zero family and scalar construction, the predecessor induction input,
-   and the positive-degree answer-valued slice realization.  The former #1515
-   and #1503 self-improvement gaps should not be reopened as live bridge
-   obligations.
+   predecessor induction input.  The
+   former #1515 and #1503 self-improvement gaps should not be reopened as live
+   bridge obligations, and the former degree-zero family branch has been retired
+   by the recursive-slice reduction.
 
 8. **Prove #1035** (recursive `mainFormal`) — the fixed-point that ties the induction together.
 
@@ -528,7 +542,7 @@ hypotheses.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` | `selfImprovementInInductionSection`, ordinary slice transport, and ordinary self-improvement data constructors |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` | Answer-valued slice transport and answer-valued self-improvement data constructors |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` | Stage-data constructors, including conversion from answer-valued to ordinary self-improvement data |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, and the remaining `mainInductionSuccessorNext_ofSmallErrorConstruction` proof obligation |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, and the remaining `answerMainInductionSuccessorNext_ofSmallErrorConstruction` proof obligation |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Source-final statement and obligation, current same-space interface, and proved final transport |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Role-register witness constructors routed through Section 6 `mainInduction` |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | Ordinary restricted-slice weighted bounds and recursive-slice targets |

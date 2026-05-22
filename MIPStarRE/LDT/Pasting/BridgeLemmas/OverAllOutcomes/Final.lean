@@ -418,6 +418,118 @@ private lemma overAllOutcomes_of_reverse_mass_bound
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg)
   exact abs_le.mpr ⟨by linarith, hforward⟩
 
+/-- Internal form of `lem:over-all-outcomes` from the one-point sandwich
+estimates.
+
+The proof of the mass comparison uses the estimates
+`lem:ld-sandwich-line-one-point` in the interpolation-eligible case.  Once those
+estimates are supplied explicitly, the remaining argument only needs
+nonnegativity of the scalar error parameters and the usual degree and field-size
+side conditions. -/
+lemma overAllOutcomes_ofLinePointBounds
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (k : ℕ)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
+  have hreverse :
+      overAllOutcomesExpansionMass params strategy family k -
+          overAllOutcomesPastedMass params strategy family k ≤
+        overAllOutcomesError params eps delta gamma zeta k := by
+    by_cases hkEligible : params.d + 1 ≤ k
+    · have hnonglobal := overAllOutcomes_distinct_nonglobal_mass_bound
+        params strategy family eps delta gamma zeta k hd
+        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
+      exact overAllOutcomes_reverse_mass_bound_of_nonglobal_mass_bound
+        params strategy family eps delta gamma zeta k hd hdq_le hkEligible
+        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hnonglobal
+    · exact overAllOutcomes_reverse_mass_bound_of_not_d_add_one_le
+        params strategy family eps delta gamma zeta k hkEligible
+        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+  exact overAllOutcomes_of_reverse_mass_bound params strategy family
+    eps delta gamma zeta k hd heps_nonneg hdelta_nonneg hgamma_nonneg
+    hzeta_nonneg hreverse
+
+/-- Internal form of `lem:over-all-outcomes` from `cor:G-hat-facts`. -/
+lemma overAllOutcomes_ofGHatFacts_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
+    (k : ℕ) :
+    OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      haxis
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hself_good
+  have hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+    intro i hi
+    exact ldSandwichLineOnePoint_ofGHatFacts_of_axis_self params strategy
+      eps delta gamma zeta haxis hself_good hgamma_nonneg hzeta_le
+      family hcons hfacts k i hi
+  exact overAllOutcomes_ofLinePointBounds params strategy eps delta gamma zeta
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hdq_le hd family k hline
+
+/-- Internal form of `lem:over-all-outcomes` from the Section 11 commutativity
+conclusion. -/
+lemma overAllOutcomes_ofComMain_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
+    (k : ℕ) :
+    OverAllOutcomesStatement params strategy family eps delta gamma zeta k := by
+  have hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
+    gHatFacts_ofComMainAndSelfConsistency params strategy family gamma zeta
+      hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcom hself
+  exact overAllOutcomes_ofGHatFacts_of_axis_self params strategy
+    eps delta gamma zeta haxis hself_good hgamma_nonneg hzeta_nonneg hzeta_le
+    hdq_le hd family hcons hfacts k
+
 /-- `lem:over-all-outcomes`. -/
 lemma overAllOutcomes
     (params : Parameters)

@@ -39,12 +39,13 @@ lemma ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas
     postprocessMeasurement]
   rfl
 
-lemma ldSandwichLineOnePoint_endpoint_ldGbcon
+lemma ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (eps delta zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself : strategy.selfConsistencyFailureProbability ≤ delta)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta) :
     ConsRel strategy.state
@@ -55,7 +56,7 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon
           (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas
           some)
         (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  have hgb := ldGbcon params strategy eps delta gamma zeta hgood family hcons
+  have hgb := ldGbcon_of_axis_self params strategy eps delta zeta haxis hself family hcons
   have hprod :
       ConsRel strategy.state
         (uniformDistribution (Point params × Fq params))
@@ -105,15 +106,35 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon
       Function.comp] using hproc
   convert hprod' using 2
 
--- The proof compares the one-question equivalence with the endpoint
--- formulation; the chain of rewriting identities records the two equivalent
--- presentations of the same postprocessed submeasurement.
-lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
+lemma ldSandwichLineOnePoint_endpoint_ldGbcon
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta) :
+    ConsRel strategy.state
+      (uniformDistribution (Point params × Fq params))
+      (fun ux => postprocess (evaluateAt params ux.1 ((family.meas ux.2).toSubMeas)) some)
+      (fun ux =>
+        postprocess
+          (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas
+          some)
+        (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  exact ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self
+    params strategy eps delta zeta hgood.axisParallelTest hgood.selfConsistencyTest family hcons
+
+-- The proof compares the one-question equivalence with the endpoint
+-- formulation; the chain of rewriting identities records the two equivalent
+-- presentations of the same postprocessed submeasurement.
+lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself : strategy.selfConsistencyFailureProbability ≤ delta)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta) :
     ConsRel strategy.state
@@ -124,8 +145,8 @@ lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
           some)
       (ldSandwichLineOnePointRightFamily params strategy family 1 0)
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  have hux := ldSandwichLineOnePoint_endpoint_ldGbcon
-    params strategy eps delta gamma zeta hgood family hcons
+  have hux := ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self
+    params strategy eps delta zeta haxis hself family hcons
   exact (Preliminaries.consRel_uniform_equiv
     (sandwichedLineQuestionOneEquiv params)
     strategy.state
@@ -142,15 +163,35 @@ lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
           ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas]
         exact (postprocess_postprocess _ _ _).symm
 
--- The proof lifts the endpoint consistency relation through the split
--- sandwiched-line equivalence; the chain of rewriting identities unfolds this
--- equivalence and the endpoint-family definition.
-lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
+lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
     (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params 1))
+      (fun q =>
+        postprocess
+          (evaluateAt params q.1 ((family.meas ((pointTupleOneEquiv params) q.2)).toSubMeas))
+          some)
+      (ldSandwichLineOnePointRightFamily params strategy family 1 0)
+      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  exact ldSandwichLineOnePoint_oneQuestion_ldGbcon_of_axis_self
+    params strategy eps delta zeta hgood.axisParallelTest hgood.selfConsistencyTest family hcons
+
+-- The proof lifts the endpoint consistency relation through the split
+-- sandwiched-line equivalence; the chain of rewriting identities unfolds this
+-- equivalence and the endpoint-family definition.
+lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself : strategy.selfConsistencyFailureProbability ≤ delta)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (k i : ℕ) (hi : i < k) :
@@ -172,8 +213,8 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
         some
   let endpointRight : IdxSubMeas (SandwichedLineQuestion params k) (Option (Fq params)) ι :=
     ldSandwichLineOnePointRightFamily params strategy family k i
-  have hbase := ldSandwichLineOnePoint_endpoint_ldGbcon
-    params strategy eps delta gamma zeta hgood family hcons
+  have hbase := ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self
+    params strategy eps delta zeta haxis hself family hcons
   have hprod :
       ConsRel strategy.state
         (uniformDistribution ((Point params × Fq params) × Rest))
@@ -206,6 +247,27 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
             ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas, endpointRight, iFin, e]
           exact (postprocess_postprocess _ _ _).symm)
   simpa [endpointLeft, endpointRight, iFin] using hlift
+
+lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (k i : ℕ) (hi : i < k) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (fun q =>
+        postprocess
+          (evaluateAt params q.1 ((family.meas (q.2 ⟨i, hi⟩)).toSubMeas))
+          some)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  exact ldSandwichLineOnePoint_endpoint_ldGbcon_lift_of_axis_self
+    params strategy eps delta zeta hgood.axisParallelTest hgood.selfConsistencyTest
+    family hcons k i hi
 
 lemma gHatIdxMeas_outcome_some_eq_evaluateAt
     (params : Parameters)

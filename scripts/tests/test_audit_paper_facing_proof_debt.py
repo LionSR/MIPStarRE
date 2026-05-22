@@ -222,6 +222,68 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(len(result.conditional_decl_findings), 1)
             self.assertEqual(result.conditional_decl_findings[0].token, "_ofRepairedBridge")
 
+    def test_known_informational_construction_name_is_classified_only_in_broad_mode(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE.LDT.Test
+
+                theorem mainFormal_ofProjectiveCompletionTransportWitness (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE.LDT.Test
+                """,
+                r"""
+                \begin{definition}\label{def:main-formal-step6-constructions}
+                  \lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
+                \end{definition}
+                """,
+            )
+            theorem_like_result = audit.run_audit(root)
+            self.assertEqual(theorem_like_result.scanned_refs, 0)
+
+            broad_result = audit.run_audit(
+                root,
+                broad_vocabulary=True,
+                include_informational_envs=True,
+            )
+            self.assertEqual(broad_result.findings, ())
+            self.assertEqual(broad_result.conditional_decl_findings, ())
+            self.assertEqual(len(broad_result.source_context_findings), 1)
+            self.assertEqual(
+                broad_result.source_context_findings[0].token,
+                "_ofProjectiveCompletionTransportWitness",
+            )
+
+    def test_known_construction_name_in_theorem_like_entry_is_still_reported(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            _write_repo(
+                root,
+                """
+                namespace MIPStarRE.LDT.Test
+
+                theorem mainFormal_ofProjectiveCompletionTransportWitness (h : P) : Q := by
+                  sorry
+
+                end MIPStarRE.LDT.Test
+                """,
+                r"""
+                \begin{theorem}\label{thm:main-formal}
+                  \lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
+                \end{theorem}
+                """,
+            )
+            result = audit.run_audit(root, broad_vocabulary=True)
+            self.assertEqual(result.findings, ())
+            self.assertEqual(len(result.conditional_decl_findings), 1)
+            self.assertEqual(
+                result.conditional_decl_findings[0].token,
+                "_ofProjectiveCompletionTransportWitness",
+            )
+
     def test_internal_obligation_name_in_paper_facing_entry_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

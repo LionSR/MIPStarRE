@@ -311,19 +311,20 @@ coefficient is bounded by `params.m * params.d / params.q` via
 `1` using `sandwichTensor_residual_sum_le_one`, so the whole nonnegative
 collision sum has the same `m d / q` bound. -/
 lemma polynomialCollision_sandwichTensor_le_mdq
-    {ι β : Type*} [Fintype ι] [DecidableEq ι] [Fintype β]
+    {ιA ιB β : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Fintype β]
     (params : Parameters) [FieldModel params.q]
-    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
-    (Outer : SubMeas β ι)
-    (Inner Right : SubMeas (Polynomial params) ι) :
+    (ψ : QuantumState (ιA × ιB)) (hnorm : ψ.IsNormalized)
+    (Outer : SubMeas β ιA)
+    (Inner : SubMeas (Polynomial params) ιA) (Right : SubMeas (Polynomial params) ιB) :
     (∑ gg : Polynomial params × Polynomial params, ∑ o : β,
         (if gg.1 = gg.2 then 0 else
           avgOver (uniformDistribution (Point params))
             (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) *
           ev ψ
-            (leftTensor (ι₂ := ι)
+            (leftTensor (ι₂ := ιB)
                 (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
-              rightTensor (ι₁ := ι) (Right.outcome gg.2))) ≤
+              rightTensor (ι₁ := ιA) (Right.outcome gg.2))) ≤
       (params.m * params.d : Error) / params.q := by
   let δ : Error := (params.m * params.d : Error) / params.q
   have hδ_nonneg : 0 ≤ δ := by
@@ -342,32 +343,41 @@ lemma polynomialCollision_sandwichTensor_le_mdq
           avgOver (uniformDistribution (Point params))
             (fun u => if gg.1 u = gg.2 u then (1 : Error) else 0)) *
           ev ψ
-            (leftTensor (ι₂ := ι)
+            (leftTensor (ι₂ := ιB)
                 (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
-              rightTensor (ι₁ := ι) (Right.outcome gg.2)))
+              rightTensor (ι₁ := ιA) (Right.outcome gg.2)))
       ≤ ∑ gg : Polynomial params × Polynomial params, ∑ o : β,
           δ * ev ψ
-            (leftTensor (ι₂ := ι)
+            (leftTensor (ι₂ := ιB)
                 (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
-              rightTensor (ι₁ := ι) (Right.outcome gg.2)) := by
+              rightTensor (ι₁ := ιA) (Right.outcome gg.2)) := by
           refine Finset.sum_le_sum ?_
           intro gg _
           refine Finset.sum_le_sum ?_
           intro o _
+          have hnonneg :
+              0 ≤ ev ψ
+                (leftTensor (ι₂ := ιB)
+                    (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
+                  rightTensor (ι₁ := ιA) (Right.outcome gg.2)) :=
+            sandwichTensorSummand_nonneg (ψ := ψ)
+              (Outer := Outer) (Inner := Inner) (Right := Right) o gg.1 gg.2
           exact mul_le_mul_of_nonneg_right (hcoef_le gg)
-            (sandwichTensorSummand_nonneg ψ Outer Inner Right o gg.1 gg.2)
+            hnonneg
     _ = δ * (∑ gg : Polynomial params × Polynomial params, ∑ o : β,
           ev ψ
-            (leftTensor (ι₂ := ι)
+            (leftTensor (ι₂ := ιB)
                 (Outer.outcome o * Inner.outcome gg.1 * Outer.outcome o) *
-              rightTensor (ι₁ := ι) (Right.outcome gg.2))) := by
+              rightTensor (ι₁ := ιA) (Right.outcome gg.2))) := by
           rw [Finset.mul_sum]
           refine Finset.sum_congr rfl ?_
           intro gg _
           rw [Finset.mul_sum]
     _ ≤ δ * 1 := by
           exact mul_le_mul_of_nonneg_left
-            (sandwichTensor_residual_sum_le_one ψ hnorm Outer Inner Right) hδ_nonneg
+            (sandwichTensor_residual_sum_le_one (ψ := ψ) hnorm
+              (Outer := Outer) (Inner := Inner) (Right := Right))
+            hδ_nonneg
     _ = (params.m * params.d : Error) / params.q := by
           simp [δ]
 
@@ -379,10 +389,11 @@ for every distinct pair of full polynomial outcomes `(g, h)`, the coefficient is
 `Pr_u[g(u) = h(u)]`, and the quantum weight is the fixed cross-register mass
 `⟨ψ | G^A_g ⊗ G^B_h | ψ⟩`. -/
 noncomputable def polynomialCollisionMass
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (params : Parameters) [FieldModel params.q]
-    (ψ : QuantumState (ι × ι))
-    (Left Right : SubMeas (Polynomial params) ι) : Error :=
+    (ψ : QuantumState (ιA × ιB))
+    (Left : SubMeas (Polynomial params) ιA) (Right : SubMeas (Polynomial params) ιB) :
+    Error :=
   ∑ gg : Polynomial params × Polynomial params,
     (if gg.1 = gg.2 then 0 else
       avgOver (uniformDistribution (Point params))
@@ -396,14 +407,14 @@ This is the specialization of `polynomialCollision_sandwichTensor_le_mdq` with
 no outer sandwich. It supplies exactly the paper's line-126 estimate for the
 collision term after the evaluated self-consistency defect has been expanded. -/
 lemma polynomialCollisionMass_le_mdq
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (params : Parameters) [FieldModel params.q]
-    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
-    (Left Right : SubMeas (Polynomial params) ι) :
+    (ψ : QuantumState (ιA × ιB)) (hnorm : ψ.IsNormalized)
+    (Left : SubMeas (Polynomial params) ιA) (Right : SubMeas (Polynomial params) ιB) :
     polynomialCollisionMass params ψ Left Right ≤
       (params.m * params.d : Error) / params.q := by
-  let One : SubMeas Unit ι :=
-    { outcome := fun _ => (1 : MIPStarRE.Quantum.Op ι)
+  let One : SubMeas Unit ιA :=
+    { outcome := fun _ => (1 : MIPStarRE.Quantum.Op ιA)
       total := 1
       outcome_pos := by intro _; exact zero_le_one
       sum_eq_total := by simp

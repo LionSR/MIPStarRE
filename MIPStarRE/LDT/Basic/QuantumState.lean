@@ -417,6 +417,16 @@ theorem leftTensor_sub
   simpa [leftTensor] using
     (opTensor_sub_left (ι₁ := ι₁) (ι₂ := ι₂) A B (1 : MIPStarRE.Quantum.Op ι₂))
 
+/-- Right tensor placement commutes with subtraction. -/
+theorem rightTensor_sub
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₂) :
+    rightTensor (ι₁ := ι₁) A - rightTensor (ι₁ := ι₁) B =
+      rightTensor (ι₁ := ι₁) (A - B) := by
+  simpa [rightTensor, opTensor] using
+    (MIPStarRE.Quantum.kronecker_sub_right
+      (A := (1 : MIPStarRE.Quantum.Op ι₁)) (B₁ := A) (B₂ := B))
+
 /-- `opTensor` is linear in the left factor: real scalar multiplication. -/
 theorem opTensor_smul_left_error
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]

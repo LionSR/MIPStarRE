@@ -2,6 +2,27 @@
 
 Date: 2026-05-20.
 
+Update on 2026-05-21: the predecessor answer-valued induction hypothesis has
+been realigned so that it no longer assumes `0 < params.d`.  Consequently the
+successor frontier no longer contains a separate degree-zero family-and-scalar
+obligation; the recursive slice route covers `d = 0`, with `1 ≤ k` supplied by
+the small-error branch.  The checked reduction is
+`mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`.
+
+Update on 2026-05-22: the active successor route no longer requires an
+ordinary realization of the answer-valued restricted diagonal measurement.
+`AnswerSelfImprovementData.ofAnswerCarrier` constructs the needed
+self-improvement data by applying the axis-parallel/self-consistency form of
+the induction-section self-improvement theorem to an ordinary carrier with an
+inert diagonal measurement.
+
+Further update on 2026-05-22: the predecessor answer-valued induction argument
+and the answer-valued pasting invocation are now proved inside the simultaneous
+answer-valued induction theorem.  The corrected large-\(k\) successor
+construction is therefore proof-complete.  The remaining source-theorem
+obstructions are the printed \(md\le k<400md\) source range and the final
+two-space source-boundary theorem, not a Chapter 10 green internal node.
+
 ## Scope
 
 This note classifies the Chapter 10 blueprint nodes that are green in the
@@ -14,7 +35,8 @@ theorems, and their green status should not be read as a proof of
 The source passages are `references/ldt-paper/inductive_step.tex:441-551` for
 the successor step of the main induction, `references/ldt-paper/ld-pasting.tex`
 for the pasting theorem invoked there, and
-`references/ldt-paper/main_theorem.tex` for the final theorem route.
+`references/ldt-paper/test_definition.tex:180-202` for the final theorem
+statement.
 
 ## `def:self-improvement-slice-transport`
 
@@ -35,9 +57,11 @@ concrete slice strategies together with state and measurement-transport
 equalities.  Their constructors derive the averaged point-operator
 compatibility from point-measurement transport, and the slice-output theorems
 then apply `selfImprovementInInductionSection` slice by slice.  This is a
-checked construction interface, not a source theorem.  The remaining work for
-`thm:main-induction` is to construct these slice strategies and transport
-equalities from the hypotheses of the successor branch.
+checked construction interface, not a source theorem.  It remains useful for
+the stronger route through an ordinary realization of the answer-valued
+restricted diagonal measurement.  It is no longer the active obstruction to
+`thm:main-induction`, because the current successor route constructs the
+answer-valued self-improvement data directly by the carrier construction.
 
 ## `def:successor-pasting-data`
 
@@ -48,38 +72,44 @@ Blueprint node:
 Linked Lean declarations include `AveragedPastingData.invokeLdPasting`,
 `assembleAveragedPastingDataOfSmallError`,
 `mainInductionFromAnswerStageDataOfSmallError`,
-`mainInductionSuccessorNextOfSmallError_ofAnswerSliceTransport`, and
-`mainInductionSuccessorNext_ofAnswerSliceTransport`.  The same blueprint node
-also links the degree-split reductions
+`mainInductionSuccessorNext_ofAnswerStageObligations`, and
+`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound`.  The
+same blueprint node also links the recursive-slice reduction
+`mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`.
+The older degree-split reductions
 `mainInductionSuccessorNext_degreeZero_ofPastingFamily` and
-`mainInductionSuccessorNext_ofDegreeSplitPastingObligations`.
+`mainInductionSuccessorNext_ofDegreeSplitPastingObligations` remain checked
+composition lemmas, but they are no longer the active successor frontier.
 
-Verdict: proved internal assembly interface with explicit remaining inputs.
+Verdict: proved internal assembly interface.
 
 The node records the checked passage from restricted probabilities, per-slice
 self-improvement outputs, and the nontrivial scalar regime to the pasting
-conclusion.  The small-error theorem assumes the predecessor answer-valued
-induction hypothesis and the slice-strategy transport data; these are internal
-construction targets, not hypotheses of the paper theorem.  The source-facing
-theorem `mainInductionSuccessorNextOfSmallError` still contains the tracked
-proof obligation under issue #1507.
+conclusion.  The predecessor answer-valued induction conclusion is now supplied
+inside the simultaneous answer-valued induction theorem, not as a hypothesis of
+the paper theorem.  The source-facing ordinary successor theorem
+`mainInductionSuccessorNext_ofSmallErrorConstruction` is proved from the
+internal answer-valued induction theorem.
 
-The degree-zero part of the node is only a reduction.  The theorem
+The degree-zero family route is now only a retained checked reduction.  The theorem
 `mainInductionSuccessorNext_degreeZero_ofPastingFamily` proves that, if a
 complete and point-consistent `IdxPolyFamily` in the predecessor parameters has
 already been constructed and its scalar error is bounded by the next-stage
 main-induction error, then the degree-zero successor branch follows from
 `Pasting.degreeZeroPastedPointConsistency`.  It does not construct this
-`IdxPolyFamily` from the hypotheses that the strategy is good.  Consequently the
-green status of `def:successor-pasting-data` should be read as a checked
-interface for the degree split, not as a proof that the degree-zero branch of
-`mainInductionSuccessorNextOfSmallError` has been discharged.
+`IdxPolyFamily` from the hypotheses that the strategy is good.  The active
+recursive-slice route avoids this obligation by using the predecessor induction
+hypothesis also when `d = 0`.  Consequently the green status of
+`def:successor-pasting-data` should be read as a checked internal interface,
+not as evidence for or against the printed source range of
+`thm:main-induction`.
 
-## `def:main-formal-successor-boundary`
+## Former `def:main-formal-successor-boundary`
 
-Blueprint node:
-`blueprint/src/chapter/ch10_induction.tex`, label
-`def:main-formal-successor-boundary`.
+Blueprint status:
+this label has been retired from `blueprint/src/chapter/ch10_induction.tex`.
+The declarations are now mentioned in an unnumbered remark, so they no longer
+form a dependency-graph node.
 
 Linked Lean declarations include the restricted-probability targets
 `MainFormalSuccessorAxisWeightedBound`,
@@ -87,20 +117,22 @@ Linked Lean declarations include the restricted-probability targets
 `mainFormalSuccessorRestrictionData`, and the ordinary and answer-valued
 recursive-slice targets.
 
-Verdict: Lean-only target boundary, not a completed final-theorem step.
+Verdict: Lean-only target list, not a completed final-theorem step.
 
 The weighted-bound helper lemmas are proved from the symmetrized passing
 strategy.  The recursive-slice propositions record what the proof of
-`mainFormal` must obtain from the Section 6 induction route.  The node is green
-because these targets and direct weighted-bound constructions are formalized;
-it does not assert that the successor branch of the final theorem has been
-completed independently of the remaining `mainInduction` proof obligation.
+`mainFormal` must obtain from the Section 6 induction route.  These declarations
+remain useful internal targets, but presenting them as a green definition node
+made the successor branch look more complete than it is.  The graph node has
+therefore been removed.  The corrected large-\(k\) Section 6 successor branch
+is now proved; the remaining work is the source-boundary range
+\(md\le k<400md\) for `thm:main-induction` and the final two-space theorem.
 
-## `def:main-formal-step6-obligations`
+## `def:main-formal-step6-constructions`
 
 Blueprint node:
 `blueprint/src/chapter/ch10_induction.tex`, label
-`def:main-formal-step6-obligations`.
+`def:main-formal-step6-constructions`.
 
 Linked Lean declarations include the diagonal orthonormalization and completion
 witness constructors, `mainFormalBaseRoleInductionWitness`,
@@ -114,24 +146,27 @@ The local completion and transport steps are proved once a Section 6 role
 measurement witness has been constructed.  The final transport theorem derives
 the three conclusions of `thm:main-formal` from that constructed witness, but
 the witness is not an additional assumption of the public theorem.  In the
-successor branch, construction of the role witness still runs through
-`mainInduction`, so the remaining proof frontier is the native successor
-obligation tracked by issue #1507.
+successor branch, construction of the role witness runs through the now-proved
+corrected large-\(k\) interface `mainInduction`.  The remaining final-theorem
+frontier is the source-boundary passage from the printed two-space theorem and
+the printed \(k\ge md\) range.
 
 ## Summary
 
-The four nodes are genuinely green as Lean-only internal interfaces: their
-linked declarations are formalized at the level stated in the blueprint
-definitions.  They are not proof-level green source theorem nodes.  In
-particular, they do not close `thm:main-induction` or `thm:main-formal`, and
-they do not add bridge, residual, package, or witness assumptions to those
-paper-facing theorem statements.
+Two Chapter 10 definition nodes remain useful green Lean-only internal
+interfaces: `def:self-improvement-slice-transport` and
+`def:successor-pasting-data`.  The final-theorem Step 6 node has been narrowed
+to completed base-case and final-transport constructions, and the former
+successor-boundary node has been retired as a dependency-graph node.  None of
+these entries closes `thm:main-induction` or `thm:main-formal`, and none adds
+bridge, residual, package, or witness assumptions to those paper-facing theorem
+statements.
 
-The remaining mathematical work is unchanged: discharge the source-facing
-successor proof obligation in `mainInductionSuccessorNextOfSmallError`, starting
-with the degree-zero `IdxPolyFamily` construction and the positive-degree
-answer-valued slice-transport construction, and then use the resulting Section 6
-theorem inside the final `mainFormal` route.
+The remaining mathematical work is now source-boundary work: prove the printed
+range `md <= k < 400md` for `thm:main-induction`, and assemble the printed
+two-space final theorem from the paper hypotheses.  The Chapter 10 green
+internal nodes no longer conceal an unproved corrected large-`k` successor
+branch.
 
 ## Verification
 
@@ -142,7 +177,7 @@ python3 scripts/audit_paper_facing_proof_debt.py --root .
 ```
 
 reports no missing Lean references, no proof-debt header findings, and no
-conditional declaration-name findings among 467 paper-facing Lean references.
-The remaining 29 findings are classified by the script as faithful boundary
+conditional declaration-name findings among 509 paper-facing Lean references.
+The remaining 30 findings are classified by the script as faithful boundary
 inputs, principally `SliceBoundednessInput` and `CascadeHypotheses`, rather than
 unproved bridge or obligation hypotheses on paper-facing theorem statements.

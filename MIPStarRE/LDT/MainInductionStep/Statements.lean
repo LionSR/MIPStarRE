@@ -365,11 +365,10 @@ def AnswerMainInductionHypothesis.{u,v} (params : Parameters)
     [FieldModel.{u} params.q] : Prop :=
   ∀ (ι : Type v) [Fintype ι] [DecidableEq ι],
     ∀ (strategy : AnswerSymStrat params ι) (eps delta gamma : Error) (k : ℕ),
-      0 < params.d →
-        strategy.IsGood eps delta gamma →
-          1 ≤ k →
-            400 * params.m * params.d ≤ k →
-              AnswerMainInductionConclusion params strategy eps delta gamma k
+      strategy.IsGood eps delta gamma →
+        1 ≤ k →
+          400 * params.m * params.d ≤ k →
+            AnswerMainInductionConclusion params strategy eps delta gamma k
 
 /-- The slice-local self-improvement error `ζ_x`. -/
 noncomputable def sliceSelfImprovementError (params : Parameters)

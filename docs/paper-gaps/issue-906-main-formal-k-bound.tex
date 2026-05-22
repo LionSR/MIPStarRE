@@ -145,7 +145,14 @@ final source theorem routes its source-boundary work through the named
 wrapper \leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation}; its
 saturated-error branch is proved, and its remaining branch is
 \leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}.  The
-induction source theorem routes the remaining interval through the named obligation
+nonzero-\(k\) branch of this remaining final-theorem wrapper is reduced to the
+checked role-register scalar absorption theorem
+\leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary};
+the direct final-theorem proof hole is now the zero-sampling boundary
+\leanid{MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation}.
+The scalar lemma \leanid{MIPStarRE.LDT.Test.mainFormalError_zero_k} records
+that the displayed final-theorem error is exactly zero at \(k=0\).
+The induction source theorem routes the remaining interval through the named obligation
 \leanid{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation}.
 The separate entries
 \texttt{thm:main-formal-current-interface} and
@@ -157,11 +164,55 @@ the range \(400\,md\le k\) and leaves the remaining source interval
 the pasting theorem is
 \leanid{MIPStarRE.LDT.Pasting.Bernoulli.ldPastingNontrivial}, with
 the corresponding large-\(k\) hypothesis.  The final assembly in
-\path{MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean} still depends
-transitively on the Section~6 small-error successor construction in
-\path{MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean}; that
-remaining proof obligation is not the side-condition discrepancy described in
-this note.}
+\path{MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean} no longer depends on an
+unfinished corrected large-\(k\) Section~6 successor construction.  The
+remaining direct proof obligations are the source-boundary interval
+\(md\le k<400md\) for the printed induction theorem and the final zero-sampling
+boundary; these obligations are distinct from the checked nonzero-\(k\)
+role-register scalar absorption.}
+
+\section{Non-vacuity of the remaining source interval}
+
+The remaining interval \(md\le k<400md\) is not eliminated by the
+``large-error'' branch of the formal proof.  The formal wrapper
+\leanid{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation}
+does close the case in which the main-induction error is already at least
+\(1\), since any submeasurement consistency estimate is then saturated.  The
+open branch is precisely the complementary case
+\[
+  m^2\left(\nu+\exp\!\left(-\frac{k}{80000m^2}\right)\right) < 1.
+\]
+This inequality can hold inside \(md\le k<400md\).  For example, take
+\(m=2\), \(k=2d\), and choose \(d\) large enough that
+\[
+  4\exp\!\left(-\frac{d}{160000}\right)<\frac12.
+\]
+With \(\varepsilon=\delta=\gamma=0\), the remaining contribution to \(\nu\) is
+controlled by \((d/q)^{1/1024}\).  Taking the field size \(q\) sufficiently
+large makes
+\[
+  4\cdot 1000\cdot (2d)^2\cdot 2^2\cdot (d/q)^{1/1024}<\frac12.
+\]
+Thus the formal small-error branch is not vacuous; it requires a mathematical
+argument for the source interval, or a corrected statement restricting the
+theorem to the large-\(k\) range used by the pasting route.  It should not be
+replaced by a hidden assumption on the paper-facing theorem.
+
+The same phenomenon occurs in the final theorem.  The wrapper
+\leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation} proves the branch
+\(\nu\ge 1\) by the trivial two-space consistency bound, but the source theorem
+also has a complementary branch in which
+\[
+  100000 k^2m^4\left(\varepsilon^{1/40000}
+    +(d/q)^{1/40000}
+    +\exp\!\left(-\frac{k}{2560000m^2}\right)\right)<1.
+\]
+Taking again \(m=2\), \(k=2d\), \(d\) sufficiently large, and then \(q\)
+sufficiently large, with \(\varepsilon=0\), gives examples in the printed
+interval \(md\le k<400md\) where this final error is below \(1\).  Hence
+\leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation} is also a
+genuine source-boundary obligation, not a branch removable by the saturated
+estimate.
 
 \section{Conclusion}
 

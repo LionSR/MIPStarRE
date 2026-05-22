@@ -58,6 +58,51 @@ lemma fromHToG_ofGHatFactsAndHalfSandwich
     fromHToGPaperTotalError_le params gamma zeta k
       hgamma_nonneg hzeta_nonneg hzeta_le_one
 
+/-- Internal form of `lem:from-H-to-G` from `cor:G-hat-facts`.
+
+The half-sandwich estimates are obtained from the same `G-hat` facts. -/
+lemma fromHToG_ofGHatFacts
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (ψbi : QuantumState (ι × ι))
+    (hnorm : ψbi.IsNormalized)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le_one : zeta ≤ 1)
+    (hfacts : GHatFactsStatement params ψbi family gamma zeta)
+    (k : ℕ) :
+    FromHToGStatement params strategy ψbi family gamma zeta k := by
+  have hhalf : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params ψbi family gamma zeta j := by
+    intro j hj
+    exact commuteGHalfSandwich_ofGHatFacts params ψbi family gamma zeta
+      j hj hzeta_le_one hfacts
+  exact fromHToG_ofGHatFactsAndHalfSandwich params strategy ψbi hnorm
+    family gamma zeta hgamma_nonneg hzeta_nonneg hzeta_le_one hfacts hhalf k
+
+/-- Internal form of `lem:from-H-to-G` from the Section 11 commutativity
+conclusion. -/
+lemma fromHToG_ofComMain
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma_le : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta_le_one : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
+    (k : ℕ) :
+    FromHToGStatement params strategy strategy.state family gamma zeta k := by
+  have hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
+    gHatFacts_ofComMainAndSelfConsistency params strategy family gamma zeta
+      hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le_one hdq_le hcom hself
+  exact fromHToG_ofGHatFacts params strategy strategy.state strategy.isNormalized
+    family gamma zeta hgamma_nonneg hzeta_nonneg hzeta_le_one hfacts k
+
 /-- `lem:from-H-to-G`, source-facing form at the strategy state. -/
 lemma fromHToG
     (params : Parameters)

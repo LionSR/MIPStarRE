@@ -36,6 +36,11 @@ Branch: `gpt55/issue-930-selfimprovement-audit`
 > `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`; the wrapper
 > `MIPStarRE.LDT.Test.mainFormal_sourceObligation` proves the saturated-error
 > branch.
+>
+> **Status note, 2026-05-22.**  The Section 6 small-error successor construction
+> is now checked for the corrected large-`k` interface.  The live proof frontier
+> is the printed source range `md <= k < 400md` for `thm:main-induction` and the
+> final two-space source-boundary obligation for `thm:main-formal`.
 
 ## Executive summary
 

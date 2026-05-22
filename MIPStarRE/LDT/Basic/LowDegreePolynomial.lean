@@ -53,6 +53,10 @@ noncomputable def const (params : Parameters) [FieldModel params.q] (a : Fq para
     intro i
     simp [MvPolynomial.degreeOf_C]
 
+noncomputable instance {params : Parameters} [FieldModel params.q] :
+    Inhabited (Polynomial params) :=
+  ⟨const params default⟩
+
 /-- The constant polynomial evaluates to its prescribed value. -/
 @[simp] theorem const_apply (params : Parameters) [FieldModel params.q]
     (a : Fq params) (u : Point params) :

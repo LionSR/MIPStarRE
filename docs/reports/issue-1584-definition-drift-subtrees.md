@@ -15,6 +15,11 @@ Date: 2026-05-14.
 > Likewise, the former #1230 SDP slackness route is discharged by
 > `sdp_statement_with_slackness` and the displayed witness
 > `sdp_slackness_measurement`.
+>
+> **Status note, 2026-05-22.**  The native small-error successor construction for
+> the corrected large-`k` interface is now also checked.  The remaining direct
+> proof holes are source-boundary obligations: the printed `md <= k < 400md`
+> range for `thm:main-induction` and the final two-space source theorem.
 
 This note records the first downstream-subtree map for issue #1584, a focused
 subtask of the definition-level audit #1571 and the source-statement

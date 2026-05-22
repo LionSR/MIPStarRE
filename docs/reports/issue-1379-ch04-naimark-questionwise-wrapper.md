@@ -2,11 +2,22 @@
 
 This note records the dependency-graph repair for the Chapter 4 Naimark node.
 
+## Current status
+
+The questionwise interface described below has been superseded as the boundary
+for the source theorem.  The current blueprint links `thm:naimark` to the proved
+tensor-product correlation theorem
+`MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation` in
+the projective-submeasurement form documented in `docs/paper-gaps/naimark.tex`.
+The declaration `questionwiseNaimark` remains a useful Lean-only auxiliary
+interface below that source theorem; it is no longer the stopping point for
+Chapter 4 Naimark.
+
 ## Source comparison
 
 | Node | Public graph status | Paper source | Lean declaration | Classification | Repair |
 | --- | --- | --- | --- | --- | --- |
-| `thm:naimark` | Source theorem present without a Lean declaration | `references/ldt-paper/orthonormalization.tex:36-115`, proof at lines 161-187 | `MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark` | Boundary condition / restricted interface | Keep the source theorem unclaimed and add a separate Lean-only proposition for the proved questionwise interface. |
+| `thm:naimark` | Source theorem locally linked and proved; public pages may still show the older unfilled status until republished | `references/ldt-paper/orthonormalization.tex:36-115`, proof at lines 161-187 | `MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation`; auxiliary interface `questionwiseNaimark` | Source theorem proved in projective-submeasurement form; questionwise interface remains Lean-only auxiliary content | Keep the source theorem linked to the tensor-product theorem and keep the questionwise interface split out as an auxiliary proposition. |
 
 ## Mathematical content
 
@@ -18,9 +29,10 @@ one bipartite auxiliary system and proves preservation of the joint correlation
 local one-measurement dilation data and proves the corresponding
 single-outcome marginal-preservation identities.
 
-This is the interface currently used by the formal development.  The full
-simultaneous tensor-product assembly remains the deliberate paper gap recorded
-in `docs/paper-gaps/naimark.tex`.
+This was the first Lean interface used by the formal development.  The full
+simultaneous tensor-product assembly is now proved by
+`naimarkTensorProductCorrelation`; `docs/paper-gaps/naimark.tex` records the
+projective-submeasurement correction to the printed complete-measurement form.
 
 ## Statement integrity audit
 
@@ -43,10 +55,11 @@ Paper conclusion:
   \(\widehat A,\widehat B\) preserving every joint bipartite correlation
   \(\langle\psi|A^x_a\otimes B^y_b|\psi\rangle\).
 
-Lean wrapper conclusion:
+Lean questionwise wrapper conclusion:
 
 - existence of `NaimarkData` satisfying `NaimarkStatement ψ A B data`, namely
   per-question source identities and single-outcome marginal-preservation
   identities.
 
-Verdict: restricted Lean-only interface, not the source theorem.
+Verdict: restricted Lean-only auxiliary interface.  The source theorem is now
+the tensor-product theorem `naimarkTensorProductCorrelation`.

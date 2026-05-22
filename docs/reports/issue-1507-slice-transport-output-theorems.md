@@ -1,15 +1,28 @@
 # Issue #1507 slice-transport output theorems
 
-This note records the ordinary and answer-valued slice-transport batch for the
-Section 6 successor proof frontier.
+## Current status
 
-The public GitHub Pages dependency graph at `origin/github-pages` commit
-`fb64dcd6b` still marks `thm:main-induction` as a non-green node.  The node is
-not missing a Lean statement: it is the source-facing theorem
-`MIPStarRE.LDT.MainInductionStep.mainInduction`, whose statement matches the
-paper theorem but whose successor branch still contains the tracked proof
-obligation in `mainInductionSuccessorNextOfSmallError`.  The present batch
-therefore does not add `\leanok` to `thm:main-induction`.
+This report records an earlier slice-transport repair batch.  The active
+successor route no longer has a slice-transport or predecessor-induction
+frontier: the corrected large-`k` successor construction is now proved through
+the simultaneous answer-valued induction theorem and the answer-valued pasting
+theorem.  The present unfinished source-facing work is the source `k >= md`
+range for `thm:main-induction` and the final two-space source-boundary theorem,
+as summarized in `docs/reports/issue-1586-sorryax-inventory.md`.
+
+This note records the ordinary and answer-valued slice-transport batch for the
+historical Section 6 successor proof frontier.
+
+The public GitHub Pages dependency graph in the separate Pages worktree is
+stale relative to the current blueprint source: it still displays
+`thm:main-induction` with a green statement border.  In the rebuilt local graph
+the node is blue/unfilled.  It is not missing a Lean statement: it is linked to
+the source-facing statement
+`MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`, whose printed
+hypotheses match the paper theorem.  Its corrected large-`k` branch is now
+proved, and its source-range branch is recorded separately as
+`mainInduction_sourceRangeObligation`.  The present batch therefore does not
+add `\leanok` to `thm:main-induction`.
 
 ## Source
 
@@ -25,8 +38,8 @@ self-improvement theorem being applied is stated in
 | --- | --- | --- |
 | `thm:main-induction` | Stated with proof hole | Unchanged.  The paper-facing theorem keeps its source hypotheses and no proof-level `\leanok` is added. |
 | `def:self-improvement-slice-transport` | Proved internal construction interface | The node now links both ordinary and answer-valued slice-output extraction theorems.  These are Lean-only internal transport theorems, not paper theorem statements. |
-| `def:successor-pasting-data` | Proved internal assembly interface | Unchanged.  It consumes the answer-valued slice-output theorem through `mainInductionSuccessorNext_ofAnswerSliceSelfImprovement`. |
-| `def:main-formal-step6-successor-targets` | Internal target depending on the `thm:main-induction` proof hole | Unchanged.  It remains without `\leanok` because its completion depends on the source-facing successor proof. |
+| `def:successor-pasting-data` | Proved internal assembly interface | The current assembly is factored through `mainInductionSuccessorNext_ofAnswerStageObligations` and `mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions`. |
+| Lean successor-dependent Step 6 targets | Proved internal target list for the corrected large-`k` route | Retired as a theorem-like graph node.  The relevant declarations remain named in prose, but no green dependency-graph vertex is used to represent the source theorem. |
 
 ## Lean declarations
 
@@ -38,15 +51,18 @@ The batch isolates the following internal mathematical implications:
   fields into the Section 6 restricted-slice notation.
 * `AnswerSelfImprovementData.slice_outputs_ofSliceStrategyTransport`: the
   answer-valued analogue, already used by the answer-valued successor assembly.
+* `AnswerSelfImprovementData.slice_outputs_ofAnswerCarrier`: the active
+  answer-valued route, applying the axis-parallel/self-consistency form of
+  self-improvement to an ordinary carrier with an inert diagonal measurement.
 
-Both declarations are internal proof-frontier lemmas.  They do not add
+These declarations are internal construction lemmas.  They do not add
 restricted-probability, recursive-slice, self-improvement, pasting, bridge,
 package, residual, repair, producer, input, or generic hypotheses to
 `thm:main-induction`.
 
-## Remaining obligation
+## Current remaining obligation
 
-The remaining source-facing task for #1507 is to derive the concrete slice
-strategies and their transport equalities from the hypotheses of
-`mainInductionSuccessorNextOfSmallError`, then feed the resulting slice-output
-theorems into the already proved successor assembly.
+The predecessor answer-valued induction conclusion is now derived inside
+`answerMainInduction`, and the corrected large-`k` successor construction is
+proved.  The remaining source-facing task is the printed range
+`md <= k < 400md`, isolated by `mainInduction_sourceRangeObligation`.

@@ -178,6 +178,12 @@
 	\lean{MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput.storedBoundedResidualBound, MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput.averagedPoint_le_witness, MIPStarRE.LDT.Commutativity.gCommStability_overlap, MIPStarRE.LDT.Commutativity.gCommStability_scalar}
 	\leanok
 	\uses{def:approx_delta}
+	This claim is made under the standing hypotheses of
+	Lemma~\ref{lem:comm-data-processed-g}.  The linked
+	\texttt{SliceBoundednessInput} declarations are precisely the two displayed
+	parts of item~\ref{item:data-processed-boundedness}: the averaged
+	\((I-G^y)\otimes Z^y\) residual bound and the domination
+	\(Z^y\ge \E_u A^{u,y}_{g(u)}\).
 	\begin{align}
 		                       & \E_{u,v,x,y} \sum_{a,b}
 		\bra{\psi} G_a^{u,x} G_b^{v,y} G_a^{u,x} G^y \ot A_b^{v,y} \ket{\psi}
@@ -213,6 +219,11 @@
 	\lean{MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput.storedBoundedResidualBound, MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput.averagedPoint_le_witness, MIPStarRE.LDT.Commutativity.gCommStabilityTwo_overlap, MIPStarRE.LDT.Commutativity.gCommStabilityTwo_scalar}
 	\leanok
 	\uses{def:approx_delta}
+	This claim is made under the standing hypotheses of
+	Lemma~\ref{lem:comm-data-processed-g}, in particular the boundedness item
+	\ref{item:data-processed-boundedness}.  The linked
+	\texttt{SliceBoundednessInput} declarations expose those boundedness
+	hypotheses in Lean; they are not auxiliary proof-obligation assumptions.
 	\begin{align*}
 		                                           & \E_{u,v,x,y} \sum_{a,b}
 		\bra{\psi} G_a^{u,x} G_b^{v,y} G^x \ot A_a^{u,x} A_b^{v,y} \ket{\psi} \\

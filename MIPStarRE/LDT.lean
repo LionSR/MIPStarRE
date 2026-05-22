@@ -87,6 +87,7 @@ import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.LiftBridges
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
+import MIPStarRE.LDT.CommutativityPoints.AnswerTheorems
 import MIPStarRE.LDT.Commutativity.Defs.Core
 import MIPStarRE.LDT.Commutativity.Defs.Stability
 import MIPStarRE.LDT.Commutativity.Defs.Normalization

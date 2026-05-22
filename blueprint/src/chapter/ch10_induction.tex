@@ -222,7 +222,7 @@
 	output in \texttt{AnswerSelfImprovementData}.  Their constructors call
 	\texttt{selfImprovementInInductionSection}; they no longer carry a separate
 	bundle of Section~\ref{chap:self-improvement} proof-stage data as an input.
-	The \texttt{SliceStrategyTransport} structures are auxiliary Lean records: they
+	The \texttt{SliceStrategyTransport} structures are narrow formal interfaces: they
 	assume concrete per-slice symmetric strategies and measurement-transport data,
 	while averaged point-operator compatibility is derived structurally from
 	point-measurement transport.  They then convert the remaining data into the
@@ -231,9 +231,8 @@
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingDataOfSmallError}
-	\lean{MIPStarRE.LDT.MainInductionStep.DegreeZeroPastingFamilyObligation}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
-	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one, MIPStarRE.LDT.MainInductionStep.one_le_k_of_mainInductionError_lt_one}
+	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionError_le_one_of_mainInductionError_lt_one}
 	\leanok
 	\uses{lem:weighted-restricted-probability-bounds, thm:ld-pasting-in-induction-section}
 	The successor step forms the pasting input by combining the restricted
@@ -243,61 +242,14 @@
 	\(\gamma\le 1\), \(\zeta\le 1\), and \(d\le q\) internally.  Thus the
 	successor proof can call the small-error pasting constructor without carrying
 	\(0<d\), \(1\le k\), \(\gamma\le 1\), \(\zeta\le 1\), or \(d\le q\) as
-	separate proof inputs.  In the degree-zero branch, Lean now names the precise
-	remaining construction as
-	\texttt{DegreeZeroPastingFamilyObligation}: a complete and point-consistent
-	family of degree-zero slice polynomials, together with the scalar comparison
-	needed to absorb the pasting error into the successor error.  This record is
-	an internal proof obligation and is not an additional hypothesis in
-	Theorem~\ref{thm:main-induction}.
-\end{definition}
-
-\begin{definition}[Lean successor obligation reductions]\label{def:successor-obligation-reductions}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorBound_pred, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit, MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations}
-	\leanok
-	\uses{def:successor-pasting-data, def:self-improvement-slice-transport}
-	The following Lean declarations are implementation reductions for the
-	successor proof.  They are proved internal theorems, not additional
-	hypotheses in Theorem~\ref{thm:main-induction}.  The answer-valued
-	small-error theorem converts
-	the answer-valued slice data to this pasting datum and applies the
-	proved stage-data theorem.  The Lean theorem
-	\texttt{mainInductionSuccessorNext\_ofAnswerStageObligations} is the
-	proved nontrivial branch: it assumes the small-error condition already
-	obtained in the proof of \texttt{mainInductionSuccessorNextOfSmallError},
-	constructs the answer-valued restricted-probability data and
-	self-improvement data from the supplied transport, and invokes the
-	small-error answer-stage pasting theorem.  The theorem
-	\texttt{mainInductionSuccessorNext\_ofAnswerStageObligationsFromSuccessorBound}
-	derives the predecessor large-\(k\) side condition from the successor one,
-	and
-	\texttt{mainInductionSuccessorNext\_ofAnswerStageObligationsFromSuccessorBoundSplit}
-	adds the trivial large-error branch.  The arithmetic lemma
-	\texttt{mainInductionSuccessorBound\_pred} derives the predecessor large-\(k\)
-	side condition from the successor one.  The degree-zero reduction
-	\texttt{mainInductionSuccessorNext\_degreeZero\_ofPastingFamily} shows that
-	the existing degree-zero pasting theorem suffices once a complete and
-	point-consistent slice family has been constructed and its scalar error is
-	absorbed into the main-induction error; it does not itself construct that
-	degree-zero family from the successor-step hypotheses.  The small-error
-	degree-split theorem
-	\texttt{mainInductionSuccessorNextOfSmallError\_ofDegreeSplitPastingObligations}
-	combines the positive-degree answer-valued route with this degree-zero
-	reduction under the nontrivial small-error assumption.  The corresponding
-	named construction target is
-	\texttt{DegreeZeroPastingFamilyObligation.ofSmallError}.  Finally,
-	\texttt{mainInductionSuccessorNext\_ofDegreeSplitPastingObligations} adds the
-	trivial large-error case and delegates its small-error branch to the
-	degree-split theorem just described.  These declarations are internal
-	theorems, not results stated in the paper and not additional hypotheses in
-	Theorem~\ref{thm:main-induction}.
+	separate proof inputs.  The answer-valued small-error assembly then converts
+	the answer-valued slice data to this pasting interface and applies the
+	checked stage-data theorem.
 \end{definition}
 
 \begin{lemma}[Base case of main induction]\label{lem:main-induction-base}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}
+	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionBaseCase}
 	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq}
 	Under the hypotheses of Theorem~\ref{thm:main-induction} with $m=1$, there exists a measurement $G \in \polymeas{1}{q}{d}$ such that, on average over $u \sim \F_q$,
@@ -305,6 +257,8 @@
 		A_a^u \ot I \simeq_\eps I \ot G_{[g(u)=a]},
 	\]
 	which is stronger than the bound required by Theorem~\ref{thm:main-induction} for $m=1$.
+	Lean also proves the same one-dimensional construction for the
+	answer-valued strategy interface used by the recursive-slice route.
 \end{lemma}
 \begin{proof}
 	\leanok
@@ -313,11 +267,13 @@
 
 \begin{lemma}[Large-error branch of main induction]\label{lem:main-induction-large-error}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}
+	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionOfOneLeError}
 	\leanok
 	\uses{def:polymeasurements, def:simeq}
 	If the target error parameter in Theorem~\ref{thm:main-induction} is at least
 	\(1\), then the conclusion follows from a distinguished trivial polynomial
-	measurement.
+	measurement.  Lean also proves the same large-error branch for the
+	answer-valued strategy interface used by the recursive-slice route.
 \end{lemma}
 \begin{proof}
 	\leanok
@@ -329,8 +285,7 @@
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement}
-	\leanok
-	\uses{def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base, lem:main-induction-large-error}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq}
   Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
@@ -344,11 +299,21 @@
     A_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]}.
   \]
 \end{theorem}
+\begin{proof}
+	\uses{lem:main-induction-base, lem:main-induction-large-error, prop:main-induction-source-range-obligation}
+	The base case and the large-error branch are formalized.  The remaining
+	source-range interval is
+	Proposition~\ref{prop:main-induction-source-range-obligation}.  The
+	corrected large-\(k\) successor branch is now proved in Lean.
+	The Lean link above records the source-shaped statement, but the theorem is
+	not marked \texttt{\textbackslash leanok} until this source-range obligation is
+	discharged from the paper hypotheses.
+\end{proof}
 
 \begin{theorem}[Main induction, corrected large-\(k\) formal interface]\label{thm:main-induction-current-interface}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
 	\leanok
-	\uses{thm:main-induction, def:good-strategy, def:polymeasurements, def:simeq, lem:main-induction-base, lem:main-induction-large-error}
+	\uses{def:good-strategy, def:polymeasurements, def:simeq}
 	This is the strengthened large-\(k\) Lean interface toward
 	Theorem~\ref{thm:main-induction}.  It is not the printed theorem.  The source
 	theorem assumes \(k\ge md\), while the proof route below invokes the pasting
@@ -369,32 +334,186 @@
 	\]
 \end{theorem}
 \begin{proof}
-	\uses{lem:restricted-probabilities, lem:weighted-restricted-probability-bounds, lem:main-induction-base, thm:self-improvement-in-induction-section, thm:ld-pasting-in-induction-section, def:successor-pasting-data}
+	\leanok
+	\uses{lem:main-induction-base, lem:main-induction-large-error, prop:main-induction-successor-small-error-construction}
+	The base case, the large-error branch, and the small-error successor
+	construction are all formalized for the corrected large-\(k\) interface.
+\end{proof}
+
+\begin{proposition}[Source-range obligation for the induction theorem]\label{prop:main-induction-source-range-obligation}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation}
+	This is the part of the printed range \(k\ge md\) not covered by the
+	corrected large-\(k\) interface: \(md\le k<400md\).  The large-error branch
+	and the base case are already separated.  The direct proof hole is the
+	positive-degree, non-base, small-error branch with \(1\le k\).  This branch is
+	not vacuous and is not an additional hypothesis of
+	Theorem~\ref{thm:main-induction}.
+\end{proposition}
+\begin{proof}
+	\uses{lem:main-induction-base, lem:main-induction-large-error}
+	The large-error and base branches are proved.  The positive-degree non-base
+	small-error branch remains open, so this frontier proposition is intentionally
+	not marked \texttt{\textbackslash leanok}.
+\end{proof}
+
+\begin{proposition}[Small-error successor construction for the induction theorem]\label{prop:main-induction-successor-small-error-construction}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction}
+	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionSuccessorNext_ofSmallErrorConstruction}
+	\leanok
+	This is the nontrivial successor branch in the corrected large-\(k\)
+	induction interface.  The ordinary successor theorem now reduces to the
+	internal answer-valued induction theorem.  That theorem supplies the
+	predecessor induction argument for the restricted slices by a genuine strong
+	induction on the dimension.  The answer-valued pasting invocation is recorded
+	in Proposition~\ref{prop:main-induction-successor-answer-valued-pasting},
+	and the answer-valued self-improvement construction is checked by
+	Proposition~\ref{prop:main-induction-successor-answer-slice-realization}.
+	This is a construction internal to the proof, not an assumption of
+	Theorem~\ref{thm:main-induction}.  The recursive slice route applies also
+	when \(d=0\); there is no longer a separate degree-zero family obligation in
+	this successor reduction.
+\end{proposition}
+\begin{proof}
+	\leanok
+	\uses{prop:main-induction-successor-predecessor-induction, prop:main-induction-successor-answer-slice-realization, prop:main-induction-successor-answer-valued-pasting}
+	The checked assembly theorem
+	\texttt{mainInductionSuccessorNext\_ofSmallErrorConstruction\_ofAnswerCarrier}
+	reduces the ordinary branch to the answer-valued induction theorem.  The
+	answer-valued induction theorem supplies the predecessor argument internally;
+	the answer-valued slice self-improvement construction and the averaged
+	family-field assembly are checked, and the answer-valued pasting proposition
+	below supplies the final pasting input.
+\end{proof}
+
+\begin{proposition}[Predecessor induction argument for successor slices]\label{prop:main-induction-successor-predecessor-induction}
+	\uses{lem:restricted-probabilities}
+	\lean{MIPStarRE.LDT.MainInductionStep.xRestrictedAnswerSymStratOfAnswer}
+	\lean{MIPStarRE.LDT.MainInductionStep.answerSuccessorRestrictedProbabilities}
+	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInduction}
+	\leanok
+	In the small-error successor branch, the proof must apply the induction
+	hypothesis in dimension \(m\) to the restricted strategies indexed by
+	\(x\in\mathbb F_q\), with the same integer \(k\).  The successor large-\(k\)
+	hypothesis implies the predecessor large-\(k\) side condition in the corrected
+	formal interface, and the nontrivial small-error branch supplies \(k\ge1\).
+	This is the genuine recursive use of the theorem; it is not an additional
+	hypothesis on the successor strategy.  The answer-valued restriction map for
+	an answer-valued successor strategy is now explicit in Lean; it preserves the
+	full function-valued diagonal answer on the slice, so it does not use the
+	ordinary low-degree realization that is unavailable for arbitrary
+	answer-valued diagonal measurements.  The corresponding restricted-probability
+	theorem for answer-valued successor strategies is also checked: the
+	axis-parallel and diagonal slice averages are derived from the ambient
+	answer-valued goodness assumptions, and the diagonal calculation uses the
+	full function-valued answer rather than an ordinary polynomial-valued
+	realization.  Lean now also checks the recursive application itself: after
+	these restricted probabilities are constructed, the predecessor
+	answer-valued induction hypothesis gives the main-induction conclusion for
+	every answer-valued restricted slice.  The theorem
+	\texttt{answerMainInduction} now supplies this predecessor hypothesis by
+	strong induction on the dimension.  Thus the predecessor induction argument
+	is a checked internal construction, not an additional theorem hypothesis.
+\end{proposition}
+\begin{proof}
+	\leanok
+	The Lean proof is contained in the simultaneous answer-valued induction
+	theorem and its restricted-slice constructors.
+\end{proof}
+
+\begin{proposition}[Answer-valued slice self-improvement]\label{prop:main-induction-successor-answer-slice-realization}
+	\uses{thm:self-improvement-in-induction-section}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.slice_outputs_ofAnswerCarrier}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofAnswerCarrier}
+	\leanok
+	The restricted slice strategy is represented in Lean by an answer-valued
+	strategy.  The slice self-improvement data are constructed directly: replace
+	only the diagonal part by an inert ordinary covariant measurement and apply
+	the induction-section self-improvement theorem in the form whose hypotheses
+	are the axis-parallel and point self-consistency estimates.  Since the
+	Section~9 conclusion is independent of the diagonal-line error parameter,
+	no low-degree support theorem for the answer-valued diagonal outcomes is
+	needed for this step.  Such a support theorem would still be necessary for
+	the stronger route which realizes the answer-valued diagonal measurement as
+	an ordinary polynomial-valued covariant measurement, but that realization is
+	not used here.
+\end{proposition}
+\begin{proof}
+	\leanok
+	\proves{prop:main-induction-successor-answer-slice-realization}
+	\uses{thm:self-improvement-in-induction-section}
+	The Lean proof is the carrier construction described in the statement.  The
+	diagonal component of the carrier is a fixed covariant projective
+	measurement; the hypotheses consumed by self-improvement are the
+	axis-parallel and point self-consistency estimates of the answer-valued
+	restricted slice.
+\end{proof}
+
+\begin{proposition}[Answer-valued pasting for the successor step]\label{prop:main-induction-successor-answer-valued-pasting}
+	\uses{thm:ld-pasting-in-induction-section, prop:main-induction-successor-predecessor-induction, prop:main-induction-successor-answer-slice-realization}
+	\lean{MIPStarRE.LDT.MainInductionStep.answerLdPastingInInductionSectionOfSmallError}
+	\leanok
+	After the recursive answer-valued slice measurements and the slice-wise
+	self-improvement outputs have been averaged, Lean has a polynomial family
+	which is complete, point-consistent with the actual answer-valued point
+	measurement, strongly self-consistent, and bounded by the witnesses obtained
+	from self-improvement.  The boundedness input is presently typed through the
+	point-equivalent ordinary carrier, because the existing boundedness interface
+	for pasting is an ordinary-strategy interface.
+
+	The final induction-section pasting invocation is proved by first deriving
+	the answer-valued Section~10 point-commutativity estimate from the
+	answer-valued diagonal-line verifier relation, then invoking the Section~11
+	scalar chain in the form which assumes this point-commutativity estimate.
+	The proof does not replace the answer-valued strategy by the ordinary carrier
+	for the diagonal-line test; the carrier is used only for the ordinary
+	boundedness interface.  This proposition is therefore a Lean-only internal
+	construction for the simultaneous successor proof, not a new hypothesis of
+	Theorem~\ref{thm:main-induction} and not a replacement for
+	Theorem~\ref{thm:ld-pasting-in-induction-section}.
+\end{proposition}
+\begin{proof}
+	\leanok
+	\uses{thm:ld-pasting-in-induction-section}
+	The checked reduction
+	\texttt{answerMainInductionSuccessorNext\_ofRecursiveHypothesisAndAnswerPasting}
+	shows that, with the predecessor answer-valued induction hypothesis in the
+	successor context, the successor branch reduces to the answer-valued pasting
+	theorem
+	\texttt{answerLdPastingInInductionSectionOfSmallError}.  That theorem is now
+	proved from the answer-valued commutativity route, the degree-zero branch, and
+	the scalar absorption estimate.
+\end{proof}
+
+\paragraph{Proof frontier for the current induction interface.}
 	In Lean, the base case is formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
+	The answer-valued analogue needed by the simultaneous recursive route uses
+	the same one-dimensional axis-parallel-line construction and does not involve
+	the diagonal answer interface.
 		The remaining part of the printed source range \(md\le k<400md\) is recorded
 		as the named obligation
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation},
-		rather than being added as a hypothesis of the source theorem.  This reduction
+		rather than being added as a hypothesis of the source theorem.  This wrapper
 		closes the large-error case by
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}; its
 		remaining branch is the small-error source-range obligation
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorObligation}.
-		This small-error reduction closes the base case by
+		This small-error wrapper closes the base case by
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}; the remaining
-		non-base reduction is
+		non-base wrapper is
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorNonBaseObligation}.
 		Its degree-zero branch is contradictory from \(k<400m\cdot0\), so the
-		positive-degree non-base reduction is
+		positive-degree non-base wrapper is
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation}.
 		It derives \(1\le k\) from \(md\le k\) and \(0<d\); the direct
 		source-range proof hole is the corresponding \(k\)-positive obligation
 		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation}.
 		The successor step of
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated in its
-	native \(m\to m+1\) form as the corrected large-\(k\) proof obligation
+	native \(m\to m+1\) form as the corrected large-\(k\) theorem
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext}.  Its
-	remaining nontrivial branch is now named as the small-error construction
+	nontrivial branch is named as the small-error construction
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction}.
 	The
 	non-base branch
@@ -419,59 +538,132 @@
 	restricted-probability estimates are now public via
 	\lean{MIPStarRE.LDT.MainInductionStep.weighted_axisParallel_bound, MIPStarRE.LDT.MainInductionStep.weighted_diagonal_bound, MIPStarRE.LDT.MainInductionStep.restrictedProbabilities},
 	The Lean proof now closes the large-error branch by
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}.  It also
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}.  The
+	answer-valued large-error branch is checked by
+	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionOfOneLeError}.  The
+	internal answer-valued induction theorem is
+	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInduction}; it is now a
+	genuine strong induction on the dimension.  The successor corollary
+	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionSuccessorNext_ofSmallErrorConstruction}
+	is proved from that induction theorem.  The surrounding development also
 	contains the internal reduction
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations}
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitObligations},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofRecursiveAnswerInduction},
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions},
-	which derives the nontrivial successor conclusion from the answer-valued
-	predecessor induction hypothesis and the concrete answer-valued
-	slice-transport data.  The second form also derives the predecessor
+	which derive the successor conclusion from the answer-valued
+	predecessor induction hypothesis.  The answer-carrier forms construct the
+	answer-valued self-improvement data directly from the restricted slices.  The
+	successor-bound forms also derive the predecessor
 	large-\(k\) and \(k\ge1\) side conditions from the successor large-\(k\)
-	hypothesis together with \(d>0\).  The split form then combines this
-	positive-degree small-error reduction with the trivial large-error theorem,
+	hypothesis together with the small-error assumption.  The split form then
+	combines this small-error reduction with the trivial large-error theorem,
 	so these elementary arithmetic conditions and the large-error case are no
-	longer part of the remaining proof frontier.  The final form also separates
-	the \(d=0\) small-error successor branch from the positive-degree route; this
-	degree-zero branch is now an explicitly named construction obligation, rather
-	than a hidden positivity assumption on the theorem statement.  The
-	degree-zero helper routes that branch through the completed degree-zero
-	pasting construction, reducing it to the construction of a complete and
-	point-consistent slice family and the scalar absorption into
-	\texttt{mainInductionError}.  The last helper composes this degree-zero
-	pasting-family route with the degree split, so the degree-zero part of the
-	frontier is stated by the required family-and-scalar construction rather than
-	by an abstract successor conclusion.  The small-error internal-constructions
-	helper then closes the small-error branch once the predecessor induction
-	hypothesis, the degree-zero family construction, and the positive-degree
-	slice-transport construction are supplied inside the induction proof.  Thus
-	the remaining direct
-	\texttt{sorry} is attached to the named small-error construction rather than
-	to an anonymous branch in the public successor theorem.  The genuine
-	interface mismatch in the
-	positive-degree branch is the slice-transport datum:
-	the recursive slice is represented by the answer-valued strategy
-	\texttt{xRestrictedAnswerSymStrat}, while the available induction-section
-	self-improvement theorem is stated for ordinary \texttt{SymStrat}s.  The
-	checked transport constructors
+	longer part of the remaining proof frontier.  The recursive answer-valued
+	reduction is the checked all-error successor assembly in the local context
+	where the predecessor induction hypothesis has been supplied by the strong
+	induction.  The recursive-slice
+	helper shows that the separate degree-zero family route is not needed for
+	the successor reduction: the predecessor induction hypothesis is used for
+	the restricted slices also when \(d=0\), while \(k\ge1\) comes from the
+	nontrivial error branch.  Thus the ordinary small-error construction theorem
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction}
+	is now proved from the internal answer-valued induction theorem, and the
+	answer-valued pasting theorem
+	\lean{MIPStarRE.LDT.MainInductionStep.answerLdPastingInInductionSectionOfSmallError}
+	is also proved by the answer-valued commutativity route, the degree-zero
+	branch, and the scalar absorption estimate.  None of these constructions is a
+	separate source hypothesis.  The former answer-valued self-improvement interface mismatch is
+	resolved for the induction step by the checked carrier construction.  The
+	older ordinary-realization constructors
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSelfImprovementInInductionSection, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
-	show that, once such ordinary slice strategies and their verifier-visible
-	measurement equalities are supplied, the Section~9 theorem can be applied
-	slice by slice without importing the remaining \texttt{sorryAx}.  The
-	remaining proof gap for
-	Theorem~\ref{thm:main-induction-current-interface} is to supply the
-	predecessor induction argument, the degree-zero successor branch, and either
-	an ordinary covariant slice-strategy realization of the answer-valued
-	restriction or an answer-valued self-improvement theorem, internally from the
-	corrected theorem hypotheses.  The predecessor induction argument is the
-	local induction hypothesis for dimension \(m\), applied to the restricted
-	strategies at heights \(x \in \F_q\); it is not an additional hypothesis
-	about the successor strategy.  Hence no proof-level \leanok is attached here.
+	remain available and show that, under the stronger ordinary-realization
+	route, the Section~9 theorem can also be applied slice by slice without
+	importing the remaining \texttt{sorryAx}.  Such a route still requires a
+	low-degree support theorem
+	for the answer-valued diagonal outcomes; otherwise the ordinary polynomial
+	diagonal measurement cannot satisfy the required covariance after rebasing.
+	The answer-valued ambient point-consistency averaging step is now checked by
+	\lean{MIPStarRE.LDT.MainInductionStep.answer_family_pointConsistencyError_eq_avg}
+	and
+		\lean{MIPStarRE.LDT.MainInductionStep.answer_family_consistency_of_slice_bounds}.
+		These lemmas prove the last-coordinate reindexing identity and the averaged
+		consistency estimate for an ambient answer-valued strategy.  The
+		answer-valued successor scalar averaging estimates are checked by
+		\lean{MIPStarRE.LDT.MainInductionStep.average_answerSuccessorSliceSelfImprovementError_le},
+		\lean{MIPStarRE.LDT.MainInductionStep.average_answerSuccessorSliceMainInductionNu_le}
+		and
+		\lean{MIPStarRE.LDT.MainInductionStep.average_answerSuccessorSliceMainInductionError_le};
+		these are the \(\zeta_x\), \(\nu_x\), and \(\sigma_x\) Jensen and
+		conditioning bounds for the actual
+		\texttt{AnswerSymStrat} restricted successor profiles.  The theorem
+		\lean{MIPStarRE.LDT.MainInductionStep.answerSuccessorRecursiveSliceMeasurements_ofMainInductionHypothesis}
+		now extracts the recursive slice measurements from the predecessor
+		answer-valued induction hypothesis and proves the averaged
+		\(\sigma_x\)-bound.  The theorem
+		\lean{MIPStarRE.LDT.MainInductionStep.answerSuccessorSelfImprovementOutputs_ofMainInductionHypothesis}
+		then applies the axis-parallel/self-consistency form of self-improvement
+		slice by slice, producing the projective \(\widehat G^x\)'s and
+		witnesses \(Z^x\) together with the averaged \(\zeta_x\) and
+		\(\sigma_x\) bounds.  These slice outputs are assembled at the
+		ambient answer-valued level by
+		\lean{MIPStarRE.LDT.MainInductionStep.answerSuccessorAveragedFamilyFields_ofMainInductionHypothesis},
+		which proves averaged completeness, point consistency with the actual
+		answer-valued point measurement, strong self-consistency, the carrier-typed
+		slice boundedness input, and the \(\kappa\)- and \(\zeta\)-bounds.  This
+		is not a final pasting theorem: the boundedness field uses the
+		point-equivalent ordinary carrier only because the current boundedness
+		interface is typed for ordinary strategies, and no claim is made that the
+		carrier's dummy diagonal measurement satisfies the answer-valued diagonal
+		test.  The answer-valued pasting invocation is proved as
+		\lean{MIPStarRE.LDT.MainInductionStep.answerLdPastingInInductionSectionOfSmallError}.
+		The checked reduction
+		\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionSuccessorNext_ofRecursiveHypothesisAndAnswerPasting}
+		shows that, with the predecessor answer-valued induction hypothesis
+		available in the successor context, the successor branch reduces to this
+		answer-valued pasting theorem.  The conditional reduction is an internal
+		lemma used inside the strong-induction proof, not a proof-level
+		formalization link for a source theorem.  The remaining
+		ordinary family-level averaging components are also now isolated as checked
+		lemmas:
+	\lean{MIPStarRE.LDT.MainInductionStep.idxPolyFamily_complete_of_slice_bounds}
+	\lean{MIPStarRE.LDT.MainInductionStep.idxPolyFamily_stronglySelfConsistent_of_slice_bounds}
+	and
+	\lean{MIPStarRE.LDT.MainInductionStep.idxPolyFamily_sliceBoundednessInput_of_slice_bounds}.
+	For answer-valued self-improvement data attached to an ordinary ambient
+	strategy, the corresponding pasting fields are checked directly by
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.complete_of_slice_bounds}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.consistentWithPoints_of_slice_bounds}
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.stronglySelfConsistent_of_slice_bounds}
+	and
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.sliceBoundednessInput_of_slice_bounds}.
+	The direct ordinary-ambient answer-valued assembly
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallErrorDirect}
+	now invokes the induction-section pasting theorem from these fields and the
+	answer-valued averaged scalar estimates; the exported theorem
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError}
+	calls this direct proof.
+	The remaining ambient answer-valued assembly is therefore the
+	\texttt{AnswerSymStrat} analogue needed inside the simultaneous successor
+	proof, together with the final pasting interface, not the ordinary
+	answer-valued slice averaging calculation.
+	The remaining proof gap for
+	Theorem~\ref{thm:main-induction-current-interface} is to prove the
+	answer-valued pasting invocation after the predecessor induction argument has
+	been supplied internally.  That predecessor argument is the local induction
+	hypothesis for dimension \(m\), applied to the restricted strategies at
+	heights \(x \in \F_q\); it is not an additional hypothesis about the
+	successor strategy.  Hence no proof-level
+	\texttt{\textbackslash leanok} is attached here.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
@@ -588,29 +780,27 @@
 		\le (m+1)^2\left(\nu+e^{-k/(80000(m+1)^2)}\right),
 	\]
 	which is exactly the bound required for dimension $m+1$.
-\end{proof}
 
-\begin{remark}[Lean proof gap for the successor-step assembly]\label{rem:main-induction-successor-assembly}
+\begin{remark}[Lean status of the successor-step assembly]\label{rem:main-induction-successor-assembly}
 	The Lean declaration for
 	Theorem~\ref{thm:main-induction-current-interface} has the corrected
 	large-\(k\) theorem hypotheses and no additional stage-data hypotheses.  Its
-	remaining proof obligation is the native successor step
-	\texttt{mainInductionSuccessorNext}.  The
-	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} are
-	still exposed through the public restricted-probability constructor above, but
-	the recursive slice witnesses, the slice-wise self-improvement outputs, and
-	the pasting comparison must be derived inside the successor proof itself.
-	They are not represented by a separate theorem whose assumptions are added
-	to the paper statement.
+	native successor step \texttt{mainInductionSuccessorNext} is now proved.  The
+	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} remain
+	exposed through the public restriction-package constructor above, but the
+	recursive slice witnesses, the slice-wise self-improvement outputs, and the
+	answer-valued pasting comparison are derived inside the successor proof.  They
+	are not represented by a separate theorem whose assumptions are added to the
+	paper statement.
 \end{remark}
 
 \section{Proof of the main formal theorem}
 
-\begin{lemma}[Role-register symmetrization bridge]\label{lem:symmetrization-bridge}
+\begin{lemma}[Same-space role-register symmetrization]\label{lem:role-register-symmetrization}
 	\lean{MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization_isGood_three_mul, MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization_isNormalized}
 	\leanok
 	\uses{def:projective-strategy, def:symmetric-projective-strategy, def:good-strategy}
-	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good.
+	Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a same-space projective strategy passing the $(m,q,d)$ low individual degree test with probability at least $1-\eps$. Introducing a two-dimensional role register on each side and taking $(\psi_{\mathrm{sym}}, A_{\mathrm{sym}}, B_{\mathrm{sym}}, L_{\mathrm{sym}})$ as in paper Section~3 yields a symmetric projective strategy that is $(3\eps,3\eps,3\eps)$-good.
 \end{lemma}
 \begin{proof}
 	\leanok
@@ -622,13 +812,13 @@
 	The formal proof of Theorem~\ref{thm:main-formal} also uses auxiliary data
 	containing the symmetrized strategy, its goodness proof, and its normalization
 	proof.  This auxiliary data supports the final assembly, not an
-	additional hypothesis in Lemma~\ref{lem:symmetrization-bridge}.
+	additional hypothesis in Lemma~\ref{lem:role-register-symmetrization}.
 \end{remark}
 
 \begin{proposition}[Lean base-case handoff for the Section 3 proof]\label{lem:main-formal-base-case-handoff}
 	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInductionBaseCase}
 	\leanok
-	\uses{lem:symmetrization-bridge, thm:main-induction}
+	\uses{lem:role-register-symmetrization, thm:main-induction}
 	If $m=1$, then for every $k$ the role-register symmetrization of a projective
 	strategy passing the low individual degree test with error $\eps$ admits a
 	measurement $G$ satisfying the base-case conclusion of
@@ -636,18 +826,16 @@
 \end{proposition}
 \begin{proof}
 	\leanok
-		This is a Lean-only construction theorem: combine Lemma~\ref{lem:symmetrization-bridge}
+		This is a Lean-only construction theorem: combine Lemma~\ref{lem:role-register-symmetrization}
 	with the $m=1$ clause of Theorem~\ref{thm:main-induction}, formalized as
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
 \end{proof}
 
-\begin{definition}[Lean successor restricted-recursion targets for the Section 3 proof]\label{def:main-formal-successor-boundary}
+\paragraph{Lean successor restricted-recursion targets for the Section 3 proof.}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionData, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofInductionData}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionData}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRestrictionData, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass}
-	\leanok
-	\uses{lem:symmetrization-bridge, thm:main-induction-current-interface}
 	These Lean-only declarations name the restricted-probability and recursive-slice
 	targets appearing in the successor comparison with
 	Remark~\ref{rem:main-induction-successor-assembly}.  The public weighted-bound
@@ -663,9 +851,8 @@
 	transport of their restricted point, axis-parallel, and diagonal measurements
 	should be proved in the successor branch rather than represented as a
 	hypothesis in the statement of Theorem~\ref{thm:main-formal}.
-\end{definition}
 
-\begin{definition}[Lean base-case Step~6 obligations for the Section~3 proof]\label{def:main-formal-step6-obligations}
+\begin{definition}[Lean base-case Step~6 constructions for the Section~3 proof]\label{def:main-formal-step6-constructions}
 	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
 	\lean{MIPStarRE.LDT.Test.MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency}
@@ -673,7 +860,7 @@
 	\lean{MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness}
 	\lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
 	\leanok
-	\uses{def:main-formal-successor-boundary, thm:orthonormalization}
+	\uses{thm:orthonormalization}
 	From a line-130 consistency relation, the theorem
 	\texttt{MainFormalDiagonalOrthonormalizationWitness.nonempty\_ofDiagonalConsistency}
 	constructs the pre-completion projective submeasurements using the Section~5
@@ -695,54 +882,52 @@
 	public statement.
 
 	The successor-dependent targets that call
-	Theorem~\ref{thm:main-induction-current-interface} are recorded in
-	Definition~\ref{def:main-formal-step6-successor-targets}; they carry the
-	tracked successor proof gap of issue~\#1507.
+	Theorem~\ref{thm:main-induction-current-interface} are described below; they carry the
+	checked successor construction for the corrected large-\(k\) interface.
 \end{definition}
 
 
-\begin{definition}[Lean successor-dependent Step~6 targets]\label{def:main-formal-step6-successor-targets}
+\paragraph{Lean successor-dependent Step~6 targets.}
 	\lean{MIPStarRE.LDT.Test.strategySymmetrization_mainInduction, MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction}
-	\leanok
-	\uses{def:main-formal-step6-obligations, thm:main-induction-current-interface}
 	The role-register Section~6 measurement is obtained by applying the
 	corrected large-\(k\) theorem \texttt{MainInductionStep.mainInduction} to
 	the role-register symmetrization.  The construction
 	\texttt{strategySymmetrization\_mainInduction} records this
 	application, and \texttt{MainFormalRoleInductionWitness.ofMainInduction}
-	builds the role-register witness from it.  Any successor proof gap is the
-	remaining proof obligation in \texttt{mainInduction} itself
-	(Remark~\ref{rem:main-induction-successor-assembly}, tracked by
-	issue~\#1507).  The \texttt{\textbackslash leanok} marker on this definition
-	records that these Lean targets are named and type-correct; it does not assert
-	that the successor-dependent witness is proof-closed independently of
-	\texttt{mainInduction}.  These targets are not an added hypothesis of
-	Theorem~\ref{thm:main-formal} but internal proof steps whose completion waits
-	on the discharge of the Section~6 successor proof.
-\end{definition}
+	builds the role-register witness from it.  These successor-dependent targets
+	are proof-complete for the current same-space corrected-range interface.  They
+	are not an added hypothesis of Theorem~\ref{thm:main-formal}; the remaining
+	source-boundary work lies in the two-space role-register reduction and the
+	printed \(k\ge md\) range, not in the corrected large-\(k\) successor
+	construction.
 
 
-\begin{remark}[Successor projective-completion construction]\label{rem:main-formal-successor-completion-obligation}
-	The remaining successor-case proof work is not named as an additional Lean
-	hypothesis of Theorem~\ref{thm:main-formal}.  Starting from a projective
-	strategy that passes the low individual degree test, the large-\(k\) bound
-	\(k \ge 400md\) from Section~6, and the non-base condition \(m \neq 1\), the
-	proof must construct the projective-completion witness consumed by
-	\texttt{mainFormal\_ofProjectiveCompletionTransportWitness}.  This is part of the
-	unfinished proof of the paper theorem, not a separate assumption in its
-	statement.
+\begin{remark}[Projective-completion construction]\label{rem:main-formal-successor-completion-obligation}
+	The projective-completion witness consumed by
+	\texttt{mainFormal\_ofProjectiveCompletionTransportWitness} is now constructed
+	in the proof of the current same-space corrected-range interface.  This
+	construction is not a separate assumption in the statement of
+	Theorem~\ref{thm:main-formal}.  The source theorem is still not proof-complete,
+	because it starts from a general two-space strategy and the printed range
+	\(k\ge md\), while the checked interface assumes same-space strategies and
+	\(k\ge400md\) together with the scalar-cascade boundary \(k>0\).
 \end{remark}
 
 \begin{remark}[Lean measurement-unsymmetrization consistency]\label{rem:main-formal-unsymmetrization-bridge}
 	Lean now isolates the Step~3 extraction from \texttt{inductive\_step.tex}
-	lines 84--108.  The principal-block map \texttt{extractRoleBlock} turns a
-	role-register POVM $G$ into the two POVMs $G^{\mathrm A}$ and
-	$G^{\mathrm B}$ on the original prover space and proves that point-evaluation
-	postprocessing commutes with this extraction.  The two round-trip lemmas
-	identify the $A$ and $B$ blocks of the symmetrized point measurement with the
-	original prover point measurements.  The remaining analytic factor-two
-	estimates \eqref{eq:cons-a} and \eqref{eq:cons-b} are named by
-	\texttt{UnsymmetrizationConsistency}; no projectivity of arbitrary principal
+	lines 84--108.  In the same-space route, the principal-block map
+	\texttt{extractRoleBlock} turns a role-register POVM \(G\) into the two POVMs
+	\(G^{\mathrm A}\) and \(G^{\mathrm B}\) on the original prover space and
+	proves that point-evaluation postprocessing commutes with this extraction.
+	In the heterogeneous two-space route, the corresponding principal-block maps
+	\texttt{extractRoleRegisterAlice} and \texttt{extractRoleRegisterBob}
+	extract the occupied \((\mathrm A,\mathrm{inl})\) and
+	\((\mathrm B,\mathrm{inr})\) blocks of a measurement on
+	\(\{\mathrm A,\mathrm B\}\times(\mathcal H_{\mathrm A}\oplus\mathcal H_{\mathrm B})\).
+	Lean proves the trace-level factor-two identities for arbitrary
+	role-register measurements in
+	\texttt{qBipartiteConsDefect\_roleRegisterProjMeas\_arbitrary\_eq\_average}
+	and its two factor-two consequences.  No projectivity of arbitrary principal
 	blocks is claimed, matching the paper's later projectivization step.
 \end{remark}
 
@@ -962,7 +1147,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 \end{remark}
 \begin{proof}
 	\proves{thm:main-formal}
-	\uses{thm:main-induction, lem:symmetrization-bridge, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual, def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
+	\uses{thm:main-induction, lem:role-register-symmetrization, lem:orthonormalization-main-lemma, prop:completing-to-measurement, prop:simeq-triangle-inequality, prop:simeq-data-processing, prop:simeq-to-approx, prop:triangle-sub, prop:triangle-inequality-for-approx_delta, lem:schwartz-zippel-individual, def:main-formal-envelope, def:main-formal-error-cascade, thm:sigma-bound-main-formal, thm:zeta-bounds-main-formal}
 	Let
 	\[
 		(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})
@@ -1034,7 +1219,10 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionBound}
 	formalizes this expansion/reindexing step and combines it with the proved
 	Schwartz--Zippel tensor bound
-	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}.
+	\lean{MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq}.  The
+	Lean statement is now formulated for a bipartite state on
+	\(H_A\otimes H_B\), so this particular Schwartz--Zippel loss is no longer a
+	same-space restriction in the source-theorem route.
 
 	Apply Lemma~\ref{lem:orthonormalization-main-lemma} to \ref{eq:G-self-consistency}. This gives projective submeasurements $P^{\mathrm A},P^{\mathrm B} \in \polysub{m}{q}{d}$ with
 	\[

@@ -256,18 +256,9 @@ This is the role-register handoff used by the paper proof of
 `\label{thm:main-formal}` at `references/ldt-paper/inductive_step.tex:68-83`.
 It calls the separate Lean interface `MainInductionStep.mainInduction`, whose
 large-`k` correction is recorded in `thm:main-induction-current-interface`.
-Consequently the remaining successor proof gap is the tracked Section 6
-small-error construction, not an extra successor-boundary hypothesis in the
-Section 3 theorem.
-
-**Unfaithful:** This proof transitively uses `MainInductionStep.mainInduction`,
-which still depends on the tracked small-error successor construction
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
-Documented in issue #1507 under #1458; the cited source proof is
-`references/ldt-paper/inductive_step.tex:68-83`, using the successor
-construction at `references/ldt-paper/inductive_step.tex:441-551`.
-Elimination: prove the Section 6 successor construction and then this handoff
-becomes standard-axiom clean. -/
+The Section 6 successor construction is now proved inside that interface, so
+this handoff is standard-axiom clean.  It remains a corrected large-`k`
+same-space route, not the printed two-space source theorem. -/
 theorem strategySymmetrization_mainInduction
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

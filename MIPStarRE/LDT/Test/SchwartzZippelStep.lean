@@ -20,8 +20,10 @@ namespace Test
 
 open Classical in
 private lemma postprocess_match_summand_expand
-    {α β ι : Type*} [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) (b : β) :
+    {α β ιA ιB : Type*} [Fintype α] [Fintype β]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB)
+    (f : α → β) (b : β) :
     ev ψ (opTensor ((postprocess A f).outcome b) ((postprocess B f).outcome b)) =
       ∑ aa : α × α,
         if f aa.1 = b ∧ f aa.2 = b then
@@ -40,8 +42,10 @@ private lemma postprocess_match_summand_expand
 
 open Classical in
 private lemma qBipartiteMatchMass_postprocess_eq_pair_sum
-    {α β ι : Type*} [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
+    {α β ιA ιB : Type*} [Fintype α] [Fintype β]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB)
+    (f : α → β) :
     qBipartiteMatchMass ψ (postprocess A f) (postprocess B f) =
       ∑ aa : α × α,
         if f aa.1 = f aa.2 then
@@ -95,8 +99,9 @@ private lemma qBipartiteMatchMass_postprocess_eq_pair_sum
 
 open Classical in
 private lemma qBipartiteMatchMass_eq_pair_diag
-    {α ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) :
+    {α ιA ιB : Type*} [Fintype α]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB) :
     qBipartiteMatchMass ψ A B =
       ∑ aa : α × α,
         if aa.1 = aa.2 then
@@ -119,15 +124,19 @@ private lemma qBipartiteMatchMass_eq_pair_diag
 
 open Classical in
 private noncomputable def localCollisionMass
-    {α β ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) : Error :=
+    {α β ιA ιB : Type*} [Fintype α]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB)
+    (f : α → β) : Error :=
   ∑ aa : α × α,
     (if aa.1 = aa.2 then 0 else if f aa.1 = f aa.2 then (1 : Error) else 0) *
       ev ψ (opTensor (A.outcome aa.1) (B.outcome aa.2))
 
 private lemma localCollisionMass_nonneg
-    {α β ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
+    {α β ιA ιB : Type*} [Fintype α]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB)
+    (f : α → β) :
     0 ≤ localCollisionMass ψ A B f := by
   classical
   unfold localCollisionMass
@@ -142,8 +151,10 @@ private lemma localCollisionMass_nonneg
   · exact ev_nonneg_of_psd ψ _ (opTensor_nonneg (A.outcome_pos aa.1) (B.outcome_pos aa.2))
 
 private lemma qBipartiteMatchMass_postprocess_eq_add_localCollision
-    {α β ι : Type*} [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
+    {α β ιA ιB : Type*} [Fintype α] [Fintype β]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB)
+    (f : α → β) :
     qBipartiteMatchMass ψ (postprocess A f) (postprocess B f) =
       qBipartiteMatchMass ψ A B + localCollisionMass ψ A B f := by
   classical
@@ -165,8 +176,10 @@ private lemma max_sub_le_max_sub_add_of_nonneg (x c : Error) (hc : 0 ≤ c) :
     linarith
 
 private lemma qBipartiteConsDefect_le_postprocess_add_localCollision
-    {α β ι : Type*} [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (A B : SubMeas α ι) (f : α → β) :
+    {α β ιA ιB : Type*} [Fintype α] [Fintype β]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB)
+    (f : α → β) :
     qBipartiteConsDefect ψ A B ≤
       qBipartiteConsDefect ψ (postprocess A f) (postprocess B f) +
         localCollisionMass ψ A B f := by
@@ -186,10 +199,10 @@ private lemma qBipartiteConsDefect_le_postprocess_add_localCollision
   ring_nf
 
 private lemma avg_localCollisionMass_eval_eq_polynomialCollisionMass
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (params : Parameters) [FieldModel params.q]
-    (ψ : QuantumState (ι × ι))
-    (Left Right : SubMeas (Polynomial params) ι) :
+    (ψ : QuantumState (ιA × ιB))
+    (Left : SubMeas (Polynomial params) ιA) (Right : SubMeas (Polynomial params) ιB) :
     avgOver (uniformDistribution (Point params))
       (fun u => localCollisionMass ψ Left Right (fun g : Polynomial params => g u)) =
       Preliminaries.polynomialCollisionMass params ψ Left Right := by
@@ -231,10 +244,11 @@ Schwartz--Zippel in `Preliminaries.polynomialCollisionMass_le_mdq`.  This
 predicate records precisely that expansion step, without bundling the
 Schwartz--Zippel estimate itself into an unproved hypothesis. -/
 def MainFormalStep5ExpansionBound
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (params : Parameters) [FieldModel params.q]
-    (ψ : QuantumState (ι × ι))
-    (Left Right : SubMeas (Polynomial params) ι) : Prop :=
+    (ψ : QuantumState (ιA × ιB))
+    (Left : SubMeas (Polynomial params) ιA) (Right : SubMeas (Polynomial params) ιB) :
+    Prop :=
   bipartiteConsError ψ (uniformDistribution Unit)
       (constSubMeasFamily Left) (constSubMeasFamily Right) ≤
     bipartiteConsError ψ (uniformDistribution (Point params))
@@ -245,10 +259,10 @@ def MainFormalStep5ExpansionBound
 /-- The algebraic Step 5 expansion bound: the full-polynomial consistency
 error is bounded by the evaluated consistency error plus the collision mass. -/
 theorem mainFormalStep5_expansionBound
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (params : Parameters) [FieldModel params.q]
-    (ψ : QuantumState (ι × ι))
-    (Left Right : SubMeas (Polynomial params) ι) :
+    (ψ : QuantumState (ιA × ιB))
+    (Left : SubMeas (Polynomial params) ιA) (Right : SubMeas (Polynomial params) ιB) :
     MainFormalStep5ExpansionBound params ψ Left Right := by
   classical
   unfold MainFormalStep5ExpansionBound
@@ -285,17 +299,19 @@ theorem mainFormalStep5_expansionBound
             Preliminaries.polynomialCollisionMass params ψ Left Right
           rw [avg_localCollisionMass_eval_eq_polynomialCollisionMass]
 
-/-- Step 5 packaging for `mainFormal` using the proved algebraic expansion bound.
+/-- Heterogeneous Step 5 packaging for `mainFormal` using the proved algebraic
+expansion bound.
 
 Given evaluated consistency at error `ζ` (paper line 116) and the exact
 line-122--125 expansion recorded by `MainFormalStep5ExpansionBound`, the
 proved tensor Schwartz--Zippel bound contributes the paper's `md/q` loss and
 returns full-polynomial consistency at error `ζ + md/q` (paper lines 126--133). -/
-theorem mainFormalStep5_selfConsistency_ofExpansionBound
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
+theorem mainFormalStep5_selfConsistency_ofExpansionBound_heterogeneous
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (params : Parameters) [FieldModel params.q]
-    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
-    (Left Right : SubMeas (Polynomial params) ι) (ζ : Error)
+    (ψ : QuantumState (ιA × ιB)) (hnorm : ψ.IsNormalized)
+    (Left : SubMeas (Polynomial params) ιA) (Right : SubMeas (Polynomial params) ιB)
+    (ζ : Error)
     (hevaluated : ConsRel ψ (uniformDistribution (Point params))
       (polynomialEvaluationFamily params Left)
       (polynomialEvaluationFamily params Right) ζ) :
@@ -315,6 +331,30 @@ theorem mainFormalStep5_selfConsistency_ofExpansionBound
         have hcollision :=
           Preliminaries.polynomialCollisionMass_le_mdq params ψ hnorm Left Right
         linarith [hevaluated.offDiagonalBound, hcollision]
+
+/-- Step 5 packaging for `mainFormal` using the proved algebraic expansion bound.
+
+Given evaluated consistency at error `ζ` (paper line 116) and the exact
+line-122--125 expansion recorded by `MainFormalStep5ExpansionBound`, the
+proved tensor Schwartz--Zippel bound contributes the paper's `md/q` loss and
+returns full-polynomial consistency at error `ζ + md/q` (paper lines 126--133).
+
+This is the source-labelled same-space statement. -/
+theorem mainFormalStep5_selfConsistency_ofExpansionBound
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q]
+    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
+    (Left Right : SubMeas (Polynomial params) ι)
+    (ζ : Error)
+    (hevaluated : ConsRel ψ (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params Left)
+      (polynomialEvaluationFamily params Right) ζ) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily Left) (constSubMeasFamily Right)
+      (ζ + (params.m * params.d : Error) / params.q) := by
+  exact
+    mainFormalStep5_selfConsistency_ofExpansionBound_heterogeneous params ψ hnorm
+      Left Right ζ hevaluated
 
 end Test
 

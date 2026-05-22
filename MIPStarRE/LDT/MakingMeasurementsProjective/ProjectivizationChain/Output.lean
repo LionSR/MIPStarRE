@@ -103,13 +103,16 @@ namespace ProjectivizationSelfConsistencyHandoff
 /-- Build the projective self-consistency handoff from the two
 orthonormalize-and-complete statements.
 
-This records the exact orthonormalization projectivization obligations for the current
-`mainFormal` residual outside `Test/MainTheorem.lean`: a pre-projective
-consistency proof, the Alice-side completion statement, and the Bob-side
-completion statement. The Bob-side statement is transported from left lifts to
-right lifts using permutation invariance, matching `inductive_step.tex` lines
-146--147. The final argument allows callers to widen the literal composed
-completion error to whichever scalar envelope they are using for `ζ₂`. -/
+This is a Lean-only construction in the projectivization chain appearing in
+`references/ldt-paper/inductive_step.tex:130-149`: from a pre-projective
+consistency proof and the Alice- and Bob-side orthonormalize-and-complete
+outputs, it builds the self-consistency handoff used later in Step 6.  The
+Bob-side statement is transported from left lifts to right lifts using
+permutation invariance, matching lines 146--147.  The final argument allows
+callers to widen the literal composed completion error to the scalar envelope
+used for `ζ₂`.  This theorem is not a hypothesis of `thm:main-formal`; the
+final theorem must construct its two orthonormalize-and-complete inputs from
+the paper hypotheses. -/
 theorem ofOrthonormalizeAndCompleteStatements
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]

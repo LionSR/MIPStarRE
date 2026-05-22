@@ -208,6 +208,143 @@ EXTERNAL_CITATION_TOKENS = {
 # context.  These tokens still appear in broad mode so reviewers can see the
 # context boundary, but they are not unresolved proof-debt hypotheses.
 SOURCE_CONTEXT_TOKENS = {
+    "AlmostProjMeasStatement": (
+        "internal projectivization statement in the proof of the "
+        "projective-non-measurement lemma; see "
+        "references/ldt-paper/orthonormalization.tex:414-658"
+    ),
+    "AnswerSelfImprovementData": (
+        "answer-valued version of the slice-wise self-improvement data in the "
+        "successor step; see references/ldt-paper/inductive_step.tex:461-551"
+    ),
+    "AveragedPastingData": (
+        "internal successor-step data collecting the averaged fields needed "
+        "for the induction-section pasting invocation; see "
+        "references/ldt-paper/inductive_step.tex:541-570"
+    ),
+    "NaimarkData": (
+        "standard one-measurement Naimark construction data; see "
+        "references/ldt-paper/orthonormalization.tex:121-187 and "
+        "docs/paper-gaps/naimark.tex"
+    ),
+    "OneMeasNaimarkData": (
+        "standard one-measurement Naimark construction data; see "
+        "references/ldt-paper/orthonormalization.tex:121-187 and "
+        "docs/paper-gaps/naimark.tex"
+    ),
+    "leftData": (
+        "left-hand one-measurement Naimark data in the two-sided trace "
+        "identity; see references/ldt-paper/orthonormalization.tex:161-187 "
+        "and docs/paper-gaps/naimark.tex"
+    ),
+    "rightData": (
+        "right-hand one-measurement Naimark data in the two-sided trace "
+        "identity; see references/ldt-paper/orthonormalization.tex:161-187 "
+        "and docs/paper-gaps/naimark.tex"
+    ),
+    "hresidual": (
+        "local residual-mass comparison for restricting an Option-completed "
+        "projective submeasurement; see docs/reports/"
+        "issue-1642-restrictsome-residual-domination-obstruction.md"
+    ),
+    "hdata": (
+        "local data-processing comparison in the final fields of the "
+        "self-improvement proof; see references/ldt-paper/"
+        "self_improvement.tex:635-671"
+    ),
+    "MainFormalDiagonalOrthonormalizationWitness": (
+        "internal Step 6 witness for the orthonormalization stage of the "
+        "final theorem proof; see references/ldt-paper/"
+        "inductive_step.tex:130-149"
+    ),
+    "MainFormalProjectiveCompletionTransportWitness": (
+        "internal Step 6 witness carrying the completed projective "
+        "measurements and final transport estimates; see "
+        "references/ldt-paper/inductive_step.tex:130-185"
+    ),
+    "MainFormalRoleInductionWitness": (
+        "internal final-theorem witness supplied by the symmetric induction "
+        "route; see references/ldt-paper/inductive_step.tex:7-18 and "
+        "test_definition.tex:180-202"
+    ),
+    "MainFormalRoleMeasurementWitness": (
+        "internal role-register measurement witness in the two-space to "
+        "same-space final theorem reduction; see references/ldt-paper/"
+        "test_definition.tex:180-202 and inductive_step.tex:130-185"
+    ),
+    "MatrixSdpStatementWithSlacknessAndDominance": (
+        "Lean-only matrix SDP dominance interface used below the "
+        "self-improvement proof; see docs/reports/"
+        "issue-1458-green-node-name-inventory.md"
+    ),
+    "OrthonormalizeAndCompleteStatement": (
+        "internal Section 5 projectivization-chain statement used for "
+        "left/right completion transport; see references/ldt-paper/"
+        "orthonormalization.tex:282-538"
+    ),
+    "PerSliceInductionData": (
+        "internal Section 6 data recording recursive induction conclusions "
+        "for restricted slices; see references/ldt-paper/"
+        "inductive_step.tex:441-454"
+    ),
+    "projectiveCompletionWitness": (
+        "local variable for the constructed final Step 6 completion-transport "
+        "witness; see references/ldt-paper/inductive_step.tex:130-185"
+    ),
+    "roleInductionWitness": (
+        "local variable for the constructed symmetric-induction witness in "
+        "the final theorem proof; see references/ldt-paper/"
+        "test_definition.tex:180-202"
+    ),
+    "roleWitness": (
+        "local variable for the constructed role-register measurement witness "
+        "inside Step 6; see references/ldt-paper/inductive_step.tex:130-185"
+    ),
+    "orthWitness": (
+        "local variable for the constructed orthonormalization witness inside "
+        "Step 6; see references/ldt-paper/inductive_step.tex:130-149"
+    ),
+    "SdpStatementWithSlackness": (
+        "source-shaped SDP slackness statement used in the self-improvement "
+        "proof; see references/ldt-paper/self_improvement.tex:86-126 and "
+        "docs/reports/selfimprovement-bridge-integrity-audit.md"
+    ),
+    "SelfImprovementConclusion": (
+        "source-shaped conclusion record for the self-improvement theorem; "
+        "see references/ldt-paper/self_improvement.tex:635-671"
+    ),
+    "SelfImprovementData": (
+        "slice-wise self-improvement data in the successor step; see "
+        "references/ldt-paper/inductive_step.tex:461-551"
+    ),
+    "SelfImprovementHelperConclusion": (
+        "internal helper-output record for the self-improvement proof; see "
+        "references/ldt-paper/self_improvement.tex:86-126 and 635-671"
+    ),
+    "selfImprovementDataProcessingError": (
+        "named scalar error term for the data-processing step in "
+        "self-improvement; see references/ldt-paper/"
+        "self_improvement.tex:635-671"
+    ),
+    "SliceRestrictionData": (
+        "internal Section 6 successor-stage data for restricted-probability "
+        "estimates; see references/ldt-paper/inductive_step.tex:374-454"
+    ),
+    "SpectralTruncationStatement": (
+        "internal spectral-truncation statement in the "
+        "projective-non-measurement proof; see references/ldt-paper/"
+        "orthonormalization.tex:414-658"
+    ),
+    "AnswerSliceRestrictionData": (
+        "internal Section 6 successor-stage restriction data for the "
+        "answer-valued recursive-slice route; see "
+        "references/ldt-paper/inductive_step.tex:374-454"
+    ),
+    "AnswerPerSliceInductionData": (
+        "internal Section 6 successor-stage data recording the recursive "
+        "answer-valued induction conclusions for restricted slices; see "
+        "references/ldt-paper/inductive_step.tex:441-454"
+    ),
     "QLayerData": (
         "source construction context for the fixed rank-reduced Q family and "
         "auxiliary projectors; see "
@@ -222,6 +359,39 @@ SOURCE_CONTEXT_TOKENS = {
         "source construction context for the matrix decomposition and "
         "X/XHat/P layer; see "
         "references/ldt-paper/orthonormalization.tex:775-940"
+    ),
+}
+
+# Exact conditional-looking declaration names which are safe only in
+# informational blueprint entries.  These are Lean-only construction or
+# transport lemmas displayed near the proof, not replacements for source
+# theorem statements.  If one of these names is linked from a theorem-like
+# entry, it should still be reported as a conditional declaration-name finding.
+SOURCE_CONTEXT_CONDITIONAL_DECL_NAMES = {
+    "MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements": (
+        "Lean-only construction from two already constructed "
+        "orthonormalize-and-complete statements and a pre-projective consistency "
+        "proof; see references/ldt-paper/orthonormalization.tex:282-538 and "
+        "the informational blueprint entry "
+        "rem:lean-right-register-completion-helpers"
+    ),
+    "MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion": (
+        "Lean-only transport from the source self-improvement conclusion to the "
+        "induction-section conclusion; see references/ldt-paper/"
+        "inductive_step.tex:249-286 and the informational blueprint entry "
+        "def:self-improvement-slice-transport"
+    ),
+    "MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness": (
+        "Lean-only construction of the final projective-completion transport "
+        "witness from an already constructed role witness; see "
+        "references/ldt-paper/inductive_step.tex:130-185 and the "
+        "informational blueprint entry def:main-formal-step6-constructions"
+    ),
+    "MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness": (
+        "Lean-only final transport theorem from an already constructed "
+        "projective-completion witness; see references/ldt-paper/"
+        "test_definition.tex:180-202 and inductive_step.tex:130-185, and "
+        "the informational blueprint entry def:main-formal-step6-constructions"
     ),
 }
 
@@ -409,6 +579,11 @@ def _source_context_reason(token: str) -> str | None:
     return SOURCE_CONTEXT_TOKENS.get(token)
 
 
+def _source_context_conditional_decl_reason(decl_name: str) -> str | None:
+    """Return the citation when a conditional-looking name is Lean-only context."""
+    return SOURCE_CONTEXT_CONDITIONAL_DECL_NAMES.get(decl_name)
+
+
 def _is_ignored_broad_binder_token(token: str, *, broad_vocabulary: bool) -> bool:
     """Return whether ``token`` is only a broad-mode local binder name."""
     return broad_vocabulary and token in IGNORED_BROAD_BINDER_TOKENS
@@ -579,7 +754,25 @@ def run_audit(
             missing.append(entry.lean_decl)
             continue
         if conditional_finding := _conditional_decl_name_finding(entry, decl):
-            conditional_decl_findings.append(conditional_finding)
+            source_context_reason = _source_context_conditional_decl_reason(entry.lean_decl)
+            if (
+                broad_vocabulary
+                and include_informational_envs
+                and entry.env_type in INFORMATIONAL_ENVS
+                and source_context_reason is not None
+            ):
+                source_context_findings.append(
+                    _classified_finding(
+                        entry,
+                        decl,
+                        token=conditional_finding.token,
+                        token_line=decl.line,
+                        header_excerpt="",
+                        reason=source_context_reason,
+                    )
+                )
+            else:
+                conditional_decl_findings.append(conditional_finding)
         entry_findings, entry_faithful, entry_external, entry_source_context = _findings_for_entry(
             root,
             entry,

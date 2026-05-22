@@ -30,6 +30,16 @@ noncomputable def mainFormalError (params : Parameters) (k : ℕ) (eps : Error) 
       Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (40000 : Error)) +
       Real.exp (-((k : Error) / (2560000 * ((params.m : Error) ^ (2 : ℕ))))))
 
+/-- At the zero-sampling boundary the displayed final-theorem error collapses to
+zero because the envelope carries an explicit factor `k^2`.
+
+This is the scalar reason that the printed hypothesis `k ≥ md` does not by
+itself supply the nonzero branch of the present final-theorem proof when
+`d = 0` and `k = 0`. -/
+theorem mainFormalError_zero_k (params : Parameters) (eps : Error) :
+    mainFormalError params 0 eps = 0 := by
+  simp [mainFormalError]
+
 /-- The polynomial-exponent envelope common to all cascade bounds,
 `ε^(1/40000) + (d/q)^(1/40000) + exp(-k/(2560000 m²))`. See
 `mainFormalError_eq_envelope` for the identification

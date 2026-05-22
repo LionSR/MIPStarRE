@@ -36,6 +36,11 @@ structure AxisLinePolynomial (params : Parameters) [FieldModel params.q] where
   poly : LinePolynomialModel params
   degreeBounded : poly.natDegree ≤ params.d
 
+noncomputable instance {params : Parameters} [FieldModel params.q] :
+    Inhabited (AxisLinePolynomial params) :=
+  ⟨{ poly := 0
+     degreeBounded := by simp }⟩
+
 namespace AxisLinePolynomial
 
 /-- Evaluation of an axis-line answer on the line parameter. -/
@@ -107,6 +112,16 @@ noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
     reparamAt f zeroCoord = f := by
   refine AxisLinePolynomial.ext ?_
   simp [reparamAt, zeroCoord]
+
+@[simp] theorem reparamAt_default {params : Parameters} [FieldModel params.q]
+    (t : Fq params) :
+    reparamAt (default : AxisLinePolynomial params) t = default := by
+  simpa [default, instInhabitedAxisLinePolynomial] using
+    (show
+      reparamAt ({ poly := 0, degreeBounded := by simp } : AxisLinePolynomial params) t =
+        ({ poly := 0, degreeBounded := by simp } : AxisLinePolynomial params) by
+        refine AxisLinePolynomial.ext ?_
+        simp [reparamAt])
 
 theorem reparamAt_reparamAt {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) (t s : Fq params) :
@@ -184,6 +199,11 @@ structure DiagonalLinePolynomial (params : Parameters) [FieldModel params.q] whe
   poly : LinePolynomialModel params
   degreeBounded : poly.natDegree ≤ params.m * params.d
 
+noncomputable instance {params : Parameters} [FieldModel params.q] :
+    Inhabited (DiagonalLinePolynomial params) :=
+  ⟨{ poly := 0
+     degreeBounded := by simp }⟩
+
 namespace DiagonalLinePolynomial
 
 /-- Evaluation of a diagonal-line answer on the line parameter. -/
@@ -245,6 +265,16 @@ noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
     reparamAt f zeroCoord = f := by
   refine DiagonalLinePolynomial.ext ?_
   simp [reparamAt, zeroCoord]
+
+@[simp] theorem reparamAt_default {params : Parameters} [FieldModel params.q]
+    (t : Fq params) :
+    reparamAt (default : DiagonalLinePolynomial params) t = default := by
+  simpa [default, instInhabitedDiagonalLinePolynomial] using
+    (show
+      reparamAt ({ poly := 0, degreeBounded := by simp } : DiagonalLinePolynomial params) t =
+        ({ poly := 0, degreeBounded := by simp } : DiagonalLinePolynomial params) by
+        refine DiagonalLinePolynomial.ext ?_
+        simp [reparamAt])
 
 theorem reparamAt_reparamAt {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) (t s : Fq params) :

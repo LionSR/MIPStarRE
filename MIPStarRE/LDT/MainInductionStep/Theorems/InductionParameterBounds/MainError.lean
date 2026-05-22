@@ -420,4 +420,288 @@ lemma dq_le_q_of_mainInductionError_lt_one
     exact_mod_cast params.hq
   exact_mod_cast ((div_le_one hq_pos).1 hratio_le_one)
 
+/-! ### Answer-valued small-error scalar consequences -/
+
+/-- Answer-valued analogue of `eps_le_one_of_mainInductionError_lt_one`. -/
+lemma answer_eps_le_one_of_mainInductionError_lt_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params.next ι)
+    {eps delta gamma : Error} {k : ℕ}
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1) :
+    eps ≤ 1 := by
+  have heps_nonneg := answer_eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := answer_delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := answer_gamma_nonneg_of_isGood params.next strategy hgood
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+    positivity
+  have hrest_nonneg :
+      0 ≤ Real.rpow delta (1 / (1024 : Error)) +
+            Real.rpow gamma (1 / (1024 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
+    have hdelta_root_nonneg : 0 ≤ Real.rpow delta (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hdelta_nonneg (1 / (1024 : Error))
+    have hgamma_root_nonneg : 0 ≤ Real.rpow gamma (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hgamma_nonneg (1 / (1024 : Error))
+    have hratio_root_nonneg :
+        0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hratio_nonneg (1 / (1024 : Error))
+    nlinarith
+  have heps_scaled_le :
+      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
+          Real.rpow eps (1 / (1024 : Error)) ≤
+        mainInductionNu params.next k eps delta gamma := by
+    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm] using
+      (mainInductionNu_scaled_component_le (params := params) (k := k)
+        (x := Real.rpow eps (1 / (1024 : Error)))
+        (y := Real.rpow delta (1 / (1024 : Error)))
+        (z := Real.rpow gamma (1 / (1024 : Error)))
+        (w := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
+        hrest_nonneg)
+  exact
+    le_one_of_mainInductionError_lt_one_of_scaled_bound
+      params hsmall heps_scaled_le
+
+/-- Answer-valued analogue of `delta_le_one_of_mainInductionError_lt_one`. -/
+lemma answer_delta_le_one_of_mainInductionError_lt_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params.next ι)
+    {eps delta gamma : Error} {k : ℕ}
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1) :
+    delta ≤ 1 := by
+  have heps_nonneg := answer_eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := answer_delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := answer_gamma_nonneg_of_isGood params.next strategy hgood
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+    positivity
+  have hrest_nonneg :
+      0 ≤ Real.rpow eps (1 / (1024 : Error)) +
+            Real.rpow gamma (1 / (1024 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
+    have heps_root_nonneg : 0 ≤ Real.rpow eps (1 / (1024 : Error)) :=
+      Real.rpow_nonneg heps_nonneg (1 / (1024 : Error))
+    have hgamma_root_nonneg : 0 ≤ Real.rpow gamma (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hgamma_nonneg (1 / (1024 : Error))
+    have hratio_root_nonneg :
+        0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hratio_nonneg (1 / (1024 : Error))
+    nlinarith
+  have hdelta_scaled_le :
+      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
+          Real.rpow delta (1 / (1024 : Error)) ≤
+        mainInductionNu params.next k eps delta gamma := by
+    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm,
+      add_assoc, add_left_comm, add_comm] using
+      (mainInductionNu_scaled_component_le (params := params) (k := k)
+        (x := Real.rpow delta (1 / (1024 : Error)))
+        (y := Real.rpow eps (1 / (1024 : Error)))
+        (z := Real.rpow gamma (1 / (1024 : Error)))
+        (w := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
+        hrest_nonneg)
+  exact
+    le_one_of_mainInductionError_lt_one_of_scaled_bound
+      params hsmall hdelta_scaled_le
+
+/-- Answer-valued analogue of `gamma_le_one_of_mainInductionError_lt_one`. -/
+lemma answer_gamma_le_one_of_mainInductionError_lt_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params.next ι)
+    {eps delta gamma : Error} {k : ℕ}
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1) :
+    gamma ≤ 1 := by
+  have heps_nonneg := answer_eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := answer_delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := answer_gamma_nonneg_of_isGood params.next strategy hgood
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+    positivity
+  have hrest_nonneg :
+      0 ≤ Real.rpow eps (1 / (1024 : Error)) +
+            Real.rpow delta (1 / (1024 : Error)) +
+            Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) := by
+    have heps_root_nonneg : 0 ≤ Real.rpow eps (1 / (1024 : Error)) :=
+      Real.rpow_nonneg heps_nonneg (1 / (1024 : Error))
+    have hdelta_root_nonneg : 0 ≤ Real.rpow delta (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hdelta_nonneg (1 / (1024 : Error))
+    have hratio_root_nonneg :
+        0 ≤ Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hratio_nonneg (1 / (1024 : Error))
+    exact add_nonneg (add_nonneg heps_root_nonneg hdelta_root_nonneg) hratio_root_nonneg
+  have hgamma_scaled_le :
+      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
+          Real.rpow gamma (1 / (1024 : Error)) ≤
+        mainInductionNu params.next k eps delta gamma := by
+    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm,
+      add_assoc, add_left_comm, add_comm] using
+      (mainInductionNu_scaled_component_le (params := params) (k := k)
+        (x := Real.rpow gamma (1 / (1024 : Error)))
+        (y := Real.rpow eps (1 / (1024 : Error)))
+        (z := Real.rpow delta (1 / (1024 : Error)))
+        (w := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
+        hrest_nonneg)
+  exact
+    le_one_of_mainInductionError_lt_one_of_scaled_bound
+      params hsmall hgamma_scaled_le
+
+/-- Answer-valued analogue of `dq_le_q_of_mainInductionError_lt_one`. -/
+lemma answer_dq_le_q_of_mainInductionError_lt_one
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params.next ι)
+    {eps delta gamma : Error} {k : ℕ}
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1) :
+    params.d ≤ params.q := by
+  have heps_nonneg := answer_eps_nonneg_of_isGood params.next strategy hgood
+  have hdelta_nonneg := answer_delta_nonneg_of_isGood params.next strategy hgood
+  have hgamma_nonneg := answer_gamma_nonneg_of_isGood params.next strategy hgood
+  have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+    positivity
+  have hrest_nonneg :
+      0 ≤ Real.rpow eps (1 / (1024 : Error)) +
+            Real.rpow delta (1 / (1024 : Error)) +
+            Real.rpow gamma (1 / (1024 : Error)) := by
+    have heps_root_nonneg : 0 ≤ Real.rpow eps (1 / (1024 : Error)) :=
+      Real.rpow_nonneg heps_nonneg (1 / (1024 : Error))
+    have hdelta_root_nonneg : 0 ≤ Real.rpow delta (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hdelta_nonneg (1 / (1024 : Error))
+    have hgamma_root_nonneg : 0 ≤ Real.rpow gamma (1 / (1024 : Error)) :=
+      Real.rpow_nonneg hgamma_nonneg (1 / (1024 : Error))
+    nlinarith
+  have hratio_scaled_le :
+      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) *
+          Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)) ≤
+        mainInductionNu params.next k eps delta gamma := by
+    simpa [mainInductionNu, Parameters.next, mul_assoc, mul_left_comm, mul_comm,
+      add_assoc, add_left_comm, add_comm] using
+      (mainInductionNu_scaled_component_le (params := params) (k := k)
+        (x := Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error)))
+        (y := Real.rpow eps (1 / (1024 : Error)))
+        (z := Real.rpow delta (1 / (1024 : Error)))
+        (w := Real.rpow gamma (1 / (1024 : Error)))
+        hrest_nonneg)
+  have hratio_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 := by
+    exact
+      le_one_of_mainInductionError_lt_one_of_scaled_bound
+        params hsmall hratio_scaled_le
+  have hq_pos : (0 : Error) < (params.q : Error) := by
+    exact_mod_cast params.hq
+  exact_mod_cast ((div_le_one hq_pos).1 hratio_le_one)
+
+/-- Answer-valued analogue of `three_le_k_sq_mul_next_m_of_hsmall`. -/
+lemma answer_three_le_k_sq_mul_next_m_of_hsmall
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params.next ι)
+    {eps delta gamma : Error} {k : ℕ}
+    (hgood : strategy.IsGood eps delta gamma)
+    (hsmall : mainInductionError params.next k eps delta gamma < 1) :
+    (3 : Error) ≤ ((k : Error) ^ (2 : ℕ)) * (params.next.m : Error) := by
+  have hk1_nat : 1 ≤ k :=
+    one_le_k_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
+  by_cases hk1 : k = 1
+  · subst hk1
+    by_cases hnext_two : params.next.m = 2
+    · have heps_nonneg := answer_eps_nonneg_of_isGood params.next strategy hgood
+      have hdelta_nonneg := answer_delta_nonneg_of_isGood params.next strategy hgood
+      have hgamma_nonneg := answer_gamma_nonneg_of_isGood params.next strategy hgood
+      have hratio_nonneg : 0 ≤ ((params.d : Error) / (params.q : Error)) := by
+        positivity
+      have hnu_nonneg : 0 ≤ mainInductionNu params.next 1 eps delta gamma := by
+        have hsumnn :
+            0 ≤ Real.rpow eps (1 / (1024 : Error)) +
+                  Real.rpow delta (1 / (1024 : Error)) +
+                  Real.rpow gamma (1 / (1024 : Error)) +
+                  Real.rpow (((params.next.d : Error) / (params.next.q : Error)))
+                    (1 / (1024 : Error)) := by
+          have heps_root_nonneg : 0 ≤ Real.rpow eps (1 / (1024 : Error)) :=
+            Real.rpow_nonneg heps_nonneg (1 / (1024 : Error))
+          have hdelta_root_nonneg : 0 ≤ Real.rpow delta (1 / (1024 : Error)) :=
+            Real.rpow_nonneg hdelta_nonneg (1 / (1024 : Error))
+          have hgamma_root_nonneg : 0 ≤ Real.rpow gamma (1 / (1024 : Error)) :=
+            Real.rpow_nonneg hgamma_nonneg (1 / (1024 : Error))
+          have hratio_root_nonneg :
+              0 ≤ Real.rpow (((params.next.d : Error) / (params.next.q : Error)))
+                    (1 / (1024 : Error)) :=
+            Real.rpow_nonneg hratio_nonneg (1 / (1024 : Error))
+          nlinarith [heps_root_nonneg, hdelta_root_nonneg, hgamma_root_nonneg,
+            hratio_root_nonneg]
+        unfold mainInductionNu
+        exact mul_nonneg (by positivity) hsumnn
+      have hnext_two' : (params.next.m : Error) = 2 := by
+        exact_mod_cast hnext_two
+      have hexp_quarter :
+          (1 / 4 : Error) ≤
+            Real.exp (-((1 : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ))))) := by
+        have hbase : (1 / 4 : Error) ≤ 1 - (1 / 320000 : Error) := by
+          norm_num
+        have hexp :
+            1 - (1 / 320000 : Error) ≤ Real.exp (-(1 / 320000 : Error)) := by
+          simpa using Real.one_sub_le_exp_neg (1 / 320000 : Error)
+        calc
+          (1 / 4 : Error) ≤ 1 - (1 / 320000 : Error) := hbase
+          _ ≤ Real.exp (-(1 / 320000 : Error)) := hexp
+          _ = Real.exp (-((1 : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ))))) := by
+                rw [hnext_two']
+                norm_num
+      have hmain_ge_one : (1 : Error) ≤ mainInductionError params.next 1 eps delta gamma := by
+        have hm_sq_eq_four : ((params.next.m : Error) ^ (2 : ℕ)) = 4 := by
+          nlinarith [hnext_two']
+        have hinner :
+            (1 / 4 : Error) ≤
+              mainInductionNu params.next 1 eps delta gamma +
+                Real.exp (-((1 : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ))))) := by
+          nlinarith
+        calc
+          (1 : Error) = ((params.next.m : Error) ^ (2 : ℕ)) * (1 / 4 : Error) := by
+              rw [hm_sq_eq_four]
+              norm_num
+          _ ≤ ((params.next.m : Error) ^ (2 : ℕ)) *
+                (mainInductionNu params.next 1 eps delta gamma +
+                  Real.exp (-((1 : Error) / (80000 * ((params.next.m : Error) ^ (2 : ℕ)))))) := by
+                gcongr
+          _ = mainInductionError params.next 1 eps delta gamma := by
+                simp [mainInductionError]
+      have hsmall' : mainInductionError params.next 1 eps delta gamma < 1 := by
+        simpa using hsmall
+      linarith
+    · have hmnat : 2 ≤ params.next.m := Nat.succ_le_succ params.hm
+      have hnext_ge_three : 3 ≤ params.next.m := by
+        omega
+      have : (3 : Error) ≤ (params.next.m : Error) := by
+        exact_mod_cast hnext_ge_three
+      simpa using this
+  · have hk_ge_two : 2 ≤ k := by
+      omega
+    have hk_sq_ge_four : (4 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
+      have hk_two : (2 : Error) ≤ (k : Error) := by
+        exact_mod_cast hk_ge_two
+      nlinarith
+    have hnext_ge_two : (2 : Error) ≤ (params.next.m : Error) := by
+      exact_mod_cast Nat.succ_le_succ params.hm
+    nlinarith
+
+/-- The successor large-`k` hypothesis implies the predecessor large-`k`
+hypothesis used by recursive slice calls.
+
+This is the elementary arithmetic comparison between the successor dimension
+`params.m + 1` and the predecessor dimension `params.m`. -/
+theorem mainInductionSuccessorBound_pred
+    (params : Parameters) {k : ℕ}
+    (hk : 400 * params.next.m * params.next.d ≤ k) :
+    400 * params.m * params.d ≤ k := by
+  have hm_le : params.m ≤ params.next.m := by
+    simp [Parameters.next]
+  have hcoef : 400 * params.m ≤ 400 * params.next.m :=
+    Nat.mul_le_mul_left 400 hm_le
+  have hmul :
+      400 * params.m * params.d ≤ 400 * params.next.m * params.next.d := by
+    simpa [Parameters.next, Nat.mul_assoc] using
+      Nat.mul_le_mul_right params.d hcoef
+  exact le_trans hmul hk
+
 end MIPStarRE.LDT.MainInductionStep

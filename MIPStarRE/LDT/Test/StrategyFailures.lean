@@ -135,6 +135,70 @@ theorem gamma_nonneg_of_isGood
   exact le_trans (diagonalFailureProbability_nonneg params strategy)
     hgood.diagonalLineTest
 
+/-! ### Answer-valued symmetric strategies -/
+
+/-- The answer-valued diagonal-line failure surrogate is nonnegative. -/
+theorem answer_diagonalFailureProbability_nonneg
+    (params : Parameters) [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι) :
+    0 ≤ strategy.diagonalFailureProbability := by
+  unfold AnswerSymStrat.diagonalFailureProbability
+  refine mul_nonneg ?_ ?_
+  · positivity
+  · refine Finset.sum_nonneg ?_
+    intro j _
+    exact bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j))
+      (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
+      (AnswerSymStrat.diagonalLineAnswerFamily strategy j)
+
+/-- A good answer-valued symmetric strategy has a nonnegative axis-parallel
+error parameter `ε`. -/
+theorem answer_eps_nonneg_of_isGood
+    (params : Parameters)
+    [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι)
+    {eps delta gamma : Error}
+    (hgood : strategy.IsGood eps delta gamma) :
+    0 ≤ eps := by
+  exact le_trans
+    (bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (AxisParallelTestSample params))
+      (AnswerSymStrat.axisParallelPointAnswerFamily strategy)
+      (AnswerSymStrat.axisParallelLineAnswerFamily strategy))
+    hgood.axisParallelTest
+
+/-- A good answer-valued symmetric strategy has a nonnegative self-consistency
+error parameter `δ`. -/
+theorem answer_delta_nonneg_of_isGood
+    (params : Parameters)
+    [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι)
+    {eps delta gamma : Error}
+    (hgood : strategy.IsGood eps delta gamma) :
+    0 ≤ delta := by
+  exact le_trans
+    (bipartiteSSCError_nonneg strategy.state
+      (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+    hgood.selfConsistencyTest
+
+/-- A good answer-valued symmetric strategy has a nonnegative diagonal-lines
+error parameter `γ`. -/
+theorem answer_gamma_nonneg_of_isGood
+    (params : Parameters)
+    [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (strategy : AnswerSymStrat params ι)
+    {eps delta gamma : Error}
+    (hgood : strategy.IsGood eps delta gamma) :
+    0 ≤ gamma := by
+  exact le_trans (answer_diagonalFailureProbability_nonneg params strategy)
+    hgood.diagonalLineTest
+
 namespace SameSpaceProjStrat
 
 /-- View the left prover's local data as a symmetric-strategy-style package. -/

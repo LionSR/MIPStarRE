@@ -22,8 +22,9 @@ as inputs, have been removed.
   `\Cref{lem:restricted-probabilities}` (lines 363–412).
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
   `\label{def:restricted-strategy}`,
-  `\label{lem:restricted-probabilities}`, and
-  `\label{def:main-formal-successor-boundary}` (answer-valued aliases).
+  `\label{lem:restricted-probabilities}`, and the unnumbered paragraph
+  "Lean successor restricted-recursion targets for the Section 3 proof"
+  (answer-valued aliases).
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

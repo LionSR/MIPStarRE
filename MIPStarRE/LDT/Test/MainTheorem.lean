@@ -10,11 +10,12 @@ import MIPStarRE.LDT.Test.MainTheorem.OrthonormalizationData
 import MIPStarRE.LDT.Test.MainTheorem.DiagonalCompletion
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
 import MIPStarRE.LDT.Test.MainTheorem.MainFormal
+import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister
 
 /-!
 # Section 3 — Main theorem
 
-Compatibility module that imports the twelve split modules under
+Compatibility module that imports the split modules under
 `MIPStarRE.LDT.Test.MainTheorem` and presents them as a single import target.
 The assembly proves `thm:main-formal` (`\Cref{thm:main-formal}`), the main
 theorem of Section 3, following the proof given in
@@ -38,6 +39,7 @@ The imported modules carry the split proof assembly:
 * `DiagonalCompletion` — diagonal consistency inputs for completing each side
 * `NativeTargets` — the final `ζ₄` native consistency targets
 * `MainFormal` — base, successor, and final branch assembly for `thm:main-formal`
+* `SourceRoleRegister` — two-space source-boundary role-register handoff
 
 ## References
 

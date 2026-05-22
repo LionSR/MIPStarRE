@@ -186,12 +186,14 @@ Steps:
 3. Apply Cauchy-Schwarz again to move `Ghat_1` right
 4. Eliminate `Ghat_<i` product using measurement completeness
 5. Reduce to the single-slice bound `eq:ld-gbcon` -/
-lemma ldSandwichLineOnePoint_core
+lemma ldSandwichLineOnePoint_core_of_axis_self
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_le : zeta ≤ 1)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
@@ -210,19 +212,13 @@ lemma ldSandwichLineOnePoint_core
         (uniformDistribution (AxisParallelTestSample params.next))
         (axisParallelPointAnswerFamily strategy)
         (axisParallelLineAnswerFamily strategy))
-      hgood.axisParallelTest
+      haxis
   have hdelta_nonneg : 0 ≤ delta := by
     exact le_trans
       (bipartiteSSCError_nonneg strategy.state
         (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-      hgood.selfConsistencyTest
-  have hgamma_nonneg : 0 ≤ gamma := by
-    have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability := by
-      unfold SymStrat.diagonalFailureProbability
-      exact mul_nonneg (by positivity)
-        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-    exact le_trans hdiag_nonneg hgood.diagonalLineTest
+      hself
   have hzeta_nonneg : 0 ≤ zeta := by
     exact le_trans
       (bipartiteConsError_nonneg strategy.state
@@ -244,12 +240,12 @@ lemma ldSandwichLineOnePoint_core
       simpa [SymStrat.selfConsistencyFailureProbability] using
         bipartiteSSCError_uniform_le_one strategy.state strategy.isNormalized
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-    have hgood_small : strategy.IsGood eps' delta' gamma := by
-      refine ⟨?_, ?_, hgood.diagonalLineTest⟩
-      · exact le_min hgood.axisParallelTest haxis_le_one
-      · exact le_min hgood.selfConsistencyTest hself_le_one
-    have hend := ldSandwichLineOnePoint_endpoint_ldGbcon_lift
-      params strategy eps' delta' gamma zeta hgood_small family hcons k 0 hi
+    have haxis_small : strategy.axisParallelFailureProbability ≤ eps' :=
+      le_min haxis haxis_le_one
+    have hself_small : strategy.selfConsistencyFailureProbability ≤ delta' :=
+      le_min hself hself_le_one
+    have hend := ldSandwichLineOnePoint_endpoint_ldGbcon_lift_of_axis_self
+      params strategy eps' delta' zeta haxis_small hself_small family hcons k 0 hi
     have hzero :
         ConsRel strategy.state
           (uniformDistribution (SandwichedLineQuestion params k))
@@ -277,12 +273,12 @@ lemma ldSandwichLineOnePoint_core
       simpa [SymStrat.selfConsistencyFailureProbability] using
         bipartiteSSCError_uniform_le_one strategy.state strategy.isNormalized
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-    have hgood_small : strategy.IsGood eps' delta' gamma := by
-      refine ⟨?_, ?_, hgood.diagonalLineTest⟩
-      · exact le_min hgood.axisParallelTest haxis_le_one
-      · exact le_min hgood.selfConsistencyTest hself_le_one
-    have hmovedEndpoint := ldSandwichLineOnePointPrefixMoved_consRel_endpoint
-      params strategy eps' delta' gamma zeta hgood_small family hcons hi
+    have haxis_small : strategy.axisParallelFailureProbability ≤ eps' :=
+      le_min haxis haxis_le_one
+    have hself_small : strategy.selfConsistencyFailureProbability ≤ delta' :=
+      le_min hself hself_le_one
+    have hmovedEndpoint := ldSandwichLineOnePointPrefixMoved_consRel_endpoint_of_axis_self
+      params strategy eps' delta' zeta haxis_small hself_small family hcons hi
     have hmovedEndpoint' :
         ConsRel strategy.state
           (uniformDistribution (SandwichedLineQuestion params k))
@@ -296,13 +292,71 @@ lemma ldSandwichLineOnePoint_core
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
       family hi hi0 hcomm hmovedEndpoint'
 
+lemma ldSandwichLineOnePoint_core
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hzeta_le : zeta ≤ 1)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hcomm : ∀ j : ℕ, 2 ≤ j →
+      CommuteGHalfSandwichStatement params strategy.state family
+        gamma zeta j)
+    (k i : ℕ) (hi : i < k) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (ldSandwichLineOnePointLeftFamily params strategy family k i)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
+  have hgamma_nonneg : 0 ≤ gamma := by
+    have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability := by
+      unfold SymStrat.diagonalFailureProbability
+      exact mul_nonneg (by positivity)
+        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
+    exact le_trans hdiag_nonneg hgood.diagonalLineTest
+  exact ldSandwichLineOnePoint_core_of_axis_self params strategy eps delta gamma zeta
+    hgood.axisParallelTest hgood.selfConsistencyTest hgamma_nonneg hzeta_le family hcons
+    hcomm k i hi
+
 /-- Internal form of `lem:ld-sandwich-line-one-point` after applying
 `cor:G-hat-facts`.
 
 **Source:** The proof in `references/ldt-paper/ld-pasting.tex:956-1074` uses
 the half-sandwich commutation estimates obtained from `cor:G-hat-facts`.  The
-paper-facing theorem `ldSandwichLineOnePoint` below derives those estimates
-from the source hypotheses. -/
+	paper-facing theorem `ldSandwichLineOnePoint` below derives those estimates
+	from the source hypotheses. -/
+lemma ldSandwichLineOnePoint_ofGHatFacts_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_le : zeta ≤ 1)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
+    (k i : ℕ)
+    (hi : i < k) :
+    LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+  have hcomm :
+      ∀ j : ℕ, 2 ≤ j →
+        CommuteGHalfSandwichStatement params strategy.state family
+          gamma zeta j := by
+    intro j hj
+    exact commuteGHalfSandwich_ofGHatFacts params strategy.state family gamma zeta
+      j hj hzeta_le hfacts
+  exact ⟨ldSandwichLineOnePoint_core_of_axis_self params strategy eps delta gamma zeta
+    haxis hself_good hgamma_nonneg hzeta_le family hcons hcomm k i hi⟩
+
+/-- Internal form of `lem:ld-sandwich-line-one-point` after applying
+`cor:G-hat-facts`.
+
+This source-facing wrapper retains the usual good-strategy hypothesis. -/
 lemma ldSandwichLineOnePoint_ofGHatFacts
     (params : Parameters)
     [FieldModel params.q]
@@ -321,15 +375,11 @@ lemma ldSandwichLineOnePoint_ofGHatFacts
     (hi : i < k) :
     LdSandwichLineOnePointStatement params strategy family
         eps delta gamma zeta k i := by
-  have hcomm :
-      ∀ j : ℕ, 2 ≤ j →
-        CommuteGHalfSandwichStatement params strategy.state family
-          gamma zeta j := by
-    intro j hj
-    exact commuteGHalfSandwich_ofGHatFacts params strategy.state family gamma zeta
-      j hj hzeta_le hfacts
-  exact ⟨ldSandwichLineOnePoint_core params strategy eps delta gamma zeta
-    hgood hzeta_le family hcons hcomm k i hi⟩
+  have hgamma_nonneg : 0 ≤ gamma :=
+    gamma_nonneg_of_isGood params.next strategy hgood
+  exact ldSandwichLineOnePoint_ofGHatFacts_of_axis_self params strategy eps delta gamma zeta
+    hgood.axisParallelTest hgood.selfConsistencyTest hgamma_nonneg hzeta_le family hcons
+    hfacts k i hi
 
 /-- `lem:ld-sandwich-line-one-point`, source-facing form. -/
 lemma ldSandwichLineOnePoint
