@@ -1019,6 +1019,8 @@
     <span class="theorem_thmtitle">Quantum soundness of the low individual degree test</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1105,7 +1107,7 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Let \(k \ge 400md\) be an integer and set </p>
+  <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Let \(k{\gt}0\) be an integer with \(k \ge 400md\), and set </p>
 <div class="displaymath" id="a0000000042">
   \[  \nu = 100000 k^2 m^4\left(\varepsilon ^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).  \]
 </div>
@@ -1132,7 +1134,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The saturated-error branch is formalized by <span class="ttfamily">mainFormal_source_trivial_witness</span>. The remaining branch is the small-error source-boundary obligation Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>. The factor \(400\) is the corrected large-\(k\) boundary inherited from Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. The Lean link above records the source-shaped statement, but the theorem is not marked <span class="ttfamily">\leanok</span> until the remaining zero-sampling boundary is resolved. </p>
+  <p> The saturated-error branch is formalized by <span class="ttfamily">mainFormal_source_trivial_witness</span>. The remaining branch is the small-error source-boundary proposition Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>. The factor \(400\) and the nonzero sampling condition are the corrected source boundaries recorded in <span class="ttfamily">docs/paper-gaps/issue-906-main-formal-k-bound.tex</span> and <span class="ttfamily">docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex</span>. </p>
 
   </div>
 </div>
@@ -1145,6 +1147,8 @@
     <span class="proposition_thmtitle">Source-boundary reduction for the final theorem</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1177,7 +1181,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>  This proposition records the source-boundary reduction for the corrected two-space theorem Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>. It proves the saturated-error branch by the trivial consistency bound and reduces the remaining non-vacuous branch to Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>. It is not an additional hypothesis of the paper theorem. </p>
+  <p>  This proposition records the saturated-error reduction for the corrected two-space theorem Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>. It proves the saturated-error branch by the trivial consistency bound and reduces the remaining non-vacuous branch to Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>. It is not an additional hypothesis of the paper theorem. </p>
 
   </div>
 </div>
@@ -1189,7 +1193,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The saturated-error branch is already proved. The proof remains incomplete only through the small-error source-boundary obligation, so this frontier proposition is intentionally not marked <span class="ttfamily">\leanok</span>. </p>
+  <p>  The saturated-error branch is already proved. The small-error branch is Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>. </p>
 
   </div>
 </div>
@@ -1202,6 +1206,8 @@
     <span class="proposition_thmtitle">Small-error source-boundary obligation for the final theorem</span>
     <div class="thm_header_extras">
 
+    
+    ✓
         </div>
     <div class="thm_header_hidden_extras">
 
@@ -1234,7 +1240,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>  This is the remaining non-vacuous branch of the corrected two-space theorem. It asks for the conclusions of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a> under \(k\ge 400md\) and \(\nu {\lt}1\). It is not a source assumption. Its proof requires the two-space role-register reduction and the zero-sampling boundary. </p>
+  <p>  This is the non-vacuous branch of the corrected two-space theorem. It asks for the conclusions of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a> under \(k\ge 400md\), \(k{\gt}0\), and \(\nu {\lt}1\). It is not a source assumption. Its proof uses the two-space role-register reduction and the scalar absorption available after excluding the zero-sampling boundary. </p>
 
   </div>
 </div>
@@ -1246,7 +1252,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> This is the direct proof hole in the final source theorem. It must be proved from the paper hypotheses rather than assumed, and therefore it is not marked <span class="ttfamily">\leanok</span>. </p>
+  <p>  The proof applies the checked two-space role-register construction and then absorbs its explicit errors into \(\nu \) at the nonzero sampling boundary. </p>
 
   </div>
 </div>
@@ -1315,7 +1321,7 @@
         </div>
   </div>
   <div class="proposition_thmcontent">
-  <p>                         The printed final theorem starts from a projective strategy on two possibly different local Hilbert spaces. The current checked formal interface Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a> is stated for the same-space interface. The source proof uses the role-register symmetrization and then unsymmetrizes the polynomial measurement. To close Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>, this reduction must be formalized for the general two-space source strategy rather than assumed as an interface restriction. The trace-level factor-two unsymmetrization estimate for arbitrary heterogeneous role-register measurements is already formalized in Lemma&#160;<a href="sec-the-test.html#lem:heterogeneous-role-register-unsymmetrization">2.7</a>; the remaining work is to assemble the full source-theorem passage from the paper hypotheses. Lean now records the first part of this source-boundary route: the heterogeneous role-register symmetrization may be fed into the source-shaped main-induction theorem under the corrected large-\(k\) hypothesis \(k\ge 400md\), and the resulting role-register consistency estimate can be unsymmetrized into the two point-consistency estimates on the original two-space strategy with the expected factor \(2\). In addition, the point-agreement branch is now available for the paper-faithful two-space strategy, and the Schwartz–Zippel Step&#160;5 theorem has been generalized from the same-space carrier to a bipartite state on \(H_A\otimes H_B\). The heterogeneous triangle/SDD comparison theorem has also been proved, so the route now reaches the complete-measurement full-polynomial consistency statement at the end of the paper’s Step&#160;5 calculation. The two heterogeneous orthonormalization applications have also been checked, producing projective submeasurements on both local Hilbert spaces and the corresponding left- and right-factor state-dependent-distance estimates. The completion step has now also been derived in Lean: the two projective submeasurements are completed to projective measurements, and the left- and right-factor estimates are widened to the orthonormalize-and-complete error appearing in the paper. The repaired polynomial line-169 consistency relations have also been checked, with the Cauchy–Schwarz loss coming from the pre-completion orthonormalization estimates rather than from a new hypothesis. The final point-evaluation triangle has also been derived: the polynomial line-169 relations and the completed \(Q_A,Q_B\) projective consistency estimate are postprocessed by evaluation at a point and then combined by the heterogeneous triangle inequality. The scalar absorption from these explicit pre-absorption errors to the final \(\nu =\texttt{mainFormalError}\) bound has also been checked under the nonzero scalar-cascade boundary \(0{\lt}k\). This proposition is not marked proof-complete here because the combined output still requires resolving the zero-sampling boundary for the final theorem. </p>
+  <p>                         The printed final theorem starts from a projective strategy on two possibly different local Hilbert spaces. The current checked formal interface Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a> is stated for the same-space interface. The source proof uses the role-register symmetrization and then unsymmetrizes the polynomial measurement. To close Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>, this reduction must be formalized for the general two-space source strategy rather than assumed as an interface restriction. The trace-level factor-two unsymmetrization estimate for arbitrary heterogeneous role-register measurements is already formalized in Lemma&#160;<a href="sec-the-test.html#lem:heterogeneous-role-register-unsymmetrization">2.7</a>; the remaining work is to assemble the full source-theorem passage from the paper hypotheses. Lean now records the first part of this source-boundary route: the heterogeneous role-register symmetrization may be fed into the source-shaped main-induction theorem under the corrected large-\(k\) hypothesis \(k\ge 400md\), and the resulting role-register consistency estimate can be unsymmetrized into the two point-consistency estimates on the original two-space strategy with the expected factor \(2\). In addition, the point-agreement branch is now available for the paper-faithful two-space strategy, and the Schwartz–Zippel Step&#160;5 theorem has been generalized from the same-space carrier to a bipartite state on \(H_A\otimes H_B\). The heterogeneous triangle/SDD comparison theorem has also been proved, so the route now reaches the complete-measurement full-polynomial consistency statement at the end of the paper’s Step&#160;5 calculation. The two heterogeneous orthonormalization applications have also been checked, producing projective submeasurements on both local Hilbert spaces and the corresponding left- and right-factor state-dependent-distance estimates. The completion step has now also been derived in Lean: the two projective submeasurements are completed to projective measurements, and the left- and right-factor estimates are widened to the orthonormalize-and-complete error appearing in the paper. The repaired polynomial line-169 consistency relations have also been checked, with the Cauchy–Schwarz loss coming from the pre-completion orthonormalization estimates rather than from a new hypothesis. The final point-evaluation triangle has also been derived: the polynomial line-169 relations and the completed \(Q_A,Q_B\) projective consistency estimate are postprocessed by evaluation at a point and then combined by the heterogeneous triangle inequality. The scalar absorption from these explicit pre-absorption errors to the final \(\nu =\texttt{mainFormalError}\) bound has also been checked under the nonzero scalar-cascade boundary \(0{\lt}k\). The combined output is the small-error branch used in the corrected two-space source theorem, where \(k{\gt}0\) is now part of the theorem statement. </p>
 
   </div>
 </div>
@@ -1331,60 +1337,26 @@
 
   </div>
 </div>
-<div class="proposition_thmwrapper theorem-style-plain" id="prop:main-formal-source-k-range-boundary">
-  <div class="proposition_thmheading">
-    <span class="proposition_thmcaption">
-    Proposition
+<div class="remark_thmwrapper theorem-style-remark" id="rem:main-formal-source-k-range-boundary">
+  <div class="remark_thmheading">
+    <span class="remark_thmcaption">
+    Remark
     </span>
-    <span class="proposition_thmlabel">2.18</span>
-    <span class="proposition_thmtitle">Final-theorem zero-sampling boundary</span>
+    <span class="remark_thmlabel">2.18</span>
+    <span class="remark_thmtitle">Final-theorem zero-sampling boundary</span>
     <div class="thm_header_extras">
 
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="sec-the-test.html#prop:main-formal-source-k-range-boundary">#</a>
-    
-    <a class="icon proof" href="sec-the-test.html#a0000000049"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
-</a>
+    <a class="icon proof" href="sec-the-test.html#rem:main-formal-source-k-range-boundary">#</a>
     
     
-    
-    <button class="modal lean">L∃∀N</button>
-        <div class="modal-container">
-      <div class="modal-content">
-        <header>
-          <h1>Lean declarations</h1>
-          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
-</button>
-        </header>
-        
-        <ul class="uses">
-          
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation" class="lean_decl">MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation</a></li>
-          
-        </ul>
-    
-      </div>
-    </div>
-
     
         </div>
   </div>
-  <div class="proposition_thmcontent">
-  <p>   The paper states Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a> for \(k\ge md\), while the corrected formal route uses the confirmed large-\(k\) condition \(k\ge 400md\) and a nonzero \(k\) boundary for the scalar cascade. The factor \(400\) is now treated as a statement correction, following Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. The remaining final-theorem boundary is the zero-sampling case allowed when \(d=0\), since \(400md\le k\) then permits \(k=0\). At this boundary the displayed final error itself collapses to \(0\), as recorded by <span class="ttfamily">mainFormalError_zero_k</span>; the obstruction is documented in <span class="ttfamily">docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex</span>. </p>
-
-  </div>
-</div>
-<div class="proof_wrapper" id="a0000000049">
-  <div class="proof_heading">
-    <span class="proof_caption">
-    Proof
-    </span>
-    <span class="expand-proof">▶</span>
-  </div>
-  <div class="proof_content">
-  <p> The nonzero branch of the two-space final theorem now uses the role-register scalar absorption theorem above. The remaining direct final-theorem boundary is the case \(k=0\), which can occur under \(400md\le k\) only in the degree-zero regime. This is recorded in Lean as <span class="ttfamily">mainFormal_sourceZeroKBoundaryObligation</span> and is not marked <span class="ttfamily">\leanok</span>. </p>
+  <div class="remark_thmcontent">
+  <p> The paper states Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a> for \(k\ge md\), while the corrected formal route uses the confirmed large-\(k\) condition \(k\ge 400md\) and a nonzero \(k\) boundary for the scalar cascade. The factor \(400\) is now treated as a statement correction, following Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>. The other corrected final-theorem boundary is the zero-sampling case allowed when \(d=0\), since \(400md\le k\) then permits \(k=0\). At this excluded boundary the displayed final error itself collapses to \(0\); the formal calculation of this equality is linked in Lean, and the obstruction is documented in <span class="ttfamily">docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex</span>. </p>
 
   </div>
 </div>
@@ -1404,7 +1376,7 @@
 
     <a class="icon proof" href="sec-the-test.html#thm:main-formal-current-interface">#</a>
     
-    <a class="icon proof" href="sec-the-test.html#a0000000050"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-the-test.html#a0000000049"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -1463,7 +1435,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000050">
+<div class="proof_wrapper" id="a0000000049">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -1517,7 +1489,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The paper statement uses the weaker hypothesis \(k \ge md\), but the proof invokes the Section&#160;6 pasting theorem with side condition \(k \ge 400\, md\). This side condition is not implied by \(k \ge md\). The current Lean interface, Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a>, therefore records the stronger large-\(k\) assumption required by the pasting step, together with the scalar-cascade boundary \(k{\gt}0\), rather than hiding the side-condition gap. The helper <span class="ttfamily">mainFormal_trivial_witness</span> remains only for already-saturated branches where \(\nu \ge 1\) makes the three \(\simeq _\nu \) conclusions vacuous; it is not a replacement for the zero-sampling boundary \(k=0\) when \(md=0\). The source-boundary reduction proposition is named in Lean as <span class="ttfamily">MIPStarRE.LDT.Test.mainFormal_sourceObligation</span>; it proves the saturated-error branch and leaves <span class="ttfamily">MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation</span> as the remaining non-vacuous internal obligation, not an extra hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>. </p>
+  <p> The paper statement uses the weaker hypothesis \(k \ge md\), but the proof invokes the Section&#160;6 pasting theorem with side condition \(k \ge 400\, md\). This side condition is not implied by \(k \ge md\). The current Lean interface, Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a>, therefore records the stronger large-\(k\) assumption required by the pasting step, together with the scalar-cascade boundary \(k{\gt}0\), rather than hiding the side-condition gap. The helper <span class="ttfamily">mainFormal_trivial_witness</span> remains only for already-saturated branches where \(\nu \ge 1\) makes the three \(\simeq _\nu \) conclusions vacuous; it is not a replacement for the zero-sampling boundary \(k=0\) when \(md=0\). The source-boundary reduction proposition proves the saturated-error branch and delegates the non-vacuous branch to the checked small-error proposition; neither declaration is an extra hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>. </p>
 
   </div>
 </div>
@@ -1540,7 +1512,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The printed theorem starts from a general projective strategy on possibly different prover spaces. The Lean declaration linked in Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a> is the same-space interface documented in <span class="ttfamily">docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex</span>. The source theorem, Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>, is linked to the source-shaped Lean statement, but no proof-level <span class="ttfamily">\leanok</span> is attached here. Removing the same-space restriction requires a two-space role-register symmetrization theorem showing that the paper’s general strategy reduces to the current formal interface, and the remaining \(k\)-boundary is the zero-sampling case described above. The current same-space corrected-range interface itself is proof-complete and is marked with proof-level <span class="ttfamily">\leanok</span>. </p>
+  <p> The printed theorem starts from a general projective strategy on possibly different prover spaces. The Lean declaration linked in Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a> is the same-space interface documented in <span class="ttfamily">docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex</span>. The source theorem, Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>, is linked to the source-shaped Lean statement and is proof-complete under the corrected boundary assumptions \(k\ge 400md\) and \(k{\gt}0\). The current same-space corrected-range interface remains a Lean-only intermediate theorem; it is also proof-complete, but it is not the printed two-space source theorem. </p>
 
   </div>
 </div>
