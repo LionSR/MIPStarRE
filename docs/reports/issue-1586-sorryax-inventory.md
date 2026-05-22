@@ -218,7 +218,7 @@ theorems as proof-complete.
 | Blueprint node | Lean declaration | Status |
 |---|---|---|
 | `thm:main-induction` | `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement` | Statement and proof are marked `\leanok`.  This is the corrected large-`k` statement with `k ≥ 400md`; the printed `k ≥ md` bound is treated as a confirmed source statement gap. |
-| `thm:main-formal` | `MIPStarRE.LDT.Test.mainFormal_sourceStatement` | Statement and proof are marked `\leanok`.  This is the corrected two-space statement with `k ≥ 400md` and `0 < k`; the wrapper `mainFormal_sourceObligation` proves the saturated-error branch and the small-error branch calls the checked role-register scalar-boundary theorem. |
+| `thm:main-formal` | `MIPStarRE.LDT.Test.mainFormal_sourceStatement` | Statement and proof are marked `\leanok`.  This is the corrected two-space statement with `k ≥ 400md` and `0 < k`; the source-boundary reduction proves the saturated-error branch and the small-error branch calls the checked role-register scalar-boundary theorem. |
 | `thm:main-formal-current-interface` | `MIPStarRE.LDT.Test.mainFormal` | Statement and proof are marked `\leanok`.  This is the same-space corrected-range interface, not the printed two-space source theorem. |
 
 The corrected source-labelled theorems `thm:main-induction` and

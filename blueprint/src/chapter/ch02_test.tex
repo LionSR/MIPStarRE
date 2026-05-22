@@ -339,9 +339,9 @@
 	factor \(400\) is now treated as a statement correction, following
 	Theorem~\ref{thm:main-induction}.  The other corrected final-theorem boundary is
 	the zero-sampling case allowed when \(d=0\), since \(400md\le k\) then permits
-	\(k=0\).  At this excluded boundary the displayed final error itself collapses to \(0\),
-	as recorded by
-	\texttt{mainFormalError\_zero\_k}; the obstruction is documented in
+	\(k=0\).  At this excluded boundary the displayed final error itself collapses to \(0\);
+	the formal calculation of this equality is linked in Lean, and the
+	obstruction is documented in
 	\texttt{docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex}.
 \end{remark}
 
@@ -391,11 +391,9 @@
 	\texttt{mainFormal\_trivial\_witness} remains only for already-saturated
 	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
 	it is not a replacement for the zero-sampling boundary \(k=0\) when \(md=0\).
-	The source-boundary reduction proposition is named in Lean as
-	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceObligation}; it proves the
-	saturated-error branch and delegates the non-vacuous branch to the checked
-	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceSmallErrorObligation}; neither
-	declaration is an extra hypothesis of Theorem~\ref{thm:main-formal}.
+	The source-boundary reduction proposition proves the saturated-error branch
+	and delegates the non-vacuous branch to the checked small-error proposition;
+	neither declaration is an extra hypothesis of Theorem~\ref{thm:main-formal}.
 \end{remark}
 
 \begin{remark}[Formal-interface boundary for the public theorem]\label{rem:main-formal-interface-boundary}

@@ -112,11 +112,11 @@ The corrected source statement `MainInductionStep.mainInduction_sourceStatement`
 is audited with standard kernel axioms only.  The paper prints the weaker
 hypothesis `k ≥ md`, but the project records the missing factor `400` as a
 confirmed theorem-level correction rather than as a remaining proof obligation.
-The final theorem source boundary is reduced by `Test.mainFormal_sourceObligation`,
-whose saturated-error branch is proved and whose small-error branch calls the
-checked role-register scalar-boundary theorem under the corrected nonzero
-sampling hypothesis.  The zero-sampling boundary tracked by #422 is now removed
-from the source theorem statement by the explicit hypothesis `0 < k`.
+The final theorem source-boundary declaration proves the saturated-error branch,
+while its small-error branch calls the checked role-register scalar-boundary
+theorem under the corrected nonzero sampling hypothesis.  The zero-sampling
+boundary tracked by #422 is now removed from the source theorem statement by the
+explicit hypothesis `0 < k`.
 
 The same-space corrected-range subcase of the final source conclusion is
 recorded separately as `Test.mainFormal_sourceConclusion_ofSameSpaceLargeK`.
@@ -268,16 +268,6 @@ open Lean Elab Command
 private def expectedStandardAxioms : Array Name :=
   #[``propext, ``Classical.choice, ``Quot.sound].qsort Name.lt
 
-private def expectedStandardAxiomsWithSorry : Array Name :=
-  #[``propext, ``Classical.choice, ``Quot.sound, ``sorryAx].qsort Name.lt
-
-/-- Standard kernel axioms plus `sorryAx`; tracks source-boundary obligations
-which remain as source-faithful statements with direct or transitive proof
-holes.  The current corrected large-`k` interfaces are audited separately with
-standard kernel axioms only. -/
-private def expectedMainFormalAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
-
 /-- Standard kernel axioms only: the issue-#1032 scalar discrepancy for
 `thm:orthonormalization` has been repaired without making the theorem depend on
 the still-unproved heterogeneous `orthonormalizationMainLemma`. -/
@@ -330,16 +320,6 @@ private def assertDoesNotUseSorryAxiom (declName : Name) : CommandElabM Unit := 
   if axioms.contains ``sorryAx then
     throwError m!"'{declName}' unexpectedly depends on `sorryAx`; axioms: {axioms.toList}"
 
-private def assertUsesOnlyStandardOrSorryAxiomsWithSorry (declName : Name) :
-    CommandElabM Unit := do
-  let axioms := (← Lean.collectAxioms declName).qsort Name.lt
-  unless axioms.contains ``sorryAx do
-    throwError m!"'{declName}' was expected to carry the tracked source-statement gap"
-  for ax in axioms do
-    unless expectedStandardAxiomsWithSorry.contains ax do
-      throwError
-        m!"'{declName}' depends on nonstandard axiom {ax}; axioms: {axioms.toList}"
-
 private def resolveDeclIdent (id : TSyntax `ident) : CommandElabM Name := do
   liftCoreM <| Lean.Elab.realizeGlobalConstNoOverloadWithInfo id
 
@@ -348,12 +328,6 @@ elab "assert_standard_axioms " id:ident : command => do
 
 elab "assert_no_sorry_axiom " id:ident : command => do
   assertDoesNotUseSorryAxiom (← resolveDeclIdent id)
-
-elab "assert_source_statement_gap_axioms " id:ident : command => do
-  assertUsesOnlyStandardOrSorryAxiomsWithSorry (← resolveDeclIdent id)
-
-elab "assert_main_formal_axioms " id:ident : command => do
-  assertUsesExactlyAxioms (← resolveDeclIdent id) expectedMainFormalAxioms
 
 elab "assert_orthonormalization_axioms " id:ident : command => do
   assertUsesExactlyAxioms (← resolveDeclIdent id) expectedOrthonormalizationAxioms
