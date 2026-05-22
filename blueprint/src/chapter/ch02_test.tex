@@ -222,10 +222,10 @@
 \begin{proposition}[Source-boundary reduction for the final theorem]\label{prop:main-formal-source-obligation}
 	\lean{MIPStarRE.LDT.Test.mainFormal_sourceObligation}
 	\leanok
-	This proposition records the source-boundary reduction for the corrected
-	two-space theorem Theorem~\ref{thm:main-formal}.  It proves the
-	saturated-error branch by the trivial consistency bound and reduces the
-	remaining non-vacuous branch to
+	This proposition records the saturated-error reduction for the corrected
+	two-space theorem
+	Theorem~\ref{thm:main-formal}.  It proves the saturated-error branch by the
+	trivial consistency bound and reduces the remaining non-vacuous branch to
 	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  It is not
 	an additional hypothesis of the paper theorem.
 \end{proposition}
@@ -247,10 +247,9 @@
 \end{proposition}
 \begin{proof}\leanok
 	\proves{prop:main-formal-source-small-error-obligation}
-	The proof is the theorem
-	\texttt{mainFormal\_sourceConclusion\_ofRoleRegisterScalarBoundary}, which
-	applies the checked two-space role-register construction and then absorbs its
-	explicit errors into \(\nu\).
+	\uses{prop:main-formal-source-two-space-role-register}
+	The proof applies the checked two-space role-register construction and then
+	absorbs its explicit errors into \(\nu\) at the nonzero sampling boundary.
 \end{proof}
 
 \begin{proposition}[Two-space role-register reduction for the source theorem]\label{prop:main-formal-source-two-space-role-register}
