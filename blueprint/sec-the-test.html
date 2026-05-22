@@ -186,9 +186,26 @@
  </li>
 <li class="">
   <a href="sec-induction.html#a0000000025"><span class="toc_ref">10.2</span> <span class="toc_entry">The inductive construction</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-induction.html#a0000000026"><span class="toc_ref"></span> <span class="toc_entry">Proof frontier for the current induction interface.</span></a>
+ </li>
+
+  </ul>
  </li>
 <li class="">
-  <a href="sec-induction.html#a0000000026"><span class="toc_ref">10.3</span> <span class="toc_entry">Proof of the main formal theorem</span></a>
+  <a href="sec-induction.html#a0000000027"><span class="toc_ref">10.3</span> <span class="toc_entry">Proof of the main formal theorem</span></a>
+  <span class="expand-toc">▶</span>
+  <ul class="sub-toc-2">
+     <li class="">
+  <a href="sec-induction.html#a0000000028"><span class="toc_ref"></span> <span class="toc_entry">Lean successor restricted-recursion targets for the Section 3 proof.</span></a>
+ </li>
+<li class="">
+  <a href="sec-induction.html#a0000000029"><span class="toc_ref"></span> <span class="toc_entry">Lean successor-dependent Step&#160;6 targets.</span></a>
+ </li>
+
+  </ul>
  </li>
 
   </ul>
@@ -340,7 +357,7 @@
 
     <a class="icon proof" href="sec-the-test.html#fig:test">#</a>
     
-    <a class="icon proof" href="sec-the-test.html#a0000000027"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-the-test.html#a0000000030"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -390,14 +407,14 @@
   </div>
   <div class="lemma_thmcontent">
   <p>   For every classical strategy, the acceptance probability of the low individual degree test is </p>
-<div class="displaymath" id="a0000000028">
+<div class="displaymath" id="a0000000031">
   \[  \frac13\left(\frac{P^{\mathrm{line,point}}_{\mathrm{axis}}+P^{\mathrm{point,line}}_{\mathrm{axis}}}{2} +P_{\mathrm{self}} +\frac{P^{\mathrm{line,point}}_{\mathrm{diag}}+P^{\mathrm{point,line}}_{\mathrm{diag}}}{2}\right),  \]
 </div>
 <p> where the five terms are the acceptance probabilities of the two axis-parallel role orderings, the self-consistency branch, and the two diagonal role orderings. </p>
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000027">
+<div class="proof_wrapper" id="a0000000030">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -517,7 +534,7 @@
 
     <a class="icon proof" href="sec-the-test.html#lem:bipartite-strategy-block-identities">#</a>
     
-    <a class="icon proof" href="sec-the-test.html#a0000000029"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-the-test.html#a0000000032"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -572,7 +589,7 @@
 
   </div>
 </div>
-<div class="proof_wrapper" id="a0000000029">
+<div class="proof_wrapper" id="a0000000032">
   <div class="proof_heading">
     <span class="proof_caption">
     Proof
@@ -584,12 +601,188 @@
 
   </div>
 </div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:heterogeneous-role-register-unsymmetrization">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">2.7</span>
+    <span class="lemma_thmtitle">Heterogeneous role-register unsymmetrization</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#lem:heterogeneous-role-register-unsymmetrization">#</a>
+    
+    <a class="icon proof" href="sec-the-test.html#a0000000033"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:projective-strategy">Definition 2.5</a></li>
+          
+          <li><a href="sec-the-test.html#lem:bipartite-strategy-block-identities">Lemma 2.6</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ProjStrat.qBipartiteConsDefect_extractRoleRegisterAlice_le_two_symm" class="lean_decl">MIPStarRE.LDT.ProjStrat.qBipartiteConsDefect_extractRoleRegisterAlice_le_two_symm</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>     Let \(\psi \) be a normalized bipartite state on \(\mathcal H_{\mathrm A}\otimes \mathcal H_{\mathrm B}\), let \(M^{\mathrm A}\) and \(M^{\mathrm B}\) be projective measurements on the two prover spaces with a common outcome type, and let \(G\) be an arbitrary measurement on the heterogeneous role-register space </p>
+<div class="displaymath" id="a0000000034">
+  \[  \{ \mathrm A,\mathrm B\} \times (\mathcal H_{\mathrm A}\oplus \mathcal H_{\mathrm B}).  \]
+</div>
+<p> After applying the direct-sum role-register symmetrization, the consistency defect between the symmetrized point measurement and \(G\) is the average of the two defects obtained from the occupied principal blocks of \(G\). In particular, each extracted defect is at most twice the symmetrized defect. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000033">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The proof is a trace-compression calculation. The \(AB\)-supported component of the symmetrized density pairs with an arbitrary role-register observable only through the principal block indexed by \((\mathrm A,\mathrm{inl})\) on the left and \((\mathrm B,\mathrm{inr})\) on the right, and similarly for the \(BA\) component. Summing over outcomes gives the average-of-two-defects identity, and nonnegativity of consistency defects gives the two factor-two consequences. </p>
+
+  </div>
+</div>
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:heterogeneous-role-register-symmetrization">
+  <div class="lemma_thmheading">
+    <span class="lemma_thmcaption">
+    Lemma
+    </span>
+    <span class="lemma_thmlabel">2.8</span>
+    <span class="lemma_thmtitle">Heterogeneous role-register symmetrization</span>
+    <div class="thm_header_extras">
+
+    
+    ✓
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#lem:heterogeneous-role-register-symmetrization">#</a>
+    
+    <a class="icon proof" href="sec-the-test.html#a0000000035"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#def:projective-strategy">Definition 2.5</a></li>
+          
+          <li><a href="sec-the-test.html#def:symmetric-projective-strategy">Definition 2.4</a></li>
+          
+          <li><a href="sec-the-test.html#def:good-strategy">Definition 2.10</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_is_good_three_mul" class="lean_decl">MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_is_good_three_mul</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="lemma_thmcontent">
+  <p>    Let </p>
+<div class="displaymath" id="a0000000036">
+  \[  (\psi ,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A}, A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})  \]
+</div>
+<p> be a two-space projective strategy passing the low individual degree test with error at most \(\varepsilon \). The heterogeneous role-register construction on </p>
+<div class="displaymath" id="a0000000037">
+  \[  \{ \mathrm A,\mathrm B\} \times (\mathcal H_{\mathrm A}\oplus \mathcal H_{\mathrm B})  \]
+</div>
+<p> produces a symmetric strategy that is \((3\varepsilon ,3\varepsilon ,3\varepsilon )\)-good. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000035">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>The role-register state is the direct-sum version of the symmetrized state in the paper proof. The axis-parallel and diagonal branches are exactly the role averages of the original strategy, and the self-consistency branch is the original point-agreement branch. Since the test chooses among its three branches with equal probability, each branch is bounded by \(3\varepsilon \). </p>
+
+  </div>
+</div>
 <div class="remark_thmwrapper theorem-style-remark" id="rem:strategy-convention">
   <div class="remark_thmheading">
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">2.7</span>
+    <span class="remark_thmlabel">2.9</span>
     <div class="thm_header_extras">
 
         </div>
@@ -611,7 +804,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">2.8</span>
+    <span class="definition_thmlabel">2.10</span>
     <span class="definition_thmtitle">Good strategy</span>
     <div class="thm_header_extras">
 
@@ -675,7 +868,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">2.9</span>
+    <span class="remark_thmlabel">2.11</span>
     <span class="remark_thmtitle">Good-strategy characterization</span>
     <div class="thm_header_extras">
 
@@ -690,11 +883,11 @@
   </div>
   <div class="remark_thmcontent">
   <p> Using notation which will be introduced in Chapter&#160;<a href="sec-prelims.html">3</a> below, a symmetric strategy is \((\varepsilon ,\delta ,\gamma )\)-good if and only if it satisfies the following three conditions. For \(\ell \) and \(u\) as in the axis-parallel lines test, </p>
-<div class="displaymath" id="a0000000030">
+<div class="displaymath" id="a0000000038">
   \[  A_a^u \otimes I \simeq _\varepsilon I \otimes B^\ell _{[f(u)=a]}, \quad \text{and} \quad A_a^u \otimes I \simeq _\delta I \otimes A_a^u.  \]
 </div>
 <p> And for \(\ell \) and \(u\) as in the diagonal lines test, </p>
-<div class="displaymath" id="a0000000031">
+<div class="displaymath" id="a0000000039">
   \[  A_a^u \otimes I \simeq _\gamma I \otimes L^\ell _{[f(u)=a]}.  \]
 </div>
 
@@ -705,7 +898,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">2.10</span>
+    <span class="definition_thmlabel">2.12</span>
     <span class="definition_thmtitle">Last-direction line notation</span>
     <div class="thm_header_extras">
 
@@ -763,7 +956,7 @@
   </div>
   <div class="definition_thmcontent">
   <p>   For \(u \in \mathbb {F}_q^m\), the last-direction axis-parallel line in \(\mathbb {F}_q^{m+1}\) is </p>
-<div class="displaymath" id="a0000000032">
+<div class="displaymath" id="a0000000040">
   \[  \ell _u = \{ (u,x) \mid x \in \mathbb {F}_q\} .  \]
 </div>
 <p> If \((\psi ,A,B,L)\) is a symmetric strategy for the \((m+1,q,d)\) low individual degree test, we write \(B_f^u\) for the operator \(B_f^{\ell _u}\). For a function \(f \colon \ell _u \to \mathbb {F}_q\), we also write \(f(x)\) for \(f(u,x)\). </p>
@@ -775,7 +968,7 @@
     <span class="definition_thmcaption">
     Definition
     </span>
-    <span class="definition_thmlabel">2.11</span>
+    <span class="definition_thmlabel">2.13</span>
     <span class="definition_thmtitle">Restricted diagonal lines test</span>
     <div class="thm_header_extras">
 
@@ -822,7 +1015,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">2.12</span>
+    <span class="theorem_thmlabel">2.14</span>
     <span class="theorem_thmtitle">Quantum soundness of the low individual degree test</span>
     <div class="thm_header_extras">
 
@@ -831,7 +1024,7 @@
 
     <a class="icon proof" href="sec-the-test.html#thm:main-formal">#</a>
     
-    <a class="icon proof" href="sec-induction.html#a0000000033"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+    <a class="icon proof" href="sec-induction.html#a0000000041"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
     
     
@@ -855,9 +1048,9 @@
           
           <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.15</a></li>
+          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.14</a></li>
           
-          <li><a href="sec-induction.html#lem:symmetrization-bridge">Lemma 10.18</a></li>
+          <li><a href="sec-induction.html#lem:role-register-symmetrization">Lemma 10.22</a></li>
           
           <li><a href="chap-projective.html#lem:orthonormalization-main-lemma">Lemma 4.10</a></li>
           
@@ -875,13 +1068,13 @@
           
           <li><a href="sec-prelims.html#lem:schwartz-zippel-individual">Lemma 3.7</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.26</a></li>
+          <li><a href="sec-induction.html#def:main-formal-envelope">Definition 10.28</a></li>
           
-          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.28</a></li>
+          <li><a href="sec-induction.html#def:main-formal-error-cascade">Definition 10.30</a></li>
           
-          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.29</a></li>
+          <li><a href="sec-induction.html#thm:sigma-bound-main-formal">Theorem 10.31</a></li>
           
-          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.30</a></li>
+          <li><a href="sec-induction.html#thm:zeta-bounds-main-formal">Theorem 10.32</a></li>
           
         </ul>
     
@@ -913,21 +1106,285 @@
   </div>
   <div class="theorem_thmcontent">
   <p>   Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Let \(k \ge md\) be an integer and set </p>
-<div class="displaymath" id="a0000000034">
+<div class="displaymath" id="a0000000042">
   \[  \nu = 100000 k^2 m^4\left(\varepsilon ^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).  \]
 </div>
 <p> Then there exist projective measurements \(G^{\mathrm A}, G^{\mathrm B} \in \mathrm{PolyMeas}(m,q,d)\) with the following properties: </p>
 <ol class="enumerate">
   <li><p>on average over \(u \sim \mathbb {F}_q^m\), </p>
-<div class="displaymath" id="a0000000035">
+<div class="displaymath" id="a0000000043">
   \[  A_a^{\mathrm A,u} \otimes I \simeq _\nu I \otimes G^{\mathrm B}_{[g(u)=a]}, \qquad I \otimes A_a^{\mathrm B,u} \simeq _\nu G^{\mathrm A}_{[g(u)=a]} \otimes I;  \]
 </div>
 </li>
-  <li><div class="displaymath" id="a0000000036">
+  <li><div class="displaymath" id="a0000000044">
   \[  G_g^{\mathrm A} \otimes I \simeq _\nu I \otimes G_g^{\mathrm B}.  \]
 </div>
 </li>
 </ol>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000045">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The saturated-error branch is formalized by <span class="ttfamily">mainFormal_source_trivial_witness</span>. The remaining branch is the small-error source-boundary obligation Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>. The Lean link above records the source-shaped statement, but the theorem is not marked <span class="ttfamily">\leanok</span> until the non-vacuous branch is derived from the paper hypotheses. </p>
+
+  </div>
+</div>
+<div class="proposition_thmwrapper theorem-style-plain" id="prop:main-formal-source-obligation">
+  <div class="proposition_thmheading">
+    <span class="proposition_thmcaption">
+    Proposition
+    </span>
+    <span class="proposition_thmlabel">2.15</span>
+    <span class="proposition_thmtitle">Source-boundary wrapper for the final theorem</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#prop:main-formal-source-obligation">#</a>
+    
+    <a class="icon proof" href="sec-the-test.html#a0000000046"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormal_sourceObligation" class="lean_decl">MIPStarRE.LDT.Test.mainFormal_sourceObligation</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="proposition_thmcontent">
+  <p>  This is the Lean wrapper for the printed two-space theorem Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>. It proves the saturated-error branch by the trivial consistency bound and reduces the remaining non-vacuous branch to Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>. It is not an additional hypothesis of the paper theorem. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000046">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The saturated-error branch is already proved. The proof remains incomplete only through the small-error source-boundary obligation, so this frontier proposition is intentionally not marked <span class="ttfamily">\leanok</span>. </p>
+
+  </div>
+</div>
+<div class="proposition_thmwrapper theorem-style-plain" id="prop:main-formal-source-small-error-obligation">
+  <div class="proposition_thmheading">
+    <span class="proposition_thmcaption">
+    Proposition
+    </span>
+    <span class="proposition_thmlabel">2.16</span>
+    <span class="proposition_thmtitle">Small-error source-boundary obligation for the final theorem</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#prop:main-formal-source-small-error-obligation">#</a>
+    
+    <a class="icon proof" href="sec-the-test.html#a0000000047"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation" class="lean_decl">MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="proposition_thmcontent">
+  <p>  This is the remaining non-vacuous branch of the printed two-space theorem. It asks for the conclusions of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a> under \(k\ge md\) and \(\nu {\lt}1\). It is not a source assumption. Its proof requires the two-space role-register reduction and the source \(k\)-range boundary. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000047">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> This is the direct proof hole in the final source theorem. It must be proved from the paper hypotheses rather than assumed, and therefore it is not marked <span class="ttfamily">\leanok</span>. </p>
+
+  </div>
+</div>
+<div class="proposition_thmwrapper theorem-style-plain" id="prop:main-formal-source-two-space-role-register">
+  <div class="proposition_thmheading">
+    <span class="proposition_thmcaption">
+    Proposition
+    </span>
+    <span class="proposition_thmlabel">2.17</span>
+    <span class="proposition_thmtitle">Two-space role-register reduction for the source theorem</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#prop:main-formal-source-two-space-role-register">#</a>
+    
+    <a class="icon proof" href="sec-the-test.html#a0000000048"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
+</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Uses</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="sec-the-test.html#lem:heterogeneous-role-register-unsymmetrization">Lemma 2.7</a></li>
+          
+          <li><a href="sec-induction.html#thm:main-induction">Theorem 10.14</a></li>
+          
+          <li><a href="sec-the-test.html#thm:main-formal-current-interface">Theorem 2.19</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary" class="lean_decl">MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="proposition_thmcontent">
+  <p>                         The printed final theorem starts from a projective strategy on two possibly different local Hilbert spaces. The current checked formal interface Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a> is stated for the same-space interface. The source proof uses the role-register symmetrization and then unsymmetrizes the polynomial measurement. To close Proposition&#160;<a href="sec-the-test.html#prop:main-formal-source-small-error-obligation">2.16</a>, this reduction must be formalized for the general two-space source strategy rather than assumed as an interface restriction. The trace-level factor-two unsymmetrization estimate for arbitrary heterogeneous role-register measurements is already formalized in Lemma&#160;<a href="sec-the-test.html#lem:heterogeneous-role-register-unsymmetrization">2.7</a>; the remaining work is to assemble the full source-theorem passage from the paper hypotheses. Lean now records the first part of this source-boundary route: the heterogeneous role-register symmetrization may be fed into the source-shaped main-induction theorem under exactly the paper hypotheses \(k\ge md\), and the resulting role-register consistency estimate can be unsymmetrized into the two point-consistency estimates on the original two-space strategy with the expected factor \(2\). In addition, the point-agreement branch is now available for the paper-faithful two-space strategy, and the Schwartz–Zippel Step&#160;5 theorem has been generalized from the same-space carrier to a bipartite state on \(H_A\otimes H_B\). The heterogeneous triangle/SDD comparison theorem has also been proved, so the route now reaches the complete-measurement full-polynomial consistency statement at the end of the paper’s Step&#160;5 calculation. The two heterogeneous orthonormalization applications have also been checked, producing projective submeasurements on both local Hilbert spaces and the corresponding left- and right-factor state-dependent-distance estimates. The completion step has now also been derived in Lean: the two projective submeasurements are completed to projective measurements, and the left- and right-factor estimates are widened to the orthonormalize-and-complete error appearing in the paper. The repaired polynomial line-169 consistency relations have also been checked, with the Cauchy–Schwarz loss coming from the pre-completion orthonormalization estimates rather than from a new hypothesis. The final point-evaluation triangle has also been derived: the polynomial line-169 relations and the completed \(Q_A,Q_B\) projective consistency estimate are postprocessed by evaluation at a point and then combined by the heterogeneous triangle inequality. The scalar absorption from these explicit pre-absorption errors to the final \(\nu =\texttt{mainFormalError}\) bound has also been checked under the nonzero scalar-cascade boundary \(0{\lt}k\). This proposition is not marked proof-complete here because the first declaration inherits the open source-range obligation in Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a>, and because the combined output still requires deriving the source-range and \(0{\lt}k\) boundaries from the printed theorem hypotheses. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000048">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p>  This is an unproved source-boundary reduction. The same-space large-\(k\) subcase is already recorded by <span class="ttfamily">mainFormal_sourceConclusion_ofSameSpaceLargeK</span>; the missing part is the complete general two-space role-register passage from the paper hypotheses, not the factor-two trace-compression estimate itself. </p>
+
+  </div>
+</div>
+<div class="proposition_thmwrapper theorem-style-plain" id="prop:main-formal-source-k-range-boundary">
+  <div class="proposition_thmheading">
+    <span class="proposition_thmcaption">
+    Proposition
+    </span>
+    <span class="proposition_thmlabel">2.18</span>
+    <span class="proposition_thmtitle">Final-theorem source \(k\)-range boundary</span>
+    <div class="thm_header_extras">
+
+        </div>
+    <div class="thm_header_hidden_extras">
+
+    <a class="icon proof" href="sec-the-test.html#prop:main-formal-source-k-range-boundary">#</a>
+    
+    <a class="icon proof" href="sec-the-test.html#a0000000049"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
+    
+    
+    
+    <button class="modal lean">L∃∀N</button>
+        <div class="modal-container">
+      <div class="modal-content">
+        <header>
+          <h1>Lean declarations</h1>
+          <button class="closebtn"><svg  class="icon icon-cross "><use xlink:href="symbol-defs.svg#icon-cross"></use></svg>
+</button>
+        </header>
+        
+        <ul class="uses">
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation" class="lean_decl">MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation</a></li>
+          
+        </ul>
+    
+      </div>
+    </div>
+
+    
+        </div>
+  </div>
+  <div class="proposition_thmcontent">
+  <p>   The paper states Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a> for \(k\ge md\), while the current same-space formal interface uses the corrected large-\(k\) condition \(k\ge 400md\) and a nonzero \(k\) boundary for the scalar cascade. The remaining source theorem must therefore account for the interval \(md\le k{\lt}400md\) and the zero-sampling boundary allowed by the paper hypothesis when \(d=0\), without adding large-\(k\) or nonzero-\(k\) conditions to the printed theorem. At this boundary the displayed final error itself collapses to \(0\), as recorded by <span class="ttfamily">mainFormalError_zero_k</span>. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000049">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> This is the final-theorem form of the source-range gap. The Section&#160;6 source range is already isolated at Proposition&#160;<a href="sec-induction.html#prop:main-induction-source-range-obligation">10.16</a>. The nonzero branch of the two-space final theorem now uses the role-register scalar absorption theorem above. The remaining direct final-theorem boundary is the case \(k=0\), which can occur under \(k\ge md\) only in the degree-zero regime. This is recorded in Lean as <span class="ttfamily">mainFormal_sourceZeroKBoundaryObligation</span> and is not marked <span class="ttfamily">\leanok</span>. </p>
 
   </div>
 </div>
@@ -936,7 +1393,7 @@
     <span class="theorem_thmcaption">
     Theorem
     </span>
-    <span class="theorem_thmlabel">2.13</span>
+    <span class="theorem_thmlabel">2.19</span>
     <span class="theorem_thmtitle">Current same-space formal interface</span>
     <div class="thm_header_extras">
 
@@ -946,6 +1403,9 @@
     <div class="thm_header_hidden_extras">
 
     <a class="icon proof" href="sec-the-test.html#thm:main-formal-current-interface">#</a>
+    
+    <a class="icon proof" href="sec-the-test.html#a0000000050"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
+</a>
     
     
     <button class="modal"><svg  class="icon icon-mindmap "><use xlink:href="symbol-defs.svg#icon-mindmap"></use></svg>
@@ -968,7 +1428,7 @@
           
           <li><a href="sec-prelims.html#def:simeq">Definition 3.16</a></li>
           
-          <li><a href="sec-the-test.html#thm:main-formal">Theorem 2.12</a></li>
+          <li><a href="sec-induction.html#thm:main-induction-current-interface">Theorem 10.15</a></li>
           
         </ul>
     
@@ -999,7 +1459,19 @@
         </div>
   </div>
   <div class="theorem_thmcontent">
-  <p>   This is the currently linked Lean interface toward Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. It is not the printed theorem. Compared with the paper statement, it uses the documented large-\(k\) correction \(k\ge 400md\) and the scalar boundary \(k{\gt}0\), and it is represented in Lean by the same-space strategy container used by the present role-register symmetrization bridge. The full paper interface is tracked in <span class="ttfamily">docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex</span>. Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy in the current same-space formal container that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Let \(k{\gt}0\) with \(k \ge 400\, md\), and define \(\nu \) by the same displayed expression as in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. Then the three consistency conclusions of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a> hold for this restricted formal interface. </p>
+  <p>   This is the currently linked Lean interface toward Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>. It is not the printed theorem. Compared with the paper statement, it uses the documented large-\(k\) correction \(k\ge 400md\) and the scalar boundary \(k{\gt}0\), and it is represented in Lean by the same-space strategy container used by the present role-register symmetrization bridge. The full paper interface is tracked in <span class="ttfamily">docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex</span>. Let \((\psi , A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}, A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})\) be a projective strategy in the current same-space formal container that passes the \((m,q,d)\) low individual degree test with probability at least \(1-\varepsilon \). Let \(k{\gt}0\) with \(k \ge 400\, md\), and define \(\nu \) by the same displayed expression as in Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>. Then the three consistency conclusions of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a> hold for this restricted formal interface. </p>
+
+  </div>
+</div>
+<div class="proof_wrapper" id="a0000000050">
+  <div class="proof_heading">
+    <span class="proof_caption">
+    Proof
+    </span>
+    <span class="expand-proof">▶</span>
+  </div>
+  <div class="proof_content">
+  <p> The proof follows the role-register route through the corrected large-\(k\) induction interface. This same-space corrected-range interface is now proof-complete; it is still not the printed two-space source theorem. </p>
 
   </div>
 </div>
@@ -1008,7 +1480,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">2.14</span>
+    <span class="remark_thmlabel">2.20</span>
     <span class="remark_thmtitle">Internal witness form of the final transport</span>
     <div class="thm_header_extras">
 
@@ -1022,7 +1494,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The witness theorem is a Lean-only formally verified final-transport result: once the Section&#160;6 role witness and the post-role projective-completion witness have been constructed from the hypotheses of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>, it derives the three consistency conclusions of the theorem. It is not a replacement statement for Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>, and it supplies no additional hypothesis to the paper theorem. </p>
+  <p> The witness theorem is a Lean-only formally verified final-transport result: once the Section&#160;6 role witness and the post-role projective-completion witness have been constructed from the hypotheses of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>, it derives the three consistency conclusions of the theorem. It is not a replacement statement for Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>, and it supplies no additional hypothesis to the paper theorem. </p>
 
   </div>
 </div>
@@ -1031,7 +1503,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">2.15</span>
+    <span class="remark_thmlabel">2.21</span>
     <span class="remark_thmtitle">\(k\)-bound boundary for the public theorem</span>
     <div class="thm_header_extras">
 
@@ -1045,7 +1517,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The paper statement uses the weaker hypothesis \(k \ge md\), but the proof invokes the Section&#160;6 pasting theorem with side condition \(k \ge 400\, md\). This side condition is not implied by \(k \ge md\). The current Lean interface, Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.13</a>, therefore records the stronger large-\(k\) assumption required by the pasting step, together with the scalar-cascade boundary \(k{\gt}0\), rather than hiding the side-condition gap. The helper <span class="ttfamily">mainFormal_trivial_witness</span> remains only for already-saturated branches where \(\nu \ge 1\) makes the three \(\simeq _\nu \) conclusions vacuous; it is not a replacement for a proof in the interval \(md \le k {\lt} 400\, md\) or at the \(k=0\) boundary when \(md=0\). The full source-boundary reduction is named in Lean as <span class="ttfamily">MIPStarRE.LDT.Test.mainFormal_sourceObligation</span>; it proves the saturated-error branch and leaves <span class="ttfamily">MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation</span> as the remaining non-vacuous internal obligation, not an extra hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>. </p>
+  <p> The paper statement uses the weaker hypothesis \(k \ge md\), but the proof invokes the Section&#160;6 pasting theorem with side condition \(k \ge 400\, md\). This side condition is not implied by \(k \ge md\). The current Lean interface, Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a>, therefore records the stronger large-\(k\) assumption required by the pasting step, together with the scalar-cascade boundary \(k{\gt}0\), rather than hiding the side-condition gap. The helper <span class="ttfamily">mainFormal_trivial_witness</span> remains only for already-saturated branches where \(\nu \ge 1\) makes the three \(\simeq _\nu \) conclusions vacuous; it is not a replacement for a proof in the interval \(md \le k {\lt} 400\, md\) or at the \(k=0\) boundary when \(md=0\). The full source-boundary wrapper is named in Lean as <span class="ttfamily">MIPStarRE.LDT.Test.mainFormal_sourceObligation</span>; it proves the saturated-error branch and leaves <span class="ttfamily">MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation</span> as the remaining non-vacuous internal obligation, not an extra hypothesis of Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>. </p>
 
   </div>
 </div>
@@ -1054,7 +1526,7 @@
     <span class="remark_thmcaption">
     Remark
     </span>
-    <span class="remark_thmlabel">2.16</span>
+    <span class="remark_thmlabel">2.22</span>
     <span class="remark_thmtitle">Formal-interface boundary for the public theorem</span>
     <div class="thm_header_extras">
 
@@ -1068,7 +1540,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> The printed theorem starts from a general projective strategy on possibly different prover spaces. The Lean declaration linked in Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.13</a> is the same-space interface documented in <span class="ttfamily">docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex</span>. The source theorem, Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.12</a>, is linked to the source-shaped Lean statement, but no proof-level <span class="ttfamily">\leanok</span> is attached here. Removing the same-space restriction requires a two-space role-register symmetrization construction showing that the paper’s general strategy reduces to the current formal interface. In addition, the proof of the current same-space interface still runs through the Section&#160;6 successor construction tracked by issue&#160;#1507, so this interface is not marked with proof-level <span class="ttfamily">\leanok</span>. </p>
+  <p> The printed theorem starts from a general projective strategy on possibly different prover spaces. The Lean declaration linked in Theorem&#160;<a href="sec-the-test.html#thm:main-formal-current-interface">2.19</a> is the same-space interface documented in <span class="ttfamily">docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex</span>. The source theorem, Theorem&#160;<a href="sec-the-test.html#thm:main-formal">2.14</a>, is linked to the source-shaped Lean statement, but no proof-level <span class="ttfamily">\leanok</span> is attached here. Removing the same-space restriction requires a two-space role-register symmetrization wrapper showing that the paper’s general strategy reduces to the current formal interface, and removing the corrected-range restriction requires a source-range argument for \(md\le k{\lt}400md\). The current same-space corrected-range interface itself is proof-complete and is marked with proof-level <span class="ttfamily">\leanok</span>. </p>
 
   </div>
 </div>
