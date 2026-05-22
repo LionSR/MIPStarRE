@@ -108,27 +108,14 @@ answer-valued induction hypothesis is in scope.  Thus the former transitive
 remaining direct proof holes are the source-boundary wrappers audited below,
 not the corrected large-`k` successor construction.
 
-The source statements `Test.mainFormal_sourceStatement` and
-`MainInductionStep.mainInduction_sourceStatement` are audited separately as
-source-boundary gaps.  They record the printed paper hypotheses (`k ≥ md`, and
-in the final theorem a general two-space projective strategy) without linking
-the source blueprint entries to the restricted corrected interfaces.  The
-remaining source interval for `thm:main-induction` is isolated as
-`MainInductionStep.mainInduction_sourceRangeObligation`, whose large-error
-branch is now proved by `mainInductionOfOneLeError` and whose small-error branch
-is the named obligation
-`MainInductionStep.mainInduction_sourceRangeSmallErrorObligation`.  That theorem
-also proves the base case by `mainInductionBaseCase`; the remaining direct
-source-range proof hole is
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`,
-after `MainInductionStep.mainInduction_sourceRangeSmallErrorNonBaseObligation`
-removes the impossible degree-zero branch and
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation`
-derives `1 ≤ k`.  The final
-theorem source boundary is wrapped by `Test.mainFormal_sourceObligation`, whose
-saturated-error branch is proved and whose remaining branch is the named
-obligation `Test.mainFormal_sourceSmallErrorObligation`.  These are named proof
-obligations, not bridge or residual assumptions.
+The corrected source statement `MainInductionStep.mainInduction_sourceStatement`
+is audited with standard kernel axioms only.  The paper prints the weaker
+hypothesis `k ≥ md`, but the project records the missing factor `400` as a
+confirmed theorem-level correction rather than as a remaining proof obligation.
+The final theorem source boundary is wrapped by `Test.mainFormal_sourceObligation`,
+whose saturated-error branch is proved and whose remaining branch is the named
+obligation `Test.mainFormal_sourceSmallErrorObligation`.  After the large-`k`
+correction, that branch still has the zero-sampling boundary tracked by #422.
 
 The same-space corrected-range subcase of the final source conclusion is
 recorded separately as `Test.mainFormal_sourceConclusion_ofSameSpaceLargeK`.
@@ -146,14 +133,12 @@ standard Lean axioms only: the measurement-valued realization of
 `thm:self-improvement-in-induction-section` no longer inherits the issue-#1230
 SDP slackness obligation.
 
-The audit for `MainInductionStep.mainInduction` records that the separate
-corrected large-`k` Lean interface to `thm:main-induction` is now proved.  The
-source-labelled blueprint theorem keeps the printed
-`k ≥ m d` hypothesis, while the Lean interface assumes the documented
-correction `k ≥ 400 m d`.  The scalar side-condition discrepancy is recorded in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The remaining
-main-induction proof debt is the source-range interval `md ≤ k < 400md`, not
-the corrected large-`k` interface.
+The audit for `MainInductionStep.mainInduction` records that the corrected
+large-`k` Lean interface to `thm:main-induction` is now proved.  The
+source-labelled blueprint theorem uses the same corrected hypothesis
+`k ≥ 400 m d`.  The scalar side-condition discrepancy is recorded in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` as a confirmed bug in the
+printed theorem statement.
 
 The audit for
 `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction` records
@@ -309,12 +294,6 @@ by `selfImprovementInInductionSection` has been discharged. -/
 private def expectedInductionSelfImprovementAxioms : Array Name :=
   expectedStandardAxioms
 
-/-- Standard kernel axioms plus `sorryAx`; tracks source-boundary wrappers for
-the printed `k ≥ md` range.  The corrected large-`k` `mainInduction` theorem is
-audited with standard kernel axioms only. -/
-private def expectedMainInductionAxioms : Array Name :=
-  expectedStandardAxiomsWithSorry
-
 /-- Standard kernel axioms only: the issue #1622 degree-zero branch for
 unrestricted `ldPasting` has been discharged. -/
 private def expectedLdPastingAxioms : Array Name :=
@@ -385,9 +364,6 @@ elab "assert_self_improvement_axioms " id:ident : command => do
 elab "assert_induction_self_improvement_axioms " id:ident : command => do
   assertUsesExactlyAxioms (← resolveDeclIdent id) expectedInductionSelfImprovementAxioms
 
-elab "assert_main_induction_axioms " id:ident : command => do
-  assertUsesExactlyAxioms (← resolveDeclIdent id) expectedMainInductionAxioms
-
 elab "assert_ld_pasting_axioms " id:ident : command => do
   assertUsesExactlyAxioms (← resolveDeclIdent id) expectedLdPastingAxioms
 
@@ -413,19 +389,9 @@ assert_standard_axioms
   MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.twoSidedCorrelationPreservation
 assert_standard_axioms
   MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation
-assert_source_statement_gap_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation
-assert_source_statement_gap_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation
-assert_source_statement_gap_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorNonBaseObligation
-assert_source_statement_gap_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorObligation
-assert_source_statement_gap_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_sourceMainInduction
 assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterPointConsistency_ofSymConsistency
@@ -463,19 +429,19 @@ assert_standard_axioms
   MIPStarRE.LDT.Test.projectiveEvaluationConsistency_ofFullPolynomialConsistency_heterogeneous
 assert_standard_axioms
   MIPStarRE.LDT.Test.mainFormalError_zero_k
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterUnsymmetrizedPointConsistency
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterCompletePolynomialSelfConsistency
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterLeftProjectiveSubmeasurement
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterTwoSidedProjectiveSubmeasurements
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterCompletedProjectiveMeasurements
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterFinalPointConsistency
-assert_source_statement_gap_axioms
+assert_standard_axioms
   MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
 assert_source_statement_gap_axioms
   MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation

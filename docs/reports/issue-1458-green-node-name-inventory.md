@@ -97,7 +97,6 @@ PY
 | `def:successor-pasting-data` | `AveragedPastingData.*`, `mainInductionFromAnswerStageDataOfSmallError` | Lean-only successor assembly interface.  The node is green because the conditional assembly is checked, not because the source successor theorem has been discharged. |
 | `prop:main-formal-source-obligation` | `mainFormal_sourceObligation` | Statement-level final-theorem source-boundary wrapper.  It proves the saturated-error branch but remains proof-incomplete through `mainFormal_sourceSmallErrorObligation`; it is not an added paper hypothesis. |
 | `prop:main-formal-source-small-error-obligation` | `mainFormal_sourceSmallErrorObligation` | Statement-level non-vacuous final-theorem source-boundary proof hole.  It records the missing branch explicitly instead of hiding it inside `thm:main-formal`. |
-| `prop:main-induction-source-range-obligation` | `mainInduction_sourceRangeObligation`, `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` | Statement-level source-range proof frontier for `md <= k < 400md`.  The branch is non-vacuous and is not a theorem hypothesis. |
 | `rem:main-formal-step6-constructions` | `MainFormal*Witness`, `mainFormalBaseRoleInductionWitness`, `mainFormal_ofProjectiveCompletionTransportWitness` | Lean-only final-transport route depending on a Section 6 role witness.  This is now an ordinary remark rather than a green definition node. |
 | `def:main-formal-error-cascade` | `CascadeHypotheses` | Faithful finite-regime hypothesis package for the scalar error calculation. |
 
@@ -107,10 +106,9 @@ After the 2026-05-22 proof-frontier update, the current local dependency graph
 no longer gives green statement borders to the source-frontier nodes whose
 proofs remain open.  In particular,
 `prop:main-formal-source-obligation`,
-`prop:main-formal-source-small-error-obligation`, and
-`prop:main-induction-source-range-obligation` are deliberately blue/unfilled:
-their Lean declarations name the missing assertions, but the blueprint does not
-mark them `\leanok`.  The remaining green high-risk-name node in this part of
+and `prop:main-formal-source-small-error-obligation` are deliberately
+blue/unfilled: their Lean declarations name the missing assertions, but the
+blueprint does not mark them `\leanok`.  The remaining green high-risk-name node in this part of
 the inventory is `lem:sdp-uniform-feasible-witness`, the elementary Slater
 witness \(T_g=(2|\mathrm{Poly}|)^{-1}I\), \(Z=2I\), not an assumed obligation.
 Earlier green nodes whose labels contained "obligations", "bridge", "repair",
@@ -134,23 +132,25 @@ The nodes divide into five classes:
 The internal frontier nodes should remain separate from source theorem labels.
 In particular, the green status of `def:self-improvement-slice-transport`
 should not be read as closing
-`thm:main-formal` or `thm:main-induction`.  Those source-facing obligations now
-lie in the printed source range and the final two-space source boundary, not in
-the corrected large-`k` successor assembly.
+`thm:main-formal` or `thm:main-induction`.  The large-`k` correction for
+`thm:main-induction` is now the source-facing statement, so the remaining
+source-facing proof debt lies in the final theorem boundary, not in the
+corrected Section 6 successor assembly.
 
 The final-theorem small-error frontier is now split into two explicit
 blueprint sub-obligations without Lean completion tags:
 `prop:main-formal-source-two-space-role-register`,
 and `prop:main-formal-source-k-range-boundary`.  These name the two-space
-role-register reduction and the source \(k\)-range boundary, respectively.  They
-are not assumptions of `thm:main-formal`.
+role-register reduction and the zero-sampling \(k\)-boundary, respectively.
+They are not assumptions of `thm:main-formal`.
 
 The corrected large-\(k\) successor frontier is now proof-complete.  The
 answer-valued restricted-probability theorem, the slice-wise recursive
 application, the answer-valued slice self-improvement construction, the
 predecessor induction argument, and the answer-valued pasting invocation are
-checked.  The remaining induction-theorem proof debt is the source interval
-\(md\le k<400md\).
+checked.  The former proof debt for the printed interval \(md\le k<400md\) has
+been retired because the factor \(400\) is treated as a confirmed statement
+correction.
 
 The former degree-zero family sub-obligation has been retired.  The recursive
 predecessor hypothesis is now stated without an artificial `0 < d` assumption,

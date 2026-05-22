@@ -17,19 +17,18 @@ The command
 rg -n '^\s*sorry\b' MIPStarRE/LDT --glob '*.lean'
 ```
 
-currently reports two direct proof holes.
+currently reports one direct proof hole in this part of the source route.
 
 | Site | Declaration | Tracking issue | Mathematical obligation |
 |---|---|---|---|
-| `MIPStarRE/LDT/MainInductionStep/Theorems/SourceTheorems.lean:79` | `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` | #906, #1507 | Prove the positive-degree non-base small-error branch of the source interval `md ≤ k < 400md` for `thm:main-induction`, after the derived side condition `1 ≤ k` has been supplied by the wrapper.  The large-error branch is closed by `mainInductionOfOneLeError`, the base case is closed by `mainInductionBaseCase`, the degree-zero branch is contradictory, and the checked large-`k` range `400md ≤ k` is handled by `MainInductionStep.mainInduction`.  The interval is not made vacuous by the small-error hypothesis: `docs/paper-gaps/issue-906-main-formal-k-bound.tex` records explicit asymptotic choices with `md ≤ k < 400md` and `mainInductionError < 1`. |
-| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:300` | `Test.mainFormal_sourceZeroKBoundaryObligation` | #906, #930, #422 | Resolve the zero-sampling boundary of the printed two-space source theorem `thm:main-formal`, with a general projective strategy, the paper hypothesis `k ≥ md`, and `k = 0`.  The wrapper `Test.mainFormal_sourceSmallErrorObligation` now calls the checked nonzero scalar-cascade route when `0 < k`, and isolates only the degree-zero sampling corner as a direct proof hole.  The note `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex` records why this boundary should be treated as a statement-level correction target rather than a package-construction obligation. |
+| `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | `Test.mainFormal_sourceZeroKBoundaryObligation` | #906, #930, #422 | Resolve the zero-sampling boundary of the corrected two-space source theorem `thm:main-formal`, with a general projective strategy, the corrected hypothesis `k ≥ 400md`, and `k = 0`.  The wrapper `Test.mainFormal_sourceSmallErrorObligation` now calls the checked nonzero scalar-cascade route when `0 < k`, and isolates only the degree-zero sampling corner as a direct proof hole.  The note `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex` records why this boundary should be treated as a statement-level correction target rather than a package-construction obligation. |
 
-The source-range obligation and the final zero-sampling boundary obligation are
-deliberate source-boundary proof holes: they make the printed paper statements
-visible in Lean and linked from the source blueprint entries, without
-certifying their proofs.  They do not add bridge, residual, repair, package,
-producer, or generic hypothesis fields to the source theorems.  The former
-Naimark tensor-product proof hole has been discharged.
+The final zero-sampling boundary obligation is a deliberate source-boundary
+proof hole: it keeps the remaining boundary visible in Lean and linked from the
+source blueprint entry, without adding bridge, residual, repair, package,
+producer, or generic hypothesis fields to the source theorem.  The former
+main-induction source-range proof hole has been removed after the factor \(400\)
+was accepted as a confirmed statement correction.
 Each direct proof-hole declaration now carries an explicit `**Unfaithful:**`
 docstring marker identifying the unfinished proof step, its paper source, its
 tracking note or issue, and the construction expected to eliminate the
@@ -165,15 +164,13 @@ and
 The source-boundary handoff
 `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_sourceMainInduction` now also
 applies the source-shaped main-induction theorem to the heterogeneous
-role-register symmetrization under the paper hypothesis `k ≥ md`.  It is not
-proof-marked in the blueprint, because it inherits the open source-range
-obligation from `MainInductionStep.mainInduction_sourceStatement`.
+role-register symmetrization under the corrected large-`k` hypothesis
+`k ≥ 400md`.  This handoff is now standard-axiom clean.
 The combined theorem
 `MIPStarRE.LDT.ProjStrat.sourceRoleRegisterUnsymmetrizedPointConsistency`
 then extracts the two complete polynomial measurements and proves the two
 factor-two point-consistency estimates for the original two-space strategy.
-This combined theorem still inherits the same source-range obligation and does
-not claim projectivity or final self-consistency.
+This combined theorem does not claim projectivity or final self-consistency.
 
 The subsequent Schwartz--Zippel component is no longer a same-space obstacle:
 `MIPStarRE.LDT.Preliminaries.polynomialCollisionMass_le_mdq` and
@@ -207,8 +204,7 @@ scalar absorption from these explicit pre-absorption errors to
 `mainFormalError` is now checked by
 `MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary`,
 under the scalar-cascade boundary `0 < k`.  The remaining two-space final
-theorem work is the source-range boundary together with the zero-sampling
-corner isolated as
+theorem work is the zero-sampling corner isolated as
 `MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation`.  The scalar
 lemma `MIPStarRE.LDT.Test.mainFormalError_zero_k` records why this is a
 statement-level boundary: at `k = 0` the displayed final error is exactly zero.
@@ -230,24 +226,18 @@ ordinary `SymStrat`.
 
 ## Blueprint Proof-Level Status
 
-The blueprint synchronization report records two proof-level gaps: the two
-source-labelled statements whose remaining proof debt is factored through named
-obligations above.  The corrected Lean-only current interfaces are now
-proof-complete.
+The blueprint synchronization report records the remaining final-theorem
+proof-level gap.  The corrected main-induction statement is proof-complete.
 
 | Blueprint node | Lean declaration | Status |
 |---|---|---|
-| `thm:main-induction` | `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement` | Statement-level `\leanok` only.  This is the printed paper statement with `k ≥ md`; the corrected large-`k` subrange is reduced to the current interface, while the source interval `md ≤ k < 400md` is isolated as `mainInduction_sourceRangeObligation`.  That wrapper proves its large-error branch and calls `mainInduction_sourceRangeSmallErrorObligation` only in the small-error branch; the small-error wrapper proves the base case, the non-base wrapper removes the impossible degree-zero branch, and the positive-degree wrapper derives `1 ≤ k`, leaving `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` as the direct source-range proof hole. |
-| `thm:main-induction-current-interface` | `MIPStarRE.LDT.MainInductionStep.mainInduction` | Statement and proof are marked `\leanok`.  This is the corrected large-`k` interface, not the printed source theorem. |
-| `thm:main-formal` | `MIPStarRE.LDT.Test.mainFormal_sourceStatement` | Statement-level `\leanok` only.  This is the printed two-space paper statement with `k ≥ md`; the wrapper `mainFormal_sourceObligation` proves the saturated-error branch and leaves the non-vacuous branch as `mainFormal_sourceSmallErrorObligation`. |
+| `thm:main-induction` | `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement` | Statement and proof are marked `\leanok`.  This is the corrected large-`k` statement with `k ≥ 400md`; the printed `k ≥ md` bound is treated as a confirmed source bug. |
+| `thm:main-formal` | `MIPStarRE.LDT.Test.mainFormal_sourceStatement` | Statement-level `\leanok` only.  This is the corrected two-space statement with `k ≥ 400md`; the wrapper `mainFormal_sourceObligation` proves the saturated-error branch and leaves the zero-sampling branch inside `mainFormal_sourceSmallErrorObligation`. |
 | `thm:main-formal-current-interface` | `MIPStarRE.LDT.Test.mainFormal` | Statement and proof are marked `\leanok`.  This is the same-space corrected-range interface, not the printed two-space source theorem. |
 
-The source-labelled theorems `thm:main-induction` and `thm:main-formal` are no
-longer linked to the restricted Lean declarations.  They now link to
-source-faithful Lean statements whose remaining proof debt is tracked directly
-or through named source-range obligations, and are intentionally left without
-proof-level formalization marks until the printed source statements are proved
-from their stated hypotheses.
+The corrected source-labelled theorem `thm:main-induction` is proof-complete.
+The source-labelled theorem `thm:main-formal` is intentionally left without a
+proof-level formalization mark until the zero-sampling boundary is resolved.
 
 ## Statement Integrity Audit for Remaining Source Theorems
 
@@ -260,8 +250,8 @@ and leave the missing arguments as named proof obligations.
 
 | Source label | Paper assumptions | Lean assumptions | Paper conclusion | Lean conclusion | Verdict |
 |---|---|---|---|---|---|
-| `thm:main-induction` | A symmetric strategy for the `(m,q,d)` test which is `(eps,delta,gamma)`-good, and an integer `k` with `k ≥ md`; see `references/ldt-paper/inductive_step.tex:7-18`. | `params : Parameters`, `[FieldModel params.q]`, `strategy : SymStrat params ι`, `hgood : strategy.IsGood eps delta gamma`, and `hk : params.m * params.d ≤ k`, with finite and decidable index type instances. | A polynomial measurement `G` whose evaluation family is point-consistent with the point measurement at error `mainInductionError params k eps delta gamma`. | `∃ G : Measurement (Polynomial params) ι, ConsRel strategy.state (uniformDistribution (Point params)) ... (mainInductionError params k eps delta gamma)`. | Exact up to faithful formal encoding of finite index types, the field model, parameters, measurements, and consistency.  There is no bridge, residual, repair, package, producer, or generic hypothesis field.  The remaining proof debt is the source interval `md ≤ k < 400md`, represented by `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`. |
-| `thm:main-formal` | A projective two-prover strategy passing the low individual degree test with probability at least `1 - eps`, and an integer `k` with `k ≥ md`; see `references/ldt-paper/test_definition.tex:180-202`. | `params : Parameters`, `[FieldModel params.q]`, a two-space projective strategy `strategy : ProjStrat params ιA ιB`, `hpass : strategy.PassesLowIndividualDegreeTest eps`, and `hk : params.m * params.d ≤ k`, with finite and decidable index type instances. | Projective polynomial measurements `G_A` and `G_B` satisfying the two point-consistency conclusions and the final self-consistency conclusion at error `mainFormalError params k eps`. | `∃ G_A : ProjMeas (Polynomial params) ιA, ∃ G_B : ProjMeas (Polynomial params) ιB, ...`, with the two point `ConsRel` conclusions and the constant-family `ConsRel` conclusion. | Exact up to faithful formal encoding of the two Hilbert-space index types, the field model, projective measurements, uniform distributions, and consistency relations.  There is no bridge, residual, repair, package, producer, or generic hypothesis field.  The remaining proof debt is the non-vacuous two-space source-boundary branch, represented by `mainFormal_sourceSmallErrorObligation`. |
+| `thm:main-induction` | A symmetric strategy for the `(m,q,d)` test which is `(eps,delta,gamma)`-good, and an integer `k` with the corrected bound `k ≥ 400md`; see `references/ldt-paper/inductive_step.tex:7-18` and `docs/paper-gaps/issue-906-main-formal-k-bound.tex`. | `params : Parameters`, `[FieldModel params.q]`, `strategy : SymStrat params ι`, `hgood : strategy.IsGood eps delta gamma`, and `hk : 400 * params.m * params.d ≤ k`, with finite and decidable index type instances. | A polynomial measurement `G` whose evaluation family is point-consistent with the point measurement at error `mainInductionError params k eps delta gamma`. | `∃ G : Measurement (Polynomial params) ι, ConsRel strategy.state (uniformDistribution (Point params)) ... (mainInductionError params k eps delta gamma)`. | Local fix for a confirmed source bug: the Lean statement uses the large-`k` hypothesis required by the proof through pasting, with no bridge, residual, repair, package, producer, or generic hypothesis field. |
+| `thm:main-formal` | A projective two-prover strategy passing the low individual degree test with probability at least `1 - eps`, and an integer `k` with the corrected bound `k ≥ 400md`; see `references/ldt-paper/test_definition.tex:180-202` and `docs/paper-gaps/issue-906-main-formal-k-bound.tex`. | `params : Parameters`, `[FieldModel params.q]`, a two-space projective strategy `strategy : ProjStrat params ιA ιB`, `hpass : strategy.PassesLowIndividualDegreeTest eps`, and `hk : 400 * params.m * params.d ≤ k`, with finite and decidable index type instances. | Projective polynomial measurements `G_A` and `G_B` satisfying the two point-consistency conclusions and the final self-consistency conclusion at error `mainFormalError params k eps`. | `∃ G_A : ProjMeas (Polynomial params) ιA, ∃ G_B : ProjMeas (Polynomial params) ιB, ...`, with the two point `ConsRel` conclusions and the constant-family `ConsRel` conclusion. | Local fix for the same confirmed large-`k` source bug.  The remaining proof debt is the zero-sampling boundary represented by `mainFormal_sourceZeroKBoundaryObligation`. |
 
 ## High-Risk Blueprint Link Cross-Check
 
@@ -291,7 +281,7 @@ follows.
 
 | Class | Status |
 |---|---|
-| Source-boundary theorem/proposition links `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, `MIPStarRE.LDT.Test.mainFormal_sourceObligation`, `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`, `MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary`, `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`, `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation`, `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`, `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_sourceMainInduction`, `MIPStarRE.LDT.ProjStrat.sourceRoleRegisterUnsymmetrizedPointConsistency`, and `MIPStarRE.LDT.ProjStrat.sourceRoleRegisterFinalPointConsistency` | These are intentionally not proof-marked in the blueprint.  They are the live source-boundary frontier or source-boundary handoffs depending on that frontier, not hidden hypotheses on paper theorems. |
+| Source-boundary theorem/proposition links `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, `MIPStarRE.LDT.Test.mainFormal_sourceObligation`, and `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` | These are intentionally not proof-marked in the blueprint because they still inherit the zero-sampling final-theorem boundary.  They are not hidden hypotheses on paper theorems. |
 | Source-shaped proved statements with high-risk words, such as `NaimarkTensorProductCorrelationStatement`, `RazSafraSoundnessStatement`, `PolishchukSpielmanClassicalSoundnessStatement`, `SdpStatementWithSlackness`, and `AddInUFullStatement` | These are explicitly audited in `AxiomAudit.lean`.  Their high-risk words record the Lean statement interface or the SDP slackness conclusion, not an added bridge assumption. |
 | Proved construction and transport lemmas with high-risk words, such as the projectivization `Repair` declarations, SDP `Witness` and `Dominance` declarations, and `SliceBoundednessInput` accessors | These are Lean-only construction or bookkeeping interfaces.  They may be linked from auxiliary blueprint entries, but they are not advertised as replacements for the source-labelled theorems unless the surrounding blueprint text states the corresponding restriction or construction role. |
 
@@ -365,9 +355,8 @@ findings: 0
 ```
 
 Thus the current LDT tree contains no explicit Lean axiom declarations.  The
-only proof-integrity markers in the kernel are the `sorryAx` dependencies
-generated by the two direct proof holes above: the source-range obligation and
-the final small-error source-boundary obligation.
+only proof-integrity marker in this kernel neighborhood is the `sorryAx`
+dependency generated by the final zero-sampling source-boundary obligation.
 
 ## Transitive `sorryAx` Frontier
 
@@ -377,20 +366,15 @@ audited public declarations expected to depend on `sorryAx` are:
 
 | Declaration | Reason |
 |---|---|
-| `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` | This is the direct proof obligation for the positive-degree non-base small-error branch of the source interval `md ≤ k < 400md` in `thm:main-induction`, with the derived side condition `1 ≤ k`.  The branch is not contradicted by `mainInductionError < 1`; it needs a genuine source-range argument or an explicitly corrected theorem range. |
-| `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation` | This is the named wrapper for the positive-degree non-base small-error source interval; it derives `1 ≤ k` from `md ≤ k`, `m > 0`, and `0 < d`, then calls `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`. |
-| `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorNonBaseObligation` | This is the named wrapper for the non-base small-error source interval; it proves the degree-zero branch by contradiction and calls `mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation` only in the positive-degree branch. |
-| `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorObligation` | This is the named wrapper for the small-error source interval; it proves the base case by `mainInductionBaseCase` and calls `mainInduction_sourceRangeSmallErrorNonBaseObligation` only in the non-base branch. |
-| `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` | This is the named wrapper for the source interval `md ≤ k < 400md`; it proves the large-error branch by `mainInductionOfOneLeError` and calls `mainInduction_sourceRangeSmallErrorObligation` only in the remaining small-error branch. |
-| `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement` | This is the printed source statement of `thm:main-induction`.  In the already covered range `400md ≤ k`, it calls the corrected large-`k` interface; in the remaining range it calls `mainInduction_sourceRangeObligation`. |
-| `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` | This is the direct proof obligation for the non-vacuous branch of the printed two-space source statement of `thm:main-formal`.  The rebuilt blueprint separates its mathematical content into the two-space role-register reduction and the source `k`-range and scalar-boundary issue.  It is not discharged by the saturated-error estimate. |
-| `MIPStarRE.LDT.Test.mainFormal_sourceObligation` | This is the named wrapper for the printed two-space source statement of `thm:main-formal`; it proves the saturated-error branch by `mainFormal_source_trivial_witness` and calls `mainFormal_sourceSmallErrorObligation` only in the remaining small-error branch. |
-| `MIPStarRE.LDT.Test.mainFormal_sourceStatement` | This is the printed two-space source statement of `thm:main-formal`; it calls `mainFormal_sourceObligation` rather than adding the missing source-boundary work as theorem hypotheses. |
+| `MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation` | This is the direct proof obligation for the zero-sampling branch of the corrected two-space source statement of `thm:main-formal`. |
+| `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` | This is the small-error wrapper for the corrected two-space source statement of `thm:main-formal`; its nonzero branch is checked and its zero-sampling branch calls `mainFormal_sourceZeroKBoundaryObligation`. |
+| `MIPStarRE.LDT.Test.mainFormal_sourceObligation` | This is the named wrapper for the corrected two-space source statement of `thm:main-formal`; it proves the saturated-error branch by `mainFormal_source_trivial_witness` and calls `mainFormal_sourceSmallErrorObligation` only in the remaining small-error branch. |
+| `MIPStarRE.LDT.Test.mainFormal_sourceStatement` | This is the corrected two-space source statement of `thm:main-formal`; it calls `mainFormal_sourceObligation` rather than adding the missing zero-sampling boundary as a theorem hypothesis. |
 The Lean docstrings for the remaining source-boundary route carry explicit
 `**Unfaithful:**` markers at the theorem boundary where the unfinished proof is
-used: the source-range wrappers, the source main-induction statement, and the
-two source-final-theorem declarations.  These markers classify the proof status;
-they do not change any public statement or add hypotheses.
+used: the source-final-theorem declarations that transitively call the
+zero-sampling obligation.  These markers classify the proof status; they do not
+change any public statement or add hypotheses.
 
 The following previously listed proof holes have been discharged and are now
 checked as standard-axiom declarations in `AxiomAudit.lean`: the

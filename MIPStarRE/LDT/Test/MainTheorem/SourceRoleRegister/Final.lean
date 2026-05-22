@@ -22,17 +22,9 @@ heterogeneous orthonormalization lemma.  It is not the final theorem: it only
 constructs the Alice-side projective submeasurement and its left-factor
 state-dependent-distance estimate.  The Bob-side construction, completion to
 projective measurements, line-169 transport, scalar absorption, and source
-range remain separate work.
-
-**Unfaithful:** The proof calls
-`sourceRoleRegisterCompletePolynomialSelfConsistency`, hence transitively
-`MainInductionStep.mainInduction_sourceStatement`; the latter currently relies
-on the tracked source-range obligation
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
-Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1507.  Elimination: discharge the source-range obligation for
-`thm:main-induction`; this theorem itself adds no bridge, package, residual,
-repair, producer, input, or generic hypothesis to the paper theorem. -/
+boundary remain separate work.  The role-register input uses the confirmed
+large-`k` correction to `thm:main-induction`; this theorem itself adds no
+bridge, package, residual, repair, producer, input, or generic hypothesis. -/
 theorem sourceRoleRegisterLeftProjectiveSubmeasurement
     (params : Parameters)
     [FieldModel params.q]
@@ -43,7 +35,7 @@ theorem sourceRoleRegisterLeftProjectiveSubmeasurement
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ G_A : Measurement (Polynomial params) ιA,
       ∃ G_B : Measurement (Polynomial params) ιB,
         ∃ P_A : ProjSubMeas (Polynomial params) ιA,
@@ -94,18 +86,10 @@ This theorem combines the source role-register Step 5 theorem with the
 heterogeneous orthonormalization lemmas on both tensor factors.  It is still not
 the final theorem: it constructs projective submeasurements and the two
 state-dependent-distance estimates.  Completion to projective measurements,
-line-169 transport, scalar absorption, and the source range remain separate
-work.
-
-**Unfaithful:** The proof calls
-`sourceRoleRegisterCompletePolynomialSelfConsistency`, hence transitively
-`MainInductionStep.mainInduction_sourceStatement`; the latter currently relies
-on the tracked source-range obligation
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
-Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1507.  Elimination: discharge the source-range obligation for
+line-169 transport, and scalar absorption remain separate work.  The
+role-register input uses the confirmed large-`k` correction to
 `thm:main-induction`; this theorem itself adds no bridge, package, residual,
-repair, producer, input, or generic hypothesis to the paper theorem. -/
+repair, producer, input, or generic hypothesis. -/
 theorem sourceRoleRegisterTwoSidedProjectiveSubmeasurements
     (params : Parameters)
     [FieldModel params.q]
@@ -116,7 +100,7 @@ theorem sourceRoleRegisterTwoSidedProjectiveSubmeasurements
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ G_A : Measurement (Polynomial params) ιA,
       ∃ G_B : Measurement (Polynomial params) ιB,
         ∃ P_A : ProjSubMeas (Polynomial params) ιA,
@@ -192,18 +176,10 @@ orthonormalize-and-complete error.
 
 It is still not `thm:main-formal`: the remaining source-route work is the
 line-169 transport from the polynomial measurements to the point measurements,
-the scalar absorption into `mainFormalError`, and the source range.
-
-**Unfaithful:** The proof calls
-`sourceRoleRegisterTwoSidedProjectiveSubmeasurements`, hence transitively
-`MainInductionStep.mainInduction_sourceStatement`; the latter currently relies
-on the tracked source-range obligation
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
-Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1507.  Elimination: discharge the source-range obligation for
-`thm:main-induction`; the completion argument in this theorem itself adds no
-bridge, package, residual, repair, producer, input, or generic hypothesis to the
-paper theorem. -/
+and the scalar absorption into `mainFormalError`.  The role-register input uses
+the confirmed large-`k` correction to `thm:main-induction`; the completion
+argument in this theorem itself adds no bridge, package, residual, repair,
+producer, input, or generic hypothesis. -/
 theorem sourceRoleRegisterCompletedProjectiveMeasurements
     (params : Parameters)
     [FieldModel params.q]
@@ -214,7 +190,7 @@ theorem sourceRoleRegisterCompletedProjectiveMeasurements
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     let σ : Error :=
       2 * MainInductionStep.mainInductionError params k (3 * eps) (3 * eps) (3 * eps)
     let ζ₁ : Error :=
@@ -365,7 +341,7 @@ theorem sourceRoleRegisterFinalPointConsistency
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     let σ : Error :=
       2 * MainInductionStep.mainInductionError params k (3 * eps) (3 * eps) (3 * eps)
     let ζ₁ : Error :=

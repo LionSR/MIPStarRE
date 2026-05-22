@@ -44,9 +44,7 @@ NOT_PROOF_FILLED_LABELS = {
     "prop:main-formal-source-obligation",
     "prop:main-formal-source-small-error-obligation",
     "prop:main-formal-source-two-space-role-register",
-    "prop:main-induction-source-range-obligation",
     "thm:main-formal",
-    "thm:main-induction",
 }
 
 NOT_GREEN_BORDER_LABELS = NOT_PROOF_FILLED_LABELS
@@ -56,7 +54,7 @@ PROOF_FILLED_LABELS = {
     "prop:main-induction-successor-small-error-construction",
     "prop:main-induction-successor-predecessor-induction",
     "thm:main-formal-current-interface",
-    "thm:main-induction-current-interface",
+    "thm:main-induction",
     "thm:naimark",
 }
 

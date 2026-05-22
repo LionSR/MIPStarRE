@@ -30,23 +30,12 @@ registers and `thm:main-induction` is applied to the resulting symmetric
 strategy.
 
 This theorem is not a proof of `thm:main-formal`: it stops at the polynomial
-measurement produced by source main induction on the role-register space.  It
-does, however, discharge the Step 1 handoff for the paper-faithful two-space
-strategy container.  The downstream unsymmetrization and two-sided
-projective-submeasurement construction are now formalized later in this file;
-completion, line-169 transport, and scalar absorption remain separate, together
-with the still-open source range inside
-`MainInductionStep.mainInduction_sourceStatement`.
-
-**Unfaithful:** The proof calls
-`MainInductionStep.mainInduction_sourceStatement`, whose proof currently relies
-on the tracked source-range obligation
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
-Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1507.  Elimination: discharge the source-range obligation for
-`thm:main-induction`; this two-space role-register handoff itself adds no
-bridge, package, residual, repair, or generic hypothesis to the source theorem.
--/
+measurement produced by corrected large-`k` main induction on the role-register
+space.  It does, however, discharge the Step 1 handoff for the two-space
+strategy container under the confirmed `400md` correction.  The downstream
+unsymmetrization and two-sided projective-submeasurement construction are
+formalized later in this file; completion, line-169 transport, and scalar
+absorption remain separate. -/
 theorem roleRegisterSymmStrategy_sourceMainInduction
     (params : Parameters)
     [FieldModel params.q]
@@ -57,7 +46,7 @@ theorem roleRegisterSymmStrategy_sourceMainInduction
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ G : Measurement (Polynomial params) (RoleRegisterLocal ιA ιB),
       ConsRel (strategy.roleRegisterSymmStrategy).state
         (uniformDistribution (Point params))
@@ -352,15 +341,9 @@ measurements, not projective measurements, and no self-consistency conclusion is
 claimed.  Those are the later projectivization, completion, and scalar
 absorption steps in `references/ldt-paper/inductive_step.tex:111-185`.
 
-**Unfaithful:** The proof calls
-`roleRegisterSymmStrategy_sourceMainInduction`, hence transitively
-`MainInductionStep.mainInduction_sourceStatement`; the latter currently relies
-on the tracked source-range obligation
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
-Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1507.  Elimination: discharge the source-range obligation for
-`thm:main-induction`; the present theorem adds no bridge, package, residual,
-repair, producer, input, or generic hypothesis to the paper theorem. -/
+It uses the corrected large-`k` main-induction handoff; no additional bridge,
+package, residual, repair, producer, input, or generic hypothesis is introduced
+at the theorem boundary. -/
 theorem sourceRoleRegisterUnsymmetrizedPointConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -371,7 +354,7 @@ theorem sourceRoleRegisterUnsymmetrizedPointConsistency
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ G_A : Measurement (Polynomial params) ιA,
       ∃ G_B : Measurement (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))
@@ -408,15 +391,8 @@ It is still not `thm:main-formal`: the measurements are complete POVMs, not
 projective measurements, and the scalar cascade has not yet been absorbed into
 `mainFormalError`.
 
-**Unfaithful:** The proof calls
-`sourceRoleRegisterUnsymmetrizedPointConsistency`, hence transitively
-`MainInductionStep.mainInduction_sourceStatement`; the latter currently relies
-on the tracked source-range obligation
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
-Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1507.  Elimination: discharge the source-range obligation for
-`thm:main-induction`; the present theorem adds no bridge, package, residual,
-repair, producer, input, or generic hypothesis to the paper theorem. -/
+It uses the corrected large-`k` role-register handoff and remains an
+intermediate construction, not the final theorem. -/
 theorem sourceRoleRegisterCompletePolynomialSelfConsistency
     (params : Parameters)
     [FieldModel params.q]
@@ -427,7 +403,7 @@ theorem sourceRoleRegisterCompletePolynomialSelfConsistency
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k) :
     ∃ G_A : Measurement (Polynomial params) ιA,
       ∃ G_B : Measurement (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))

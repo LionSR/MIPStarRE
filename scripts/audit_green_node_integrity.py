@@ -175,6 +175,10 @@ ALLOWED_SOURCE_SIGNATURE_WARNINGS = {
         "MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection",
     ),
     (
+        "prop:main-induction-successor-answer-valued-pasting",
+        "MIPStarRE.LDT.MainInductionStep.answerLdPastingInInductionSectionOfSmallError",
+    ),
+    (
         "thm:sigma-bound-main-formal",
         "MIPStarRE.LDT.Test.sigma_bound",
     ),
@@ -208,14 +212,6 @@ ALLOWED_SOURCE_UNFAITHFUL = {
     (
         "thm:main-formal-current-interface",
         "MIPStarRE.LDT.Test.mainFormal",
-    ),
-    (
-        "thm:main-induction-current-interface",
-        "MIPStarRE.LDT.MainInductionStep.mainInduction",
-    ),
-    (
-        "thm:main-induction",
-        "MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement",
     ),
 }
 

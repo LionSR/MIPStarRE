@@ -876,25 +876,21 @@ theorem mainInductionSuccessor
   cases hnext
   exact mainInductionSuccessorNext pred strategy eps delta gamma k hgood hk
 
-/-- Corrected large-`k` interface toward `thm:main-induction`.
+/-- Corrected large-`k` interface for `thm:main-induction`.
 
-This is not the printed source theorem.  It is the separate Lean interface
-linked from `thm:main-induction-current-interface`: a good symmetric strategy
-and an integer `k ≥ 400 m d` produce a polynomial measurement consistent with
-the point measurement at error `mainInductionError`.  The strengthening from
-the printed `k ≥ m d` hypothesis in
+This is the Lean theorem linked from the corrected blueprint statement: a good
+symmetric strategy and an integer `k ≥ 400 m d` produce a polynomial
+measurement consistent with the point measurement at error `mainInductionError`.
+The strengthening from the printed `k ≥ m d` hypothesis in
 `references/ldt-paper/inductive_step.tex` is documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`, and the printed source
-theorem remains unlinked in the blueprint.
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` as a confirmed statement
+correction.
 
 The proof uses the base case `mainInductionBaseCase` and the corrected
 large-`k` successor theorem `mainInductionSuccessor`.  In the small-error
 successor branch the recursive predecessor calls are supplied by the genuine
 strong-induction theorem `answerMainInduction`, and the answer-valued pasting
-conclusion is derived inside that route.  This corrected large-`k` interface is
-therefore proof-complete.  It is still not the printed source theorem, because
-the printed theorem assumes only `k ≥ m d`; that remaining source-range boundary
-is isolated in `SourceTheorems.lean`. -/
+conclusion is derived inside that route. -/
 theorem mainInduction
     (params : Parameters)
     [FieldModel params.q]

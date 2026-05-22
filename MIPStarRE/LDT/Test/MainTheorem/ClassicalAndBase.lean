@@ -255,7 +255,7 @@ theorem strategySymmetrization_mainInductionBaseCase
 This is the role-register handoff used by the paper proof of
 `\label{thm:main-formal}` at `references/ldt-paper/inductive_step.tex:68-83`.
 It calls the separate Lean interface `MainInductionStep.mainInduction`, whose
-large-`k` correction is recorded in `thm:main-induction-current-interface`.
+large-`k` correction is recorded in `thm:main-induction`.
 The Section 6 successor construction is now proved inside that interface, so
 this handoff is standard-axiom clean.  It remains a corrected large-`k`
 same-space route, not the printed two-space source theorem. -/
