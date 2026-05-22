@@ -141,13 +141,13 @@ blueprint theorem for main induction links to the corrected Lean statement
 \leanid{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement}.  The
 main formal source theorem links to
 \leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement}.  The final source
-theorem routes through the named
-wrapper \leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation}; its
+theorem routes through the named source-boundary reduction
+\leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation}; its
 saturated-error branch is proved, and its non-vacuous branch is
 \leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}.  The
 small-error branch is reduced to the checked role-register scalar absorption
 theorem under the corrected nonzero sampling hypothesis
-\leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary};
+\leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary}.
 The scalar lemma \leanid{MIPStarRE.LDT.Test.mainFormalError_zero_k} records
 that the displayed final-theorem error is exactly zero at \(k=0\).
 The Lean theorem \leanid{MIPStarRE.LDT.Test.mainFormal} assumes
@@ -184,7 +184,7 @@ replaced by a hidden assumption on the paper-facing theorem.  The project now
 takes the second option: the theorem statement is corrected to the large-\(k\)
 range.
 
-The same phenomenon occurs in the final theorem.  The wrapper
+The same phenomenon occurs in the final theorem.  The source-boundary reduction
 \leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation} proves the branch
 \(\nu\ge 1\) by the trivial two-space consistency bound, but the source theorem
 also has a complementary branch in which
