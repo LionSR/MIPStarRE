@@ -38,24 +38,24 @@ ABSENT_LABELS = {
     "def:successor-obligation-reductions",
     "prop:main-induction-source-range-obligation",
     "prop:main-induction-successor-degree-zero-family",
+    "prop:main-formal-source-k-range-boundary",
     "prop:main-formal-source-successor-construction",
     "thm:main-induction-current-interface",
 }
 
 NOT_PROOF_FILLED_LABELS = {
-    "prop:main-formal-source-k-range-boundary",
-    "prop:main-formal-source-obligation",
-    "prop:main-formal-source-small-error-obligation",
     "prop:main-formal-source-two-space-role-register",
-    "thm:main-formal",
 }
 
 NOT_GREEN_BORDER_LABELS = NOT_PROOF_FILLED_LABELS
 
 PROOF_FILLED_LABELS = {
+    "prop:main-formal-source-obligation",
+    "prop:main-formal-source-small-error-obligation",
     "prop:main-induction-successor-answer-valued-pasting",
     "prop:main-induction-successor-small-error-construction",
     "prop:main-induction-successor-predecessor-induction",
+    "thm:main-formal",
     "thm:main-formal-current-interface",
     "thm:main-induction",
     "thm:naimark",

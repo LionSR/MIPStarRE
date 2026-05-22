@@ -17,8 +17,8 @@ module contains:
   projective-completion witness.
 
 * `mainFormal_sourceObligation` and `mainFormal_sourceStatement` — record the
-  corrected two-space source theorem, prove its saturated-error branch, and name
-  the remaining zero-sampling source-boundary obligation.
+  corrected two-space source theorem, including the nonzero sampling condition,
+  and prove its saturated-error branch.
 
 * `mainFormal_sourceConclusion_ofSameSpaceLargeK` — proves the source-shaped
   conclusion in the same-space corrected-range subcase by calling the current
@@ -143,8 +143,8 @@ private theorem projStrat_eps_nonneg_of_passes
 `0 < k`.
 
 This theorem is not an additional hypothesis of `thm:main-formal`; it isolates
-the already checked two-space role-register construction from the remaining
-zero-sampling boundary.  The proof uses
+the already checked two-space role-register construction from the scalar
+absorption at the corrected nonzero sampling boundary.  The proof uses
 `ProjStrat.sourceRoleRegisterFinalPointConsistency` and then weakens the three
 explicit pre-absorption errors to `mainFormalError` by the existing Step 8
 scalar cascade. -/
@@ -250,84 +250,24 @@ theorem mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
       simpa [σsrc, ζ₁src, ζ₂src, ηsrc, ζ₃src] using hsourceSelf) hQQ
 
 /--
-Degenerate zero-\(k\) source-boundary obligation for the printed two-space
-theorem `thm:main-formal`.
-
-Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
-
-This is not an additional hypothesis of the paper theorem.  It isolates the
-only part of the final small-error branch not reached by the present nonzero
-scalar-cascade route.  Since the parameter bundle allows `params.d = 0`, the
-corrected large-`k` hypothesis `400 * params.m * params.d ≤ k` does not imply
-`0 < k`; the corner `k = 0` remains possible exactly when the degree bound is
-zero.  In this corner `mainFormalError params k eps` is definitionally zero, so
-the saturated-error branch and the Step 8 cascade do not apply automatically.
-
-**Unfaithful:** This proof currently contains the tracked `sorry` for the
-zero-sampling boundary of `references/ldt-paper/test_definition.tex:180-202`,
-which is not derived from the printed hypotheses of `thm:main-formal`.
-Documented in `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex` and
-issue #422.  Elimination: replace the zero-boundary obligation by a corrected
-source statement whose sampling parameter is required to be nonzero, or by a
-final error bound that does not vanish at `k = 0`. -/
-theorem mainFormal_sourceZeroKBoundaryObligation
-    (params : Parameters)
-    [FieldModel params.q]
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
-    (strategy : ProjStrat params ιA ιB)
-    (eps : Error)
-    (_hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (k : ℕ)
-    (_hk : 400 * params.m * params.d ≤ k)
-    (_hsmall : ¬ 1 ≤ mainFormalError params k eps)
-    (_hk_zero : k = 0) :
-    ∃ G_A : ProjMeas (Polynomial params) ιA,
-      ∃ G_B : ProjMeas (Polynomial params) ιB,
-        ConsRel strategy.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-            (polynomialEvaluationFamily params G_B.toSubMeas)
-            (mainFormalError params k eps) ∧
-          ConsRel strategy.state (uniformDistribution (Point params))
-            (polynomialEvaluationFamily params G_A.toSubMeas)
-            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-            (mainFormalError params k eps) ∧
-          ConsRel strategy.state (uniformDistribution Unit)
-            (constSubMeasFamily G_A.toSubMeas)
-            (constSubMeasFamily G_B.toSubMeas)
-            (mainFormalError params k eps) := by
-  sorry
-
-/--
 Small-error internal proof obligation for the corrected two-space theorem
 `thm:main-formal`.
 
 Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
 
-This theorem records the remaining non-vacuous source-boundary work needed to
-derive the corrected theorem from the present formal infrastructure.  It is not
-an additional hypothesis of `thm:main-formal`; the source-boundary reduction
-below calls this obligation only after the saturated-error branch has been
-discharged by `mainFormal_source_trivial_witness`.
+This theorem records the small-error branch of the corrected source theorem.
+It is not an additional hypothesis of `thm:main-formal`; the source-boundary
+reduction below calls this obligation only after the saturated-error branch has
+been discharged by `mainFormal_source_trivial_witness`.
 
-**Proof gap:** The heterogeneous role-register symmetrization, factor-two
+The heterogeneous role-register symmetrization, factor-two
 unsymmetrization, point-agreement branch, heterogeneous triangle step,
 Schwartz--Zippel Step 5 calculation, projectivization, completion, line-169
 transport, final point-evaluation triangle, and scalar absorption into
 `mainFormalError` are checked in the two-space route once the nonzero
-scalar-cascade boundary `0 < k` is supplied.  The remaining direct proof hole
-in this file is therefore the zero-sampling boundary
-`mainFormal_sourceZeroKBoundaryObligation`.
-
-**Unfaithful:** This proof currently calls
-`mainFormal_sourceZeroKBoundaryObligation` on the zero-sampling branch.  It
-therefore uses `sorryAx` transitively rather than deriving
-`references/ldt-paper/test_definition.tex:180-202` from the paper hypotheses.
-Documented in `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`,
-`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`, and issue #422.
-Elimination: discharge the zero-sampling final-theorem boundary or correct the
-source statement to require `0 < k`. -/
+scalar-cascade boundary `0 < k` is supplied.  This nonzero boundary is the
+correction recorded in
+`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`. -/
 theorem mainFormal_sourceSmallErrorObligation
     (params : Parameters)
     [FieldModel params.q]
@@ -336,10 +276,11 @@ theorem mainFormal_sourceSmallErrorObligation
     [Fintype ιB] [DecidableEq ιB]
     (strategy : ProjStrat params ιA ιB)
     (eps : Error)
-    (_hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (_hk : 400 * params.m * params.d ≤ k)
-    (_hsmall : ¬ 1 ≤ mainFormalError params k eps) :
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k)
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
     ∃ G_A : ProjMeas (Polynomial params) ιA,
       ∃ G_B : ProjMeas (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))
@@ -354,13 +295,9 @@ theorem mainFormal_sourceSmallErrorObligation
             (constSubMeasFamily G_A.toSubMeas)
             (constSubMeasFamily G_B.toSubMeas)
             (mainFormalError params k eps) := by
-  by_cases hk0 : 0 < k
-  · exact
-      mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
-        params strategy eps _hpass k _hk hk0 _hsmall
-  · exact
-      mainFormal_sourceZeroKBoundaryObligation
-        params strategy eps _hpass k _hk _hsmall (Nat.eq_zero_of_not_pos hk0)
+  exact
+    mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
+      params strategy eps hpass k hk hk0 hsmall
 
 /--
 Internal proof-obligation reduction for the corrected two-space theorem
@@ -373,15 +310,7 @@ frontier.  If `mainFormalError params k eps ≥ 1`, the conclusion follows from
 `mainFormal_source_trivial_witness`; otherwise the proof is exactly the named
 small-error obligation `mainFormal_sourceSmallErrorObligation`.  This reduction
 is not an additional hypothesis of `thm:main-formal`.
-
-**Unfaithful:** The small-error branch calls the tracked obligation
-`mainFormal_sourceSmallErrorObligation`, whose proof is not yet derived from the
-source theorem hypotheses.  Documented in
-`docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`,
-`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex` and issue #422;
-the source theorem is `references/ldt-paper/test_definition.tex:180-202`.
-Elimination: discharge `mainFormal_sourceSmallErrorObligation` by resolving the
-zero-sampling boundary. -/
+-/
 theorem mainFormal_sourceObligation
     (params : Parameters)
     [FieldModel params.q]
@@ -392,7 +321,8 @@ theorem mainFormal_sourceObligation
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k) :
     ∃ G_A : ProjMeas (Polynomial params) ιA,
       ∃ G_B : ProjMeas (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))
@@ -409,7 +339,7 @@ theorem mainFormal_sourceObligation
             (mainFormalError params k eps) := by
   by_cases hlarge : 1 ≤ mainFormalError params k eps
   · exact mainFormal_source_trivial_witness params strategy eps k hlarge
-  · exact mainFormal_sourceSmallErrorObligation params strategy eps hpass k hk hlarge
+  · exact mainFormal_sourceSmallErrorObligation params strategy eps hpass k hk hk0 hlarge
 
 /--
 Corrected source statement of `thm:main-formal`.
@@ -419,19 +349,10 @@ Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
 This theorem records the two-space source theorem with the confirmed large-`k`
 correction `k ≥ 400 m d`.  The paper prints the weaker hypothesis `k ≥ m d`;
 the missing factor `400` is documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The remaining proof gap is
-the zero-sampling boundary allowed when `params.d = 0`.
-
-**Unfaithful:** The proof currently calls the tracked source-boundary reduction
-`mainFormal_sourceObligation`; its saturated-error branch is proved, while its
-small-error branch calls `mainFormal_sourceSmallErrorObligation`, whose only
-remaining direct proof hole is the zero-sampling boundary.  Documented in
-`references/ldt-paper/test_definition.tex:180-202`,
-`docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`,
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`,
-`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`, and issue #422.
-Elimination: discharge `mainFormal_sourceSmallErrorObligation` by resolving the
-zero-sampling boundary. -/
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The additional condition
+`0 < k` corrects the zero-sampling boundary where the printed error collapses
+to zero; this boundary is documented in
+`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`. -/
 theorem mainFormal_sourceStatement
     (params : Parameters)
     [FieldModel params.q]
@@ -442,7 +363,8 @@ theorem mainFormal_sourceStatement
     (eps : Error)
     (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k) :
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k) :
     ∃ G_A : ProjMeas (Polynomial params) ιA,
       ∃ G_B : ProjMeas (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))
@@ -457,7 +379,7 @@ theorem mainFormal_sourceStatement
             (constSubMeasFamily G_A.toSubMeas)
             (constSubMeasFamily G_B.toSubMeas)
             (mainFormalError params k eps) := by
-  exact mainFormal_sourceObligation params strategy eps hpass k hk
+  exact mainFormal_sourceObligation params strategy eps hpass k hk hk0
 
 
 /-- The role-register witness used by the `m = 1` branch of
@@ -586,10 +508,7 @@ already obtained from the current checked interface: after forgetting a
 consistency conclusions follow under the corrected hypotheses
 `400 * m * d ≤ k` and `0 < k`.
 
-It is not a substitute for the source theorem.  The general two-space route and
-the zero-sampling boundary remain the separate source-boundary work recorded in
-`mainFormal_sourceObligation`, whose saturated-error branch is proved and whose
-remaining branch is `mainFormal_sourceSmallErrorObligation`.  This theorem is
+It is not a substitute for the two-space source theorem.  This theorem is
 standard-axiom clean because it only calls the checked current same-space
 interface. -/
 theorem mainFormal_sourceConclusion_ofSameSpaceLargeK

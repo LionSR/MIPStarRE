@@ -33,13 +33,12 @@ graphContainer.graphviz().renderDot(`strict digraph "" {{ {dot} }}`).on("end", i
 
 GOOD_DOT = r'''
 "thm:naimark" [color=green, fillcolor="#1CAC78", label=naimark, shape=ellipse, style=filled];
-"thm:main-formal" [color=blue, label="main-formal", shape=ellipse];
+"thm:main-formal" [color=green, fillcolor="#1CAC78", label="main-formal", shape=ellipse, style=filled];
 "thm:main-induction" [color=green, fillcolor="#1CAC78", label="main-induction", shape=ellipse, style=filled];
 "thm:main-formal-current-interface" [color=green, fillcolor="#1CAC78", label="main-formal-current-interface", shape=ellipse, style=filled];
-"prop:main-formal-source-obligation" [color=blue, label="main-formal-source-obligation", shape=ellipse];
-"prop:main-formal-source-small-error-obligation" [color=blue, label="main-formal-source-small-error-obligation", shape=ellipse];
+"prop:main-formal-source-obligation" [color=green, fillcolor="#1CAC78", label="main-formal-source-obligation", shape=ellipse, style=filled];
+"prop:main-formal-source-small-error-obligation" [color=green, fillcolor="#1CAC78", label="main-formal-source-small-error-obligation", shape=ellipse, style=filled];
 "prop:main-formal-source-two-space-role-register" [color=blue, label="main-formal-source-two-space-role-register", shape=ellipse];
-"prop:main-formal-source-k-range-boundary" [color=blue, label="main-formal-source-k-range-boundary", shape=ellipse];
 "prop:main-induction-successor-small-error-construction" [color=green, fillcolor="#1CAC78", label="main-induction-successor-small-error-construction", shape=ellipse, style=filled];
 "prop:main-induction-successor-predecessor-induction" [color=green, fillcolor="#1CAC78", label="main-induction-successor-predecessor-induction", shape=ellipse, style=filled];
 "prop:main-induction-successor-answer-valued-pasting" [color=green, fillcolor="#1CAC78", label="main-induction-successor-answer-valued-pasting", shape=ellipse, style=filled];
@@ -61,6 +60,7 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
             "def:successor-obligation-reductions",
             "def:main-induction-successor-answer-valued-pasting",
             "prop:main-induction-source-range-obligation",
+            "prop:main-formal-source-k-range-boundary",
             "thm:main-induction-current-interface",
         ]
         for label in retired_labels:
@@ -83,13 +83,13 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
             graph = write_graph(
                 Path(tmp),
                 GOOD_DOT.replace(
-                    '"prop:main-formal-source-small-error-obligation" '
+                    '"prop:main-formal-source-two-space-role-register" '
                     '[color=blue, '
-                    'label="main-formal-source-small-error-obligation", '
+                    'label="main-formal-source-two-space-role-register", '
                     'shape=ellipse];',
-                    '"prop:main-formal-source-small-error-obligation" '
+                    '"prop:main-formal-source-two-space-role-register" '
                     '[color=green, fillcolor="#1CAC78", '
-                    'label="main-formal-source-small-error-obligation", '
+                    'label="main-formal-source-two-space-role-register", '
                     'shape=ellipse, style=filled];',
                 ),
             )
@@ -99,7 +99,7 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
         self.assertEqual(len(result.findings), 1)
         self.assertEqual(
             result.findings[0].label,
-            "prop:main-formal-source-small-error-obligation",
+            "prop:main-formal-source-two-space-role-register",
         )
         self.assertEqual(result.findings[0].kind, "frontier-proof-filled")
 
@@ -108,9 +108,9 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
             graph = write_graph(
                 Path(tmp),
                 GOOD_DOT.replace(
-                    '"prop:main-formal-source-small-error-obligation" '
+                    '"prop:main-formal-source-two-space-role-register" '
                     '[color=blue, '
-                    'label="main-formal-source-small-error-obligation", '
+                    'label="main-formal-source-two-space-role-register", '
                     'shape=ellipse];\n',
                     "",
                 ),
@@ -121,7 +121,7 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
         self.assertEqual(len(result.findings), 1)
         self.assertEqual(
             result.findings[0].label,
-            "prop:main-formal-source-small-error-obligation",
+            "prop:main-formal-source-two-space-role-register",
         )
         self.assertEqual(result.findings[0].kind, "frontier-node-missing")
 
