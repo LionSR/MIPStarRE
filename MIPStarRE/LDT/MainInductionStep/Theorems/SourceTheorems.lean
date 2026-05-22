@@ -3,7 +3,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 /-!
 # Section 6 — Corrected source-boundary induction theorem
 
-This module contains the corrected large-`k` source-boundary wrapper for
+This module contains the corrected large-`k` source-facing theorem for
 `thm:main-induction`, together with the public restricted-probability
 constructors used by the final soundness handoff.
 
@@ -28,10 +28,11 @@ The paper statement prints `k ≥ m d`.  The proof of the successor step invokes
 the induction-section pasting theorem, which requires the stronger bound
 `k ≥ 400 m d`.  The interval `m d ≤ k < 400 m d` is non-vacuous and the
 printed implication to the pasting hypothesis is false; the project therefore
-treats this as a confirmed source bug rather than as a hidden proof obligation.
+treats this as a confirmed statement gap rather than as a hidden proof
+obligation.
 
-**Local fix:** This corrected statement uses the large-`k` hypothesis required
-by the proof route through pasting.  The discrepancy is documented in
+**Local correction:** This statement uses the large-`k` hypothesis required by
+the proof route through pasting.  The discrepancy is documented in
 `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1507. -/
 theorem mainInduction_sourceStatement
     (params : Parameters)
