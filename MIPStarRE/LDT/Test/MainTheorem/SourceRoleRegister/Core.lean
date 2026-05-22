@@ -43,7 +43,7 @@ with the still-open source range inside
 on the tracked source-range obligation
 `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: discharge the source-range obligation for
+#1507.  Elimination: discharge the source-range obligation for
 `thm:main-induction`; this two-space role-register handoff itself adds no
 bridge, package, residual, repair, or generic hypothesis to the source theorem.
 -/
@@ -358,7 +358,7 @@ absorption steps in `references/ldt-paper/inductive_step.tex:111-185`.
 on the tracked source-range obligation
 `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: discharge the source-range obligation for
+#1507.  Elimination: discharge the source-range obligation for
 `thm:main-induction`; the present theorem adds no bridge, package, residual,
 repair, producer, input, or generic hypothesis to the paper theorem. -/
 theorem sourceRoleRegisterUnsymmetrizedPointConsistency
@@ -414,7 +414,7 @@ projective measurements, and the scalar cascade has not yet been absorbed into
 on the tracked source-range obligation
 `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: discharge the source-range obligation for
+#1507.  Elimination: discharge the source-range obligation for
 `thm:main-induction`; the present theorem adds no bridge, package, residual,
 repair, producer, input, or generic hypothesis to the paper theorem. -/
 theorem sourceRoleRegisterCompletePolynomialSelfConsistency

@@ -30,7 +30,7 @@ range remain separate work.
 on the tracked source-range obligation
 `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: discharge the source-range obligation for
+#1507.  Elimination: discharge the source-range obligation for
 `thm:main-induction`; this theorem itself adds no bridge, package, residual,
 repair, producer, input, or generic hypothesis to the paper theorem. -/
 theorem sourceRoleRegisterLeftProjectiveSubmeasurement
@@ -103,7 +103,7 @@ work.
 on the tracked source-range obligation
 `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: discharge the source-range obligation for
+#1507.  Elimination: discharge the source-range obligation for
 `thm:main-induction`; this theorem itself adds no bridge, package, residual,
 repair, producer, input, or generic hypothesis to the paper theorem. -/
 theorem sourceRoleRegisterTwoSidedProjectiveSubmeasurements
@@ -200,7 +200,7 @@ the scalar absorption into `mainFormalError`, and the source range.
 on the tracked source-range obligation
 `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: discharge the source-range obligation for
+#1507.  Elimination: discharge the source-range obligation for
 `thm:main-induction`; the completion argument in this theorem itself adds no
 bridge, package, residual, repair, producer, input, or generic hypothesis to the
 paper theorem. -/

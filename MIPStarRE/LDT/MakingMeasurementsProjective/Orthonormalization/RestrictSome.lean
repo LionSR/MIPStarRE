@@ -115,10 +115,10 @@ generic restriction interface with the completion-and-restriction step in
 `references/ldt-paper/orthonormalization.tex`, where the residual domination
 used by this interface is not asserted as a generic theorem.
 
-**Lean-only:** This declaration is not a paper object.  Elimination: keep it
-only while issue #1642 records the generic residual-domination obstruction; if
-that issue is replaced entirely by a helper-specific Section 9 dominance
-theorem, this example can be moved to the report or deleted. -/
+**Lean-only:** This declaration is not a paper object.  Issue #1642 records the
+generic residual-domination obstruction; if a future helper-specific Section 9
+dominance theorem makes this comparison unnecessary, this example can be moved
+to the report or deleted. -/
 def residualDominationObstructionSubMeas : SubMeas Unit Unit where
   outcome := fun _ => 0
   total := 0
@@ -134,10 +134,10 @@ generic restriction interface with the completion-and-restriction step in
 `references/ldt-paper/orthonormalization.tex`, where the residual domination
 used by this interface is not asserted as a generic theorem.
 
-**Lean-only:** This declaration is not a paper object.  Elimination: keep it
-only while issue #1642 records the generic residual-domination obstruction; if
-that issue is replaced entirely by a helper-specific Section 9 dominance
-theorem, this example can be moved to the report or deleted. -/
+**Lean-only:** This declaration is not a paper object.  Issue #1642 records the
+generic residual-domination obstruction; if a future helper-specific Section 9
+dominance theorem makes this comparison unnecessary, this example can be moved
+to the report or deleted. -/
 def residualDominationObstructionProjSubMeas : ProjSubMeas (Option Unit) Unit where
   toSubMeas :=
     { outcome := fun oa => if oa = some () then 1 else 0
@@ -175,7 +175,7 @@ comparison point is the completion-and-restriction step in
 residual-domination theorem.
 
 **Lean-only:** This theorem is an obstruction theorem, not a paper theorem and
-not a substitute for the helper-specific issue #1642 dominance construction.
+not a substitute for a helper-specific Section 9 dominance construction.
 Elimination: delete this theorem only after the public blueprint route no longer
 needs to explain why the generic `RestrictSome` implication is conditional. -/
 theorem restrictSomeProjSubMeas_total_not_le_obstruction :
@@ -202,7 +202,7 @@ comparison point is the completion-and-restriction step in
 residual-domination theorem.
 
 **Lean-only:** This theorem is an obstruction theorem, not a paper theorem and
-not a substitute for the helper-specific issue #1642 dominance construction.
+not a substitute for a helper-specific Section 9 dominance construction.
 Elimination: delete this theorem only after the public blueprint route no longer
 needs to explain why the generic `RestrictSome` implication is conditional. -/
 theorem optionCompletion_outcome_none_not_le_obstruction :
@@ -233,7 +233,7 @@ residual-domination theorem.  It does not address the possible
 helper-output-specific route through the Section 9 SDP dominance witness.
 
 **Lean-only:** This theorem is an obstruction theorem, not a paper theorem and
-not a substitute for the helper-specific issue #1642 dominance construction.
+not a substitute for a helper-specific Section 9 dominance construction.
 Elimination: delete this theorem only after the public blueprint route no longer
 needs to explain why the generic `RestrictSome` implication is conditional. -/
 theorem restrictSomeProjSubMeas_total_le_requires_residual_hypothesis :
