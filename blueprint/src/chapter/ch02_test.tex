@@ -185,7 +185,7 @@
 	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A},
 	A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that
 	passes the $(m,q,d)$ low individual degree test with probability at least
-	$1-\eps$. Let \(k \ge md\) be an integer and set
+	$1-\eps$. Let \(k \ge 400md\) be an integer and set
 	\[
 		\nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
 	\]
@@ -210,10 +210,12 @@
 	The saturated-error branch is formalized by
 	\texttt{mainFormal\_source\_trivial\_witness}.  The remaining branch is the
 	small-error source-boundary obligation
-	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  The Lean
-	link above records the source-shaped statement, but the theorem is not marked
-	\texttt{\textbackslash leanok} until the non-vacuous branch is derived from
-	the paper hypotheses.
+	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  The
+	factor \(400\) is the corrected large-\(k\) boundary inherited from
+	Theorem~\ref{thm:main-induction}.  The Lean link above records the
+	source-shaped statement, but the theorem is not marked
+	\texttt{\textbackslash leanok} until the remaining zero-sampling boundary is
+	resolved.
 \end{proof}
 
 \begin{proposition}[Source-boundary wrapper for the final theorem]\label{prop:main-formal-source-obligation}
