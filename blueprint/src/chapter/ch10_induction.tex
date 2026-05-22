@@ -366,7 +366,7 @@
 	internal answer-valued induction theorem.  That theorem supplies the
 	predecessor induction argument for the restricted slices by a genuine strong
 	induction on the dimension.  The answer-valued pasting invocation is recorded
-	in Proposition~\ref{prop:main-induction-successor-answer-valued-pasting},
+	in Definition~\ref{def:main-induction-successor-answer-valued-pasting},
 	and the answer-valued self-improvement construction is checked by
 	Proposition~\ref{prop:main-induction-successor-answer-slice-realization}.
 	This is a construction internal to the proof, not an assumption of
@@ -376,13 +376,13 @@
 \end{proposition}
 \begin{proof}
 	\leanok
-	\uses{prop:main-induction-successor-predecessor-induction, prop:main-induction-successor-answer-slice-realization, prop:main-induction-successor-answer-valued-pasting}
+	\uses{prop:main-induction-successor-predecessor-induction, prop:main-induction-successor-answer-slice-realization, def:main-induction-successor-answer-valued-pasting}
 	The checked assembly theorem
 	\texttt{mainInductionSuccessorNext\_ofSmallErrorConstruction\_ofAnswerCarrier}
 	reduces the ordinary branch to the answer-valued induction theorem.  The
 	answer-valued induction theorem supplies the predecessor argument internally;
 	the answer-valued slice self-improvement construction and the averaged
-	family-field assembly are checked, and the answer-valued pasting proposition
+	family-field assembly are checked, and the answer-valued pasting construction
 	below supplies the final pasting input.
 \end{proof}
 
@@ -449,7 +449,7 @@
 	restricted slice.
 \end{proof}
 
-\begin{proposition}[Answer-valued pasting for the successor step]\label{prop:main-induction-successor-answer-valued-pasting}
+\begin{definition}[Lean answer-valued pasting construction for the successor step]\label{def:main-induction-successor-answer-valued-pasting}
 	\uses{thm:ld-pasting-in-induction-section, prop:main-induction-successor-predecessor-induction, prop:main-induction-successor-answer-slice-realization}
 	\lean{MIPStarRE.LDT.MainInductionStep.answerLdPastingInInductionSectionOfSmallError}
 	\leanok
@@ -467,11 +467,11 @@
 	scalar chain in the form which assumes this point-commutativity estimate.
 	The proof does not replace the answer-valued strategy by the ordinary carrier
 	for the diagonal-line test; the carrier is used only for the ordinary
-	boundedness interface.  This proposition is therefore a Lean-only internal
+	boundedness interface.  This construction is therefore a Lean-only internal
 	construction for the simultaneous successor proof, not a new hypothesis of
 	Theorem~\ref{thm:main-induction} and not a replacement for
 	Theorem~\ref{thm:ld-pasting-in-induction-section}.
-\end{proposition}
+\end{definition}
 \begin{proof}
 	\leanok
 	\uses{thm:ld-pasting-in-induction-section}
