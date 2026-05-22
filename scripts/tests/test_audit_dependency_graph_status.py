@@ -60,6 +60,7 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
             "def:successor-obligation-reductions",
             "def:main-induction-successor-answer-valued-pasting",
             "prop:main-induction-source-range-obligation",
+            "prop:main-formal-source-k-range-boundary",
             "thm:main-induction-current-interface",
         ]
         for label in retired_labels:

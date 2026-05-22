@@ -38,6 +38,7 @@ ABSENT_LABELS = {
     "def:successor-obligation-reductions",
     "prop:main-induction-source-range-obligation",
     "prop:main-induction-successor-degree-zero-family",
+    "prop:main-formal-source-k-range-boundary",
     "prop:main-formal-source-successor-construction",
     "thm:main-induction-current-interface",
 }
