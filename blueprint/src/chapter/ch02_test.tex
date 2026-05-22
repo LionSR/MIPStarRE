@@ -218,11 +218,12 @@
 	resolved.
 \end{proof}
 
-\begin{proposition}[Source-boundary wrapper for the final theorem]\label{prop:main-formal-source-obligation}
+\begin{proposition}[Source-boundary reduction for the final theorem]\label{prop:main-formal-source-obligation}
 	\lean{MIPStarRE.LDT.Test.mainFormal_sourceObligation}
-	This is the Lean wrapper for the printed two-space theorem
-	Theorem~\ref{thm:main-formal}.  It proves the saturated-error branch by the
-	trivial consistency bound and reduces the remaining non-vacuous branch to
+	This proposition records the source-boundary reduction for the printed
+	two-space theorem Theorem~\ref{thm:main-formal}.  It proves the
+	saturated-error branch by the trivial consistency bound and reduces the
+	remaining non-vacuous branch to
 	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  It is not
 	an additional hypothesis of the paper theorem.
 \end{proposition}
@@ -237,7 +238,7 @@
 	\lean{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}
 	This is the remaining non-vacuous branch of the printed two-space theorem.
 	It asks for the conclusions of Theorem~\ref{thm:main-formal} under
-	\(k\ge md\) and \(\nu<1\).  It is not a source assumption.  Its proof requires
+	\(k\ge 400md\) and \(\nu<1\).  It is not a source assumption.  Its proof requires
 	the two-space role-register reduction and the source \(k\)-range boundary.
 \end{proposition}
 \begin{proof}
@@ -286,8 +287,8 @@
 	work is to assemble the full source-theorem passage from the paper
 	hypotheses.  Lean now records the first part of this source-boundary route:
 	the heterogeneous role-register symmetrization may be fed into the
-	source-shaped main-induction theorem under exactly the paper hypotheses
-	\(k\ge md\), and the resulting role-register consistency estimate can be
+	source-shaped main-induction theorem under the corrected large-\(k\)
+	hypothesis \(k\ge 400md\), and the resulting role-register consistency estimate can be
 	unsymmetrized into the two point-consistency estimates on the original
 	two-space strategy with the expected factor \(2\).  In addition, the
 	point-agreement branch is now available for the paper-faithful two-space
@@ -398,7 +399,7 @@
 	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
 	it is not a replacement for a proof in the interval $md \le k < 400\,md$ or
 	at the \(k=0\) boundary when \(md=0\).
-	The full source-boundary wrapper is named in Lean as
+	The source-boundary reduction proposition is named in Lean as
 	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceObligation}; it proves the
 	saturated-error branch and leaves
 	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceSmallErrorObligation} as the
@@ -415,7 +416,7 @@
 	The source theorem, Theorem~\ref{thm:main-formal}, is linked to the
 	source-shaped Lean statement, but no proof-level \texttt{\textbackslash leanok}
 	is attached here.  Removing the same-space restriction requires a two-space
-	role-register symmetrization wrapper showing that the paper's general strategy
+	role-register symmetrization theorem showing that the paper's general strategy
 	reduces to the current formal interface, and the remaining \(k\)-boundary is
 	the zero-sampling case described above.  The current same-space
 	corrected-range interface itself is proof-complete and is marked with

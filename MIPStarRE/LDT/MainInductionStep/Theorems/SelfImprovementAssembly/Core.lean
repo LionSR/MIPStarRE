@@ -38,7 +38,7 @@ variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 This helper is the final `error ≤ mainInductionError` cleanup step only; the
 actual Section 6 construction is carried by `mainInductionBaseCase`,
-`mainInduction`, and the corrected source-boundary wrapper in
+`mainInduction`, and the corrected source-facing theorem in
 `SourceTheorems.lean`. -/
 theorem mainInductionOfWitness
     (params : Parameters)
