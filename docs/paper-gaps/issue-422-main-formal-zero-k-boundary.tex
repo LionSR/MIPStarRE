@@ -1,0 +1,135 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{./command}
+
+\title{The Zero-Sampling Boundary in the Main Formal Theorem}
+\author{}
+\date{2026-05-22}
+
+\begin{document}
+\maketitle
+
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty: low as a mathematical obstruction, medium as a
+  formal repair.}  The scalar obstruction is immediate from the factor \(k^2\)
+  in the printed final error; deciding the replacement theorem form requires a
+  source-statement judgment.
+  \item \textbf{Estimated weight:} no new proof machinery is expected if the
+  formal theorem is corrected to require \(k>0\).  A fully formal
+  counterexample would require a small explicit projective strategy with
+  nonconstant point answers in degree zero.
+  \item \textbf{Mathlib/project split:} approximately \textbf{5\% Mathlib} and
+  \textbf{95\% project-local}.  The only arithmetic is the simplification of the
+  displayed error at \(k=0\); the issue concerns the LDT theorem statement.
+  \item \textbf{Key Mathlib inputs:} elementary arithmetic on nonnegative real
+  error parameters.  The project-local inputs are the zero-\(k\) simplification
+  of the final error and the degree-zero evaluation fact for polynomial-valued
+  measurements.
+\end{itemize}
+
+\section{Key theorem forms}
+
+Let \(\sigma\) be the projective strategy in the low individual degree test.
+Write \(m\) for the number of variables, \(q\) for the field size, \(d\) for
+the individual degree bound, \(k\) for the sampling parameter, and \(\eps\) for
+the test-passing error, so that the strategy is assumed to pass the test with
+probability at least \(1-\eps\).  The final consistency error in the source
+theorem is denoted by \(\nu\).  With this notation there are three relevant
+theorem forms.
+\begin{enumerate}
+  \item \textbf{Printed source form.}  The theorem
+  \path{thm:main-formal} assumes \(k\ge md\) and gives the three final
+  consistency conclusions at
+  \[
+    \nu =
+    100000 k^2m^4\left(\eps^{1/40000}+(d/q)^{1/40000}
+      + e^{-k/(2560000m^2)}\right).
+  \]
+  \item \textbf{Current checked nonzero form.}  The present formal route proves
+  the two-space source conclusion after the source-range work has supplied the
+  role-register construction and after the scalar-cascade boundary \(0<k\) is
+  available.
+  \item \textbf{Zero-sampling boundary.}  If \(d=0\) and \(k=0\), the printed
+  hypothesis \(k\ge md\) is satisfied, but the displayed error is exactly
+  \(0\).  The theorem then demands exact consistency with degree-zero
+  polynomial measurements.
+\end{enumerate}
+
+\section{The source assertion}
+
+The source theorem in \cite{Ji2020LowIndividualDegree} states the final
+soundness theorem for an integer \(k\ge md\).%
+\footnote{Tracked in \ghissue{422}.  The relevant source passage is
+\path{references/ldt-paper/test_definition.tex}, lines~180--202.}
+This condition admits the boundary case \(k=0\) exactly when \(d=0\).  At that
+boundary the printed error parameter is
+\[
+  100000\cdot 0^2\cdot m^4
+  \left(\eps^{1/40000}+(0/q)^{1/40000}
+    + e^{-0/(2560000m^2)}\right)=0.
+\]
+Thus the conclusion is no longer an approximate consistency statement.  It is
+an exact consistency statement.
+
+This is stronger than what the test-passing hypothesis implies.  If
+\(\eps\) is allowed to be large, the hypothesis that the strategy passes with
+probability at least \(1-\eps\) imposes no exact agreement condition on the
+point measurements.  In degree zero, however, every polynomial outcome is a
+constant function on \(\F_q^m\), so a polynomial-valued measurement evaluates to
+the same answer-valued measurement at every point.  A strategy whose point
+measurement gives different deterministic answers at two different points can
+therefore satisfy the printed hypotheses for a sufficiently large \(\eps\), but
+cannot be exactly consistent with a single degree-zero polynomial measurement
+at both points.
+
+For instance, take \(m=1\), \(d=0\), and \(k=0\), and let \(q\ge 2\).  On a
+one-dimensional classical Hilbert space, let the point measurement answer
+deterministically with value \(0\) at one field point and value \(1\) at another.
+With \(\eps=1\), the passing hypothesis is the vacuous inequality that the
+acceptance probability is at least \(0\).  But any degree-zero polynomial
+measurement has a constant answer on \(\F_q\), and so cannot agree exactly with
+both point measurements.  Thus the zero value of \(\nu\) would force a
+conclusion that this strategy does not satisfy.
+
+This is not a defect of the final scalar cascade.  The cascade simply records
+the printed factor \(k^2\).  At \(k=0\) that factor annihilates all error terms,
+including the term involving \(\eps\).
+
+\section{Comparison with the blueprint and formalization}
+
+The formalization currently keeps the printed theorem visible as a
+source-shaped statement and isolates this boundary as the declaration
+\leanid{mainFormal\_sourceZeroKBoundaryObligation}.  The scalar equality
+\leanid{mainFormalError\_zero\_k} records the formal calculation that the
+advertised error is zero at \(k=0\).
+
+The nonzero branch is of a different nature.  Once \(0<k\) is available, the
+current role-register and scalar-cascade route gives the final source-shaped
+conclusion, up to the inherited Section~6 source-range issue documented in
+\path{docs/paper-gaps/issue-906-main-formal-k-bound.tex}.  The zero-sampling
+boundary is therefore not another request for a package or bridge input; it is
+a statement-level boundary case.
+
+\section{Conclusion}
+
+The printed hypothesis \(k\ge md\) is too weak at \(d=0,k=0\) for the displayed
+final error.  At that point the error parameter is exactly zero, while the
+test-passing hypothesis with arbitrary \(\eps\) does not force exact agreement
+with a constant polynomial measurement.  A source-faithful formal theorem must
+therefore either include a justified nonzero sampling condition, such as
+\(0<k\), or replace the zero-boundary conclusion by a statement whose error
+does not vanish at \(k=0\).  The existing Lean declaration
+\leanid{mainFormal\_sourceZeroKBoundaryObligation} should not be treated as a
+proof obligation dischargeable by further packaging.
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}

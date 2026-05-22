@@ -266,10 +266,12 @@ branch and the Step 8 cascade do not apply automatically.
 **Unfaithful:** This proof currently contains the tracked `sorry` for the
 zero-sampling boundary of `references/ldt-paper/test_definition.tex:180-202`,
 which is not derived from the printed hypotheses of `thm:main-formal`.
-Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#422.  Elimination: prove the \(d=0,k=0\) source theorem directly, or record
-a corrected source statement whose sampling parameter is required to be
-nonzero. -/
+Documented in `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex` and
+issue #422; the neighboring source-range boundary is documented in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  Elimination: replace the
+zero-boundary obligation by a corrected source statement whose sampling
+parameter is required to be nonzero, or by a final error bound that does not
+vanish at `k = 0`. -/
 theorem mainFormal_sourceZeroKBoundaryObligation
     (params : Parameters)
     [FieldModel params.q]
