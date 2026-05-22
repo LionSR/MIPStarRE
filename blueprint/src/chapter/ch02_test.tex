@@ -220,7 +220,7 @@
 
 \begin{proposition}[Source-boundary reduction for the final theorem]\label{prop:main-formal-source-obligation}
 	\lean{MIPStarRE.LDT.Test.mainFormal_sourceObligation}
-	This proposition records the source-boundary reduction for the printed
+	This proposition records the source-boundary reduction for the corrected
 	two-space theorem Theorem~\ref{thm:main-formal}.  It proves the
 	saturated-error branch by the trivial consistency bound and reduces the
 	remaining non-vacuous branch to
@@ -236,7 +236,7 @@
 
 \begin{proposition}[Small-error source-boundary obligation for the final theorem]\label{prop:main-formal-source-small-error-obligation}
 	\lean{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}
-	This is the remaining non-vacuous branch of the printed two-space theorem.
+	This is the remaining non-vacuous branch of the corrected two-space theorem.
 	It asks for the conclusions of Theorem~\ref{thm:main-formal} under
 	\(k\ge 400md\) and \(\nu<1\).  It is not a source assumption.  Its proof requires
 	the two-space role-register reduction and the source \(k\)-range boundary.
@@ -397,8 +397,7 @@
 	scalar-cascade boundary \(k>0\), rather than hiding the side-condition gap. The helper
 	\texttt{mainFormal\_trivial\_witness} remains only for already-saturated
 	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
-	it is not a replacement for a proof in the interval $md \le k < 400\,md$ or
-	at the \(k=0\) boundary when \(md=0\).
+	it is not a replacement for the zero-sampling boundary \(k=0\) when \(md=0\).
 	The source-boundary reduction proposition is named in Lean as
 	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceObligation}; it proves the
 	saturated-error branch and leaves
