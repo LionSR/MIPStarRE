@@ -276,11 +276,11 @@ theorem mainFormal_sourceSmallErrorObligation
     [Fintype ιB] [DecidableEq ιB]
     (strategy : ProjStrat params ιA ιB)
     (eps : Error)
-    (_hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hpass : strategy.PassesLowIndividualDegreeTest eps)
     (k : ℕ)
-    (_hk : 400 * params.m * params.d ≤ k)
+    (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k)
-    (_hsmall : ¬ 1 ≤ mainFormalError params k eps) :
+    (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
     ∃ G_A : ProjMeas (Polynomial params) ιA,
       ∃ G_B : ProjMeas (Polynomial params) ιB,
         ConsRel strategy.state (uniformDistribution (Point params))
@@ -297,7 +297,7 @@ theorem mainFormal_sourceSmallErrorObligation
             (mainFormalError params k eps) := by
   exact
     mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
-      params strategy eps _hpass k _hk hk0 _hsmall
+      params strategy eps hpass k hk hk0 hsmall
 
 /--
 Internal proof-obligation reduction for the corrected two-space theorem
