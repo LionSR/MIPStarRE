@@ -34,12 +34,12 @@ The final-theorem wrapper proves its saturated-error branch and leaves only
 proof hole.
 
 The current broad scan reports no unresolved proof-debt theorem boundaries.  It
-also records 39 uses of source-construction context and 2 quoted external
+also records 49 uses of source-construction context and 2 quoted external
 theorem interfaces.
 The stricter paper-facing proof-debt check finds no remaining proof-debt header
 occurrence of the agreed bridge, residual, repair, package, producer,
 hypothesis, assumption, obligation, wrapper, bundle, or conditional vocabulary
-in source-labelled public inputs.  It separately classifies 28 faithful boundary
+in source-labelled public inputs.  It separately classifies 30 faithful boundary
 inputs, such as the boundedness hypothesis and the error-cascade regime.
 
 This is not a proof that every remaining source-construction context is already
@@ -184,10 +184,10 @@ theorem, lemma, proposition, or corollary entries.
    declarations `sdp_statement_with_slackness` and
    `sdp_slackness_measurement` are proved from the canonical SDP
    strong-duality and complementary-slackness argument.
-2. Discharge the Section 6 successor target `mainInductionSuccessor` by
-   constructing the restricted-probability package, recursive slice
-   measurements, self-improvement outputs, and averaged pasting input from the
-   paper hypotheses, then applying `mainInductionFromStageData`.
+2. Keep the corrected large-\(k\) Section 6 successor route under axiom audit.
+   It is now proved; the remaining Section 6 work is the printed source range
+   \(md \le k < 400md\), represented by
+   `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
 3. Continue the Chapter 4 source-construction audit for `QLayerData`,
    `QXPLayerData`, and `RankReductionWitness`, checking that each public input
    represents a fixed object introduced by the paper rather than an unproved

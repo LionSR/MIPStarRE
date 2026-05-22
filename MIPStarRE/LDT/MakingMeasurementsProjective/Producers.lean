@@ -157,6 +157,90 @@ private lemma leftMarginal_ev_eq {ιA ιB : Type*}
   simp [normalizedTrace_leftMarginalDensity_mul_eq (ρ := ψ.density) (X := X),
     leftMarginalState]
 
+private def rightDiagBlock {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (M : MIPStarRE.Quantum.Op (ιA × ιB)) (a : ιA) :
+    MIPStarRE.Quantum.Op ιB :=
+  M.submatrix (fun i => (a, i)) (fun j => (a, j))
+
+private def rightMarginalDensity {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
+    (ρ : MIPStarRE.Quantum.Op (ιA × ιB)) : MIPStarRE.Quantum.Op ιB :=
+  ((((Fintype.card ιA : Error) : Error)⁻¹ : Error) : ℂ) •
+    ∑ a : ιA, rightDiagBlock ρ a
+
+private lemma rightMarginalDensity_nonneg {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
+    {ρ : MIPStarRE.Quantum.Op (ιA × ιB)} (hρ : 0 ≤ ρ) :
+    0 ≤ rightMarginalDensity ρ := by
+  have hρpsd : ρ.PosSemidef := Matrix.nonneg_iff_posSemidef.mp hρ
+  have hsum : 0 ≤ ∑ a : ιA, rightDiagBlock ρ a := by
+    refine Finset.sum_nonneg fun a _ => ?_
+    refine Matrix.nonneg_iff_posSemidef.mpr ?_
+    simpa [rightDiagBlock] using hρpsd.submatrix (fun i => (a, i))
+  have hcoeff : 0 ≤ ((((Fintype.card ιA : Error) : Error)⁻¹ : Error) : ℂ) := by
+    positivity
+  simpa [rightMarginalDensity] using smul_nonneg hcoeff hsum
+
+private def rightMarginalState {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
+    (ψ : QuantumState (ιA × ιB)) : QuantumState ιB where
+  density := rightMarginalDensity ψ.density
+  density_psd := rightMarginalDensity_nonneg ψ.density_psd
+
+private lemma trace_mul_rightTensor_eq_sum_trace_rightDiagBlock
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (M : MIPStarRE.Quantum.Op (ιA × ιB)) (X : MIPStarRE.Quantum.Op ιB) :
+    Matrix.trace (M * rightTensor (ι₁ := ιA) X) =
+      ∑ a : ιA, Matrix.trace (rightDiagBlock M a * X) := by
+  classical
+  let e : ((ιA × ιB) × ιB) ≃ (ιA × (ιB × ιB)) :=
+    { toFun := fun x => (x.1.1, (x.1.2, x.2))
+      invFun := fun x => ((x.1, x.2.1), x.2.2)
+      left_inv := by intro x; cases x; rfl
+      right_inv := by intro x; cases x; rfl }
+  simpa [rightDiagBlock, Matrix.trace, Matrix.mul_apply, rightTensor, Matrix.one_apply,
+    Fintype.sum_prod_type, Finset.sum_sigma', e] using
+    (e.sum_comp (fun y : ιA × (ιB × ιB) =>
+      M (y.1, y.2.1) (y.1, y.2.2) * X y.2.2 y.2.1))
+
+private lemma normalizedTrace_rightMarginalDensity_mul_eq
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
+    (ρ : MIPStarRE.Quantum.Op (ιA × ιB)) (X : MIPStarRE.Quantum.Op ιB) :
+    MIPStarRE.Quantum.normalizedTrace (rightMarginalDensity ρ * X) =
+      MIPStarRE.Quantum.normalizedTrace (ρ * rightTensor (ι₁ := ιA) X) := by
+  have hcard : ((Fintype.card ιA : Error) : ℂ) ≠ 0 := by
+    exact_mod_cast Nat.cast_ne_zero.mpr Fintype.card_ne_zero
+  unfold MIPStarRE.Quantum.normalizedTrace rightMarginalDensity
+  rw [smul_mul_assoc, Matrix.trace_smul, Matrix.sum_mul, Matrix.trace_sum]
+  rw [trace_mul_rightTensor_eq_sum_trace_rightDiagBlock]
+  simp [Fintype.card_prod]
+  ring
+
+private lemma rightMarginalState_isNormalized {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
+    {ψ : QuantumState (ιA × ιB)} (hψ : ψ.IsNormalized) :
+    (rightMarginalState ψ).IsNormalized := by
+  unfold QuantumState.IsNormalized
+  have hnorm :
+      MIPStarRE.Quantum.normalizedTrace (rightMarginalDensity ψ.density) =
+        MIPStarRE.Quantum.normalizedTrace ψ.density := by
+    simpa [rightTensor_one] using
+      normalizedTrace_rightMarginalDensity_mul_eq (ρ := ψ.density)
+        (X := (1 : MIPStarRE.Quantum.Op ιB))
+  simpa [rightMarginalState] using hnorm.trans hψ
+
+private lemma rightMarginal_ev_eq {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
+    (ψ : QuantumState (ιA × ιB)) (X : MIPStarRE.Quantum.Op ιB) :
+    ev ψ (rightTensor (ι₁ := ιA) X) = ev (rightMarginalState ψ) X := by
+  unfold ev
+  rw [← Complex.ofReal_inj]
+  simp [normalizedTrace_rightMarginalDensity_mul_eq (ρ := ψ.density) (X := X),
+    rightMarginalState]
+
 private lemma projectivizationRepair_small_error_bound {ζ : Error}
     (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
     2 * (roundingToProjectiveError ζ + 30 * zetaQuarterRoot ζ) ≤
@@ -263,6 +347,75 @@ private lemma sddRel_of_leftPlaced_sddOpRel {Outcome : Type*}
     intro a _
     simp [constSubMeasFamily, leftPlacedSubMeas, SubMeas.toOpFamily,
       OpFamily.leftPlacedOpFamily, hR a]
+  rw [herror]
+  exact hclose.squaredDistanceBound
+
+private lemma sddOpRel_rightPlaced_of_ev_eq
+    {Question Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (φ : QuantumState ιB)
+    (𝒟 : Distribution Question)
+    (A B : IdxOpFamily Question Outcome ιB) (δ : Error)
+    (hev : ∀ X : MIPStarRE.Quantum.Op ιB,
+      ev ψ (rightTensor (ι₁ := ιA) X) = ev φ X) :
+    SDDOpRel φ 𝒟 A B δ →
+    SDDOpRel ψ 𝒟
+      (fun q => OpFamily.rightPlacedOpFamily (ιA := ιA) (A q))
+      (fun q => OpFamily.rightPlacedOpFamily (ιA := ιA) (B q)) δ := by
+  intro ⟨hAB⟩
+  constructor
+  unfold sddErrorOp at *
+  calc
+    avgOver 𝒟
+        (fun q =>
+          qSDDOp ψ
+            (OpFamily.rightPlacedOpFamily (ιA := ιA) (A q))
+            (OpFamily.rightPlacedOpFamily (ιA := ιA) (B q)))
+      = avgOver 𝒟 (fun q => qSDDOp φ (A q) (B q)) := by
+          refine avgOver_congr 𝒟 _ _ ?_
+          intro q
+          unfold qSDDOp qSDDCore
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          simp [OpFamily.rightPlacedOpFamily, rightTensor_sub,
+            rightTensor_mul_rightTensor, hev]
+    _ ≤ δ := hAB
+
+private lemma sddRel_of_rightPlaced_sddOpRel {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    {ψ : QuantumState (ιA × ιB)} {B : Measurement Outcome ιB}
+    {R : OpFamily Outcome ιB}
+    {P : ProjSubMeas Outcome ιB}
+    {δ : Error}
+    (hR : ∀ a : Outcome, R.outcome a = P.outcome a)
+    (hclose :
+      SDDOpRel ψ (uniformDistribution Unit)
+        (fun _ => OpFamily.rightPlacedOpFamily (ιA := ιA) (B.toSubMeas : OpFamily Outcome ιB))
+        (fun _ => OpFamily.rightPlacedOpFamily (ιA := ιA) R)
+        δ) :
+    SDDRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) B.toSubMeas))
+      (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) P.toSubMeas))
+      δ := by
+  refine ⟨?_⟩
+  have herror :
+      sddError ψ (uniformDistribution Unit)
+          (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) B.toSubMeas))
+          (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) P.toSubMeas)) =
+        sddErrorOp ψ (uniformDistribution Unit)
+          (fun _ => OpFamily.rightPlacedOpFamily (ιA := ιA) (B.toSubMeas : OpFamily Outcome ιB))
+          (fun _ => OpFamily.rightPlacedOpFamily (ιA := ιA) R) := by
+    unfold sddError sddErrorOp
+    refine avgOver_congr (uniformDistribution Unit) _ _ ?_
+    intro u
+    unfold qSDD qSDDOp qSDDCore
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    simp [constSubMeasFamily, rightPlacedSubMeas, SubMeas.toOpFamily,
+      OpFamily.rightPlacedOpFamily, hR a]
   rw [herror]
   exact hclose.squaredDistanceBound
 
@@ -413,6 +566,151 @@ theorem leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_m
     simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily]
       using (le_trans hzero hbound)
 
+/-- Right-register locality-preserving `Q/X/XHat/P` repair at the paper's
+`2ζ` source-defect scale.
+
+This is the tensor-factor counterpart of
+`leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul`.
+It uses the right marginal state and returns a local projective submeasurement
+on Bob's space whose right placement is close to the given right-lifted
+measurement.
+
+**Faithful encoding:** Paper origin:
+`references/ldt-paper/projectivization.tex`; this is the right-register
+two-space form of the projectivization repair used by the source proof of
+`thm:main-formal`. -/
+theorem rightPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+    {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
+    (B : Measurement Outcome ιB) (ζ : Error) (hζ : 0 ≤ ζ)
+    (hsource :
+      ∑ a, ev ψ
+        ((rightLiftedMeasurement (ιA := ιA) B).outcome a -
+          (rightLiftedMeasurement (ιA := ιA) B).outcome a *
+            (rightLiftedMeasurement (ιA := ιA) B).outcome a) ≤ 2 * ζ) :
+    ∃ P : ProjSubMeas Outcome ιB,
+      SDDRel ψ (uniformDistribution Unit)
+        (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) B.toSubMeas))
+        (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) P.toSubMeas))
+        (orthonormalizationMainLemmaError ζ) := by
+  classical
+  letI : DecidableEq Outcome := Classical.decEq Outcome
+  rcases QuantumState.IsNormalized.nonempty (ι := ιA × ιB) hψ with ⟨⟨i, j⟩⟩
+  letI : Nonempty ιA := ⟨i⟩
+  letI : Nonempty ιB := ⟨j⟩
+  let φ : QuantumState ιB := rightMarginalState ψ
+  have hφ : φ.IsNormalized := rightMarginalState_isNormalized hψ
+  have hterm : ∀ a : Outcome,
+      ev ψ
+        ((rightLiftedMeasurement (ιA := ιA) B).outcome a -
+          (rightLiftedMeasurement (ιA := ιA) B).outcome a *
+            (rightLiftedMeasurement (ιA := ιA) B).outcome a) =
+      ev φ (B.outcome a - B.outcome a * B.outcome a) := by
+    intro a
+    simpa [φ, rightLiftedMeasurement, rightPlacedSubMeas, rightTensor_sub,
+      rightTensor_mul_rightTensor] using
+      (rightMarginal_ev_eq (ψ := ψ) (X := B.outcome a - B.outcome a * B.outcome a))
+  have hsourceLocal :
+      ∑ a, ev φ (B.outcome a - B.outcome a * B.outcome a) ≤ 2 * ζ := by
+    simpa [hterm] using hsource
+  by_cases hζ_small : ζ ≤ 1 / (4 : Error)
+  · have hprojective : projectiveNonMeasurement φ B ζ :=
+      projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
+        φ B ζ hφ hsourceLocal
+    obtain ⟨R, hR⟩ := hprojective
+    have hSpectralLocal : SpectralTruncationStatement φ B ζ :=
+      spectralTruncationStatement_of_witness φ B ζ R hR
+    obtain ⟨qLayer, hRank⟩ :=
+      projectiveLowRankSum_of_spectralTruncationStatement φ B ζ hφ hζ
+        hζ_small hSpectralLocal hsourceLocal
+    by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+        (fun a : Outcome => (qLayer.q.outcome a).rank))
+    · letI := hsigma
+      obtain ⟨_xHat, _hxHat_coisometry, _hxHat_mixed, data, hq, _hx, _hxHat, hQP⟩ :=
+        pQApprox_ofRankReductionSigmaRangePositiveGram φ B ζ hRank hφ hζ hζ_small
+      have hBQ :
+          SDDOpRel φ (uniformDistribution Unit)
+            (constOpFamily (B.toSubMeas : OpFamily Outcome ιB))
+            (constOpFamily data.qLayer.q) (roundingToProjectiveError ζ) := by
+        simpa [hq] using hRank.closeness
+      have hBP_local :
+          SDDOpRel φ (uniformDistribution Unit)
+            (constOpFamily (B.toSubMeas : OpFamily Outcome ιB))
+            (constOpFamily (PFamily data)) (orthonormalizationMainLemmaError ζ) := by
+        exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono φ (uniformDistribution Unit)
+          (constOpFamily (B.toSubMeas : OpFamily Outcome ιB))
+          (constOpFamily (PFamily data))
+          (2 * (roundingToProjectiveError ζ + 30 * zetaQuarterRoot ζ))
+          (orthonormalizationMainLemmaError ζ)
+          (MIPStarRE.LDT.Preliminaries.sddOpRel_triangle φ (uniformDistribution Unit)
+            (constOpFamily (B.toSubMeas : OpFamily Outcome ιB))
+            (constOpFamily data.qLayer.q)
+            (constOpFamily (PFamily data))
+            (roundingToProjectiveError ζ) (30 * zetaQuarterRoot ζ) hBQ hQP)
+          (projectivizationRepair_small_error_bound hζ hζ_small)
+      have hLifted :
+          SDDOpRel ψ (uniformDistribution Unit)
+            (fun _ => OpFamily.rightPlacedOpFamily (ιA := ιA) (B.toSubMeas : OpFamily Outcome ιB))
+            (fun _ => OpFamily.rightPlacedOpFamily (ιA := ιA) (PFamily data))
+            (orthonormalizationMainLemmaError ζ) := by
+        refine sddOpRel_rightPlaced_of_ev_eq
+          (ιA := ιA) (ιB := ιB) ψ φ (uniformDistribution Unit)
+          (constOpFamily (B.toSubMeas : OpFamily Outcome ιB))
+          (constOpFamily (PFamily data))
+          (orthonormalizationMainLemmaError ζ) ?_ hBP_local
+        intro X
+        exact rightMarginal_ev_eq ψ X
+      exact ⟨qxpProjSubMeas data,
+        sddRel_of_rightPlaced_sddOpRel
+          (R := PFamily data) (P := qxpProjSubMeas data)
+          (fun a => by
+            rw [qxpProjSubMeas_outcome]
+            rfl)
+          hLifted⟩
+    · have hQzero_rank : ∀ a : Outcome, (qLayer.q.outcome a).rank = 0 := by
+        intro a
+        by_contra hrank
+        have hpos : 0 < (qLayer.q.outcome a).rank := Nat.pos_of_ne_zero hrank
+        have : Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => (qLayer.q.outcome a).rank)) := by
+          refine ⟨⟨Fintype.equivFin Outcome a, ⟨0, ?_⟩⟩⟩
+          simpa [Fintype.equivFin] using hpos
+        exact hsigma this
+      have hQzero : ∀ a : Outcome, qLayer.q.outcome a = 0 := by
+        intro a
+        exact matrix_eq_zero_of_rank_eq_zero (qLayer.q.outcome a) (hQzero_rank a)
+      have hQ_lifted :
+          SDDOpRel ψ (uniformDistribution Unit)
+            (fun _ => OpFamily.rightPlacedOpFamily (ιA := ιA) (B.toSubMeas : OpFamily Outcome ιB))
+            (fun _ => OpFamily.rightPlacedOpFamily (ιA := ιA) qLayer.q)
+            (roundingToProjectiveError ζ) := by
+        refine sddOpRel_rightPlaced_of_ev_eq
+          (ιA := ιA) (ιB := ιB) ψ φ (uniformDistribution Unit)
+          (constOpFamily (B.toSubMeas : OpFamily Outcome ιB))
+          (constOpFamily qLayer.q) (roundingToProjectiveError ζ) ?_ hRank.closeness
+        intro X
+        exact rightMarginal_ev_eq ψ X
+      exact ⟨zeroProjSubMeas (Outcome := Outcome) (ι := ιB),
+        ⟨le_trans
+          (sddRel_of_rightPlaced_sddOpRel
+            (R := qLayer.q) (P := zeroProjSubMeas (Outcome := Outcome) (ι := ιB))
+            hQzero hQ_lifted).squaredDistanceBound
+          (roundingToProjectiveError_le_orthonormalizationMainLemmaError
+            hζ hζ_small)⟩⟩
+  · refine ⟨zeroProjSubMeas (Outcome := Outcome) (ι := ιB), ?_⟩
+    have hzero :
+        qSDD ψ (rightPlacedSubMeas (ιA := ιA) B.toSubMeas)
+          (rightPlacedSubMeas (ιA := ιA)
+            (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas) ≤ 1 :=
+      qSDD_rightPlaced_zeroProjSubMeas_le_one ψ hψ B.toSubMeas
+    have hbound : 1 ≤ orthonormalizationMainLemmaError ζ :=
+      one_le_orthonormalizationMainLemmaError_of_quarter_lt (lt_of_not_ge hζ_small)
+    constructor
+    simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily]
+      using (le_trans hzero hbound)
+
 /-- Square-register form of the locality-preserving repair theorem.
 
 This is the specialization of
@@ -493,7 +791,7 @@ theorem leftLiftedProjectivizationRepairProducer
 
 This is the same theorem as `leftLiftedProjectivizationRepairProducer`, recorded
 under a name suitable for the blueprint entry
-`lem:left-lifted-projectivization-repair`.  The statement is the Section 5
+`lem:locality-preserving-projectivization`.  The statement is the Section 5
 construction theorem: from the source almost-projective estimate for the
 left-lifted family, it constructs a local projective submeasurement whose left
 lift is close with the `84 ζ^(1/4)` envelope.  The historical `Producer` name

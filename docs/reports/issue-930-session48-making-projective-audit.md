@@ -47,11 +47,19 @@ The requested parallel orthonormalization audit has a separate worktree and bran
 
 ### Naimark dilation support
 
-The paper first states the full Naimark dilation theorem, then proves the one-measurement helper. The blueprint mirrors this distinction: `thm:naimark` links to `MIPStarRE.LDT.MakingMeasurementsProjective.naimark` but deliberately does not claim `\leanok`, because the current Lean theorem records questionwise local dilations rather than the full tensor-product correlation statement (`blueprint/src/chapter/ch04_projective.tex:4-8`).
+The paper first states the full Naimark dilation theorem, then proves the
+one-measurement helper.  This historical audit predated the repair of the full
+tensor-product statement.  The current blueprint links `thm:naimark` to
+`MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation`
+and marks it `\leanok` in the projective-submeasurement form documented in
+`docs/paper-gaps/naimark.tex`.
 
 The audited one-measurement theorem `oneMeasNaimark` matches the paper helper. It constructs a projective submeasurement on the enlarged space `d × Option α`, using the extra `none` outcome as the auxiliary direction, and proves the normalized-trace compression identity for each original outcome (`NaimarkOneMeas.lean:238-257`). The proof follows the paper route: build the isometry column from the square roots of the submeasurement effects and the residual effect, extend it to a unitary, and conjugate the auxiliary-basis projectors (`NaimarkOneMeas.lean:247-255`, `:271-286`).
 
-The full `naimark` theorem packages these helpers questionwise and proves single-outcome expectation preservation for each local dilation (`NaimarkFull.lean:17-22`, `:78-90`). This is exactly the weaker, already documented formal statement. Since the blueprint already marks the full tensor-product statement as not fully formalized and no downstream proof in this slice uses Naimark to replace an `≈_δ` estimate, there is no new paper-gap note to add.
+The full `naimarkTensorProductCorrelation` theorem now constructs the auxiliary
+spaces, auxiliary product state, dilated state, and projective submeasurements
+from these one-measurement helpers, and proves the two-sided trace identity for
+bipartite correlation preservation.
 
 ### Q/X/\widehat X/P layer
 
@@ -103,7 +111,12 @@ No new paper-gap note is needed because the discrepancies or packaging differenc
 
 ## Follow-up
 
-I did not open a new follow-up issue. At the time of this audit, the only live projectivization-related proof obligation was the already tracked #834 Step-6 witness residual. In the current tree that exact-match sub-obligation has been retired.  The current direct LDT proof frontier consists of the two source-boundary obligations for `thm:main-induction` and `thm:main-formal`, together with the remaining Section~6 small-error successor construction.
+I did not open a new follow-up issue. At the time of this audit, the only live
+projectivization-related proof obligation was the already tracked #834 Step-6
+witness residual. In the current tree that exact-match sub-obligation has been
+retired, and the corrected large-\(k\) Section 6 small-error successor
+construction is proved.  The current direct LDT proof frontier consists of the
+two source-boundary obligations for `thm:main-induction` and `thm:main-formal`.
 
 ## Validation
 

@@ -30,19 +30,25 @@ The last two commands are broader inventories: the first scans theorem-like
 blueprint environments, and the second also scans green definition, remark, and
 example environments.
 
-On the current main-branch snapshot the ordinary blueprint synchronization
-report finds 647 statement-level green entries out of 653 Lean references and
-476 proof-level green entries out of 476 proof-bearing Lean references.  The
-axiom-closure checker then checks 630 unique declarations carrying at least one
-`\leanok` marker and reports no proof-level `\leanok` declaration depending on
-`sorryAx`.
+On the current branch snapshot the ordinary blueprint synchronization report
+finds 654 statement-level green entries out of 681 Lean references and 491
+proof-level green entries out of 518 proof-bearing Lean references, with
+`blueprint/lean_decls` synchronized to the current Lean declarations.  The
+source-boundary entries that still contain direct Lean proof holes are
+`prop:main-formal-source-small-error-obligation` and
+`prop:main-induction-source-range-obligation`; in each case no proof completion
+is claimed.  The corrected large-\(k\) successor construction
+`prop:main-induction-successor-small-error-construction` is now proof-complete
+and should no longer be listed as a live `sorryAx` frontier.
 
 The broad-vocabulary theorem-like audit reports no strict proof-debt findings
 and no conditional declaration-name findings.  Its non-blocking classifications
-are 29 faithful-boundary inputs, 45 source-construction contexts, and two
+are 30 faithful-boundary inputs, 49 source-construction contexts, and two
 external citation interfaces.  When informational environments are included,
-the same broad vocabulary gives 92 raw findings and four conditional-name
-findings; these occur in definitions or remarks, not in source theorem claims.
+the same broad vocabulary still gives no strict findings and no conditional
+declaration-name findings.  The additional construction and transport names
+are classified only as Lean-only definition or remark interfaces, not as source
+theorem hypotheses.
 
 ## Theorem-like green nodes
 
@@ -94,10 +100,12 @@ changed, but they are not currently classified as proof-debt smuggling.
 
 ## Informational green nodes
 
-The broader scan over definition and remark environments reported 92 raw
-findings and 4 conditional declaration-name findings.  These are not direct
-source-theorem overclaims, but they are useful maintenance targets because a
-reader may see them as green in the public graph.
+The broader scan over definition and remark environments reports no
+unclassified findings and no conditional declaration-name findings.  Its
+non-blocking classifications are 30 faithful-boundary inputs, 141
+source-construction contexts, and two external citation interfaces.  These
+classifications remain useful maintenance targets because a reader may see the
+corresponding definition or remark nodes as green in the public graph.
 
 The largest clusters are:
 
@@ -113,13 +121,12 @@ The largest clusters are:
    `SelfImprovementData`, and `AveragedPastingData`.  This node is a checked
    assembly boundary, not the source theorem itself.
 
-3. `def:main-formal-step6-obligations` and
-   `def:main-formal-successor-boundary`, with role-measurement,
-   orthonormalization, recursive-slice, and projective-completion witness
-   vocabulary.  These are the highest-priority green informational nodes for
-   continued #1458 review, because their names make explicit that the final
-   theorem route still has internal construction obligations.
-   The Chapter 10 instances are classified in
+3. `def:main-formal-step6-constructions`, the base-case Step 6
+   constructions, with role-measurement, orthonormalization, and
+   projective-completion witness vocabulary.  The former
+   `def:main-formal-successor-boundary` node has been retired from the local
+   blueprint graph; its recursive-slice targets are now described only in an
+   unnumbered remark.  The Chapter 10 instances are classified in
    `docs/reports/issue-1458-ch10-green-internal-nodes.md`.
 
 4. Chapter 7 self-improvement implementation remarks, including

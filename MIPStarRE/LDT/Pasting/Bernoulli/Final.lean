@@ -269,6 +269,66 @@ private lemma fromHToGBernoulliTailMass_lower_bound
     rw [ldPasting_chernoff_exponent_eq]
   linarith
 
+/-- Internal form of `cor:ld-pasting-N-completeness` from the two preceding
+mass-comparison inputs.
+
+This theorem isolates the scalar assembly after `lem:over-all-outcomes`,
+`lem:from-H-to-G`, and the Bernoulli-tail lower bound have already been
+established. -/
+theorem ldPastingNCompleteness_of_overAllOutcomes_fromHToG_tail
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (heps_nonneg : 0 ≤ eps)
+    (hdelta_nonneg : 0 ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (family : IdxPolyFamily params ι)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k)
+    (hOAO : OverAllOutcomesStatement params strategy family eps delta gamma zeta k)
+    (hFrom : FromHToGStatement params strategy strategy.state family gamma zeta k)
+    (htail :
+      1 - kappa * (1 + 1 / (100 * (params.m : Error))) -
+          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
+        fromHToGBernoulliTailMass params strategy.state family k) :
+    LdPastingNCompletenessStatement params strategy family kappa
+      (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
+  let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
+  have happrox_le :
+      overAllOutcomesError params eps delta gamma zeta k +
+          fromHToGError params gamma zeta k ≤ ν := by
+    simpa [ν] using
+      overAllOutcomesError_add_fromHToGError_le_ldPastingNu params
+        eps delta gamma zeta k hk_pos
+        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+  constructor
+  constructor
+  have hOAO_mass :
+      overAllOutcomesPastedMass params strategy family k ≥
+        overAllOutcomesExpansionMass params strategy family k -
+          overAllOutcomesError params eps delta gamma zeta k := by
+    have habs := abs_le.mp hOAO.totalOutcomeExpansion
+    linarith
+  have hFrom_mass :
+      fromHToGAllOutcomesMass params strategy strategy.state family k ≥
+        fromHToGBernoulliTailMass params strategy.state family k -
+          fromHToGError params gamma zeta k := by
+    have habs := abs_le.mp hFrom.bernoulliPolynomialRewrite
+    linarith
+  have hmass :
+      overAllOutcomesPastedMass params strategy family k ≥
+        1 - kappa * (1 + 1 / (100 * (params.m : Error))) - ν -
+          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
+    have hOAO_mass' :
+        overAllOutcomesPastedMass params strategy family k ≥
+          fromHToGAllOutcomesMass params strategy strategy.state family k -
+            overAllOutcomesError params eps delta gamma zeta k := by
+      simpa [overAllOutcomesExpansionMass, fromHToGAllOutcomesMass] using hOAO_mass
+    linarith
+  simpa [ν, ldPastingCompletenessLowerBound, overAllOutcomesPastedMass] using hmass
+
 -- The downstream completeness theorem elaborates the full `fromHToG` bridge facts.
 /-- `cor:ld-pasting-N-completeness` once the Bernoulli-tail lower bound is
 supplied explicitly.
@@ -321,38 +381,9 @@ theorem ldPastingNCompleteness_of_tailLowerBound
   have hFrom := fromHToG params strategy family eps delta gamma zeta
     hgamma_nonneg hzeta_nonneg hgamma_le hzeta_le hdq_le
     hgood hcons hself hbound k
-  have happrox_le :
-      overAllOutcomesError params eps delta gamma zeta k +
-          fromHToGError params gamma zeta k ≤ ν := by
-    simpa [ν] using
-      overAllOutcomesError_add_fromHToGError_le_ldPastingNu params
-        eps delta gamma zeta k hk_pos
-        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
-  constructor
-  constructor
-  have hOAO_mass :
-      overAllOutcomesPastedMass params strategy family k ≥
-        overAllOutcomesExpansionMass params strategy family k -
-          overAllOutcomesError params eps delta gamma zeta k := by
-    have habs := abs_le.mp hOAO.totalOutcomeExpansion
-    linarith
-  have hFrom_mass :
-      fromHToGAllOutcomesMass params strategy strategy.state family k ≥
-        fromHToGBernoulliTailMass params strategy.state family k -
-          fromHToGError params gamma zeta k := by
-    have habs := abs_le.mp hFrom.bernoulliPolynomialRewrite
-    linarith
-  have hmass :
-      overAllOutcomesPastedMass params strategy family k ≥
-        1 - kappa * (1 + 1 / (100 * (params.m : Error))) - ν -
-          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) := by
-    have hOAO_mass' :
-        overAllOutcomesPastedMass params strategy family k ≥
-          fromHToGAllOutcomesMass params strategy strategy.state family k -
-            overAllOutcomesError params eps delta gamma zeta k := by
-      simpa [overAllOutcomesExpansionMass, fromHToGAllOutcomesMass] using hOAO_mass
-    linarith
-  simpa [ν, ldPastingCompletenessLowerBound, overAllOutcomesPastedMass] using hmass
+  exact ldPastingNCompleteness_of_overAllOutcomes_fromHToG_tail params strategy
+    eps delta gamma kappa zeta heps_nonneg hdelta_nonneg hgamma_nonneg
+    hzeta_nonneg family k hk_pos hOAO hFrom htail
 
 /-- `cor:ld-pasting-N-completeness`. -/
 theorem ldPastingNCompleteness
@@ -383,6 +414,58 @@ theorem ldPastingNCompleteness
   exact ldPastingNCompleteness_of_tailLowerBound params strategy
     eps delta gamma kappa zeta hgood hgamma_le hzeta_le hdq_le hd
     family hcons hself hbound k hk_pos hk htail
+
+/-- Internal form of `cor:ld-pasting-N-completeness` from the Section 11
+commutativity conclusion. -/
+theorem ldPastingNCompleteness_ofComMain_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma kappa zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcomplete : family.Complete strategy.state kappa)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k)
+    (hk : 400 * params.m * params.d ≤ k) :
+    LdPastingNCompletenessStatement params strategy family kappa
+      (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k := by
+  have heps_nonneg : 0 ≤ eps := by
+    exact le_trans
+      (bipartiteConsError_nonneg strategy.state
+        (uniformDistribution (AxisParallelTestSample params.next))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy))
+      haxis
+  have hdelta_nonneg : 0 ≤ delta := by
+    exact le_trans
+      (bipartiteSSCError_nonneg strategy.state
+        (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      hself_good
+  have hOAO := overAllOutcomes_ofComMain_of_axis_self params strategy
+    eps delta gamma zeta haxis hself_good hgamma_nonneg hgamma_le
+    hzeta_nonneg hzeta_le hdq_le hd family hcons hself hcom k
+  have hFrom := fromHToG_ofComMain params strategy family gamma zeta
+    hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hself hcom k
+  have htail :
+      1 - kappa * (1 + 1 / (100 * (params.m : Error))) -
+          Real.exp (-((k : Error) / (80000 * ((params.m : Error) ^ (2 : ℕ))))) ≤
+        fromHToGBernoulliTailMass params strategy.state family k := by
+    exact fromHToGBernoulliTailMass_lower_bound params strategy kappa family hcomplete k hk
+  exact ldPastingNCompleteness_of_overAllOutcomes_fromHToG_tail params strategy
+    eps delta gamma kappa zeta heps_nonneg hdelta_nonneg hgamma_nonneg
+    hzeta_nonneg family k hk_pos hOAO hFrom htail
 
 /-- `lem:ld-pasting-sub-measurement`. -/
 lemma ldPastingSubMeas

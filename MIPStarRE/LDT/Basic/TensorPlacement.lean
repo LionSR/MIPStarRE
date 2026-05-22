@@ -193,15 +193,15 @@ expectation.
 The left register `Outer_o * Inner_i * Outer_o` is PSD by sandwich positivity,
 and the right-register outcome is PSD, so their tensor product is PSD. -/
 theorem sandwichTensorSummand_nonneg
-    {α β γ ι : Type*} [Fintype α] [Fintype β] [Fintype γ]
-    [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι))
-    (Outer : SubMeas β ι) (Inner : SubMeas α ι) (Right : SubMeas γ ι)
+    {α β γ ιA ιB : Type*} [Fintype α] [Fintype β] [Fintype γ]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB))
+    (Outer : SubMeas β ιA) (Inner : SubMeas α ιA) (Right : SubMeas γ ιB)
     (o : β) (i : α) (r : γ) :
     0 ≤ ev ψ
-      (leftTensor (ι₂ := ι)
+      (leftTensor (ι₂ := ιB)
           (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
-        rightTensor (ι₁ := ι) (Right.outcome r)) := by
+        rightTensor (ι₁ := ιA) (Right.outcome r)) := by
   rw [leftTensor_mul_rightTensor_eq_opTensor]
   exact ev_nonneg_of_psd ψ _ <|
     opTensor_nonneg
@@ -217,16 +217,16 @@ The operator under the sum factors as
 bounded by `1` by the submeasurement axioms and sandwich monotonicity, and the
 second factor is also bounded by `1`. -/
 theorem sandwichTensor_residual_sum_le_one
-    {α β γ ι : Type*} [Fintype α] [Fintype β] [Fintype γ]
-    [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized)
-    (Outer : SubMeas β ι) (Inner : SubMeas α ι) (Right : SubMeas γ ι) :
+    {α β γ ιA ιB : Type*} [Fintype α] [Fintype β] [Fintype γ]
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (ψ : QuantumState (ιA × ιB)) (hnorm : ψ.IsNormalized)
+    (Outer : SubMeas β ιA) (Inner : SubMeas α ιA) (Right : SubMeas γ ιB) :
     (∑ ir : α × γ, ∑ o : β,
         ev ψ
-          (leftTensor (ι₂ := ι)
+          (leftTensor (ι₂ := ιB)
               (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
-            rightTensor (ι₁ := ι) (Right.outcome ir.2))) ≤ 1 := by
-  let sandwichTotal : MIPStarRE.Quantum.Op ι :=
+            rightTensor (ι₁ := ιA) (Right.outcome ir.2))) ≤ 1 := by
+  let sandwichTotal : MIPStarRE.Quantum.Op ιA :=
     ∑ o : β, Outer.outcome o * Inner.total * Outer.outcome o
   have hsandwichTotal_nonneg : 0 ≤ sandwichTotal := by
     exact Finset.sum_nonneg fun o _ =>
@@ -249,75 +249,75 @@ theorem sandwichTensor_residual_sum_le_one
       _ ≤ 1 := Outer.total_le_one
   have hop_sum :
       (∑ ir : α × γ, ∑ o : β,
-          leftTensor (ι₂ := ι)
+          leftTensor (ι₂ := ιB)
               (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
-            rightTensor (ι₁ := ι) (Right.outcome ir.2)) =
-        leftTensor (ι₂ := ι) sandwichTotal * rightTensor (ι₁ := ι) Right.total := by
+            rightTensor (ι₁ := ιA) (Right.outcome ir.2)) =
+        leftTensor (ι₂ := ιB) sandwichTotal * rightTensor (ι₁ := ιA) Right.total := by
     calc
       (∑ ir : α × γ, ∑ o : β,
-          leftTensor (ι₂ := ι)
+          leftTensor (ι₂ := ιB)
               (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
-            rightTensor (ι₁ := ι) (Right.outcome ir.2))
+            rightTensor (ι₁ := ιA) (Right.outcome ir.2))
         = ∑ i : α, ∑ r : γ, ∑ o : β,
-            leftTensor (ι₂ := ι)
+            leftTensor (ι₂ := ιB)
                 (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
-              rightTensor (ι₁ := ι) (Right.outcome r) := by
+              rightTensor (ι₁ := ιA) (Right.outcome r) := by
             rw [Fintype.sum_prod_type]
       _ = ∑ i : α, ∑ o : β,
-            leftTensor (ι₂ := ι)
+            leftTensor (ι₂ := ιB)
                 (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
-              rightTensor (ι₁ := ι) Right.total := by
+              rightTensor (ι₁ := ιA) Right.total := by
             refine Finset.sum_congr rfl ?_
             intro i _
             calc
               (∑ r : γ, ∑ o : β,
-                  leftTensor (ι₂ := ι)
+                  leftTensor (ι₂ := ιB)
                       (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
-                    rightTensor (ι₁ := ι) (Right.outcome r))
+                    rightTensor (ι₁ := ιA) (Right.outcome r))
                 = ∑ o : β, ∑ r : γ,
-                    leftTensor (ι₂ := ι)
+                    leftTensor (ι₂ := ιB)
                         (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
-                      rightTensor (ι₁ := ι) (Right.outcome r) := by
+                      rightTensor (ι₁ := ιA) (Right.outcome r) := by
                     rw [Finset.sum_comm]
               _ = ∑ o : β,
-                    leftTensor (ι₂ := ι)
+                    leftTensor (ι₂ := ιB)
                         (Outer.outcome o * Inner.outcome i * Outer.outcome o) *
-                      rightTensor (ι₁ := ι) Right.total := by
+                      rightTensor (ι₁ := ιA) Right.total := by
                     refine Finset.sum_congr rfl ?_
                     intro o _
                     rw [← Matrix.mul_sum]
-                    rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ Right.outcome]
+                    rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ Right.outcome]
                     rw [Right.sum_eq_total]
       _ = (∑ i : α, ∑ o : β,
-            leftTensor (ι₂ := ι)
+            leftTensor (ι₂ := ιB)
               (Outer.outcome o * Inner.outcome i * Outer.outcome o)) *
-            rightTensor (ι₁ := ι) Right.total := by
+            rightTensor (ι₁ := ιA) Right.total := by
             rw [Finset.sum_mul]
             refine Finset.sum_congr rfl ?_
             intro i _
             rw [Finset.sum_mul]
-      _ = leftTensor (ι₂ := ι) sandwichTotal * rightTensor (ι₁ := ι) Right.total := by
+      _ = leftTensor (ι₂ := ιB) sandwichTotal * rightTensor (ι₁ := ιA) Right.total := by
             congr 1
             calc
               ∑ i : α, ∑ o : β,
-                  leftTensor (ι₂ := ι)
+                  leftTensor (ι₂ := ιB)
                     (Outer.outcome o * Inner.outcome i * Outer.outcome o)
                 = ∑ o : β, ∑ i : α,
-                    leftTensor (ι₂ := ι)
+                    leftTensor (ι₂ := ιB)
                       (Outer.outcome o * Inner.outcome i * Outer.outcome o) := by
                     rw [Finset.sum_comm]
               _ = ∑ o : β,
-                    leftTensor (ι₂ := ι)
+                    leftTensor (ι₂ := ιB)
                       (∑ i : α,
                         Outer.outcome o * Inner.outcome i * Outer.outcome o) := by
                     refine Finset.sum_congr rfl ?_
                     intro o _
-                    rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ]
-              _ = leftTensor (ι₂ := ι)
+                    rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ]
+              _ = leftTensor (ι₂ := ιB)
                     (∑ o : β, ∑ i : α,
                       Outer.outcome o * Inner.outcome i * Outer.outcome o) := by
-                    rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ]
-              _ = leftTensor (ι₂ := ι) sandwichTotal := by
+                    rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ]
+              _ = leftTensor (ι₂ := ιB) sandwichTotal := by
                     congr 1
                     calc
                       ∑ o : β, ∑ i : α,
@@ -331,28 +331,29 @@ theorem sandwichTensor_residual_sum_le_one
   calc
     (∑ ir : α × γ, ∑ o : β,
         ev ψ
-          (leftTensor (ι₂ := ι)
+          (leftTensor (ι₂ := ιB)
               (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
-            rightTensor (ι₁ := ι) (Right.outcome ir.2)))
+            rightTensor (ι₁ := ιA) (Right.outcome ir.2)))
       = ev ψ (∑ ir : α × γ, ∑ o : β,
-          leftTensor (ι₂ := ι)
+          leftTensor (ι₂ := ιB)
               (Outer.outcome o * Inner.outcome ir.1 * Outer.outcome o) *
-            rightTensor (ι₁ := ι) (Right.outcome ir.2)) := by
+            rightTensor (ι₁ := ιA) (Right.outcome ir.2)) := by
           rw [ev_sum]
           refine Finset.sum_congr rfl ?_
           intro ir _
           rw [ev_sum]
-    _ = ev ψ (leftTensor (ι₂ := ι) sandwichTotal * rightTensor (ι₁ := ι) Right.total) := by
+    _ = ev ψ (leftTensor (ι₂ := ιB) sandwichTotal *
+        rightTensor (ι₁ := ιA) Right.total) := by
           rw [hop_sum]
-    _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+    _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
           apply ev_mono ψ _ _
           calc
-            leftTensor (ι₂ := ι) sandwichTotal * rightTensor (ι₁ := ι) Right.total
+            leftTensor (ι₂ := ιB) sandwichTotal * rightTensor (ι₁ := ιA) Right.total
               = opTensor sandwichTotal Right.total := by
                 rw [leftTensor_mul_rightTensor_eq_opTensor]
-            _ ≤ leftTensor (ι₂ := ι) sandwichTotal :=
+            _ ≤ leftTensor (ι₂ := ιB) sandwichTotal :=
                 opTensor_le_leftTensor hsandwichTotal_nonneg Right.total_le_one
-            _ ≤ 1 := leftTensor_le_one (ι₂ := ι) hsandwichTotal_le_one
+            _ ≤ 1 := leftTensor_le_one (ι₂ := ιB) hsandwichTotal_le_one
     _ = 1 := ev_one_of_isNormalized ψ hnorm
 
 end MIPStarRE.LDT

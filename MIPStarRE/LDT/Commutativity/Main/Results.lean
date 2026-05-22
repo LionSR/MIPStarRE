@@ -68,21 +68,27 @@ private lemma fullSliceCommutation_of_evaluated
 The paper theorem is formulated directly for the family `family.meas`; any
 explicit auxiliary family used by the scalar approximation proof is internal to
 the proof. -/
-theorem comMain
+theorem comMain_of_commutativityPoints
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
+    (gamma zeta : Error)
     (hnorm : strategy.state.IsNormalized)
-    (hgood : strategy.IsGood eps delta gamma)
+    (hcomm :
+      SDDOpRel strategy.state
+        (uniformDistribution (MIPStarRE.LDT.GlobalVariance.PointPairQuestion params.next))
+        (pointMeasurementProductLeft params.next strategy)
+        (pointMeasurementProductRight params.next strategy)
+        (commutativityPointsError params.next gamma))
+    (hgamma_nonneg : 0 ≤ gamma)
     (family : IdxPolyFamily params ι)
     (hcons : family.ConsistentWithPoints strategy zeta)
     (hself : family.StronglySelfConsistent strategy.state zeta)
     (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     ComMainConclusion params strategy family gamma zeta := by
   let hEval :=
-    commDataProcessedG params strategy eps delta gamma zeta hnorm hgood family
-      hcons hself hbound
+    commDataProcessedG_of_commutativityPoints
+      params strategy gamma zeta hnorm hcomm hgamma_nonneg family hcons hself hbound
   have hSpecialized :
       SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
@@ -95,6 +101,37 @@ theorem comMain
   have hzeta_nonneg : 0 ≤ zeta :=
     le_trans (sddError_nonneg _ _ _ _)
       hself.sliceSelfConsistency.squaredDistanceBound
+  exact
+    fullSliceCommutation_of_evaluated
+      params strategy family gamma zeta
+      hnorm hgamma_nonneg hzeta_nonneg
+      hself hSpecialized
+
+/-- Paper origin: `references/ldt-paper/commutativity-G.tex`
+(`\label{thm:com-main}`).
+
+The paper theorem is formulated directly for the family `family.meas`; any
+explicit auxiliary family used by the scalar approximation proof is internal to
+the proof. -/
+theorem comMain
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (hnorm : strategy.state.IsNormalized)
+    (hgood : strategy.IsGood eps delta gamma)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    ComMainConclusion params strategy family gamma zeta := by
+  have hcomm :
+      SDDOpRel strategy.state
+        (uniformDistribution (MIPStarRE.LDT.GlobalVariance.PointPairQuestion params.next))
+        (pointMeasurementProductLeft params.next strategy)
+        (pointMeasurementProductRight params.next strategy)
+        (commutativityPointsError params.next gamma) :=
+    commutativityPoints (params := params.next) strategy eps delta gamma hgood
   have hgamma_nonneg : 0 ≤ gamma := by
     have : 0 ≤ strategy.diagonalFailureProbability := by
       unfold SymStrat.diagonalFailureProbability
@@ -103,10 +140,8 @@ theorem comMain
           bipartiteConsError_nonneg strategy.state _ _ _)
     exact le_trans this hgood.diagonalLineTest
   exact
-    fullSliceCommutation_of_evaluated
-      params strategy family gamma zeta
-      hnorm hgamma_nonneg hzeta_nonneg
-      hself hSpecialized
+    comMain_of_commutativityPoints
+      params strategy gamma zeta hnorm hcomm hgamma_nonneg family hcons hself hbound
 
 /-- `lem:normalization-condition`. -/
 lemma normalizationCondition {OutcomeA OutcomeB : Type*}

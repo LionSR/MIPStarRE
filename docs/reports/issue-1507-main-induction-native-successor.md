@@ -2,11 +2,128 @@
 
 Audit date: 2026-05-18.
 
-Last status update: 2026-05-20.  The classifications below incorporate the
+Last status update: 2026-05-22.  The classifications below incorporate the
 current split between the printed source theorem `thm:main-induction` and the
 separate corrected large-`k` Lean interface
 `thm:main-induction-current-interface`, together with the axiom-audit evidence
 recorded in `MIPStarRE/LDT/Test/AxiomAudit.lean`.
+
+Later update on 2026-05-22: the corrected large-`k` successor route is now
+proof-complete.  Older paragraphs in this report describe the answer-valued
+pasting invocation and the enclosing predecessor induction as the active
+frontier; those statements are historical.  The present source-facing proof
+debt is instead the printed source range
+`md <= k < 400md`, recorded by
+`mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`, and the
+final printed theorem wrapper recorded by
+`mainFormal_sourceSmallErrorObligation`.
+
+Update on 2026-05-21: the predecessor answer-valued induction hypothesis no
+longer assumes `0 < params.d`.  The recursive slice route is therefore
+available also in the case `d = 0`; the side condition `1 ≤ k` is derived from
+the nontrivial branch `mainInductionError < 1`.  The checked theorem
+`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier` shows
+that the small-error successor construction now reduces to the predecessor
+induction argument.  The answer-valued slice self-improvement construction is
+checked directly, and the earlier degree-zero family-and-scalar branch is
+retired as an artifact of the former internal hypothesis, not a separate
+requirement of the paper proof.
+The checked theorem `mainInductionSuccessorNext_ofRecursiveAnswerInduction`
+adds the complementary large-error branch, so the full successor conclusion is
+now available from precisely the recursive answer-valued predecessor induction
+hypothesis.
+
+Update on 2026-05-22: the answer-valued ambient point-consistency averaging
+step is now checked.  The lemmas
+`answer_family_pointConsistencyError_eq_avg` and
+`answer_family_consistency_of_slice_bounds` prove, respectively, the
+Fubini/reindexing identity over
+`Point params.next ≃ Point params × Fq params` for an ambient
+`AnswerSymStrat`, and the consequence that slice-wise consistency estimates
+average to the ambient consistency estimate.  These lemmas are audited in
+`MIPStarRE/LDT/Test/AxiomAudit.lean` as `sorryAx`-free.  Thus the remaining
+answer-valued averaged assembly is not the point-consistency calculation.
+
+The ordinary family-level averaging components have also been separated from
+the monolithic assembly theorem.  The lemmas
+`idxPolyFamily_complete_of_slice_bounds`,
+`idxPolyFamily_stronglySelfConsistent_of_slice_bounds`, and
+`idxPolyFamily_sliceBoundednessInput_of_slice_bounds` prove the completeness,
+strong self-consistency, and boundedness fields from the corresponding
+slice-wise estimates.  The ordinary `assembleAveragedPastingData` now consumes
+these lemmas.  All three are audited as `sorryAx`-free.  At this stage of the
+repair the remaining work was to state and prove the `AnswerSymStrat` ambient
+analogue needed by the simultaneous successor theorem.  The later updates in
+this report record the subsequent proof of that answer-valued pasting route.
+
+The answer-valued successor scalar averaging estimate has also been separated
+from the ambient pasting question.  The lemmas
+`average_answerSuccessorSliceSelfImprovementError_le`,
+`average_answerSuccessorSliceMainInductionNu_le` and
+`average_answerSuccessorSliceMainInductionError_le` prove the `zeta_x`,
+`nu_x`, and `sigma_x` Jensen and conditioning estimates for an
+`AnswerSuccessorRestrictedFailureProfile`, i.e. for the actual restricted
+profiles of an ambient `AnswerSymStrat` successor.
+The theorem
+`answerSuccessorRecursiveSliceMeasurements_ofMainInductionHypothesis` then
+extracts the recursive slice measurements from the predecessor answer-valued
+induction hypothesis and proves the averaged `sigma_x` estimate.  The theorem
+`answerSuccessorSelfImprovementOutputs_ofMainInductionHypothesis` applies the
+axis-parallel/self-consistency form of self-improvement to those slices and
+constructs the projective slice submeasurements and witnesses, together with
+the averaged `zeta_x` and `sigma_x` bounds.  These declarations are audited as
+`sorryAx`-free.  The theorem
+`answerSuccessorAveragedFamilyFields_ofMainInductionHypothesis` now assembles
+these outputs into an ambient answer-valued polynomial family: it proves
+averaged completeness, point consistency with the actual answer-valued point
+measurement, strong self-consistency, the carrier-typed slice boundedness
+input, and the averaged `kappa` and `zeta` scalar bounds.  The boundedness
+input is still typed through `answerSelfImprovementCarrier` because the
+existing boundedness interface is an ordinary-strategy interface; this is not a
+claim that the carrier's dummy diagonal measurement satisfies the
+answer-valued diagonal-line test.  The answer-valued pasting invocation was
+isolated as
+`answerLdPastingInInductionSectionOfSmallError`.  The checked reduction
+`answerMainInductionSuccessorNext_ofRecursiveHypothesisAndAnswerPasting` shows
+that, with the predecessor answer-valued induction hypothesis in the successor
+context, the successor branch reduces to this answer-valued pasting theorem.
+Thus, at this intermediate stage, the `AnswerSymStrat` successor assembly was
+not blocked on the recursive-call output, the slice-wise self-improvement
+output, the averaged recursive and self-improvement error bounds, or the
+family-level averaging fields.  The remaining item was the answer-valued final
+pasting invocation, which is recorded below as subsequently proved.
+
+For answer-valued self-improvement data attached to an ordinary ambient
+strategy, the corresponding fields are now also checked directly:
+`AnswerSelfImprovementData.complete_of_slice_bounds`,
+`AnswerSelfImprovementData.consistentWithPoints_of_slice_bounds`,
+`AnswerSelfImprovementData.stronglySelfConsistent_of_slice_bounds`, and
+`AnswerSelfImprovementData.sliceBoundednessInput_of_slice_bounds`.  These
+consume the answer-slice self-improvement average bound
+`average_answerSliceSelfImprovementError_le`; together with
+`average_answerSliceError_le`, they feed the direct theorem
+`mainInductionFromAnswerStageDataOfSmallErrorDirect`.  The exported assembly
+`mainInductionFromAnswerStageDataOfSmallError` now calls this direct proof
+instead of converting through the legacy `SelfImprovementData` record.  This
+removes another conversion layer from the ordinary answer-valued route.  At
+this stage it did not close the ambient `AnswerSymStrat` successor theorem; the
+later answer-valued successor route closes that theorem.
+
+Update later on 2026-05-22: the first pasting transfers have been separated
+from the diagonal-line test hypothesis.  The lemmas
+`Pasting.pointVerticalLineSdd_of_axis_self`,
+`Pasting.ldGbcon_of_axis_self`,
+`Pasting.ldGbcon_liftedVerticalLine_of_axis_self`,
+`Pasting.ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self`,
+`Pasting.ldSandwichLineOnePoint_endpoint_ldGbcon_lift_of_axis_self`,
+`Pasting.ldSandwichLineOnePoint_core_of_axis_self`, and
+`Pasting.ldSandwichLineOnePoint_ofGHatFacts_of_axis_self` now state the actual
+dependencies of those steps: the axis-parallel test, point self-consistency,
+and, where scalar estimates require it, nonnegativity of `gamma`.  The original
+source-facing names remain as wrappers.  This does not prove the final
+answer-valued pasting theorem, but it removes a spurious full-good-strategy
+dependency from the part of the pasting proof where the diagonal measurement is
+not mathematically used.
 
 ## Scope
 
@@ -17,8 +134,11 @@ the separate corrected large-`k` interface
 `thm:main-induction-current-interface`.  The public graph on the GitHub Pages
 branch predates this split and marks `thm:main-induction` blue, while
 `lem:main-induction-base` and `def:successor-pasting-data` are green.  Thus the
-remaining mathematical obstruction is the successor branch of the corrected
-formal interface, not the base case or the already formalized pasting data.
+historical obstruction inspected by this note was the successor branch of the
+corrected formal interface, not the base case or the already formalized
+pasting data.  In the current working tree that corrected successor branch is
+checked; the remaining Section 6 source-boundary obstruction is the printed
+range `md <= k < 400md`.
 
 ## Source comparison
 
@@ -55,15 +175,17 @@ Classification: source statement, linked to
 
 `thm:main-induction-current-interface`: corrected Lean interface.
 
-Classification: stated with proof hole.  The Lean theorem has the source-shaped
-conclusion and corrected large-`k` hypotheses; the successor branch remains
-unfinished.
+Classification: checked corrected interface.  The Lean theorem has the
+source-shaped conclusion and corrected large-`k` hypotheses.  It does not cover
+the full printed source range `k >= md`, but its successor branch is no longer
+the active proof hole.
 
 `mainInductionSuccessorNext`: Lean successor obligation.
 
-Classification: stated with proof hole.  This is the native `m -> m + 1`
-successor statement.  It carries no restricted-probability, recursive-slice,
-self-improvement, or pasting data as hypotheses.
+Classification: checked successor theorem for the corrected large-`k` route.
+This is the native `m -> m + 1` successor statement.  It carries no
+restricted-probability, recursive-slice, self-improvement, or pasting data as
+hypotheses.
 
 `mainInductionSuccessor`: Lean branch theorem.
 
@@ -78,173 +200,184 @@ Classification: internal assembly theorems.  The first consumes the ordinary
 restriction, induction, self-improvement, and averaged pasting data.  The
 second is the answer-valued small-error wrapper used by the current successor
 route: once the answer-valued restriction, per-slice induction, and
-self-improvement data are constructed, it passes through the ordinary assembly
-and proves the successor conclusion.  Neither theorem is advertised as
-`thm:main-induction`, and neither supplies an extra hypothesis to the source
-statement.  The file `MIPStarRE/LDT/Test/AxiomAudit.lean` checks both assembly
-theorems as free of `sorryAx`, so they are not part of the remaining proof
-frontier.
+self-improvement data are constructed, it now calls the direct theorem
+`mainInductionFromAnswerStageDataOfSmallErrorDirect`, which invokes the
+induction-section pasting theorem from the answer-valued fields and scalar
+estimates.  Neither theorem is advertised as `thm:main-induction`, and neither
+supplies an extra hypothesis to the source statement.  The file
+`MIPStarRE/LDT/Test/AxiomAudit.lean` checks both assembly theorems as free of
+`sorryAx`, so they are not part of the remaining proof frontier.
 
 ## Repair
 
-The direct `sorry` has been moved from the arbitrary non-base presentation to the
-named small-error construction
-`mainInductionSuccessorNext_ofSmallErrorConstruction`.  The native successor
-theorem `mainInductionSuccessorNext` now only splits the already proved
-large-error branch from this nontrivial construction.  The public branch theorem
-`mainInductionSuccessor` still only performs the predecessor decomposition for
-`params.m != 1`; the missing mathematics is exactly the nontrivial source proof
-step from `m` to `m + 1`.
+The corrected large-`k` successor route has now been repaired.  The ordinary
+successor theorem `mainInductionSuccessorNext_ofSmallErrorConstruction` has
+only the successor strategy hypotheses and the small-error branch condition; it
+is proved from the internal answer-valued induction theorem and the checked
+answer-carrier reduction.  The predecessor answer-valued induction argument is
+supplied by the strong-induction proof of `answerMainInduction`.  The native
+successor theorem `mainInductionSuccessorNext` splits the already proved
+large-error branch from this nontrivial construction.  The public branch
+theorem `mainInductionSuccessor` performs the predecessor decomposition for
+`params.m != 1` and then calls the checked successor theorem.
 
-The next proof work is now more sharply localized.  The theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction` is the current direct
-proof obligation.  In that nontrivial small-error branch,
-`mainInductionFromAnswerStageDataOfSmallError` already
-turns answer-valued restriction data, answer-valued per-slice induction data,
-and answer-valued self-improvement data into the desired successor conclusion.
-The answer-valued restricted-probabilities theorem supplies the restriction
-data from `strategy.IsGood eps delta gamma`.  The internal theorem
-`mainInductionSuccessorNext_ofAnswerStageObligations` records the next reduction:
-given the predecessor answer-valued induction hypothesis, the positive-degree
-side condition, the predecessor large-`k` side condition, and concrete
-answer-valued slice-transport data, it proves the nontrivial successor
-conclusion.
+The answer-valued ingredients used in this proof are no longer hypotheses of
+the successor statement.  The theorem
+`mainInductionFromAnswerStageDataOfSmallError` turns answer-valued restriction
+data, answer-valued per-slice induction data, and answer-valued
+self-improvement data into the desired successor conclusion.  The
+answer-valued restricted-probabilities theorem supplies the restriction data
+from `strategy.IsGood eps delta gamma`.  The internal theorem
+`mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier` records
+the corresponding reduction under a predecessor answer-valued induction
+hypothesis, the predecessor large-`k` side condition, and the nonzero-`k` side
+condition.  The strong-induction proof supplies the predecessor hypothesis, and
+the elementary side conditions are derived in the successor branch rather than
+postulated.
 
 The checked theorem
-`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound`
-removes the elementary size bookkeeping from this frontier.  From the
-successor hypothesis `400(m+1)d <= k` and `d > 0`, Lean derives both
-`k >= 1` and the predecessor hypothesis `400md <= k`, then calls the
-answer-valued successor assembly above.  Thus the remaining open inputs are not
-the large-`k` side conditions; they are the predecessor induction hypothesis and
-the answer-valued slice-transport construction.
+`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier`
+removes the elementary size bookkeeping from this frontier.  From the successor
+hypothesis `400(m+1)d <= k`, Lean derives the predecessor hypothesis
+`400md <= k`; from the small-error branch it derives `k >= 1`.  It then calls
+the answer-valued successor assembly above.  Thus the large-`k` side condition,
+the nonzero-`k` side condition, and the predecessor induction hypothesis are
+not additional assumptions of the public successor theorem.
 
 The checked theorem
 `mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit`
-also removes the large-error case from the successor frontier.  It performs the
-same positive-degree small-error reduction when
+also removes the large-error case from the successor route.  It performs the
+same small-error reduction when
 `mainInductionError params.next k eps delta gamma < 1`, and otherwise applies
 the trivial-measurement theorem `mainInductionOfOneLeError`.  Consequently the
 large-error case is no longer part of the remaining construction.
+The newer theorem `mainInductionSuccessorNext_ofRecursiveAnswerInduction`
+records the same all-error conclusion in the current answer-carrier route:
+after the predecessor answer-valued induction hypothesis is supplied, the
+successor statement itself follows.
 The axiom audit also checks the linked base-case theorem, large-error theorem,
 restricted-probability estimates, predecessor-hypothesis predicates,
 answer/legacy conversion constructors, and averaged-pasting invocation as
-free of `sorryAx`.  Thus the remaining proof debt is not in those bookkeeping
-or reduction declarations.
+free of `sorryAx`.  Thus the current proof debt is not in those bookkeeping or
+reduction declarations.
 
 The checked theorem
-`mainInductionSuccessorNext_ofDegreeSplitObligations` also separates the
-small-error degree-zero branch from the positive-degree route.  In positive
-degree it calls the answer-valued successor assembly above; when `d = 0`, it
-waits for a separate degree-zero successor construction.  This is the correct
-source-facing status: the theorem statement has not acquired a positivity
-hypothesis, and the degree-zero branch is now named as its own internal proof
-obligation.
-
-The checked helper
-`mainInductionSuccessorNext_degreeZero_ofPastingFamily` connects this
-degree-zero obligation to the existing degree-zero pasting theorem.  It says
-that a successor measurement follows from `degreeZeroPastedPointConsistency`
-once the proof has constructed a slice family which is complete and
-point-consistent with parameters `kappa` and `zeta`, and has proved that the
-resulting degree-zero pasting error is at most the main-induction error.  Thus
-the degree-zero branch is not blocked on interpolation itself; it is blocked on
-the construction of the appropriate slice family and the corresponding scalar
-absorption.
-
-The checked composition theorem
-`mainInductionSuccessorNext_ofDegreeSplitPastingObligations` plugs this
-degree-zero pasting-family route into the degree split.  Thus the remaining
-degree-zero input is no longer an abstract proof of the successor conclusion:
-it is the construction of the complete point-consistent slice family, together
-with the scalar absorption inequality which places the degree-zero pasting
-error below `mainInductionError`.
-
-The checked small-error theorem
+`mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`
+removes the former degree-zero obstruction.  It uses the predecessor induction
+hypothesis for the restricted slices without assuming `0 < d`, and derives
+`1 <= k` from the small-error branch.  Therefore the successor route does not
+require a separate degree-zero polynomial-family construction.  The
+older helpers `mainInductionSuccessorNext_degreeZero_ofPastingFamily`,
+`mainInductionSuccessorNext_ofDegreeSplitPastingObligations`, and
 `mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions`
-then closes the small-error successor conclusion from exactly these internal
-constructions and the predecessor answer-valued induction hypothesis.  It is
-not a source theorem and is not linked as the proof of
-`thm:main-induction`; it records where the eventual induction proof will use
-its local hypothesis for dimension `m`.
+remain checked composition lemmas, but they are not the proof route for the
+current large-`k` theorem.
 
-The remaining missing data are therefore the recursive predecessor argument and
-the small-error successor constructions from
-`references/ldt-paper/inductive_step.tex:441-551`: a degree-zero branch, and in
-positive degree the slice-transport construction for the restricted
-answer-valued strategies.  These data should be supplied internally by the
-final proof of `thm:main-induction`; they should not be promoted to public
-hypotheses of `mainInduction`, `mainInductionSuccessorNext`, or `mainFormal`.
+The answer-valued pasting invocation for the ambient successor strategy has
+now been proved internally in the successor route.  It has not been promoted to
+a public hypothesis of `mainInduction`, `mainInductionSuccessorNext`, or
+`mainFormal`.
 
 The paper-to-Lean correspondence is now as follows.  Lines
 `441-454` of `references/ldt-paper/inductive_step.tex` are the recursive
 predecessor call, represented in Lean by `AnswerPerSliceInductionData` and the
-local induction hypothesis expected by
-`mainInductionSuccessorNext_ofSmallErrorConstruction`.  Lines `456-485` are the
-slice-wise self-improvement step, represented by `AnswerSelfImprovementData`;
-the open point is that the paper's restricted slice is currently modeled as an
-`AnswerSymStrat`, while `selfImprovementInInductionSection` is an ordinary
-`SymStrat` theorem.  Lines `487-550` are the averaging of the slice-wise
-properties, already consumed by
-`mainInductionFromAnswerStageDataOfSmallError` after the answer-valued
-restriction, induction, and self-improvement data are supplied.  Lines
-`552-623` are the final pasting invocation and scalar absorption; the ordinary
-positive-degree route is checked by the stage assembly, while the separate
-degree-zero route has been reduced to constructing a complete point-consistent
-slice family and the corresponding scalar inequality.
+local induction hypothesis supplied by `answerMainInduction`.  Lines `456-485` are the
+slice-wise self-improvement step, represented by `AnswerSelfImprovementData`
+and now constructed by `AnswerSelfImprovementData.ofAnswerCarrier`.  Lines
+`487-550` are the averaging of the slice-wise
+properties.  The point-consistency component of this averaging is now checked
+directly for an ambient `AnswerSymStrat` by
+`answer_family_pointConsistencyError_eq_avg` and
+`answer_family_consistency_of_slice_bounds`.  The ordinary family-level
+completeness, self-consistency, and boundedness calculations are now checked
+separately by `idxPolyFamily_complete_of_slice_bounds`,
+`idxPolyFamily_stronglySelfConsistent_of_slice_bounds`, and
+`idxPolyFamily_sliceBoundednessInput_of_slice_bounds`.  For answer-valued
+self-improvement data over an ordinary ambient strategy, the fields are checked
+directly by `AnswerSelfImprovementData.complete_of_slice_bounds`,
+`AnswerSelfImprovementData.consistentWithPoints_of_slice_bounds`,
+`AnswerSelfImprovementData.stronglySelfConsistent_of_slice_bounds`, and
+`AnswerSelfImprovementData.sliceBoundednessInput_of_slice_bounds`.  The direct
+ordinary-ambient answer-valued assembly
+`mainInductionFromAnswerStageDataOfSmallErrorDirect` invokes
+`ldPastingInInductionSection` from these fields and the answer-valued averaged
+scalar estimates, and the exported theorem
+`mainInductionFromAnswerStageDataOfSmallError` calls this direct proof.  The
+corresponding `AnswerSymStrat` ambient versions of these fields have now been
+assembled without using the dummy diagonal carrier as a substitute for the
+given strategy.  Lines `552-623` are the final pasting invocation and scalar
+absorption; the scalar estimates in the answer-valued route and the full
+ambient answer-valued pasting interface are now checked.  The older separate
+degree-zero family route is retained only as a checked composition lemma and is
+not part of the active successor route.
 
-The recursive predecessor argument has a different logical status from the
-degree-zero and slice-transport constructions.  It is not a new mathematical
-hypothesis about the given successor strategy.  It is the induction hypothesis
-for dimension `m`, applied to the restricted strategies at heights
-`x \in F_q`.  A final repair should therefore either prove `mainInduction` by
-an explicit induction on the dimension and pass this predecessor conclusion
-locally to the checked successor assembly, or introduce a named internal
-successor lemma whose induction-hypothesis parameter is consumed only inside
-that recursive proof.  Such a parameter must not be displayed as an assumption
-of the source theorem, the corrected large-`k` current interface, or the final
-formal soundness theorem.
+The recursive predecessor argument is not a new mathematical hypothesis about
+the given successor strategy.  It is the induction hypothesis for dimension
+`m`, applied to the restricted strategies at heights `x \in F_q`, and it is now
+produced by the strong-induction proof of `answerMainInduction`.  The remaining
+source-boundary repair is not to add a predecessor-conclusion hypothesis
+anywhere; it is to handle the printed source range and the final theorem
+wrapper from the paper hypotheses.
 
-The slice-transport obstruction is not merely notational.  The restricted slice
-used for the recursive call is currently represented by
-`xRestrictedAnswerSymStrat`, an `AnswerSymStrat` whose diagonal-line answers are
-full functions, matching the paper's restriction more literally.  The available
-Section 9 theorem `selfImprovementInInductionSection`, however, is stated for an
-ordinary `SymStrat`, whose diagonal-line answers are
-`DiagonalLinePolynomial`s with the covariant measurement interface.  Thus the
-missing construction is one of the following equivalent mathematical bridges:
-construct an ordinary covariant slice strategy whose verifier-visible point,
-axis-parallel, and diagonal zero-coordinate tests agree with
-`xRestrictedAnswerSymStrat`, or prove the induction-section self-improvement
-theorem directly for `AnswerSymStrat`.  This is an internal construction
-obligation, not an admissible extra hypothesis on the public theorem.
+Update on 2026-05-22: the answer-valued base case
+`answerMainInductionBaseCase` is also checked.  It uses the same
+one-dimensional axis-parallel-line construction as `mainInductionBaseCase`;
+the function-valued diagonal answer interface is irrelevant in dimension one.
+The answer-valued large-error branch `answerMainInductionOfOneLeError` is also
+checked, by the same distinguished trivial polynomial measurement as
+`mainInductionOfOneLeError`.  These supply the base and saturated-error branches
+of the simultaneous answer-valued recursion.  The successor predecessor
+hypothesis is supplied by the strong-induction proof of `answerMainInduction`.
 
-The legacy restricted object `xRestrictedStrategy` does not discharge this
-obligation as it stands.  It is a `RestrictedSymStrat`, not a `SymStrat`, and
-its diagonal measurement keeps only the sampled base-point value before
-re-embedding it into the degree-bounded slice-polynomial alphabet.  Therefore it
-supplies the diagonal failure-probability comparison used in
-`lem:restricted-probabilities`, but it does not supply the transport-covariant
-ordinary diagonal measurement needed as input to the Section 9 theorem.
-The existing ordinary and answer-valued slice-transport constructors are
+This was the main place where a formally green intermediate theorem would have
+been misleading.  A theorem named as the small-error successor construction,
+but proved only from an assumed predecessor conclusion that was not produced by
+an actual induction on `m`, would not have proved the successor step of the
+paper.  The current proof avoids that error by using `answerMainInduction`; the
+remaining formally visible holes are now the source-boundary wrappers
+`mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` and
+`mainFormal_sourceSmallErrorObligation`.
+
+The former slice-transport obstruction is no longer part of the active route.
+The restricted slice used for the recursive call is represented by
+`xRestrictedAnswerSymStrat`, and
+`AnswerSelfImprovementData.ofAnswerCarrier` now obtains the needed
+self-improvement data by applying the axis-parallel/self-consistency form of
+Section 9 to an ordinary carrier with an inert diagonal measurement.
+The next simultaneous-induction construction has also been made explicit:
+`xRestrictedAnswerSymStratOfAnswer` restricts an answer-valued successor
+strategy to an answer-valued predecessor slice while preserving the full
+function-valued diagonal answer.  This removes a definitional obstruction to
+stating the recursive answer-valued induction theorem; it does not by itself
+prove the predecessor induction argument.
+The matching restricted-probability theorem for an answer-valued successor,
+`answerSuccessorRestrictedProbabilities`, is now also checked.  Its diagonal
+part is proved directly for the function-valued diagonal answers, rather than
+by realizing the diagonal measurement as an ordinary low-degree polynomial
+measurement.  The theorem `answerSuccessorRestrictedSliceConclusions` now
+performs the actual recursive call for these answer-valued successor slices:
+from the predecessor answer-valued induction hypothesis, the successor
+large-`k` bound, and the small-error branch, it derives the main-induction
+conclusion for every restricted slice.  Thus the remaining
+recursive-predecessor frontier is no longer a missing slice definition,
+restricted-probability estimate, or local application of the predecessor
+induction hypothesis.  What remains is to place this answer-valued recursive
+argument inside a genuine induction on the dimension.
+
+The legacy restricted object `xRestrictedStrategy` is still not an ordinary
+realization of the answer-valued diagonal interface.  It is a
+`RestrictedSymStrat`, not a `SymStrat`, and its diagonal measurement keeps only
+the sampled base-point value before re-embedding it into the degree-bounded
+slice-polynomial alphabet.
+The existing ordinary and answer-valued slice-transport constructors are still
 checked not to import `sorryAx`; once concrete ordinary slice strategies and
 their verifier-visible measurement equalities are available, they apply the
 Section 9 theorem slice by slice and assemble the required self-improvement
-data.  The missing assertion is the construction of those strategies, or else
-an answer-valued version of the self-improvement theorem.
-
-The second route is a genuine generalization of the Section 9 interface, not a
-local change to the induction assembly.  The current self-improvement
-definitions use the ordinary `SymStrat` point-conditioned operator
-`pointConditionedOutcomeOperatorAtPolynomial`, the averaged SDP operator
-`averagedPointOperator`, and the local-variance expressions built from them.
-An answer-valued self-improvement theorem would therefore either refactor these
-operators through the common point-measurement and state data, or reprove the
-same analytic chain for `AnswerSymStrat`.  This confirms that the remaining
-gap is the mathematical interface between the paper-faithful restricted
-strategy and the existing Section 9 theorem, rather than a missing simplifier or
-rename in the successor assembly.
-
+data.  The active route no longer needs such ordinary realizations: it applies
+the axis-parallel/self-consistency form of self-improvement to the ordinary
+carrier of the answer-valued slice.  A low-degree support theorem is therefore
+not needed for this stage, though it would still be the theorem needed for the
+stronger ordinary-realization route.
 The older degree-bounded restricted strategy `xRestrictedStrategy` cannot simply
 fill this role.  Its diagonal measurement `restrictDiagonalMeasurement`
 postprocesses an ambient slice-preserving diagonal answer to the value at
@@ -255,6 +388,54 @@ covariance required by `SymStrat`: after rebasing by a parameter `t`, the
 ambient measurement is read at `t`, while the degree-bounded restriction has
 discarded all values except the one at `zeroCoord`.  Consequently the ordinary
 slice realization cannot be obtained by reusing `xRestrictedStrategy` unchanged.
+
+## Pull-request history diagnosis
+
+The recent pull-request history separates genuine proof progress from interface
+realignment.  The Naimark branch is proof progress: it proves the tensor-product
+correlation theorem from the one-measurement dilation, and the corresponding
+source node may be treated as proved.  By contrast, the Section 6 branches that
+introduce named records, successor-stage data, or obligation statements do not
+by themselves prove the paper's induction theorem.  They are acceptable only as
+local coordinates for the remaining argument, and their green status must not be
+read as discharging `thm:main-induction`.
+
+The remaining mathematical theorem is therefore not another record-valued
+interface.  At the time of the diagnosis, one had to prove an answer-valued
+recursive induction theorem whose successor case applies the predecessor
+hypothesis to the restricted answer-valued slices and then carries the
+resulting slice measurements through the Section 6 self-improvement and pasting
+estimates.  That construction is now checked by the `answerMainInduction`
+route.  The lesson remains: a PR that merely packages recursive conclusions as
+fields or assumptions is not a proof of the induction step.  The current
+proof-bearing targets are the source-boundary range
+`md <= k < 400md` and the final printed theorem wrapper.
+
+Update on 2026-05-22: the small-error scalar part of the answer-valued route
+has been advanced.  The lemmas
+`answer_eps_nonneg_of_isGood`, `answer_delta_nonneg_of_isGood`,
+`answer_gamma_nonneg_of_isGood`, and
+`answer_diagonalFailureProbability_nonneg` prove the corresponding facts
+directly from the answer-valued test definitions.  The subsequent lemmas
+`answer_eps_le_one_of_mainInductionError_lt_one`,
+`answer_delta_le_one_of_mainInductionError_lt_one`,
+`answer_gamma_le_one_of_mainInductionError_lt_one`,
+`answer_dq_le_q_of_mainInductionError_lt_one`,
+`answer_three_le_k_sq_mul_next_m_of_hsmall`,
+`answer_selfImprovementInInductionError_le_mainInductionNu`, and
+`answer_selfImprovementInInductionError_le_one_of_mainInductionError_lt_one`
+port the ordinary small-error scalar side conditions to an ambient
+`AnswerSymStrat`.  The subsequent theorem
+`answerLdPastingInInductionError_le_mainInductionError_of_smallError` proves
+the scalar absorption for the answer-valued pasting route from these numerical
+facts and the averaged `κ` and `ζ` bounds.  These are not source theorem
+hypotheses and, by themselves, did not close the successor branch.  They
+remove the scalar obstruction to the answer-valued successor route.  The
+degree-zero
+answer-valued pasting branch is also now proved by an axis/self-consistency
+variant of the degree-zero pasting construction.  A later update below records
+the proof of the answer-valued Section 11 commutativity input for the
+point-equivalent carrier.
 
 ## Statement integrity audit
 
@@ -291,10 +472,20 @@ together with the integer `k` used in the induction theorem.
 
 Lean assumptions in `mainInductionSuccessorNext`: a good symmetric strategy
 `strategy : SymStrat params.next ι`, the error parameters, and
-`400 * params.next.m * params.next.d <= k`.  The named remaining theorem
+`400 * params.next.m * params.next.d <= k`.  The named small-error theorem
 `mainInductionSuccessorNext_ofSmallErrorConstruction` has the same successor
 hypotheses, together with the branch condition
-`mainInductionError params.next k eps delta gamma < 1`.
+`mainInductionError params.next k eps delta gamma < 1`; its proof now calls the
+internal theorem `answerMainInduction`.  The former direct Section 6 proof hole
+below `answerLdPastingInInductionSectionOfSmallError` has been discharged:
+`answerComMainForCarrier_ofAnswerGood` proves the answer-valued Section 11
+commutativity input for the carrier from answer-valued point commutativity.  The
+degree-zero branch
+`answerLdPastingInInductionSectionDegreeZeroOfSmallError` is now proved by the
+axis/self degree-zero construction.  The scalar estimate
+`answerLdPastingInInductionError_le_mainInductionError_of_smallError` is now
+proved from the answer-valued small-error scalar lemmas and the averaged
+`κ` and `ζ` bounds.
 
 Paper conclusion for the successor step: a measurement in
 `PolyMeas(m + 1,q,d)` whose evaluations are consistent with the point
@@ -307,5 +498,44 @@ Lean conclusion for the successor step: an existential measurement
 
 Verdict for the successor step: source-faithful modulo the documented
 large-`k` correction and the explicit small-error branch split.  The remaining
-proof hole is a named source-faithful proof obligation, not an additional
-hypothesis on the paper theorem or on the current Lean interface.
+unproved source-range obligation is the interval `md ≤ k < 400md`, not an
+additional hypothesis on the paper theorem or on the current Lean interface.
+
+Further update on 2026-05-22: the Section 12 `H-B`/`H-A` transport has been
+split at its actual mathematical inputs.  The checked theorems
+`hAConsistency_submeas_from_lineConsistency_of_axis_self`,
+`hAConsistency_submeas_ofLinePointBounds_of_axis_self`,
+`hAConsistency_submeas_ofGHatFacts_of_axis_self`, and
+`hAConsistency_submeas_ofComMain_of_axis_self` show that the passage from
+vertical-line consistency and one-point sandwich estimates to the final
+point-consistency estimate uses only the axis-parallel and self-consistency
+bounds of the ambient strategy.  The diagonal-line estimate enters only through
+the upstream Section 11 commutativity conclusion.  The auxiliary theorem
+`gHatFacts_ofComMainAndSelfConsistency` makes the same separation for
+`cor:G-hat-facts`: after `thm:com-main` and slice self-consistency are known,
+the `G-hat` estimates do not require a separate good-strategy package.  This
+separated the answer-valued pasting obstruction to the answer-valued analogue
+of the Section 11 commutativity input, rather than the ordinary carrier's dummy
+diagonal measurement; the later update below records that this input has now
+been proved.
+
+Later on 2026-05-22 the same separation was propagated through the remaining
+mass-comparison part of Section 12.  The checked theorems
+`overAllOutcomes_ofComMain_of_axis_self`, `fromHToG_ofComMain`, and
+`ldPastingNCompleteness_ofComMain_of_axis_self` show that the
+`over-all-outcomes`, `from-H-to-G`, and `N`-completeness stages can be assembled
+from an explicit Section 11 commutativity conclusion for the point-equivalent
+carrier.  The theorem
+`answerLdPastingInInductionSectionOfComMainAndErrorBound` then proves the
+answer-valued final pasting assembly once the answer-valued commutativity
+conclusion for the carrier is available; the scalar inequality absorbing the
+resulting `ldPastingInInductionError` into `mainInductionError` is now proved.
+The broad theorem
+`answerLdPastingInInductionSectionOfSmallError` has consequently been changed
+from a direct proof hole into a checked wrapper whose Section 11 input, scalar
+absorption, and answer-valued degree-zero construction are all proved.  The
+answer-valued commutativity proof proceeds through
+`CommutativityPoints.answerCommutativityPoints` and
+`Commutativity.comMain_of_commutativityPoints`, so it uses the answer-valued
+diagonal verifier relation rather than the ordinary carrier's dummy diagonal
+measurement.

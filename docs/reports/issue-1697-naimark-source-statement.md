@@ -22,30 +22,28 @@ the missing mass is represented by the additional `⊥` outcome of the auxiliary
 construction.  Thus a complete projective measurement on the original outcome
 type is not the standard theorem for arbitrary submeasurements.
 
+The checked Lean proof uses a slightly smaller standard realization of the same
+argument.  Since the theorem does not ask measurements for different questions
+to commute, all questions with the same outcome type can use the same auxiliary
+carrier `Option Outcome`, with a different Naimark unitary chosen for each
+question.  This proves the same source conclusion and avoids treating the
+product-over-questions auxiliary register as a hidden assumption.
+
 ## Lean status
 
-The formalization now separates the following declarations.
+The formalization now separates three declarations.
 
-- `oneMeasNaimark`: the one-measurement helper corresponding to
-  `lem:naimark-helper`; proved.
-- `OneMeasNaimarkData.toProjSubMeas`: the restriction of the completed
-  `Option`-outcome dilation to the original outcomes; proved.
-- `questionwiseNaimark`: the Lean-only interface for per-question marginal
-  preservation; proved.
-- `naimarkTensorProductCorrelation_of_productSubmeasurements`: the internal
-  reduction from product-register projective submeasurements and the four-index
-  correlation identity to the source-shaped theorem; proved.
-- `naimarkTensorProductCorrelationDataConstruction`: the named construction target
-  for the auxiliary spaces, product auxiliary state, product-register projective
-  submeasurements, and four-index correlation identity; proof obligation.
-- `naimarkTensorProductCorrelation`: the source-shaped tensor-product
-  correlation theorem; proved from the named proof obligation.
+| Declaration | Role | Status |
+| --- | --- | --- |
+| `oneMeasNaimark` | one-measurement helper corresponding to `lem:naimark-helper` | proved |
+| `oneNaimarkAuxHilbertSpace`, `oneNaimarkAuxState` | standard one-register auxiliary space and all-`⊥` state used in the checked source proof | proved |
+| `OneMeasNaimarkData.toProjSubMeas` | restriction of the completed `Option`-outcome dilation to the original outcomes | proved |
+| `questionwiseNaimark` | Lean-only interface for per-question marginal preservation | proved |
+| `OneMeasNaimarkData.twoSidedCorrelationPreservation` | four-register trace identity converting two one-measurement compression identities into bipartite correlation preservation | proved |
+| `naimarkTensorProductCorrelation` | Lean statement of the tensor-product correlation theorem | proved |
 
-The source-shaped statement is deliberately not marked `\leanok` in the
-blueprint.  Its Lean proof now factors through the named construction target
-`naimarkTensorProductCorrelationDataConstruction`, so the declaration records the
-source statement without claiming that the tensor assembly has been fully
-formalized.
+The source theorem is now marked `\leanok` in the blueprint, in the
+projective-submeasurement form justified below.
 
 ## Statement integrity audit
 
@@ -83,13 +81,10 @@ explicit finite carriers and normalization fields are Lean encodings of the
 paper's finite-dimensional state convention.  The projective-submeasurement
 conclusion is the form supplied by the paper's helper lemma; the stronger
 complete-measurement conclusion on the original outcome type is false for
-arbitrary submeasurements.  The local passage from completed `Option`-outcome
-measurements to original-outcome projective submeasurements is proved by
-`OneMeasNaimarkData.toProjSubMeas`.  The auxiliary-state and dilated-state part
-of the final assembly is packaged by
-`naimarkTensorProductCorrelation_of_productSubmeasurements`.  The remaining
-proof obligation is now the single named theorem
-`naimarkTensorProductCorrelationDataConstruction`: construct the auxiliary
-spaces, product auxiliary state, product-register projective submeasurements,
-and four-index correlation identity from the questionwise one-measurement
-Naimark dilations.
+arbitrary submeasurements.  The construction of the auxiliary spaces, auxiliary
+state, dilated state, and projective submeasurements is now present in Lean.
+The two-sided trace identity
+`OneMeasNaimarkData.twoSidedCorrelationPreservation` is proved from the
+one-measurement compression identity and the product-extension state.  The local
+passage from completed `Option`-outcome measurements to original-outcome
+projective submeasurements is proved by `OneMeasNaimarkData.toProjSubMeas`.

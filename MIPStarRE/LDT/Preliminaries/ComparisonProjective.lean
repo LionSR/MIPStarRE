@@ -186,4 +186,198 @@ theorem approxToSimeq {Question Outcome : Type*}
           ((IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas B)) q)) ≤ δ
   linarith
 
+set_option maxHeartbeats 800000 in
+-- The heterogeneous proof expands the projective identity on the tensor-product
+-- space; the final algebra is the same as the same-space theorem above, but the
+-- generated matrix expressions are larger.
+private lemma two_questionConsistency_eq_questionSDD_of_projective_heterogeneous
+    {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (A : ProjMeas Outcome ιA) (B : ProjMeas Outcome ιB) :
+    2 * qConsDefect ψ
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+        (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) =
+      qSDD ψ
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+        (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) := by
+  let ALeft : ProjSubMeas Outcome (ιA × ιB) :=
+    { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
+      proj := by
+        intro a
+        simp [leftPlacedSubMeas, leftTensor_mul_leftTensor, A.proj a] }
+  let BRight : ProjSubMeas Outcome (ιA × ιB) :=
+    { toSubMeas := rightPlacedSubMeas (ιA := ιA) B.toSubMeas
+      proj := by
+        intro a
+        simp [rightPlacedSubMeas, rightTensor_mul_rightTensor, B.proj a] }
+  let totalMass : Error := ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB))
+  let overlap : Error :=
+    ∑ a : Outcome, ev ψ (ALeft.outcome a * BRight.outcome a)
+  have hdiagA :
+      ∑ a : Outcome, ev ψ (ALeft.outcome a * ALeft.outcome a) = totalMass := by
+    calc
+      ∑ a : Outcome, ev ψ (ALeft.outcome a * ALeft.outcome a)
+        = ev ψ ALeft.total := projSubMeas_diagMass_eq_mass ψ ALeft
+      _ = ev ψ (leftTensor (ι₂ := ιB) A.total) := by rfl
+      _ = ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) := by
+            rw [A.total_eq_one]
+      _ = totalMass := by
+            rw [leftTensor_one (ι₁ := ιA) (ι₂ := ιB)]
+  have hdiagB :
+      ∑ a : Outcome, ev ψ (BRight.outcome a * BRight.outcome a) = totalMass := by
+    calc
+      ∑ a : Outcome, ev ψ (BRight.outcome a * BRight.outcome a)
+        = ev ψ BRight.total := projSubMeas_diagMass_eq_mass ψ BRight
+      _ = ev ψ (rightTensor (ι₁ := ιA) B.total) := by rfl
+      _ = ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) := by
+            rw [B.total_eq_one]
+      _ = totalMass := by
+            rw [rightTensor_one (ι₁ := ιA) (ι₂ := ιB)]
+  have h_expand :
+      ∀ a : Outcome,
+        ev ψ (((ALeft.outcome a - BRight.outcome a)ᴴ) *
+              (ALeft.outcome a - BRight.outcome a)) =
+          ev ψ (ALeft.outcome a * ALeft.outcome a) +
+            ev ψ (BRight.outcome a * BRight.outcome a) -
+            2 * ev ψ (ALeft.outcome a * BRight.outcome a) := by
+    intro a
+    have hcomm :
+        ev ψ (BRight.outcome a * ALeft.outcome a) =
+          ev ψ (ALeft.outcome a * BRight.outcome a) :=
+      ev_mul_comm_of_psd ψ _ _ (BRight.outcome_pos a) (ALeft.outcome_pos a)
+    calc
+      ev ψ (((ALeft.outcome a - BRight.outcome a)ᴴ) *
+            (ALeft.outcome a - BRight.outcome a))
+        = ev ψ ((ALeft.outcome a * ALeft.outcome a - ALeft.outcome a * BRight.outcome a) -
+            (BRight.outcome a * ALeft.outcome a - BRight.outcome a * BRight.outcome a)) := by
+              congr 1
+              simp [sub_mul, mul_sub, ProjSubMeas.outcome_hermitian]
+              abel
+      _ = ev ψ (ALeft.outcome a * ALeft.outcome a) -
+            ev ψ (ALeft.outcome a * BRight.outcome a) -
+            (ev ψ (BRight.outcome a * ALeft.outcome a) -
+              ev ψ (BRight.outcome a * BRight.outcome a)) := by
+              rw [ev_sub, ev_sub, ev_sub]
+      _ = ev ψ (ALeft.outcome a * ALeft.outcome a) +
+            ev ψ (BRight.outcome a * BRight.outcome a) -
+            2 * ev ψ (ALeft.outcome a * BRight.outcome a) := by
+              rw [hcomm]
+              ring
+  have hqSDD :
+      qSDD ψ
+          (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+          (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) =
+        2 * (totalMass - overlap) := by
+    unfold qSDD qSDDCore overlap
+    calc
+      ∑ a : Outcome,
+          ev ψ
+            ((((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a -
+                (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).outcome a)ᴴ) *
+              ((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a -
+                (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).outcome a))
+        = ∑ a : Outcome,
+            (ev ψ (ALeft.outcome a * ALeft.outcome a) +
+              ev ψ (BRight.outcome a * BRight.outcome a) -
+              2 * ev ψ (ALeft.outcome a * BRight.outcome a)) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              simpa [ALeft, BRight] using h_expand a
+      _ = (∑ a : Outcome, ev ψ (ALeft.outcome a * ALeft.outcome a)) +
+            (∑ a : Outcome, ev ψ (BRight.outcome a * BRight.outcome a)) -
+            2 * ∑ a : Outcome, ev ψ (ALeft.outcome a * BRight.outcome a) := by
+              rw [Finset.sum_sub_distrib, Finset.sum_add_distrib, Finset.mul_sum]
+      _ = 2 * (totalMass - overlap) := by
+              rw [hdiagA, hdiagB]
+              simp [overlap]
+              ring
+  have hgap_nonneg : 0 ≤ totalMass - overlap := by
+    have hnonneg :=
+      qSDD_nonneg ψ
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+        (rightPlacedSubMeas (ιA := ιA) B.toSubMeas)
+    rw [hqSDD] at hnonneg
+    linarith
+  have hqCons :
+      qConsDefect ψ
+          (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+          (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) =
+        totalMass - overlap := by
+    unfold qConsDefect qMatchMass
+    have htotal :
+        ev ψ
+            ((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total *
+              (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).total) =
+          totalMass := by
+      calc
+        ev ψ
+            ((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total *
+              (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).total)
+          = ev ψ (leftTensor (ι₂ := ιB) A.total * rightTensor (ι₁ := ιA) B.total) := by
+              rfl
+        _ = ev ψ
+              (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA) *
+                rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) := by
+              rw [A.total_eq_one, B.total_eq_one]
+        _ = ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB)) := by
+              rw [leftTensor_one (ι₁ := ιA) (ι₂ := ιB),
+                rightTensor_one (ι₁ := ιA) (ι₂ := ιB)]
+              simp
+        _ = totalMass := rfl
+    rw [htotal, max_eq_right hgap_nonneg]
+  calc
+    2 * qConsDefect ψ
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+        (rightPlacedSubMeas (ιA := ιA) B.toSubMeas)
+      = 2 * (totalMass - overlap) := by rw [hqCons]
+    _ = qSDD ψ
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas)
+        (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) := by rw [hqSDD]
+
+/-- Heterogeneous projective converse of `prop:simeq-to-approx`.
+
+For projective measurements acting on different tensor factors, a
+state-dependent-distance estimate at strength `2·δ` for the placed families
+implies the corresponding bipartite consistency statement at strength `δ`. -/
+theorem approxToSimeq_heterogeneous {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxProjMeas Question Outcome ιA) (B : IdxProjMeas Question Outcome ιB)
+    (δ : Error) :
+    SDDRel ψ 𝒟
+        (IdxSubMeas.placeLeft (ιB := ιB) (IdxProjMeas.toIdxSubMeas A))
+        (IdxSubMeas.placeRight (ιA := ιA) (IdxProjMeas.toIdxSubMeas B))
+        (2 * δ) →
+      ConsRel ψ 𝒟
+        (IdxProjMeas.toIdxSubMeas A)
+        (IdxProjMeas.toIdxSubMeas B) δ := by
+  intro ⟨happrox⟩
+  constructor
+  rw [bipartiteConsError_eq_consError_placed]
+  unfold consError sddError at *
+  have h_two_avg :
+      2 * avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              ((IdxSubMeas.placeLeft (ιB := ιB) (IdxProjMeas.toIdxSubMeas A)) q)
+              ((IdxSubMeas.placeRight (ιA := ιA) (IdxProjMeas.toIdxSubMeas B)) q)) =
+        avgOver 𝒟
+          (fun q =>
+            qSDD ψ
+              ((IdxSubMeas.placeLeft (ιB := ιB) (IdxProjMeas.toIdxSubMeas A)) q)
+              ((IdxSubMeas.placeRight (ιA := ιA) (IdxProjMeas.toIdxSubMeas B)) q)) := by
+    rw [← avgOver_const_mul]
+    refine avgOver_congr _ _ _ ?_
+    intro q
+    simpa [IdxSubMeas.placeLeft, IdxSubMeas.placeRight, IdxProjMeas.toIdxSubMeas] using
+      two_questionConsistency_eq_questionSDD_of_projective_heterogeneous ψ (A q) (B q)
+  change avgOver 𝒟
+      (fun q =>
+        qConsDefect ψ
+          ((IdxSubMeas.placeLeft (ιB := ιB) (IdxProjMeas.toIdxSubMeas A)) q)
+          ((IdxSubMeas.placeRight (ιA := ιA) (IdxProjMeas.toIdxSubMeas B)) q)) ≤ δ
+  linarith
+
 end MIPStarRE.LDT.Preliminaries

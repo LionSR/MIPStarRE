@@ -21,6 +21,11 @@
 > The final-theorem wrapper proves the saturated-error branch and leaves
 > `mainFormal_sourceSmallErrorObligation` as the remaining direct final
 > source-boundary proof hole.
+>
+> **Status note, 2026-05-22.**  The corrected large-`k` Section 6 successor
+> construction is now checked.  The source-boundary obligations above remain:
+> the printed source range for `thm:main-induction` and the final two-space
+> source theorem.
 
 This note replaces the obsolete 2026-05-07 description of the old
 conditional route into the final theorem.  The current `mainFormal` statement

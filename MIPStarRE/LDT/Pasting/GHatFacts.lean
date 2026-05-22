@@ -556,4 +556,36 @@ theorem gHatFacts
     hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
     hselfComplete hselfIncomplete hcommComplete hcommIncomplete
 
+/-- Internal form of `cor:G-hat-facts` after applying `thm:com-main`.
+
+The construction of the `\widehat G` estimates needs the commutativity
+conclusion of Section 11 and the strong self-consistency of the slice family.
+The full good-strategy hypothesis is therefore not part of this passage; it is
+used only upstream when proving `thm:com-main`. -/
+theorem gHatFacts_ofComMainAndSelfConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (gamma zeta : Error)
+    (hgamma_nonneg : 0 ≤ gamma) (hgamma : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta) (hzeta : zeta ≤ 1)
+    (hd_le_q : params.d ≤ params.q)
+    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta) :
+    GHatFactsStatement params strategy.state family gamma zeta := by
+  have hselfComplete : GCompleteSelfConsistencyStatement params strategy.state family zeta :=
+    gCompleteSelfConsistency params strategy.state family zeta strategy.permInvState hself
+  have hselfIncomplete : GBotSelfConsistencyStatement params strategy.state family zeta :=
+    gBotSelfConsistency params strategy.state family zeta strategy.permInvState hself
+  have hcommComplete : CommutingWithGCompleteStatement params strategy.state family gamma zeta :=
+    commutingWithGComplete_ofComMainAndSelfConsistency params strategy family gamma zeta
+      hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q hcom hselfComplete
+  have hcommIncomplete :
+      CommutingWithGIncompleteStatement params strategy.state family gamma zeta :=
+    commutingWithGIncomplete_ofComplete params strategy.state family gamma zeta hcommComplete
+  exact gHatFacts_ofSelfConsistencyAndCommutation params strategy.state family gamma zeta
+    hgamma_nonneg hgamma hzeta_nonneg hzeta hd_le_q
+    hselfComplete hselfIncomplete hcommComplete hcommIncomplete
+
 end MIPStarRE.LDT.Pasting

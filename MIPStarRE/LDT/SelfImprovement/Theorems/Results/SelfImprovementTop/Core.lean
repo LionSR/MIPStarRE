@@ -701,4 +701,46 @@ theorem selfImprovement
     exact selfImprovement_of_error_ge_one
       params strategy eps delta gamma nu hgood G herror_ge_one hnu_nonneg
 
+/-- Self-improvement only uses the axis-parallel and point self-consistency
+parts of the good-strategy hypothesis.
+
+Paper origin: `references/ldt-paper/self_improvement.tex:24-60` and
+`references/ldt-paper/self_improvement.tex:631-811`.
+
+The displayed Section 9 construction is written in terms of the point
+measurement \(A^u\), the input polynomial measurement \(G\), and the scalar
+bounds `eps` and `delta`; the diagonal-line error parameter `gamma` is part of
+the paper's standing good-strategy context but does not occur in
+`selfImprovementError` or in `SelfImprovementConclusion`.  This wrapper makes
+that independence explicit: it supplies the diagonal component of `IsGood` by
+taking the actual diagonal failure as the auxiliary parameter, applies the
+source theorem, and then reindexes the conclusion at the caller's `gamma`. -/
+theorem selfImprovement_of_axisParallel_selfConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma nu : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself : strategy.selfConsistencyFailureProbability ≤ delta)
+    (G : Measurement (Polynomial params) ι)
+    (hcons : ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    ∃ H : ProjSubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementConclusion params strategy G H Z eps delta gamma nu := by
+  let gamma₀ : Error := strategy.diagonalFailureProbability
+  have hgood₀ : strategy.IsGood eps delta gamma₀ :=
+    { axisParallelTest := haxis
+      selfConsistencyTest := hself
+      diagonalLineTest := le_rfl }
+  rcases selfImprovement params strategy eps delta gamma₀ nu hgood₀ G hcons with
+    ⟨H, Z, hHZ⟩
+  exact ⟨H, Z,
+    { completeness := hHZ.completeness
+      pointConsistency := hHZ.pointConsistency
+      selfCloseness := hHZ.selfCloseness
+      positiveSemidefiniteWitness := hHZ.positiveSemidefiniteWitness
+      dualDominatesAveragedPoint := hHZ.dualDominatesAveragedPoint
+      projectiveResidualBound := hHZ.projectiveResidualBound }⟩
+
 end MIPStarRE.LDT.SelfImprovement

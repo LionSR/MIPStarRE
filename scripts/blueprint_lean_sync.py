@@ -1367,15 +1367,15 @@ def run_sync(
             if entry.has_leanok or entry.proof_has_leanok:
                 report.leanok_but_missing.append(entry)
 
-    # 4. Optionally update lean_decls before diffing against it.  We capture the
-    # pre-write contents first so the drift loops below still surface the
-    # "developer added a blueprint ref but forgot to regenerate lean_decls"
-    # warning even in the regeneration path.
+    # 4. Optionally update lean_decls before diffing against it.  In update
+    # mode the check should validate the regenerated file, not the stale
+    # contents that were just replaced.
     existing_lean_decls = read_lean_decls_file(lean_decls_path)
     if update_lean_decls:
         sorted_decls = sorted(blueprint_decl_names)
         lean_decls_path.write_text("\n".join(sorted_decls) + "\n")
         print(f"  Updated {lean_decls_path} with {len(sorted_decls)} entries")
+        existing_lean_decls = set(sorted_decls)
 
     # 5. Check lean_decls file
     for name in sorted(existing_lean_decls - blueprint_decl_names):

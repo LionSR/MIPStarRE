@@ -22,6 +22,20 @@ def write_lean(root: Path, text: str) -> None:
     path.write_text(text, encoding="utf-8")
 
 
+def write_blueprint(root: Path, text: str) -> None:
+    """Create a minimal blueprint chapter file for an audit fixture."""
+    path = root / "blueprint" / "src" / "chapter" / "ch_fixture.tex"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding="utf-8")
+
+
+COMPLETE_UNFAITHFUL_DOCSTRING = """/--
+**Unfaithful:** this helper assumes `hbridge`, which is not derived
+from `thm:main-formal`.  This proof debt is tracked by #1458.
+Elimination: prove `bridgeProducer` from the paper hypotheses. -/
+"""
+
+
 class UnfaithfulMarkerAuditTests(unittest.TestCase):
     def test_accepts_complete_marker(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -101,6 +115,147 @@ class UnfaithfulMarkerAuditTests(unittest.TestCase):
 
         self.assertEqual(len(result.findings), 1)
         self.assertIn("paper citation", result.findings[0].missing)
+
+    def test_flags_proof_level_leanok_to_unfaithful_declaration(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_lean(
+                root,
+                "namespace MIPStarRE.LDT\n"
+                f"{COMPLETE_UNFAITHFUL_DOCSTRING}"
+                "theorem bad : True := by trivial\n"
+                "end MIPStarRE.LDT\n",
+            )
+            write_blueprint(
+                root,
+                r"""\begin{theorem}\label{thm:bad}\lean{MIPStarRE.LDT.bad}
+This is a fixture theorem.
+\end{theorem}
+\begin{proof}
+\leanok
+This proof is asserted complete.
+\end{proof}
+""",
+            )
+
+            result = run_audit(root)
+
+        self.assertEqual(result.findings, ())
+        self.assertEqual(len(result.proof_link_findings), 1)
+        finding = result.proof_link_findings[0]
+        self.assertEqual(finding.lean_decl, "MIPStarRE.LDT.bad")
+        self.assertEqual(finding.label, "thm:bad")
+
+    def test_allows_statement_level_leanok_to_unfaithful_declaration(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_lean(
+                root,
+                "namespace MIPStarRE.LDT\n"
+                f"{COMPLETE_UNFAITHFUL_DOCSTRING}"
+                "theorem frontier : True := by trivial\n"
+                "end MIPStarRE.LDT\n",
+            )
+            write_blueprint(
+                root,
+                r"""\begin{theorem}\label{thm:frontier}\lean{MIPStarRE.LDT.frontier}\leanok
+This is a statement-level frontier.
+\end{theorem}
+""",
+            )
+
+            result = run_audit(root)
+
+        self.assertEqual(result.findings, ())
+        self.assertEqual(result.proof_link_findings, ())
+
+    def test_allows_proof_level_leanok_to_clean_declaration(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_lean(
+                root,
+                "namespace MIPStarRE.LDT\n"
+                "/-- A clean fixture theorem. -/\n"
+                "theorem clean : True := by trivial\n"
+                "end MIPStarRE.LDT\n",
+            )
+            write_blueprint(
+                root,
+                r"""\begin{theorem}\label{thm:clean}\lean{MIPStarRE.LDT.clean}
+This is a fixture theorem.
+\end{theorem}
+\begin{proof}
+\leanok
+This proof is asserted complete.
+\end{proof}
+""",
+            )
+
+            result = run_audit(root)
+
+        self.assertEqual(result.findings, ())
+        self.assertEqual(result.proof_link_findings, ())
+
+    def test_module_docstring_marker_does_not_attach_to_first_declaration(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_lean(
+                root,
+                """/-!
+**Unfaithful:** this module discusses `hbridge`, which is not derived
+from `thm:main-formal`.  This proof debt is tracked by #1458.
+Elimination: prove `bridgeProducer` from the paper hypotheses. -/
+namespace MIPStarRE.LDT
+/-- A clean fixture theorem. -/
+theorem firstDecl : True := by trivial
+end MIPStarRE.LDT
+""",
+            )
+            write_blueprint(
+                root,
+                r"""\begin{theorem}\label{thm:first}\lean{MIPStarRE.LDT.firstDecl}
+This is a fixture theorem.
+\end{theorem}
+\begin{proof}
+\leanok
+This proof is asserted complete.
+\end{proof}
+""",
+            )
+
+            result = run_audit(root)
+
+        self.assertEqual(result.findings, ())
+        self.assertEqual(result.proof_link_findings, ())
+
+    def test_bare_module_docstring_marker_does_not_attach_to_first_declaration(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_lean(
+                root,
+                """/-!
+**Unfaithful:** this module discusses `hbridge`, which is not derived
+from `thm:main-formal`.  This proof debt is tracked by #1458.
+Elimination: prove `bridgeProducer` from the paper hypotheses. -/
+theorem firstDecl : True := by trivial
+""",
+            )
+            write_blueprint(
+                root,
+                r"""\begin{theorem}\label{thm:first}\lean{firstDecl}
+This is a fixture theorem.
+\end{theorem}
+\begin{proof}
+\leanok
+This proof is asserted complete.
+\end{proof}
+""",
+            )
+
+            result = run_audit(root)
+
+        self.assertEqual(result.findings, ())
+        self.assertEqual(result.proof_link_findings, ())
 
 
 if __name__ == "__main__":

@@ -29,8 +29,11 @@ the named wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation`.  That
 wrapper proves the saturated-error branch and leaves
 `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` as the current direct
 proof-term `sorry` frontier in the Test slice; the current same-space interface
-`mainFormal` inherits its proof debt transitively through the Section 6 successor theorem
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
+`mainFormal` no longer inherits proof debt through the corrected large-\(k\)
+Section 6 successor theorem
+`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`, which
+is now proved.  The remaining final-theorem proof debt is the source-boundary
+passage from the paper's two-space statement and printed \(k\ge md\) range.
 
 ## Executive summary
 
@@ -43,8 +46,10 @@ did not edit Lean statements or proof code, and I intentionally avoided the
 then-live residual at `MIPStarRE/LDT/Test/MainTheorem.lean:4117` and the
 then-#931-owned self-improvement producer assumptions.  In the current code
 those residual and producer interfaces have been removed from the active route;
-the remaining proof frontier is the Section 6 theorem
-`MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
+the corrected large-\(k\) Section 6 successor theorem
+`MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
+is now proved.  The remaining proof frontier is the source-boundary wrapper for
+`thm:main-formal`, not the successor construction.
 
 Verdict: I found one real, previously undocumented formal-interface restriction. The paper's `thm:main-formal` starts from an arbitrary general projective strategy on possibly different local Hilbert spaces. The current Lean interface `MIPStarRE.LDT.Test.mainFormal` is stated for `SameSpaceProjStrat`, a same-carrier special case carrying swap-invariance data. The earlier additional assumption `0 < params.d` has since been discharged; the remaining interface restriction is the same-space strategy input. I added `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex` to document this formalization deviation, separate from the already-documented large-`k` correction in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
 
@@ -185,8 +190,10 @@ Quot.sound]` for `razSafra`, `classicalTestSoundness`,
 `SameSpaceProjStrat.strategySymmetrization_isGood_three_mul`, and
 `SameSpaceProjStrat.strategySymmetrizationPackage`. The same scratch file showed
 `sorryAx` for `mainFormal`, exactly as expected from the excluded live residual
-in the audit snapshot.  The current `sorryAx` route is the transitive Section 6
-successor construction described at the start of this report.
+in the audit snapshot.  That historical `sorryAx` route through the Section 6
+successor construction has since been discharged for the corrected large-\(k\)
+interface.  The current direct Test-slice proof hole is the source-boundary
+small-error obligation named below.
 
 The audited-scope grep in the original snapshot
 
@@ -201,7 +208,9 @@ Test-slice proof-term `sorry` is the named small-error source-boundary
 obligation `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`; its
 wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation` proves the
 saturated-error branch.  The current same-space interface inherits the
-Section 6 successor theorem named in the status update above.
+proved corrected large-\(k\) Section 6 theorem named in the status update above;
+the source theorem still has the separate two-space and \(k\ge md\)
+source-boundary obligation.
 
 The new paper-gap note compiled successfully with:
 

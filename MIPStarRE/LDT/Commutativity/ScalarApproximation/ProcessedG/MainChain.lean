@@ -20,6 +20,7 @@ namespace MIPStarRE.LDT.Commutativity
 open MIPStarRE.LDT
 open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
+open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -86,9 +87,14 @@ private lemma evaluatedSlice_pointSwap_right_prefix_normalization
 private lemma evaluatedSlice_pointSwap_right_bound_of_norms
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
+    (gamma : Error)
     (hnorm : strategy.state.IsNormalized)
-    (hgood : strategy.IsGood eps delta gamma)
+    (hcomm :
+      SDDOpRel strategy.state
+        (uniformDistribution (PointPairQuestion params.next))
+        (pointMeasurementProductLeft params.next strategy)
+        (pointMeasurementProductRight params.next strategy)
+        (commutativityPointsError params.next gamma))
     (C : EvaluatedSliceQuestion params → EvaluatedSliceOutcome params →
       MIPStarRE.Quantum.Op (ι × ι))
     (hC : ∀ q, ∑ ab : EvaluatedSliceOutcome params, C q ab * (C q ab)ᴴ ≤ 1)
@@ -103,8 +109,8 @@ private lemma evaluatedSlice_pointSwap_right_bound_of_norms
         avgOver (uniformDistribution (EvaluatedSliceQuestion params)) rhs| ≤
       6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
   have hswap :=
-    evaluatedSlice_phaseFour_pointSwap_right_bound
-      params strategy eps delta gamma hnorm hgood C hC
+    evaluatedSlice_phaseFour_pointSwap_right_bound_of_commutativityPoints
+      params strategy gamma hnorm hcomm C hC
   calc
     |avgOver (uniformDistribution (EvaluatedSliceQuestion params)) lhs -
         avgOver (uniformDistribution (EvaluatedSliceQuestion params)) rhs|
@@ -139,9 +145,15 @@ Summing: `Σεᵢ = 12√ζ + 12√(γ(m+1))`, so `2 * Σεᵢ ≤ 48m(√γ + �
 lemma evaluatedSlice_scalar_chain_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
+    (gamma zeta : Error)
     (_hnorm : strategy.state.IsNormalized)
-    (_hgood : strategy.IsGood eps delta gamma)
+    (_hcomm :
+      SDDOpRel strategy.state
+        (uniformDistribution (PointPairQuestion params.next))
+        (pointMeasurementProductLeft params.next strategy)
+        (pointMeasurementProductRight params.next strategy)
+        (commutativityPointsError params.next gamma))
+    (_hgamma_nonneg : 0 ≤ gamma)
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (_hG : ∀ x, G x = (family.meas x).toSubMeas)
@@ -495,7 +507,7 @@ lemma evaluatedSlice_scalar_chain_bound
                   ((evaluatedSlicePointMeas params strategy q.2).outcome b))))).symm
     exact
       evaluatedSlice_pointSwap_right_bound_of_norms
-        params strategy eps delta gamma _hnorm _hgood C hC
+        params strategy gamma _hnorm _hcomm C hC
         phase3PaperInserted phase4PaperSwapped hphase3_norm hphase4_norm
   -- Paper phase five: remove the trailing `G^x` total from the line-87 endpoint.
   -- The `√ζ + 6√(γ(m+1))` bound decomposes as:
@@ -607,7 +619,7 @@ lemma evaluatedSlice_scalar_chain_bound
                     ((evaluatedSlicePointMeas params strategy q.1).outcome a))))).symm
       have hswap :=
         evaluatedSlice_pointSwap_right_bound_of_norms
-          params strategy eps delta gamma _hnorm _hgood C hC
+          params strategy gamma _hnorm _hcomm C hC
           swappedDefect orderedDefect hswap_norm hord_norm
       simpa [abs_sub_comm] using hswap
     have hordered_abs :
@@ -719,12 +731,7 @@ lemma evaluatedSlice_scalar_chain_bound
       rw [hrw]
       nlinarith
     have hgamma_nonneg : 0 ≤ gamma := by
-      have hdfp : 0 ≤ strategy.diagonalFailureProbability := by
-        unfold SymStrat.diagonalFailureProbability
-        exact mul_nonneg (by positivity)
-          (Finset.sum_nonneg fun j _ =>
-            bipartiteConsError_nonneg strategy.state _ _ _)
-      exact le_trans hdfp _hgood.diagonalLineTest
+      exact _hgamma_nonneg
     have hzeta_nonneg : 0 ≤ zeta :=
       le_trans (sddError_nonneg strategy.state
         (uniformDistribution (Point params.next))

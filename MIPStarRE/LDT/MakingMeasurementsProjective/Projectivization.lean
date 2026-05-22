@@ -285,6 +285,126 @@ private lemma qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
   simpa [qSSCDefect, diagA, hleftPlaced_outcome, hleftPlaced_total,
     leftTensor_mul_leftTensor, A.total_eq_one] using hmax'
 
+/-- The consistency defect of `(A,B)` controls the strong self-consistency
+defect of the right-placed version of `B`.  This is the right-register
+counterpart of `qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect`;
+it uses the same Cauchy--Schwarz calculation with the two diagonal terms
+interchanged. -/
+private lemma qSSCDefect_rightPlacedMeasurement_le_two_qBipartiteConsDefect
+    {Outcome : Type*} {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) :
+    qSSCDefect ψ (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) ≤
+      2 * qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
+  classical
+  let diagA : Error :=
+    ∑ a : Outcome,
+      ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a))
+  let diagB : Error :=
+    ∑ a : Outcome,
+      ev ψ (rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a))
+  let overlap : Error :=
+    ∑ a : Outcome, ev ψ (opTensor (A.outcome a) (B.outcome a))
+  let totalMass : Error := ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB))
+  let defect : Error := qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas
+  have hdefect_nonneg : 0 ≤ defect :=
+    qBipartiteConsDefect_nonneg ψ A.toSubMeas B.toSubMeas
+  have hdiagA_nonneg : 0 ≤ diagA :=
+    sum_ev_leftTensor_outcome_sq_nonneg (ιB := ιB) ψ A.toSubMeas
+  have hdiagB_nonneg : 0 ≤ diagB :=
+    sum_ev_rightTensor_outcome_sq_nonneg (ιA := ιA) ψ B.toSubMeas
+  have hleft_one :
+      ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) =
+        totalMass := by
+    simpa [totalMass] using congrArg (ev ψ) (leftTensor_one (ι₁ := ιA) (ι₂ := ιB))
+  have hright_one :
+      ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) = totalMass := by
+    simpa [totalMass] using congrArg (ev ψ) (rightTensor_one (ι₁ := ιA) (ι₂ := ιB))
+  have hleftPlaced_outcome :
+      ∀ a : Outcome,
+        (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).outcome a =
+          leftTensor (ι₂ := ιB) (A.outcome a) := by
+    intro a
+    rfl
+  have hleftPlaced_total :
+      (leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total =
+        leftTensor (ι₂ := ιB) A.total :=
+    rfl
+  have hrightPlaced_outcome :
+      ∀ a : Outcome,
+        (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).outcome a =
+          rightTensor (ι₁ := ιA) (B.outcome a) := by
+    intro a
+    rfl
+  have hrightPlaced_total :
+      (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).total =
+        rightTensor (ι₁ := ιA) B.total :=
+    rfl
+  have hdiagA_le : diagA ≤ totalMass := by
+    calc
+      diagA ≤ ev ψ (leftTensor (ι₂ := ιB) (1 : MIPStarRE.Quantum.Op ιA)) := by
+        simpa [diagA, hleftPlaced_outcome, hleftPlaced_total, leftTensor_mul_leftTensor,
+          A.total_eq_one] using
+          (MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_mass ψ
+            (leftPlacedSubMeas (ιB := ιB) A.toSubMeas))
+      _ = totalMass := hleft_one
+  have hdiagB_le : diagB ≤ totalMass := by
+    calc
+      diagB ≤ ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) := by
+        simpa [diagB, hrightPlaced_outcome, hrightPlaced_total,
+          rightTensor_mul_rightTensor, B.total_eq_one] using
+          (MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_mass ψ
+            (rightPlacedSubMeas (ιA := ιA) B.toSubMeas))
+      _ = totalMass := hright_one
+  have hoverlap_le : overlap ≤ totalMass :=
+    sum_ev_opTensor_outcome_le_totalMass (ψ := ψ) A B
+  have habs : |overlap| ≤ Real.sqrt diagA * Real.sqrt diagB :=
+    abs_sum_ev_opTensor_le_sqrt_mul_sqrt (ψ := ψ) A.toSubMeas B.toSubMeas
+  have hoverlap_upper : overlap ≤ Real.sqrt diagA * Real.sqrt diagB :=
+    (abs_le.mp habs).2
+  have hoverlap_sq : overlap ^ 2 ≤ diagA * diagB := by
+    have hsq :
+        overlap ^ 2 ≤ (Real.sqrt diagA * Real.sqrt diagB) ^ 2 := by
+      have hoverlap_nonneg : 0 ≤ overlap :=
+        Finset.sum_nonneg fun a _ =>
+          ev_nonneg_of_psd ψ _ <| opTensor_nonneg (A.outcome_pos a) (B.outcome_pos a)
+      nlinarith [hoverlap_nonneg, hoverlap_upper,
+        Real.sqrt_nonneg diagA, Real.sqrt_nonneg diagB]
+    calc
+      overlap ^ 2 ≤ (Real.sqrt diagA * Real.sqrt diagB) ^ 2 := hsq
+      _ = diagA * diagB := by
+            ring_nf
+            rw [Real.sq_sqrt hdiagA_nonneg, Real.sq_sqrt hdiagB_nonneg]
+  have hdefect_eq : defect = totalMass - overlap := by
+    have hoverlap_le_totalOverlap :
+        overlap ≤ ev ψ (opTensor A.total B.total) := by
+      simpa [totalMass, A.total_eq_one, B.total_eq_one, opTensor] using hoverlap_le
+    dsimp [defect]
+    unfold qBipartiteConsDefect
+    rw [show qBipartiteMatchMass ψ A.toSubMeas B.toSubMeas = overlap by rfl]
+    rw [show (let totalOverlap := ev ψ (opTensor A.total B.total);
+          max 0 (totalOverlap - overlap)) =
+        max 0 (ev ψ (opTensor A.total B.total) - overlap) by rfl]
+    rw [max_eq_right (sub_nonneg.mpr hoverlap_le_totalOverlap)]
+    simp [totalMass, A.total_eq_one, B.total_eq_one, opTensor]
+  have hoverlap_sq' : overlap ^ 2 ≤ diagB * diagA := by
+    rw [mul_comm]
+    exact hoverlap_sq
+  have hdiagB_lower : totalMass - 2 * defect ≤ diagB :=
+    totalMass_sub_two_defect_le_diagA
+      hdiagB_nonneg hdefect_nonneg hdefect_eq hoverlap_sq' hdiagA_le
+  have hinner : totalMass - diagB ≤ 2 * defect := by linarith
+  have htarget_nonneg : 0 ≤ 2 * defect := by linarith
+  have hmax : max 0 (totalMass - diagB) ≤ 2 * defect :=
+    max_le_iff.mpr ⟨htarget_nonneg, hinner⟩
+  have hmax' : max 0 (ev ψ (rightTensor (ι₁ := ιA) (1 : MIPStarRE.Quantum.Op ιB)) -
+        diagB) ≤ 2 * defect := by
+    simpa [hright_one] using hmax
+  simpa [qSSCDefect, diagB, hrightPlaced_outcome, hrightPlaced_total,
+    rightTensor_mul_rightTensor, B.total_eq_one] using hmax'
+
 private lemma sourceAlmostProjective_of_ssc {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -379,6 +499,58 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
             nlinarith [hζ_nonneg]
   · exact sourceAlmostProjective_of_ssc ψ A_lifted _ hsscBound
 
+/-- Right-register form of consistency-to-almost-projective: if `A` and `B`
+are `ζ`-consistent across \(H_A\otimes H_B\), then Bob's lifted measurement is
+`2ζ`-almost-projective on the right tensor factor. -/
+lemma consistencyToAlmostProjective_right {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome] [DecidableEq Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily B.toSubMeas) ζ →
+      AlmostProjMeasStatement ψ
+        (rightLiftedMeasurement (ιA := ιA) B)
+        (consistencyToAlmostProjectiveError ζ) := by
+  intro hCons
+  classical
+  let B_lifted : Measurement Outcome (ιA × ιB) :=
+    rightLiftedMeasurement (ιA := ιA) B
+  have hCons' :
+      qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas ≤ ζ := by
+    simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily] using
+      hCons.offDiagonalBound
+  have hζ_nonneg : 0 ≤ ζ := by
+    exact le_trans (qBipartiteConsDefect_nonneg ψ A.toSubMeas B.toSubMeas) hCons'
+  have hsscBound :
+      qSSCDefect ψ B_lifted.toSubMeas ≤ consistencyToAlmostProjectiveError ζ := by
+    calc
+      qSSCDefect ψ B_lifted.toSubMeas
+        ≤ 2 * qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
+            simpa [B_lifted] using
+              qSSCDefect_rightPlacedMeasurement_le_two_qBipartiteConsDefect
+                (ψ := ψ) A B
+      _ ≤ 2 * ζ := by
+            exact mul_le_mul_of_nonneg_left hCons' (by norm_num)
+      _ = consistencyToAlmostProjectiveError ζ := by
+            simp [consistencyToAlmostProjectiveError]
+  refine ⟨?_, ?_, ?_⟩
+  · constructor
+    rw [MIPStarRE.LDT.Preliminaries.constFamily_ssc_unit]
+    exact hsscBound
+  · constructor
+    calc
+      sddError ψ (uniformDistribution Unit)
+          (constSubMeasFamily B_lifted.toSubMeas)
+          (constSubMeasFamily B_lifted.toSubMeas)
+        = 0 := sddError_self ψ (uniformDistribution Unit) _
+      _ ≤ 2 * consistencyToAlmostProjectiveError ζ := by
+            dsimp [consistencyToAlmostProjectiveError]
+            nlinarith [hζ_nonneg]
+  · exact sourceAlmostProjective_of_ssc ψ B_lifted _ hsscBound
+
 /-- Increase the allowed error bound for a rounded-projective witness. -/
 lemma roundedProjMeasStatement_mono {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -451,6 +623,55 @@ lemma qSDD_leftPlaced_zeroProjSubMeas_le_one {Outcome : Type*}
   simpa using
     MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ
       (leftPlacedSubMeas (ιB := ιB) A)
+
+/-- The zero projective submeasurement is within unit `qSDD` of any
+right-placed submeasurement on a normalized bipartite state. -/
+lemma qSDD_rightPlaced_zeroProjSubMeas_le_one {Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
+    (A : SubMeas Outcome ιB) :
+    qSDD ψ (rightPlacedSubMeas (ιA := ιA) A)
+      (rightPlacedSubMeas (ιA := ιA)
+        (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas) ≤ 1 := by
+  have hq :
+      qSDD ψ (rightPlacedSubMeas (ιA := ιA) A)
+          (rightPlacedSubMeas (ιA := ιA)
+            (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas) =
+        ∑ a : Outcome,
+          ev ψ (((rightPlacedSubMeas (ιA := ιA) A).outcome a) *
+            ((rightPlacedSubMeas (ιA := ιA) A).outcome a)) := by
+    unfold qSDD qSDDCore
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    let Z : MIPStarRE.Quantum.Op (ιA × ιB) := (rightPlacedSubMeas (ιA := ιA) A).outcome a
+    have hzero :
+        (rightPlacedSubMeas (ιA := ιA)
+          (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas).outcome a = 0 := by
+      ext i j
+      rcases i with ⟨i₁, i₂⟩
+      rcases j with ⟨j₁, j₂⟩
+      by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
+        simp [zeroProjSubMeas, rightPlacedSubMeas, rightTensor, h₁, h₂]
+    calc
+      ev ψ
+          ((Z -
+              (rightPlacedSubMeas (ιA := ιA)
+                (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas).outcome a)ᴴ *
+            (Z - (rightPlacedSubMeas (ιA := ιA)
+              (zeroProjSubMeas (Outcome := Outcome) (ι := ιB)).toSubMeas).outcome a))
+        = ev ψ (Zᴴ * Z) := by
+            rw [hzero]
+            simp
+      _ = ev ψ (Z * Z) := by
+            rw [SubMeas.outcome_hermitian (rightPlacedSubMeas (ιA := ιA) A) a]
+      _ = ev ψ (((rightPlacedSubMeas (ιA := ιA) A).outcome a) *
+            ((rightPlacedSubMeas (ιA := ιA) A).outcome a)) := by
+            rfl
+  rw [hq]
+  simpa using
+    MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ
+      (rightPlacedSubMeas (ιA := ιA) A)
 
 /-- Square-register specialization of
 `qSDD_leftPlaced_zeroProjSubMeas_le_one`.

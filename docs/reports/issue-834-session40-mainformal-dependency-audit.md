@@ -190,7 +190,7 @@ inspect `blueprint/web/dep_graph_document.html`.
 - The generated graph has incoming edges
   - `prop:simeq-triangle-inequality -> thm:main-formal`,
   - `thm:main-induction -> thm:main-formal`,
-  - `lem:symmetrization-bridge -> thm:main-formal`, and
+  - `lem:role-register-symmetrization -> thm:main-formal`, and
   - `thm:zeta-bounds-main-formal -> thm:main-formal`.
 - The graph has outgoing edge `thm:main-formal -> thm:main-informal`.
 

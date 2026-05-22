@@ -8,8 +8,10 @@ Audit date: 2026-04-09
 > or moved under explicit axiom-audit coverage.  In particular, the current
 > Section 7 entries `lem:sdp`, `lem:add-in-u`, `lem:self-improvement-helper`,
 > and `thm:self-improvement` are no longer represented by the reduced
-> declarations listed in this table.  For the current public/local dependency
-> graph status, use `docs/reports/2026-05-20-dependency-graph-status.md`.
+> declarations listed in this table, and `thm:naimark` is now linked to the
+> proved tensor-product theorem `naimarkTensorProductCorrelation`.  For the
+> current public/local dependency graph status, use
+> `docs/reports/2026-05-20-dependency-graph-status.md`.
 
 Scope:
 - `blueprint/src/chapter/ch03_preliminaries.tex`

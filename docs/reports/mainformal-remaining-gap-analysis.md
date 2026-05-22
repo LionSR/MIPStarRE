@@ -32,10 +32,10 @@ Date: 2026-05-07
 > same-space Lean interface is recorded separately as
 > `thm:main-formal-current-interface`.  The same-space theorem
 > `MIPStarRE.LDT.Test.mainFormal` has no bridge, residual, package, or
-> obligation hypotheses.  Its only remaining `sorryAx` dependency is
-> transitive through `MIPStarRE.LDT.MainInductionStep.mainInduction`, and the
-> only construction proof hole on that same-space route is
-> `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`.
+> obligation hypotheses.  At this date its remaining `sorryAx` dependency was
+> transitive through `MIPStarRE.LDT.MainInductionStep.mainInduction`; the
+> later 2026-05-22 update below records that the corrected large-\(k\)
+> successor construction has since been proved.
 > The source-labelled blueprint entry `thm:main-formal` is now recorded as
 > `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
 > wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation` for the printed
@@ -48,16 +48,139 @@ Date: 2026-05-07
 > `answerSuccessorSelfImprovementObligations`, and recursive-slice input
 > records should therefore be read as removed intermediate interfaces, not as
 > current proof targets.
+>
+> **Status note, 2026-05-21.**  The remaining source-final proof hole is not a
+> generic container for old bridge hypotheses.  It is the non-vacuous branch of
+> the printed two-space theorem.  Its mathematical content is the conjunction of
+> three documented tasks: the two-space role-register reduction from
+> `ProjStrat`, the source \(k\)-range and scalar-boundary issue from
+> `docs/paper-gaps/issue-906-main-formal-k-bound.tex`, and, at that snapshot,
+> the native Section 6 small-error successor construction.  The rebuilt
+> blueprint then displayed these as
+> `prop:main-formal-source-two-space-role-register`,
+> `prop:main-formal-source-k-range-boundary`, and
+> `prop:main-formal-source-successor-construction`.  The successor item is now
+> historical: the corrected large-\(k\) Section 6 successor branch has since
+> been proved, and the live final-theorem frontier has the two pieces listed in
+> the next status note.  The saturated branch is already proved by
+> `mainFormal_source_trivial_witness`, and the small-error branch is not
+> vacuous: the \(md\le k<400md\) interval can still have
+> `mainFormalError params k eps < 1`.
+>
+> **Status note, 2026-05-22.**  The native Section 6 successor construction is
+> now proved for the corrected large-\(k\) interface.  The current final-theorem
+> source frontier has two displayed pieces, not three:
+> `prop:main-formal-source-two-space-role-register` and
+> `prop:main-formal-source-k-range-boundary`.  The direct Lean proof holes are
+> `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`
+> and `Test.mainFormal_sourceSmallErrorObligation`.
+>
+> **Update, 2026-05-21.**  The first state and measurement pieces of the
+> heterogeneous role-register construction are now present in Lean.
+> `MIPStarRE.LDT.ProjStrat.roleRegisterSymmState` constructs the positive
+> direct-sum role-register state on `Role × (ιA ⊕ ιB)`, and
+> `MIPStarRE.LDT.ProjStrat.roleRegisterSymmState_density_fixed` proves the
+> exchange symmetry stated immediately after the definition of
+> \(\psi_{\mathrm{sym}}\) in the paper.  The theorem
+> `MIPStarRE.LDT.ProjStrat.roleRegisterSymmState_isNormalized` proves its
+> normalized-trace condition from the normalization of the original two-space
+> state.  The proof is the explicit finite-dimensional trace calculation for
+> the two occupied direct-sum sectors.  The theorem
+> `MIPStarRE.LDT.ProjStrat.roleRegisterProjMeas` constructs the corresponding
+> projective measurements, with point, axis-parallel, and diagonal measurement
+> families, and `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy` packages the
+> state and these covariant measurements as a `SymStrat`.  The occupied-sector
+> expectation identities
+> `MIPStarRE.LDT.ProjStrat.ev_roleRegisterSymmState_rolePair_AB_localPairABBlock`
+> and
+> `MIPStarRE.LDT.ProjStrat.ev_roleRegisterSymmState_rolePair_BA_localPairBABlock_swap`
+> now prove the two half-weight trace calculations from which the branch
+> averages follow.  The branch-probability comparison has also been assembled:
+> `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_axisParallel_eq_roleAverage`,
+> `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_selfConsistency_eq_pointAgreement`,
+> and
+> `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_diagonal_eq_roleAverage`
+> identify the three tested branches of the heterogeneous role-register
+> strategy with the corresponding two-space role averages, and
+> `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_is_good_three_mul` proves
+> the `(3ε,3ε,3ε)` goodness comparison.  These declarations are axiom-clean.
+> The principal-block extraction used in the reverse passage is also now
+> present in Lean.  The file
+> `MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization` defines the Alice and Bob
+> block extractions from a POVM on `Role × (ιA ⊕ ιB)`, proves positivity,
+> monotonicity, completeness preservation, compatibility with postprocessing
+> and polynomial evaluation, and proves that extracting from
+> `roleRegisterProjMeas` recovers the original point measurements.  These
+> declarations are axiom-clean.  The remaining two-space role-register work for
+> `thm:main-formal` is therefore not the existence of the block extraction.
+> Lean now also records
+> `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_sourceMainInduction`, which
+> applies the source-shaped main-induction theorem to the heterogeneous
+> role-register symmetrization under the paper hypothesis \(k\ge md\).  This
+> handoff inherits the source-range `sorryAx` from
+> `MainInductionStep.mainInduction_sourceStatement`; it is not a completed
+> final-theorem proof.  Lean also records
+> `MIPStarRE.LDT.ProjStrat.sourceRoleRegisterUnsymmetrizedPointConsistency`,
+> which combines this handoff with the factor-two trace-compression theorem and
+> produces the two complete polynomial measurements with the two point-consistency
+> estimates for the original two-space strategy.  The remaining source-boundary
+> work is no longer this point-unsymmetrization step.  The point-agreement
+> branch is also available for the two-space strategy, and the Step 5
+> Schwartz--Zippel loss has been generalized to a bipartite state on
+> \(H_A\otimes H_B\).  The heterogeneous triangle/SDD comparison theorem has
+> also been proved, so Lean reaches the complete-measurement
+> full-polynomial consistency statement at the end of the paper's Step 5
+> calculation.  The heterogeneous orthonormalization steps on both tensor
+> factors have also been formalized: from this complete-measurement consistency
+> they produce projective submeasurements on \(H_A\) and \(H_B\), together with
+> the corresponding SDD estimates.  The completion step has also been proved:
+> the projective submeasurements are completed to projective measurements and
+> the corresponding estimates are widened to the orthonormalize-and-complete
+> error.  The repaired polynomial line-169 relations have also been derived
+> from the pre-completion orthonormalization estimates.  The final
+> point-evaluation triangle has also been derived from these polynomial
+> relations by ordinary evaluation data processing and the heterogeneous
+> triangle inequality.  The scalar absorption from these explicit
+> pre-absorption errors to `mainFormalError` is now checked under the nonzero
+> scalar-cascade boundary.  The remaining work is the source range boundary,
+> together with the zero-sampling boundary permitted by the printed theorem
+> when \(d=0\) and \(k=0\).  The scalar lemma
+> `MIPStarRE.LDT.Test.mainFormalError_zero_k` records that the displayed final
+> error is exactly zero at this boundary.  The remaining work is final assembly
+> needed for the printed theorem.
+>
+> **Update, 2026-05-21.**  The next missing assertion has now been proved as a
+> trace-level calculation.  For an arbitrary role-register observable \(Y\), the factor-two
+> unsymmetrization estimate cannot be proved from an operator identity of the
+> form
+> \[
+>   P_{AB}(\rho)\,Y = P_{AB}(\rho\,Y_{AB}).
+> \]
+> Such an identity is false because \(Y\) may have off-role or off-direct-sum
+> blocks.  What the paper uses is the corresponding trace-compression identity:
+> after pairing with the \(AB\)-supported component of the symmetrized density,
+> only the \((\mathrm A,\mathrm{inl})\)-left and
+> \((\mathrm B,\mathrm{inr})\)-right principal block of \(Y\) contributes.  The
+> theorem
+> `MIPStarRE.LDT.ProjStrat.qBipartiteConsDefect_roleRegisterProjMeas_arbitrary_eq_average`
+> formalizes the resulting average-of-two-defects identity for arbitrary
+> role-register measurements.  The factor-two consequences are
+> `MIPStarRE.LDT.ProjStrat.qBipartiteConsDefect_extractRoleRegisterBob_le_two_symm`
+> and
+> `MIPStarRE.LDT.ProjStrat.qBipartiteConsDefect_extractRoleRegisterAlice_le_two_symm`.
+> These are direct analogues of the same-space theorem
+> `MIPStarRE.LDT.qBipartiteConsDefect_roleSymmetrizedMeasurement_left`, now for
+> the heterogeneous carrier `Role × (ιA ⊕ ιB)`.
 
-## 1. Exact sorry site
+## 1. Historical sorry site
 
-**Current direct file:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean:680`
+**Historical direct file:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean:760`
 
-**Current direct theorem:**
+**Historical direct theorem:**
 `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
 
-The active goal is the small-error branch of the native successor step in
-`thm:main-induction`:
+At the time of the earlier report, the active goal was the small-error branch
+of the native successor step in `thm:main-induction`:
 
 ```lean
 ∃ G : Measurement (Polynomial params.next) ι,
@@ -67,12 +190,13 @@ The active goal is the small-error branch of the native successor step in
     (mainInductionError params.next k eps delta gamma)
 ```
 
-This theorem assumes precisely the successor branch hypotheses, including
+This theorem assumed precisely the successor branch hypotheses, including
 `strategy.IsGood eps delta gamma`,
 `400 * params.next.m * params.next.d ≤ k`, and
 `mainInductionError params.next k eps delta gamma < 1`.  It does not assume
 restricted-probability records, slice-induction data, self-improvement data,
 pasting data, residual packages, or arbitrary implication hypotheses.
+It is now proved in the corrected large-\(k\) interface.
 
 The older conditional direct `sorry` in `MainFormal.lean` has been removed.  A
 direct `sorry` remains in `mainFormal_sourceSmallErrorObligation`, but it is a
@@ -112,8 +236,9 @@ small-error branch.
 The Lean theorem `mainFormal` is a separate current interface with
 faithful boundary hypotheses for the present formal container and the
 documented large-`k` correction.  It has no bridge, residual, package, repair,
-producer, input, or obligation hypothesis.  Its only remaining proof debt is
-transitive through the Section 6 theorem `MainInductionStep.mainInduction`.
+producer, input, or obligation hypothesis.  The corrected large-`k` Section 6
+theorem is now proved; the remaining proof debt for the printed final theorem
+is the source-boundary branch `Test.mainFormal_sourceSmallErrorObligation`.
 
 **Historical goal type at the sorry:**
 ```lean
@@ -136,10 +261,12 @@ and the post-role diagonal completion theorem.
 
 ## 2. Historical context at the removed `MainFormal.lean` sorry site
 
-### Branch conditions
+### Historical branch conditions
 - `herr : ¬ 1 ≤ mainFormalError params k eps` — error is non-trivial
 - `hm1 : params.m ≠ 1` — **successor case** (the base case `params.m = 1` is handled on lines 595-601)
-- `hd : 0 < params.d` — degree positive
+- `hd : 0 < params.d` — historical positive-degree branch condition; the
+  current recursive successor route no longer requires it as an active frontier
+  assumption
 - `hk0 : 0 < k` — dimension positive
 - `hk : 400 * params.m * params.d ≤ k` — large-k hypothesis
 
@@ -160,18 +287,15 @@ is the Section 6 successor construction described above.
 The current successor theorem makes the missing constructions explicit in
 mathematical form, rather than as extra fields on `mainFormal`.  The remaining
 proof must construct the answer-valued restricted slice profile, apply the
-recursive predecessor induction conclusion to each slice, realize the
-induction-section self-improvement interface, assemble the pasting input, and
-prove the scalar absorption estimates.
+recursive predecessor induction conclusion to each slice, assemble the pasting
+input, and prove the scalar absorption estimates.
 
-The checked assembly theorems have reduced this to three concrete components:
+The checked assembly theorems have reduced this to one concrete component:
 
-1. the degree-zero family-and-scalar construction;
-2. the predecessor induction argument for the answer-valued restricted slices;
-3. the positive-degree answer-valued slice realization.
+1. the predecessor induction argument for the answer-valued restricted slices.
 
-These are not hypotheses of `mainFormal`, nor of the paper-facing successor
-step.  They are the remaining internal proof obligations in Section 6.
+This is not a hypothesis of `mainFormal`, nor of the paper-facing successor
+step.  It is the remaining internal proof obligation in Section 6.
 
 ## 3. Field analysis
 
@@ -195,14 +319,13 @@ structure MainFormalRoleInductionWitness ... where
 The historical successor constructors in `RoleRegister.lean` have been removed
 from the active final-theorem route.  Their names recorded the missing
 predecessor-slice and self-improvement data as records.  The current repair
-does not present those records as acceptable public inputs.  Instead,
-`mainInductionSuccessorNext_ofSmallErrorConstruction` is the single named
-construction obligation: it must derive the required successor witness from the
-paper hypotheses by the induction argument of Section 6.
+does not present those records as acceptable public inputs.  The later
+successor repair proves `mainInductionSuccessorNext_ofSmallErrorConstruction`
+for the corrected large-\(k\) interface.
 
 **Status:** the role-register construction is no longer a separate
-`mainFormal` gap.  It is part of the remaining native successor proof for
-`thm:main-induction`.
+`mainFormal` gap.  The remaining source-facing work is the two-space
+source-boundary assembly and the printed \(k\ge md\) range.
 
 ### Field 2: `postRoleDiagonalCompletion : MainFormalDiagonalCompletionWitness`
 
@@ -289,15 +412,16 @@ The current internal proof obligations are:
 
 | Component | Mathematical role | Present status |
 |-----------|-------------------|----------------|
-| Degree-zero branch | Produce the family and scalar estimates when `params.d = 0` | Isolated by the checked degree-split assembly |
 | Predecessor induction | Apply `thm:main-induction` to each answer-valued restricted predecessor slice | Still the genuine recursive part |
-| Positive-degree slice realization | Build the answer-valued slice transport and self-improvement data when `0 < params.d` | Reduced to the checked stage interfaces |
+| Answer-valued slice realization | Build the slice self-improvement data for the answer-valued restricted interface | Discharged by `AnswerSelfImprovementData.ofAnswerCarrier` |
 | Scalar absorption | Verify that the accumulated losses are bounded by `mainInductionError params.next k eps delta gamma` | Partly assembled; remaining estimates belong to #1507 |
 
 The rejected historical route was to add records encoding these objects to
 `mainFormal`, or to a paper-facing successor theorem.  That route would
 strengthen the source statement.  The present route keeps the objects internal
-to the Section 6 proof.
+to the Section 6 proof.  The former degree-zero family route is now only a
+retained checked reduction; the active recursive-slice route applies also when
+`params.d = 0`.
 
 ## 6. Relationship to earlier trackers
 

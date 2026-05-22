@@ -124,13 +124,16 @@ private lemma liftedVerticalLineConsistency
       (B := liftedVerticalLineAnswerFamily params strategy)
       (δ := η)).mpr (by simpa [CommutativityPoints.pointNextEquiv] using hprod_next)
 
-/-- Convert source-style vertical-line consistency to point consistency.
+/-- Convert source-style vertical-line consistency to point consistency using only
+the axis-parallel and self-consistency estimates.
 
 This is the main estimate in `cor:h-a-consistency`, stated without the
 intermediate `HBConsistencyStatement` type.  It takes only the line-consistency estimate
 for a candidate polynomial submeasurement `H`, restricts that estimate to the
 point on each vertical line, and then applies the good-strategy
-point-to-vertical-line comparison.
+point-to-vertical-line comparison.  The diagonal-line estimate in
+`strategy.IsGood` is not used in this transport step; it enters earlier in the
+construction of the line-consistency estimate.
 
 Paper reference: `cor:h-a-consistency` proof in `ld-pasting.tex`
 lines 1098–1117.
@@ -143,13 +146,14 @@ Steps:
 The completion and large-`k` hypotheses are carried by the downstream
 completed-measurement theorem; this submeasurement argument only uses the positive
 `k` regime and the displayed line-consistency estimate. -/
-theorem hAConsistency_submeas_from_lineConsistency
+theorem hAConsistency_submeas_from_lineConsistency_of_axis_self
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (H : SubMeas (Polynomial params.next) ι)
     (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
     (hgamma_nonneg : 0 ≤ gamma)
     (hzeta_nonneg : 0 ≤ zeta)
     (k : ℕ)
@@ -190,23 +194,23 @@ theorem hAConsistency_submeas_from_lineConsistency
     simpa [SymStrat.selfConsistencyFailureProbability] using
       bipartiteSSCError_uniform_le_one strategy.state strategy.isNormalized
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-  have hgood_small : strategy.IsGood eps' delta' gamma := by
-    refine ⟨?_, ?_, hgood.diagonalLineTest⟩
-    · exact le_min hgood.axisParallelTest haxis_le_one
-    · exact le_min hgood.selfConsistencyTest hself_le_one
+  have haxis_small : strategy.axisParallelFailureProbability ≤ eps' :=
+    le_min haxis haxis_le_one
+  have hself_small : strategy.selfConsistencyFailureProbability ≤ delta' :=
+    le_min hself_good hself_le_one
   have heps_nonneg : 0 ≤ eps := by
     exact le_trans
       (bipartiteConsError_nonneg strategy.state
         (uniformDistribution (AxisParallelTestSample params.next))
         (axisParallelPointAnswerFamily strategy)
         (axisParallelLineAnswerFamily strategy))
-      hgood.axisParallelTest
+      haxis
   have hdelta_nonneg : 0 ≤ delta := by
     exact le_trans
       (bipartiteSSCError_nonneg strategy.state
         (uniformDistribution (Point params.next))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-      hgood.selfConsistencyTest
+      hself_good
   have hline_prod :
       ConsRel strategy.state (uniformDistribution (VerticalLineQuestion params × Fq params))
         (fun ux => hRestrictionToVerticalLine params H ux.1)
@@ -248,12 +252,13 @@ theorem hAConsistency_submeas_from_lineConsistency
       (uniformDistribution (Point params.next))
       (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointLineMeas))
       (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
-        (8 * (params.m : Error) * eps' + 4 * delta') := by
+      (8 * (params.m : Error) * eps' + 4 * delta') := by
     exact Preliminaries.sddRel_symm strategy.state
       (uniformDistribution (Point params.next))
       _ _ _
       (by simpa [pointLineMeas, eps', delta'] using
-        MIPStarRE.LDT.Pasting.pointVerticalLineSdd params strategy eps' delta' gamma hgood_small)
+        (MIPStarRE.LDT.Pasting.pointVerticalLineSdd_of_axis_self
+          params strategy eps' delta' haxis_small hself_small))
   have htri :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (polynomialEvaluationFamily params.next H)
@@ -291,6 +296,62 @@ theorem hAConsistency_submeas_from_lineConsistency
       exact hAConsistency_error_le_nu_of_pos params eps delta gamma zeta k hk_pos
         heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
 
+/-- Convert source-style vertical-line consistency to point consistency.
+
+This source-style wrapper specializes
+`hAConsistency_submeas_from_lineConsistency_of_axis_self` to the two estimates
+contained in `strategy.IsGood`. -/
+theorem hAConsistency_submeas_from_lineConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (H : SubMeas (Polynomial params.next) ι)
+    (eps delta gamma zeta : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k)
+    (hline :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (hRestrictionToVerticalLine params H)
+        (verticalLineMeasurementFamily params strategy)
+        (hBConsistencyError params eps delta gamma zeta k)) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next H)
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) := by
+  exact hAConsistency_submeas_from_lineConsistency_of_axis_self params strategy H
+    eps delta gamma zeta hgood.axisParallelTest hgood.selfConsistencyTest
+    hgamma_nonneg hzeta_nonneg k hk_pos hline
+
+/-- Specialization of `hAConsistency_submeas_from_lineConsistency` to the
+constructed pasted submeasurement. -/
+private lemma hAConsistency_submeas_core_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (family : IdxPolyFamily params ι)
+    (eps delta gamma zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k)
+    (hHB : HBConsistencyStatement params strategy family
+        eps delta gamma zeta k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+        (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) := by
+  exact hAConsistency_submeas_from_lineConsistency_of_axis_self params strategy
+    (constructedPastedSubMeas params family k) eps delta gamma zeta
+    haxis hself_good hgamma_nonneg hzeta_nonneg k hk_pos hHB.lineConsistency
+
 /-- Specialization of `hAConsistency_submeas_from_lineConsistency` to the
 constructed pasted submeasurement. -/
 private lemma hAConsistency_submeas_core
@@ -312,9 +373,126 @@ private lemma hAConsistency_submeas_core
           (constructedPastedSubMeas params family k))
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) := by
-  exact hAConsistency_submeas_from_lineConsistency params strategy
-    (constructedPastedSubMeas params family k) eps delta gamma zeta
-    hgood hgamma_nonneg hzeta_nonneg k hk_pos hHB.lineConsistency
+  exact hAConsistency_submeas_core_of_axis_self params strategy family
+    eps delta gamma zeta hgood.axisParallelTest hgood.selfConsistencyTest
+    hgamma_nonneg hzeta_nonneg k hk_pos hHB
+
+/-- Internal form of `cor:h-a-consistency` from the one-point sandwich estimates.
+
+This theorem separates the genuinely earlier pasting input from the diagonal
+test.  Once the estimates of `lem:ld-sandwich-line-one-point` are known for all
+positions, the passage from `H-B` consistency to `H-A` consistency uses only the
+axis-parallel and self-consistency estimates of the ambient strategy. -/
+theorem hAConsistency_submeas_ofLinePointBounds_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k)
+    (hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) := by
+  have hHB := hBConsistency_ofLinePointBounds_of_axis_self params strategy
+    eps delta gamma zeta haxis hself_good hgamma_nonneg hd
+    family hcons hself hbound k hline
+  exact hAConsistency_submeas_core_of_axis_self params strategy family
+    eps delta gamma zeta haxis hself_good hgamma_nonneg hzeta_nonneg k hk_pos hHB
+
+/-- Internal form of `cor:h-a-consistency` from `cor:G-hat-facts`.
+
+This is the same proof as
+`hAConsistency_submeas_ofLinePointBounds_of_axis_self`, with the one-point
+sandwich estimates constructed from `GHatFactsStatement`. -/
+theorem hAConsistency_submeas_ofGHatFacts_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le : zeta ≤ 1)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (hfacts : GHatFactsStatement params strategy.state family gamma zeta)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) := by
+  have hline : ∀ i : ℕ, i < k →
+      LdSandwichLineOnePointStatement params strategy family
+        eps delta gamma zeta k i := by
+    intro i hi
+    exact ldSandwichLineOnePoint_ofGHatFacts_of_axis_self params strategy
+      eps delta gamma zeta haxis hself_good hgamma_nonneg hzeta_le
+      family hcons hfacts k i hi
+  exact hAConsistency_submeas_ofLinePointBounds_of_axis_self params strategy
+    eps delta gamma zeta haxis hself_good hgamma_nonneg hzeta_nonneg hd
+    family hcons hself hbound k hk_pos hline
+
+/-- Internal form of `cor:h-a-consistency` from the Section 11 commutativity
+conclusion.
+
+This exposes the precise upstream mathematical input needed for the `G-hat`
+construction.  The diagonal-line estimate is not used in the `H-B` to `H-A`
+transport; it is used only insofar as it is needed to prove the commutativity
+conclusion supplied here. -/
+theorem hAConsistency_submeas_ofComMain_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself_good : strategy.selfConsistencyFailureProbability ≤ delta)
+    (hgamma_nonneg : 0 ≤ gamma)
+    (hgamma_le : gamma ≤ 1)
+    (hzeta_nonneg : 0 ≤ zeta)
+    (hzeta_le : zeta ≤ 1)
+    (hdq_le : params.d ≤ params.q)
+    (hd : 0 < params.d)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    (hself : family.StronglySelfConsistent strategy.state zeta)
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
+    (hcom : Commutativity.ComMainConclusion params strategy family gamma zeta)
+    (k : ℕ)
+    (hk_pos : 1 ≤ k) :
+    ConsRel strategy.state (uniformDistribution (Point params.next))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params.next
+          (constructedPastedSubMeas params family k))
+        (MainInductionStep.ldPastingInInductionNu params k
+          eps delta gamma zeta) := by
+  have hfacts : GHatFactsStatement params strategy.state family gamma zeta :=
+    gHatFacts_ofComMainAndSelfConsistency params strategy family gamma zeta
+      hgamma_nonneg hgamma_le hzeta_nonneg hzeta_le hdq_le hcom hself
+  exact hAConsistency_submeas_ofGHatFacts_of_axis_self params strategy
+    eps delta gamma zeta haxis hself_good hgamma_nonneg hzeta_nonneg
+    hzeta_le hd family hcons hself hbound hfacts k hk_pos
 
 /-- `cor:h-a-consistency`.
 

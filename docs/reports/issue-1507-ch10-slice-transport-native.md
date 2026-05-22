@@ -1,5 +1,13 @@
 # Issue #1507: Chapter 10 Slice-Transport Native Link Audit
 
+> **Status note, 2026-05-21.**  The slice-transport node remains a Lean-only
+> internal interface.  The earlier issue-#1230 SDP slackness dependency in
+> `selfImprovementInInductionSection` has since been discharged; that theorem is
+> now axiom-clean and marked as proved in the blueprint.  The answer-valued
+> self-improvement data are now constructed by the carrier route.  The remaining
+> issue #1507 work is the construction of the predecessor induction data inside
+> `mainInductionSuccessorNext_ofSmallErrorConstruction`.
+
 This note records the repair of the public dependency-graph node
 `def:self-improvement-slice-transport`, inspected from the GitHub Pages
 `github-pages` worktree at commit `f6338de65`.  The node appeared with a blue
@@ -51,4 +59,4 @@ files no longer depend on it.
 | Declaration or node | Paper assumptions | Lean assumptions | Paper conclusion | Lean conclusion | Verdict |
 |---|---|---|---|---|---|
 | `def:self-improvement-slice-transport` | Successor-step slice strategies and self-improvement outputs from `inductive_step.tex:461-485` | Concrete ordinary and answer-valued slice transport structures, plus the existing `selfImprovementInInductionSection` theorem | Slice-wise self-improvement data used before pasting | Ordinary and answer-valued `SelfImprovementData` records | Lean-only internal bookkeeping; faithfully linked under a definition node |
-| `selfImprovementInInductionSection` | Good symmetric strategy, complete polynomial measurement `G`, and consistency with the point measurement | Same formal encoding, with `FieldModel` and finite-type instances | Projective submeasurement with completeness, consistency, strong self-consistency, and boundedness | `SelfImprovementInInductionSectionConclusion` | Source-facing statement; proof still transitively depends on issue #1230 and is not marked proof-`\leanok` |
+| `selfImprovementInInductionSection` | Good symmetric strategy, complete polynomial measurement `G`, and consistency with the point measurement | Same formal encoding, with `FieldModel` and finite-type instances | Projective submeasurement with completeness, consistency, strong self-consistency, and boundedness | `SelfImprovementInInductionSectionConclusion` | Source-facing statement; axiom-clean and marked proof-`\leanok`.  It is not the remaining issue-#1507 gap. |

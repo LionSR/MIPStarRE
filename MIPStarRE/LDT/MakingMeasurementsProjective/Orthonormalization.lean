@@ -182,8 +182,8 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
 
 /-- Measurement-level orthonormalization for a complete measurement.
 
-This is a source-shaped corollary of `lem:orthonormalization-main-lemma`; it
-does not assume the proof-stage spectral-truncation or repair data. -/
+This is the measurement-level corollary of `lem:orthonormalization-main-lemma`;
+it does not assume the proof-stage spectral-truncation or repair data. -/
 lemma orthonormalizationMeasurement {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -254,6 +254,97 @@ lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
       orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError ζ hζ
     simpa [consistencyToAlmostProjectiveError] using
       htwo
+  refine ⟨P, ?_⟩
+  rcases hP with ⟨hP⟩
+  exact ⟨hP.trans hbound⟩
+
+/-- Heterogeneous measurement-level orthonormalization from cross consistency.
+
+This is the two-space form of `lem:orthonormalization-main-lemma` needed in the
+source proof of `thm:main-formal`: if complete measurements `A` and `B` on
+possibly different local spaces are consistent on a bipartite state, then `A`
+has a projective submeasurement close on Alice's tensor factor.  No
+permutation-invariance or same-space identification is used.
+
+**Faithful encoding:** Paper origin:
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/projectivization.tex`; the heterogeneous form is the
+two-space tensor-factor version needed by the source proof. -/
+lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_heterogeneous
+    {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily B.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ιA,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) A.toSubMeas))
+          (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) P.toSubMeas))
+          (orthonormalizationError ζ) := by
+  intro hCons
+  obtain ⟨P, hP⟩ :=
+    orthonormalizationMainLemma (ψ := ψ) (hψ := hψ) (A := A) (B := B)
+      (ζ := ζ) hζ hCons
+  have hbound :
+      orthonormalizationMainLemmaError ζ ≤ orthonormalizationError ζ :=
+    Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError
+      ζ hζ
+  refine ⟨P, ?_⟩
+  rcases hP with ⟨hP⟩
+  exact ⟨hP.trans hbound⟩
+
+/-- Heterogeneous measurement-level orthonormalization on Bob's tensor factor.
+
+This is the right-register counterpart of
+`orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_heterogeneous`.
+If complete measurements `A` and `B` are consistent on a bipartite state, then
+`B` has a projective submeasurement close on Bob's tensor factor.  No
+same-space identification or permutation-invariance hypothesis is used.
+
+**Faithful encoding:** Paper origin:
+`references/ldt-paper/test_definition.tex:180-202` and
+`references/ldt-paper/projectivization.tex`; the heterogeneous form is the
+two-space tensor-factor version needed by the source proof. -/
+lemma orthonormalizationMeasurement_right_of_consistency_from_projectivizationRepair_heterogeneous
+    {Outcome : Type*}
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB))
+    (hψ : ψ.IsNormalized)
+    (A : Measurement Outcome ιA) (B : Measurement Outcome ιB) (ζ : Error)
+    (hζ : 0 ≤ ζ) :
+    ConsRel ψ (uniformDistribution Unit)
+      (constSubMeasFamily A.toSubMeas)
+      (constSubMeasFamily B.toSubMeas) ζ →
+      ∃ P : ProjSubMeas Outcome ιB,
+        SDDRel ψ (uniformDistribution Unit)
+          (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) B.toSubMeas))
+          (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) P.toSubMeas))
+          (orthonormalizationError ζ) := by
+  intro hCons
+  classical
+  have hAlmost :
+      MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
+        ψ (rightLiftedMeasurement (ιA := ιA) B)
+        (consistencyToAlmostProjectiveError ζ) := by
+    exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective_right
+      (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
+  obtain ⟨P, hP⟩ :=
+    rightPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+      (ψ := ψ) (hψ := hψ) (B := B) (ζ := ζ) hζ <| by
+        simpa [consistencyToAlmostProjectiveError] using
+          hAlmost.sourceAlmostProjective
+  have hbound :
+      orthonormalizationMainLemmaError ζ ≤ orthonormalizationError ζ :=
+    Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError
+      ζ hζ
   refine ⟨P, ?_⟩
   rcases hP with ⟨hP⟩
   exact ⟨hP.trans hbound⟩

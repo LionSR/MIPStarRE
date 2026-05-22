@@ -498,4 +498,321 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
             rfl
     _ ≤ pointDiagonalLineApproxError params gamma := hbase
 
+/-- Evaluate each answer-valued restricted diagonal measurement at the
+distinguished base parameter `zeroCoord`. -/
+private noncomputable def rawAnswerDiagonalLineAnswerFamily
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+  fun s =>
+    let v := extendRestrictedDirection j s.2
+    postprocess
+      ((strategy.diagonalMeasurement { base := s.1, direction := v }).toSubMeas)
+      (· zeroCoord)
+
+/-- The answer-valued diagonal-line test controls the final restricted
+diagonal slice. -/
+private lemma answer_sampledDiagonalLineConsistency
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    ConsRel strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params (lastRestrictionIndex params)))
+      (AnswerSymStrat.diagonalPointAnswerFamily strategy (lastRestrictionIndex params))
+      (rawAnswerDiagonalLineAnswerFamily params strategy (lastRestrictionIndex params))
+      (restrictedDiagonalLinesConsistencyError params gamma) := by
+  let j := lastRestrictionIndex params
+  let err : Fin params.m → Error := fun j =>
+    bipartiteConsError strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j))
+      (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
+      (rawAnswerDiagonalLineAnswerFamily params strategy j)
+  have herr_nonneg : ∀ j : Fin params.m, 0 ≤ err j := by
+    intro j'
+    exact bipartiteConsError_nonneg strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j'))
+      (AnswerSymStrat.diagonalPointAnswerFamily strategy j')
+      (rawAnswerDiagonalLineAnswerFamily params strategy j')
+  have hsum_bound : ∑ j' : Fin params.m, err j' ≤ gamma * (params.m : Error) := by
+    have hm_nonneg : 0 ≤ (params.m : Error) := by
+      positivity
+    have hm_ne : (params.m : Error) ≠ 0 := by
+      exact_mod_cast Nat.ne_of_gt params.hm
+    have hdiag := hgood.diagonalLineTest
+    dsimp [AnswerSymStrat.diagonalFailureProbability, err,
+      AnswerSymStrat.diagonalLineAnswerFamily, rawAnswerDiagonalLineAnswerFamily] at hdiag
+    calc
+      ∑ j' : Fin params.m, err j'
+        = (params.m : Error) * ((1 / (params.m : Error)) * ∑ j' : Fin params.m, err j') := by
+            field_simp [hm_ne]
+      _ ≤ (params.m : Error) * gamma := by
+            exact mul_le_mul_of_nonneg_left hdiag hm_nonneg
+      _ = gamma * (params.m : Error) := by ring
+  have hj_le : err j ≤ gamma * (params.m : Error) := by
+    calc
+      err j ≤ ∑ j' : Fin params.m, err j' := by
+        exact Finset.single_le_sum (fun j' _ => herr_nonneg j') (Finset.mem_univ j)
+      _ ≤ gamma * (params.m : Error) := hsum_bound
+  refine ⟨?_⟩
+  simpa [j, err, restrictedDiagonalLinesConsistencyError] using hj_le
+
+/-- The answer-valued restricted diagonal test gives the same SDD
+approximation at the final restriction index as the ordinary diagonal test. -/
+private lemma answer_sampledDiagonalLineApproximation
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    SDDRel strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params (lastRestrictionIndex params)))
+      (IdxSubMeas.liftLeft
+        (AnswerSymStrat.diagonalPointAnswerFamily strategy (lastRestrictionIndex params)))
+      (IdxSubMeas.liftRight
+        (rawAnswerDiagonalLineAnswerFamily params strategy (lastRestrictionIndex params)))
+      (pointDiagonalLineApproxError params gamma) := by
+  let j := lastRestrictionIndex params
+  let pointFamily : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+    fun s => (strategy.pointMeasurement s.1).toMeasurement
+  let lineFamily : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+    fun s =>
+      { toSubMeas := rawAnswerDiagonalLineAnswerFamily params strategy j s
+        total_eq_one := by
+          dsimp [rawAnswerDiagonalLineAnswerFamily]
+          rw [postprocess_total]
+          exact
+            (strategy.diagonalMeasurement
+              { base := s.1
+                direction := extendRestrictedDirection j s.2 }).total_eq_one }
+  have hcons := answer_sampledDiagonalLineConsistency params strategy eps delta gamma hgood
+  have hcons' :
+      ConsRel strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (IdxMeas.toIdxSubMeas pointFamily)
+        (IdxMeas.toIdxSubMeas lineFamily)
+        (restrictedDiagonalLinesConsistencyError params gamma) := by
+    simpa [j, pointFamily, lineFamily, AnswerSymStrat.diagonalPointAnswerFamily,
+      rawAnswerDiagonalLineAnswerFamily, IdxMeas.toIdxSubMeas] using hcons
+  have happrox :
+      Preliminaries.BipartiteSDDRel strategy.state
+        (uniformDistribution (RestrictedDiagonalSample params j))
+        (IdxMeas.toIdxSubMeas pointFamily)
+        (IdxMeas.toIdxSubMeas lineFamily)
+        (2 * restrictedDiagonalLinesConsistencyError params gamma) :=
+    Preliminaries.simeqToApprox strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params j))
+      pointFamily lineFamily
+      (restrictedDiagonalLinesConsistencyError params gamma) hcons'
+  refine ⟨?_⟩
+  simpa [j, pointFamily, lineFamily, AnswerSymStrat.diagonalPointAnswerFamily,
+    pointDiagonalLineApproxError, restrictedDiagonalLinesConsistencyError,
+    Preliminaries.BipartiteSDDRel, sddError, IdxMeas.toIdxSubMeas,
+    IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+    happrox.leftRightSquaredDistanceBound
+
+/-- Answer-valued version of
+`sampledDiagonalLineApproximation_pointWithDiagonalLine`.
+
+This is the Section 10 diagonal approximation needed by the answer-valued
+commutativity route: it uses the answer-valued diagonal verifier relation
+directly and does not pass through an ordinary dummy diagonal measurement. -/
+lemma answer_sampledDiagonalLineApproximation_pointWithDiagonalLine
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma) :
+    SDDRel strategy.state
+      (pointWithDiagonalLineDistribution params)
+      (IdxSubMeas.liftLeft
+        (fun q =>
+          (strategy.pointMeasurement (sampledPointFromDiagonalQuestion params q)).toSubMeas))
+      (IdxSubMeas.liftRight
+        (fun q =>
+          postprocess ((strategy.diagonalMeasurement q.1).toSubMeas) (fun f => f q.2)))
+      (pointDiagonalLineApproxError params gamma) := by
+  let j := lastRestrictionIndex params
+  let e := rebasedLastRestrictedQuestionEquiv params
+  rcases answer_sampledDiagonalLineApproximation params strategy eps delta gamma hgood with
+    ⟨hbase⟩
+  let f : PointDiagonalLineQuestion params → Error := fun q =>
+    qSDD strategy.state
+      ((IdxSubMeas.liftLeft
+        (fun q =>
+          (strategy.pointMeasurement (sampledPointFromDiagonalQuestion params q)).toSubMeas)) q)
+      ((IdxSubMeas.liftRight
+        (fun q => postprocess ((strategy.diagonalMeasurement q.1).toSubMeas)
+          (fun f => f q.2))) q)
+  have hreindex :
+      avgOver (pointWithDiagonalLineDistribution params) f =
+        avgOver
+          (uniformDistribution (RestrictedDiagonalSample params j × Fq params))
+          (fun st => f (e st)) := by
+    symm
+    simpa [pointWithDiagonalLineDistribution, f] using
+      (MIPStarRE.LDT.avgOver_uniform_equiv e (fun st => f (e st)))
+  let g : RestrictedDiagonalSample params j → Error := fun s =>
+    qSDD strategy.state
+      ((IdxSubMeas.liftLeft (AnswerSymStrat.diagonalPointAnswerFamily strategy j)) s)
+      ((IdxSubMeas.liftRight (rawAnswerDiagonalLineAnswerFamily params strategy j)) s)
+  have hignore :
+      avgOver
+          (uniformDistribution (RestrictedDiagonalSample params j × Fq params))
+          (fun st => g st.1) =
+        avgOver (uniformDistribution (RestrictedDiagonalSample params j)) g := by
+    exact avgOver_uniform_fst g
+  refine ⟨?_⟩
+  calc
+    sddError strategy.state
+        (pointWithDiagonalLineDistribution params)
+        (IdxSubMeas.liftLeft
+          (fun q =>
+            (strategy.pointMeasurement (sampledPointFromDiagonalQuestion params q)).toSubMeas))
+        (IdxSubMeas.liftRight
+          (fun q => postprocess ((strategy.diagonalMeasurement q.1).toSubMeas)
+            (fun f => f q.2)))
+      = avgOver (pointWithDiagonalLineDistribution params) f := by
+          rfl
+    _ = avgOver
+          (uniformDistribution (RestrictedDiagonalSample params j × Fq params))
+          (fun st => f (e st)) := hreindex
+    _ = avgOver
+          (uniformDistribution (RestrictedDiagonalSample params j × Fq params))
+          (fun st =>
+            qSDD strategy.state
+              ((IdxSubMeas.liftLeft
+                (AnswerSymStrat.diagonalPointAnswerFamily strategy j)) st.1)
+              ((IdxSubMeas.liftRight
+                  (rawAnswerDiagonalLineAnswerFamily params strategy j)) st.1)) := by
+            apply avgOver_congr
+            rintro ⟨s, t⟩
+            let ℓ₀ : DiagonalLine params := lastRestrictedSampleEquivDiagonalLine params s
+            have hpoint : sampledPointFromDiagonalQuestion params (e (s, t)) = s.1 := by
+              change (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t)).pointAt t = s.1
+              calc
+                (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t)).pointAt t
+                  = ℓ₀.pointAt (addCoord (subCoord zeroCoord t) t) := by
+                      simpa using
+                        DiagonalLine.rebaseAt_pointAt ℓ₀ (subCoord zeroCoord t) t
+                _ = ℓ₀.pointAt zeroCoord := by simp
+                _ = s.1 := by
+                      rcases s with ⟨u, free⟩
+                      funext i
+                      simp [ℓ₀, lastRestrictedSampleEquivDiagonalLine, DiagonalLine.pointAt,
+                        addPoint, smulPoint, zeroCoord, addCoord, mulCoord]
+            have hA : ∀ a,
+                (((IdxSubMeas.liftLeft
+                    (fun q => (strategy.pointMeasurement
+                      (sampledPointFromDiagonalQuestion params q)).toSubMeas))
+                      (e (s, t))).outcome a) =
+                  (((IdxSubMeas.liftLeft
+                    (AnswerSymStrat.diagonalPointAnswerFamily strategy j)) s).outcome a) := by
+              intro a
+              simp [IdxSubMeas.liftLeft, AnswerSymStrat.diagonalPointAnswerFamily, hpoint]
+            have hB : ∀ a,
+                (((IdxSubMeas.liftRight
+                    (fun q => postprocess ((strategy.diagonalMeasurement q.1).toSubMeas)
+                      (fun f => f q.2))) (e (s, t))).outcome a) =
+                  (((IdxSubMeas.liftRight
+                      (rawAnswerDiagonalLineAnswerFamily params strategy j)) s).outcome a) := by
+              intro a
+              have hline :
+                  (postprocess
+                    ((strategy.diagonalMeasurement (e (s, t)).1).toSubMeas)
+                    (fun f => f (e (s, t)).2)).outcome a =
+                    (rawAnswerDiagonalLineAnswerFamily params strategy j s).outcome a := by
+                have htransport :=
+                  strategy.diagonalMeasurement.transportInvariant
+                    (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t)) t
+                have hpost :
+                    postprocess
+                        ((ProjMeas.transport
+                          (DiagonalLineAnswer.reparamAtEquiv (params := params) t)
+                          (strategy.diagonalMeasurement
+                            (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t)))).toSubMeas)
+                        (fun f : DiagonalLineAnswer params => f t) =
+                      postprocess
+                        ((strategy.diagonalMeasurement
+                          (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t))).toSubMeas)
+                        (fun f : DiagonalLineAnswer params => f (addCoord t t)) := by
+                  simpa [ProjMeas.transport, Measurement.transport] using
+                    (SubMeas.postprocess_transport
+                      (e := DiagonalLineAnswer.reparamAtEquiv (params := params) t)
+                      (A := (strategy.diagonalMeasurement
+                        (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t))).toSubMeas)
+                      (f := fun f : DiagonalLineAnswer params => f t))
+                calc
+                  (postprocess
+                    ((strategy.diagonalMeasurement (e (s, t)).1).toSubMeas)
+                    (fun f => f (e (s, t)).2)).outcome a
+                    = (postprocess
+                        ((strategy.diagonalMeasurement
+                          (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t))).toSubMeas)
+                        (fun f : DiagonalLineAnswer params => f t)).outcome a := by
+                          simp [e, rebasedLastRestrictedQuestionEquiv, ℓ₀]
+                  _ = (postprocess
+                        ((ProjMeas.transport
+                          (DiagonalLineAnswer.reparamAtEquiv (params := params)
+                            (subCoord zeroCoord t))
+                          (strategy.diagonalMeasurement ℓ₀)).toSubMeas)
+                        (fun f : DiagonalLineAnswer params => f t)).outcome a := by
+                          rw [strategy.diagonalMeasurement.transportInvariant ℓ₀
+                            (subCoord zeroCoord t)]
+                  _ = (postprocess
+                        ((strategy.diagonalMeasurement ℓ₀).toSubMeas)
+                        (fun f : DiagonalLineAnswer params =>
+                          f (addCoord (subCoord zeroCoord t) t))).outcome a := by
+                          have h :=
+                            SubMeas.postprocess_transport
+                              (e := DiagonalLineAnswer.reparamAtEquiv (params := params)
+                                (subCoord zeroCoord t))
+                              (A := (strategy.diagonalMeasurement ℓ₀).toSubMeas)
+                              (f := fun f : DiagonalLineAnswer params => f t)
+                          simpa [ProjMeas.transport, Measurement.transport,
+                            DiagonalLineAnswer.reparamAtEquiv,
+                            DiagonalLineAnswer.reparamAt] using
+                            congrArg (fun M : SubMeas (Fq params) ι => M.outcome a) h
+                  _ = (postprocess
+                        ((strategy.diagonalMeasurement ℓ₀).toSubMeas)
+                        (fun f : DiagonalLineAnswer params => f zeroCoord)).outcome a := by
+                          simp
+                  _ = (rawAnswerDiagonalLineAnswerFamily params strategy j s).outcome a := by
+                          rcases s with ⟨u, free⟩
+                          change
+                            (postprocess
+                              ((strategy.diagonalMeasurement
+                                { base := u,
+                                  direction :=
+                                    lastRestrictedDirectionEquiv params free
+                                }).toSubMeas)
+                              (fun f : DiagonalLineAnswer params => f zeroCoord)).outcome a =
+                            (postprocess
+                              ((strategy.diagonalMeasurement
+                                { base := u,
+                                  direction :=
+                                    extendRestrictedDirection
+                                      (lastRestrictionIndex params) free
+                                }).toSubMeas)
+                              (fun f : DiagonalLineAnswer params => f zeroCoord)).outcome a
+                          simp [lastRestrictedDirectionEquiv]
+              simpa [IdxSubMeas.liftRight] using
+                congrArg (fun X => rightTensor (ι₁ := ι) X) hline
+            unfold f qSDD qSDDCore
+            apply Finset.sum_congr rfl
+            intro a _
+            rw [hA a, hB a]
+    _ = avgOver (uniformDistribution (RestrictedDiagonalSample params j))
+          g := by
+            exact hignore
+    _ = sddError strategy.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (IdxSubMeas.liftLeft (AnswerSymStrat.diagonalPointAnswerFamily strategy j))
+          (IdxSubMeas.liftRight (rawAnswerDiagonalLineAnswerFamily params strategy j)) := by
+            rfl
+    _ ≤ pointDiagonalLineApproxError params gamma := hbase
+
 end MIPStarRE.LDT.CommutativityPoints

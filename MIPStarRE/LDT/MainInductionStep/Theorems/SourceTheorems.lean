@@ -3,10 +3,9 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 /-!
 # Section 6 — Source-boundary induction theorems
 
-This module records the printed source-range statement of `thm:main-induction`
-and its companion source-range theorems, together with the public
-restricted-probability constructors used by the final soundness handoff.  The
-corrected large-`k` interface remains in `MainTheorems`.
+This module contains the printed source-range wrappers for `thm:main-induction`,
+together with the public restricted-probability constructors used by the final
+soundness handoff.  The corrected large-`k` interface remains in `MainTheorems`.
 
 ## References
 
@@ -31,7 +30,7 @@ not covered by the corrected large-`k` interface: the positive-degree,
 non-base, small-error branch inside the interval
 `params.m * params.d ≤ k < 400 * params.m * params.d`, under the branch
 conditions `0 < params.d`, `params.m ≠ 1`, and the derived side condition
-`1 ≤ k`.  It is not an additional hypothesis of the paper theorem; the reduction
+`1 ≤ k`.  It is not an additional hypothesis of the paper theorem; the wrapper
 `mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation` proves `1 ≤ k`
 from `params.m * params.d ≤ k`, `params.hm`, and `0 < params.d`.  Rather, this
 records the missing scalar-range argument documented in
@@ -44,8 +43,13 @@ a weaker pasting-and-cascade route.  The base case is already proved by
 `mainInductionBaseCase`, and the large-error branch of the same interval is
 already proved by `mainInductionOfOneLeError`.  The degree-zero branch is empty
 because `k < 400 * params.m * 0` is impossible, and the `1 ≤ k` side condition
-is derived in this reduction.  None of these branches is part of this
-positive-degree non-base obligation.
+is derived in the wrapper.  None of these branches is part of this
+positive-degree non-base obligation.  The remaining small-error interval is
+not vacuous: for instance, with \(m=2\), \(k=2d\), sufficiently large \(d\), and
+\(\varepsilon=\delta=\gamma=0\), taking \(q\) sufficiently large makes the
+displayed main-induction error smaller than \(1\) while still satisfying
+\(md\le k<400md\).  Thus this theorem cannot be discharged merely by
+contradicting the small-error hypothesis.
 
 **Unfaithful:** This proof currently contains the tracked `sorry` for the source
 interval `params.m * params.d ≤ k < 400 * params.m * params.d` in the
@@ -74,7 +78,7 @@ theorem mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation
         (mainInductionError params k eps delta gamma) := by
   sorry
 
-/-- Positive-degree non-base small-error source-range reduction for
+/-- Positive-degree non-base small-error source-range wrapper for
 `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:7-18`.
@@ -114,7 +118,7 @@ theorem mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation
     mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation
       params strategy eps delta gamma k hgood hk hsmallK hsmall hd hk_pos hm1
 
-/-- Non-base small-error source-range reduction for `thm:main-induction`.
+/-- Non-base small-error source-range wrapper for `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:7-18`.
 
@@ -155,7 +159,7 @@ theorem mainInduction_sourceRangeSmallErrorNonBaseObligation
       have hd_zero : params.d = 0 := Nat.eq_zero_of_not_pos hd
       simp [hd_zero] at hsmallK
 
-/-- Small-error source-range reduction for `thm:main-induction`.
+/-- Small-error source-range wrapper for `thm:main-induction`.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:7-18`.
 
@@ -246,20 +250,17 @@ polynomial measurement point-consistent with the point measurement at the error
 paper but not yet covered by the current formal proof route,
 `params.m * params.d ≤ k < 400 * params.m * params.d`.  This discrepancy is
 documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  In the
-covered range, the proof still inherits the named small-error construction
-obligation `mainInductionSuccessorNext_ofSmallErrorConstruction`, tracked by
-issue #1507 under #1458.  The uncovered source range is isolated as the named
-internal obligation `mainInduction_sourceRangeObligation`, rather than being
-added as a hypothesis or replacing the paper statement by the strengthened
-large-`k` interface.
+covered range, the corrected large-`k` interface `mainInduction` is checked.
+The uncovered source range is isolated as the named internal obligation
+`mainInduction_sourceRangeObligation`, rather than being added as a hypothesis
+or replacing the paper statement by the strengthened large-`k` interface.
 
-**Unfaithful:** The proof currently uses two tracked proof obligations:
-`mainInductionSuccessorNext_ofSmallErrorConstruction` in the covered large-`k`
-range and `mainInduction_sourceRangeObligation` in the remaining source range.
-These obligations are not derived from
-`references/ldt-paper/inductive_step.tex:7-18`.  Documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`, issue #1507, and issue
-#1458.  Elimination: discharge both named obligations while keeping the printed
+**Unfaithful:** The proof currently uses the tracked source-range obligation
+`mainInduction_sourceRangeObligation` for the interval
+`params.m * params.d ≤ k < 400 * params.m * params.d`.  This obligation is not
+derived from `references/ldt-paper/inductive_step.tex:7-18`.  Documented in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1458.
+Elimination: discharge the source-range obligation while keeping the printed
 `k ≥ m d` statement unchanged. -/
 theorem mainInduction_sourceStatement
     (params : Parameters)

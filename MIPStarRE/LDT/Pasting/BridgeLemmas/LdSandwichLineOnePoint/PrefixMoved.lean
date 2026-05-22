@@ -93,6 +93,26 @@ lemma ldSandwichLineOnePointLeftFamily_self_eq_prefixOriginal
   simp [ldSandwichLineOnePointLeftFamily, ldSandwichLineOnePointPrefixOriginalFamily]
 
 /-- Endpoint consistency for the rotated prefix family. -/
+lemma ldSandwichLineOnePointPrefixMoved_consRel_endpoint_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta zeta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself : strategy.selfConsistencyFailureProbability ≤ delta)
+    (family : IdxPolyFamily params ι)
+    (hcons : family.ConsistentWithPoints strategy zeta)
+    {k i : ℕ} (hi : i < k) :
+    ConsRel strategy.state
+      (uniformDistribution (SandwichedLineQuestion params k))
+      (ldSandwichLineOnePointPrefixMovedFamily params family hi)
+      (ldSandwichLineOnePointRightFamily params strategy family k i)
+      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
+  have hend := ldSandwichLineOnePoint_endpoint_ldGbcon_lift_of_axis_self
+    params strategy eps delta zeta haxis hself family hcons k i hi
+  simpa [ldSandwichLineOnePointPrefixMoved_eq_endpoint params strategy family hi] using hend
+
+/-- Endpoint consistency for the rotated prefix family. -/
 lemma ldSandwichLineOnePointPrefixMoved_consRel_endpoint
     (params : Parameters)
     [FieldModel params.q]
@@ -107,9 +127,9 @@ lemma ldSandwichLineOnePointPrefixMoved_consRel_endpoint
       (ldSandwichLineOnePointPrefixMovedFamily params family hi)
       (ldSandwichLineOnePointRightFamily params strategy family k i)
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  have hend := ldSandwichLineOnePoint_endpoint_ldGbcon_lift
-    params strategy eps delta gamma zeta hgood family hcons k i hi
-  simpa [ldSandwichLineOnePointPrefixMoved_eq_endpoint params strategy family hi] using hend
+  exact ldSandwichLineOnePointPrefixMoved_consRel_endpoint_of_axis_self
+    params strategy eps delta zeta hgood.axisParallelTest hgood.selfConsistencyTest
+    family hcons hi
 
 /-- Raw commutation for the nonempty prefix before adding the remaining question tail. -/
 lemma ldSandwichLineOnePointPrefixMoved_rawCommutation

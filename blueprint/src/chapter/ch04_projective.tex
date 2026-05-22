@@ -5,9 +5,10 @@
 \begin{theorem}[Naimark dilation]\label{thm:naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkTensorProductCorrelationStatement}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation}
-	% The Lean declaration is a source-shaped proof obligation for the full
-	% tensor-product correlation statement.  It is not marked \leanok until the
-	% auxiliary-register tensor assembly is formalized.  Tracked by issue #1697.
+	\leanok
+	% The Lean declaration constructs the Naimark data from the checked
+	% one-measurement theorem and the two-sided trace identity
+	% OneMeasNaimarkData.twoSidedCorrelationPreservation.
 	\uses{def:submeasurement}
 	Let $\ket{\psi}$ be a state in $\mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$.
 	Let $A = \{A^x_a\}$ be a sub-measurement acting on $\mathcal H_{\mathrm A}$
@@ -32,6 +33,7 @@
 \end{theorem}
 \begin{proof}
 	\uses{lem:naimark-helper}
+	\leanok
 
 	For each question $x$, choose a local auxiliary state
 	$\ket{\mathsf{aux}_{\mathrm A,x}}$ of dimension one larger than the number of
@@ -65,56 +67,42 @@
 
 \begin{definition}[Lean questionwise Naimark interface]\label{rem:lean-questionwise-naimark}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark, MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkStatement}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseOneMeasNaimarkData}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseOneMeasNaimarkData_source_effect}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimarkProjSubMeas}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimarkProjSubMeas_expectation_preservation}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeasOption}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.toProjSubMeas}
 	\leanok
 	\uses{lem:naimark-helper}
-	Lean currently proves the questionwise one-measurement interface obtained
-	from Lemma~\ref{lem:naimark-helper}.  For every indexed family \(A^x\) and
-	\(B^y\), it produces local dilation data for each question and proves the
-	corresponding single-outcome marginal-preservation identities.  It also
-	first regards the completed \(\mathrm{Option}\)-outcome projective measurement
-	as a projective sub-measurement, and then restricts it to a projective
-	sub-measurement on the original outcomes.  The declarations
-	\texttt{questionwiseOneMeasNaimarkData} and
-	\texttt{questionwiseNaimarkProjSubMeas} expose this local construction
-	without duplicating the choice of Naimark data.  This is the
-	interface used downstream in the formal development.  It is not the full
-	tensor-product correlation statement of Theorem~\ref{thm:naimark}, whose
-	simultaneous bipartite assembly remains recorded in
-	\texttt{docs/paper-gaps/naimark.tex}.
+	In addition to Theorem~\ref{thm:naimark}, Lean records the questionwise
+	one-measurement interface obtained from Lemma~\ref{lem:naimark-helper}.  For
+	every indexed family \(A^x\) and \(B^y\), it produces local dilation data for
+	each question and proves the corresponding single-outcome
+	marginal-preservation identities.  It also restricts the completed
+	\(\mathrm{Option}\)-outcome projective measurement to a projective
+	sub-measurement on the original outcomes.  This is a useful Lean-only
+	auxiliary interface for downstream arguments, not a substitute for the full
+	tensor-product correlation theorem, which is proved separately by
+	\texttt{naimarkTensorProductCorrelation}.
 \end{definition}
 
 \begin{definition}[Lean auxiliary declarations for Naimark]\label{rem:lean-naimark-auxiliary-declarations}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryHilbertSpace}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryState}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkAuxiliaryProductState}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelationDataConstruction}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation_of_productSubmeasurements}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.oneNaimarkAuxHilbertSpace}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.oneNaimarkAuxState}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.oneNaimarkAuxState_isNormalized}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.twoSidedCorrelationPreservation}
+	\leanok
 	\uses{thm:naimark}
-	The Lean construction represents the tensor product of the one-measurement
-	auxiliary registers on one side by the finite function type
+	The checked Lean proof of Theorem~\ref{thm:naimark} uses the standard
+	one-measurement auxiliary register
 	\[
-		x \mapsto \mathrm{Option}(\mathcal A_x),
+		\mathrm{Option}(\mathcal A),
 	\]
-	with the all-\(\bot\) vector as the initial auxiliary state.  The declaration
-	\texttt{naimarkAuxiliaryHilbertSpace} records this one-sided product
-	register, \texttt{naimarkAuxiliaryState} records its normalized all-\(\bot\)
-	state, and \texttt{naimarkAuxiliaryProductState} records the Alice--Bob
-	product auxiliary state.  The reduction
-	\texttt{naimarkTensorProductCorrelation\_of\_productSubmeasurements} then
-	packages these auxiliary objects into the source-shaped theorem once the
-	product-register projective submeasurements and the four-index correlation
-	identity have been constructed.  The construction target
-	\texttt{naimarkTensorProductCorrelationDataConstruction} names the remaining
-	construction of the full Naimark data.  These are internal declarations for the
-	tensor assembly in Theorem~\ref{thm:naimark}; they do not by themselves prove
-	the correlation-preservation identity, and this node is therefore not marked
-	\texttt{\textbackslash leanok}.
+	with the all-\(\bot\) vector as the initial auxiliary state.  A separate
+	Naimark unitary is chosen for each question, so the proof does not need a
+	distinct auxiliary tensor factor for every question.  This is equivalent for
+	the theorem's conclusion, since no commutation relation between different
+	questions' dilated measurements is required.  The declaration
+	\texttt{OneMeasNaimarkData.twoSidedCorrelationPreservation} proves the
+	four-register trace identity which turns the two local compression identities
+	into the bipartite correlation-preservation identity used by
+	\texttt{naimarkTensorProductCorrelation}.
 \end{definition}
 
 \begin{theorem}[Orthogonalization lemma]\label{thm:orthonormalization}
@@ -148,7 +136,7 @@
 \begin{proof}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}
 	\leanok
-	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair,
+	\uses{lem:orthonormalization-main-lemma, lem:locality-preserving-projectivization,
 		prop:other-two-notions-of-self-consistency,
 		prop:triangle-inequality-for-approx_delta}
 	Complete the sub-measurement by adding the missing outcome and use
@@ -159,13 +147,9 @@
 	sub-measurement with the paper constant \(100\zeta^{1/4}\).
 \end{proof}
 
-\begin{definition}[Lean auxiliary declarations: residual domination]\label{rem:lean-residual-domination-declarations}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
+\begin{definition}[Lean auxiliary declarations: restricted-completion total mass]\label{rem:lean-restricted-completion-total-mass}
+	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas, MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_not_le_obstruction}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.optionCompletion_outcome_none_not_le_obstruction}
-	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_requires_residual_hypothesis}
 	\leanok
 	The following are Lean auxiliary declarations, not hypotheses in
 	Theorem~\ref{thm:orthonormalization}.
@@ -191,8 +175,6 @@
 	option-completed orthonormalization output to the monotone-total route used in
 	the self-improvement theorem.  The invariant is recorded as a separate
 	order-theoretic fact; it is not added as an orthonormalization hypothesis.
-	Lean also proves a one-dimensional counterexample showing that the fresh-outcome
-	residual hypothesis cannot be omitted from this generic restriction lemma.
 \end{definition}
 
 \begin{definition}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
@@ -206,11 +188,12 @@
 	helper compares right- and left-tensor placements at the level of the
 	underlying state-dependent-distance form.  Its submeasurement and indexed
 	lemmas transport state-dependent distance to the right register under the
-	permutation-invariance hypothesis on the state.  The remaining two
-	declarations combine this transport with the orthonormalize-and-complete
-	output so that the line-156 projectivization transition can later be produced
-	from the two completed measurements without restating the tensor-factor
-	bookkeeping.
+	permutation-invariance hypothesis on the state.  The last linked declaration
+	is a Lean-only construction from two already constructed
+	orthonormalize-and-complete statements and a pre-projective consistency
+	proof.  It is not a source theorem and it is not an additional hypothesis of
+	Theorem~\ref{thm:main-formal}; it records only the tensor-factor bookkeeping
+	needed to form the later line-156 projectivization transition.
 \end{definition}
 
 \begin{definition}[Lean line-169 projectivization match-mass declarations]\label{rem:lean-line169-projectivization-match-mass}
@@ -356,7 +339,7 @@
 \begin{lemma}[Formalized orthogonalization envelope for measurements]\label{lem:orthonormalization-main-lemma-formalized-envelope}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
 	\leanok
-	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair, def:simeq, def:approx_delta}
+	\uses{lem:orthonormalization-main-lemma, lem:locality-preserving-projectivization, def:simeq, def:approx_delta}
 	This same-space corollary weakens Lemma~\ref{lem:orthonormalization-main-lemma}
 	to the public orthonormalization envelope \(100\zeta^{1/4}\).  Thus, if \(A=\{A_a\}\) and
 	\(B=\{B_a\}\) are measurements on the same finite-dimensional space satisfying
@@ -376,7 +359,7 @@
 \begin{proof}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair}
 	\leanok
-	\uses{lem:orthonormalization-main-lemma, lem:left-lifted-projectivization-repair,
+	\uses{lem:orthonormalization-main-lemma, lem:locality-preserving-projectivization,
 		prop:simeq-for-measurements, prop:triangle-inequality-for-approx_delta}
 	The consistency hypothesis first gives the source almost-projective estimate
 	for \(A_a\ot I\).  The locality-preserving projectivization repair then
@@ -390,7 +373,7 @@
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement}
 	\leanok
-	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:left-lifted-projectivization-repair}
+	\uses{lem:orthonormalization-main-lemma, lem:orthonormalization-main-lemma-formalized-envelope, lem:locality-preserving-projectivization}
 	The Lean declaration
 	\texttt{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}
 	proves Lemma~\ref{lem:orthonormalization-main-lemma} without adding
@@ -407,7 +390,7 @@
 	displayed consistency or self-consistency hypotheses.
 \end{definition}
 
-\begin{lemma}[Locality-preserving projectivization repair]\label{lem:left-lifted-projectivization-repair}
+\begin{lemma}[Locality-preserving projectivization]\label{lem:locality-preserving-projectivization}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepair}
 	\uses{lem:projective-non-measurement, def:approx_delta}
 	\leanok
@@ -446,12 +429,12 @@
 	expectation formula.
 \end{proof}
 
-	\begin{definition}[Lean implementation name for projectivization repair]\label{rem:lean-left-lifted-projectivization-repair-producer}
+	\begin{definition}[Lean implementation name for locality-preserving projectivization]\label{rem:lean-left-lifted-projectivization-construction-name}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer}
 		\leanok
 		The declaration \texttt{leftLiftedProjectivizationRepair} is the
 		paper-labelled name for
-	Lemma~\ref{lem:left-lifted-projectivization-repair}.  The older declaration
+	Lemma~\ref{lem:locality-preserving-projectivization}.  The older declaration
 	\texttt{leftLiftedProjectivizationRepairProducer} has the same public
 	mathematical statement and is retained for compatibility with existing
 	Section~5 declarations.  The word ``producer'' here refers to the construction
@@ -503,7 +486,7 @@
 \begin{definition}[Lean completion-route orthonormalization]\label{rem:orthonormalization-completion-route}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}
 	\leanok
-	\uses{prop:other-two-notions-of-self-consistency, lem:left-lifted-projectivization-repair}
+	\uses{prop:other-two-notions-of-self-consistency, lem:locality-preserving-projectivization}
 
 	The paper theorem \ref{thm:orthonormalization} is proved in Lean with the
 	\(100\zeta^{1/4}\) constant.  The declaration checked here is the
@@ -536,7 +519,7 @@
 		\ket{\psi}
 		\le 4\zeta.
 	\]
-	Apply \ref{lem:left-lifted-projectivization-repair} to obtain a projective sub-measurement $\widehat P$ such that
+	Apply \ref{lem:locality-preserving-projectivization} to obtain a projective sub-measurement $\widehat P$ such that
 	\[
 		\widehat A_a \ot I \approx_{84(4\zeta)^{1/4}} \widehat P_a \ot I.
 	\]

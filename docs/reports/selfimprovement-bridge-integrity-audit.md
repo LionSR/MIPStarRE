@@ -11,10 +11,11 @@ assembly theorems, and the Section 3/6 successor-boundary conditional API have
 been removed.  The later 2026-05-13 PR update also removes
 `mainInductionPublicWrapper` and `answerMainInductionPublicWrapper`.  Subsequent
 repairs split the printed induction theorem from the corrected large-\(k\) Lean
-interface and narrowed the live proof debt to the native successor construction
-recorded below.  The present paper-alignment policy is to preserve the theorem
-statements from the paper and to leave missing source derivations as tracked
-`sorry` sites until they are proved.
+interface.  The later status notes below supersede the successor-frontier
+description in the body of this historical report.  The present
+paper-alignment policy is to preserve the theorem statements from the paper and
+to leave missing source derivations as tracked `sorry` sites until they are
+proved.
 
 Status note, 2026-05-13 after PR #1547 and the follow-up orthonormalization
 cleanup: the residual-domination orthonormalization route and the bundled
@@ -38,15 +39,20 @@ interfaces are linked separately from `thm:main-formal-current-interface` and
 `thm:main-induction-current-interface`, where the same-space and corrected
 large-`k` restrictions are stated explicitly.
 
-Status note, 2026-05-20 after the Section 9 repair: the source-facing
+Historical status note, 2026-05-20 after the Section 9 repair: the source-facing
 `selfImprovement` theorem and the induction-section reformulation
 `selfImprovementInInductionSection` are now axiom-clean in
 `MIPStarRE/LDT/Test/AxiomAudit.lean`.  The former #1515 and #1503
 self-improvement proof gaps should therefore be read as historical entries in
-this report.  The live transitive proof frontier is the Section 6 small-error
-successor construction
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`,
-tracked by issue #1507.
+this report.  At that snapshot the live transitive proof frontier was the
+Section 6 small-error successor construction; this has since been discharged
+for the corrected large-\(k\) interface.
+
+Status note, 2026-05-22 after the answer-valued successor repair: the Section 6
+small-error successor construction is now checked for the corrected large-`k`
+interface.  The remaining direct proof holes are the source-range obligation
+for the printed `k >= md` induction theorem and the final two-space
+source-boundary obligation.
 
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
@@ -70,9 +76,9 @@ proved final-transport theorem
 but no public theorem supplies completion data as an additional hypothesis.
 
 The architecture is therefore incomplete, but the theorem boundary is no longer
-misstated.  The remaining work is to derive the Section 6 role residual and the
-post-role projective-completion residual inside the proof, and then apply the
-already-proved final transport.
+misstated.  The remaining work is now the source-boundary work described in the
+status notes above: the printed \(md \le k < 400md\) range for
+`thm:main-induction` and the final two-space source-boundary theorem.
 
 ---
 
@@ -158,9 +164,9 @@ ldPastingInInductionSection   (Core.lean)
 ```
 mainInductionSuccessorNext_ofSmallErrorConstruction   (MainTheorems.lean)
   └─ named source-faithful successor construction obligation
-     ├─ degree-zero family-and-scalar construction
      ├─ recursive predecessor induction argument
-     ├─ positive-degree ordinary or answer-valued slice realization
+     ├─ answer-valued self-improvement, or a prior low-degree support theorem
+     │  giving ordinary slice realization
      └─ checked assembly through selfImprovementInInductionSection and ldPasting
 ```
 
@@ -292,15 +298,16 @@ theorem.
 `AveragedPastingData.output` (in `PackageConstructors.lean:357`) calls
 `ldPastingInInductionSection`, which calls `Pasting.ldPasting`.
 
-### 3.6. mainInduction successor → mainFormal completion targets: INCOMPLETE
+### 3.6. mainInduction source boundary → mainFormal completion targets: INCOMPLETE
 
 The theorem `mainFormal` carries the remaining construction gap directly.  It
 does not expose recursive-slice data, self-improvement obligations, or a role
 residual as hypotheses.
 
-The missing successor construction needs:
+The remaining source-boundary construction needs:
 
-- the Section 6 role residual, via `MainFormalRoleInductionWitness.ofMainInduction`;
+- the printed source range for the Section 6 induction theorem;
+- the two-space role-register reduction for the final theorem;
 - the post-role projective-completion residual, from the line-130
   orthonormalization and completion estimates.
 
@@ -312,8 +319,8 @@ The missing successor construction needs:
 |-------|------------------------|--------------------------------------|-----|
 | SelfImprovement | ~50 theorems/lemmas | 2 paper theorem statements (`selfImprovementHelper`, `selfImprovement`) | Section 9 route is checked and axiom-clean |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | Used internally by `selfImprovement` where needed; some historical adapters have been removed | No public substitute for the source theorem |
-| MainInductionStep | `selfImprovementInInductionSection`, slice-transport constructors, `ldPastingInInductionSection`, checked successor assembly lemmas | Internal assembly remains in `MainTheorems.lean` | `mainInductionSuccessorNext_ofSmallErrorConstruction` is the remaining direct proof obligation |
-| MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionTransportWitness` | Current same-space interface plus proved final transport from a constructed completion witness | Remaining gap is transitive through the Section 6 successor construction |
+| MainInductionStep | `selfImprovementInInductionSection`, slice-transport constructors, `ldPastingInInductionSection`, checked successor assembly lemmas | Internal assembly remains in `MainTheorems.lean` | Corrected large-\(k\) successor route is proved; the remaining direct proof obligation is the printed source range \(md \le k < 400md\) |
+| MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionTransportWitness` | Current same-space interface plus proved final transport from a constructed completion witness | Remaining gap is the final two-space source-boundary theorem and printed \(k \ge md\) range |
 
 ---
 
