@@ -236,9 +236,9 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 end MIPStarRE.LDT.Test
                 """,
                 r"""
-                \begin{definition}\label{def:main-formal-step6-constructions}
+                \begin{remark}\label{rem:main-formal-step6-constructions}
                   \lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
-                \end{definition}
+                \end{remark}
                 """,
             )
             theorem_like_result = audit.run_audit(root)

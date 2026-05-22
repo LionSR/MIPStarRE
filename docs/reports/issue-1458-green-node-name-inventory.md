@@ -17,6 +17,17 @@ The scan below removes full-line TeX comments before looking for active
 `\leanok` markers, so comment text such as "not marked `\leanok`" does not make
 an unfinished source theorem appear green.
 
+Update on 2026-05-22: issue #1786 reclassified several prose-only entries.  The
+compatibility name
+`rem:lean-left-lifted-projectivization-construction-name` is now an ordinary
+remark with no active Lean metadata, and the completion-route orthonormalization
+entry is now the proposition `prop:orthonormalization-completion-route`.
+The remaining Chapter 4 and Chapter 7 entries whose labels already began with
+`rem:` are also ordinary remarks without active Lean metadata.  The Chapter 10
+base-case Step~6 construction list is now
+`rem:main-formal-step6-constructions`, again as prose rather than as a green
+definition node.
+
 ## Command
 
 ```text
@@ -62,23 +73,23 @@ PY
 | `prop:lean-classical-test-soundness-interface` | `PolishchukSpielmanClassicalSoundnessStatement` | Explicit external Polishchuk--Spielman hypothesis.  The source theorem `thm:classical-test-soundness` is not claimed as formalized. |
 | `prop:simeq-data-processing` and `prop:self-consistency-implies-data-processing` | `simeqDataProcessing`, `selfConsistencyImpliesDataProcessing` | Standard use of the mathematical term data processing.  These are source-facing preliminary lemmas proved from their displayed hypotheses; the word `Data` is not construction-data vocabulary here. |
 | `thm:naimark` | `NaimarkTensorProductCorrelationStatement` | Source-facing Naimark tensor-product correlation statement in the projective-submeasurement form produced by the one-measurement construction.  It is linked to the proved theorem `naimarkTensorProductCorrelation`; the statement wrapper records the displayed mathematical assertion, not an extra hypothesis. |
-| `rem:lean-questionwise-naimark` | `NaimarkStatement`, `OneMeasNaimarkData.toProjSubMeas` | Restricted Lean-only questionwise dilation interface and the projection back to the original-outcome submeasurement.  This is now an auxiliary route below the proved source theorem `thm:naimark`, not a substitute for it. |
-| `rem:lean-restricted-completion-total-mass` | `restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le`, `restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le` | Lean-only restricted-completion total-mass declarations.  They are not linked as the source Naimark or orthonormalization theorem. |
-| `rem:lean-right-register-completion-helpers` | `OrthonormalizeAndCompleteStatement.completedCloseness_liftRight`, `ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements` | Lean-only tensor-factor bookkeeping for the projectivization chain.  It is not a source theorem. |
-| `rem:lean-line169-projectivization-match-mass` | `ProjectivizationLine169Repair.*` | Lean-only line-169 consistency and match-mass repair lemmas.  They are construction lemmas, not hypotheses added to a paper theorem. |
+| `rem:lean-questionwise-naimark` | `NaimarkStatement`, `OneMeasNaimarkData.toProjSubMeas` | Restricted Lean-only questionwise dilation interface and the projection back to the original-outcome submeasurement.  This is now an ordinary remark without active Lean metadata; the proved source theorem remains `thm:naimark`. |
+| `rem:lean-restricted-completion-total-mass` | `restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le`, `restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le` | Lean-only restricted-completion total-mass declarations.  This is now an ordinary remark rather than a green definition node. |
+| `rem:lean-right-register-completion-helpers` | `OrthonormalizeAndCompleteStatement.completedCloseness_liftRight`, `ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements` | Lean-only tensor-factor bookkeeping for the projectivization chain.  This is now an ordinary remark rather than a green definition node. |
+| `rem:lean-line169-projectivization-match-mass` | `ProjectivizationLine169Repair.*` | Lean-only line-169 consistency and match-mass repair lemmas.  This is now an ordinary remark rather than a green definition node. |
 | `lem:orthonormalization-main-lemma-formalized-envelope` | `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair` | Same-space corollary of the source orthogonalization lemma with the weaker public envelope stated in the blueprint.  The repair appears as an internal proof construction. |
 | `lem:locality-preserving-projectivization` | `leftLiftedProjectivizationRepair` | Source-aligned locality-preserving construction theorem.  The Lean name contains the historical word `Repair`, but the blueprint node records the mathematical construction rather than an assumed repair input. |
-| `rem:lean-left-lifted-projectivization-construction-name` | `leftLiftedProjectivizationRepairProducer` | Compatibility name for the proved construction theorem.  The blueprint explicitly says that `Producer` is not a paper-lemma hypothesis. |
-| `rem:orthonormalization-completion-route` | `orthonormalizationCompletionRoute` | Lean-only route marker for the completion form of the orthonormalization construction. |
-| `rem:lean-projective-non-measurement-auxiliary` | `AlmostProjMeasStatement`, `SpectralTruncationStatement`, `RoundingToProjectorsWitness` | Internal auxiliary conversions in the projective-non-measurement chain.  They are not advertised as a source theorem. |
+| `rem:lean-left-lifted-projectivization-construction-name` | `leftLiftedProjectivizationRepairProducer` | Compatibility name for the proved construction theorem.  As of issue #1786 this is an ordinary remark, not a green graph node. |
+| `prop:orthonormalization-completion-route` | `orthonormalizationCompletionRoute` | Proved completion-route proposition for the orthonormalization construction, with the weaker \(120\zeta^{1/4}\) bound stated explicitly. |
+| `rem:lean-projective-non-measurement-auxiliary` | `AlmostProjMeasStatement`, `SpectralTruncationStatement`, `RoundingToProjectorsWitness` | Internal auxiliary conversions in the projective-non-measurement chain.  This is now an ordinary remark rather than a green definition node. |
 | `def:svd-of-X`, `lem:X-hat-squared`, and `lem:X-times-X-hat` | `QXPLayerData.*`, `exists_qxpLayerData_*` | Source-construction contexts for the rank-reduced \(Q\), \(X\), \(\hat X\), and \(P\) layer in the orthonormalization proof.  The data record constructed algebraic objects, not an extra hypothesis of a paper theorem. |
 | `lem:sdp-uniform-feasible-witness` | `sdpStrictDualWitness` | Elementary Slater-type feasible witness; this is a proved mathematical witness, not an assumed proof obligation. |
 | `lem:sdp-matrix-feasible-bounds` | `matrixSdpStrictDualWitness` and related witness bounds | Matrix specialization of the same feasible-witness construction. |
 | `lem:sdp-matrix-slackness-output` | `MatrixSdpStatementWithSlackness`, `MatrixSdpOptimalWitnessWithDominance`, and conversion theorems | Internal matrix strong-duality and slackness interfaces for `lem:sdp`.  The dominance-carrying route is explicitly separated from the source-facing SDP theorem. |
-| `rem:lean-reduced-sdp-dominance-interfaces` | `SdpStatement`, `*WitnessWithDominance*`, `MatrixSdpStatementWithSlacknessAndDominance` | Lean-only dominance interfaces.  The blueprint states that these are not formalizations of `lem:sdp`. |
+| `rem:lean-reduced-sdp-dominance-interfaces` | `SdpStatement`, `*WitnessWithDominance*`, `MatrixSdpStatementWithSlacknessAndDominance` | Lean-only dominance interfaces.  This is now an ordinary remark rather than a green definition node. |
 | `lem:sdp` | `SdpStatementWithSlackness` | Source-facing SDP theorem with complementary slackness.  The slackness structure records the paper conclusion, not an extra public hypothesis. |
 | `lem:add-in-u` | `AddInUFullStatement` | Source-facing add-in-\(u\) statement package.  The package records the displayed conclusion of the lemma. |
-| `rem:self-improvement-lean-interfaces` | `spectralTruncationStatement_of_sourceAlmostProjective` | Lean-only auxiliary interface for the projective self-improvement proof.  The spectral-truncation declaration is a proved construction from the source almost-projective estimate, not a witness hypothesis added to Theorem `thm:self-improvement`. |
+| `rem:self-improvement-lean-interfaces` | `spectralTruncationStatement_of_sourceAlmostProjective` | Lean-only auxiliary interface for the projective self-improvement proof.  This is now an ordinary remark rather than a green definition node. |
 | `lem:comm-data-processed-g` | `commDataProcessedG` | Source-facing commutativity preprocessing lemma.  The word `Data` is descriptive of the constructed commutativity datum, while the only high-risk public input is the faithful boundedness hypothesis recorded by the proof-debt audit. |
 | `clm:g-comm-stability` and `clm:g-comm-stability2` | `SliceBoundednessInput.*` | Faithful encoding of the paper boundedness hypothesis from the commutativity and pasting route. |
 | `lem:weighted-restricted-probability-bounds` | `RestrictedProbabilitiesStatement.ofWeightedBounds` | Internal weighted-probability statement constructor used in the induction assembly. |
@@ -87,7 +98,7 @@ PY
 | `prop:main-formal-source-obligation` | `mainFormal_sourceObligation` | Statement-level final-theorem source-boundary wrapper.  It proves the saturated-error branch but remains proof-incomplete through `mainFormal_sourceSmallErrorObligation`; it is not an added paper hypothesis. |
 | `prop:main-formal-source-small-error-obligation` | `mainFormal_sourceSmallErrorObligation` | Statement-level non-vacuous final-theorem source-boundary proof hole.  It records the missing branch explicitly instead of hiding it inside `thm:main-formal`. |
 | `prop:main-induction-source-range-obligation` | `mainInduction_sourceRangeObligation`, `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` | Statement-level source-range proof frontier for `md <= k < 400md`.  The branch is non-vacuous and is not a theorem hypothesis. |
-| `def:main-formal-step6-constructions` | `MainFormal*Witness`, `mainFormalBaseRoleInductionWitness`, `mainFormal_ofProjectiveCompletionTransportWitness` | Lean-only final-transport route depending on a Section 6 role witness.  It does not prove `thm:main-formal` by itself. |
+| `rem:main-formal-step6-constructions` | `MainFormal*Witness`, `mainFormalBaseRoleInductionWitness`, `mainFormal_ofProjectiveCompletionTransportWitness` | Lean-only final-transport route depending on a Section 6 role witness.  This is now an ordinary remark rather than a green definition node. |
 | `def:main-formal-error-cascade` | `CascadeHypotheses` | Faithful finite-regime hypothesis package for the scalar error calculation. |
 
 ## Verdict
@@ -121,8 +132,8 @@ The nodes divide into five classes:
 5. Lean-only internal construction frontiers in Chapter 10.
 
 The internal frontier nodes should remain separate from source theorem labels.
-In particular, the green status of `def:main-formal-step6-constructions` and
-`def:self-improvement-slice-transport` should not be read as closing
+In particular, the green status of `def:self-improvement-slice-transport`
+should not be read as closing
 `thm:main-formal` or `thm:main-induction`.  Those source-facing obligations now
 lie in the printed source range and the final two-space source boundary, not in
 the corrected large-`k` successor assembly.
@@ -165,8 +176,9 @@ Those labels are stale with respect to the current local graph except for
 `lem:sdp-uniform-feasible-witness`.  The current source has renamed the
 symmetrization node to `lem:role-register-symmetrization`, the
 locality-preserving projectivization theorem to
-`lem:locality-preserving-projectivization`, and the compatibility remark to
-`rem:lean-left-lifted-projectivization-construction-name`.  The former
+`lem:locality-preserving-projectivization`.  The compatibility name
+`rem:lean-left-lifted-projectivization-construction-name` is now an ordinary
+non-green remark.  The former
 	successor-obligation node is no longer a separate green graph vertex; the
 	corrected large-\(k\) successor route is proved, and the final-theorem source
 	frontier is displayed by the two unproved final-theorem propositions.  The

@@ -128,11 +128,11 @@ therefore been removed.  The corrected large-\(k\) Section 6 successor branch
 is now proved; the remaining work is the source-boundary range
 \(md\le k<400md\) for `thm:main-induction` and the final two-space theorem.
 
-## `def:main-formal-step6-constructions`
+## `rem:main-formal-step6-constructions`
 
 Blueprint node:
 `blueprint/src/chapter/ch10_induction.tex`, label
-`def:main-formal-step6-constructions`.
+`rem:main-formal-step6-constructions`.
 
 Linked Lean declarations include the diagonal orthonormalization and completion
 witness constructors, `mainFormalBaseRoleInductionWitness`,
@@ -155,10 +155,10 @@ the printed \(k\ge md\) range.
 
 Two Chapter 10 definition nodes remain useful green Lean-only internal
 interfaces: `def:self-improvement-slice-transport` and
-`def:successor-pasting-data`.  The final-theorem Step 6 node has been narrowed
-to completed base-case and final-transport constructions, and the former
-successor-boundary node has been retired as a dependency-graph node.  None of
-these entries closes `thm:main-induction` or `thm:main-formal`, and none adds
+`def:successor-pasting-data`.  The final-theorem Step 6 construction list is
+now an ordinary remark, and the former successor-boundary node has been retired
+as a dependency-graph node.  None of these entries closes `thm:main-induction`
+or `thm:main-formal`, and none adds
 bridge, residual, package, or witness assumptions to those paper-facing theorem
 statements.
 

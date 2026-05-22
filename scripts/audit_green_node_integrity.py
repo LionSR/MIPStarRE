@@ -114,6 +114,11 @@ ALLOWED_SOURCE_SIGNATURE_WARNINGS = {
         "MIPStarRE.LDT.Pasting.ldPasting",
     ),
     (
+        "prop:main-induction-successor-answer-valued-pasting",
+        "MIPStarRE.LDT.MainInductionStep."
+        "answerLdPastingInInductionSectionOfSmallError",
+    ),
+    (
         "lem:ld-pasting-sub-measurement",
         "MIPStarRE.LDT.Pasting.ldPastingSubMeas",
     ),

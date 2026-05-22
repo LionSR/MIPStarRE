@@ -385,13 +385,13 @@ SOURCE_CONTEXT_CONDITIONAL_DECL_NAMES = {
         "Lean-only construction of the final projective-completion transport "
         "witness from an already constructed role witness; see "
         "references/ldt-paper/inductive_step.tex:130-185 and the "
-        "informational blueprint entry def:main-formal-step6-constructions"
+        "informational blueprint entry rem:main-formal-step6-constructions"
     ),
     "MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness": (
         "Lean-only final transport theorem from an already constructed "
         "projective-completion witness; see references/ldt-paper/"
         "test_definition.tex:180-202 and inductive_step.tex:130-185, and "
-        "the informational blueprint entry def:main-formal-step6-constructions"
+        "the informational blueprint entry rem:main-formal-step6-constructions"
     ),
 }
 
