@@ -136,7 +136,7 @@ construction stage rather than an additional hypothesis.
 - `lem:orthonormalization-main-lemma-formalized-envelope` links to
   `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair`.
   This is a faithful boundary formulation of the displayed same-space envelope.
-- `lem:left-lifted-projectivization-repair` links to
+- `lem:locality-preserving-projectivization` links to
   `MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepair`.
   This is genuine for the displayed locality-preserving projectivization
   statement; `repair` names the construction stage.

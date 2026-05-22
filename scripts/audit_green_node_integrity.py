@@ -47,7 +47,7 @@ ALLOWED_SOURCE_WARNINGS = {
         "orthonormalizationMeasurement_of_consistency_from_projectivizationRepair",
     ),
     (
-        "lem:left-lifted-projectivization-repair",
+        "lem:locality-preserving-projectivization",
         "MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepair",
     ),
     (
