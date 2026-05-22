@@ -105,7 +105,7 @@ The successor branch is now represented by the native Section 6 theorem
 measurement promised by the small-error successor step from the paper
 hypotheses and the recursive predecessor induction argument.
 
-This is tracked by #1507 under the source-statement boundary tracker #1458.
+This is tracked by #1507.
 
 ### Base Branch
 

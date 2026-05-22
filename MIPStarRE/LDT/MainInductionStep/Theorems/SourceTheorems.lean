@@ -56,7 +56,7 @@ interval `params.m * params.d ≤ k < 400 * params.m * params.d` in the
 small-error, positive-degree, non-base regime, so it uses `sorryAx` rather than
 deriving the printed range of `references/ldt-paper/inductive_step.tex:7-18`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: prove this interval directly or derive it from a corrected
+#1507.  Elimination: prove this interval directly or derive it from a corrected
 source-range argument. -/
 theorem mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation
     (params : Parameters)
@@ -92,7 +92,7 @@ is therefore the named obligation
 **Unfaithful:** The final line calls the tracked positive-degree source-range
 obligation, whose proof is not yet derived from the printed range of
 `references/ldt-paper/inductive_step.tex:7-18`.  Documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1458.
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1507.
 Elimination: discharge the positive-degree non-base small-error source-range
 obligation while keeping the printed `k ≥ md` statement unchanged. -/
 theorem mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation
@@ -132,7 +132,7 @@ calls the named positive-degree non-base obligation
 `mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation`, whose proof is
 not yet derived from the printed range of
 `references/ldt-paper/inductive_step.tex:7-18`.  Documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1458.
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1507.
 Elimination: discharge the positive-degree non-base small-error source-range
 obligation while keeping the printed `k ≥ md` statement unchanged. -/
 theorem mainInduction_sourceRangeSmallErrorNonBaseObligation
@@ -174,7 +174,7 @@ base case.
 `mainInduction_sourceRangeSmallErrorNonBaseObligation`, whose proof is not yet
 derived from the printed range of `references/ldt-paper/inductive_step.tex:7-18`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: discharge the non-base small-error source-range obligation
+#1507.  Elimination: discharge the non-base small-error source-range obligation
 while keeping the printed `k ≥ md` statement unchanged. -/
 theorem mainInduction_sourceRangeSmallErrorObligation
     (params : Parameters)
@@ -212,7 +212,7 @@ obligation `mainInduction_sourceRangeSmallErrorObligation`.
 `mainInduction_sourceRangeSmallErrorObligation`, whose proof is not yet derived
 from the printed range of `references/ldt-paper/inductive_step.tex:7-18`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: discharge the small-error source-range obligation while
+#1507.  Elimination: discharge the small-error source-range obligation while
 keeping the printed `k ≥ md` statement unchanged. -/
 theorem mainInduction_sourceRangeObligation
     (params : Parameters)
@@ -259,7 +259,7 @@ or replacing the paper statement by the strengthened large-`k` interface.
 `mainInduction_sourceRangeObligation` for the interval
 `params.m * params.d ≤ k < 400 * params.m * params.d`.  This obligation is not
 derived from `references/ldt-paper/inductive_step.tex:7-18`.  Documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1458.
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1507.
 Elimination: discharge the source-range obligation while keeping the printed
 `k ≥ m d` statement unchanged. -/
 theorem mainInduction_sourceStatement

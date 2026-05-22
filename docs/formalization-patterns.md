@@ -485,7 +485,7 @@ proof gap in `MIPStarRE.LDT.SelfImprovement.selfImprovement`.
 ### Rules
 
 1. **Every obligation field must have a theorem that produces it somewhere**, or a
-   live tracking issue (#1458, #422, etc.) explaining when it will be produced.
+   live tracking issue (#1507, #422, etc.) explaining when it will be produced.
 2. **Docstrings must name the tracking issue and paper source.**
 3. **Fields must be the *assumptions* of the paper's proof, not the
    *conclusion* of the theorem** (see A1 anti-pattern in
@@ -539,7 +539,7 @@ with the step it replaces.
 - `audits/` — chapter-by-chapter scouting reports
 - Issue [#449] — hypothesis-smuggle ledger
 - Issue [#451] — historical bridge-hypothesis catalogue
-- Issue [#1458] — source-statement bridge-debt tracker
+- Issue [#1458] — historical source-statement bridge-debt tracker
 - Issue [#1507] — main-induction successor proof obligation
 - Issue [#422] — main-formal assembly gap tracker
 

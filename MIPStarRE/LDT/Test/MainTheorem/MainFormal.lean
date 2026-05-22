@@ -267,7 +267,7 @@ branch and the Step 8 cascade do not apply automatically.
 zero-sampling boundary of `references/ldt-paper/test_definition.tex:180-202`,
 which is not derived from the printed hypotheses of `thm:main-formal`.
 Documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue
-#1458.  Elimination: prove the \(d=0,k=0\) source theorem directly, or record
+#422.  Elimination: prove the \(d=0,k=0\) source theorem directly, or record
 a corrected source statement whose sampling parameter is required to be
 nonzero. -/
 theorem mainFormal_sourceZeroKBoundaryObligation
@@ -339,8 +339,8 @@ zero-sampling branch it calls `mainFormal_sourceZeroKBoundaryObligation`.
 It therefore uses `sorryAx` transitively rather than deriving
 `references/ldt-paper/test_definition.tex:180-202` from the paper hypotheses.
 Documented in `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`,
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`, and issue #1458.
-Elimination: discharge the source `k ≥ m d` range boundary and the
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`, and issues #1507 and
+#422.  Elimination: discharge the source `k ≥ m d` range boundary and the
 zero-sampling final-theorem boundary. -/
 theorem mainFormal_sourceSmallErrorObligation
     (params : Parameters)
@@ -392,8 +392,8 @@ not an additional hypothesis of `thm:main-formal`.
 `mainFormal_sourceSmallErrorObligation`, whose proof is not yet derived from the
 source theorem hypotheses.  Documented in
 `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`,
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1458; the source
-theorem is `references/ldt-paper/test_definition.tex:180-202`.
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issues #1507 and #422;
+the source theorem is `references/ldt-paper/test_definition.tex:180-202`.
 Elimination: discharge `mainFormal_sourceSmallErrorObligation` while preserving
 the printed two-space statement and the paper bound `k ≥ m d`. -/
 theorem mainFormal_sourceObligation
@@ -450,8 +450,8 @@ producer, or generic hypothesis fields.
 small-error branch calls `mainFormal_sourceSmallErrorObligation`, whose proof is
 not yet derived from the source theorem hypotheses.  Documented in
 `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`,
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issue #1458; the source
-theorem is `references/ldt-paper/test_definition.tex:180-202`.
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and issues #1507 and #422;
+the source theorem is `references/ldt-paper/test_definition.tex:180-202`.
 Elimination: discharge `mainFormal_sourceSmallErrorObligation` while preserving
 the printed two-space statement and the paper bound `k ≥ m d`. -/
 theorem mainFormal_sourceStatement
