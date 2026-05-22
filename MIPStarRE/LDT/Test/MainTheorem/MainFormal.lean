@@ -307,9 +307,9 @@ Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
 
 This theorem records the remaining non-vacuous source-boundary work needed to
 derive the corrected theorem from the present formal infrastructure.  It is not
-an additional hypothesis of `thm:main-formal`; the source-boundary wrapper below
-calls this obligation only after the saturated-error branch has been discharged
-by `mainFormal_source_trivial_witness`.
+an additional hypothesis of `thm:main-formal`; the source-boundary reduction
+below calls this obligation only after the saturated-error branch has been
+discharged by `mainFormal_source_trivial_witness`.
 
 **Proof gap:** The heterogeneous role-register symmetrization, factor-two
 unsymmetrization, point-agreement branch, heterogeneous triangle step,
@@ -363,7 +363,7 @@ theorem mainFormal_sourceSmallErrorObligation
         params strategy eps _hpass k _hk _hsmall (Nat.eq_zero_of_not_pos hk0)
 
 /--
-Internal proof-obligation wrapper for the printed two-space theorem
+Internal proof-obligation reduction for the corrected two-space theorem
 `thm:main-formal`.
 
 Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
@@ -371,8 +371,8 @@ Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
 This theorem removes the saturated-error branch from the source-boundary
 frontier.  If `mainFormalError params k eps ≥ 1`, the conclusion follows from
 `mainFormal_source_trivial_witness`; otherwise the proof is exactly the named
-small-error obligation `mainFormal_sourceSmallErrorObligation`.  The wrapper is
-not an additional hypothesis of `thm:main-formal`.
+small-error obligation `mainFormal_sourceSmallErrorObligation`.  This reduction
+is not an additional hypothesis of `thm:main-formal`.
 
 **Unfaithful:** The small-error branch calls the tracked obligation
 `mainFormal_sourceSmallErrorObligation`, whose proof is not yet derived from the
@@ -422,7 +422,7 @@ the missing factor `400` is documented in
 `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The remaining proof gap is
 the zero-sampling boundary allowed when `params.d = 0`.
 
-**Unfaithful:** The proof currently calls the tracked wrapper
+**Unfaithful:** The proof currently calls the tracked source-boundary reduction
 `mainFormal_sourceObligation`; its saturated-error branch is proved, while its
 small-error branch calls `mainFormal_sourceSmallErrorObligation`, whose only
 remaining direct proof hole is the zero-sampling boundary.  Documented in
