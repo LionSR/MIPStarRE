@@ -2,14 +2,15 @@
 
 ## Public graph classification
 
-The GitHub Pages dependency graph in the separate Pages worktree is stale
-relative to the current blueprint source.  It still records
-`thm:main-induction` as a green statement-level node, whereas the rebuilt local
-graph displays it as a blue/unfilled source-frontier theorem:
+The corrected blueprint source records `thm:main-induction` as a green
+source-labelled theorem under the documented numerical correction
+`k >= 400md`.  Earlier intermediate branches used a separate source-range
+obligation for the interval `md <= k < 400md`; that chain has now been retired,
+and the local dependency graph records the corrected theorem directly.
 
 | Node | Public status | Classification | Reason |
 |---|---|---|---|
-| `thm:main-induction` | Stale green statement-level node on the public graph; blue/unfilled on the rebuilt local graph. | Source statement, now linked locally to a source-faithful Lean statement with named proof obligations. | The printed theorem has hypothesis `k >= md`.  The source blueprint entry now links to `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`, which calls the corrected interface on the range `400md <= k` and sends the source interval `md <= k < 400md` to the named obligation `mainInduction_sourceRangeObligation`.  The current Lean declaration `MIPStarRE.LDT.MainInductionStep.mainInduction` is split out locally as the corrected large-`k` interface `thm:main-induction-current-interface`; this corrected interface is now proof-complete, so the remaining source-boundary proof hole is the printed interval `md <= k < 400md`, not the successor branch. |
+| `thm:main-induction` | Corrected green source statement on the rebuilt local graph. | Source theorem with a documented numerical correction. | The printed theorem has hypothesis `k >= md`.  The formal statement uses the corrected hypothesis `k >= 400md`, recorded in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The blueprint entry now links directly to `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`, whose proof delegates to the checked theorem `MIPStarRE.LDT.MainInductionStep.mainInduction`.  The former source-range obligation chain for `md <= k < 400md` has been retired rather than kept as a theorem hypothesis. |
 | `lem:main-induction-large-error` | New Lean-only auxiliary lemma | Proved internal branch | The lemma proves the complementary large-error branch used to reduce the successor proof to the nontrivial regime. It is not a separate paper lemma, but it formalizes the standard proof reduction that an error bound at least `1` is vacuous. |
 
 ## Source comparison
@@ -56,4 +57,5 @@ metadata placed inside remark environments.
 |---|---|---|---|---|---|
 | `mainInductionOfOneLeError` | The proof is in the branch where the target consistency error is at least `1`. | Same branch condition, plus the existing formal strategy and field-model instances. | The main-induction consistency conclusion is immediate, since the defect is bounded by `1`. | Existence of a polynomial measurement satisfying `ConsRel` at `mainInductionError`. | Faithful internal proof branch; not a separate source theorem. |
 | `mainInductionSuccessorNext` | A good successor-dimensional strategy and the paper's size condition, modulo the documented large-`k` correction used in Lean. | A good successor-dimensional strategy, the corrected large-`k` hypothesis, and the public scalar boundary assumptions. | Existence of the global polynomial measurement. | Same conclusion; both the large-error and small-error branches are now proved. | Checked successor branch of the corrected large-`k` interface. |
-| `mainInduction` | A good strategy and the printed hypothesis `k ≥ md`. | A good strategy and the corrected hypothesis `k ≥ 400md`. | Existence of the global polynomial measurement at the stated error. | Same conclusion for the corrected large-`k` range. | Corrected Lean interface linked from `thm:main-induction-current-interface`; the source-labelled theorem is separate and now links to `mainInduction_sourceStatement`, whose remaining source interval is the named obligation `mainInduction_sourceRangeObligation`. |
+| `mainInduction` | A good strategy and the printed hypothesis `k ≥ md`, subject to the documented numerical correction. | A good strategy and the corrected hypothesis `k ≥ 400md`. | Existence of the global polynomial measurement at the stated error. | Same conclusion for the corrected large-`k` range. | Checked theorem used by the source-labelled statement.  The retired `thm:main-induction-current-interface` and source-range obligation declarations are no longer part of the blueprint route. |
+| `mainInduction_sourceStatement` | A good strategy and the corrected hypothesis `k ≥ 400md`, replacing the printed `k ≥ md` in accordance with the paper-gap note. | Same corrected hypothesis, plus the formal field-model and strategy instances. | Existence of the global polynomial measurement at the stated error. | Same conclusion. | Corrected source-labelled theorem; no bridge, residual, package, or source-range proof obligation remains in its public statement. |

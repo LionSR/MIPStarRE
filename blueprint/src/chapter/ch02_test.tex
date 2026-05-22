@@ -185,7 +185,7 @@
 	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A},
 	A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy that
 	passes the $(m,q,d)$ low individual degree test with probability at least
-	$1-\eps$. Let \(k \ge md\) be an integer and set
+	$1-\eps$. Let \(k \ge 400md\) be an integer and set
 	\[
 		\nu = 100000 k^2 m^4\left(\eps^{1/40000} + (d/q)^{1/40000} + e^{-k/(2560000m^2)}\right).
 	\]
@@ -210,17 +210,20 @@
 	The saturated-error branch is formalized by
 	\texttt{mainFormal\_source\_trivial\_witness}.  The remaining branch is the
 	small-error source-boundary obligation
-	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  The Lean
-	link above records the source-shaped statement, but the theorem is not marked
-	\texttt{\textbackslash leanok} until the non-vacuous branch is derived from
-	the paper hypotheses.
+	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  The
+	factor \(400\) is the corrected large-\(k\) boundary inherited from
+	Theorem~\ref{thm:main-induction}.  The Lean link above records the
+	source-shaped statement, but the theorem is not marked
+	\texttt{\textbackslash leanok} until the remaining zero-sampling boundary is
+	resolved.
 \end{proof}
 
-\begin{proposition}[Source-boundary wrapper for the final theorem]\label{prop:main-formal-source-obligation}
+\begin{proposition}[Source-boundary reduction for the final theorem]\label{prop:main-formal-source-obligation}
 	\lean{MIPStarRE.LDT.Test.mainFormal_sourceObligation}
-	This is the Lean wrapper for the printed two-space theorem
-	Theorem~\ref{thm:main-formal}.  It proves the saturated-error branch by the
-	trivial consistency bound and reduces the remaining non-vacuous branch to
+	This proposition records the source-boundary reduction for the corrected
+	two-space theorem Theorem~\ref{thm:main-formal}.  It proves the
+	saturated-error branch by the trivial consistency bound and reduces the
+	remaining non-vacuous branch to
 	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  It is not
 	an additional hypothesis of the paper theorem.
 \end{proposition}
@@ -233,10 +236,10 @@
 
 \begin{proposition}[Small-error source-boundary obligation for the final theorem]\label{prop:main-formal-source-small-error-obligation}
 	\lean{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}
-	This is the remaining non-vacuous branch of the printed two-space theorem.
+	This is the remaining non-vacuous branch of the corrected two-space theorem.
 	It asks for the conclusions of Theorem~\ref{thm:main-formal} under
-	\(k\ge md\) and \(\nu<1\).  It is not a source assumption.  Its proof requires
-	the two-space role-register reduction and the source \(k\)-range boundary.
+	\(k\ge 400md\) and \(\nu<1\).  It is not a source assumption.  Its proof requires
+	the two-space role-register reduction and the zero-sampling boundary.
 \end{proposition}
 \begin{proof}
 	\uses{prop:main-formal-source-two-space-role-register, prop:main-formal-source-k-range-boundary}
@@ -284,8 +287,8 @@
 	work is to assemble the full source-theorem passage from the paper
 	hypotheses.  Lean now records the first part of this source-boundary route:
 	the heterogeneous role-register symmetrization may be fed into the
-	source-shaped main-induction theorem under exactly the paper hypotheses
-	\(k\ge md\), and the resulting role-register consistency estimate can be
+	source-shaped main-induction theorem under the corrected large-\(k\)
+	hypothesis \(k\ge 400md\), and the resulting role-register consistency estimate can be
 	unsymmetrized into the two point-consistency estimates on the original
 	two-space strategy with the expected factor \(2\).  In addition, the
 	point-agreement branch is now available for the paper-faithful two-space
@@ -311,11 +314,9 @@
 		absorption from these explicit pre-absorption errors to the final
 		\(\nu=\texttt{mainFormalError}\) bound has also been checked under the
 		nonzero scalar-cascade boundary \(0<k\).
-		This proposition is not marked proof-complete here because the first
-		declaration inherits the open source-range obligation in
-		Theorem~\ref{thm:main-induction}, and because the combined output still
-		requires deriving the source-range and \(0<k\) boundaries from the
-		printed theorem hypotheses.
+		This proposition is not marked proof-complete here because the combined
+		output still requires resolving the zero-sampling boundary for the final
+		theorem.
 \end{proposition}
 \begin{proof}
 	\uses{lem:heterogeneous-role-register-symmetrization, lem:heterogeneous-role-register-unsymmetrization}
@@ -327,29 +328,26 @@
 	hypotheses, not the factor-two trace-compression estimate itself.
 \end{proof}
 
-\begin{proposition}[Final-theorem source \(k\)-range boundary]\label{prop:main-formal-source-k-range-boundary}
+\begin{proposition}[Final-theorem zero-sampling boundary]\label{prop:main-formal-source-k-range-boundary}
 	\lean{MIPStarRE.LDT.Test.mainFormalError_zero_k}
 	\lean{MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation}
 	The paper states Theorem~\ref{thm:main-formal} for \(k\ge md\), while the
-	current same-space formal interface uses the corrected large-\(k\) condition
+	corrected formal route uses the confirmed large-\(k\) condition
 	\(k\ge 400md\) and a nonzero \(k\) boundary for the scalar cascade.  The
-	remaining source theorem must therefore account for the interval
-	\(md\le k<400md\) and the zero-sampling boundary allowed by the paper
-	hypothesis when \(d=0\), without adding large-\(k\) or nonzero-\(k\)
-	conditions to the printed theorem.  At this boundary the displayed final
-	error itself collapses to \(0\), as recorded by
+	factor \(400\) is now treated as a statement correction, following
+	Theorem~\ref{thm:main-induction}.  The remaining final-theorem boundary is
+	the zero-sampling case allowed when \(d=0\), since \(400md\le k\) then permits
+	\(k=0\).  At this boundary the displayed final error itself collapses to \(0\),
+	as recorded by
 	\texttt{mainFormalError\_zero\_k}; the obstruction is documented in
 	\texttt{docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex}.
 \end{proposition}
 \begin{proof}
-	\uses{prop:main-induction-source-range-obligation, thm:main-formal-current-interface}
-	This is the final-theorem form of the source-range gap.  The Section~6 source
-	range is already isolated at
-	Proposition~\ref{prop:main-induction-source-range-obligation}.  The nonzero
-	branch of the two-space final theorem now uses the role-register scalar
-	absorption theorem above.  The remaining direct final-theorem boundary is the
-	case \(k=0\), which can occur under \(k\ge md\) only in the degree-zero
-	regime.  This is recorded in Lean as
+	\uses{thm:main-induction, thm:main-formal-current-interface}
+	The nonzero branch of the two-space final theorem now uses the role-register
+	scalar absorption theorem above.  The remaining direct final-theorem boundary
+	is the case \(k=0\), which can occur under \(400md\le k\) only in the
+	degree-zero regime.  This is recorded in Lean as
 	\texttt{mainFormal\_sourceZeroKBoundaryObligation} and is not marked
 	\texttt{\textbackslash leanok}.
 \end{proof}
@@ -375,7 +373,7 @@
 \end{theorem}
 \begin{proof}
 	\leanok
-	\uses{thm:main-induction-current-interface}
+	\uses{thm:main-induction}
 	The proof follows the role-register route through the corrected large-\(k\)
 	induction interface.  This same-space corrected-range interface is now
 	proof-complete; it is still not the printed two-space source theorem.
@@ -399,9 +397,8 @@
 	scalar-cascade boundary \(k>0\), rather than hiding the side-condition gap. The helper
 	\texttt{mainFormal\_trivial\_witness} remains only for already-saturated
 	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
-	it is not a replacement for a proof in the interval $md \le k < 400\,md$ or
-	at the \(k=0\) boundary when \(md=0\).
-	The full source-boundary wrapper is named in Lean as
+	it is not a replacement for the zero-sampling boundary \(k=0\) when \(md=0\).
+	The source-boundary reduction proposition is named in Lean as
 	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceObligation}; it proves the
 	saturated-error branch and leaves
 	\texttt{MIPStarRE.LDT.Test.mainFormal\_sourceSmallErrorObligation} as the
@@ -418,9 +415,9 @@
 	The source theorem, Theorem~\ref{thm:main-formal}, is linked to the
 	source-shaped Lean statement, but no proof-level \texttt{\textbackslash leanok}
 	is attached here.  Removing the same-space restriction requires a two-space
-	role-register symmetrization wrapper showing that the paper's general strategy
-	reduces to the current formal interface, and removing the corrected-range
-	restriction requires a source-range argument for \(md\le k<400md\).  The
-	current same-space corrected-range interface itself is proof-complete and is
-	marked with proof-level \texttt{\textbackslash leanok}.
+	role-register symmetrization theorem showing that the paper's general strategy
+	reduces to the current formal interface, and the remaining \(k\)-boundary is
+	the zero-sampling case described above.  The current same-space
+	corrected-range interface itself is proof-complete and is marked with
+	proof-level \texttt{\textbackslash leanok}.
 \end{remark}

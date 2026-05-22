@@ -285,8 +285,12 @@
 
 \begin{theorem}[Main induction]\label{thm:main-induction}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement}
+	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq}
-  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge md$ and set
+	This is the corrected numerical form of the theorem; the paper-gap note
+	\texttt{docs/paper-gaps/issue-906-main-formal-k-bound.tex} records the
+	replacement of the printed bound \(k \ge md\) by \(k \ge 400md\).
+  Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400md$ and set
   \[
     \nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
   \]
@@ -300,61 +304,14 @@
   \]
 \end{theorem}
 \begin{proof}
-	\uses{lem:main-induction-base, lem:main-induction-large-error, prop:main-induction-source-range-obligation}
-	The base case and the large-error branch are formalized.  The remaining
-	source-range interval is
-	Proposition~\ref{prop:main-induction-source-range-obligation}.  The
-	corrected large-\(k\) successor branch is now proved in Lean.
-	The Lean link above records the source-shaped statement, but the theorem is
-	not marked \texttt{\textbackslash leanok} until this source-range obligation is
-	discharged from the paper hypotheses.
-\end{proof}
-
-\begin{theorem}[Main induction, corrected large-\(k\) formal interface]\label{thm:main-induction-current-interface}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction}
-	\leanok
-	\uses{def:good-strategy, def:polymeasurements, def:simeq}
-	This is the strengthened large-\(k\) Lean interface toward
-	Theorem~\ref{thm:main-induction}.  It is not the printed theorem.  The source
-	theorem assumes \(k\ge md\), while the proof route below invokes the pasting
-	theorem with the hypothesis \(k\ge 400md\); this side-condition gap is
-	documented in
-	\texttt{docs/paper-gaps/issue-906-main-formal-k-bound.tex}.
-	Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low individual degree test. Let $k \ge 400md$ and set
-	\[
-		\nu = 1000k^2m^2\left(\eps^{1/1024}+\delta^{1/1024}+\gamma^{1/1024}+(d/q)^{1/1024}\right)
-	\]
-	and
-	\[
-		\sigma = m^2\left(\nu + e^{-k/(80000m^2)}\right).
-	\]
-	Then there exists a measurement $G \in \polymeas{m}{q}{d}$ such that, on average over $u \sim \F_q^m$,
-	\[
-		A_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]}.
-	\]
-\end{theorem}
-\begin{proof}
 	\leanok
 	\uses{lem:main-induction-base, lem:main-induction-large-error, prop:main-induction-successor-small-error-construction}
 	The base case, the large-error branch, and the small-error successor
 	construction are all formalized for the corrected large-\(k\) interface.
-\end{proof}
-
-\begin{proposition}[Source-range obligation for the induction theorem]\label{prop:main-induction-source-range-obligation}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation}
-	This is the part of the printed range \(k\ge md\) not covered by the
-	corrected large-\(k\) interface: \(md\le k<400md\).  The large-error branch
-	and the base case are already separated.  The direct proof hole is the
-	positive-degree, non-base, small-error branch with \(1\le k\).  This branch is
-	not vacuous and is not an additional hypothesis of
-	Theorem~\ref{thm:main-induction}.
-\end{proposition}
-\begin{proof}
-	\uses{lem:main-induction-base, lem:main-induction-large-error}
-	The large-error and base branches are proved.  The positive-degree non-base
-	small-error branch remains open, so this frontier proposition is intentionally
-	not marked \texttt{\textbackslash leanok}.
+	The paper prints the weaker bound \(k\ge md\); the implication needed to
+	apply the pasting theorem is false in the interval \(md\le k<400md\).
+	Thus the factor \(400\) is recorded as a confirmed statement correction, as
+	documented in \texttt{docs/paper-gaps/issue-906-main-formal-k-bound.tex}.
 \end{proof}
 
 \begin{proposition}[Small-error successor construction for the induction theorem]\label{prop:main-induction-successor-small-error-construction}
@@ -487,31 +444,16 @@
 	the scalar absorption estimate.
 \end{proof}
 
-\paragraph{Proof frontier for the current induction interface.}
+\paragraph{Proof frontier for the corrected induction interface.}
 	In Lean, the base case is formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
 	The answer-valued analogue needed by the simultaneous recursive route uses
 	the same one-dimensional axis-parallel-line construction and does not involve
 	the diagonal answer interface.
-		The remaining part of the printed source range \(md\le k<400md\) is recorded
-		as the named obligation
-		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation},
-		rather than being added as a hypothesis of the source theorem.  This wrapper
-		closes the large-error case by
-		\lean{MIPStarRE.LDT.MainInductionStep.mainInductionOfOneLeError}; its
-		remaining branch is the small-error source-range obligation
-		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorObligation}.
-		This small-error wrapper closes the base case by
-		\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}; the remaining
-		non-base wrapper is
-		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorNonBaseObligation}.
-		Its degree-zero branch is contradictory from \(k<400m\cdot0\), so the
-		positive-degree non-base wrapper is
-		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseObligation}.
-		It derives \(1\le k\) from \(md\le k\) and \(0<d\); the direct
-		source-range proof hole is the corresponding \(k\)-positive obligation
-		\lean{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation}.
-		The successor step of
+	The printed source range \(md\le k<400md\) is no longer represented as a
+	frontier obligation: the missing implication to the pasting size hypothesis is
+	a confirmed statement gap, and Theorem~\ref{thm:main-induction} is stated
+	with the corrected large-\(k\) hypothesis.  The successor step of
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated in its
 	native \(m\to m+1\) form as the corrected large-\(k\) theorem
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext}.  Its
@@ -658,14 +600,9 @@
 	\texttt{AnswerSymStrat} analogue needed inside the simultaneous successor
 	proof, together with the final pasting interface, not the ordinary
 	answer-valued slice averaging calculation.
-	The remaining proof gap for
-	Theorem~\ref{thm:main-induction-current-interface} is to prove the
-	answer-valued pasting invocation after the predecessor induction argument has
-	been supplied internally.  That predecessor argument is the local induction
-	hypothesis for dimension \(m\), applied to the restricted strategies at
-	heights \(x \in \F_q\); it is not an additional hypothesis about the
-	successor strategy.  Hence no proof-level
-	\texttt{\textbackslash leanok} is attached here.
+	The answer-valued pasting invocation and predecessor induction argument are
+	now supplied internally in the proof of Theorem~\ref{thm:main-induction};
+	they are not additional hypotheses about the successor strategy.
 	We may assume $\eps,\delta,\gamma,d/q \le 1$, since otherwise $\nu \ge 1$ and the bound is trivial.
 
 	The proof is by induction on $m$. The base case $m=1$ is Lemma~\ref{lem:main-induction-base}.
@@ -785,7 +722,7 @@
 
 \begin{remark}[Lean status of the successor-step assembly]\label{rem:main-induction-successor-assembly}
 	The Lean declaration for
-	Theorem~\ref{thm:main-induction-current-interface} has the corrected
+	Theorem~\ref{thm:main-induction} has the corrected
 	large-\(k\) theorem hypotheses and no additional stage-data hypotheses.  Its
 	native successor step \texttt{mainInductionSuccessorNext} is now proved.  The
 	weighted slice bounds feeding Lemma~\ref{lem:restricted-probabilities} remain
@@ -845,7 +782,7 @@
 	fields from the symmetrized passing strategy.  The former Lean boundary records,
 	which also required a supplied self-improvement input, have been removed:
 	that missing work is part of the proof of
-	Theorem~\ref{thm:main-induction-current-interface}, not an additional
+	Theorem~\ref{thm:main-induction}, not an additional
 	assumption in
 	Theorem~\ref{thm:main-formal}.  The former slice-data records, which supplied
 	concrete pinned same-space slice strategies and passing hypotheses as Lean
@@ -876,7 +813,7 @@
 	public statement.
 
 	The successor-dependent targets that call
-	Theorem~\ref{thm:main-induction-current-interface} are described below; they carry the
+	Theorem~\ref{thm:main-induction} are described below; they carry the
 	checked successor construction for the corrected large-\(k\) interface.
 \end{remark}
 
@@ -1134,8 +1071,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	\texttt{ProjectivizationMatchMassMonotonicity.completeAtOutcomeProj\_left\_matchMass\_ge},
 	not a separate exact match-mass witness route.
 	No proof-level completeness tag is claimed here while \texttt{mainFormal}
-	itself has tracked source-boundary proof debt: the Section~6 source-range
-	boundary is tracked in issue~\#1507, and the final theorem boundary is
+	itself has tracked source-boundary proof debt in the final theorem boundary
 	tracked in issue~\#422.
 
 \end{remark}

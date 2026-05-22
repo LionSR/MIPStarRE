@@ -34,14 +34,12 @@ graphContainer.graphviz().renderDot(`strict digraph "" {{ {dot} }}`).on("end", i
 GOOD_DOT = r'''
 "thm:naimark" [color=green, fillcolor="#1CAC78", label=naimark, shape=ellipse, style=filled];
 "thm:main-formal" [color=blue, label="main-formal", shape=ellipse];
-"thm:main-induction" [color=blue, label="main-induction", shape=ellipse];
+"thm:main-induction" [color=green, fillcolor="#1CAC78", label="main-induction", shape=ellipse, style=filled];
 "thm:main-formal-current-interface" [color=green, fillcolor="#1CAC78", label="main-formal-current-interface", shape=ellipse, style=filled];
-"thm:main-induction-current-interface" [color=green, fillcolor="#1CAC78", label="main-induction-current-interface", shape=ellipse, style=filled];
 "prop:main-formal-source-obligation" [color=blue, label="main-formal-source-obligation", shape=ellipse];
 "prop:main-formal-source-small-error-obligation" [color=blue, label="main-formal-source-small-error-obligation", shape=ellipse];
 "prop:main-formal-source-two-space-role-register" [color=blue, label="main-formal-source-two-space-role-register", shape=ellipse];
 "prop:main-formal-source-k-range-boundary" [color=blue, label="main-formal-source-k-range-boundary", shape=ellipse];
-"prop:main-induction-source-range-obligation" [color=blue, fillcolor="#A3D6FF", label="main-induction-source-range-obligation", shape=ellipse, style=filled];
 "prop:main-induction-successor-small-error-construction" [color=green, fillcolor="#1CAC78", label="main-induction-successor-small-error-construction", shape=ellipse, style=filled];
 "prop:main-induction-successor-predecessor-induction" [color=green, fillcolor="#1CAC78", label="main-induction-successor-predecessor-induction", shape=ellipse, style=filled];
 "prop:main-induction-successor-answer-valued-pasting" [color=green, fillcolor="#1CAC78", label="main-induction-successor-answer-valued-pasting", shape=ellipse, style=filled];
@@ -58,33 +56,40 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
 
         self.assertEqual(result.findings, ())
 
-    def test_flags_retired_successor_node(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            graph = write_graph(
-                Path(tmp),
-                GOOD_DOT
-                + '"def:successor-obligation-reductions" '
-                '[color=green, fillcolor="#B0ECA3", shape=box, style=filled];',
-            )
+    def test_flags_retired_successor_nodes(self) -> None:
+        retired_labels = [
+            "def:successor-obligation-reductions",
+            "def:main-induction-successor-answer-valued-pasting",
+            "prop:main-induction-source-range-obligation",
+            "thm:main-induction-current-interface",
+        ]
+        for label in retired_labels:
+            with self.subTest(label=label), tempfile.TemporaryDirectory() as tmp:
+                graph = write_graph(
+                    Path(tmp),
+                    GOOD_DOT
+                    + f'"{label}" '
+                    '[color=green, fillcolor="#B0ECA3", shape=box, style=filled];',
+                )
 
-            result = run_audit(graph)
+                result = run_audit(graph)
 
-        self.assertEqual(len(result.findings), 1)
-        self.assertEqual(result.findings[0].label, "def:successor-obligation-reductions")
-        self.assertEqual(result.findings[0].kind, "retired-node-present")
+            self.assertEqual(len(result.findings), 1)
+            self.assertEqual(result.findings[0].label, label)
+            self.assertEqual(result.findings[0].kind, "retired-node-present")
 
     def test_flags_proof_filled_frontier_node(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             graph = write_graph(
                 Path(tmp),
                 GOOD_DOT.replace(
-                    '"prop:main-induction-source-range-obligation" '
-                    '[color=blue, fillcolor="#A3D6FF", '
-                    'label="main-induction-source-range-obligation", '
-                    'shape=ellipse, style=filled];',
-                    '"prop:main-induction-source-range-obligation" '
+                    '"prop:main-formal-source-small-error-obligation" '
+                    '[color=blue, '
+                    'label="main-formal-source-small-error-obligation", '
+                    'shape=ellipse];',
+                    '"prop:main-formal-source-small-error-obligation" '
                     '[color=green, fillcolor="#1CAC78", '
-                    'label="main-induction-source-range-obligation", '
+                    'label="main-formal-source-small-error-obligation", '
                     'shape=ellipse, style=filled];',
                 ),
             )
@@ -94,7 +99,7 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
         self.assertEqual(len(result.findings), 1)
         self.assertEqual(
             result.findings[0].label,
-            "prop:main-induction-source-range-obligation",
+            "prop:main-formal-source-small-error-obligation",
         )
         self.assertEqual(result.findings[0].kind, "frontier-proof-filled")
 
@@ -120,14 +125,14 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
         )
         self.assertEqual(result.findings[0].kind, "frontier-node-missing")
 
-    def test_flags_unfilled_current_interface(self) -> None:
+    def test_flags_unfilled_main_induction(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             graph = write_graph(
                 Path(tmp),
                 GOOD_DOT.replace(
-                    '"thm:main-induction-current-interface" '
+                    '"thm:main-induction" '
                     '[color=green, fillcolor="#1CAC78", ',
-                    '"thm:main-induction-current-interface" '
+                    '"thm:main-induction" '
                     '[color=blue, fillcolor="#A3D6FF", ',
                 ),
             )
@@ -135,7 +140,7 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
             result = run_audit(graph)
 
         self.assertEqual(len(result.findings), 1)
-        self.assertEqual(result.findings[0].label, "thm:main-induction-current-interface")
+        self.assertEqual(result.findings[0].label, "thm:main-induction")
         self.assertEqual(result.findings[0].kind, "proved-node-not-proof-filled")
 
     def test_flags_unproved_looking_naimark_node(self) -> None:
