@@ -45,8 +45,9 @@ averaged family.
 The Lean declaration `mainInductionSuccessorNext` is the native successor step
 for the corrected large-`k` interface.  It does not take restricted-probability
 packages, recursive slice witnesses, self-improvement data, or pasting data as
-hypotheses.  It is now checked; the remaining source-boundary issue for
-`thm:main-induction` is the printed interval `md <= k < 400md`.
+hypotheses.  It is now checked.  The printed interval `md <= k < 400md` is not
+a live proof branch in the current formalization; it is the confirmed numerical
+correction recorded in the corrected statement of `thm:main-induction`.
 
 The present Lean route has been further factored.  The declaration
 `mainInductionSuccessorNext_ofAnswerCarrier` proves
@@ -138,5 +139,6 @@ the predecessor answer-valued induction hypothesis is an internal proof
 obligation for these helper statements.  It is not added to
 `thm:main-induction`; in the current tree the enclosing answer-valued induction
 theorem supplies it internally and the corrected large-\(k\) successor branch
-is proved.  The source theorem remains incomplete only through the printed
-source range \(md \le k < 400md\).
+is proved.  The remaining difference from the literal printed theorem is the
+documented replacement of \(k \ge md\) by \(k \ge 400md\), not an unproved
+source-range wrapper.
