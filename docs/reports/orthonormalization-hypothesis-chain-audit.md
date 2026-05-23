@@ -90,13 +90,13 @@ without `sorry` or `axiom`.
 ## Layer 3: Section 6 Induction
 
 `selfImprovementInInductionSection` and the slice assembly records now call the
-source-facing Section 9 theorem directly.  That wrapper is checked.  The open
-Section 6 obligation is to construct the answer-valued restricted slice
-profile, obtain the predecessor induction conclusion for each restricted
-slice, realize the slice-wise self-improvement interface, assemble the pasting
-input, and close the scalar estimates in the small-error successor branch.
-
-This is tracked by #1507; #1503 is historical for the current code.
+source-facing Section 9 theorem directly.  That wrapper is checked.  At the
+audit snapshot, the open Section 6 obligation was to construct the
+answer-valued restricted slice profile, obtain the predecessor induction
+conclusion for each restricted slice, realize the slice-wise self-improvement
+interface, assemble the pasting input, and close the scalar estimates in the
+small-error successor branch.  Later repairs proved this corrected large-\(k\)
+successor construction, so #1507 and #1503 are historical for the current code.
 
 ## Layer 4: Final `mainFormal` Assembly
 
@@ -110,11 +110,11 @@ checked.
 ### Successor Branch
 
 The successor branch is now represented by the native Section 6 theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction`.  It must produce the
+`mainInductionSuccessorNext_ofSmallErrorConstruction`.  At the audit snapshot,
+this theorem was the remaining construction target: it had to produce the
 measurement promised by the small-error successor step from the paper
-hypotheses and the recursive predecessor induction argument.
-
-This is tracked by #1507.
+hypotheses and the recursive predecessor induction argument.  In the current
+tree this theorem is checked under the corrected large-\(k\) hypothesis.
 
 ### Base Branch
 
@@ -135,13 +135,17 @@ historical audit context.
 - Blueprint and documentation now separate the source statements from current
   Lean interfaces where the Lean theorem is not yet the full paper statement.
 
-## What Remains Open
+## Historical Open Items
 
-- The Section 6 small-error successor construction
-  `mainInductionSuccessorNext_ofSmallErrorConstruction` remains open.
-- The source-facing `mainInduction` and current `mainFormal` interface depend
-  transitively on that theorem.
+- At the audit snapshot, the Section 6 small-error successor construction
+  `mainInductionSuccessorNext_ofSmallErrorConstruction` remained open.  It has
+  since been proved under the corrected large-\(k\) hypothesis.
+- At the audit snapshot, the source-facing `mainInduction` and `mainFormal`
+  interfaces depended transitively on that theorem.  The current corrected
+  source route is checked, with the printed-theorem discrepancies recorded as
+  statement corrections rather than as theorem hypotheses.
 
-None of these remaining obligations should be added to the public statement of
-any theorem labelled by the paper.  They should be proved internally or left as
-tracked proof obligations with source-origin documentation.
+The general policy remains unchanged: proof obligations should not be added to
+the public statement of any theorem labelled by the paper.  They should be
+proved internally or left as tracked proof obligations with source-origin
+documentation.

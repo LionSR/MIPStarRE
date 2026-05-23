@@ -131,11 +131,15 @@ The audited `origin/main` snapshot has exactly one Lean `sorry` token:
 MIPStarRE/LDT/Test/MainTheorem.lean:2950:      sorry
 ```
 
-Thus the long files listed above are mostly sorry-free despite their size. In particular,
-`LdSandwichLineOnePoint.lean`, `MainInductionStep/Theorems.lean`, `FullSlice.lean`,
-`GlobalVariance/Theorems/Results.lean`, `LineInterpolation.lean`, `MoveChain.lean`,
-`ProcessedG.lean`, `Setup.lean`, and `SwitcherooCompletion.lean` are sorry-free in this snapshot.
-`Test/MainTheorem.lean` is the only long file with live proof debt.
+Thus the long files listed above were mostly sorry-free despite their size in
+the audited snapshot. In particular, `LdSandwichLineOnePoint.lean`,
+`MainInductionStep/Theorems.lean`, `FullSlice.lean`,
+`GlobalVariance/Theorems/Results.lean`, `LineInterpolation.lean`,
+`MoveChain.lean`, `ProcessedG.lean`, `Setup.lean`, and
+`SwitcherooCompletion.lean` were sorry-free in that snapshot.  The statement
+that `Test/MainTheorem.lean` was the only long file with live proof debt is a
+historical observation about the audited commit, not a current proof-frontier
+claim.
 
 ## Dependency and import structure
 
