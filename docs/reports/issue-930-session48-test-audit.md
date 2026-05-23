@@ -2,11 +2,11 @@
 
 Base commit: `68e3a1d9` (`origin/main` when the requested worktree was verified).
 
-Update, 2026-05-20: the positive-degree part of the finding below has been
-discharged.  The current declaration `MIPStarRE.LDT.Test.mainFormal` no longer
-assumes `0 < params.d`; the remaining interface restriction is that it is still
-stated for `SameSpaceProjStrat`, rather than the paper's general two-space
-projective strategy.  The live paper-gap note
+Update, 2026-05-20: the positive-degree part of the finding below had been
+discharged.  At that snapshot, the declaration `MIPStarRE.LDT.Test.mainFormal`
+no longer assumed `0 < params.d`; the remaining interface restriction was that
+it was still stated for `SameSpaceProjStrat`, rather than the paper's general
+two-space projective strategy.  The paper-gap note
 `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex` records this
 current status.
 
@@ -23,7 +23,7 @@ displays the same-space interface and scalar-boundary restrictions.  Thus the
 source-labelled blueprint theorem no longer presents the restricted Lean
 interface as the paper statement.
 
-Update, final 2026-05-20 audit state: the source-labelled theorem now links to
+Update, final 2026-05-20 audit state: the source-labelled theorem then linked to
 `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, whose proof factors through
 the named wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion`.  That
 wrapper proves the saturated-error branch and leaves
@@ -32,8 +32,16 @@ proof-term `sorry` frontier in the Test slice; the current same-space interface
 `mainFormal` no longer inherits proof debt through the corrected large-\(k\)
 Section 6 successor theorem
 `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`, which
-is now proved.  The remaining final-theorem proof debt is the source-boundary
-passage from the paper's two-space statement and printed \(k\ge md\) range.
+is now proved.  At that snapshot, the remaining final-theorem proof debt was
+the source-boundary passage from the paper's two-space statement and printed
+\(k\ge md\) range.
+
+Update, 2026-05-23: the preceding paragraph is historical.  The corrected
+source theorem now assumes the documented boundaries \(k\ge 400md\) and
+\(0<k\), and the two-space source-boundary route is checked.  The remaining
+differences from the literal printed theorem are the two statement corrections,
+not the same-space interface restriction or a live
+`mainFormal_sourceSmallErrorConclusion` proof hole.
 
 ## Executive summary
 
@@ -48,10 +56,18 @@ then-#931-owned self-improvement producer assumptions.  In the current code
 those residual and producer interfaces have been removed from the active route;
 the corrected large-\(k\) Section 6 successor theorem
 `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
-is now proved.  The remaining proof frontier is the source-boundary wrapper for
-`thm:main-formal`, not the successor construction.
+is now proved.  After the later corrected-boundary repair, the source-boundary
+wrapper for `thm:main-formal` is also checked under \(k\ge400md\) and \(0<k\).
 
-Verdict: I found one real, previously undocumented formal-interface restriction. The paper's `thm:main-formal` starts from an arbitrary general projective strategy on possibly different local Hilbert spaces. The current Lean interface `MIPStarRE.LDT.Test.mainFormal` is stated for `SameSpaceProjStrat`, a same-carrier special case carrying swap-invariance data. The earlier additional assumption `0 < params.d` has since been discharged; the remaining interface restriction is the same-space strategy input. I added `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex` to document this formalization deviation, separate from the already-documented large-`k` correction in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
+Verdict at the audited snapshot: I found one real, previously undocumented
+formal-interface restriction. The paper's `thm:main-formal` starts from an
+arbitrary general projective strategy on possibly different local Hilbert
+spaces. The then-current Lean interface `MIPStarRE.LDT.Test.mainFormal` was
+stated for `SameSpaceProjStrat`, a same-carrier special case carrying
+swap-invariance data. This restriction has since been removed from the corrected
+source theorem: `MIPStarRE.LDT.Test.mainFormal_sourceStatement` is stated for
+the general two-space `ProjStrat` container, under the documented \(k\ge400md\)
+and \(0<k\) corrections.
 
 Other apparent discrepancies are already documented or are faithful formal bookkeeping: the `ProjStrat` container itself is now the paper-faithful two-space API, the branch failure probabilities match the paper's `1/3` subtest average and `1/2` role averages, the final `ConsRel` tensor placement in `mainFormal` now matches the paper's left/right content, the widened `ζ₂` coefficient is already documented in `docs/paper-gaps/issue-904-zeta2-completion.tex`, and strategy-level normalization is already covered by `docs/paper-gaps/issue-933-quantumstate-normalization.tex`.
 
