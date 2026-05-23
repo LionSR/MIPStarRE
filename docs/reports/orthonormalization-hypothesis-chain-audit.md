@@ -100,9 +100,12 @@ This is tracked by #1507; #1503 is historical for the current code.
 
 ## Layer 4: Final `mainFormal` Assembly
 
-The current final assembly has no explicit orthonormalization hypothesis and no
-final-theorem bridge or residual package.  Its remaining proof debt is the
-transitive dependency on `MainInductionStep.mainInduction`.
+The final assembly has no explicit orthonormalization hypothesis and no
+final-theorem bridge or residual package.  The proof-debt statement in this
+layer is historical: the transitive dependency on
+`MainInductionStep.mainInduction` has since been discharged under the corrected
+large-\(k\) theorem, and the corrected final two-space source theorem is now
+checked.
 
 ### Successor Branch
 
