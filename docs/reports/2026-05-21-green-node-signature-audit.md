@@ -51,7 +51,7 @@ allowed source-like warning links: 6
 allowed source-like signature warnings: 29
 allowed source-like unfaithful markers: 4
 auxiliary unfaithful markers: 2
-auxiliary warning links: 16
+auxiliary warning links: 12
 auxiliary warning links:
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd
