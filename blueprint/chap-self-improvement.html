@@ -566,7 +566,7 @@
 <div class="displaymath" id="a0000000341">
   \[  \sum _h \langle \psi  \rvert  H_h \otimes H_h \lvert \psi  \rangle  \ge \sum _h \langle \psi  \rvert  H_h \otimes I \lvert \psi  \rangle  - 11 \sqrt{\zeta _{\mathrm{variance}}} - \sqrt{2\delta } - \frac{md}{q}.  \]
 </div>
-<p> The Lean formalization records this step as a named proof obligation, starting with the input structure  and the exact residual-side expansion          and then uses the proved lemma  together with  to recover the final helper-stage self-consistency conclusion. The remaining theorem-level derivation is not moved into an additional hypothesis; it is the proof gap in the paper theorem below. The paper’s arithmetic shows that the right-hand error is at most  </p>
+<p> The Lean formalization records this step by named scalar bounds, starting with the internal record  and the exact residual-side expansion          and then uses the proved lemma  together with  to recover the final helper-stage self-consistency conclusion. The theorem-level derivation is not moved into an additional hypothesis. The paper’s arithmetic shows that the right-hand error is at most  </p>
 <div class="displaymath" id="a0000000342">
   \[  57m\cdot \Big(\varepsilon ^{1/2} + \delta ^{1/2} + (d/q)^{1/2}\Big) \le \zeta ,  \]
 </div>
