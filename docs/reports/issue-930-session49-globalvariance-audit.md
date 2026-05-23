@@ -150,7 +150,6 @@ The `MainTheorems.lean` file provides multiple wrapper lemmas at different abstr
 levels:
 - `localVarianceOfPointsFromEdgeDeviation` — reduction from edgewise norm bound to the full statement
 - `localVarianceOfPointsFromTransportChainBound` — reduction from the post-triangle chain bound
-- `localVarianceOfPoints` — legacy wrapper with explicit pointwise hypotheses
 
 The algebraic identity `localVarianceDeviationAtPolynomial_eq_two_pointConditionedLocalVarianceAtPolynomial`
 (in `AlgebraicIdentity.lean`) relates the edge-deviation form to the local-variance form,
