@@ -29,9 +29,9 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 These lemmas capture the infrastructure needed for the `lem:commute-g-half-sandwich`
 through `cor:h-a-consistency` chain in `ld-pasting.tex` §9.3.
 
-The n-step SDDOpRel composition lemma (`sddOpRel_chain`) now lives in
-`Preliminaries.Theorems` alongside `sddOpRel_triangle`, since it is a
-general-purpose result used by multiple chapters. -/
+The n-step SDDOpRel composition lemma (`sddOpRel_chain`) lives in
+`MIPStarRE.LDT.Preliminaries.CompletionTransfer` alongside `sddOpRel_triangle`,
+since it is a general-purpose result used by multiple chapters. -/
 
 def pointTupleConsEquiv (params : Parameters) (k : ℕ) :
     PointTuple params (k + 1) ≃ SliceQuestion params × PointTuple params k where
