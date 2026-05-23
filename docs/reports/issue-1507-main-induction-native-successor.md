@@ -11,11 +11,11 @@ recorded in `MIPStarRE/LDT/Test/AxiomAudit.lean`.
 Later update on 2026-05-22: the corrected large-`k` successor route is now
 proof-complete.  Older paragraphs in this report describe the answer-valued
 pasting invocation and the enclosing predecessor induction as the active
-frontier; those statements are historical.  The present source-facing proof
-debt is instead the printed source range
-`md <= k < 400md`, recorded by
-`mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`, and the
-final printed theorem wrapper recorded by
+frontier; those statements are historical.  The interval
+`md <= k < 400md` is no longer represented by a live Lean obligation chain.
+It is the confirmed statement-boundary discrepancy recorded in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The remaining printed
+source-facing proof debt is the final theorem wrapper recorded by
 `mainFormal_sourceSmallErrorObligation`.
 
 Update on 2026-05-21: the predecessor answer-valued induction hypothesis no
@@ -149,16 +149,15 @@ the slice measurements, averages the resulting estimates, and invokes the
 induction-section pasting theorem.
 
 The blueprint source theorem in `blueprint/src/chapter/ch10_induction.tex` keeps
-the printed hypothesis `k >= md` and now links to the source-faithful Lean
-statement `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`,
-which sends the remaining source range `md <= k < 400md` to the named
-obligation `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation`;
-in the covered range `400md <= k`, it calls the corrected large-`k` interface.
-The separate current-interface theorem uses the corrected large-`k` hypothesis
-`k >= 400md`, following
+the printed hypothesis `k >= md` and links to the source-facing Lean statement
+`MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`.  The checked
+large-`k` theorem uses the corrected hypothesis `k >= 400md`, following
 `docs/paper-gaps/issue-906-main-formal-k-bound.tex`, and links the Lean
-declaration `MIPStarRE.LDT.MainInductionStep.mainInduction`.  No proof-level
-`\leanok` is claimed for the successor proof.
+declaration `MIPStarRE.LDT.MainInductionStep.mainInduction`.  The interval
+`md <= k < 400md` is the documented discrepancy between the printed statement
+and the corrected boundary; it is not represented by a separate live Lean
+obligation.  No proof-level `\leanok` is claimed for the printed source
+theorem.
 
 ## Classification
 
@@ -166,17 +165,18 @@ declaration `MIPStarRE.LDT.MainInductionStep.mainInduction`.  No proof-level
 
 Classification: source statement, linked to
 `MainInductionStep.mainInduction_sourceStatement`.  The printed hypothesis is
-`k >= md`; the present Lean source statement proves the subrange
-`400md <= k` by calling the corrected interface and leaves the interval
-`md <= k < 400md` as the named obligation
-`mainInduction_sourceRangeObligation`.
+`k >= md`.  The checked large-`k` theorem proves the corrected range
+`400md <= k`; the interval `md <= k < 400md` is the confirmed statement
+discrepancy recorded in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`,
+not a current Lean obligation declaration.
 
 `thm:main-induction-current-interface`: corrected Lean interface.
 
 Classification: checked corrected interface.  The Lean theorem has the
 source-shaped conclusion and corrected large-`k` hypotheses.  It does not cover
-the full printed source range `k >= md`, but its successor branch is no longer
-the active proof hole.
+the printed lower bound `k >= md`, but this is the corrected-boundary
+discrepancy documented in the paper-gap note, not an active successor proof
+hole.
 
 `mainInductionSuccessorNext`: Lean successor obligation.
 
@@ -303,8 +303,8 @@ the given successor strategy.  It is the induction hypothesis for dimension
 `m`, applied to the restricted strategies at heights `x \in F_q`, and it is now
 produced by the strong-induction proof of `answerMainInduction`.  The remaining
 source-boundary repair is not to add a predecessor-conclusion hypothesis
-anywhere; it is to handle the printed source range and the final theorem
-wrapper from the paper hypotheses.
+anywhere; it is to account for the corrected large-`k` boundary and the final
+theorem wrapper from the paper hypotheses.
 
 Update on 2026-05-22: the answer-valued base case
 `answerMainInductionBaseCase` is also checked.  It uses the same
@@ -321,9 +321,10 @@ been misleading.  A theorem named as the small-error successor construction,
 but proved only from an assumed predecessor conclusion that was not produced by
 an actual induction on `m`, would not have proved the successor step of the
 paper.  The current proof avoids that error by using `answerMainInduction`; the
-remaining formally visible holes are now the source-boundary wrappers
-`mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` and
-`mainFormal_sourceSmallErrorObligation`.
+remaining formally visible source-boundary hole is the final wrapper
+`mainFormal_sourceSmallErrorObligation`.  The printed interval
+`md <= k < 400md` is treated as the confirmed boundary discrepancy documented
+in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
 
 The former slice-transport obstruction is no longer part of the active route.
 The restricted slice used for the recursive call is represented by
@@ -395,8 +396,9 @@ resulting slice measurements through the Section 6 self-improvement and pasting
 estimates.  That construction is now checked by the `answerMainInduction`
 route.  The lesson remains: a PR that merely packages recursive conclusions as
 fields or assumptions is not a proof of the induction step.  The current
-proof-bearing targets are the source-boundary range
-`md <= k < 400md` and the final printed theorem wrapper.
+proof-bearing target is the final printed theorem wrapper; the interval
+`md <= k < 400md` is the corrected-boundary discrepancy recorded in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
 
 Update on 2026-05-22: the small-error scalar part of the answer-valued route
 has been advanced.  The lemmas
@@ -445,13 +447,13 @@ gamma`.
 
 Verdict for the theorem boundary: the printed source theorem
 `thm:main-induction` remains exact in the blueprint and is now linked to the
-source-faithful Lean statement
-`MainInductionStep.mainInduction_sourceStatement`, which factors the interval
-`md <= k < 400md` through the named obligation
-`mainInduction_sourceRangeObligation`.  The current Lean theorem
-`MainInductionStep.mainInduction` is a separate corrected large-`k` interface;
-it supplies the covered range `400md <= k` but not the full printed range
-`k >= md`.
+source-facing Lean statement
+`MainInductionStep.mainInduction_sourceStatement`.  The current Lean theorem
+`MainInductionStep.mainInduction` is a separate corrected large-`k` interface
+under `400 * params.m * params.d <= k`, following
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  The interval
+`md <= k < 400md` is the confirmed statement discrepancy, not a live proof
+obligation declaration.
 
 Paper assumptions for the native successor step: in the non-base induction
 step, an `(eps, delta, gamma)`-good symmetric strategy for dimension `m + 1`,

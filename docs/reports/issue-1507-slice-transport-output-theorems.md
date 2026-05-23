@@ -6,9 +6,12 @@ This report records an earlier slice-transport repair batch.  The active
 successor route no longer has a slice-transport or predecessor-induction
 frontier: the corrected large-`k` successor construction is now proved through
 the simultaneous answer-valued induction theorem and the answer-valued pasting
-theorem.  The present unfinished source-facing work is the source `k >= md`
-range for `thm:main-induction` and the final two-space source-boundary theorem,
-as summarized in `docs/reports/issue-1586-sorryax-inventory.md`.
+theorem.  The interval `md <= k < 400md` is now treated as the confirmed
+statement-boundary discrepancy recorded in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`, rather than as a live
+slice-transport or successor obligation.  The remaining unfinished
+source-facing work is the final two-space source-boundary theorem, as
+summarized in `docs/reports/issue-1586-sorryax-inventory.md`.
 
 This note records the ordinary and answer-valued slice-transport batch for the
 historical Section 6 successor proof frontier.
@@ -19,10 +22,10 @@ stale relative to the current blueprint source: it still displays
 the node is blue/unfilled.  It is not missing a Lean statement: it is linked to
 the source-facing statement
 `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`, whose printed
-hypotheses match the paper theorem.  Its corrected large-`k` branch is now
-proved, and its source-range branch is recorded separately as
-`mainInduction_sourceRangeObligation`.  The present batch therefore does not
-add `\leanok` to `thm:main-induction`.
+hypotheses match the paper theorem.  The corrected large-`k` theorem is proved
+under the boundary `400 * params.m * params.d <= k`; the smaller printed
+interval is recorded in the paper-gap note cited above.  The present batch
+therefore does not add `\leanok` to `thm:main-induction`.
 
 ## Source
 
@@ -64,5 +67,6 @@ package, residual, repair, producer, input, or generic hypotheses to
 
 The predecessor answer-valued induction conclusion is now derived inside
 `answerMainInduction`, and the corrected large-`k` successor construction is
-proved.  The remaining source-facing task is the printed range
-`md <= k < 400md`, isolated by `mainInduction_sourceRangeObligation`.
+proved.  The printed interval `md <= k < 400md` is recorded as the confirmed
+boundary discrepancy in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`,
+not as a current Lean successor obligation.
