@@ -172,9 +172,7 @@ the paper theorem; they prove the positive-degree nontrivial successor
 conclusion once the predecessor answer-valued induction hypothesis and concrete
 answer-valued slice-transport data have been supplied internally.  The latter
 helper also derives the predecessor large-`k` and `k ≥ 1` side conditions from
-the successor large-`k` hypothesis.  The older split helper
-`MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit`
-also discharges the complementary large-error branch.  The checked theorem
+the successor large-`k` hypothesis.  The checked theorem
 `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`
 records the exact small-error closure from the predecessor induction hypothesis
 and the answer-valued slice transport, without a separate degree-zero family
@@ -578,13 +576,9 @@ assert_standard_axioms
 assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier
 assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit
-assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitObligations
 assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations
 assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions
 assert_standard_axioms
