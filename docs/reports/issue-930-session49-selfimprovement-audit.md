@@ -260,8 +260,9 @@ files of `MIPStarRE/LDT/SelfImprovement/`. The module compiles cleanly.
 The historical follow-up for this audit was discharged by later repairs.  The
 paper-gap note `issue-930-self-improvement-missing-nu-consistency.tex` now
 records that the Section 9 theorem and its induction-section wrapper are
-checked, and that the remaining downstream work is the Section 6 successor
-construction #1507.
+checked.  The downstream Section 6 successor construction that was formerly
+tracked by #1507 has also been proved under the corrected large-\(k\)
+hypothesis.
 
 ## Validation
 

@@ -71,10 +71,10 @@ data records, the good-strategy hypothesis, and the large-`k` hypothesis.
   `mainInductionError params.next k eps delta gamma`.
 - Verdict: source-faithful boundary cleanup.  No bridge, residual, repair,
   package, producer, compatibility wrapper, generic hypotheses input, or
-  additional paper-theorem assumption is introduced.  The public theorem
-  `thm:main-induction` remains a stated theorem with a tracked successor proof
-  hole; this PR only removes obsolete side conditions from the proved internal
-  pasting assembly.
+  additional paper-theorem assumption is introduced.  At this report snapshot,
+  the public theorem `thm:main-induction` still had a tracked successor proof
+  hole; later repairs proved the corrected large-\(k\) successor theorem, so
+  this sentence is historical rather than a current proof-frontier claim.
 
 ## Axiom Check
 
