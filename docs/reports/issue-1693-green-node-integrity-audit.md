@@ -8,7 +8,7 @@ A second pass on May 21, 2026 also checks public Lean signatures; see
 
 The audit was run on commit `e3d69726b` of `origin/main`, before the open PRs
 `#1763`--`#1766` were merged.  Those PRs further refine the same boundary, but
-the classification below concerns the current mainline state.
+the classification below is the audit state at that commit.
 
 > **Status note, 2026-05-23.**  This report is now historical.  The current
 > local tree has removed the direct proof holes listed below and the green-node
@@ -95,9 +95,11 @@ paper theorems.
 - `rem:lean-left-lifted-projectivization-repair-producer`: compatibility name
   for the construction theorem.  The blueprint text explicitly says that
   `Producer` is not a hypothesis.
-- `def:successor-pasting-data`: internal successor-stage constructors.  The
-  declarations ending in `ofDegreeSplitPastingObligations` are construction
-  targets inside the still-open `mainInduction` proof route.
+- `def:successor-pasting-data`: internal successor-stage constructors.  At the
+  audited snapshot, the declarations ending in
+  `ofDegreeSplitPastingObligations` were construction targets inside the
+  then-open `mainInduction` proof route.  The current successor route is
+  proof-complete under the corrected large-\(k\) statement.
 - `def:main-formal-step6-obligations`: internal Step 6 witness-construction
   targets.  The successor-dependent part is kept separate in
   `def:main-formal-step6-successor-targets`, which is not marked `\leanok`.

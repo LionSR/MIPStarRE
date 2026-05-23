@@ -39,7 +39,7 @@ itself counted as a green node.
 > former source-range wrappers for \(md\le k<400md\) should therefore be read as
 > historical, not as live proof obligations.
 
-On the current `main` snapshot, the script reports:
+On the May 21 `main` snapshot, the script reported:
 
 ```text
 leanok environments: 185
@@ -79,11 +79,12 @@ auxiliary unfaithful markers:
 OK: no unexpected warning links or unfaithful markers in green source-like blueprint nodes.
 ```
 
-Thus 100 source-like green nodes have no warning-shaped declaration name, no
+Thus, in that snapshot, 100 source-like green nodes had no warning-shaped
+declaration name, no
 warning-shaped public Lean header, and no linked declaration docstring marked
 `**Unfaithful:**` under this audit.  The other 27 source-like green nodes are
-not hidden: their warning-shaped dependencies or unfaithful proof markers are
-current, explicit exceptions.  The 29 signature warnings consist of:
+not hidden: their warning-shaped dependencies or unfaithful proof markers were
+explicitly enumerated.  The 29 signature warnings consisted of:
 
 - 23 Section 8 and Section 9 commutativity/pasting links whose statements use
   `IdxPolyFamily.SliceBoundednessInput` or its residual projections.  These are
@@ -93,24 +94,28 @@ current, explicit exceptions.  The 29 signature warnings consist of:
   numerical regime for the cascade estimates.
 
 After the #1642 residual-domination obstruction split, one additional auxiliary
-warning link is expected: the Lean-only residual-obstruction declaration under
-`rem:lean-residual-domination-declarations`.  It is not a source theorem.
+warning link was expected in that snapshot: the Lean-only residual-obstruction
+declaration under `rem:lean-residual-domination-declarations`.  It was not a
+source theorem.  Those Lean-only residual-obstruction declarations have since
+been removed from the current tree.
 
-The four source-like unfaithful markers are the two source-shaped public
+The four source-like unfaithful markers in that snapshot were the two
+source-shaped public
 statements and the two current formal interfaces for `thm:main-formal` and
-`thm:main-induction`.  They are green only in the statement-boundary sense: the
-Lean declarations expose the paper-facing statements or the documented
-large-\(k\) formal interfaces, but their docstrings correctly record that the
-present proof still passes through the tracked Section 6 and source-range
-obligations.
+`thm:main-induction`.  They were green only in the statement-boundary sense:
+the Lean declarations exposed the paper-facing statements or the documented
+large-\(k\) formal interfaces, and their docstrings recorded the then-open
+Section 6 and source-range obligations.  In the current tree these markers have
+been discharged under the corrected \(k\ge400md\) and \(0<k\) source-boundary
+statements.
 
-Thus the present graph is not being certified as "green with no obligations".
-It is certified as "green with the current known obligation-shaped signatures
-and unfaithful proof markers enumerated".  A new green source-like blueprint
-link with an obligation-shaped name, an obligation-shaped public signature, or
-an `**Unfaithful:**` docstring now fails the audit until it is either removed,
-moved to an auxiliary/non-source entry, or added deliberately to the explicit
-exception list with a mathematical justification.
+Thus the May 21 graph was not certified as "green with no obligations".  It was
+certified as "green with the then-known obligation-shaped signatures and
+unfaithful proof markers enumerated".  The current audit is stricter: a new
+green source-like blueprint link with an obligation-shaped name, an
+obligation-shaped public signature, or an `**Unfaithful:**` docstring fails
+until it is either removed, moved to an auxiliary/non-source entry, or added
+deliberately to the explicit exception list with a mathematical justification.
 
 ## Reading a green node
 
@@ -198,6 +203,9 @@ docstrings contain the marker `**Unfaithful:**`.  They are allowed exceptions
 because the blueprint text already says that the displayed node is only a
 source-shaped boundary or the current corrected formal interface, and because
 the remaining proof obligation is named explicitly.
+
+In the current tree this section is historical: the fresh audit reports no
+source-like unfaithful markers.
 
 - `thm:main-formal` links to
   `MIPStarRE.LDT.Test.mainFormal_sourceStatement`.  In the current tree this is
