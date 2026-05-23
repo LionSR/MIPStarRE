@@ -286,23 +286,24 @@ and the post-role diagonal completion theorem.
 
 The line-130 orthonormalization witness is now obtained from cross consistency
 through the Section 5 repair construction.  In the current code, this is no
-longer an open `MainFormal.lean` completion problem; the remaining dependency
-is the Section 6 successor construction described above.
+longer an open `MainFormal.lean` completion problem.  The Section 6 successor
+construction referred to by the earlier version of this report has also been
+proved under the corrected large-\(k\) hypotheses.
 
 ### What's NOT in scope
 
-The current successor theorem makes the missing constructions explicit in
-mathematical form, rather than as extra fields on `mainFormal`.  The remaining
-proof must construct the answer-valued restricted slice profile, apply the
-recursive predecessor induction conclusion to each slice, assemble the pasting
-input, and prove the scalar absorption estimates.
+The successor theorem made the missing constructions explicit in mathematical
+form, rather than as extra fields on `mainFormal`.  At the time of the audit,
+the remaining proof was to construct the answer-valued restricted slice
+profile, apply the recursive predecessor induction conclusion to each slice,
+assemble the pasting input, and prove the scalar absorption estimates.  These
+items were internal Section 6 proof obligations, not hypotheses of
+`mainFormal`, nor of the paper-facing successor step.
 
-The checked assembly theorems have reduced this to one concrete component:
-
-1. the predecessor induction argument for the answer-valued restricted slices.
-
-This is not a hypothesis of `mainFormal`, nor of the paper-facing successor
-step.  It is the remaining internal proof obligation in Section 6.
+In the current tree this frontier is historical: the recursive answer-valued
+route is represented by `answerMainInduction`, and
+`mainInductionSuccessorNext_ofSmallErrorConstruction` is checked under the
+corrected large-\(k\) interface.
 
 ## 3. Field analysis
 
@@ -369,9 +370,9 @@ zero polynomial and derives the completion-closeness fields from the checked
 analytic completion argument.  The former exact match-mass branch and its QXP
 outcome-expectation formulation have both been removed from the active route.
 
-**Status:** partially derivable once Field 1 is obtained.  The active route is
-the repaired line-169 estimate, and the remaining work sits in the successor /
-induction side rather than in a separate exact line-169 sub-obligation.
+**Status:** checked once the role-register witness is supplied by the corrected
+Section 6 route.  The active route is the repaired line-169 estimate; there is
+no separate exact line-169 sub-obligation in the current final-theorem proof.
 
 ## 4. Historical resolution routes
 
@@ -400,12 +401,15 @@ intermediate record and constructs the active
 
 **Comparison:** Route A was simpler and more faithful to the base-case
 structure.  Route B required more construction and preserved downstream code
-that has since been simplified.  Either route ultimately needs Field 1.
+that has since been simplified.  The current route obtains Field 1 through the
+checked corrected Section 6 theorem rather than through an extra final-theorem
+hypothesis.
 
-## 5. What must be proved internally now
+## 5. Historical internal proof obligation
 
-The remaining work is no longer a `mainFormal` parameter problem.  It is the
-small-error successor construction for `thm:main-induction`.
+The remaining work at the time of the audit was no longer a `mainFormal`
+parameter problem.  It was the small-error successor construction for
+`thm:main-induction`.
 
 The paper uses answer-restricted slices in the induction step.  In Lean this
 means the proof of
@@ -415,20 +419,20 @@ data needed by the checked answer-stage assembly.  The recursive predecessor
 induction should enter as the local induction hypothesis in the proof of
 `mainInduction`, not as an assumption of the final theorem.
 
-The current internal proof obligations are:
+The historical internal proof obligations were:
 
 | Component | Mathematical role | Present status |
 |-----------|-------------------|----------------|
-| Predecessor induction | Apply `thm:main-induction` to each answer-valued restricted predecessor slice | Still the genuine recursive part |
+| Predecessor induction | Apply `thm:main-induction` to each answer-valued restricted predecessor slice | Discharged through `answerMainInduction` |
 | Answer-valued slice realization | Build the slice self-improvement data for the answer-valued restricted interface | Discharged by `AnswerSelfImprovementData.ofAnswerCarrier` |
-| Scalar absorption | Verify that the accumulated losses are bounded by `mainInductionError params.next k eps delta gamma` | Partly assembled; remaining estimates belong to #1507 |
+| Scalar absorption | Verify that the accumulated losses are bounded by `mainInductionError params.next k eps delta gamma` | Checked in the corrected successor route |
 
 The rejected historical route was to add records encoding these objects to
 `mainFormal`, or to a paper-facing successor theorem.  That route would
 strengthen the source statement.  The present route keeps the objects internal
-to the Section 6 proof.  The former degree-zero family route is now only a
-retained checked reduction; the active recursive-slice route applies also when
-`params.d = 0`.
+to the Section 6 proof.  The former degree-zero family route is only a retained
+checked reduction; the recursive-slice route applies also when `params.d = 0`
+and is no longer a proof hole.
 
 ## 6. Relationship to earlier trackers
 
@@ -438,7 +442,7 @@ interface.
 
 | Issue | Current reading |
 |-------|-----------------|
-| #1507 | Live tracker for the native small-error successor construction |
+| #1507 | Historical tracker for the native small-error successor construction |
 | #1458 | Source-statement boundary tracker for the final theorem route |
 | #1363 | Historical final-theorem successor-completion tracker |
 | #1565 | Historical line-130 diagonal completion tracker; the active route now derives this through checked completion lemmas |
@@ -449,11 +453,12 @@ interface.
 | #1103, #1367 | Historical Section 9 closure and audit trackers; the self-improvement interface is now checked |
 | #1359 | Historical orthonormalization-input audit; the Section 5 route is now checked |
 
-Thus the active mathematical frontier is a single theorem:
+Thus the mathematical frontier identified by the older report was the theorem:
 
 ```lean
 MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction
 ```
 
-Closing that theorem removes the remaining direct `sorry` and eliminates the
-transitive `sorryAx` dependency of `mainInduction` and `mainFormal`.
+That theorem is now checked in the corrected large-\(k\) interface.  Closing it
+removed the direct proof hole and the corresponding transitive `sorryAx`
+dependency of `mainInduction` and `mainFormal`.
