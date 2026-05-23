@@ -53,9 +53,6 @@ allowed source-like unfaithful markers: 4
 auxiliary unfaithful markers: 2
 auxiliary warning links: 16
 auxiliary warning links:
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_requires_residual_hypothesis
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss

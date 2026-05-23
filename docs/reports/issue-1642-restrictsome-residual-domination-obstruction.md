@@ -7,10 +7,10 @@ Scope: `MIPStarRE/LDT/MakingMeasurementsProjective/` and the downstream
 
 > **Status note, 2026-05-23.**  This report is now a historical mathematical
 > analysis of a route that is no longer used by the source-boundary proof.  The
-> generic `RestrictSome` obstruction declarations named below have been removed
-> from Lean, because the current orthonormalization and final-theorem route no
-> longer appeals to the residual-domination implication they were meant to
-> diagnose.  The substantive lesson of the report remains: the generic
+> generic `RestrictSome` residual-domination declarations named below have been
+> removed from Lean, because the current orthonormalization and final-theorem
+> route no longer appeals to the residual-domination implication they were meant
+> to diagnose.  The substantive lesson of the report remains: the generic
 > implication is false without additional hypotheses.
 
 ---

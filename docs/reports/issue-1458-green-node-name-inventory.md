@@ -155,8 +155,7 @@ matching the narrow high-risk vocabulary:
 `lem:left-lifted-projectivization-repair`,
 `lem:sdp-uniform-feasible-witness`,
 `lem:symmetrization-bridge`,
-`rem:lean-left-lifted-projectivization-repair-producer`, and
-`rem:lean-residual-domination-declarations`.
+and `rem:lean-left-lifted-projectivization-repair-producer`.
 
 Those labels are stale with respect to the current local graph except for
 `lem:sdp-uniform-feasible-witness`.  The current source has renamed the
