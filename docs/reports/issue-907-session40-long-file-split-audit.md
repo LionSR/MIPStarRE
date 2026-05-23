@@ -137,7 +137,7 @@ the audited snapshot. In particular, `LdSandwichLineOnePoint.lean`,
 `GlobalVariance/Theorems/Results.lean`, `LineInterpolation.lean`,
 `MoveChain.lean`, `ProcessedG.lean`, `Setup.lean`, and
 `SwitcherooCompletion.lean` were sorry-free in that snapshot.  The statement
-that `Test/MainTheorem.lean` was the only long file with live proof debt is a
+about `Test/MainTheorem.lean` being the only long file with proof debt is a
 historical observation about the audited commit, not a current proof-frontier
 claim.
 

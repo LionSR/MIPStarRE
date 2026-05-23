@@ -6,8 +6,8 @@ Date: 2026-05-14.
 > self-improvement entries below should be read with the later closure in
 > mind: `selfImprovement` and `selfImprovementInInductionSection` are checked
 > without `sorry` or `axiom`.  The former #1515 and #1503 self-improvement
-> proof gaps are historical for the current code.  At this May 20 snapshot, the
-> remaining downstream frontier was #1507, the native small-error successor
+> proof gaps are historical for the current code.  In this May 20 snapshot, the
+> downstream frontier was still #1507, the native small-error successor
 > construction for `thm:main-induction`.
 > The former #1622 degree-zero branch of low-degree pasting is also discharged:
 > `Pasting.ldPastingDegreeZeroBranch` and the unrestricted
@@ -18,9 +18,8 @@ Date: 2026-05-14.
 >
 > **Status note, 2026-05-22.**  The native small-error successor construction for
 > the corrected large-`k` interface was then also checked.  At this snapshot, the
-> remaining direct proof holes were source-boundary obligations: the printed
-> `md <= k < 400md` range for `thm:main-induction` and the final two-space
-> source theorem.
+> remaining source-boundary items were the printed `md <= k < 400md` range for
+> `thm:main-induction` and the final two-space source theorem.
 >
 > **Status note, 2026-05-23.**  The preceding proof-hole description is
 > historical.  The current source route treats the factor \(400\) and the
