@@ -8,11 +8,7 @@ corrected large-`k` successor construction is proof-complete: locally
 `MainInductionStep.mainInduction`,
 `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`, and
 the answer-valued successor route are standard-axiom clean.  The remaining
-direct LDT proof holes are now the source-range obligation
-`mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` and the
-final two-space source-boundary obligation
-`Test.mainFormal_sourceSmallErrorObligation`.  The current dependency-graph
-classification is recorded in
+direct LDT proof-hole inventory is recorded in
 `docs/reports/2026-05-22-public-graph-and-naimark-status.md` and
 `docs/reports/issue-1586-sorryax-inventory.md`.
 
@@ -50,36 +46,32 @@ The Lean declaration `mainInductionSuccessorNext` is the native successor step
 for the corrected large-`k` interface.  It does not take restricted-probability
 packages, recursive slice witnesses, self-improvement data, or pasting data as
 hypotheses.  It is now checked; the remaining source-boundary issue for
-`thm:main-induction` is the printed interval `md <= k < 400md`.
+`thm:main-induction` is the confirmed large-`k` boundary correction recorded in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
 
 The present Lean route has been further factored.  The declaration
-`mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier` proves
-the successor conclusion once the predecessor answer-valued induction hypothesis
-is supplied.  The declaration
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier` then shows
-that the small-error successor branch reduces to the predecessor answer-valued
-induction conclusion.  The answer-valued self-improvement data are constructed
-directly by the carrier theorem.  The older degree-split declarations remain
-proved composition lemmas, but the separate degree-zero family construction is
-no longer part of the active frontier.
-The declaration `mainInductionSuccessorNext_ofRecursiveAnswerInduction`
-combines this small-error reduction with the trivial large-error branch.  Thus
-the complete successor conclusion is checked once the local predecessor
-answer-valued induction hypothesis is available inside the proof by induction
-on the dimension.
+`mainInductionSuccessorNext_ofAnswerCarrier` proves the successor conclusion
+once the predecessor answer-valued induction hypothesis is supplied.  The
+declaration `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`
+then derives the predecessor large-`k` side condition from the successor bound.
+The answer-valued self-improvement data are constructed directly by the carrier
+theorem.  The older degree-split declarations and the separate degree-zero
+family construction have been removed from the checked interface.  The
+complete ordinary successor conclusion is now supplied by
+`mainInductionSuccessorNext`, whose proof obtains the predecessor answer-valued
+induction hypothesis inside the induction on the dimension.
 
 ## Classification
 
 | Node or declaration | Status | Reason |
 | --- | --- | --- |
-| `thm:main-induction` | Source statement with source-range proof hole | The blueprint and Lean source statement match the paper theorem.  The corrected large-`k` successor route is proved; the remaining proof hole is the printed source range `md <= k < 400md`. |
+| `thm:main-induction` | Source statement with confirmed large-`k` correction | The corrected large-`k` successor route is proved.  The printed interval `md <= k < 400md` is recorded as the boundary discrepancy in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`. |
 | `mainInductionSuccessorNext` | Proved corrected large-`k` successor step | This is the native `m -> m + 1` branch corresponding to `inductive_step.tex:441--551` in the corrected large-`k` interface. |
-| `answerMainInductionSuccessorNext_ofSmallErrorConstruction` | Proved answer-valued small-error construction | This theorem is a corollary of the simultaneous answer-valued induction theorem. |
+| `answerMainInduction` | Proved simultaneous answer-valued induction theorem | This theorem supplies the predecessor answer-valued induction conclusion used inside the ordinary successor step. |
 | `mainInductionSuccessorNext_ofSmallErrorConstruction` | Proved ordinary small-error construction theorem | This theorem has exactly the successor strategy hypotheses and the branch condition `mainInductionError < 1`.  It is proved from `answerMainInduction` and the checked answer-carrier reduction. |
 | `def:successor-pasting-data` | Internal construction node | The public graph marks this node green.  It records formal data and scalar bounds used by the successor construction; it is not itself the paper theorem. |
-| `mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier` | Conditional helper, proved | This theorem proves the small-error successor conclusion from the predecessor answer-valued induction hypothesis.  This input is an internal proof obligation, not a source hypothesis. |
-| `mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier` | Conditional helper, proved | This theorem combines the predecessor induction argument with the checked answer-valued self-improvement carrier route into the small-error successor conclusion.  It is useful mathematics but is not advertised as the paper theorem. |
-| `mainInductionSuccessorNext_ofRecursiveAnswerInduction` | Conditional helper, proved | This theorem proves the full successor conclusion, including the large-error branch, from exactly the recursive answer-valued predecessor induction hypothesis.  It is not advertised as the paper theorem because that predecessor conclusion must be obtained internally from the induction proof. |
+| `mainInductionSuccessorNext_ofAnswerCarrier` | Conditional helper, proved | This theorem proves the small-error successor conclusion from the predecessor answer-valued induction hypothesis.  This input is an internal proof obligation, not a source hypothesis. |
+| `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound` | Conditional helper, proved | This theorem combines the predecessor induction argument with the checked answer-valued self-improvement carrier route into the small-error successor conclusion, deriving the predecessor large-`k` side condition from the successor bound. |
 
 ## Repair status
 
@@ -93,8 +85,7 @@ route, assembles the averaged pasting data, and invokes the
 small-error answer-stage pasting theorem.  The recursive predecessor hypothesis
 now has no artificial `0 < d` assumption, so the route applies also when
 `d = 0`.
-The full all-error assembly from this recursive predecessor hypothesis is
-recorded by `mainInductionSuccessorNext_ofRecursiveAnswerInduction` and is
+The full ordinary successor theorem `mainInductionSuccessorNext` is
 standard-axiom clean.
 
 No compatibility wrapper is introduced.  The source-labelled theorem
@@ -108,7 +99,7 @@ Paper assumptions: a good symmetric strategy for the `(m + 1, q, d)` test,
 restricted strategies.
 
 Lean assumptions for
-`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier`:
+`mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`:
 `[FieldModel params.q]`, a good `SymStrat params.next ι`,
 `400 * params.next.m * params.next.d <= k`,
 `mainInductionError params.next k eps delta gamma < 1`, the answer-valued
@@ -117,19 +108,11 @@ from the successor large-`k` bound, and the predecessor induction hypothesis no
 longer carries an artificial `0 < params.d` assumption.  The answer-valued
 self-improvement data are constructed by the carrier route.
 
-Lean assumptions for `mainInductionSuccessorNext_ofRecursiveAnswerInduction`:
-the same successor hypotheses and the answer-valued predecessor induction
-hypothesis, but no small-error hypothesis.  The proof splits on
-`mainInductionError params.next k eps delta gamma < 1`; the small-error branch
-uses the answer-carrier construction above, and the complementary branch uses
-`mainInductionOfOneLeError`.
-
-Lean assumptions for
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions`:
-the same successor hypotheses, together with three internal construction
-obligations: the predecessor answer-valued induction conclusion, a degree-zero
-complete point-consistent family with its scalar bound, and the positive-degree
-slice transport.
+The older degree-split internal construction theorem, which separately assumed
+a degree-zero complete point-consistent family and a positive-degree slice
+transport, has since been removed.  The active successor route uses the
+answer-valued predecessor induction theorem and applies the predecessor
+induction hypothesis also when `d = 0`.
 
 Paper conclusion: a polynomial measurement in dimension `m + 1` consistent
 with the point measurement at the successor error.
@@ -142,5 +125,6 @@ the predecessor answer-valued induction hypothesis is an internal proof
 obligation for these helper statements.  It is not added to
 `thm:main-induction`; in the current tree the enclosing answer-valued induction
 theorem supplies it internally and the corrected large-\(k\) successor branch
-is proved.  The source theorem remains incomplete only through the printed
-source range \(md \le k < 400md\).
+is proved.  The printed range \(md \le k < 400md\) is recorded as a confirmed
+large-\(k\) boundary correction rather than as a remaining successor
+construction.

@@ -18,9 +18,9 @@ obsolete rows about `prop:main-formal-source-successor-construction`,
 `prop:main-induction-successor-predecessor-induction`, and
 `thm:main-formal-current-interface`.  For the current classification, use the
 2026-05-22 report and `docs/reports/issue-1586-sorryax-inventory.md`: the only
-direct source-boundary Lean proof holes are
-`mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` and
-`mainFormal_sourceSmallErrorObligation`.
+remaining source-boundary discrepancies are the corrected large-`k` hypothesis
+and the corrected nonzero sampling hypothesis recorded in the current source
+statements.
 
 This note records the status of the non-green or non-filled nodes visible in
 the blueprint dependency graph for the low-individual-degree-test formalization.
@@ -97,8 +97,7 @@ proposition nodes:
 `prop:main-formal-source-obligation`,
 `prop:main-formal-source-small-error-obligation`,
 `prop:main-formal-source-two-space-role-register`,
-`prop:main-formal-source-k-range-boundary`, and
-`prop:main-induction-source-range-obligation`.  Earlier versions of this report
+and `prop:main-formal-source-k-range-boundary`.  Earlier versions of this report
 also listed successor-frontier nodes here; those are now proof-complete in the
 corrected large-\(k\) interface.  The related
 answer-valued slice proposition remains a blue graph node because of the
@@ -196,10 +195,10 @@ source-faithful Lean statements
 source theorem calls the named obligation
 `MIPStarRE.LDT.Test.mainFormal_sourceObligation`, whose saturated-error branch is
 proved and whose remaining branch is the small-error obligation
-`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`, while the induction source
-theorem isolates the interval `md ≤ k < 400md` as the named obligation
-`MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation`.  They do
-not link to the restricted corrected Lean interfaces.  The source entry
+`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`, while the induction
+source theorem records the corrected large-`k` boundary in
+`MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`.  They do not
+link to the restricted corrected Lean interfaces.  The source entry
 `thm:naimark` is linked to the axiom-clean source-shaped Lean theorem
 `MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation`
 and is now marked `\leanok` in the local blueprint.  The source entries `thm:raz-safra` and
@@ -229,9 +228,9 @@ bookkeeping entries separately:
 `thm:main-induction-current-interface`, and the final scalar-cascade entries in
 Chapter 10.  The source theorem entries without Lean links are precisely the
 external theorem boundaries and the informal main theorem.  The two central
-source statements now have Lean statement links, but their proof holes are
-direct and tracked rather than being disguised as assumptions of restricted
-interfaces.  The full Naimark theorem is linked separately to an axiom-clean
+source statements now have Lean statement links, and their corrected boundary
+conditions are explicit rather than being disguised as assumptions of
+restricted interfaces.  The full Naimark theorem is linked separately to an axiom-clean
 proof of the corrected projective-submeasurement statement.
 
 The suspicious-name scan is also covered by the Lean axiom audit.  The command
@@ -269,14 +268,12 @@ declaration is a paper theorem; rather, they ensure that these
 blueprint-linked auxiliary names do not hide the active `sorryAx` frontier.
 The audit also checks
 `MakingMeasurementsProjective.questionwiseNaimark`, the separate Lean-only
-Naimark interface recorded below the source theorem.  After adding the
-small-error source-range target to the Chapter 10 proof discussion, a broader
+Naimark interface recorded below the source theorem.  A broader
 scan over all blueprint `\lean{...}` references whose names contain
 `Bridge`, `Package`, `Residual`, `Repair`, `Producer`, `Input`,
 `Hypotheses`, `Assumptions`, `Obligation`, `Statement`, `Slackness`,
 `Dominance`, or `Witness` reports 84 such references and no missing
 `AxiomAudit.lean` coverage.  The newly covered auxiliary declarations include
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`,
 `MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationStatement`,
 and the two final-theorem diagonal witness constructors
 `Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` and
@@ -298,9 +295,8 @@ Thus the current theorem-like suspicious-link frontier is classified.  In
 particular, the source theorem entries `thm:main-formal` and
 `thm:main-induction` do not link to declarations whose names contain this
 vocabulary; their proof debt is instead represented by the named obligations
-`Test.mainFormal_sourceSmallErrorObligation` and
-`MainInductionStep.mainInduction_sourceRangeObligation` below the source
-statements.
+`Test.mainFormal_sourceSmallErrorObligation` and by the corrected large-`k`
+boundary recorded in `MainInductionStep.mainInduction_sourceStatement`.
 The commutativity claims
 `clm:g-comm-stability` and `clm:g-comm-stability2` still link to fields of
 `IdxPolyFamily.SliceBoundednessInput`.  This is a faithful encoding of the
@@ -317,9 +313,9 @@ The same audit previously checked the transitive Section 6 route
 \(\to\) `strategySymmetrization_mainInduction`
 \(\to\) `MainFormalRoleInductionWitness.ofMainInduction`;
 the corrected large-\(k\) successor theorem on this route is now proved.  The
-remaining direct proof holes are the source-boundary interval for
-`thm:main-induction` and the final two-space source-boundary theorem, not an
-unfinished corrected large-\(k\) successor construction.
+remaining source-boundary discrepancies are recorded as explicit corrected
+large-\(k\) and nonzero-sampling hypotheses, not as an unfinished corrected
+large-\(k\) successor construction.
 It also checks the answer-valued restriction, predecessor-induction,
 self-improvement transport, and small-error stage assembly constructors used by
 the successor reductions; these are axiom-clean transport mechanisms rather
@@ -411,15 +407,12 @@ auxiliary submeasurement and the selection rule.  They are axiom-clean in
 `AxiomAudit.lean`; the older theorem `addInU` remains only the reduced
 variance-bound specialization used downstream.
 
-In Section 10, `mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier` and
-`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier` are
-checked internal assembly theorems for the successor step, and
-`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit`
-adds the already proved large-error branch.  The recursive-slice helper
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`
-further reduces the open successor step to the predecessor answer-valued
-induction hypothesis.  These declarations
-do not replace `thm:main-induction`; the public theorem remains unmarked at
+In Section 10, `mainInductionSuccessorNext_ofAnswerCarrier` and
+`mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound` are checked
+internal assembly theorems for the successor step.  The ordinary theorem
+`mainInductionSuccessorNext_ofSmallErrorConstruction` reduces the small-error
+successor step to the answer-valued induction theorem.  These declarations do
+not replace `thm:main-induction`; the public theorem remains unmarked at
 proof level until the Section 6 successor construction is supplied internally.
 The helper derives `k >= 1` from the small-error branch and the predecessor
 large-`k` bound from the successor large-`k` hypothesis, without assuming
@@ -480,14 +473,14 @@ The extracted blue-border nodes are:
 | Graph | Blue nodes |
 |---|---|
 | Fetched public `origin/github-pages` | `thm:main-informal`, `thm:raz-safra`, `thm:classical-test-soundness`, `thm:naimark` |
-| Local rebuilt graph | `prop:main-formal-source-two-space-role-register`, `prop:main-formal-source-k-range-boundary`, `prop:main-induction-source-range-obligation`, `thm:main-formal`, `thm:main-induction`, `thm:main-informal`, `thm:raz-safra`, `thm:classical-test-soundness` |
+| Local rebuilt graph | `prop:main-formal-source-two-space-role-register`, `prop:main-formal-source-k-range-boundary`, `thm:main-formal`, `thm:main-induction`, `thm:main-informal`, `thm:raz-safra`, `thm:classical-test-soundness` |
 
 The non-green or non-proof-filled nodes extracted from the same DOT payloads are:
 
 | Graph | Nodes |
 |---|---|
 | Fetched public `origin/github-pages` | `rem:lean-naimark-auxiliary-declarations`, `thm:classical-test-soundness`, `thm:main-formal`, `thm:main-formal-current-interface`, `thm:main-induction`, `thm:main-informal`, `thm:naimark`, `thm:raz-safra`.  The former successor-boundary and successor-target definition nodes are still present in the public graph, but they are green-filled stale nodes rather than current unfilled frontier nodes. |
-| Local rebuilt graph | `thm:classical-test-soundness`, `thm:main-formal`, `thm:main-induction`, `thm:main-informal`, `thm:raz-safra`, together with the proof-frontier propositions `prop:main-formal-source-obligation`, `prop:main-formal-source-small-error-obligation`, `prop:main-formal-source-two-space-role-register`, `prop:main-formal-source-k-range-boundary`, and `prop:main-induction-source-range-obligation`.  The source-frontier theorem and proposition nodes with tracked proof debt are now blue/unfilled in the rebuilt local graph, not green statement-level nodes.  The Naimark source theorem, its auxiliary declaration node, the corrected current-interface nodes, and the answer-valued successor nodes are now green or proof-filled in the rebuilt local graph.  The retired nodes `def:main-formal-successor-boundary`, `def:main-formal-step6-successor-targets`, and `prop:main-induction-successor-degree-zero-family` are absent. |
+| Local rebuilt graph | `thm:classical-test-soundness`, `thm:main-formal`, `thm:main-induction`, `thm:main-informal`, `thm:raz-safra`, together with the proof-frontier propositions `prop:main-formal-source-obligation`, `prop:main-formal-source-small-error-obligation`, `prop:main-formal-source-two-space-role-register`, and `prop:main-formal-source-k-range-boundary`.  The source-frontier theorem and proposition nodes with tracked proof debt are now blue/unfilled in the rebuilt local graph, not green statement-level nodes.  The Naimark source theorem, its auxiliary declaration node, the corrected current-interface nodes, and the answer-valued successor nodes are now green or proof-filled in the rebuilt local graph.  The retired nodes `def:main-formal-successor-boundary`, `def:main-formal-step6-successor-targets`, and `prop:main-induction-successor-degree-zero-family` are absent. |
 
 The same DOT extraction was also applied to green public nodes whose labels
 contain high-risk words such as `bridge`, `repair`, `producer`, `residual`,
@@ -513,38 +506,24 @@ rebuilding with the compatible interpreter, the graph no longer contains
 `def:main-formal-successor-boundary` or
 `def:main-formal-step6-successor-targets`.
 
-The direct Lean proof-hole inventory is now three sites:
-`MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`, inside
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`;
-`MIPStarRE/LDT/MainInductionStep/Theorems/SourceTheorems.lean:79`, inside
-`MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`;
-and `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:189`, inside
-`Test.mainFormal_sourceSmallErrorObligation`.
-The latter two are source-boundary gaps introduced or preserved in
-paper-realignment mode.  The Section 6 successor hole is deliberately kept at
-the source-shaped small-error construction theorem: its predecessor induction
-argument must be supplied by the eventual dimension induction and must not be
-postulated as a standalone theorem.
-The induction source statement already
-calls the corrected large-`k` interface when
-`400 * params.m * params.d ≤ k`; its remaining source range
-`params.m * params.d ≤ k < 400 * params.m * params.d` is factored through the
-named wrapper `mainInduction_sourceRangeObligation`.  That wrapper proves the
-large-error branch by `mainInductionOfOneLeError`, so the direct source-range
-hole is now the small-error obligation
-`mainInduction_sourceRangeSmallErrorObligation`; that small-error wrapper proves
-the base case by `mainInductionBaseCase`, so the direct source-range proof hole is
-`mainInduction_sourceRangeSmallErrorNonBaseObligation`, which removes the
-degree-zero branch by contradiction.  Thus the direct source-range proof hole is
-`mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`; the
-positive-degree wrapper derives the side condition `1 ≤ k`.  The active
-corrected route now has a single direct Section 6 proof hole in
-`MainTheorems.lean`, namely
-`answerMainInductionSuccessorNext_ofSmallErrorConstruction`.  Its proof must
-supply one mathematical construction internally: the predecessor answer-valued
-induction argument.  The ordinary successor theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction` now inherits this gap
-through the internal theorem `answerMainInduction`.  The former
+The direct Lean proof-hole inventory recorded in this dated report has since
+been superseded: the current `issue-1586` inventory reports no direct `sorry`
+sites in the LDT tree.  The Section 6 successor construction is proved in the
+corrected large-`k` interface.  The predecessor induction argument is supplied
+inside the simultaneous answer-valued induction theorem and is not postulated
+as a standalone theorem.
+The induction source statement now calls the corrected large-`k` interface when
+`400 * params.m * params.d ≤ k`.  The printed range
+`params.m * params.d ≤ k < 400 * params.m * params.d` is treated as the
+confirmed statement gap recorded in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`,
+not as a hidden hypothesis or a remaining Lean construction.  The active
+corrected route has no separate answer-valued small-error theorem at the
+successor boundary: `answerMainInduction` supplies the predecessor
+answer-valued induction conclusion, and its successor branch invokes
+`answerMainInductionSuccessorNext_ofRecursiveHypothesisAndAnswerPasting`.
+The ordinary successor theorem
+`mainInductionSuccessorNext_ofSmallErrorConstruction` uses the checked
+answer-carrier reductions to assemble the small-error branch.  The former
 degree-zero family branch has been retired because the recursive predecessor
 hypothesis no longer assumes `0 < d`.  These are not hypotheses of the public
 successor theorem.  The public successor theorem
@@ -596,28 +575,28 @@ corrected, or external-interface theorem.
 | `thm:main-informal` | `references/ldt-paper/introduction.tex:199-213` | Matches the paper's informal expectation estimate. | No Lean declaration is attached; the paper directs the formal content to `thm:main-formal`. |
 | `thm:naimark` | `references/ldt-paper/orthonormalization.tex:36-75` | Records the full bipartite tensor-product correlation statement in the projective-submeasurement form produced by `lem:naimark-helper`. | Linked to the axiom-clean source-shaped Lean theorem `MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation` and marked `\leanok`.  The checked questionwise interface remains split out as `rem:lean-questionwise-naimark`. |
 | `thm:main-formal` | `references/ldt-paper/test_definition.tex:180-202` | Matches the printed formal theorem, including `k >= md`. | Linked to the source-faithful Lean statement `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named source-boundary wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation`; this wrapper proves the saturated-error branch and leaves `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` as the remaining non-vacuous source boundary.  The current same-space, corrected large-`k` interface remains split out as `thm:main-formal-current-interface`. |
-| `thm:main-induction` | `references/ldt-paper/inductive_step.tex:7-18` | Matches the printed induction theorem, including `k >= md`. | Linked to the source-faithful Lean statement `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`, which proves the corrected range `400md ≤ k` by calling `MIPStarRE.LDT.MainInductionStep.mainInduction` and sends the source interval `md ≤ k < 400md` to the named wrapper `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation`.  The wrapper proves the large-error branch and isolates the remaining small-error source-range work as `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorObligation`; that small-error wrapper proves the base case, the non-base wrapper removes the impossible degree-zero branch, and the positive-degree wrapper derives `1 ≤ k`, leaving `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` as the direct source-range proof hole.  The corrected large-`k` interface remains split out as `thm:main-induction-current-interface`. |
+| `thm:main-induction` | `references/ldt-paper/inductive_step.tex:7-18` | Records the corrected large-`k` boundary for the induction theorem. | Linked to the Lean statement `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`, which proves the corrected range `400md ≤ k` by calling `MIPStarRE.LDT.MainInductionStep.mainInduction`.  The printed interval `md ≤ k < 400md` is recorded as the confirmed boundary discrepancy in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`, not as a remaining Lean construction.  The corrected large-`k` interface remains split out as `thm:main-induction-current-interface`. |
 
 ## Classification
 
 | Node | Public graph status | Current source status | Mathematical status | Next action |
 |---|---|---|---|---|
-| `thm:main-formal` | Green statement border with the non-proof blue fill in the fetched public graph. | The rebuilt local graph is blue/unfilled, and the blueprint links it to `MIPStarRE.LDT.Test.mainFormal_sourceStatement` without `\leanok` or proof-level completion. | This is the full paper theorem from `references/ldt-paper/test_definition.tex:180-202`: a general projective strategy, the printed hypothesis `k ≥ md`, and the three final consistency conclusions.  The Lean statement is now source-faithful and factors the remaining work through `mainFormal_sourceObligation`; that wrapper proves the saturated-error case and leaves only the non-vacuous `mainFormal_sourceSmallErrorObligation`.  It is not the same-space corrected interface. | Prove the small-error two-space source theorem by discharging the documented same-space interface and scalar-boundary/source-range issues. |
+| `thm:main-formal` | Green statement border with the non-proof blue fill in the fetched public graph. | The rebuilt local graph is blue/unfilled, and the blueprint links it to `MIPStarRE.LDT.Test.mainFormal_sourceStatement` without `\leanok` or proof-level completion. | This is the full paper theorem from `references/ldt-paper/test_definition.tex:180-202`: a general projective strategy, the printed hypothesis `k ≥ md`, and the three final consistency conclusions.  The Lean statement is now source-faithful and factors the remaining work through `mainFormal_sourceObligation`; that wrapper proves the saturated-error case and leaves only the non-vacuous `mainFormal_sourceSmallErrorObligation`.  It is not the same-space corrected interface. | Keep the final theorem synchronized with the documented large-`k` and nonzero-sampling boundary corrections. |
 | `thm:main-formal-current-interface` | Green statement border and no proof fill on the fetched public graph. | Current source marks this separate Lean-only entry proof-complete; the fetched public graph is stale. | This is the separate Lean-only entry linked to `MIPStarRE.LDT.Test.mainFormal`.  Its statement displays the current same-space interface, the documented large-`k` correction `k ≥ 400md`, and the scalar boundary `k > 0`; the former positive-degree restriction has been removed.  Its public Lean statement has no bridge, residual, repair, data, obligation, or package hypothesis.  The auxiliary theorem `MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofSameSpaceLargeK` now proves that this same-space corrected-range interface gives the source-shaped two-space conclusion after forgetting `SameSpaceProjStrat` to `ProjStrat`.  The corrected large-`k` Section 6 theorem is now proved; the remaining final-theorem proof debt is the two-space source-boundary assembly and the printed `k ≥ md` range. | Combine the checked same-space subcase with the heterogeneous two-space symmetrization and source `k ≥ md` range to obtain the full source theorem. |
-| `thm:main-induction` | Green statement border without proof fill on the fetched public graph. | The rebuilt local graph is blue/unfilled, and the blueprint links it to `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement` without `\leanok` or proof-level completion. | This is the full paper theorem from `references/ldt-paper/inductive_step.tex:7-18`, with hypothesis `k ≥ md`.  The Lean statement is now source-faithful.  In the range `400md ≤ k` it calls the separate corrected large-`k` interface, whose successor route is now proved.  The remaining interval `md ≤ k < 400md` is no longer an anonymous branch in the source theorem; it is a named wrapper whose large-error branch is proved.  Its small-error wrapper also proves the base case, its non-base wrapper removes the impossible degree-zero branch, and its positive-degree wrapper derives `1 ≤ k`, leaving only `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` in the positive-degree non-base small-error regime. | Prove the smaller-`k` positive-degree non-base small-error source range, or derive it from a corrected argument. |
-| `thm:main-induction-current-interface` | Green statement border without proof fill on the fetched public graph. | Current source marks this separate Lean-only entry proof-complete; the fetched public graph is stale. | This is the separate Lean-only entry linked to `MIPStarRE.LDT.MainInductionStep.mainInduction`.  Its statement displays the corrected large-`k` hypothesis `k ≥ 400md`.  The successor-stage construction is now proved.  The internal theorem `mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier` proves the nontrivial successor conclusion from the predecessor answer-valued induction hypothesis, deriving the predecessor large-`k` condition from the successor large-`k` hypothesis and deriving `k ≥ 1` from the nontrivial small-error branch.  The predecessor induction hypothesis no longer carries an artificial `0 < d` assumption, so the recursive slice route applies also when `d = 0`.  The checked theorem `mainInductionSuccessorNext_ofRecursiveAnswerInduction` closes the full successor conclusion, including the large-error branch, once the local predecessor induction hypothesis is supplied; the former separate degree-zero family-and-scalar route and the former answer-valued slice-realization frontier are no longer part of the active reduction.  The ordinary small-error theorem `mainInductionSuccessorNext_ofSmallErrorConstruction` is now proved from the internal theorem `answerMainInduction`. | No successor repair remains for the corrected large-`k` interface; the remaining source-boundary range is `md ≤ k < 400md`. |
-| `prop:main-formal-source-small-error-obligation` | Not present on the fetched public graph. | The rebuilt local graph has a blue/unfilled node linked to `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`, with no `\leanok` or proof-level completion. | This is the non-vacuous small-error branch of the printed two-space theorem under the paper hypothesis `k ≥ md`.  It is not a source hypothesis.  The nonzero-\(k\) branch now calls the two-space role-register scalar absorption theorem; the remaining direct final-theorem hole is the zero-sampling boundary. | Prove the zero-sampling boundary and the inherited Section 6 source range from the paper hypotheses, then the source-boundary wrapper and `thm:main-formal` can be made proof-complete. |
+| `thm:main-induction` | Green statement border without proof fill on the fetched public graph. | The rebuilt local graph is blue/unfilled, and the blueprint links it to `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement` without `\leanok` or proof-level completion. | This is the induction theorem from `references/ldt-paper/inductive_step.tex:7-18` with the corrected large-`k` boundary.  The Lean statement records the confirmed correction: it assumes `400md ≤ k` and calls the separate corrected large-`k` interface, whose successor route is now proved.  The printed interval `md ≤ k < 400md` is documented as the boundary discrepancy in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`. | No successor repair remains; keep the paper-gap note synchronized with the corrected source statement. |
+| `thm:main-induction-current-interface` | Green statement border without proof fill on the fetched public graph. | Current source marks this separate Lean-only entry proof-complete; the fetched public graph is stale. | This is the separate Lean-only entry linked to `MIPStarRE.LDT.MainInductionStep.mainInduction`.  Its statement displays the corrected large-`k` hypothesis `k ≥ 400md`.  The successor-stage construction is now proved.  The internal theorem `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound` proves the nontrivial successor conclusion from the predecessor answer-valued induction hypothesis, deriving the predecessor large-`k` condition from the successor large-`k` hypothesis and deriving `k ≥ 1` from the nontrivial small-error branch.  The predecessor induction hypothesis no longer carries an artificial `0 < d` assumption, so the answer-valued route applies also when `d = 0`.  The former separate degree-zero family-and-scalar route and the former slice-transport route are no longer part of the active reduction.  The ordinary small-error theorem `mainInductionSuccessorNext_ofSmallErrorConstruction` is now proved from the internal theorem `answerMainInduction`. | No successor repair remains for the corrected large-`k` interface. |
+| `prop:main-formal-source-small-error-obligation` | Not present on the fetched public graph. | The rebuilt local graph has a blue/unfilled node linked to `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`, with no `\leanok` or proof-level completion. | This is the non-vacuous small-error branch of the corrected two-space theorem under the large-`k` and nonzero-sampling hypotheses.  It is not a source hypothesis.  The nonzero-\(k\) branch now calls the two-space role-register scalar absorption theorem. | Keep this node synchronized with the corrected source-boundary statement. |
 | `prop:main-formal-source-two-space-role-register` | Not present on the fetched public graph. | The rebuilt local graph has a blue statement-ready node without a Lean declaration. | This is the general two-space role-register reduction in the proof of the printed final theorem.  The heterogeneous symmetrization part is now proved in Lean and recorded in the blueprint as `lem:heterogeneous-role-register-symmetrization`, including the `(3ε,3ε,3ε)` branch comparison for `roleRegisterSymmStrategy`.  The trace-level factor-two unsymmetrization estimate for arbitrary heterogeneous role-register measurements is also proved by `MIPStarRE.LDT.ProjStrat.qBipartiteConsDefect_roleRegisterProjMeas_arbitrary_eq_average` and its two factor-two consequences, now recorded in the blueprint as `lem:heterogeneous-role-register-unsymmetrization`.  The checked same-space large-`k` theorem still does not by itself cover the full source route from a two-space strategy to the final conclusion. | Use the proved heterogeneous role-register goodness and unsymmetrization theorems in the final-theorem route and formalize the remaining source-boundary passage from the paper hypotheses. |
-| `prop:main-formal-source-k-range-boundary` | Not present on the fetched public graph. | The rebuilt local graph has a blue statement-ready node linked to `MIPStarRE.LDT.Test.mainFormal_sourceZeroKBoundaryObligation` without proof completion. | This is the final-theorem form of the gap between the printed hypothesis `k ≥ md` and the corrected large-`k` interface `k ≥ 400md`, together with the zero-sampling boundary allowed by \(d=0,k=0\). | Use the source-range induction obligation or another faithful argument to cover `md ≤ k < 400md`, and prove or explicitly correct the zero-sampling boundary without strengthening the printed theorem silently. |
-| Former `prop:main-formal-source-successor-construction` | Not present on the fetched public graph. | Retired from the local graph. | This former explanatory node recorded the final theorem's dependence on the Section 6 successor construction.  The corrected large-\(k\) successor branch is now proved, so this is no longer a live final-theorem frontier node. | No successor repair remains for this node; the remaining final-theorem work is the two-space source-boundary assembly and printed \(k \ge md\) range. |
-| `prop:main-induction-source-range-obligation` | Not present on the fetched public graph. | The rebuilt local graph has a blue/non-proof-filled node linked to `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and the direct positive-degree proof hole `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`, with no `\leanok` or proof-level completion. | This is the interval `md ≤ k < 400md` left by the current corrected large-`k` proof route.  The large-error, base, degree-zero, and `1 ≤ k` reductions are already separated; the remaining branch is positive-degree, non-base, small-error, and non-vacuous. | Prove the interval directly or derive it from a corrected source-range argument. |
+| `prop:main-formal-source-k-range-boundary` | Not present on the fetched public graph. | The rebuilt local graph has a blue statement-ready node. | This is the final-theorem form of the confirmed discrepancy between the printed hypothesis `k ≥ md` and the corrected large-`k` interface `k ≥ 400md`, together with the corrected nonzero sampling boundary. | Keep the paper-gap notes for the large-`k` and zero-sampling corrections synchronized with the corrected final theorem. |
+| Former `prop:main-formal-source-successor-construction` | Not present on the fetched public graph. | Retired from the local graph. | This former explanatory node recorded the final theorem's dependence on the Section 6 successor construction.  The corrected large-\(k\) successor branch is now proved, so this is no longer a live final-theorem frontier node. | No successor repair remains for this node. |
+| Former `prop:main-induction-source-range-obligation` | Not present on the fetched public graph. | Retired from the local graph after the large-`k` factor was accepted as a confirmed statement correction. | This former node represented the interval `md ≤ k < 400md` as a proof obligation.  The current source statement instead records the corrected large-`k` boundary explicitly. | No successor repair remains for this node. |
 | `prop:main-induction-successor-small-error-construction` | Missing from the fetched public graph. | The rebuilt local graph marks this node proof-complete. | This is the corrected large-\(k\) small-error successor branch.  It is now proved from the internal answer-valued induction theorem and the checked answer-valued pasting theorem. | No successor repair remains for this node. |
 | `prop:main-induction-successor-predecessor-induction` | Missing from the fetched public graph. | The rebuilt local graph marks this node proof-complete. | This records the recursive use of the predecessor answer-valued induction theorem on restricted slices.  It is supplied internally by the simultaneous answer-valued induction theorem, not as a hypothesis on the successor strategy. | No successor repair remains for this node. |
 | `prop:main-induction-successor-answer-slice-realization` | Not present on the fetched public graph. | The rebuilt local graph marks this node green and proof-filled through `MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofAnswerCarrier` and `slice_outputs_ofAnswerCarrier`. | This formerly recorded the all-degree interface mismatch between answer-valued restricted slices and the ordinary `SymStrat` self-improvement theorem.  The active route is now checked: it applies the axis-parallel/self-consistency form of self-improvement to an ordinary carrier with an inert diagonal measurement.  Ordinary realization would still require a low-degree support theorem for the answer-valued diagonal measurement, but that stronger route is not needed for the successor reduction. | No remaining action for this node. |
 | `def:main-formal-step6-constructions` | The fetched public graph still has the former label `def:main-formal-step6-obligations`. | Current source and the local graph mark the renamed base-case construction node `\leanok`. | The node records completed base-case and final-transport Step 6 constructions; it is not an additional theorem hypothesis for `mainFormal`.  The label has been changed from "obligations" to "constructions" to avoid suggesting that unproved hypotheses are being packaged as a definition. | No mathematical repair is needed for this node. |
 | Former `def:main-formal-successor-boundary` | Present as a green definition node on the fetched public graph. | Retired from the local source and absent from the rebuilt local graph. | The declarations formerly collected here are still mentioned in an unnumbered remark, but they no longer form a theorem-like graph node.  This prevents the restricted-recursion targets from being read as a completed final-theorem step. | Keep the underlying weighted-bound and recursive-slice declarations as internal targets; prove the successor construction inside Section 6. |
 | Former `def:main-formal-step6-successor-targets` | Present as a green definition node on the fetched public graph. | Retired from the local source and absent from the rebuilt local graph. | The successor-dependent uses of `mainInduction` are now described in an unnumbered remark, without `\leanok` and without graph-node status.  They call the now-proved corrected large-\(k\) successor route, but they are still not the printed final theorem. | Keep this as prose-only internal target information; do not restore it as a green graph node. |
-| Scalar-cascade envelope and inequality nodes | Not identified as public non-green frontier nodes in the inspected graph. | The rebuilt local graph marks `def:main-formal-envelope`, `def:main-formal-error-cascade`, `thm:main-formal-envelope-basics`, `thm:sigma-bound-main-formal`, `thm:zeta-bounds-main-formal`, and `thm:error-cascade-main-formal` green or filled.  The blueprint now explicitly places them in a scalar-cascade subsection as Lean bookkeeping for the final proof. | These nodes encode the final numerical envelope and the inequalities among the named error parameters.  They are scalar estimates, not source theorem boundaries, and `CascadeHypotheses` carries only the non-vacuous numerical regime needed to apply them.  They contain no bridge, residual, measurement-construction, or successor-strategy hypothesis. | Keep them as checked bookkeeping nodes.  They should not be used as substitutes for `thm:main-formal` or for the printed source-range obligations. |
+| Scalar-cascade envelope and inequality nodes | Not identified as public non-green frontier nodes in the inspected graph. | The rebuilt local graph marks `def:main-formal-envelope`, `def:main-formal-error-cascade`, `thm:main-formal-envelope-basics`, `thm:sigma-bound-main-formal`, `thm:zeta-bounds-main-formal`, and `thm:error-cascade-main-formal` green or filled.  The blueprint now explicitly places them in a scalar-cascade subsection as Lean bookkeeping for the final proof. | These nodes encode the final numerical envelope and the inequalities among the named error parameters.  They are scalar estimates, not source theorem boundaries, and `CascadeHypotheses` carries only the non-vacuous numerical regime needed to apply them.  They contain no bridge, residual, measurement-construction, or successor-strategy hypothesis. | Keep them as checked bookkeeping nodes.  They should not be used as substitutes for `thm:main-formal` or for the corrected source-boundary hypotheses. |
 | `thm:orthonormalization` | Green border, no proof fill. | Current source and the local graph mark the theorem fully proved. | `MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization` is axiom-clean in `AxiomAudit.lean`.  The formal proof uses the completed-measurement route and the locality-preserving projectivization repair, then absorbs the scalar estimate into the paper constant `100\zeta^{1/4}`. | No mathematical repair is needed. |
 | `lem:orthonormalization-main-lemma` | Green border with dark proof fill in the local graph. | Current source marks both the statement and proof `\leanok`, and the declaration is included in `AxiomAudit.lean`. | This is the source-facing `84\zeta^{1/4}` measurement orthogonalization lemma.  The proof uses the left-lifted projectivization repair and has no spectral-truncation or repair input as a theorem hypothesis. | No mathematical repair is needed. |
 | `lem:orthonormalization-main-lemma-formalized-envelope` | Green border, no proof fill. | Current source and the local graph mark the lemma fully proved. | The formalized envelope is the Lean-checked `100\zeta^{1/4}` version of the orthonormalization-main route.  It uses the projectivization repair and weakens the sharper repaired estimate to the displayed envelope. | No mathematical repair is needed. |
@@ -671,7 +650,6 @@ statement borders; and `thm:naimark` and
 published graph also predates the current explicit frontier proposition nodes
 `prop:main-formal-source-obligation`,
 `prop:main-formal-source-small-error-obligation`,
-`prop:main-induction-source-range-obligation`,
 `prop:main-induction-successor-small-error-construction`,
 `prop:main-induction-successor-predecessor-induction`, while the checked
 answer-valued slice self-improvement node
@@ -683,7 +661,6 @@ external-wrapper or corrected-interface declarations.  Its progress counts show
 the source-frontier entries as intentionally not statement-complete:
 `thm:main-formal`, `prop:main-formal-source-obligation`,
 `prop:main-formal-source-small-error-obligation`, `thm:main-induction`,
-`prop:main-induction-source-range-obligation`, and
 `prop:main-induction-successor-small-error-construction`.  The current
 corrected-interface entries `thm:main-formal-current-interface` and
 `thm:main-induction-current-interface` are deliberately not marked
@@ -691,23 +668,20 @@ statement-complete in the blueprint graph.  The external source theorems
 `thm:raz-safra` and `thm:classical-test-soundness` remain unlinked, while their
 checked Lean wrappers are separate fully marked interface entries.
 
-The genuine mathematical red node on the current main-formalization route
-remains the Section 6 successor construction for the corrected large-`k`
-interface to `thm:main-induction`, tracked by issue #1507.  The source theorem
-nodes `thm:main-formal` and `thm:main-induction` now have source-faithful Lean
-statements whose proof debt is direct or factored through named obligations,
-rather than pointing to the current restricted interfaces.  The other blue nodes
-in the inspected graph are
+The successor construction for the corrected large-`k` interface to
+`thm:main-induction`, tracked by issue #1507, is now proved.  The source theorem
+nodes `thm:main-formal` and `thm:main-induction` record the corrected large-`k`
+and nonzero-sampling boundary conditions rather than pointing to restricted
+interfaces through hidden hypotheses.  The other blue nodes in the inspected
+graph are
 deliberate external theorem boundaries or the informal theorem.  In the current
 source, the deliberate external theorem boundaries are source entries without
 Lean links; their checked Lean wrappers are separate fully marked interface
 entries.
-The remaining current-interface entries without proof-level closure are exactly
-those whose proofs still run through the Section 6 successor obligation.
 Apart from the separate current-interface entries for `mainFormal` and
-`mainInduction`, none of the reviewed
-paper-facing statements has acquired a new bridge, residual, repair, producer,
-package, or obligation hypothesis in order to appear formalized.
+`mainInduction`, none of the reviewed paper-facing statements has acquired a
+new bridge, residual, repair, producer, package, or obligation hypothesis in
+order to appear formalized.
 
 ## Auxiliary-name scan
 
@@ -749,20 +723,16 @@ checked not to import `sorryAx`.
   The same audit includes `AddInUFullStatement` and
   `addInUFullStatement_of_isGood`, which are the full formal counterpart of
   `lem:add-in-u`, not hidden hypotheses.
-* In Section 10, the helpers named
-  `mainInductionSuccessorNext_ofAnswerStageObligations`,
-  `mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound`,
-  `mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit`,
-  `mainInductionSuccessorNext_ofDegreeSplitObligations`, and
-  `mainInductionSuccessorNext_ofDegreeSplitPastingObligations` are linked only
-  in the proof discussion for `thm:main-induction-current-interface`.  They are
-  checked internal reductions, not extra hypotheses of the printed induction
-  theorem.  The same holds for the current small-error helper with an
-  internal-constructions name, and the current-interface theorem intentionally
-  has no proof-level `\leanok`.
+* In Section 10, the remaining answer-carrier helpers
+  `mainInductionSuccessorNext_ofAnswerCarrier` and
+  `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound` are checked
+  internal reductions, not extra hypotheses of the printed induction theorem.
+  The obsolete answer-stage, degree-split, and internal-construction helper
+  routes have been removed.
 * Also in Section 10, `CascadeHypotheses` is scalar-only: it records the
   non-vacuous numerical regime used in the final error-cascade inequalities.
 
 Thus the remaining source-statement issue is not a disguised name-shape
-problem.  It is the mathematical construction gap already isolated at
-`answerMainInductionSuccessorNext_ofSmallErrorConstruction`.
+problem.  It is the confirmed large-`k` boundary correction recorded by
+`mainInduction_sourceStatement` and
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.

@@ -187,8 +187,9 @@ lake env lean MIPStarRE/LDT/Test/AxiomAudit.lean
 Scratch `#print axioms` checks showed only `[propext, Classical.choice,
 Quot.sound]` for `razSafra`, `classicalTestSoundness`,
 `mainFormal_trivial_witness`, the final main-formal target weakening theorem,
-`SameSpaceProjStrat.strategySymmetrization_isGood_three_mul`, and
-`SameSpaceProjStrat.strategySymmetrizationPackage`. The same scratch file showed
+and `SameSpaceProjStrat.strategySymmetrization_isGood_three_mul`.  The former
+unused `SameSpaceProjStrat.strategySymmetrizationPackage` intermediate record has since been
+removed.  The same scratch file showed
 `sorryAx` for `mainFormal`, exactly as expected from the excluded live residual
 in the audit snapshot.  That historical `sorryAx` route through the Section 6
 successor construction has since been discharged for the corrected large-\(k\)

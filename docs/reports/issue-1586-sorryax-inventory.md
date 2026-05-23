@@ -61,33 +61,23 @@ the later pasting route still needs the answer-valued diagonal verifier
 relation.
 
 The internal theorem
-`MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier`
+`MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier`
 records this reduction in Lean: from the predecessor answer-valued induction
 hypothesis, the predecessor large-`k` side condition, and the nonzero-`k` side
 condition, it derives the nontrivial successor conclusion using the existing
 small-error assembly and the checked answer-valued self-improvement carrier.
 The nonzero-`k` side condition is derived from the small-error branch, not from
 a positive-degree assumption.  The checked strengthening
-`MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier`
+`MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`
 derives the predecessor large-`k` side condition from the successor large-`k`
 hypothesis, and the nontrivial branch derives `k ≥ 1` from
-`mainInductionError < 1`.  The checked split theorem
-`MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit`
-then combines this small-error reduction with the already proved large-error
-branch.  The newer checked theorem
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`
+`mainInductionError < 1`.  The checked theorem
+`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
 uses the predecessor induction hypothesis without assuming `0 < d`, so the
 former degree-zero successor construction is no longer part of the active
-frontier.  The older degree-split helper
-`MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily` shows
-that the retired degree-zero route could use the already completed degree-zero
-pasting construction once a proof supplies a complete, point-consistent slice
-family and the scalar comparison with `mainInductionError`.  The checked
-composition theorem
-`MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations`
-plugs this family-and-scalar route into the degree split, but this route is no
-longer the active frontier.
-`AxiomAudit.lean` checks the six completed helpers as standard-axiom
+frontier.  The retired degree-split route and its degree-zero family obligation
+have been removed.
+`AxiomAudit.lean` checks the completed successor helpers as standard-axiom
 declarations and checks the assembled small-error construction and its public
 successor wrappers as standard-axiom clean.  It also checks
 that the final Section 3 role-register transport theorem

@@ -74,7 +74,6 @@ PY
 | `prop:simeq-data-processing` and `prop:self-consistency-implies-data-processing` | `simeqDataProcessing`, `selfConsistencyImpliesDataProcessing` | Standard use of the mathematical term data processing.  These are source-facing preliminary lemmas proved from their displayed hypotheses; the word `Data` is not construction-data vocabulary here. |
 | `thm:naimark` | `NaimarkTensorProductCorrelationStatement` | Source-facing Naimark tensor-product correlation statement in the projective-submeasurement form produced by the one-measurement construction.  It is linked to the proved theorem `naimarkTensorProductCorrelation`; the statement wrapper records the displayed mathematical assertion, not an extra hypothesis. |
 | `rem:lean-questionwise-naimark` | `NaimarkStatement`, `OneMeasNaimarkData.toProjSubMeas` | Restricted Lean-only questionwise dilation interface and the projection back to the original-outcome submeasurement.  This is now an ordinary remark without active Lean metadata; the proved source theorem remains `thm:naimark`. |
-| `rem:lean-restricted-completion-total-mass` | `restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le`, `restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le` | Lean-only restricted-completion total-mass declarations.  This is now an ordinary remark rather than a green definition node. |
 | `rem:lean-right-register-completion-helpers` | `OrthonormalizeAndCompleteStatement.completedCloseness_liftRight`, `ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements` | Lean-only tensor-factor bookkeeping for the projectivization chain.  This is now an ordinary remark rather than a green definition node. |
 | `rem:lean-line169-projectivization-match-mass` | `ProjectivizationLine169Repair.*` | Lean-only line-169 consistency and match-mass repair lemmas.  This is now an ordinary remark rather than a green definition node. |
 | `lem:orthonormalization-main-lemma-formalized-envelope` | `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair` | Same-space corollary of the source orthogonalization lemma with the weaker public envelope stated in the blueprint.  The repair appears as an internal proof construction. |
@@ -155,7 +154,7 @@ correction.
 The former degree-zero family sub-obligation has been retired.  The recursive
 predecessor hypothesis is now stated without an artificial `0 < d` assumption,
 and the checked theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`
+`mainInductionSuccessorNext_ofSmallErrorConstruction`
 uses the same recursive slice route when `d = 0`; the nontrivial branch supplies
 `k ≥ 1` from `mainInductionError < 1`.
 
@@ -169,8 +168,7 @@ matching the narrow high-risk vocabulary:
 `lem:left-lifted-projectivization-repair`,
 `lem:sdp-uniform-feasible-witness`,
 `lem:symmetrization-bridge`,
-`rem:lean-left-lifted-projectivization-repair-producer`, and
-`rem:lean-residual-domination-declarations`.
+and `rem:lean-left-lifted-projectivization-repair-producer`.
 
 Those labels are stale with respect to the current local graph except for
 `lem:sdp-uniform-feasible-witness`.  The current source has renamed the
