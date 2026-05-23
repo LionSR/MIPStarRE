@@ -242,8 +242,9 @@ matrix-level definitions; they mirror the operator-level ones structurally.
   the old Section 9 gap but is no longer part of the current Lean route.
 - Issue #1515 and #1503 are historical for the checked Section 9 and
   induction-section self-improvement theorems.
-- The live downstream frontier is #1507, the Section 6 successor construction
-  that consumes the checked self-improvement interface.
+- The former downstream frontier #1507, the Section 6 successor construction
+  that consumes the checked self-improvement interface, is now historical.  The
+  corrected large-`k` construction is proved.
 - The paper-gap note
   `docs/paper-gaps/issue-930-self-improvement-missing-nu-consistency.tex`
   now records this status explicitly.

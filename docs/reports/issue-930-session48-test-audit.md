@@ -220,14 +220,12 @@ rg -n "\b(sorry|admit|axiom|unsafe|native_decide)\b" MIPStarRE/LDT/Test -g '*.le
 
 found only documentation mentions of the former ambient axiom and the expected
 `sorry` comment/proof term in `MainTheorem.lean`; the only actual proof-term
-`sorry` was then at `MainTheorem.lean:4117`.  In the current tree, the direct
-Test-slice proof-term `sorry` is the named small-error source-boundary
-obligation `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`; its
-wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` proves the
-saturated-error branch.  The current same-space interface inherits the
-proved corrected large-\(k\) Section 6 theorem named in the status update above;
-the source theorem still has the separate two-space and \(k\ge md\)
-source-boundary obligation.
+`sorry` was then at `MainTheorem.lean:4117`.  This proof-frontier paragraph is
+historical.  In the current tree, the corrected two-space source theorem assumes
+the documented boundaries \(k\ge400md\) and \(0<k\); the former
+`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` wrapper is checked,
+and there is no live Test-slice proof-term `sorry` attached to that
+source-boundary route.
 
 The new paper-gap note compiled successfully with:
 
