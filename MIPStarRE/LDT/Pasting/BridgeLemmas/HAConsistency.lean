@@ -280,7 +280,7 @@ theorem hAConsistency_submeas_from_lineConsistency_of_axis_self
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params.next H)
         (νB + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) := by
-    exact bridge_consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
       (uniformDistribution (Point params.next))
       (polynomialEvaluationFamily params.next H)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
