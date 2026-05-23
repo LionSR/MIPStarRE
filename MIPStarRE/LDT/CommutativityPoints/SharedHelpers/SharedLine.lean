@@ -4,7 +4,7 @@ import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 # Section 10 commutativity points: shared-line helpers
 
 Compatibility lemmas between sampled point pairs and shared-diagonal line
-questions, used by both the lift and drop bridges.
+questions, used by both the lift and drop comparisons.
 
 ## References
 

@@ -1,11 +1,11 @@
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.LiftBridges
 
 /-!
-# Section 10 commutativity points: drop bridges
+# Section 10 commutativity points: drop comparisons
 
-Bridge lemmas that drop structure from the mixed line family back to the
+Comparison lemmas that drop structure from the mixed line family back to the
 ordered diagonal-line product, used in the drop direction of the Section 10
-bridge argument.
+point-commutativity argument.
 
 ## References
 
@@ -319,8 +319,8 @@ theorem commutativityPoints
       (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy))
       (diagonalLineProductOrdered params strategy)
       δ δ
-      (orderedLiftToMixedBridge params strategy eps delta gamma hgood)
-      (orderedLiftToLineBridge params strategy eps delta gamma hgood)
+      (orderedLiftToMixedLine params strategy eps delta gamma hgood)
+      (orderedLiftToLineProduct params strategy eps delta gamma hgood)
   have hright :
       SDDOpRel strategy.state
         (pointPairSharedDiagonalLineDistribution params)

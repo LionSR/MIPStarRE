@@ -32,7 +32,7 @@ lake env lean MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean
 lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean
 ```
 
-A scratch `#check`/`#print axioms` file was run for the audited public route.  For `sampledDiagonalLineApproximation_pointWithDiagonalLine`, `orderedLiftToMixedBridge`, `orderedLiftToLineBridge`, and `commutativityPoints`, `#print axioms` reported only the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound`; no audited declaration reported `sorryAx`.
+A scratch `#check`/`#print axioms` file was run for the audited public route.  For `sampledDiagonalLineApproximation_pointWithDiagonalLine`, `orderedLiftToMixedLine`, `orderedLiftToLineProduct`, and `commutativityPoints`, `#print axioms` reported only the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound`; no audited declaration reported `sorryAx`.
 
 A grep over `MIPStarRE/LDT/CommutativityPoints/**/*.lean` found no `sorry`, `axiom`, or `admit` in the checked slice.
 
@@ -89,10 +89,11 @@ The paper's calculation routes
   -> (A^v_b A^u_a) \otimes I.
 ```
 
-Lean uses the same route, split into bridge lemmas over raw operator families:
+Lean uses the same route, split into comparison lemmas over raw operator
+families:
 
-- `orderedLiftToMixedBridge` proves the first replacement step (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean:23-130`);
-- `orderedLiftToLineBridge` proves the second replacement step (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean:133-255`);
+- `orderedLiftToMixedLine` proves the first replacement step (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean:23-130`);
+- `orderedLiftToLineProduct` proves the second replacement step (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean:133-255`);
 - `diagonalLineProduct_outcome_swap` proves the exact middle swap using projectivity of the postprocessed diagonal-line measurement (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean:22-40`);
 - `orderedDropFromLineBridge` and `reversedDropToPointsBridge` prove the two return steps (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean:161-294`).
 
