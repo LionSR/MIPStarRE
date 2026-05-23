@@ -9,11 +9,11 @@ Branch: `gpt55/issue-930-expansion-audit`
 > **Status note, 2026-05-20.**  The coordination paragraph below records the
 > issue state at the May 1 audit snapshot.  The old `Test/MainTheorem.lean`
 > Step-6 residual and #931 self-improvement input-producer route are no longer
-> the current proof frontier.  The current direct LDT proof obligations are the
-> two source-boundary obligations for `thm:main-induction` and
-> `thm:main-formal`, together with the Section 6 small-error successor
-> construction tracked by #1507.  This historical audit remains valid as a
-> statement audit for the hypercube expansion slice.
+> the current proof frontier.  The later Section 6 small-error successor
+> construction is checked, and the former source-boundary obligation wrappers
+> have been retired under the documented \(k\ge400md\) and \(0<k\) statement
+> corrections.  This historical audit remains valid as a statement audit for
+> the hypercube expansion slice.
 
 ## Executive summary
 
