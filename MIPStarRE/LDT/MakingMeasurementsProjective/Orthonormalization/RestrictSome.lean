@@ -1,8 +1,4 @@
-import MIPStarRE.LDT.Tactic.LdtSimp
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
-import MIPStarRE.LDT.Basic.MeasurementLift
-import MIPStarRE.LDT.Preliminaries.ComparisonCore
-import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Section 5 — restriction of completed projective submeasurements
