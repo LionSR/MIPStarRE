@@ -8,11 +8,7 @@ corrected large-`k` successor construction is proof-complete: locally
 `MainInductionStep.mainInduction`,
 `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`, and
 the answer-valued successor route are standard-axiom clean.  The remaining
-direct LDT proof holes are now the source-range obligation
-`mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation` and the
-final two-space source-boundary obligation
-`Test.mainFormal_sourceSmallErrorObligation`.  The current dependency-graph
-classification is recorded in
+direct LDT proof-hole inventory is recorded in
 `docs/reports/2026-05-22-public-graph-and-naimark-status.md` and
 `docs/reports/issue-1586-sorryax-inventory.md`.
 
@@ -50,7 +46,8 @@ The Lean declaration `mainInductionSuccessorNext` is the native successor step
 for the corrected large-`k` interface.  It does not take restricted-probability
 packages, recursive slice witnesses, self-improvement data, or pasting data as
 hypotheses.  It is now checked; the remaining source-boundary issue for
-`thm:main-induction` is the printed interval `md <= k < 400md`.
+`thm:main-induction` is the confirmed large-`k` boundary correction recorded in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
 
 The present Lean route has been further factored.  The declaration
 `mainInductionSuccessorNext_ofAnswerCarrier` proves the successor conclusion
@@ -68,9 +65,9 @@ induction hypothesis inside the induction on the dimension.
 
 | Node or declaration | Status | Reason |
 | --- | --- | --- |
-| `thm:main-induction` | Source statement with source-range proof hole | The blueprint and Lean source statement match the paper theorem.  The corrected large-`k` successor route is proved; the remaining proof hole is the printed source range `md <= k < 400md`. |
+| `thm:main-induction` | Source statement with confirmed large-`k` correction | The corrected large-`k` successor route is proved.  The printed interval `md <= k < 400md` is recorded as the boundary discrepancy in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`. |
 | `mainInductionSuccessorNext` | Proved corrected large-`k` successor step | This is the native `m -> m + 1` branch corresponding to `inductive_step.tex:441--551` in the corrected large-`k` interface. |
-| `answerMainInductionSuccessorNext_ofSmallErrorConstruction` | Proved answer-valued small-error construction | This theorem is a corollary of the simultaneous answer-valued induction theorem. |
+| `answerMainInduction` | Proved simultaneous answer-valued induction theorem | This theorem supplies the predecessor answer-valued induction conclusion used inside the ordinary successor step. |
 | `mainInductionSuccessorNext_ofSmallErrorConstruction` | Proved ordinary small-error construction theorem | This theorem has exactly the successor strategy hypotheses and the branch condition `mainInductionError < 1`.  It is proved from `answerMainInduction` and the checked answer-carrier reduction. |
 | `def:successor-pasting-data` | Internal construction node | The public graph marks this node green.  It records formal data and scalar bounds used by the successor construction; it is not itself the paper theorem. |
 | `mainInductionSuccessorNext_ofAnswerCarrier` | Conditional helper, proved | This theorem proves the small-error successor conclusion from the predecessor answer-valued induction hypothesis.  This input is an internal proof obligation, not a source hypothesis. |
@@ -128,5 +125,6 @@ the predecessor answer-valued induction hypothesis is an internal proof
 obligation for these helper statements.  It is not added to
 `thm:main-induction`; in the current tree the enclosing answer-valued induction
 theorem supplies it internally and the corrected large-\(k\) successor branch
-is proved.  The source theorem remains incomplete only through the printed
-source range \(md \le k < 400md\).
+is proved.  The printed range \(md \le k < 400md\) is recorded as a confirmed
+large-\(k\) boundary correction rather than as a remaining successor
+construction.
