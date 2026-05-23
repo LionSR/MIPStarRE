@@ -6,8 +6,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSl
 
 Compatibility module for the self-improvement part of the main-induction
 successor step.  The ordinary Section 6 assembly is in
-`SelfImprovementAssembly.Core`; the answer-valued slice-transport interface is
-in `SelfImprovementAssembly.AnswerSlice`.
+`SelfImprovementAssembly.Core`; the answer-valued carrier construction is in
+`SelfImprovementAssembly.AnswerSlice`.
 
 ## References
 

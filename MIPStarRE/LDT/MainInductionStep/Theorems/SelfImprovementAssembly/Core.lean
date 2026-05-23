@@ -17,7 +17,7 @@ Core public API for the ordinary self-improvement data: constructors for
 `ldPastingInInductionSectionNontrivial` is the restricted nontrivial-regime
 form used as an auxiliary statement.
 
-The answer-valued slice-transport constructors are separated into
+The answer-valued carrier construction is separated into
 `SelfImprovementAssembly.AnswerSlice`.
 
 ## References

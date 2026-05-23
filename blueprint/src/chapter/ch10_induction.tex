@@ -214,13 +214,13 @@
 	output in \texttt{AnswerSelfImprovementData}.  Their constructors call
 	\texttt{selfImprovementInInductionSection}; they no longer carry a separate
 	bundle of Section~\ref{chap:self-improvement} proof-stage data as an input.
-	The ordinary \texttt{SliceStrategyTransport} structure is a narrow formal
-	interface: it assumes concrete per-slice symmetric strategies and
-	measurement-transport data, while averaged point-operator compatibility is
-	derived structurally from point-measurement transport.  The answer-valued
-	successor route instead uses the carrier construction
-	\texttt{AnswerSelfImprovementData.ofAnswerCarrier}, so it does not assume an
-	ordinary realization of the restricted answer-valued diagonal measurements.
+	The former ordinary slice-transport interface, which assumed concrete
+	per-slice symmetric strategies and measurement-transport data, has been
+	retired from the checked route.  The answer-valued successor route uses the
+	carrier construction \texttt{AnswerSelfImprovementData.ofAnswerCarrier} and
+	then forgets the answer-valued data through \texttt{SelfImprovementData.ofAnswer},
+	so it does not assume an ordinary realization of the restricted answer-valued
+	diagonal measurements.
 \end{remark}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}

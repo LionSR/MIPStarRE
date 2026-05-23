@@ -1,13 +1,13 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.Core
 
 /-!
-# Section 6 — Answer-Valued Self-Improvement Slice Transport
+# Section 6 — Answer-Valued Self-Improvement Assembly
 
-This file contains the answer-valued analogues of the Section 6 slice-transport
-constructors.  The ordinary construction, including `selfImprovementInInductionSection`,
-lives in `SelfImprovementAssembly.Core` and is imported here so that the
-answer-valued construction can reuse the same Section 9 self-improvement
-theorem.
+This file contains the answer-valued carrier construction used in the Section 6
+self-improvement assembly.  The ordinary construction, including
+`selfImprovementInInductionSection`, lives in `SelfImprovementAssembly.Core` and
+is imported here so that the answer-valued construction can reuse the same
+Section 9 self-improvement theorem.
 
 ## References
 
