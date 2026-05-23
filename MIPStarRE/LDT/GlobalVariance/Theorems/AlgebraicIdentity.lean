@@ -4,7 +4,6 @@ import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.LDT.Preliminaries.ComparisonCore
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
-import MIPStarRE.LDT.GlobalVariance.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
 import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
@@ -37,18 +36,6 @@ lemma pointConditionedExpansionTransfer
           leftTensor (ι₂ := ι)
             (pointConditionedOutcomeOperatorAtPolynomial params strategy g u))
         (weightedPolynomialState params strategy G g))
-
-lemma matrixPointConditionedExpansionTransfer
-    (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixVarianceTransferRealization params)
-    (g : Polynomial params) :
-    matrixPointConditionedGlobalVarianceAtPolynomial params model g ≤
-      (params.m : Error) * matrixPointConditionedLocalVarianceAtPolynomial params model g := by
-  simpa [matrixPointConditionedGlobalVarianceAtPolynomial,
-    matrixPointConditionedLocalVarianceAtPolynomial] using
-      (matrixLocalToGlobal params
-        (matrixPointConditionedRealizationAtPolynomial params model g))
 
 lemma globalVarianceOfPoints_bound_of_local
     (params : Parameters)
