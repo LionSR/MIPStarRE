@@ -14,15 +14,32 @@
 \begin{document}
 \maketitle
 
-\section*{At a glance}
+\section{At a glance}
 
-\textbf{Verdict (2026-05-13).}
-The statement-level discrepancy is resolved: the Lean theorem
-\leanid{selfImprovement} contains the paper's $\nu$-consistency hypothesis.
-The remaining work is the proof of that theorem from the paper hypotheses,
-tracked by issue~\#1515.
+\begin{itemize}
+  \item \textbf{Status: resolved.}  The statement-level discrepancy is resolved:
+  the Lean theorem \leanid{selfImprovement} contains the paper's
+  $\nu$-consistency hypothesis.  The proof-level gap described in the original
+  note has also been closed: \leanid{selfImprovement} and the induction-section
+  reformulation are now proved from the corrected source-facing hypotheses.
+  Thus issue~\#1515 is historical for the current Lean tree.
+  \item \textbf{Difficulty: low as a statement repair, substantial as the
+  former proof construction.}  The missing hypothesis was easy to identify from
+  the paper statement.  The later proof closure required the Section~9 helper,
+  semidefinite-programming, orthonormalization, and final-field constructions.
+  \item \textbf{Estimated weight:} no remaining proof construction is expected
+  for this note.  It remains as documentation of the former statement-level
+  discrepancy and its resolution.
+  \item \textbf{Mathlib/project split:} roughly \textbf{25\% Mathlib} and
+  \textbf{75\% project-local} for the proof route that closed the issue.
+  Mathlib supplies finite-dimensional operator and matrix order infrastructure;
+  the project supplies the LDT self-improvement interfaces and transports.
+  \item \textbf{Key Mathlib inputs:} positive semidefinite matrices, finite
+  sums of matrix-valued effects, trace and operator inequalities, and the
+  finite-dimensional SDP infrastructure used by the Section~9 proof.
+\end{itemize}
 
-\section{The assertion}
+\section{Key theorem forms}
 
 The self-improvement step in \cite[Section~9]{Ji2020LowIndividualDegree}
 takes a measurement $G\in\polymeas{m}{q}{d}$, where $m$ is the number
@@ -64,28 +81,32 @@ now includes the consistency hypothesis
 have been removed.  Thus the discrepancy recorded in this note has been
 resolved at the level of the public theorem statement.
 
-The proof is still incomplete.  The missing work is now represented by an
-explicit \leanid{sorry} in the theorem with the paper statement, rather than by
-extra hypotheses on a conditional substitute for the theorem.
+The proof-level gap recorded by the original version of this note has since
+been discharged.  The current theorem proves the source-shaped statement
+directly, rather than representing the missing work by an explicit
+\leanid{sorry} or by extra hypotheses on a conditional substitute for the
+theorem.
 
 The induction-step theorem
 \leanid{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection}
 has the same status: its statement includes the input consistency hypothesis,
-and its remaining Section~9 work is a direct proof gap.
+and the Section~9 work needed by that reformulation is now checked.
 
 \section{Mathematical consequence}
 
 The previous theorem statement was too weak to express the paper's claim,
 because $\nu$ was not related to the input measurement.  The present theorem
-statement no longer has that defect.  The remaining mathematical problem is to
-derive the helper strong self-consistency estimate, the orthonormalization
-input, and the final-field transport from the paper hypotheses.
+statement no longer has that defect.  The helper strong self-consistency
+estimate, the orthonormalization step, and the final-field transport are now
+derived inside the checked proof rather than supplied as auxiliary source
+hypotheses.
 
 \section{Blueprint status}
 
 The blueprint entry now points to the theorem \leanid{selfImprovement}.  No
 top-level conditional obligation theorem is recorded as the formalization of
-the paper theorem.  The proof-level gap is tracked by issue~\#1515.
+the paper theorem.  The former proof-level gap tracked by issue~\#1515 is
+historical for the current code.
 
 \section{Error coefficients}
 
@@ -105,9 +126,9 @@ $\zeta = 3000\,m\,(\eps^{1/32}+\delta^{1/32}+(d/q)^{1/32})$ matches the paper.
 
 The paper's self-improvement theorem requires an approximation hypothesis
 $\simeq_{\nu}$ linking the input measurement $G$ to the parent measurement
-$A$.  The Lean statement now contains this hypothesis.  The remaining task is
-to complete the proof of the theorem with the paper statement, not to
-reintroduce the missing work as auxiliary hypotheses.
+$A$.  The Lean statement now contains this hypothesis, and the corresponding
+proof is checked without reintroducing the missing work as auxiliary
+hypotheses.
 
 \bibliographystyle{alpha}
 \bibliography{references}
