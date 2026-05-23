@@ -111,8 +111,10 @@ theorem mainFormal_source_trivial_witness
   classical
   haveI : Inhabited (Polynomial params) :=
     ⟨⟨0, by intro i; simp [MvPolynomial.degreeOf_zero]⟩⟩
-  let trivialA : ProjMeas (Polynomial params) ιA := default
-  let trivialB : ProjMeas (Polynomial params) ιB := default
+  let trivialA : ProjMeas (Polynomial params) ιA :=
+    ProjMeas.trivialDistinguishedOutcome (default : Polynomial params)
+  let trivialB : ProjMeas (Polynomial params) ιB :=
+    ProjMeas.trivialDistinguishedOutcome (default : Polynomial params)
   refine ⟨trivialA, trivialB, ?_, ?_, ?_⟩
   all_goals exact ⟨le_trans
     (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩

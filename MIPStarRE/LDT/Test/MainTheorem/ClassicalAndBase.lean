@@ -193,10 +193,10 @@ fallback. The complementary non-vacuous branch
 `mainFormalError params k eps < 1` supplies the scalar hypotheses needed by the
 Step 8 cascade.
 
-Witness choice: we pick an arbitrary `ProjMeas` via `default` — the proof only
-needs the generic bound `bipartiteConsError ≤ 1`, not any specific
-distributional property of the witness, so the lemma is insensitive to how the
-ambient `Inhabited (ProjMeas …)` instance is realized. -/
+Witness choice: we use the explicit degenerate projective measurement supported
+at the zero polynomial.  The proof only needs the generic bound
+`bipartiteConsError ≤ 1`, not any specific distributional property of the
+witness. -/
 theorem mainFormal_trivial_witness
     (params : Parameters) [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
@@ -218,7 +218,8 @@ theorem mainFormal_trivial_witness
   classical
   haveI : Inhabited (Polynomial params) :=
     ⟨⟨0, by intro i; simp [MvPolynomial.degreeOf_zero]⟩⟩
-  let trivialG : ProjMeas (Polynomial params) ι := default
+  let trivialG : ProjMeas (Polynomial params) ι :=
+    ProjMeas.trivialDistinguishedOutcome (default : Polynomial params)
   refine ⟨trivialG, trivialG, ?_, ?_, ?_⟩
   all_goals exact ⟨le_trans
     (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩

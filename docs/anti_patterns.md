@@ -372,12 +372,13 @@ From the ledger in [#449]:
 
 ### Acceptable uses
 
-Non-computable instances required for typeclass plumbing —
-`Nonempty (Polynomial params)` inhabited by the zero polynomial, `Inhabited
-(Measurement ...)` by the trivial one — are fine when they are used only to
-*inhabit* a type, not to discharge a paper-cited existential. The smell is
-specifically about `default` showing up in the proof of a *theorem named
-after a paper result*.
+Non-computable instances required for typeclass plumbing, such as
+`Nonempty (Polynomial params)` inhabited by the zero polynomial, are fine when
+they are used only to *inhabit* a type, not to discharge a paper-cited
+existential.  Degenerate measurements should be constructed explicitly with a
+specified outcome rather than supplied by an ambient `Inhabited` instance.  The
+smell is specifically about `default` showing up in the proof of a *theorem
+named after a paper result*.
 
 ### How to fix it
 

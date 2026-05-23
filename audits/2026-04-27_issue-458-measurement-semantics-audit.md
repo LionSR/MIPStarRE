@@ -42,15 +42,18 @@ A project-wide search for measurement/state defaults found:
 
 - No global `Inhabited` instance for `QuantumState`, `SubMeas`, or `ProjSubMeas`.
 - No global `Inhabited` instance for `Quantum.Submeasurement` or `Quantum.Measurement`.
-- The only measurement-family defaults are the complete one-outcome-at-`default` witnesses:
-  - `Inhabited (Measurement α ι)` in `SubMeasurementCore.lean`;
-  - `Inhabited (ProjMeas α ι)` in `SubMeasurementCore.lean`.
-- Explicit uses of those defaults are sparse. The notable one is the already-documented
-  witness choice in `MIPStarRE/LDT/Test/MainTheorem.lean:168--193`, which uses
-  `default : ProjMeas ...` only to realize an ambient witness package and is outside this
-  PR's scope.
+- The former complete one-outcome-at-`default` instances
+  `Inhabited (Measurement α ι)` and `Inhabited (ProjMeas α ι)` have since been
+  removed.  Degenerate complete measurements must now be constructed explicitly
+  by `Measurement.trivialDistinguishedOutcome` or
+  `ProjMeas.trivialDistinguishedOutcome`, with the chosen outcome displayed.
+- The formerly documented saturated-error witness in the final theorem route
+  now uses the explicit distinguished-outcome constructor rather than
+  `default : ProjMeas ...`.
 
-This confirms the previously merged unsafe-zero-default cleanup is still intact.
+This confirms the previously merged unsafe-zero-default cleanup is still intact;
+the later explicit-constructor cleanup removes the remaining ambient
+measurement defaults.
 
 ## Session32 helper additions
 
