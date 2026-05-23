@@ -109,7 +109,9 @@ These align directly with the existing folders:
 **Lean mapping**
 
 - `MIPStarRE/LDT/Preliminaries/Defs.lean`
-- `MIPStarRE/LDT/Preliminaries/Theorems.lean`
+- `MIPStarRE/LDT/Preliminaries/ComparisonCore.lean`
+- `MIPStarRE/LDT/Preliminaries/DistanceBounds.lean`
+- `MIPStarRE/LDT/Preliminaries/ConsistencyBridges.lean`
 
 Important Lean theorem names already scaffolded:
 

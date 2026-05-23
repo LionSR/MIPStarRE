@@ -129,7 +129,6 @@ These files import many submodules and are natural compile-time bottlenecks in a
 
 | File | Lines | Imports | Real Time |
 |------|-------|---------|-----------|
-| `Preliminaries/Theorems.lean` | 25 | 18 | <1s |
 | `Commutativity/Theorems.lean` | 24 | 18 | <1s |
 | `Pasting/Theorems.lean` | 19 | 13 | <1s |
 | `GlobalVariance/Theorems/Results.lean` | 2,950 | 10 | 8.6s |
