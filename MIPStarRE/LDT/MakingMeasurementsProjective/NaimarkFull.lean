@@ -56,34 +56,6 @@ theorem questionwiseOneMeasNaimarkData_source_effect
           simpa [(A x).sum_eq_total] using (A x).total_le_one
       } : MIPStarRE.Quantum.Submeasurement Outcome ι)
 
-/-- The projective submeasurement obtained by discarding the fresh `none`
-outcome from each questionwise Naimark completion. -/
-noncomputable def questionwiseNaimarkProjSubMeas
-    {Question Outcome ι : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    [Fintype ι] [DecidableEq ι]
-    (A : IdxSubMeas Question Outcome ι) :
-    IdxProjSubMeas Question Outcome (ι × Option Outcome) :=
-  fun x => (questionwiseOneMeasNaimarkData A x).toProjSubMeas
-
-/-- The questionwise projective submeasurement has the same single-outcome
-expectations as the original submeasurement after the one-measurement Naimark
-state lift. -/
-theorem questionwiseNaimarkProjSubMeas_expectation_preservation
-    {Question Outcome ι : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    [Fintype ι] [DecidableEq ι]
-    (A : IdxSubMeas Question Outcome ι) (x : Question)
-    (ρ : MIPStarRE.Quantum.Op ι) (a : Outcome) :
-    MIPStarRE.Quantum.normalizedTrace (ρ * (A x).outcome a) =
-      MIPStarRE.Quantum.normalizedTrace
-        (oneMeasLiftedDensity Outcome ρ *
-          ((questionwiseNaimarkProjSubMeas A x).outcome a)) := by
-  have hsource := questionwiseOneMeasNaimarkData_source_effect A x
-  simpa [questionwiseNaimarkProjSubMeas, OneMeasNaimarkData.toProjSubMeas,
-    restrictSomeProjSubMeas, hsource] using
-    (questionwiseOneMeasNaimarkData A x).expectation_preservation ρ a
-
 /-- Questionwise one-measurement Naimark data.
 
 For each question on each side, apply `oneMeasNaimark` to the corresponding
