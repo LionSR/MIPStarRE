@@ -124,9 +124,20 @@ The paper's `thm:main-formal` starts from a general projective strategy and then
 (strategy : SameSpaceProjStrat params ι)
 ```
 
-and no longer assumes the historical hypothesis `hd : 0 < params.d`. Its Step 1 bridge also lives in the `SameSpaceProjStrat` namespace and constructs the role-register symmetrized strategy only from that same-space input (`SymmetrizationBridge.lean:76-120`). Thus a paper-general strategy on different local spaces, or with a nonsymmetric starting state, is not presently an input to the formal interface.
+and no longer assumes the historical hypothesis `hd : 0 < params.d`.  This is
+the separate same-space Lean interface, not the corrected source theorem.
+The corrected source theorem `mainFormal_sourceStatement` now starts from the
+paper-faithful two-space `ProjStrat` input under the documented boundary
+corrections.
 
-The current declaration no longer assumes `hd : 0 < params.d`; this positive-degree restriction was discharged after the original audit. Its remaining non-source interface restriction is the same-space input. This is not the former #931 residual: it is a statement/interface restriction on the current same-space Lean theorem and is now separated from the source-boundary obligations for `thm:main-formal` and `thm:main-induction`. PR #958 closed the earlier #560 container mismatch by promoting the two-space container to `ProjStrat`, but the current main-formal interface and Step 1 bridge still need a heterogeneous role-register symmetrization wrapper to recover the full paper theorem. I documented this in `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`; that note now records the positive-degree condition as historical rather than current.
+The current same-space declaration no longer assumes `hd : 0 < params.d`; this
+positive-degree restriction was discharged after the original audit.  Its
+remaining non-source interface restriction is the same-space input.  This is
+not the former #931 residual: it is a statement/interface restriction on the
+separate same-space Lean theorem.  The former need for a heterogeneous
+role-register wrapper is now historical for the source theorem: the corrected
+two-space source-boundary route is checked in `mainFormal_sourceStatement`, as
+recorded in `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`.
 
 ## Finding 3: known theorem-interface corrections are already documented
 
@@ -209,8 +220,8 @@ removed.  The same scratch file showed
 `sorryAx` for `mainFormal`, exactly as expected from the excluded live residual
 in the audit snapshot.  That historical `sorryAx` route through the Section 6
 successor construction has since been discharged for the corrected large-\(k\)
-interface.  The current direct Test-slice proof hole is the source-boundary
-small-error obligation named below.
+interface.  The later source-boundary small-error wrapper named below is also
+now checked under the corrected \(k\ge400md\) and \(0<k\) hypotheses.
 
 The audited-scope grep in the original snapshot
 
