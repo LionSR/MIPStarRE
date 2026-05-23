@@ -56,27 +56,34 @@ role-register restriction.
 
 \section{Key theorem forms}
 
-The comparison separates the source theorem from the current formal interface.
+The comparison separates the printed theorem, the corrected source theorem, and
+the retained same-space formal interface.
 \begin{enumerate}
   \item \textbf{Printed source form.}  The paper's main theorem starts from a
   general projective strategy on
   \(\mathcal H_{\mathrm A}\otimes\mathcal H_{\mathrm B}\), with no assumption
-  that the two local spaces coincide and no assumption that the original state
-  is already symmetric.  The Lean declaration
-  \leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement} records this source
-  statement and factors the remaining source-boundary work through the named
-  wrapper \leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion}.  This wrapper
-  proves the saturated-error branch and leaves the non-vacuous branch as
-  \leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion}.
+  that the two local spaces coincide and no assumption that the original state is
+  already symmetric.  Its printed numerical hypotheses are corrected separately
+  in \path{docs/paper-gaps/issue-906-main-formal-k-bound.tex} and
+  \path{docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex}.
+  \item \textbf{Corrected source form.}  The Lean declaration
+  \leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement} is now stated for the
+  general two-space strategy container
+  \leanid{MIPStarRE.LDT.ProjStrat}.  It assumes the documented corrected
+  boundaries \(k\ge 400md\) and \(0<k\), and it proves the three final
+  consistency conclusions without an added same-space hypothesis.
   \item \textbf{Current formal-interface form.}  The Lean theorem
   \leanid{MIPStarRE.LDT.Test.mainFormal} is stated for the same-space strategy
-  interface \leanid{MIPStarRE.LDT.SameSpaceProjStrat}.  The source-labelled
-  blueprint theorem remains separate from the current-interface entry.
-  \item \textbf{Expected adapter form.}  A future theorem should construct the
-  role-register symmetrized strategy directly from the two-space container
-  \leanid{MIPStarRE.LDT.ProjStrat}, or prove that the paper's general strategy
-  reduces to the same-space formal interface without changing the source
-  hypotheses.
+  interface \leanid{MIPStarRE.LDT.SameSpaceProjStrat}.  This theorem remains a
+  useful Lean-only subcase, but the source-labelled blueprint theorem is no
+  longer identified with this restricted interface.
+  \item \textbf{Checked heterogeneous adapter form.}  The heterogeneous
+  role-register passage is formalized by
+  \leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary},
+  which feeds the role-register symmetrization into the corrected
+  main-induction theorem and then unsymmetrizes, orthonormalizes, completes, and
+  evaluates the resulting polynomial measurements on the two original tensor
+  factors.
 \end{enumerate}
 
 \section{The assertion}
