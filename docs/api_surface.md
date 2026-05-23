@@ -60,9 +60,11 @@ Relevant re-exported API:
 - `noncomputable def Submeasurement.postprocess [DecidableEq α] [DecidableEq β] (M : Submeasurement α d) (f : α → β) : Submeasurement β d`
   - Preserves PSD by fiberwise sum and preserves the `sum_le_one` obligation.
 
-## `MIPStarRE/LDT/Basic/SubMeasurement.lean`
+## `MIPStarRE/LDT/Basic/SubMeasurementCore.lean` and related files
 
-This is the main local API for proving `SubMeas` obligations.
+The main local API for proving `SubMeas` obligations is now split across
+`SubMeasurementCore.lean`, `SubMeasurementFamilies.lean`, `TensorPlacement.lean`,
+and `MeasurementLift.lean`.
 
 ### Core structures
 

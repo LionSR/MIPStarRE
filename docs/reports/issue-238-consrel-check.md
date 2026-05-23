@@ -14,8 +14,8 @@ Main paper references:
 Main Lean references:
 
 - `MIPStarRE/LDT/Test/Defs.lean`, lines 140-212
-- `MIPStarRE/LDT/Basic/Operator.lean`, lines 44-67
-- `MIPStarRE/LDT/Basic/SubMeasurement.lean`, lines 515-537
+- `MIPStarRE/LDT/Basic/QuantumState.lean`, for tensor placement primitives
+- `MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean`, for placed submeasurements
 
 ## Executive Summary
 
@@ -110,23 +110,18 @@ Conclusion:
 
 Yes.
 
-The tensor primitives are:
+The tensor primitives are defined in `MIPStarRE/LDT/Basic/QuantumState.lean`:
 
 - `opTensor A B = Matrix.kronecker A B`
-  in `MIPStarRE/LDT/Basic/Operator.lean`, lines 44-48
 - `leftTensor A = A ⊗ I`
-  in `MIPStarRE/LDT/Basic/Operator.lean`, lines 50-53
 - `rightTensor B = I ⊗ B`
-  in `MIPStarRE/LDT/Basic/Operator.lean`, lines 55-58
 - `leftTensor_mul_rightTensor_eq_opTensor`
-  in `MIPStarRE/LDT/Basic/Operator.lean`, lines 61-67
 
 The placement wrappers are:
 
 - `leftPlacedSubMeas`
-  in `MIPStarRE/LDT/Basic/SubMeasurement.lean`, lines 515-528
 - `rightPlacedSubMeas`
-  in `MIPStarRE/LDT/Basic/SubMeasurement.lean`, lines 531-537
+  in `MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean`
 
 And the bridge theorem states:
 

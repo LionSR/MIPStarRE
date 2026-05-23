@@ -209,7 +209,7 @@ finite-dimensional complex matrices.  Tracked at [#1250].
 **Lean files**:
 - `MIPStarRE/Quantum/FiniteMatrix.lean` — `Op d`, `normalizedTrace`,
   `tauNormSq`, `IsProj`, `sandwich_nonneg`, `sandwich_mono`
-- `MIPStarRE/LDT/Basic/SubMeasurement.lean` — `SubMeas`, `Measurement`,
+- `MIPStarRE/LDT/Basic/SubMeasurementCore.lean` — `SubMeas`, `Measurement`,
   `ProjSubMeas`, `ProjMeas`
 - `MIPStarRE/LDT/Basic/TensorPlacement.lean` — left/right tensor lifts
 - `MIPStarRE/LDT/Basic/QuantumState.lean` — `opTensor_nonneg`
