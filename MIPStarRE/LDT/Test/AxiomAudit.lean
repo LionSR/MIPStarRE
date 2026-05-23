@@ -164,36 +164,21 @@ handoff: `mainInductionSuccessor`, `mainInduction`,
 `strategySymmetrization_mainInduction`, and
 `MainFormalRoleInductionWitness.ofMainInduction` are standard-axiom clean.
 
-The audit for
-`MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations` and
-`MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound`
-requires the standard Lean axioms only.  These older internal helpers are not
-the paper theorem; they prove the positive-degree nontrivial successor
-conclusion once the predecessor answer-valued induction hypothesis and concrete
-answer-valued slice-transport data have been supplied internally.  The latter
-helper also derives the predecessor large-`k` and `k ≥ 1` side conditions from
-the successor large-`k` hypothesis.  The checked theorem
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`
-records the exact small-error closure from the predecessor induction hypothesis
-and the answer-valued slice transport, without a separate degree-zero family
-branch.
-The answer-carrier variants
-`MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier`,
-the corresponding successor-bound form, and
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`
-are also standard-axiom clean.  They remove the answer-valued slice-transport
-input from the active successor route: the needed self-improvement data are
-constructed directly from `AnswerSelfImprovementData.ofAnswerCarrier`.
+The answer-carrier reductions
+`MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier` and
+`MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`
+are standard-axiom clean.  They are not paper theorems; they are internal
+successor reductions from the predecessor answer-valued induction hypothesis.
+They remove the answer-valued slice-transport input from the active successor
+route: the needed self-improvement data are constructed directly from
+`AnswerSelfImprovementData.ofAnswerCarrier`, and the successor-bound form derives
+the predecessor large-`k` side condition from the successor large-`k` hypothesis.
 The answer-valued recursive slice restriction
 `MainInductionStep.xRestrictedAnswerSymStratOfAnswer` and its
 restricted-probability theorem
 `MainInductionStep.answerSuccessorRestrictedProbabilities` are also
 standard-axiom clean; they are constructions toward the simultaneous
 answer-valued induction argument, not added hypotheses of the paper theorem.
-The theorem
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions`
-is retained as an older degree-split composition helper; it is checked and does
-not import `sorryAx`, but it is no longer the active frontier reduction.
 The named stage-data constructors used by these reductions are also checked not
 to import `sorryAx`; they are bookkeeping and transport constructions, not
 hidden proof assumptions for the paper theorem.
@@ -558,8 +543,6 @@ assert_no_sorry_axiom
 assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.answerMainInductionSuccessorNext_ofRecursiveHypothesisAndAnswerPasting
 assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.answerMainInductionSuccessorNext_ofSmallErrorConstruction
-assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.answerMainInduction
 assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction
@@ -568,23 +551,9 @@ assert_standard_axioms
 assert_standard_axioms
   MIPStarRE.LDT.MainInductionStep.mainInductionSuccessor
 assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations
+  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier
 assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitObligations
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofRecursiveAnswerInduction
+  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound
 assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.SliceRestrictionData
 assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.AnswerSliceRestrictionData
 assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.PerSliceInductionData
@@ -734,8 +703,6 @@ assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSectio
 assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.mainInductionFromStageData
 assert_no_sorry_axiom
   MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError
-assert_no_sorry_axiom
-  MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport
 assert_standard_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
 assert_standard_axioms
   MIPStarRE.LDT.Test.strategySymmetrization_mainInduction
