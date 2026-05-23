@@ -48,10 +48,9 @@ The most promising small proof-infrastructure follow-ups are:
    induction step.
 
 I would implement them in that order, but only after opening small PRs that
-measure heartbeat impact on a representative file.  A good low-blast-radius home
-would be a new proof-infrastructure module such as `MIPStarRE/LDT/Tactic.lean`
-(or a `MIPStarRE/LDT/Tactic/` folder if the simp attribute and tactic code need
-separate files).
+measure heartbeat impact on a representative file.  The current codebase keeps
+these helpers in separate modules under `MIPStarRE/LDT/Tactic/`, so files import
+only the proof helper they use.
 
 ## Candidate 1: `avg_congr` / recursive weighted-average congruence
 
