@@ -39,7 +39,8 @@ order, are:
 
 Files with higher raw line counts (`LdSandwichLineOnePoint.lean`,
 `MainInductionStep/Theorems.lean`, and `Test/MainTheorem.lean`) should be deferred because they are
-more likely to conflict or still contain the live main-theorem residual.
+more likely to conflict with nearby proof work.  The old live main-theorem
+residual mentioned in the original session-40 reasoning has since been removed.
 
 ## Commands used
 

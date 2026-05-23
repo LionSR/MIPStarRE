@@ -23,12 +23,19 @@ Branch: `gpt55/issue-834-mainformal-residual-session40`
 > represented by
 > `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
 > wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` for the printed
-> two-space statement.  That wrapper proves the saturated-error branch and
-> leaves `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` as the
-> direct non-vacuous source-boundary proof hole.  All references below to the live
+> two-space statement.  At that snapshot, the wrapper proved the saturated-error
+> branch and left `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` as
+> the direct non-vacuous source-boundary proof hole.  All references below to the live
 > `MainTheorem.lean` residual, #834,
 > #924, #931, #950, or #958 describe the April 30 audit snapshot, not the
 > current proof frontier.
+>
+> **Status note, 2026-05-23.**  The 2026-05-20 frontier description is also
+> historical.  The corrected large-\(k\), nonzero-sampling source route is now
+> checked, including the two-space final theorem.  The remaining differences
+> from the literal printed theorem are documented statement corrections:
+> \(k\ge400md\) and \(0<k\), not live residual or source-boundary obligation
+> declarations.
 
 ## Executive summary
 
