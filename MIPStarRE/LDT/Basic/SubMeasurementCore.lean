@@ -34,11 +34,10 @@ This is a valid POVM but highly degenerate: it is only used in vacuous
 fallback branches of the proof where the error bound is ≥ 1 (see
 `Test/MainTheorem.lean:mainFormal_trivial_witness`).
 
-Prefer calling this function explicitly (with a chosen outcome) rather than
-relying on the ambient `Inhabited` instance, which picks an arbitrary
-`default : α`.  The `Inhabited` instance is provided for backward compatibility
-with the exclusion-zone files listed above and may be removed once those
-call-sites are migrated. -/
+Call this function explicitly with a chosen outcome.  There is intentionally no
+ambient `Inhabited (Measurement α ι)` instance: choosing a hidden
+`default : α` would make degenerate witnesses available to paper-facing
+existential statements without displaying the selected outcome. -/
 noncomputable def Measurement.trivialDistinguishedOutcome
     {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
@@ -56,11 +55,6 @@ noncomputable def Measurement.trivialDistinguishedOutcome
         total_le_one := le_rfl
       }
       total_eq_one := rfl }
-
-noncomputable instance {α : Type*} {ι : Type*}
-    [Inhabited α] [Fintype α] [Fintype ι] [DecidableEq ι] :
-    Inhabited (Measurement α ι) where
-  default := Measurement.trivialDistinguishedOutcome (default : α)
 
 /-- A paper-local projective submeasurement (each effect is idempotent).
 
@@ -81,11 +75,8 @@ distinguished outcome `a₀` is the identity and all other outcomes are zero.
 This is a valid projective POVM but highly degenerate: see the discussion at
 `Measurement.trivialDistinguishedOutcome`.  Prefer calling this function
 explicitly (with a chosen outcome) rather than relying on the ambient
-`Inhabited` instance.
-
-The ambient `Inhabited (ProjMeas α ι)` instance is provided for backward
-compatibility with exclusion-zone files and should be removed once those
-call-sites are migrated. -/
+`Inhabited` instance.  As for `Measurement`, there is intentionally no ambient
+`Inhabited (ProjMeas α ι)` instance. -/
 noncomputable def ProjMeas.trivialDistinguishedOutcome
     {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
@@ -107,11 +98,6 @@ noncomputable def ProjMeas.trivialDistinguishedOutcome
         intro a
         rw [h_outcome a]
         exact hproj a }
-
-noncomputable instance {α : Type*} {ι : Type*}
-    [Inhabited α] [Fintype α] [Fintype ι] [DecidableEq ι] :
-    Inhabited (ProjMeas α ι) where
-  default := ProjMeas.trivialDistinguishedOutcome (default : α)
 
 /-! ### Derived properties -/
 
