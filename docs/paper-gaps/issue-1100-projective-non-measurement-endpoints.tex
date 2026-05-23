@@ -18,19 +18,18 @@
 \section{At a glance}
 
 \begin{itemize}
-  \item \textbf{Difficulty.} Medium.  The small-error truncation argument is
-  the one printed in the paper, but an unconditional Lean theorem must also
-  supply the exact endpoint $\zeta = 0$ and the large-error branch.
-  \item \textbf{Estimated weight.} The endpoint and packaging branches require
-  roughly \textbf{3--5 theorem interfaces} and \textbf{200--400 lines} of
-  formal proof around spectral truncation and state-dependent distance.
-  \item \textbf{Mathlib/project split.} Approximately \textbf{35\% Mathlib}
-  and \textbf{65\% project-local}.  Mathlib supplies finite-dimensional
-  spectral projections and order facts; the project supplies the LDT
-  measurement interfaces and the tensor-positioned distance estimates.
-  \item \textbf{Key Mathlib inputs.} Spectral calculus for Hermitian operators,
-  positive semidefinite order, square-root inequalities, and finite matrix
-  trace positivity.
+  \item \textbf{Difficulty.} Low.  The paper proof treats the nontrivial
+  small-error regime explicitly, while the endpoint \(\zeta=0\) and the
+  large-error regime require separate formal branches.
+  \item \textbf{Estimated weight.} A local spectral endpoint argument together
+  with a trivial large-error construction; both are already represented in the
+  current Lean development.
+  \item \textbf{Mathlib/project split.} Mostly project-local.  Mathlib supplies
+  the spectral calculus and matrix-order facts, while the project supplies the
+  measurement, state-dependent distance, and spectral-truncation interfaces.
+  \item \textbf{Key mathematical inputs.} The source almost-projectivity estimate
+  \path{eq:A-looks-projective}, the small-error truncation theorem, the
+  \(\zeta=0\) spectral projection argument, and the large-error fallback.
 \end{itemize}
 
 \section{Key theorem forms}
