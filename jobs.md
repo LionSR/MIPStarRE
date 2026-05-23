@@ -24,10 +24,11 @@ Last updated: 2026-04-23
     decomposition: the general test uses point agreement as its
     self-consistency branch and the role-register symmetrized strategy is proved
     `(3 * eps, 3 * eps, 3 * eps)`-good.
-  - The canonical geometric-line API now exists in `Basic/Parameters.lean`, but
-    the actual Test / induction / commutativity paths stay on the older raw
-    affine representatives in this PR so the downstream commutativity proof
-    remains fully proved.
+  - The canonical geometric-line API now lives in
+    `Basic/AxisParallelLine.lean` and `Basic/DiagonalLine.lean`, but the actual
+    Test / induction / commutativity paths stay on the older raw affine
+    representatives in this PR so the downstream commutativity proof remains
+    fully proved.
   - The `d = 0` / `k = 0` corner has been excluded in the Lean and blueprint
     statements.
   - `Test.classicalTestSoundness` now closes through the explicit quoted
@@ -123,7 +124,7 @@ Last updated: 2026-04-23
     `Test.classicalTestSoundness` now closes via
     `polishchukSpielmanClassicalSoundness`
   - added canonical geometric-line constructors and recovery/sample-parameter
-    lemmas in `Basic/Parameters.lean`
+    lemmas in `Basic/AxisParallelLine.lean` and `Basic/DiagonalLine.lean`
   - addressed PR review feedback by restoring the fully-proved
     `CommutativityPoints.sampledDiagonalLineApproximation_pointWithDiagonalLine`
     bridge and by keeping the Test / induction / commutativity paths on the
@@ -513,7 +514,8 @@ Last updated: 2026-04-23
     `lastRestrictedQuestionEquiv`
   - replaced the former blocker with a reusable strategy-level invariant:
     `DiagonalEvaluationReparamInvariant` on diagonal-line measurements, together
-    with public rebasing lemmas in `Basic/Parameters.lean`
+    with public rebasing lemmas in `Basic/AxisParallelLine.lean` and
+    `Basic/DiagonalLine.lean`
   - localized the new rebasing invariant to `SymStrat.IsGood` instead of adding
     it to the core `SymStrat` / `ProjStrat` records
   - proved `sampledDiagonalLineApproximation_pointWithDiagonalLine` by reindexing
@@ -776,7 +778,7 @@ Last updated: 2026-04-23
   same-local `IsGood` consequences with tested crossed-branch component bounds;
   `PassesLowIndividualDegreeTest` directly controls the individual point SSC
   defects and crossed line/point branch terms, not cross-prover point agreement.
-- `Basic/Parameters.lean`: added `Fintype Role`.
+- `Basic/ParametersBase.lean`: added `Fintype Role`.
 - `Test/Strategy.lean`: added `roleProj`, `roleCond`, `symmetrizedIdxProjMeas`,
   and the `ProjStrat` wrappers `symmetrizedPointMeasurement`,
   `symmetrizedAxisParallelMeasurement`, and `symmetrizedDiagonalMeasurement`.
