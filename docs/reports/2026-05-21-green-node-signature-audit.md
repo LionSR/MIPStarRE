@@ -25,7 +25,7 @@ The parser also ignores TeX line comments before deciding that a block contains
 `\leanok`.  Thus a comment saying that a theorem is not marked `\leanok` is not
 itself counted as a green node.
 
-On the current `main` snapshot, the script reports:
+On the current local snapshot, the script reports:
 
 ```text
 leanok environments: 178
