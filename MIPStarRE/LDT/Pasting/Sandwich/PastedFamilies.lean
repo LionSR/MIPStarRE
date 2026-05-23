@@ -102,8 +102,8 @@ noncomputable def averagedSliceAppendedSubMeas (params : Parameters) [FieldModel
 is the same as evaluating the averaged slice family at the truncated point.
 
 This is the first formal step in the degree-zero branch of `thm:ld-pasting`;
-the remaining work is the consistency rectangle that compares this averaged
-slice construction with the point measurement. -/
+the later consistency rectangle compares this averaged slice construction with
+the point measurement. -/
 theorem evaluateAt_averagedSliceAppendedSubMeas
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (u : Point params.next) :

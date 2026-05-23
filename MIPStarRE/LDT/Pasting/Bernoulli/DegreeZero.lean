@@ -671,10 +671,9 @@ private theorem degreeZero_averagedSlice_pointConsistency_of_axis_self
 
 /-- Degree-zero point-consistency construction for `thm:ld-pasting`.
 
-Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  This is the
-remaining source-faithful construction obligation for issue #1622.  In the
-degree-zero branch the slice polynomials and the last-coordinate line answers
-are constant on their respective domains.  The measurement is the completion of
+Paper origin: `references/ldt-paper/ld-pasting.tex:12-55`.  In the degree-zero
+branch the slice polynomials and the last-coordinate line answers are constant
+on their respective domains.  The measurement is the completion of
 `averagedSliceAppendedSubMeas`, the averaged slice family viewed as a global
 polynomial family by ignoring the appended variable. -/
 theorem degreeZeroPastedPointConsistency

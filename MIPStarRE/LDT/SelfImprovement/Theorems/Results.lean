@@ -28,13 +28,13 @@ All original declarations remain available under the same namespace.
   helper `A`-consistency
 - `AddInUStep12` — algebraic alignment and raw CS Step 1/2 bounds
 - `AddInUStep34AndTransfer` — variance conversions, factored CS, assembly, transfer
-- `HelperSSC` — final helper strong self-consistency scalar-bound construction
+- `HelperSSC` — final helper strong self-consistency bounds construction
 - `BoundednessTransport` — off-diagonal decomposition, boundedness gap transport,
   projective-residual estimates
   (`projective_boundedness_gap_le_helper_boundedness_gap`,
   `final_fields_projective_residual_bound_natural`,
   `final_fields_projective_residual_bound`, `final_fields_bounded`)
-- `SelfImprovementTop` — `selfImprovement` wrappers and final-fields obligations
+- `SelfImprovementTop` — `selfImprovement` wrappers and final-field targets
 
 ## References
 

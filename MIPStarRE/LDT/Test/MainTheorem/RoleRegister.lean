@@ -12,9 +12,9 @@ assembly to be supplied with recursive slice witnesses and self-improvement
 inputs that are not hypotheses of `thm:main-formal`.  They have been removed.
 The paper-theorem route now obtains the role-register witness from
 `MainInductionStep.mainInduction` through
-`MainFormalRoleInductionWitness.ofMainInduction`; any remaining successor
-work is therefore an explicit `sorry` in the Section 6 theorem rather than an
-extra hypothesis on the Section 3 theorem.
+`MainFormalRoleInductionWitness.ofMainInduction`.  The corrected Section 6
+successor theorem is now proved, so this module no longer records a final-theorem
+successor hypothesis.
 
 ## References
 

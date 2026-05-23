@@ -58,7 +58,7 @@
 > printed source-range obligation
 > `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`
 > and the final two-space source-boundary obligation
-> `Test.mainFormal_sourceSmallErrorObligation`.
+> `Test.mainFormal_sourceSmallErrorConclusion`.
 >
 > The same day, the orthonormalization-input cleanup removed the former
 > `SelfImprovement.HelperStrongSelfConsistencyInput`,
@@ -75,6 +75,13 @@
 > abbreviations.  Mentions of those names below are historical descriptions of
 > the old formalization boundary; the current construction uses
 > `leftLiftedProjectivizationRepair` directly.
+>
+> **Status note, 2026-05-23.**  The 2026-05-22 proof-frontier description is
+> now historical.  With the confirmed correction `k >= 400md` and the explicit
+> nonzero-sampling boundary `0 < k`, the Section 6 source route and the final
+> two-space source-boundary theorem are proof-complete in Lean.  Later mentions
+> of source-range or final-theorem obligation declarations below refer to
+> retired interfaces, not to current theorem hypotheses.
 
 ---
 
@@ -86,8 +93,8 @@ old downstream Section 3/6 wiring have been removed.  The current invariant is
 that paper-facing theorem statements retain the paper hypotheses.  The Section
 9 and induction-section self-improvement derivations are now checked in Lean;
 the corrected large-\(k\) Section 6 small-error successor construction is also
-now checked.  The live proof gaps are the printed source range for
-`thm:main-induction` and the final two-space source-boundary theorem.
+now checked.  Under the corrected source hypotheses, the former source-range
+and final two-space obligation declarations have also been retired.
 
 In the audited snapshot, the `SelfImprovementObligations` record (the three
 Section 9 hypotheses) and its downstream wiring in `MainInductionStep` and

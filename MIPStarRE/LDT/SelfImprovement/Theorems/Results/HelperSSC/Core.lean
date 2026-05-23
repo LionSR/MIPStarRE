@@ -3,7 +3,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer
 /-!
 # Helper strong self-consistency bounds: core reductions
 
-Core scalar-bound structures, the bare off-diagonal quantity, and the two
+Core bound structures, the bare off-diagonal quantity, and the two
 variance-swap identities used in the helper strong self-consistency chain.
 
 ## References
@@ -22,17 +22,19 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Named scalar bounds for the helper-stage strong self-consistency proof.
+/-- Named intermediate bounds for the helper-stage strong self-consistency proof.
 
 Paper origin: `references/ldt-paper/self_improvement.tex:255-603`
 (`\label{item:self-improvement-self}` and the subsequent add-in-`u`,
 self-consistency, and variance-swap chain).
 
-This is an internal record of intermediate estimates for the helper-stage
-strong self-consistency proof, tracked by #1596.  It is not a hypothesis of a
-source-labelled theorem.
+This is an internal record for the helper-stage strong self-consistency proof,
+tracked by #1596.  It is not a hypothesis of a source-labelled theorem.  Its
+fields are derived from the add-in-`u`, self-consistency, and global-variance
+estimates and are not passed across the public statement of
+`lem:self-improvement-helper`.
 
-These fields isolate the paper-side scalar bounds in the proof of
+These fields isolate the paper-side intermediate estimates in the proof of
 `item:self-improvement-self` once the reduced helper conclusion is fixed:
 
 1. the four scalar transport bounds along the chain
@@ -40,12 +42,11 @@ These fields isolate the paper-side scalar bounds in the proof of
 2. the final lower bound on the released right-hand side before the arithmetic
    absorption into `selfImprovementHelperError`.
 
-This structure records the actual intermediate estimates still needed from the
+This structure records the actual intermediate estimates used from the
 add-in-`u`, self-consistency, and variance calculations, rather than restating
-the final `BipartiteSSCRel` conclusion as an input.  It is a local proof
-frontier for the helper theorem, not a hypothesis of the paper-aligned helper
-theorem; the full assembly of these scalar estimates discharges the former #1514
-gap. -/
+the final `BipartiteSSCRel` conclusion as an input.  It is an internal assembly
+record for the helper theorem, not a hypothesis of the paper-aligned helper
+theorem; the full assembly of these bounds discharged the former #1514 gap. -/
 structure HelperStrongSelfConsistencyBounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -87,8 +88,8 @@ structure HelperStrongSelfConsistencyBounds
 
 -- This constructor fills the helper SSC bound record by composing the
 -- point self-consistency bounds with the local-to-global variance transfer.
-/-- Construct the helper-stage scalar bounds from the remaining mathematical
-inputs after the add-in-`u` chain has been closed.
+/-- Construct the helper-stage bounds from the mathematical inputs after the
+add-in-`u` chain has been closed.
 
 The point self-consistency hypothesis supplies the two self-consistency moves
 `Q₀ → Q₁` and `Q₁ → Q₂`; the local-variance sum bound supplies the two

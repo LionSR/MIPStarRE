@@ -31,15 +31,11 @@ blueprint environments, and the second also scans green definition, remark, and
 example environments.
 
 On the current branch snapshot the ordinary blueprint synchronization report
-finds 654 statement-level green entries out of 681 Lean references and 491
-proof-level green entries out of 518 proof-bearing Lean references, with
-`blueprint/lean_decls` synchronized to the current Lean declarations.  The
-source-boundary entries that still contain direct Lean proof holes are
-`prop:main-formal-source-small-error-obligation` and
-`prop:main-induction-source-range-obligation`; in each case no proof completion
-is claimed.  The corrected large-\(k\) successor construction
-`prop:main-induction-successor-small-error-construction` is now proof-complete
-and should no longer be listed as a live `sorryAx` frontier.
+finds the blueprint and Lean declaration list synchronized.  The corrected
+large-\(k\) successor construction, the corrected source-facing main induction
+statement, and the corrected source-facing final theorem are proof-complete.
+The remaining non-green Chapter 2 entries are external or expository theorem
+statements and Lean-only remarks, not live `sorryAx` frontiers.
 
 The broad-vocabulary theorem-like audit reports no strict proof-debt findings
 and no conditional declaration-name findings.  Its non-blocking classifications
@@ -109,7 +105,8 @@ corresponding definition or remark nodes as green in the public graph.
 
 The largest clusters are:
 
-1. `def:self-improvement-slice-transport` in Chapter 10, with the
+1. The former `def:self-improvement-slice-transport` in Chapter 10, now the
+   informational remark `rem:self-improvement-slice-transport`, with the
    `SliceRestrictionData`, `PerSliceInductionData`,
    `AnswerSliceRestrictionData`, `AnswerPerSliceInductionData`, and
    `SliceStrategyTransport` interfaces.  These are internal induction-stage

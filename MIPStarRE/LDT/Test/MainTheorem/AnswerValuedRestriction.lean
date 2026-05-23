@@ -48,9 +48,8 @@ construction in the paper because:
   `zeroCoord`.
 
 These declarations no longer feed a conditional role-witness constructor.  The
-missing successor argument is represented by the Section 6 proof obligation and
-the final `mainFormal` proof gap, not by an additional hypothesis on a Section 3
-theorem.
+successor argument is now supplied by the corrected Section 6 theorem, not by an
+additional hypothesis on a Section 3 theorem.
 -/
 
 /-- Answer-valued successor-case weighted restricted-axis input for the

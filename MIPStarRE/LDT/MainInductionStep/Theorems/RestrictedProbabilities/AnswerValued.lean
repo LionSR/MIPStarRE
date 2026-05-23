@@ -630,7 +630,7 @@ lemma answerSuccessor_weighted_diagonal_bound
         answerSuccessorDiagonalFailure_eq_average_indexError params strategy
     _ ≤ gamma := hgood.diagonalLineTest
 
-/-- Package the weighted answer-valued successor restricted-probability bounds
+/-- Assemble the weighted answer-valued successor restricted-probability bounds
 into the averaged statement. -/
 lemma AnswerSuccessorRestrictedProbabilitiesStatement.ofWeightedBounds
     (params : Parameters)

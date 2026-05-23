@@ -72,12 +72,12 @@ a positive-degree assumption.  The checked strengthening
 derives the predecessor large-`k` side condition from the successor large-`k`
 hypothesis, and the nontrivial branch derives `k ≥ 1` from
 `mainInductionError < 1`.  The checked theorem
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
+`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`
 uses the predecessor induction hypothesis without assuming `0 < d`, so the
 former degree-zero successor construction is no longer part of the active
-frontier.  The retired degree-split route and its degree-zero family obligation
-have been removed.
-`AxiomAudit.lean` checks the completed successor helpers as standard-axiom
+frontier.  The older degree-split family route has been removed because it had
+no remaining caller after the recursive-slice theorem covered the case `d = 0`.
+`AxiomAudit.lean` checks the retained completed helpers as standard-axiom
 declarations and checks the assembled small-error construction and its public
 successor wrappers as standard-axiom clean.  It also checks
 that the final Section 3 role-register transport theorem
@@ -254,7 +254,7 @@ follows.
 
 | Class | Status |
 |---|---|
-| Corrected source-boundary theorem/proposition links `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, `MIPStarRE.LDT.Test.mainFormal_sourceObligation`, and `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` | These are proof-marked in the blueprint after the zero-sampling boundary was corrected by the explicit hypothesis `0 < k`.  They are not hidden hypotheses on paper theorems. |
+| Corrected source-boundary theorem/proposition links `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, `MIPStarRE.LDT.Test.mainFormal_sourceConclusion`, and `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` | These are proof-marked in the blueprint after the zero-sampling boundary was corrected by the explicit hypothesis `0 < k`.  They are not hidden hypotheses on paper theorems. |
 | Source-shaped proved statements with high-risk words, such as `NaimarkTensorProductCorrelationStatement`, `RazSafraSoundnessStatement`, `PolishchukSpielmanClassicalSoundnessStatement`, `SdpStatementWithSlackness`, and `AddInUFullStatement` | These are explicitly audited in `AxiomAudit.lean`.  Their high-risk words record the Lean statement interface or the SDP slackness conclusion, not an added bridge assumption. |
 | Proved construction and transport lemmas with high-risk words, such as the projectivization `Repair` declarations, SDP `Witness` and `Dominance` declarations, and `SliceBoundednessInput` accessors | These are Lean-only construction or bookkeeping interfaces.  They may be linked from auxiliary blueprint entries, but they are not advertised as replacements for the source-labelled theorems unless the surrounding blueprint text states the corresponding restriction or construction role. |
 

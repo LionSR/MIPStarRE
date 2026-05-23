@@ -234,8 +234,8 @@ This record is intentionally scalar-only. It does not assert any measurement
 transport. Its fields are precisely the hypotheses needed to invoke the already
 formalized Step 8 bound `errorCascade_le_mainFormalError` on the
 main-induction `ν` produced after symmetrization (paper lines 68--75). The
-remaining proof of `mainFormal` must still derive these scalar side conditions
-from the theorem hypotheses or route to the vacuous branch when they fail. -/
+corrected source route derives these scalar side conditions in the non-vacuous
+branch and otherwise uses the saturated-error witness. -/
 structure MainFormalCascadeScalars (params : Parameters) (eps : Error) (k : ℕ) : Prop where
   /-- Standing scalar regime for the paper's cascade estimates. -/
   cascadeHypotheses : CascadeHypotheses params k eps

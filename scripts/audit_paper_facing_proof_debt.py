@@ -375,12 +375,6 @@ SOURCE_CONTEXT_CONDITIONAL_DECL_NAMES = {
         "the informational blueprint entry "
         "rem:lean-right-register-completion-helpers"
     ),
-    "MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion": (
-        "Lean-only transport from the source self-improvement conclusion to the "
-        "induction-section conclusion; see references/ldt-paper/"
-        "inductive_step.tex:249-286 and the informational blueprint entry "
-        "def:self-improvement-slice-transport"
-    ),
     "MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness": (
         "Lean-only construction of the final projective-completion transport "
         "witness from an already constructed role witness; see "

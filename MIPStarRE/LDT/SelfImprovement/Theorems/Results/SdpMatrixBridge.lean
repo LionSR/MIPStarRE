@@ -145,9 +145,9 @@ namespace MatrixSdpCanonicalOptimalPair
 zero duality gap, and an explicitly vanishing slack block.
 
 The product complementary-slackness equation is derived from zero duality gap by
-`matrixSdpCanonicalComplementarySlackness_of_strongDuality`.  Thus the only
-remaining Watrous/Slater producer obligations are existence of feasible witnesses
-with equal objective values and a saturated slack block. -/
+`matrixSdpCanonicalComplementarySlackness_of_strongDuality`.  Thus the remaining
+Watrous/Slater data are feasible witnesses with equal objective values and a
+saturated slack block. -/
 theorem ofFeasibleStrongDualitySlackBlock
     {params : Parameters}
     [FieldModel params.q]
@@ -542,15 +542,15 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
 `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
 **Source-faithful transport:** This declaration assumes exactly the canonical
-optimal-pair output left as the proof obligation for `lem:sdp` and translates it
-without strengthening the paper hypotheses.
+optimal-pair output used in the proof of `lem:sdp` and translates it without
+strengthening the paper hypotheses.
 
 This is the native transport from the canonical block-SDP output appearing in
 the proof of `lem:sdp` to the abstract self-improvement statement.  The
-existential hypothesis is precisely the remaining strong-duality and
-complementary-slackness obligation: it supplies a feasible canonical primal
-matrix, a dual-feasible operator with equal objective value, canonical
-complementary slackness, and a vanishing slack block. -/
+existential hypothesis is precisely the strong-duality and complementary-slackness
+output: it supplies a feasible canonical primal matrix, a dual-feasible operator
+with equal objective value, canonical complementary slackness, and a vanishing
+slack block. -/
 theorem sdpStatementWithSlackness_of_exists_canonicalOptimalPair
     (params : Parameters)
     [FieldModel params.q]
@@ -638,8 +638,8 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
 `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
 **Source-faithful transport:** This declaration assumes exactly the canonical
-optimal-pair output left as the proof obligation for `lem:sdp` and translates it
-without strengthening the paper hypotheses.
+optimal-pair output used in the proof of `lem:sdp` and translates it without
+strengthening the paper hypotheses.
 
 This is the measurement-level counterpart of
 `sdpStatementWithSlackness_of_exists_canonicalOptimalPair`.  It avoids the
@@ -761,7 +761,7 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity
   sdpMeasurementWitness_of_canonicalOptimalPairWithDominance
     params strategy X Z (h.withDominance hOneLe)
 
-/-- Canonical strong-duality and complementary-slackness obligation for the
+/-- Canonical strong-duality and complementary-slackness construction for the
 point-measurement realization of the Section 9 SDP.
 
 Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
@@ -770,14 +770,14 @@ rewrites the primal and dual SDPs in canonical block form, invokes strong
 duality, and then applies complementary slackness to obtain a saturated
 canonical optimal pair.
 
-This is the remaining source-faithful proof obligation for the formalized SDP
-route.  Its conclusion is the native canonical block-SDP output: a feasible
-canonical primal matrix, a dual-feasible operator with equal objective value,
-canonical complementary slackness, and a vanishing slack block.  It does not
+This is the source-faithful construction for the formalized SDP route.  Its
+conclusion is the native canonical block-SDP output: a feasible canonical primal
+matrix, a dual-feasible operator with equal objective value, canonical
+complementary slackness, and a vanishing slack block.  It does not
 assume the auxiliary dominance condition `I ≤ Z`; the saturated slack block is
-part of the expected strong-duality output.  Once this theorem is proved, the
-matrix statement `matrixSdpPointRealization_statementWithSlackness` follows by
-extracting the diagonal polynomial blocks.
+part of the expected strong-duality output.  The matrix statement
+`matrixSdpPointRealization_statementWithSlackness` follows by extracting the
+diagonal polynomial blocks.
 
 Tracked by issue #1230 and documented in
 `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`. -/
@@ -804,11 +804,11 @@ Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
 `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
 
 **Source-faithful transport:** This declaration is a proved extraction from the
-canonical optimal-pair proof obligation for `lem:sdp`; it is not a conditional
+canonical optimal-pair construction for `lem:sdp`; it is not a conditional
 replacement for the SDP strong-duality theorem.
 
-This theorem is now a proved transport from the native canonical optimal-pair
-obligation `matrixSdpPointRealization_canonicalOptimalPair`.  It contains no
+This theorem is a proved transport from the native canonical optimal-pair
+construction `matrixSdpPointRealization_canonicalOptimalPair`.  It contains no
 additional dominance, bridge, residual, or package hypothesis. -/
 theorem matrixSdpPointRealization_statementWithSlackness
     (params : Parameters)

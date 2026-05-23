@@ -5,11 +5,11 @@ The blueprint source is the authoritative mathematical object.  The generated
 ``dep_graph_document.html`` is nevertheless what a reader sees on GitHub Pages,
 so it must not preserve stale green nodes after a source-boundary repair.  This
 audit checks the small set of graph statuses that currently carry mathematical
-meaning for the LDT frontier:
+meaning for the LDT theorem boundary:
 
 * retired successor-boundary nodes must not appear;
-* source-frontier nodes with tracked proof debt must be present and must not be
-  displayed as statement-complete or proof-complete;
+* source-boundary nodes that have since been proved must be displayed as
+  proof-complete;
 * corrected Lean-only current-interface nodes that are now proved must be
   proof-filled;
 * the now-proved Naimark tensor-product theorem must be proof-filled locally.
@@ -43,15 +43,10 @@ ABSENT_LABELS = {
     "thm:main-induction-current-interface",
 }
 
-NOT_PROOF_FILLED_LABELS = {
-    "prop:main-formal-source-two-space-role-register",
-}
-
-NOT_GREEN_BORDER_LABELS = NOT_PROOF_FILLED_LABELS
-
 PROOF_FILLED_LABELS = {
-    "prop:main-formal-source-obligation",
-    "prop:main-formal-source-small-error-obligation",
+    "prop:main-formal-source-reduction",
+    "prop:main-formal-source-small-error",
+    "prop:main-formal-source-two-space-role-register",
     "prop:main-induction-successor-answer-valued-pasting",
     "prop:main-induction-successor-small-error-construction",
     "prop:main-induction-successor-predecessor-induction",
@@ -164,7 +159,7 @@ def parse_nodes_from_dot(dot: str) -> dict[str, GraphNode]:
 
 
 def audit_nodes(nodes: dict[str, GraphNode]) -> tuple[GraphFinding, ...]:
-    """Check the LDT graph frontier-status invariants."""
+    """Check the selected LDT graph-status invariants."""
     findings: list[GraphFinding] = []
 
     for label in sorted(ABSENT_LABELS):
@@ -175,50 +170,6 @@ def audit_nodes(nodes: dict[str, GraphNode]) -> tuple[GraphFinding, ...]:
                     label=label,
                     kind="retired-node-present",
                     message="retired successor-boundary node is still present in the graph",
-                    color=node.color,
-                    fillcolor=node.fillcolor,
-                    style=node.style,
-                )
-            )
-
-    for label in sorted(NOT_PROOF_FILLED_LABELS):
-        node = nodes.get(label)
-        if node is None:
-            findings.append(
-                GraphFinding(
-                    label=label,
-                    kind="frontier-node-missing",
-                    message="frontier node with tracked proof debt is absent from the graph",
-                )
-            )
-        elif node.is_proof_filled:
-            findings.append(
-                GraphFinding(
-                    label=label,
-                    kind="frontier-proof-filled",
-                    message="tracked proof-frontier node is displayed as proof-complete",
-                    color=node.color,
-                    fillcolor=node.fillcolor,
-                    style=node.style,
-                )
-            )
-
-    for label in sorted(NOT_GREEN_BORDER_LABELS):
-        node = nodes.get(label)
-        if node is not None and node.has_green_border:
-            if label in NOT_PROOF_FILLED_LABELS:
-                if node.is_proof_filled:
-                    continue
-                kind = "frontier-statement-green"
-                message = "tracked proof-frontier node is displayed as statement-complete"
-            else:
-                kind = "current-interface-green"
-                message = "corrected Lean-only interface is displayed as statement-complete"
-            findings.append(
-                GraphFinding(
-                    label=label,
-                    kind=kind,
-                    message=message,
                     color=node.color,
                     fillcolor=node.fillcolor,
                     style=node.style,

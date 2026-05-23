@@ -333,9 +333,8 @@ stated against the cleaner right-hand side `E_u Σ_h ⟨ψ, H^u_h ⊗ T_h ψ⟩`
 obtained after collapsing the outer projection factors of
 `eq:release-the-kraken` via `proj_outer_sandwich_eq`. The conclusion is
 identical and can therefore feed the same diagonal helper-SSC application;
-the simplification reduces the remaining Cauchy--Schwarz/global-variance
-proof obligation (`self_improvement.tex:247--343`) to a transfer in the
-simpler shape. -/
+the simplification reduces the Cauchy--Schwarz/global-variance comparison
+(`self_improvement.tex:247--343`) to a transfer in the simpler shape. -/
 lemma selfConsistencyDiagonalAddInU_of_simplifiedTransfer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)

@@ -208,128 +208,101 @@
 \end{theorem}
 \begin{proof}
 	\leanok
-	\uses{prop:main-formal-source-obligation}
+	\uses{prop:main-formal-source-reduction}
 	The saturated-error branch is formalized by
 	\texttt{mainFormal\_source\_trivial\_witness}.  The remaining branch is the
 	small-error source-boundary proposition
-	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  The
+	Proposition~\ref{prop:main-formal-source-small-error}.  The
 	factor \(400\) and the nonzero sampling condition are the corrected source
 	boundaries recorded in
 	\texttt{docs/paper-gaps/issue-906-main-formal-k-bound.tex} and
 	\texttt{docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex}.
 \end{proof}
 
-\begin{proposition}[Source-boundary reduction for the final theorem]\label{prop:main-formal-source-obligation}
-	\lean{MIPStarRE.LDT.Test.mainFormal_sourceObligation}
+\begin{proposition}[Source-boundary reduction for the final theorem]\label{prop:main-formal-source-reduction}
+	\lean{MIPStarRE.LDT.Test.mainFormal_sourceConclusion}
 	\leanok
 	This proposition records the saturated-error reduction for the corrected
 	two-space theorem
 	Theorem~\ref{thm:main-formal}.  It proves the saturated-error branch by the
 	trivial consistency bound and reduces the remaining non-vacuous branch to
-	Proposition~\ref{prop:main-formal-source-small-error-obligation}.  It is not
+	Proposition~\ref{prop:main-formal-source-small-error}.  It is not
 	an additional hypothesis of the paper theorem.
 \end{proposition}
 \begin{proof}\leanok
-	\proves{prop:main-formal-source-obligation}
-	\uses{prop:main-formal-source-small-error-obligation}
+	\proves{prop:main-formal-source-reduction}
+	\uses{prop:main-formal-source-small-error}
 	The saturated-error branch is already proved.  The small-error branch is
-	Proposition~\ref{prop:main-formal-source-small-error-obligation}.
+	Proposition~\ref{prop:main-formal-source-small-error}.
 \end{proof}
 
-\begin{proposition}[Small-error source-boundary obligation for the final theorem]\label{prop:main-formal-source-small-error-obligation}
-	\lean{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}
+\begin{proposition}[Small-error source-boundary conclusion for the final theorem]\label{prop:main-formal-source-small-error}
+	\lean{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion}
 	\leanok
 	This is the non-vacuous branch of the corrected two-space theorem.
-	It asks for the conclusions of Theorem~\ref{thm:main-formal} under
+	It proves the conclusions of Theorem~\ref{thm:main-formal} under
 	\(k\ge 400md\), \(k>0\), and \(\nu<1\).  It is not a source assumption.  Its
 	proof uses the two-space role-register reduction and the scalar absorption
 	available after excluding the zero-sampling boundary.
 \end{proposition}
 \begin{proof}\leanok
-	\proves{prop:main-formal-source-small-error-obligation}
+	\proves{prop:main-formal-source-small-error}
 	\uses{prop:main-formal-source-two-space-role-register}
 	The proof applies the checked two-space role-register construction and then
 	absorbs its explicit errors into \(\nu\) at the nonzero sampling boundary.
 \end{proof}
 
 \begin{proposition}[Two-space role-register reduction for the source theorem]\label{prop:main-formal-source-two-space-role-register}
-	\lean{MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_sourceMainInduction}
-	\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterPointConsistency_ofSymConsistency}
-	\lean{MIPStarRE.LDT.ProjStrat.pointAgreementFailureProbability_le_three_mul}
-	\lean{MIPStarRE.LDT.Preliminaries.triangleSub_heterogeneous}
-	\lean{MIPStarRE.LDT.Preliminaries.simeqTriangleInequality_heterogeneous}
-	\lean{MIPStarRE.LDT.Test.mainFormalStep5_selfConsistency_ofExpansionBound}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterUnsymmetrizedPointConsistency}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterFullPolynomialSelfConsistency_ofPointConsistency}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterCompletePolynomialSelfConsistency}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair_heterogeneous}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_right_of_consistency_from_projectivizationRepair_heterogeneous}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterLeftProjectiveSubmeasurement_ofFullConsistency}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterRightProjectiveSubmeasurement_ofFullConsistency}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterLeftProjectiveSubmeasurement}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterTwoSidedProjectiveSubmeasurements}
-		\lean{MIPStarRE.LDT.ProjStrat.completedProjectiveMeasurements_ofTwoSidedSubmeasurements}
-		\lean{MIPStarRE.LDT.ProjStrat.completedProjectiveMeasurementsAndLine169_ofTwoSidedSubmeasurements}
-		\lean{MIPStarRE.LDT.ProjStrat.completedProjectiveConsistency_ofFullConsistency}
-		\lean{MIPStarRE.LDT.Test.consRel_constPolynomialEvaluation_heterogeneous}
-		\lean{MIPStarRE.LDT.Test.projectiveEvaluationConsistency_ofFullPolynomialConsistency_heterogeneous}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterCompletedProjectiveMeasurements}
-		\lean{MIPStarRE.LDT.ProjStrat.sourceRoleRegisterFinalPointConsistency}
-		\lean{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary}
-		\uses{lem:heterogeneous-role-register-unsymmetrization}
+	\lean{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary}
+	\leanok
+	\uses{lem:heterogeneous-role-register-unsymmetrization}
 	The printed final theorem starts from a projective strategy on two possibly
 	different local Hilbert spaces.  The current checked formal interface
 	Theorem~\ref{thm:main-formal-current-interface} is stated for the same-space
 	interface.  The source proof uses the role-register symmetrization and then
-	unsymmetrizes the polynomial measurement.  To close
-	Proposition~\ref{prop:main-formal-source-small-error-obligation}, this
-	reduction must be formalized for the general two-space source strategy rather
-	than assumed as an interface restriction.  The trace-level factor-two
-	unsymmetrization estimate for arbitrary heterogeneous role-register
-	measurements is already formalized in
-	Lemma~\ref{lem:heterogeneous-role-register-unsymmetrization}; the remaining
-	work is to assemble the full source-theorem passage from the paper
-	hypotheses.  Lean now records the first part of this source-boundary route:
-	the heterogeneous role-register symmetrization may be fed into the
-	source-shaped main-induction theorem under the corrected large-\(k\)
-	hypothesis \(k\ge 400md\), and the resulting role-register consistency
-	estimate can be unsymmetrized into the two point-consistency estimates on the
-	original two-space strategy with the expected factor \(2\).  In addition, the
-	point-agreement branch is now available for the paper-faithful two-space
+	unsymmetrizes the polynomial measurement.  Lean now formalizes this reduction
+	for the general two-space source strategy rather than assuming it as an
+	interface restriction.  The trace-level factor-two unsymmetrization estimate
+	for arbitrary heterogeneous role-register measurements is formalized in
+	Lemma~\ref{lem:heterogeneous-role-register-unsymmetrization}.  The
+	heterogeneous role-register symmetrization may be fed into the source-shaped
+	main-induction theorem under the corrected large-\(k\) hypothesis
+	\(k\ge 400md\), and the resulting role-register consistency estimate can be
+	unsymmetrized into the two point-consistency estimates on the original
+	two-space strategy with the expected factor \(2\).
+
+	The remaining steps of the source-boundary passage are also checked.  The
+	point-agreement branch is available for the paper-faithful two-space
 	strategy, and the Schwartz--Zippel Step~5 theorem has been generalized from
 	the same-space carrier to a bipartite state on \(H_A\otimes H_B\).  The
-		heterogeneous triangle/SDD comparison theorem has also been proved, so the
-		route now reaches the complete-measurement full-polynomial consistency
-		statement at the end of the paper's Step~5 calculation.  The two
-		heterogeneous orthonormalization applications have also been checked,
-		producing projective submeasurements on both local Hilbert spaces and the
-		corresponding left- and right-factor state-dependent-distance estimates.
-		The completion step has now also been derived in Lean: the two projective
-		submeasurements are completed to projective measurements, and the
-		left- and right-factor estimates are widened to the
-		orthonormalize-and-complete error appearing in the paper.  The repaired
-		polynomial line-169 consistency relations have also been checked, with
-		the Cauchy--Schwarz loss coming from the pre-completion
-		orthonormalization estimates rather than from a new hypothesis.
-		The final point-evaluation triangle has also been derived: the
-		polynomial line-169 relations and the completed \(Q_A,Q_B\) projective
-		consistency estimate are postprocessed by evaluation at a point and then
-		combined by the heterogeneous triangle inequality.  The scalar
-		absorption from these explicit pre-absorption errors to the final
-		\(\nu=\texttt{mainFormalError}\) bound has also been checked under the
-		nonzero scalar-cascade boundary \(0<k\).
-		The combined output is the small-error branch used in the corrected
-		two-space source theorem, where \(k>0\) is now part of the theorem
-		statement.
+	heterogeneous triangle/SDD comparison theorem gives the complete-measurement
+	full-polynomial consistency statement at the end of the paper's Step~5
+	calculation.  The two heterogeneous orthonormalization applications produce
+	projective submeasurements on the two local Hilbert spaces, and the completion
+	step widens the resulting left- and right-factor state-dependent-distance
+	estimates to the orthonormalize-and-complete error appearing in the paper.
+	The repaired polynomial line-169 consistency relations use the
+	Cauchy--Schwarz loss from the pre-completion orthonormalization estimates,
+	not a new hypothesis.  The final point-evaluation triangle postprocesses
+	these relations and the completed \(Q_A,Q_B\) projective consistency estimate
+	by evaluation at a point, combines them by the heterogeneous triangle
+	inequality, and absorbs the explicit pre-absorption errors into the final
+	\(\nu=\texttt{mainFormalError}\) bound under the nonzero scalar-cascade
+	boundary \(0<k\).  This is the small-error branch used in the corrected
+	two-space source theorem, where \(k>0\) is part of the theorem statement.
 \end{proposition}
 \begin{proof}
+	\proves{prop:main-formal-source-two-space-role-register}
+	\lean{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary}
+	\leanok
 	\uses{lem:heterogeneous-role-register-symmetrization, lem:heterogeneous-role-register-unsymmetrization}
 	\uses{thm:main-induction, thm:main-formal-current-interface}
-	This is an unproved source-boundary reduction.  The same-space large-\(k\)
-	subcase is already recorded by
-	\texttt{mainFormal\_sourceConclusion\_ofSameSpaceLargeK}; the missing part is
-	the complete general two-space role-register passage from the paper
-	hypotheses, not the factor-two trace-compression estimate itself.
+	The proof is the linked heterogeneous role-register chain, ending in
+	\texttt{mainFormal\_sourceConclusion\_ofRoleRegisterScalarBoundary}.  It
+	combines the source-shaped main-induction theorem, the heterogeneous
+	unsymmetrization estimates, projectivization on both local Hilbert spaces, the
+	completion and line-169 consistency steps, and the final scalar absorption
+	under the nonzero sampling boundary.
 \end{proof}
 
 \begin{remark}[Final-theorem zero-sampling boundary]\label{rem:main-formal-source-k-range-boundary}
@@ -353,9 +326,9 @@
 	It is not the printed theorem.  Compared with the paper statement, it uses the
 	documented large-\(k\) correction \(k\ge 400md\) and the scalar boundary
 	\(k>0\), and it is represented in Lean by the same-space strategy container
-	used by the present role-register symmetrization bridge.  The full paper
-	interface is tracked in
-	\texttt{docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex}.
+	used by the present role-register symmetrization construction.  The corrected
+	two-space source theorem is recorded above; the literal printed interface
+	still differs by the large-\(k\) and nonzero-sampling corrections.
 	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A},
 	A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy in the
 	current same-space formal container that passes the $(m,q,d)$ low individual

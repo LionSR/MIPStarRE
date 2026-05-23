@@ -22,7 +22,7 @@ Paper origin: `references/ldt-paper/inductive_step.tex:130-173`.
 This is the source-shaped internal construction target for the non-vacuous
 branch of `mainFormal`.  It reconstructs the paper line-130 cross consistency
 from the role witness and constructs the line-130 orthonormalization witness.
-The remaining completion step is the explicit proof obligation in
+The completion step is the checked construction theorem
 `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency`;
 no match-mass or diagonal-consistency data is accepted as an extra input.
 

@@ -22,9 +22,9 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Final-fields completeness construction
 
-The earlier interface combined several paper-side final-field obligations into
+The earlier interface combined several paper-side final-field targets into
 one hypothesis block. The lemmas below isolate the **completeness** field, exposing
-the precise analytic ingredient that remains — the helper-stage
+the precise analytic ingredient used here — the helper-stage
 completeness lower bound on `Hhat.liftLeft` — and discharging the rest of the
 transport algebra (orthonormalization SDD step) with a checked proof.
 
@@ -36,9 +36,9 @@ proved in `Preliminaries.SelfConsistency.Extensions`) to the
 self-improvement parameters and yields the precise `(1 - nu) - δ - 2 √ε`
 target on `H.toSubMeas.liftLeft`.
 
-This does **not** add an additional residual hypothesis: the hypothesis has been narrowed
-to the single named paper obligation
-`hhelperCompleteness`, which corresponds to `self_improvement.tex` lines
+This does **not** add an additional residual hypothesis: the hypothesis is the
+single named paper estimate `hhelperCompleteness`, which corresponds to
+`self_improvement.tex` lines
 351--414 (helper completeness, especially the Cauchy--Schwarz step at lines
 366--414) followed by the projective transfer at lines 713--717. The remaining
 final-field constructions (point-consistency, self-closeness, and
@@ -72,9 +72,9 @@ This is the orthonormalization transport ingredient of the final-fields
 completeness construction for `thm:self-improvement`. Given:
 
 * `hcomplete` — completeness of the *helper-stage* submeasurement `A` at level
-  `m`, expressed as `subMeasMass ψ A.liftLeft ≥ m`. This is the still-missing
-  paper obligation; with the current API the only way to obtain it is from the
-  Cauchy--Schwarz argument in `references/ldt-paper/self_improvement.tex`
+  `m`, expressed as `subMeasMass ψ A.liftLeft ≥ m`. This is the paper estimate
+  supplied by the Cauchy--Schwarz argument in
+  `references/ldt-paper/self_improvement.tex`
   lines 351--414, especially lines 366--414, which uses the incoming
   consistency hypothesis on `G` and `nu`.
 * `hssc` — bipartite strong self-consistency of `A`, proved by the helper-SSC
@@ -148,12 +148,12 @@ a separate numerical step on the explicit error definitions
 (`selfImprovementHelperError`, `selfImprovementOrthogonalizationError`,
 `selfImprovementError`) that does not require any new analytic input.
 
-This narrows the missing input for the `completeness` field of
-`SelfImprovementFinalFields` to the single named
-paper obligation `hhelperCompleteness` matching
+This isolates the analytic input for the `completeness` field of
+`SelfImprovementFinalFields` as the single named paper estimate
+`hhelperCompleteness` matching
 `references/ldt-paper/self_improvement.tex` lines 351--414, which is the only
-remaining analytic step (especially the Cauchy--Schwarz argument at lines
-366--414 that feeds on `G`/`nu` and the strategy's input consistency). The
+analytic step used by this construction (especially the Cauchy--Schwarz argument
+at lines 366--414 that feeds on `G`/`nu` and the strategy's input consistency). The
 blueprint mirror is `blueprint/src/chapter/ch07_self_improvement.tex` lines
 101--142.
 

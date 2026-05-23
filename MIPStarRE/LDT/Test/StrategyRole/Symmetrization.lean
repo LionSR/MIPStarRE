@@ -161,7 +161,7 @@ noncomputable def symmetrizedDiagonalMeasurement {params : Parameters}
     IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) (Role × ι) :=
   symmetrizedIdxProjMeas strategy.diagonalMeasurementA strategy.diagonalMeasurementB
 
-/-- Package the role-register symmetrized measurements with an external
+/-- Assemble the role-register symmetrized measurements with an external
 permutation-invariant classical role-register state.
 
 `Nonempty ι` is derived locally from `strategy.isNormalized`: an empty carrier

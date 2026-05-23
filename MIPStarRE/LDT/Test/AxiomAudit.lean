@@ -111,7 +111,7 @@ corrected large-`k` and nonzero sampling hypotheses.
 The corrected source statement `MainInductionStep.mainInduction_sourceStatement`
 is audited with standard kernel axioms only.  The paper prints the weaker
 hypothesis `k ≥ md`, but the project records the missing factor `400` as a
-confirmed theorem-level correction rather than as a remaining proof obligation.
+confirmed theorem-level correction rather than as proof debt.
 The final theorem source-boundary declaration proves the saturated-error branch,
 while its small-error branch calls the checked role-register scalar-boundary
 theorem under the corrected nonzero sampling hypothesis.  The zero-sampling
@@ -131,8 +131,8 @@ no longer carries a `sorryAx` dependency.
 
 The audit for `MainInductionStep.selfImprovementInInductionSection` records
 standard Lean axioms only: the measurement-valued realization of
-`thm:self-improvement-in-induction-section` no longer inherits the issue-#1230
-SDP slackness obligation.
+`thm:self-improvement-in-induction-section` no longer inherits any issue-#1230
+SDP slackness proof debt.
 
 The audit for `MainInductionStep.mainInduction` records that the corrected
 large-`k` Lean interface to `thm:main-induction` is now proved.  The
@@ -165,9 +165,9 @@ handoff: `mainInductionSuccessor`, `mainInduction`,
 `MainFormalRoleInductionWitness.ofMainInduction` are standard-axiom clean.
 
 The answer-carrier reductions
-`MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier` and
+`MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier`,
 `MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`
-are standard-axiom clean.  They are not paper theorems; they are internal
+are also standard-axiom clean.  They are not paper theorems; they are internal
 successor reductions from the predecessor answer-valued induction hypothesis.
 They remove the answer-valued slice-transport input from the active successor
 route: the needed self-improvement data are constructed directly from
@@ -184,10 +184,10 @@ to import `sorryAx`; they are bookkeeping and transport constructions, not
 hidden proof assumptions for the paper theorem.
 
 The Section 3 final-theorem witness constructors have the same separation.
-Base-case role witnesses and projective-completion transport are standard-axiom
-clean.  The successor-dependent role witness inherits the single tracked
-`sorryAx` only through `MainInductionStep.mainInduction`, not through an added
-final-theorem witness hypothesis.
+Base-case role witnesses, the successor-dependent role witness, and
+projective-completion transport are standard-axiom clean.  They are constructed
+from the corrected induction theorem and do not introduce added final-theorem
+witness hypotheses.
 
 The audit for `Pasting.ldPasting` now requires the standard Lean axioms only:
 the unrestricted paper-facing theorem no longer depends on a dedicated
@@ -207,10 +207,10 @@ requires the standard Lean axioms only: the ordered-eigenvalue statement of
 diagonalization to the ordered roots of the characteristic polynomial, so the
 former issue-#1497 `sorryAx` dependency is gone.
 
-The axiom expectation is attached to each declaration separately. A declaration
-using one of the `assert_*_axioms` commands with `sorryAx` in its expected set
-has a named proof obligation still to be discharged; fulfilling one such
-obligation should not change the audit status of the others.
+The axiom expectation is attached to each declaration separately.  The current
+paper-facing route is audited with the standard Lean axioms only; if a future
+declaration is temporarily audited with a larger expected set, its status must
+be justified at that declaration rather than inferred from nearby checks.
 
 The audit for the helper strong self-consistency assembly now requires the
 standard Lean axioms only: the issue-#1514 local estimate is proved by the
@@ -236,10 +236,9 @@ The blueprint-linked auxiliary declarations whose names contain words such as
 `Producer`, `Statement`, `Slackness`, or `Dominance` are all covered by explicit
 assertions in this file.  These names are not by themselves proof defects: some
 are direct encodings of paper hypotheses, some are construction theorems, and
-some are internal proof frontiers.  The audit records whether each checked
+some are auxiliary comparison statements.  The audit records whether each checked
 declaration uses only the standard Lean axioms, has exactly the expected Section
-6 `sorryAx` dependency where historically relevant, or does not itself import
-`sorryAx`.
+6 dependency when explicitly documented, or does not itself import `sorryAx`.
 
 This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
@@ -253,7 +252,7 @@ private def expectedStandardAxioms : Array Name :=
 
 /-- Standard kernel axioms only: the issue-#1032 scalar discrepancy for
 `thm:orthonormalization` has been repaired without making the theorem depend on
-the still-unproved heterogeneous `orthonormalizationMainLemma`. -/
+any unproved heterogeneous orthonormalization lemma. -/
 private def expectedOrthonormalizationAxioms : Array Name :=
   expectedStandardAxioms
 
@@ -400,8 +399,8 @@ assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterFinalPointConsistency
 assert_standard_axioms
   MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
-assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation
-assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceObligation
+assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion
+assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceConclusion
 assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceStatement
 
 /-! Chapter 2 interfaces used by the final-theorem route.  These are

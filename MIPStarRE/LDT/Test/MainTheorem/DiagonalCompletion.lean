@@ -8,9 +8,10 @@ Diagonal completion data for the `mainFormal` assembly.  Once
 the two unsymmetrized role POVMs `Gᴬ` and `Gᴮ` are obtained together with
 their cross-consistency relation `Gᴬ ⊗ I ≃ I ⊗ Gᴮ` at error `ζ₁`, the
 remaining construction of completed projective measurements is an internal
-proof obligation.  The source-facing construction theorem below is therefore
-left unfinished rather than represented by additional diagonal-consistency or
-match-mass hypotheses in the public `mainFormal` statement.
+construction theorem.  The source-facing theorem below proves this construction
+from the diagonal consistency and orthonormalization data, rather than
+representing it by additional match-mass hypotheses in the public `mainFormal`
+statement.
 
 The checked auxiliary lemmas in this file keep useful analytic content: they
 show how completion follows once the line-130 cross consistency and

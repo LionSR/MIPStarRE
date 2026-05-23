@@ -203,7 +203,7 @@ lemma orthonormalizationMeasurement {Outcome : Type*}
     (A := A) (B := A) (ζ := ζ) hζ
     (bipartiteSSCRel_self_of_measurement (ψ := ψ) A ζ hssc)
 
--- The direct repair-producer route below still uses `[DecidableEq Outcome]`
+-- The direct locality-preserving repair route below still uses `[DecidableEq Outcome]`
 -- through the concrete QXP-layer construction.
 set_option linter.unusedDecidableInType false in
 /-- Measurement-level orthonormalization from cross consistency, using the

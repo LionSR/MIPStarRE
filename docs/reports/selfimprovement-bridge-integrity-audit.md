@@ -30,9 +30,9 @@ Status note, 2026-05-20: the blueprint now separates the printed source
 theorems from the current Lean interfaces for `mainFormal` and `mainInduction`.
 The source-labelled statements remain visible and now link to source-faithful
 Lean statements with named proof obligations.  The final source statement
-factors its remaining work through `Test.mainFormal_sourceObligation`, whose
+factors its remaining work through `Test.mainFormal_sourceConclusion`, whose
 saturated-error branch is proved and whose remaining branch is
-`Test.mainFormal_sourceSmallErrorObligation`, while
+`Test.mainFormal_sourceSmallErrorConclusion`, while
 the induction source statement factors its remaining `md ≤ k < 400md` interval through
 `MainInductionStep.mainInduction_sourceRangeObligation`.  The current Lean
 interfaces are linked separately from `thm:main-formal-current-interface` and
@@ -50,9 +50,15 @@ for the corrected large-\(k\) interface.
 
 Status note, 2026-05-22 after the answer-valued successor repair: the Section 6
 small-error successor construction is now checked for the corrected large-`k`
-interface.  The remaining direct proof holes are the source-range obligation
-for the printed `k >= md` induction theorem and the final two-space
-source-boundary obligation.
+interface.
+
+Status note, 2026-05-23 after the source-boundary cleanup: the project has
+adopted the factor-\(400\) correction as a confirmed statement correction and
+has added the final-theorem nonzero sampling boundary \(0<k\).  Under these
+corrected statements, the main induction source theorem and the final
+two-space source theorem are proof-complete; the remaining differences from the
+printed paper are these documented boundary corrections, not hidden proof
+obligations.
 
 Auditor: Research specialist (read-only analysis)
 Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
@@ -62,10 +68,11 @@ Scope: `MIPStarRE/LDT/SelfImprovement/` → `MIPStarRE/LDT/Pasting/` →
 
 ## Executive Summary
 
-The proof-debt concern is valid.  Several formal interfaces still record
-intermediate mathematical obligations as explicit inputs to conditional helper
-theorems.  Such helpers may preserve useful downstream proof content, but they
-must not be presented as theorems from the paper.
+This executive summary is historical.  At the audited snapshot, several formal
+interfaces still recorded intermediate mathematical obligations as explicit
+inputs to conditional helper theorems.  Those interfaces have since been
+removed or replaced by checked construction theorems under the corrected source
+statements.
 
 The SelfImprovement module compiles with all its lemmas, the Pasting module
 compiles independently, and the MainInductionStep module wires them together in
@@ -75,10 +82,10 @@ proved final-transport theorem
 `mainFormal_ofProjectiveCompletionTransportWitness` is retained as useful proof content,
 but no public theorem supplies completion data as an additional hypothesis.
 
-The architecture is therefore incomplete, but the theorem boundary is no longer
-misstated.  The remaining work is now the source-boundary work described in the
-status notes above: the printed \(md \le k < 400md\) range for
-`thm:main-induction` and the final two-space source-boundary theorem.
+Under the current corrected theorem statements, the architecture described
+above is no longer incomplete.  The theorem boundary differs from the literal
+paper only by the documented factor-\(400\) large-\(k\) correction and the
+nonzero-sampling boundary \(0<k\).
 
 ---
 
@@ -102,8 +109,8 @@ proof-stage inputs:
    `HelperStrongSelfConsistencyInput` has been removed.  The helper SSC
    conclusion is now produced by
    `helper_strong_self_consistency_of_helper_conclusion` from the checked
-   record of intermediate estimates
-   `HelperStrongSelfConsistencyBounds`; this record is assembled
+   package of intermediate estimates
+   `HelperStrongSelfConsistencyBounds`; this package is assembled
    internally from the self-consistency, local-variance, and residual estimates.
 2. **`orthonormalization`**: the former `OrthonormalizationInput` bundle has
    been removed.  The retained Section 9 API records the spectral-truncation

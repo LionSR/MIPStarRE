@@ -1,15 +1,15 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 
 /-!
-# Helper completeness and SDP bridge
+# Helper completeness and SDP comparison
 
 This compatibility module re-exports the helper-completeness development.  The
-proof is split into input-consistency and SDP bridge lemmas, fiber-operator
+proof is split into input-consistency and SDP comparison lemmas, fiber-operator
 bounds, linearized SDP rewrites, and bracketed mass identities.
 
 ## Contents
 
-### Input consistency and the SDP bridge
+### Input consistency and the SDP comparison
 
 - `input_consistency_match_mass_lower_bound` records the incoming `ConsRel`
   lower bound for the input matching mass.

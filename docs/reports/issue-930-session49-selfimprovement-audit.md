@@ -33,14 +33,20 @@ Branch: `gpt55/issue-930-selfimprovement-audit`
 > tracked by #1507.  The source-labelled final-theorem route additionally
 > contains the named source-boundary obligations
 > `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
-> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`; the wrapper
-> `MIPStarRE.LDT.Test.mainFormal_sourceObligation` proves the saturated-error
+> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`; the wrapper
+> `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` proves the saturated-error
 > branch.
 >
 > **Status note, 2026-05-22.**  The Section 6 small-error successor construction
 > is now checked for the corrected large-`k` interface.  The live proof frontier
 > is the printed source range `md <= k < 400md` for `thm:main-induction` and the
 > final two-space source-boundary obligation for `thm:main-formal`.
+>
+> **Status note, 2026-05-23.**  The preceding frontier is now historical.
+> Under the corrected assumptions `k >= 400md` and `0 < k`, the Section 6
+> source route and the final two-space source-boundary theorem are checked.
+> The remaining differences from the literal printed theorem are the documented
+> statement corrections, not live obligation wrappers.
 
 ## Executive summary
 

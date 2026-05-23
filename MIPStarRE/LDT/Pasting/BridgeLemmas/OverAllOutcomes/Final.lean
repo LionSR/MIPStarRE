@@ -380,16 +380,14 @@ private lemma overAllOutcomes_distinct_nonglobal_mass_bound
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
   linarith
 
-/-- Reduction of `lem:over-all-outcomes` to the one remaining reverse mass
-comparison.
+/-- Reduction of `lem:over-all-outcomes` to a reverse mass comparison.
 
 The forward direction
 `overAllOutcomesPastedMass - overAllOutcomesExpansionMass` is now discharged by
 expanding the pasted mass over distinct tuples, forgetting global consistency,
-and paying only `ldDnoteq`.  Thus the only remaining mathematical obligation is
-bounding the reverse loss
-`overAllOutcomesExpansionMass - overAllOutcomesPastedMass`, which is the part of
-`ld-pasting.tex` that still needs the completed `ldSandwichLineOnePoint`
+and paying only `ldDnoteq`.  The reverse loss
+`overAllOutcomesExpansionMass - overAllOutcomesPastedMass` is the part of
+`ld-pasting.tex` supplied below by the completed `ldSandwichLineOnePoint`
 aggregation. -/
 private lemma overAllOutcomes_of_reverse_mass_bound
     (params : Parameters) [FieldModel params.q]

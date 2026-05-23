@@ -20,18 +20,12 @@ case is a statement-drift problem for the paper theorem itself.
 
 ## Summary
 
-Update, 2026-05-20: the printed source statements for `thm:main-formal` and
-`thm:main-induction` are now linked to source-faithful Lean statements, and
-their remaining proof debt is factored through named obligations
-`Test.mainFormal_sourceObligation` and
-`MainInductionStep.mainInduction_sourceRangeObligation`.  These declarations
-are not public hypotheses of the source theorems.  They are explicit proof
-targets below the source theorem boundary, introduced so that the paper-facing
-statements do not acquire bridge, package, residual, repair, input,
-hypotheses, or obligation assumptions.
-The final-theorem wrapper proves its saturated-error branch and leaves only
-`Test.mainFormal_sourceSmallErrorObligation` as the direct final source-boundary
-proof hole.
+Update, 2026-05-22: the corrected source statements for `thm:main-formal` and
+`thm:main-induction` are now proof-complete.  The factor `400` in the
+large-\(k\) hypothesis and the nonzero sampling boundary for the final theorem
+are treated as documented statement corrections, not as proof obligations hidden
+inside bridge, package, residual, repair, input, hypotheses, or obligation
+assumptions.
 
 The current broad scan reports no unresolved proof-debt theorem boundaries.  It
 also records 49 uses of source-construction context and 2 quoted external
@@ -110,10 +104,10 @@ self-contained mathematical target for #1507 rather than an implicit proof gap
 inside `mainInduction`.
 
 The optional informational scan still reports the Section 6 stage records in
-the blueprint definition `def:self-improvement-slice-transport`.  This is
-expected: the definition records formal intermediate objects for the successor
-proof.  The review task is to ensure that these objects are never advertised as
-extra assumptions of `thm:main-induction` or `thm:main-formal`.
+the informational blueprint remark `rem:self-improvement-slice-transport`.
+This is expected: the remark records formal intermediate objects for the
+successor proof.  The review task is to ensure that these objects are never
+advertised as extra assumptions of `thm:main-induction` or `thm:main-formal`.
 
 ## Chapter 9 Pasting
 
@@ -185,9 +179,9 @@ theorem, lemma, proposition, or corollary entries.
    `sdp_slackness_measurement` are proved from the canonical SDP
    strong-duality and complementary-slackness argument.
 2. Keep the corrected large-\(k\) Section 6 successor route under axiom audit.
-   It is now proved; the remaining Section 6 work is the printed source range
-   \(md \le k < 400md\), represented by
-   `mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`.
+   It is now proved.  The former source-range obligation has been retired
+   because \(k\ge400md\) is treated as a confirmed statement correction rather
+   than as a theorem still to be proved in the interval \(md \le k < 400md\).
 3. Continue the Chapter 4 source-construction audit for `QLayerData`,
    `QXPLayerData`, and `RankReductionWitness`, checking that each public input
    represents a fixed object introduced by the paper rather than an unproved

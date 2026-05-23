@@ -3,7 +3,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.ErrorBounds
 /-!
 # Section 6 — Pasting Assembly: Successor Assembly
 
-This module contains the final answer-valued pasting obligation, averaged
+This module contains the final answer-valued pasting invocation, averaged
 pasting data constructors, and ordinary successor assembly corollaries.
 -/
 
@@ -16,7 +16,7 @@ universe uι
 
 variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
-/-- Answer-valued induction-section pasting obligation for the small-error
+/-- Answer-valued induction-section pasting theorem for the small-error
 successor branch.
 
 Paper origin: `references/ldt-paper/ld-pasting.tex:12-50` and its use in
@@ -114,7 +114,7 @@ theorem answerLdPastingInInductionSectionOfSmallError
       hkappa_le hzeta_le_nu hk (Nat.eq_zero_of_not_pos hd)
 
 /-- Internal successor reduction from the predecessor answer-valued induction
-hypothesis and the answer-valued pasting obligation.
+hypothesis and the answer-valued pasting theorem.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-551`.
 

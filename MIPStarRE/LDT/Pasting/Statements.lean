@@ -478,7 +478,7 @@ Lean statement for `lem:from-H-to-G`.
 The paper's displayed statement is a scalar approximation of expectation values,
 not a new `≈_δ` relation between submeasurements.  Accordingly, this bundle
 stores only the final all-outcomes vs. Bernoulli-tail comparison; the
-adjacent-stage estimates remain internal proof obligations. -/
+adjacent-stage estimates are recorded by the internal construction lemmas. -/
 structure FromHToGStatement (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params.next ι)

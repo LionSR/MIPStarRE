@@ -36,9 +36,9 @@ GOOD_DOT = r'''
 "thm:main-formal" [color=green, fillcolor="#1CAC78", label="main-formal", shape=ellipse, style=filled];
 "thm:main-induction" [color=green, fillcolor="#1CAC78", label="main-induction", shape=ellipse, style=filled];
 "thm:main-formal-current-interface" [color=green, fillcolor="#1CAC78", label="main-formal-current-interface", shape=ellipse, style=filled];
-"prop:main-formal-source-obligation" [color=green, fillcolor="#1CAC78", label="main-formal-source-obligation", shape=ellipse, style=filled];
-"prop:main-formal-source-small-error-obligation" [color=green, fillcolor="#1CAC78", label="main-formal-source-small-error-obligation", shape=ellipse, style=filled];
-"prop:main-formal-source-two-space-role-register" [color=blue, label="main-formal-source-two-space-role-register", shape=ellipse];
+"prop:main-formal-source-reduction" [color=green, fillcolor="#1CAC78", label="main-formal-source-reduction", shape=ellipse, style=filled];
+"prop:main-formal-source-small-error" [color=green, fillcolor="#1CAC78", label="main-formal-source-small-error", shape=ellipse, style=filled];
+    "prop:main-formal-source-two-space-role-register" [color=green, fillcolor="#1CAC78", label="main-formal-source-two-space-role-register", shape=ellipse, style=filled];
 "prop:main-induction-successor-small-error-construction" [color=green, fillcolor="#1CAC78", label="main-induction-successor-small-error-construction", shape=ellipse, style=filled];
 "prop:main-induction-successor-predecessor-induction" [color=green, fillcolor="#1CAC78", label="main-induction-successor-predecessor-induction", shape=ellipse, style=filled];
 "prop:main-induction-successor-answer-valued-pasting" [color=green, fillcolor="#1CAC78", label="main-induction-successor-answer-valued-pasting", shape=ellipse, style=filled];
@@ -47,7 +47,7 @@ GOOD_DOT = r'''
 
 
 class DependencyGraphStatusAuditTests(unittest.TestCase):
-    def test_accepts_expected_local_frontier_statuses(self) -> None:
+    def test_accepts_expected_graph_statuses(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             graph = write_graph(Path(tmp), GOOD_DOT)
 
@@ -78,19 +78,19 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
             self.assertEqual(result.findings[0].label, label)
             self.assertEqual(result.findings[0].kind, "retired-node-present")
 
-    def test_flags_proof_filled_frontier_node(self) -> None:
+    def test_flags_unfilled_source_role_register_node(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             graph = write_graph(
                 Path(tmp),
                 GOOD_DOT.replace(
                     '"prop:main-formal-source-two-space-role-register" '
-                    '[color=blue, '
-                    'label="main-formal-source-two-space-role-register", '
-                    'shape=ellipse];',
-                    '"prop:main-formal-source-two-space-role-register" '
                     '[color=green, fillcolor="#1CAC78", '
                     'label="main-formal-source-two-space-role-register", '
                     'shape=ellipse, style=filled];',
+                    '"prop:main-formal-source-two-space-role-register" '
+                    '[color=blue, '
+                    'label="main-formal-source-two-space-role-register", '
+                    'shape=ellipse];',
                 ),
             )
 
@@ -101,17 +101,17 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
             result.findings[0].label,
             "prop:main-formal-source-two-space-role-register",
         )
-        self.assertEqual(result.findings[0].kind, "frontier-proof-filled")
+        self.assertEqual(result.findings[0].kind, "proved-node-not-proof-filled")
 
-    def test_flags_missing_frontier_node(self) -> None:
+    def test_flags_missing_required_proved_node(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             graph = write_graph(
                 Path(tmp),
                 GOOD_DOT.replace(
                     '"prop:main-formal-source-two-space-role-register" '
-                    '[color=blue, '
+                    '[color=green, fillcolor="#1CAC78", '
                     'label="main-formal-source-two-space-role-register", '
-                    'shape=ellipse];\n',
+                    'shape=ellipse, style=filled];\n',
                     "",
                 ),
             )
@@ -123,7 +123,7 @@ class DependencyGraphStatusAuditTests(unittest.TestCase):
             result.findings[0].label,
             "prop:main-formal-source-two-space-role-register",
         )
-        self.assertEqual(result.findings[0].kind, "frontier-node-missing")
+        self.assertEqual(result.findings[0].kind, "missing-required-node")
 
     def test_flags_unfilled_main_induction(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

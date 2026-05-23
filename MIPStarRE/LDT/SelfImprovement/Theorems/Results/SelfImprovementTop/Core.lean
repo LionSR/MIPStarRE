@@ -389,9 +389,9 @@ conclusions. The paper and blueprint impose the `(eps, delta, gamma)`-good
 strategy condition as a standing hypothesis for the self-improvement section
 (`blueprint/src/chapter/ch07_self_improvement.tex`, line 4); Lean records it
 here as the explicit hypothesis `hgood`. The source-facing theorem remains
-visible with the paper statement; any remaining missing derivation is lowered to
-internal obligations rather than hidden in a conditional theorem with extra
-obligation hypotheses. -/
+visible with the paper statement; the intermediate estimates are assembled by
+named internal construction lemmas rather than hidden in a conditional theorem
+with extra hypotheses. -/
 theorem selfImprovement
     (params : Parameters)
     [FieldModel params.q]

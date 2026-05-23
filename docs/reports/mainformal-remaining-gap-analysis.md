@@ -38,10 +38,10 @@ Date: 2026-05-07
 > successor construction has since been proved.
 > The source-labelled blueprint entry `thm:main-formal` is now recorded as
 > `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
-> wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation` for the printed
+> wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` for the printed
 > two-space, `k >= md` statement.  This wrapper proves the saturated-error
 > branch and leaves
-> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` as the direct
+> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` as the direct
 > final-theorem source-boundary proof hole.
 > The former `MainFormalRolePackageBranchResidual`,
 > `successorSelfImprovementObligations`,
@@ -73,7 +73,15 @@ Date: 2026-05-07
 > `prop:main-formal-source-two-space-role-register` and
 > `prop:main-formal-source-k-range-boundary`.  The direct Lean proof holes are
 > `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`
-> and `Test.mainFormal_sourceSmallErrorObligation`.
+> and `Test.mainFormal_sourceSmallErrorConclusion`.
+>
+> **Status note, 2026-05-23.**  That final-theorem frontier is now historical.
+> The factor \(400\) in the large-\(k\) hypothesis is treated as a confirmed
+> correction to the printed statement, and the final theorem explicitly assumes
+> the nonzero-sampling boundary \(0<k\).  Under these corrected source
+> hypotheses, the two-space source-boundary route is checked; the older
+> `mainInduction_sourceRange*` and `mainFormal_source*Obligation` names below
+> refer to retired wrappers rather than live proof holes.
 >
 > **Update, 2026-05-21.**  The first state and measurement pieces of the
 > heterogeneous role-register construction are now present in Lean.
@@ -198,11 +206,11 @@ restricted-probability records, slice-induction data, self-improvement data,
 pasting data, residual packages, or arbitrary implication hypotheses.
 It is now proved in the corrected large-\(k\) interface.
 
-The older conditional direct `sorry` in `MainFormal.lean` has been removed.  A
-direct `sorry` remains in `mainFormal_sourceSmallErrorObligation`, but it is a
-named non-vacuous source-boundary obligation rather than the removed conditional
-bridge package.  The wrapper `mainFormal_sourceObligation` proves the
-saturated-error branch by a two-space trivial measurement construction.
+The older conditional direct `sorry` in `MainFormal.lean` has been removed.  The
+later source-boundary wrapper `mainFormal_sourceSmallErrorConclusion` is now
+checked under the corrected hypotheses `k >= 400md` and `0 < k`.  The wrapper
+`mainFormal_sourceConclusion` proves the saturated-error branch by a two-space
+trivial measurement construction.
 The historical goal displayed below records the earlier state of this report.
 
 ## 1.1. Statement integrity audit
@@ -226,19 +234,20 @@ Lean conclusion: projective measurements
 relations and the final self-consistency relation at `mainFormalError params k
 eps`.
 
-Verdict: the source theorem `thm:main-formal` is exact in the blueprint and is
-now linked to the source-faithful Lean statement
+Verdict: the source theorem `thm:main-formal` is recorded in its corrected form
+in the blueprint and is linked to the Lean statement
 `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
-source-boundary wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation`.
+source-boundary construction `MIPStarRE.LDT.Test.mainFormal_sourceConclusion`.
 This wrapper proves the saturated-error branch and calls
-`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` in the remaining
+`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` in the non-vacuous
 small-error branch.
 The Lean theorem `mainFormal` is a separate current interface with
 faithful boundary hypotheses for the present formal container and the
 documented large-`k` correction.  It has no bridge, residual, package, repair,
 producer, input, or obligation hypothesis.  The corrected large-`k` Section 6
-theorem is now proved; the remaining proof debt for the printed final theorem
-is the source-boundary branch `Test.mainFormal_sourceSmallErrorObligation`.
+theorem and the corrected final two-space source theorem are now proved.  The
+literal printed theorem is not formalized verbatim because of the confirmed
+factor-\(400\) correction and the explicit boundary \(0<k\).
 
 **Historical goal type at the sorry:**
 ```lean

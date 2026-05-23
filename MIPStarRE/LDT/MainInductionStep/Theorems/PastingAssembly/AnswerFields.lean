@@ -141,8 +141,8 @@ theorem answerSuccessorAveragedFamilyFields_ofMainInductionHypothesis.{uι', uF}
 This theorem performs the checked final assembly once the answer-valued
 analogue of the Section 11 commutativity theorem has been supplied for the
 point-equivalent ordinary carrier.  The hypotheses `hcom` and `herror_le` are
-not source assumptions; they are the remaining internal construction and scalar
-absorption obligations for the answer-valued pasting route. -/
+not source assumptions; they are the internal commutativity construction and
+scalar absorption targets for the answer-valued pasting route. -/
 theorem answerLdPastingInInductionSectionOfComMainAndErrorBound
     (params : Parameters)
     [FieldModel params.q]
@@ -243,8 +243,8 @@ theorem answerLdPastingInInductionSectionOfComMainAndErrorBound
 /-- Answer-valued Section 11 commutativity input needed by the positive-degree
 pasting branch.
 
-This is a Lean-only proof obligation, not a source theorem and not a hypothesis
-of `thm:main-induction`.  It is the precise replacement for the invalid route
+This is a Lean-only construction target, not a source theorem and not a
+hypothesis of `thm:main-induction`.  It is the precise replacement for the invalid route
 through the ordinary carrier's dummy diagonal measurement: the conclusion is
 the ordinary `ComMainConclusion` for the point-equivalent carrier, but the
 intended proof must use the answer-valued diagonal verifier relation of

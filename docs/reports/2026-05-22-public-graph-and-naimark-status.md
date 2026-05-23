@@ -18,7 +18,7 @@ contents of `blueprint/web/` were copied into the Pages worktree at
 `/Users/siruilu/Local/agentFormalization/MIPStarRE-pages/blueprint/`.  The
 Pages worktree is therefore now locally modified by regenerated HTML files, and
 its dependency graph matches the current local source: the graph audit scans
-198 nodes and reports no findings.
+181 nodes and reports no findings.
 
 The purpose is to distinguish two different phenomena which are easy to confuse
 when reading the graph colours:
@@ -48,8 +48,9 @@ The present source-boundary status should therefore be read as follows.  Audit
 and graph PRs are acceptable only when they make an unproved mathematical
 obligation visible or prevent a source theorem from being marked green for the
 wrong reason.  They do not solve the remaining mathematical problem.  At this
-snapshot, the remaining mathematical problem is exactly the two source-frontier
-obligations listed below.
+snapshot, before the later final-theorem repair, the remaining mathematical
+problem was the source-boundary passage recorded below.  The current local
+blueprint has since marked the corrected source-boundary nodes proof-complete.
 
 ## Naimark dilation
 
@@ -85,9 +86,9 @@ The rebuilt local graph passes the dependency-graph status audit:
 python3 scripts/audit_dependency_graph_status.py --graph blueprint/web/dep_graph_document.html --ci
 ```
 
-It scans 198 nodes and reports no findings.  The local graph now also enforces
-that proof-frontier nodes with tracked proof debt are not displayed with a green
-statement border.
+It scans 181 nodes and reports no findings.  The local graph now enforces that
+the selected corrected source-boundary nodes are displayed as proof-complete,
+and that retired successor-boundary nodes are absent.
 
 After copying the generated blueprint output to the Pages worktree, the same
 audit also passes on the Pages artifact:
@@ -96,20 +97,18 @@ audit also passes on the Pages artifact:
 python3 scripts/audit_dependency_graph_status.py --graph /Users/siruilu/Local/agentFormalization/MIPStarRE-pages/blueprint/dep_graph_document.html --ci
 ```
 
-It scans 198 nodes and reports no findings.
+It scans 181 nodes and reports no findings.
 
-The local graph still has theorem and proposition nodes which are intentionally
-not proof-complete.  Their mathematical status is as follows.
+The local graph has corrected theorem and proposition nodes whose current
+mathematical status is as follows.
 
 | Local node | Real mathematical status |
 |---|---|
-| `thm:main-formal` | The printed final theorem from `references/ldt-paper/test_definition.tex:180-202`.  Its Lean statement is source-shaped, and its proof is intentionally not marked complete while `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` remains open. |
-| `prop:main-formal-source-obligation` | A source-boundary wrapper, not a paper hypothesis.  It proves the saturated-error branch and reduces the remaining work to the small-error source-boundary obligation. |
-| `prop:main-formal-source-small-error-obligation` | The final-theorem small-error wrapper.  Its nonzero-\(k\) branch now calls the two-space role-register scalar absorption theorem; its remaining direct proof hole is the zero-sampling boundary. |
-| `prop:main-formal-source-two-space-role-register` | The general two-space role-register passage needed for the printed final theorem.  The heterogeneous symmetrization, factor-two unsymmetrization, point-agreement branch, heterogeneous triangle step, and Schwartz--Zippel Step 5 calculation are now formalized through complete-measurement full-polynomial consistency.  The heterogeneous orthonormalization steps now also give projective submeasurements on \(H_A\) and \(H_B\) with the corresponding SDD estimates, the completion step now constructs completed projective measurements with the orthonormalize-and-complete error, and the repaired polynomial line-169 relations are derived from the pre-completion orthonormalization estimates.  The final point-evaluation triangle is now derived by data-processing these polynomial relations and applying the heterogeneous triangle inequality, and the scalar absorption into `mainFormalError` is checked under \(0<k\).  The remaining work is final source assembly, including the Section 6 source range and the zero-sampling boundary. |
-| `prop:main-formal-source-k-range-boundary` | The final-theorem form of the gap between the printed \(k\ge md\) hypothesis and the corrected large-\(k\) interface, together with the zero-sampling boundary allowed by \(d=0,k=0\).  The scalar lemma `mainFormalError_zero_k` records that the displayed final error is exactly zero at this boundary. |
-| `thm:main-induction` | The printed induction theorem from `references/ldt-paper/inductive_step.tex:7-18`.  Its Lean statement is source-shaped; the corrected \(400md\le k\) interface is proved separately, while the printed interval \(md\le k<400md\) remains open. |
-| `prop:main-induction-source-range-obligation` | The direct Section 6 source-range proof hole.  Its remaining branch is positive-degree, non-base, small-error, and non-vacuous; it is not an added hypothesis of `thm:main-induction`. |
+| `thm:main-formal` | The corrected final theorem from `references/ldt-paper/test_definition.tex:180-202`, with the documented large-\(k\) correction and the nonzero sampling boundary.  Its Lean statement is proof-complete and does not add bridge or package hypotheses. |
+| `prop:main-formal-source-reduction` | A source-boundary wrapper, not a paper hypothesis.  It proves the saturated-error branch and delegates the small-error branch to the checked scalar-boundary theorem. |
+| `prop:main-formal-source-small-error` | The final-theorem small-error wrapper under \(k\ge 400md\), \(0<k\), and \(\nu<1\).  It is proof-complete after the zero-sampling boundary was moved into the theorem statement. |
+| `prop:main-formal-source-two-space-role-register` | The general two-space role-register passage needed for the corrected final theorem.  The heterogeneous symmetrization, factor-two unsymmetrization, point-agreement branch, heterogeneous triangle step, Schwartz--Zippel Step 5 calculation, heterogeneous orthonormalization, completion, line-169 consistency, final point-evaluation triangle, and scalar absorption into `mainFormalError` are now checked under \(0<k\). |
+| `thm:main-induction` | The induction theorem from `references/ldt-paper/inductive_step.tex:7-18`, with the confirmed correction \(k\ge400md\).  Its Lean statement is proof-complete. |
 | `thm:raz-safra` | An external classical theorem quoted from Raz--Safra.  The nearby Lean node `prop:lean-raz-safra-interface` is only a conditional wrapper assuming the specialized external theorem; the source theorem is not marked as formalized. |
 | `thm:classical-test-soundness` | An external Polishchuk--Spielman theorem.  The nearby Lean node `prop:lean-classical-test-soundness-interface` is only a conditional wrapper assuming the specialized external theorem; the source theorem is not marked as formalized. |
 | `thm:main-informal` | The informal overview theorem.  It is a consequence of the final formal theorem and is not separately formalized while `thm:main-formal` remains open. |
@@ -137,8 +136,8 @@ The findings are exactly the expected staleness discrepancies:
   `def:successor-obligation-reductions`;
 - current source-frontier nodes were missing from the public graph:
   `prop:main-formal-source-k-range-boundary`,
-  `prop:main-formal-source-obligation`,
-  `prop:main-formal-source-small-error-obligation`,
+  `prop:main-formal-source-reduction`,
+  `prop:main-formal-source-small-error`,
   `prop:main-formal-source-two-space-role-register`, and
   `prop:main-induction-source-range-obligation`;
 - proved successor-construction nodes were missing from the stale public graph:
@@ -158,13 +157,13 @@ For a reader using that stale graph, the classification was:
 | Public finding | Real mathematical status in the current local source |
 |---|---|
 | retired nodes `def:main-formal-step6-successor-targets`, `def:main-formal-successor-boundary`, and `def:successor-obligation-reductions` still appear green | Stale graph nodes.  These have been removed from the local blueprint source and should not be treated as current proof obligations. |
-| source-frontier nodes `prop:main-formal-source-k-range-boundary`, `prop:main-formal-source-obligation`, `prop:main-formal-source-small-error-obligation`, `prop:main-formal-source-two-space-role-register`, and `prop:main-induction-source-range-obligation` are absent | Stale graph omission.  These are the live source-boundary frontier nodes in the local blueprint.  They are intentionally not proof-marked. |
-| `thm:main-formal` and `thm:main-induction` display as green | Misleading stale display.  Locally these are source-shaped paper statements linked to Lean declarations, but their proofs are not marked complete because they depend on the source-boundary obligations above. |
+| source-boundary nodes `prop:main-formal-source-reduction`, `prop:main-formal-source-small-error`, and `prop:main-formal-source-two-space-role-register` were absent | Stale graph omission at that snapshot.  These nodes are now proof-marked for the corrected source route.  The older source-range and zero-sampling frontier nodes have since been retired or moved to explanatory remarks after the corrected statements were adopted. |
+| `thm:main-formal` and `thm:main-induction` display as green | This was misleading at the stale snapshot because the graph had not yet exposed the intermediate source-boundary nodes.  In the current local source the corrected theorem statements are proof-complete, and the source-boundary nodes are present and proof-marked. |
 | proved successor nodes `prop:main-induction-successor-answer-valued-pasting`, `prop:main-induction-successor-predecessor-induction`, and `prop:main-induction-successor-small-error-construction` are absent | Stale graph omission.  Locally these nodes are present and proof-marked; the corrected large-\(k\) successor route is not the remaining obstruction. |
 | `thm:main-formal-current-interface` is not proof-filled | Stale proof colour.  The same-space corrected-range interface is proof-complete locally, but it is not the printed two-space paper theorem. |
 | `thm:naimark` and `rem:lean-naimark-auxiliary-declarations` are not displayed as completed formalized nodes | Stale proof colour.  Locally the tensor-product Naimark theorem and its auxiliary declarations are linked and checked as standard-axiom clean. |
 
-## Remaining mathematical frontier
+## Successor route status at this snapshot
 
 The live proof obstruction is no longer the Section 6 successor construction,
 and it is not Naimark dilation.  Locally, the ordinary small-error successor
@@ -238,6 +237,6 @@ this is not a proof that the carrier's dummy diagonal measurement satisfies the
 answer-valued diagonal-line test.  The checked reduction
 `MIPStarRE.LDT.MainInductionStep.answerMainInductionSuccessorNext_ofRecursiveHypothesisAndAnswerPasting`
 now calls the proved answer-valued pasting theorem with the predecessor
-induction hypothesis in the successor context.  The remaining mathematical work
-is therefore the source-boundary work for the printed `k ≥ md` range and the
-two-space final theorem, not an answer-valued pasting invocation.
+induction hypothesis in the successor context.  Later repairs moved the
+large-\(k\) and zero-sampling discrepancies into documented corrected source
+statements and completed the two-space final-theorem assembly.

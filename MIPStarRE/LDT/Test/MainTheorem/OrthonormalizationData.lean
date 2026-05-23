@@ -51,7 +51,7 @@ orthonormalization supplied by `references/ldt-paper/orthonormalization.tex:282`
 
 This stops before `completeAtOutcome`: the honest paper-shaped boundary records
 only the part now derivable from the `G^A/G^B` `ConsRel`; completion closeness is
-kept as a separate downstream obligation. -/
+handled by the downstream completion construction. -/
 structure MainFormalDiagonalOrthonormalizationWitness
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
