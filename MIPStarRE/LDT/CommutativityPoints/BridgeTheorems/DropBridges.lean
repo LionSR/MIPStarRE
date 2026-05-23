@@ -1,11 +1,11 @@
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.LiftBridges
 
 /-!
-# Section 10 commutativity points: drop bridges
+# Section 10 commutativity points: drop comparisons
 
-Bridge lemmas that drop structure from the mixed line family back to the
+Comparison lemmas that drop structure from the mixed line family back to the
 ordered diagonal-line product, used in the drop direction of the Section 10
-bridge argument.
+point-commutativity argument.
 
 ## References
 
@@ -39,7 +39,7 @@ private lemma diagonalLineProduct_outcome_swap
     (fun f => f q.2.2)
     (fun f => f q.2.1) b a
 
-private lemma reversedDropFromLineBridge
+private lemma reversedDropFromLineComparison
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -158,7 +158,7 @@ private lemma reversedDropFromLineBridge
               exact pointDiagonalLineMixedProductRight_outcome params strategy q a b)
     hreindexed
 
-private lemma orderedDropFromLineBridge
+private lemma orderedDropFromLineComparison
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -181,9 +181,9 @@ private lemma orderedDropFromLineBridge
       symm
       exact diagonalLineProduct_outcome_swap params strategy q ab)
     (by intro q ab; rfl)
-    (reversedDropFromLineBridge params strategy eps delta gamma hgood)
+    (reversedDropFromLineComparison params strategy eps delta gamma hgood)
 
-private lemma reversedDropToPointsBridge
+private lemma reversedDropToPointsComparison
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -319,8 +319,8 @@ theorem commutativityPoints
       (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductLeft params strategy))
       (diagonalLineProductOrdered params strategy)
       δ δ
-      (orderedLiftToMixedBridge params strategy eps delta gamma hgood)
-      (orderedLiftToLineBridge params strategy eps delta gamma hgood)
+      (orderedLiftToMixedLine params strategy eps delta gamma hgood)
+      (orderedLiftToLineProduct params strategy eps delta gamma hgood)
   have hright :
       SDDOpRel strategy.state
         (pointPairSharedDiagonalLineDistribution params)
@@ -334,8 +334,8 @@ theorem commutativityPoints
       (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy))
       (pointMeasurementProductAlongSharedLineReversed params strategy)
       δ δ
-      (orderedDropFromLineBridge params strategy eps delta gamma hgood)
-      (reversedDropToPointsBridge params strategy eps delta gamma hgood)
+      (orderedDropFromLineComparison params strategy eps delta gamma hgood)
+      (reversedDropToPointsComparison params strategy eps delta gamma hgood)
   have hshared :
       SDDOpRel strategy.state
         (pointPairSharedDiagonalLineDistribution params)

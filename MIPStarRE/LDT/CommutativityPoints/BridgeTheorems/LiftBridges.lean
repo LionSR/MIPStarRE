@@ -2,10 +2,11 @@ import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
 
 /-!
-# Section 10 commutativity points: lift bridges
+# Section 10 commutativity points: lift comparisons
 
-Bridge lemmas lifting the ordered shared-line point product to the mixed
-line family, used in the lift direction of the Section 10 bridge argument.
+Comparison lemmas lifting the ordered shared-line point product to the mixed
+line family, used in the lift direction of the Section 10 point-commutativity
+argument.
 
 ## References
 
@@ -20,7 +21,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 open scoped Matrix MatrixOrder ComplexOrder BigOperators
 /-- Lift the ordered shared-line point product to the mixed line family. -/
-lemma orderedLiftToMixedBridge
+lemma orderedLiftToMixedLine
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -130,7 +131,7 @@ lemma orderedLiftToMixedBridge
     hreindexed
 
 /-- Lift the mixed line family to the ordered shared-line line product. -/
-lemma orderedLiftToLineBridge
+lemma orderedLiftToLineProduct
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
