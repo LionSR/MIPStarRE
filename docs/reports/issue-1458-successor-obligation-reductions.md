@@ -18,7 +18,7 @@ the averaged pasting datum and its scalar side conditions.
 `def:successor-obligation-reductions` is a Lean-only blueprint node.  It records
 proved internal reductions such as
 `mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations` and
-`mainInductionSuccessorNext_ofDegreeSplitPastingObligations`.  These theorems
+the former degree-split successor reductions.  These theorems
 are not paper statements and are not additional hypotheses of
 `thm:main-induction`; they reduce the source-facing successor proof to named
 construction obligations.

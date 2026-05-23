@@ -428,7 +428,7 @@ private theorem degreeZero_averagedSlice_pointConsistency
           (averagedSliceAppendedSubMeas params family))
         ((min zeta 1 + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) +
           Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) := by
-    exact bridge_consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
       (uniformDistribution (Point params.next))
       (polynomialEvaluationFamily params.next
         (averagedSliceAppendedSubMeas params family))
@@ -656,7 +656,7 @@ private theorem degreeZero_averagedSlice_pointConsistency_of_axis_self
           (averagedSliceAppendedSubMeas params family))
         ((min zeta 1 + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) +
           Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) := by
-    exact bridge_consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+    exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
       (uniformDistribution (Point params.next))
       (polynomialEvaluationFamily params.next
         (averagedSliceAppendedSubMeas params family))

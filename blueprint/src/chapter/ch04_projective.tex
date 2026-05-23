@@ -137,33 +137,6 @@
 	sub-measurement with the paper constant \(100\zeta^{1/4}\).
 \end{proof}
 
-\begin{remark}[Lean auxiliary declarations: restricted-completion total mass]\label{rem:lean-restricted-completion-total-mass}
-	The following are Lean auxiliary declarations, not hypotheses in
-	Theorem~\ref{thm:orthonormalization}.
-	Let \(A=\{A_a\}_{a\in\mathcal A}\) be a sub-measurement, and complete it to
-	\(\widehat A\) on \(\mathcal A\cup\{\bot\}\) by setting
-	\(\widehat A_\bot=I-A_{\mathrm{tot}}\).  Let \(\widehat P\) be a projective
-	sub-measurement on the completed outcome set.  If the completed projective
-	family puts at least the original residual mass on the fresh outcome,
-	\[
-		\widehat A_\bot \leq \widehat P_\bot,
-	\]
-	then the restriction \(P_a=\widehat P_a\), \(a\in\mathcal A\), satisfies
-	\[
-		P_{\mathrm{tot}}\leq A_{\mathrm{tot}}.
-	\]
-	Consequently, for any bipartite state \(\psi\),
-	\[
-		\langle\psi,\, I\otimes P_{\mathrm{tot}}\rangle
-		\leq
-		\langle\psi,\, I\otimes A_{\mathrm{tot}}\rangle.
-	\]
-	This isolates the order-theoretic invariant needed to pass from the
-	option-completed orthonormalization output to the monotone-total route used in
-	the self-improvement theorem.  The invariant is recorded as a separate
-	order-theoretic fact; it is not added as an orthonormalization hypothesis.
-\end{remark}
-
 \begin{remark}[Lean right-register completion helpers]\label{rem:lean-right-register-completion-helpers}
 	The inductive-step application of the orthogonalization lemma uses
 	completion on both tensor factors.  The formal development records the

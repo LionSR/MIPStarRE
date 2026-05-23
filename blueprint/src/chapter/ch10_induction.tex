@@ -316,7 +316,6 @@
 
 \begin{proposition}[Small-error successor construction for the induction theorem]\label{prop:main-induction-successor-small-error-construction}
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction}
-	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionSuccessorNext_ofSmallErrorConstruction}
 	\leanok
 	This is the nontrivial successor branch in the corrected large-\(k\)
 	induction interface.  The ordinary successor theorem now reduces to the
@@ -328,8 +327,8 @@
 	Proposition~\ref{prop:main-induction-successor-answer-slice-realization}.
 	This is a construction internal to the proof, not an assumption of
 	Theorem~\ref{thm:main-induction}.  The recursive slice route applies also
-	when \(d=0\); there is no longer a separate degree-zero family obligation in
-	this successor reduction.
+	when \(d=0\); the successor reduction no longer needs a separate degree-zero
+	family construction.
 \end{proposition}
 \begin{proof}
 	\leanok
@@ -337,12 +336,12 @@
 		prop:main-induction-successor-answer-slice-realization,
 		prop:main-induction-successor-answer-valued-pasting}
 	The checked assembly theorem
-	\texttt{mainInductionSuccessorNext\_ofSmallErrorConstruction\_ofAnswerCarrier}
-	reduces the ordinary branch to the answer-valued induction theorem.  The
-	answer-valued induction theorem supplies the predecessor argument internally;
-	the answer-valued slice self-improvement construction and the averaged
-	family-field assembly are checked, and the answer-valued pasting construction
-	below supplies the final pasting input.
+	\texttt{mainInductionSuccessorNext\_ofSmallErrorConstruction} reduces the
+	ordinary branch to the answer-valued induction theorem through the
+	answer-carrier construction.  The answer-valued induction theorem supplies
+	the predecessor argument internally; the answer-valued slice self-improvement
+	construction and the averaged family-field assembly are checked, and the
+	answer-valued pasting construction below supplies the final pasting input.
 \end{proof}
 
 \begin{proposition}[Predecessor induction argument for successor slices]\label{prop:main-induction-successor-predecessor-induction}
@@ -487,38 +486,23 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionOfOneLeError}.  The
 	internal answer-valued induction theorem is
 	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInduction}; it is now a
-	genuine strong induction on the dimension.  The successor corollary
-	\lean{MIPStarRE.LDT.MainInductionStep.answerMainInductionSuccessorNext_ofSmallErrorConstruction}
-	is proved from that induction theorem.  The surrounding development also
-	contains the internal reduction
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier}
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitObligations},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_degreeZero_ofPastingFamily},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofRecursiveAnswerInduction},
-	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions},
+	genuine strong induction on the dimension.  The surrounding development also
+	contains the internal reductions
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier},
+	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound},
 	which derive the successor conclusion from the answer-valued
 	predecessor induction hypothesis.  The answer-carrier forms construct the
 	answer-valued self-improvement data directly from the restricted slices.  The
-	successor-bound forms also derive the predecessor
+	successor-bound form also derives the predecessor
 	large-\(k\) and \(k\ge1\) side conditions from the successor large-\(k\)
-	hypothesis together with the small-error assumption.  The split form then
-	combines this small-error reduction with the trivial large-error theorem,
-	so these elementary arithmetic conditions and the large-error case are no
-	longer part of the remaining proof frontier.  The recursive answer-valued
-	reduction is the checked all-error successor assembly in the local context
-	where the predecessor induction hypothesis has been supplied by the strong
-	induction.  The recursive-slice
-	helper shows that the separate degree-zero family route is not needed for
-	the successor reduction: the predecessor induction hypothesis is used for
-	the restricted slices also when \(d=0\), while \(k\ge1\) comes from the
-	nontrivial error branch.  Thus the ordinary small-error construction theorem
+	hypothesis together with the small-error assumption, so these elementary
+	arithmetic conditions are no longer additional hypotheses in the successor
+	proof.  The answer-carrier route shows that the separate degree-zero family
+	route is not needed for the successor reduction: the predecessor induction
+	hypothesis is used for the restricted slices also when \(d=0\), while
+	\(k\ge1\) comes from the nontrivial error branch.  The obsolete
+	slice-transport and degree-split family routes have therefore been removed
+	from the checked interface.  Thus the ordinary small-error construction theorem
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction}
 	is now proved from the internal answer-valued induction theorem, and the
 	answer-valued pasting theorem
