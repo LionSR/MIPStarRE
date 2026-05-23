@@ -28,18 +28,13 @@ discharged the locality-preserving projectivization route inside the
 source-facing self-improvement theorem; it is no longer a live Section 9 proof
 gap.
 
-Status note, 2026-05-20: the blueprint now separates the printed source
-theorems from the current Lean interfaces for `mainFormal` and `mainInduction`.
-The source-labelled statements remain visible and now link to source-faithful
-Lean statements with named proof obligations.  The final source statement
-factors its remaining work through `Test.mainFormal_sourceConclusion`, whose
-saturated-error branch is proved and whose remaining branch is
-`Test.mainFormal_sourceSmallErrorConclusion`, while
-the induction source statement factors its remaining `md ≤ k < 400md` interval through
-`MainInductionStep.mainInduction_sourceRangeObligation`.  The current Lean
-interfaces are linked separately from `thm:main-formal-current-interface` and
-`thm:main-induction-current-interface`, where the same-space and corrected
-large-`k` restrictions are stated explicitly.
+Historical status note, 2026-05-20: the blueprint separated the printed source
+theorems from the then-current Lean interfaces for `mainFormal` and
+`mainInduction`.  At that snapshot the source-labelled statements linked to
+source-shaped Lean statements with named proof obligations, including a
+temporary source-range chain for `md ≤ k < 400md`.  The later 2026-05-23 status
+note supersedes that classification: the factor-\(400\) condition is now a
+confirmed statement correction, not a live source-range proof obligation.
 
 Historical status note, 2026-05-20 after the Section 9 repair: the source-facing
 `selfImprovement` theorem and the induction-section reformulation
@@ -305,13 +300,15 @@ theorem.
 `AveragedPastingData.output` (in `PackageConstructors.lean:357`) calls
 `ldPastingInInductionSection`, which calls `Pasting.ldPasting`.
 
-### 3.6. mainInduction source boundary → mainFormal completion targets: INCOMPLETE
+### 3.6. mainInduction source boundary → mainFormal completion targets: historical
 
-The theorem `mainFormal` carries the remaining construction gap directly.  It
-does not expose recursive-slice data, self-improvement obligations, or a role
-residual as hypotheses.
+At the audited snapshot, the theorem `mainFormal` carried the remaining
+construction gap directly.  It did not expose recursive-slice data,
+self-improvement obligations, or a role residual as hypotheses.
 
-The remaining source-boundary construction needs:
+The following list is historical.  Later repairs discharged the corrected
+two-space source-boundary route and reclassified the printed \(k\ge md\) range
+as the confirmed \(k\ge400md\) statement correction:
 
 - the printed source range for the Section 6 induction theorem;
 - the two-space role-register reduction for the final theorem;
@@ -326,8 +323,8 @@ The remaining source-boundary construction needs:
 |-------|------------------------|--------------------------------------|-----|
 | SelfImprovement | ~50 theorems/lemmas | 2 paper theorem statements (`selfImprovementHelper`, `selfImprovement`) | Section 9 route is checked and axiom-clean |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | Used internally by `selfImprovement` where needed; some historical adapters have been removed | No public substitute for the source theorem |
-| MainInductionStep | `selfImprovementInInductionSection`, slice-transport constructors, `ldPastingInInductionSection`, checked successor assembly lemmas | Internal assembly remains in `MainTheorems.lean` | Corrected large-\(k\) successor route is proved; the remaining direct proof obligation is the printed source range \(md \le k < 400md\) |
-| MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionTransportWitness` | Current same-space interface plus proved final transport from a constructed completion witness | Remaining gap is the final two-space source-boundary theorem and printed \(k \ge md\) range |
+| MainInductionStep | `selfImprovementInInductionSection`, slice-transport constructors, `ldPastingInInductionSection`, checked successor assembly lemmas | Internal assembly remains in `MainTheorems.lean` | Corrected large-\(k\) successor route is proved; the printed range has been superseded by the confirmed \(k\ge400md\) correction |
+| MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionTransportWitness` | Corrected two-space source theorem plus proved final transport from a constructed completion witness | Proof-complete under the documented \(k\ge400md\) and \(0<k\) boundary corrections |
 
 ---
 
