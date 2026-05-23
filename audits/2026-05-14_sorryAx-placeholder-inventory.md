@@ -9,10 +9,20 @@ bridge debt is #1458, with the current main-induction and self-improvement proof
 obligations tracked by #1507, #1503, and #1230.  The degree-zero pasting
 obligation formerly tracked by #1622 has been discharged.
 
+**Status note (2026-05-23).**  The 2026-05-18 live-obligation classification is
+now historical.  The current `MIPStarRE/LDT/Test/AxiomAudit.lean` records
+standard-axiom checks for `mainFormal`, `mainFormal_sourceStatement`,
+`mainInduction`, `mainInduction_sourceStatement`, `selfImprovement`,
+`selfImprovementInInductionSection`, `ldPasting`,
+`sdp_statement_with_slackness`, and the displayed SDP slackness measurement.
+Thus the inventory below should be read as a snapshot of former `sorryAx`
+dependencies, not as a current list of declarations intentionally allowed to
+depend on `sorryAx`.
+
 ## Purpose
 
-This note records the current status of `sorryAx` and explicit axiom-like
-placeholders for issue #1586.  The distinction is important:
+This note originally recorded the status of `sorryAx` and explicit axiom-like
+placeholders for issue #1586.  The distinction remains important:
 
 - `sorryAx` is Lean's kernel-level marker for an ordinary unfinished proof
   written with `sorry`.
@@ -33,33 +43,33 @@ rg -n "sorryAx|expected.*Axioms|assert_.*axioms" MIPStarRE/LDT -g "*.lean"
 
 ## Current Findings
 
-The explicit axiom-declaration audit reports no `axiom` or `constant`
+The explicit axiom-declaration audit reported no `axiom` or `constant`
 declarations in the active LDT Lean tree after stripping Lean comments and
-docstrings.  This means the current `sorryAx` occurrences in the LDT proof
-audit are not separate project axioms; they are the transitive closure of
-ordinary tracked `sorry` obligations.
+docstrings.  This means the `sorryAx` occurrences observed at the snapshot were
+not separate project axioms; they were the transitive closure of ordinary
+tracked `sorry` obligations.  The current axiom-audit file now checks the
+formerly listed source-facing routes against the standard Lean axioms.
 
 `MIPStarRE/LDT/Test/AxiomAudit.lean` is the live inventory of paper-facing
-declarations whose axiom closure is checked explicitly.  As of this audit, the
-following declarations intentionally allow `sorryAx` because their proofs still
-have named obligations:
+declarations whose axiom closure is checked explicitly.  At the original audit
+snapshot, several declarations intentionally allowed `sorryAx` because their
+proofs still had named obligations.  In the current tree those entries have
+been replaced by standard-axiom checks:
 
-- `MIPStarRE.LDT.Test.mainFormal`: final-theorem construction gaps, tracked by
-  #1043, #1363, #1369, #1458, #1566, and the #1610 match-mass
-  preservation sub-obligation.
-- `MIPStarRE.LDT.SelfImprovement.selfImprovement`: issue #1515,
-  source-facing self-improvement derivation.
-- `MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection`: issue
-  #1503, induction-section self-improvement derivation.
-- `MIPStarRE.LDT.MainInductionStep.mainInduction`: issue #1507, derivation of
-  successor-stage inputs from the paper hypotheses.
-- `MIPStarRE.LDT.Pasting.ldPasting`: issue #1622, the degree-zero
-  complementary branch of the unrestricted pasting theorem.
-- `MIPStarRE.LDT.SelfImprovement.selfImprovementHelper`: transitive dependency
-  on issue #1230 through `sdp_statement_with_slackness`.  The former #1514
-  helper strong self-consistency estimate is now discharged locally.
-- `MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness`: issue #1230,
-  finite-dimensional SDP strong-duality and slackness proof.
+- `MIPStarRE.LDT.Test.mainFormal` and the corrected two-space source theorem
+  are checked under the documented `k >= 400md` and `0 < k` statement
+  corrections.
+- `MIPStarRE.LDT.SelfImprovement.selfImprovement` and
+  `MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection` are
+  checked; the former #1515 and #1503 proof holes are historical.
+- `MIPStarRE.LDT.MainInductionStep.mainInduction` and the successor theorem
+  `mainInductionSuccessorNext_ofSmallErrorConstruction` are checked for the
+  corrected large-`k` interface.
+- `MIPStarRE.LDT.Pasting.ldPasting` is checked, including the former #1622
+  degree-zero branch.
+- `MIPStarRE.LDT.SelfImprovement.selfImprovementHelper` and
+  `MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness` are checked;
+  the former #1230 SDP slackness route is discharged.
 
 Several other audited declarations now require only the standard Lean axioms
 `propext`, `Classical.choice`, and `Quot.sound`.  In particular, the current
@@ -74,10 +84,10 @@ proof obligation.
 ## Verdict
 
 There is no current evidence of an explicit LDT project axiom or constant being
-used to hide a proof gap.  The remaining `sorryAx` occurrences are ordinary
-tracked proof holes.  The correct repair direction is therefore to discharge
-the named proof obligations above, or to keep the corresponding source-faithful
-statement with a tracked `sorry` during paper realignment.  It is not acceptable
-to remove a `sorryAx` dependency by adding non-paper connection, residual,
-repair, data-producing, hypotheses-bundle, assumptions-bundle, `axiom`, or
-`constant` assumption.
+used to hide a proof gap.  The formerly listed `sorryAx` dependencies for the
+main induction, final theorem, pasting, SDP, and self-improvement routes have
+been discharged rather than hidden behind new bridge, residual, repair,
+data-producing, hypotheses-bundle, assumptions-bundle, `axiom`, or `constant`
+assumptions.  Future paper-realignment work should preserve the same principle:
+an unfinished source theorem should remain a source-faithful statement with a
+tracked proof obligation, not be strengthened by a non-paper hypothesis.
