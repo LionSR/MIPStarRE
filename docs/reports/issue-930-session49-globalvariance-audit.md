@@ -28,7 +28,7 @@ The audited Lean scope was `MIPStarRE/LDT/GlobalVariance/**`:
 `Theorems/CollisionExpansion.lean`, `Theorems/MainTheorems.lean`,
 `Theorems/Results.lean`, `Theorems/SelfConsistencyTransport.lean`,
 `Theorems/Statements.lean`, `Theorems/TransportChain.lean`,
-`MatrixRealization.lean`, and the barrel files `Defs.lean`, `Theorems.lean`.
+and the barrel files `Defs.lean`, `Theorems.lean`.
 
 This scope intentionally excludes the already-audited `ExpansionHypercubeGraph/**`
 (Sections 5/7, session 49 expansion audit) and the `Test/MainTheorem.lean` Step-6
@@ -211,17 +211,14 @@ All distributions match:
 - `rerandomizeCoord`: hypercube edge distribution (reused from `ExpansionHypercubeGraph`)
 - `independentPointPair`: uniform independent point pairs (reused from `ExpansionHypercubeGraph`)
 
-### MatrixRealization
+### Retired matrix realization layer
 
-The matrix realization layer (`MatrixRealization.lean`) provides concrete
-finite-dimensional matrix realizations of the abstract variance-transfer
-constructions. All definitions mirror their abstract counterparts with `space`,
-`state`, and matrix-valued operator families. The `MatrixVarianceTransferRealization`
-structure (`MatrixRealization.lean:36-51`) packages a finite-dimensional Hilbert
-space, a bipartite positive matrix state, and the three measurement families
-(point, axis-parallel line, polynomial-weight). Matrix-level theorem wrappers
-(`MainTheorems.lean:379-452`) reduce to the abstract versions via explicit
-compatibility hypotheses.
+The former matrix realization layer (`MatrixRealization.lean`) mirrored the
+abstract variance-transfer constructions with a finite-dimensional matrix
+model. It had no callers outside its own matrix wrappers and was not part of
+the active blueprint route. It has therefore been removed; the checked
+global-variance route now proceeds through the abstract strategy-state
+statements recorded in `Theorems/Statements.lean` and `Theorems/MainTheorems.lean`.
 
 ## Proof-integrity scan
 

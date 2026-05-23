@@ -71,7 +71,6 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 import MIPStarRE.LDT.GlobalVariance.Defs.Core
 import MIPStarRE.LDT.GlobalVariance.Defs.Operators
 import MIPStarRE.LDT.GlobalVariance.Defs.Families
-import MIPStarRE.LDT.GlobalVariance.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
 import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
