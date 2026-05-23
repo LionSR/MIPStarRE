@@ -31,7 +31,7 @@ formalization boundary are therefore historical.
 The same cleanup later removed the older `ProjectivizationRepairInput` and
 `LeftLiftedProjectivizationRepairInput` abbreviations and the conditional
 rounding lemmas that consumed them.  The current Section 5 repair route uses the
-proved theorem `leftLiftedProjectivizationRepairProducer` directly.
+proved theorem `leftLiftedProjectivizationRepair` directly.
 
 ## Executive summary
 

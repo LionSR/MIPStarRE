@@ -86,9 +86,6 @@ paper theorems.
   assumption is not advertised as a source theorem.
 - `rem:lean-line169-projectivization-match-mass`: internal projectivization
   repair bookkeeping.
-- `rem:lean-left-lifted-projectivization-repair-producer`: compatibility name
-  for the construction theorem.  The blueprint text explicitly says that
-  `Producer` is not a hypothesis.
 - `def:successor-pasting-data`: internal successor-stage constructors.  The
   declarations ending in `ofDegreeSplitPastingObligations` are construction
   targets inside the still-open `mainInduction` proof route.

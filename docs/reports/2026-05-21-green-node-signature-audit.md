@@ -46,7 +46,6 @@ auxiliary warning links:
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-left-lifted-projectivization-repair-producer: MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer
 - blueprint/src/chapter/ch10_induction.tex:def:successor-pasting-data: MIPStarRE.LDT.MainInductionStep.DegreeZeroPastingFamilyObligation
 - blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations
 - blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound

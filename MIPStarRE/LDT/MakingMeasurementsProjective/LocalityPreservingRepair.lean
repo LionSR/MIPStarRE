@@ -27,7 +27,7 @@ require the spectral truncation statement should call that declaration directly.
 
 The main result recorded here:
 
-- **`leftLiftedProjectivizationRepairProducer`** — paper origin
+- **`leftLiftedProjectivizationRepair`** — paper origin
   `references/ldt-paper/orthonormalization.tex` lines 534–860 (rank
   reduction and the `Q`/`√Q` completeness setup) and 862–1194 (the
   `X`/`X̂`/`P` algebra producing the lifted projective sub-measurement,
@@ -241,6 +241,15 @@ private lemma rightMarginal_ev_eq {ιA ιB : Type*}
   simp [normalizedTrace_rightMarginalDensity_mul_eq (ρ := ψ.density) (X := X),
     rightMarginalState]
 
+/-- Scalar absorption used inside the locality-preserving projectivization repair.
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:862-1194`, where the
+local \(Q/X/\widehat X/P\) construction is combined by the triangle inequality
+and then absorbed into the displayed \(84\zeta^{1/4}\) envelope.
+
+**Faithful encoding:** This is an internal scalar estimate for the proved
+locality-preserving construction, not an additional hypothesis of the source
+orthonormalization theorem. -/
 private lemma projectivizationRepair_small_error_bound {ζ : Error}
     (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
     2 * (roundingToProjectiveError ζ + 30 * zetaQuarterRoot ζ) ≤
@@ -434,7 +443,7 @@ for the scalar constant repair in
 **Faithful encoding:** This is the paper's locality-preserving construction at
 the `2ζ` scale needed by the completion-to-measurement proof of
 `thm:orthonormalization`. -/
-theorem leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+theorem leftPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
     {Outcome : Type*} {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
@@ -570,7 +579,7 @@ theorem leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_m
 `2ζ` source-defect scale.
 
 This is the tensor-factor counterpart of
-`leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul`.
+`leftPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul`.
 It uses the right marginal state and returns a local projective submeasurement
 on Bob's space whose right placement is close to the given right-lifted
 measurement.
@@ -579,7 +588,7 @@ measurement.
 `references/ldt-paper/projectivization.tex`; this is the right-register
 two-space form of the projectivization repair used by the source proof of
 `thm:main-formal`. -/
-theorem rightPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+theorem rightPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
     {Outcome : Type*} {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome]
@@ -714,7 +723,7 @@ theorem rightPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_
 /-- Square-register form of the locality-preserving repair theorem.
 
 This is the specialization of
-`leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul` to
+`leftPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul` to
 the case where the two tensor factors have the same carrier.
 
 Paper origin: `references/ldt-paper/orthonormalization.tex:862-1194`
@@ -722,7 +731,7 @@ Paper origin: `references/ldt-paper/orthonormalization.tex:862-1194`
 
 **Faithful encoding:** This is the square-register specialization of the
 source-faithful left-register construction above. -/
-theorem leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+theorem leftLiftedProjectivizationRepair_of_sourceAlmostProjective_two_mul
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -737,26 +746,25 @@ theorem leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_m
       RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
         (ProjSubMeas.liftLeft P) (orthonormalizationMainLemmaError ζ) := by
   obtain ⟨P, hP⟩ :=
-    leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+    leftPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
       (ψ := ψ) (hψ := hψ) (A := A) (ζ := ζ) hζ hsource
   refine ⟨P, ?_⟩
   constructor
   simpa [leftLiftedMeasurement, ProjSubMeas.liftLeft, SubMeas.liftLeft]
     using hP
 
-/-- Locality-preserving `Q/X/XHat/P` repair for a left-lifted measurement.
+/-- Paper-labelled name for the locality-preserving projectivization repair.
 
-This is the specialization of
-`leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul` to
-the stronger input hypothesis `hsource ≤ ζ`.
+This is the theorem recorded by the blueprint entry
+`lem:locality-preserving-projectivization`: from the source almost-projective
+estimate for the left-lifted family, it constructs a local projective
+submeasurement whose left lift is close with the `84 ζ^(1/4)` envelope.
 
-Paper origin: `references/ldt-paper/orthonormalization.tex:862-1194`, recorded
-for the scalar constant repair in
-`docs/paper-gaps/issue-1032-orthonormalization-constant.tex`.
+Paper origin: `references/ldt-paper/orthonormalization.tex:862-1194`.
 
-**Faithful encoding:** This is the specialization of the same construction from
-the stronger source almost-projective estimate. -/
-theorem leftLiftedProjectivizationRepairProducer
+**Faithful encoding:** This is the paper-labelled name for the proved
+locality-preserving construction. -/
+theorem leftLiftedProjectivizationRepair
     {Outcome : Type*} {ι : Type*}
     [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]
@@ -784,39 +792,8 @@ theorem leftLiftedProjectivizationRepairProducer
             (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ 2 * ζ := by
     have hζ_le : ζ ≤ 2 * ζ := by nlinarith
     exact hsource.trans hζ_le
-  exact leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+  exact leftLiftedProjectivizationRepair_of_sourceAlmostProjective_two_mul
     ψ hψ A ζ hζ_nonneg hsource_two
-
-/-- Paper-labelled name for the locality-preserving projectivization repair.
-
-This is the same theorem as `leftLiftedProjectivizationRepairProducer`, recorded
-under a name suitable for the blueprint entry
-`lem:locality-preserving-projectivization`.  The statement is the Section 5
-construction theorem: from the source almost-projective estimate for the
-left-lifted family, it constructs a local projective submeasurement whose left
-lift is close with the `84 ζ^(1/4)` envelope.  The historical `Producer` name
-is retained for compatibility with existing Section 5 declarations; it is not a
-separate source hypothesis.
-
-Paper origin: `references/ldt-paper/orthonormalization.tex:862-1194`.
-
-**Faithful encoding:** This is the paper-labelled name for the proved
-locality-preserving construction. -/
-theorem leftLiftedProjectivizationRepair
-    {Outcome : Type*} {ι : Type*}
-    [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
-    (A : Measurement Outcome ι) (ζ : Error)
-    (hsource :
-      ∑ a, ev ψ
-        ((leftLiftedMeasurement (ιB := ι) A).outcome a -
-          (leftLiftedMeasurement (ιB := ι) A).outcome a *
-            (leftLiftedMeasurement (ιB := ι) A).outcome a) ≤ ζ) :
-    ∃ P : ProjSubMeas Outcome ι,
-      RoundedProjMeasStatement ψ (leftLiftedMeasurement (ιB := ι) A)
-        (ProjSubMeas.liftLeft P) (orthonormalizationMainLemmaError ζ) :=
-  leftLiftedProjectivizationRepairProducer ψ hψ A ζ hsource
 
 end
 

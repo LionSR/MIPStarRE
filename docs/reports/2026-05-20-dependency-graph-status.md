@@ -246,7 +246,6 @@ covered blueprint-linked auxiliary declarations include
 `projectiveNonMeasurement`,
 `projectiveNonMeasurement_of_sourceAlmostProjective_full`,
 `leftLiftedProjectivizationRepair`,
-`leftLiftedProjectivizationRepairProducer`,
 `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair`,
 `projectiveLowRankSum_of_spectralTruncationStatement`,
 `SpectralTruncationStatement.toRoundingToProjectorsWitness`,
@@ -501,7 +500,7 @@ misleading:
 | `def:successor-obligation-reductions` | Removed as a separate graph node; the relevant checked reductions are discussed under `def:successor-pasting-data` and the explicit successor propositions. | Checked composition lemmas for the successor stage, not hypotheses of `thm:main-induction`.  The remaining unproved successor assertion is now the visible proposition `prop:main-induction-successor-predecessor-induction`; the answer-valued slice self-improvement construction is checked by the carrier route. |
 | `lem:symmetrization-bridge` | Split locally into the same-space node `lem:role-register-symmetrization` and the two-space node `lem:heterogeneous-role-register-symmetrization`. | The same-space node is the current Lean interface used by `mainFormal`; the heterogeneous node records the proved two-space role-register goodness theorem `ProjStrat.roleRegisterSymmStrategy_is_good_three_mul`.  Neither is an arbitrary bridge assumption. |
 | `lem:left-lifted-projectivization-repair` | Renamed locally to `lem:locality-preserving-projectivization`. | Proved locality-preserving projectivization theorem in the orthonormalization route.  The word "repair" was historical naming, not an additional hypothesis. |
-| `rem:lean-left-lifted-projectivization-repair-producer` | Renamed locally to `rem:lean-left-lifted-projectivization-construction-name`. | Compatibility name for the same construction theorem; it is not a paper-lemma assumption. |
+| Former `rem:lean-left-lifted-projectivization-repair-producer` | Removed locally. | Former compatibility name for the same construction theorem; the remaining paper-labelled declaration is `leftLiftedProjectivizationRepair`. |
 | `rem:lean-residual-domination-declarations` | Retired from the current local graph. | Former Lean-only order-theoretic route for option-completion residual mass.  The current orthonormalization and self-improvement routes no longer use it as a theorem-level substitute. |
 | `lem:sdp-uniform-feasible-witness` | Still present locally and green. | Elementary Slater witness for the SDP proof, not an unproved obligation. |
 
@@ -644,7 +643,7 @@ it still contains green theorem-like nodes for the former
 corrected induction interface.  Its green high-risk labels also include several
 stale construction names, such as `def:successor-obligation-reductions`,
 `lem:symmetrization-bridge`, and
-`rem:lean-left-lifted-projectivization-repair-producer`; these have been
+the former left-lifted projectivization compatibility-name remark; these have been
 removed, renamed, or reclassified in the rebuilt local graph as described
 above.  After rebuilding the graph with the compatible Python interpreter, the
 local DOT file agrees with the source parser for the repaired nodes.  The

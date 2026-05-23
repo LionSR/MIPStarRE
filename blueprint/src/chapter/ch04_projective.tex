@@ -402,18 +402,6 @@
 	expectation formula.
 \end{proof}
 
-\begin{remark}[Lean implementation name for locality-preserving projectivization]
-	\label{rem:lean-left-lifted-projectivization-construction-name}
-	The declaration \texttt{leftLiftedProjectivizationRepair} is the
-	paper-labelled name for
-	Lemma~\ref{lem:locality-preserving-projectivization}.  The older declaration
-	\texttt{leftLiftedProjectivizationRepairProducer} has the same public
-	mathematical statement and is retained for compatibility with existing
-	Section~5 declarations.  The word ``producer'' here refers to the construction
-	theorem that produces the projective submeasurement; it is not a hypothesis
-	added to the paper lemma.
-\end{remark}
-
 \begin{proposition}[Measurement-level orthogonalization from consistency]\label{prop:orthonormalization-measurement-of-consistency}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency}
 	\leanok

@@ -18,10 +18,9 @@ The scan below removes full-line TeX comments before looking for active
 an unfinished source theorem appear green.
 
 Update on 2026-05-22: issue #1786 reclassified several prose-only entries.  The
-compatibility name
-`rem:lean-left-lifted-projectivization-construction-name` is now an ordinary
-remark with no active Lean metadata, and the completion-route orthonormalization
-entry is now the proposition `prop:orthonormalization-completion-route`.
+former compatibility-name remark for the left-lifted projectivization repair is
+no longer present, and the completion-route orthonormalization entry is now the
+proposition `prop:orthonormalization-completion-route`.
 The remaining Chapter 4 and Chapter 7 entries whose labels already began with
 `rem:` are also ordinary remarks without active Lean metadata.  The Chapter 10
 base-case Step~6 construction list is now
@@ -79,7 +78,6 @@ PY
 | `rem:lean-line169-projectivization-match-mass` | `ProjectivizationLine169Repair.*` | Lean-only line-169 consistency and match-mass repair lemmas.  This is now an ordinary remark rather than a green definition node. |
 | `lem:orthonormalization-main-lemma-formalized-envelope` | `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair` | Same-space corollary of the source orthogonalization lemma with the weaker public envelope stated in the blueprint.  The repair appears as an internal proof construction. |
 | `lem:locality-preserving-projectivization` | `leftLiftedProjectivizationRepair` | Source-aligned locality-preserving construction theorem.  The Lean name contains the historical word `Repair`, but the blueprint node records the mathematical construction rather than an assumed repair input. |
-| `rem:lean-left-lifted-projectivization-construction-name` | `leftLiftedProjectivizationRepairProducer` | Compatibility name for the proved construction theorem.  As of issue #1786 this is an ordinary remark, not a green graph node. |
 | `prop:orthonormalization-completion-route` | `orthonormalizationCompletionRoute` | Proved completion-route proposition for the orthonormalization construction, with the weaker \(120\zeta^{1/4}\) bound stated explicitly. |
 | `rem:lean-projective-non-measurement-auxiliary` | `AlmostProjMeasStatement`, `SpectralTruncationStatement`, `RoundingToProjectorsWitness` | Internal auxiliary conversions in the projective-non-measurement chain.  This is now an ordinary remark rather than a green definition node. |
 | `def:svd-of-X`, `lem:X-hat-squared`, and `lem:X-times-X-hat` | `QXPLayerData.*`, `exists_qxpLayerData_*` | Source-construction contexts for the rank-reduced \(Q\), \(X\), \(\hat X\), and \(P\) layer in the orthonormalization proof.  The data record constructed algebraic objects, not an extra hypothesis of a paper theorem. |
@@ -169,16 +167,13 @@ matching the narrow high-risk vocabulary:
 `lem:left-lifted-projectivization-repair`,
 `lem:sdp-uniform-feasible-witness`,
 `lem:symmetrization-bridge`,
-`rem:lean-left-lifted-projectivization-repair-producer`, and
 `rem:lean-residual-domination-declarations`.
 
 Those labels are stale with respect to the current local graph except for
 `lem:sdp-uniform-feasible-witness`.  The current source has renamed the
 symmetrization node to `lem:role-register-symmetrization`, the
 locality-preserving projectivization theorem to
-`lem:locality-preserving-projectivization`.  The compatibility name
-`rem:lean-left-lifted-projectivization-construction-name` is now an ordinary
-non-green remark.  The former
+`lem:locality-preserving-projectivization`.  The former
 	successor-obligation node is no longer a separate green graph vertex; the
 	corrected large-\(k\) successor route is proved, and the final-theorem source
 	frontier is displayed by the two unproved final-theorem propositions.  The
