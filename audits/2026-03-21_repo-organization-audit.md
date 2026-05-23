@@ -41,7 +41,8 @@ _Dated audit snapshot: this note records a 2026-03-21 organization review. It is
 
 - The current workspace has local clutter that is harmless but not pleasant to return to: `.DS_Store`, `.lake/`, `blueprint/print/`, `blueprint/web/`, and `blueprint/lean_decls` are present locally. Since these are generated or machine-local, cleaning them out before handing the repo to another human would make the tree calmer.
 
-- `references/.gitkeep` looks obsolete now that `references/` is populated.
+- `references/.gitkeep` was obsolete once `references/` was populated; it has
+  since been removed.
 
 - `references/ldt-paper/README.md` is too thin to help a returning human. Right now it only says the folder was imported from another repo path. It does not say, in plain language, that this is the active TeX source mirror for the 2009 LDT paper or that `multilinearity.tex` is the root file.
 
@@ -118,7 +119,7 @@ _Dated audit snapshot: this note records a 2026-03-21 organization review. It is
    The overall architecture is already close to good. This does not need a major reorganization. The main need is to stop current and archival guidance from living under equally generic names.
 
 8. **Do a light workspace cleanup before future handoff.**
-   Remove local generated folders and OS cruft when convenient: `.DS_Store`, `.lake/`, `blueprint/print/`, `blueprint/web/`, `blueprint/lean_decls`, and the obsolete `references/.gitkeep`.
+   Remove local generated folders and OS cruft when convenient: `.DS_Store`, `.lake/`, `blueprint/print/`, `blueprint/web/`, and `blueprint/lean_decls`.
 
 9. **Improve the small explanatory files in source-mirror areas.**
    `references/ldt-paper/README.md` should say what the folder is for in project language, not just where it came from.
