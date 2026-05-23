@@ -95,7 +95,7 @@ families:
 - `orderedLiftToMixedLine` proves the first replacement step (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean:23-130`);
 - `orderedLiftToLineProduct` proves the second replacement step (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean:133-255`);
 - `diagonalLineProduct_outcome_swap` proves the exact middle swap using projectivity of the postprocessed diagonal-line measurement (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean:22-40`);
-- `orderedDropFromLineBridge` and `reversedDropToPointsBridge` prove the two return steps (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean:161-294`).
+- `orderedDropFromLineComparison` and `reversedDropToPointsComparison` prove the two return steps (`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean:161-294`).
 
 The use of `SDDOpRel` rather than `SDDRel` is intentional and mathematically appropriate: products such as `A^u_a A^v_b` are arbitrary operator families and need not themselves be submeasurement effects before commutativity is proved.
 

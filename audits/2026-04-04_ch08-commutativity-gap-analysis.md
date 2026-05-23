@@ -81,8 +81,8 @@ Lean status:
 - The proof structure mirrors the paper very closely via the fields
   `orderedLiftToMixedLine` (formerly `orderedLiftToMixedBridge`),
   `orderedLiftToLineProduct` (formerly `orderedLiftToLineBridge`),
-  `diagonalLineProjectiveSwap`, `reversedDropFromLineBridge`,
-  `reversedDropToPointsBridge`, and `pointwiseCommutation`.
+  `diagonalLineProjectiveSwap`, `reversedDropFromLineComparison`,
+  `reversedDropToPointsComparison`, and `pointwiseCommutation`.
 
 Verdict:
 
@@ -339,8 +339,8 @@ Notes:
   `eq:point-diagonal-line-approx` are individually scaffolded by
   `orderedLiftToMixedLine` (formerly `orderedLiftToMixedBridge`),
   `orderedLiftToLineProduct` (formerly `orderedLiftToLineBridge`),
-  `diagonalLineProjectiveSwap`, `reversedDropFromLineBridge`, and
-  `reversedDropToPointsBridge`, but all five are still `sorry`.
+  `diagonalLineProjectiveSwap`, `reversedDropFromLineComparison`, and
+  `reversedDropToPointsComparison`, but all five are still `sorry`.
 
 ### 3.2 `commutativity-G.tex`
 
