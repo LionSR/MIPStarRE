@@ -31,6 +31,13 @@ itself counted as a green node.
 > audit should be read from a fresh run of
 > `scripts/audit_green_node_integrity.py --root . --ci`, not from the historical
 > block below.
+>
+> **Status note, 2026-05-23.**  The source-boundary classifications below also
+> predate the final corrected-boundary cleanup.  Under the current corrected
+> statements, `thm:main-induction` and `thm:main-formal` use the documented
+> \(k\ge400md\) and, for the final theorem, \(0<k\) boundary corrections.  The
+> former source-range wrappers for \(md\le k<400md\) should therefore be read as
+> historical, not as live proof obligations.
 
 On the current `main` snapshot, the script reports:
 
@@ -193,22 +200,21 @@ source-shaped boundary or the current corrected formal interface, and because
 the remaining proof obligation is named explicitly.
 
 - `thm:main-formal` links to
-  `MIPStarRE.LDT.Test.mainFormal_sourceStatement`.  Its statement matches the
-  printed two-space theorem with the paper range \(k\ge md\), but its proof is
-  routed through `mainFormal_sourceConclusion`, whose non-vacuous branch is
-  `mainFormal_sourceSmallErrorConclusion`.
+  `MIPStarRE.LDT.Test.mainFormal_sourceStatement`.  In the current tree this is
+  the corrected two-space source statement with the documented \(k\ge400md\)
+  and \(0<k\) boundary corrections, and it is proof-complete.
 - `thm:main-formal-current-interface` links to
   `MIPStarRE.LDT.Test.mainFormal`.  This is the same-space, corrected
-  large-\(k\) interface.  It has no additional construction hypothesis, but its
-  proof transitively uses the open Section 6 successor construction.
+  large-\(k\) interface.  It has no additional construction hypothesis, and the
+  corrected Section 6 successor construction is now checked.
 - `thm:main-induction` links to
   `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`.  Its
-  statement records the printed \(k\ge md\) range, while the source interval
-  below \(400md\) remains the named range obligation.
+  current statement records the confirmed \(k\ge400md\) correction.  The former
+  source-range obligation below \(400md\) has been retired.
 - `thm:main-induction-current-interface` links to
   `MIPStarRE.LDT.MainInductionStep.mainInduction`.  This is the corrected
-  large-\(k\) formal interface, and its proof still depends on the named
-  small-error successor construction.
+  large-\(k\) formal interface, and the named small-error successor construction
+  is now checked.
 
 ## Auxiliary green nodes
 

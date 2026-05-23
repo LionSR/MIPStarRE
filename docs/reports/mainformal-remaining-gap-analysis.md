@@ -150,12 +150,10 @@ Date: 2026-05-07
 > relations by ordinary evaluation data processing and the heterogeneous
 > triangle inequality.  The scalar absorption from these explicit
 > pre-absorption errors to `mainFormalError` is now checked under the nonzero
-> scalar-cascade boundary.  The remaining work is the source range boundary,
-> together with the zero-sampling boundary permitted by the printed theorem
-> when \(d=0\) and \(k=0\).  The scalar lemma
-> `MIPStarRE.LDT.Test.mainFormalError_zero_k` records that the displayed final
-> error is exactly zero at this boundary.  The remaining work is final assembly
-> needed for the printed theorem.
+> scalar-cascade boundary.  This passage predates the corrected final-theorem
+> statement: the source-range and zero-sampling boundaries are now documented
+> statement corrections, with \(k\ge400md\) and \(0<k\) assumed in the checked
+> final theorem.
 >
 > **Update, 2026-05-21.**  The next missing assertion has now been proved as a
 > trace-level calculation.  For an arbitrary role-register observable \(Y\), the factor-two
@@ -333,8 +331,8 @@ successor repair proves `mainInductionSuccessorNext_ofSmallErrorConstruction`
 for the corrected large-\(k\) interface.
 
 **Status:** the role-register construction is no longer a separate
-`mainFormal` gap.  The remaining source-facing work is the two-space
-source-boundary assembly and the printed \(k\ge md\) range.
+`mainFormal` gap.  Under the corrected final-theorem statement, the two-space
+source-boundary assembly and the \(k\)-range correction are checked.
 
 ### Field 2: `postRoleDiagonalCompletion : MainFormalDiagonalCompletionWitness`
 
