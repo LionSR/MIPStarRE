@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Core
 
 /-!
-# Helper strong self-consistency obligations: post-delete transports
+# Helper strong self-consistency bounds: post-delete transports
 
 Post-`delete-an-A` transport lemmas culminating in the moved-quantity bound
 used before the residual-chain assembly.

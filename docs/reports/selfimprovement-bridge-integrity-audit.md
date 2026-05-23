@@ -102,8 +102,8 @@ proof-stage inputs:
    `HelperStrongSelfConsistencyInput` has been removed.  The helper SSC
    conclusion is now produced by
    `helper_strong_self_consistency_of_helper_conclusion` from the checked
-   package of intermediate estimates
-   `HelperStrongSelfConsistencyObligations`; this package is assembled
+   record of intermediate estimates
+   `HelperStrongSelfConsistencyBounds`; this record is assembled
    internally from the self-consistency, local-variance, and residual estimates.
 2. **`orthonormalization`**: the former `OrthonormalizationInput` bundle has
    been removed.  The retained Section 9 API records the spectral-truncation

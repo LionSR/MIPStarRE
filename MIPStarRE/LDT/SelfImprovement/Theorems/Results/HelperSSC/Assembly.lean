@@ -2,9 +2,9 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.PostDeleteA
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
 
 /-!
-# Helper strong self-consistency obligations: residual assembly
+# Helper strong self-consistency bounds: residual assembly
 
-Residual lower-bound reductions, scalar-chain obligation constructors, and
+Residual lower-bound reductions, scalar-chain bound constructors, and
 the final helper-stage strong self-consistency assembly theorems.
 
 ## References
@@ -23,16 +23,16 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Reduce the residual obligation to the off-diagonal residual scalar
+/-- Reduce the residual lower bound to the off-diagonal residual scalar
 bound.
 
 For the actual helper output, the equality
 `Hhat = E_u A^u_{h(u)} T_h A^u_{h(u)}` identifies the left-hand side of
-`HelperStrongSelfConsistencyObligations.residualLowerBound` with the
+`HelperStrongSelfConsistencyBounds.residualLowerBound` with the
 off-diagonal quantity isolated by
 `helper_mass_sub_release_eq_polynomial_off_diagonal`.  Thus the remaining
 analytic work may be stated as a bound on that concrete polynomial-pair sum,
-rather than as a bound on the obligation field itself. -/
+rather than as a direct bound on the record field itself. -/
 theorem helper_residualLowerBound_of_offDiagonal_bound
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -60,12 +60,12 @@ theorem helper_residualLowerBound_of_offDiagonal_bound
   rw [helper_mass_sub_release_eq_polynomial_off_diagonal]
   simpa [helperOffDiagonalBareQuantity] using hoffdiag
 
-/-- Reduce the residual obligation to the paper-shaped residual-chain bound.
+/-- Reduce the residual lower bound to the paper-shaped residual-chain bound.
 
 After `eq:release-the-kraken`, `eq:threw-in-h-prime`, `eq:delete-an-A`, and
 `eq:move-over-v`, the paper bounds the expanded residual by
 `7√ζ_variance + √(2δ) + md/q`.  Since
-`addInUError = 4√ζ_variance`, this is exactly the obligation-side bound
+`addInUError = 4√ζ_variance`, this is exactly the pre-absorption bound
 `11√ζ_variance + √(2δ) + md/q - addInUError`. -/
 theorem helper_residualLowerBound_of_paper_chain_bound
     (params : Parameters) [FieldModel params.q]
@@ -516,14 +516,14 @@ theorem helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
   rw [helper_mass_sub_release_eq_polynomial_off_diagonal] at hresidual
   simpa [release, ζsqrt, sqrtTwoDelta, mdq, helperOffDiagonalBareQuantity] using hresidual
 
-/-- Construct the helper-stage obligations from local variance and a named
+/-- Construct the helper-stage scalar bounds from local variance and a named
 off-diagonal residual estimate.
 
-This produces the same named obligations as
-`helper_strong_self_consistency_obligations_of_selfConsistency_localVariance`,
+This produces the same named scalar bounds as
+`helper_strong_self_consistency_bounds_of_selfConsistency_localVariance`,
 but its final input is the concrete off-diagonal polynomial-pair bound obtained
 after expanding the released residual. -/
-lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_offDiagonal
+lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_offDiagonal
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
@@ -543,20 +543,20 @@ lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVarianc
             Real.sqrt (2 * delta) +
             ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
           addInUError params eps delta) :
-    HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta := by
-  exact helper_strong_self_consistency_obligations_of_selfConsistency_localVariance
+    HelperStrongSelfConsistencyBounds params strategy T Hhat eps delta := by
+  exact helper_strong_self_consistency_bounds_of_selfConsistency_localVariance
     params strategy eps delta hssc hlocal
     (helper_residualLowerBound_of_offDiagonal_bound
       params strategy eps delta hhelper hoffdiag)
 
-/-- Construct the helper-stage obligations from the paper's final residual
+/-- Construct the helper-stage scalar bounds from the paper's final residual
 chain estimate.
 
 This variant lets downstream work target the paper's natural bound
 `7√ζ_variance + √(2δ) + md/q` on the expanded off-diagonal residual.  The
-conversion to the obligation's `11√ζ_variance + √(2δ) + md/q - addInUError`
-form is performed internally. -/
-lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_paperChain
+conversion to the pre-absorption bound
+`11√ζ_variance + √(2δ) + md/q - addInUError` is performed internally. -/
+lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_paperChain
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
@@ -575,22 +575,22 @@ lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVarianc
         7 * Real.sqrt (selfImprovementVarianceError params eps delta) +
           Real.sqrt (2 * delta) +
           ((params.m : Error) * (params.d : Error) / (params.q : Error))) :
-    HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta := by
-  exact helper_strong_self_consistency_obligations_of_selfConsistency_localVariance
+    HelperStrongSelfConsistencyBounds params strategy T Hhat eps delta := by
+  exact helper_strong_self_consistency_bounds_of_selfConsistency_localVariance
     params strategy eps delta hssc hlocal
     (helper_residualLowerBound_of_paper_chain_bound
       params strategy eps delta hhelper hoffdiag)
 
-/-- Construct the helper-stage obligations directly from the scalar
+/-- Construct the helper-stage scalar bounds directly from the scalar
 transport estimates appearing in the paper.
 
 Compared with
-`helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_paperChain`,
+`helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_paperChain`,
 this version does not ask for the already assembled residual-chain estimate.
 It consumes the two off-diagonal variance swaps, the two post-`delete-an-A`
 transports, and the final lower bound on the `move-over-v` endpoint, then
 assembles the residual estimate internally. -/
-lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports
+lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_scalarTransports
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
@@ -624,24 +624,24 @@ lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVarianc
       subMeasMass strategy.state Hhat.liftLeft ≤
         helperMoveOverVQuantity params strategy T.toSubMeas +
           4 * Real.sqrt (selfImprovementVarianceError params eps delta)) :
-    HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta := by
+    HelperStrongSelfConsistencyBounds params strategy T Hhat eps delta := by
   exact
-    helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_paperChain
+    helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_paperChain
       params strategy eps delta hhelper hssc hlocal
       (helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
         params strategy eps delta hhelper hleft hright hclone hmove hmoveLower)
 
-/-- Construct the helper-stage obligations from the paper's scalar transports and
+/-- Construct the helper-stage scalar bounds from the paper's scalar transports and
 the point-consistency add-in-`u` transfer.
 
 This is the same residual-chain constructor as
-`helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports`,
+`helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_scalarTransports`,
 but it discharges the two off-diagonal variance swaps from local variance and
 the final `move-over-v` lower-bound input from complementary slackness, dual
 feasibility, and the point-consistency transfer. It packages the paper lines
 after `eq:move-over-v` together with the two post-`delete-an-A` scalar
 transports. -/
-lemma helper_ssc_obligations_of_scalarTransports_pointTransfer
+lemma helper_ssc_bounds_of_scalarTransports_pointTransfer
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
@@ -676,7 +676,7 @@ lemma helper_ssc_obligations_of_scalarTransports_pointTransfer
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
           T.toSubMeas
           (pointConsistencyAddInUSelection params)| ≤ addInUError params eps delta) :
-    HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta := by
+    HelperStrongSelfConsistencyBounds params strategy T Hhat eps delta := by
   have hleft :
       |helperOffDiagonalIndicatorQuantity params strategy T.toSubMeas -
         helperOffDiagonalOneSidedSwappedIndicatorQuantity params strategy T.toSubMeas| ≤
@@ -698,7 +698,7 @@ lemma helper_ssc_obligations_of_scalarTransports_pointTransfer
         params strategy eps delta hhelper hslack hpointTransfer
     simpa [addInUError, Real.sqrt_eq_rpow] using hlower
   exact
-    helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports
+    helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_scalarTransports
       params strategy eps delta hhelper hssc hlocal hleft hright hclone hmove hmoveLower
 
 /-- Produce the helper-stage strong self-consistency conclusion from the actual
@@ -706,7 +706,7 @@ helper construction together with the named add-in-`u`/variance transports.
 
 The theorem consumes the reduced helper output
 `SelfImprovementHelperConclusion params strategy T Hhat Z eps delta` and the
-four named scalar chain obligations together with the final lower bound on the
+four named scalar chain bounds together with the final lower bound on the
 released right-hand side. It then assembles the diagonal transfer
 using `add_in_u_simplified_transfer_of_cs_chain_sqrt_form`, upgrades it to the
 paper's released right-hand side via
@@ -715,8 +715,8 @@ arithmetic absorption
 `helper_strong_self_consistency_error_le_selfImprovementHelperError`.
 
 This is the complete route from the actual helper construction and the named
-scalar obligations to helper-stage strong self-consistency. The remaining
-analytic work is therefore stated as named obligations, rather than left as an
+scalar bounds to helper-stage strong self-consistency. The remaining analytic
+work is therefore stated as named scalar estimates, rather than left as an
 unstructured `BipartiteSSCRel` assumption. -/
 theorem helper_strong_self_consistency_of_helper_conclusion
     (params : Parameters) [FieldModel params.q]
@@ -728,7 +728,7 @@ theorem helper_strong_self_consistency_of_helper_conclusion
     {Hhat : SubMeas (Polynomial params) ι}
     {Z : MIPStarRE.Quantum.Op ι}
     (hhelper : SelfImprovementHelperConclusion params strategy T Hhat Z eps delta)
-    (hobligations : HelperStrongSelfConsistencyObligations
+    (hbounds : HelperStrongSelfConsistencyBounds
       params strategy T Hhat eps delta) :
     BipartiteSSCRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily Hhat)
@@ -746,8 +746,8 @@ theorem helper_strong_self_consistency_of_helper_conclusion
         addInUError params eps delta :=
     add_in_u_simplified_transfer_of_cs_chain_sqrt_form
       params strategy eps delta heps hdelta T.toSubMeas
-      hobligations.step01Bound hobligations.step12Bound
-      hobligations.step23Bound hobligations.step34Bound
+      hbounds.step01Bound hbounds.step12Bound
+      hbounds.step23Bound hbounds.step34Bound
   have htransfer_release :
       |qBipartiteMatchMass strategy.state
           (averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas)
@@ -782,7 +782,7 @@ theorem helper_strong_self_consistency_of_helper_conclusion
           qBipartiteMatchMass strategy.state Hhat Hhat ≤
         addInUError params eps delta := by
       linarith [(abs_le.mp htransfer_release_hhat).1]
-    linarith [hobligations.residualLowerBound, hreleaseGap]
+    linarith [hbounds.residualLowerBound, hreleaseGap]
   have hhelperGap_absorbed :
       subMeasMass strategy.state Hhat.liftLeft -
           qBipartiteMatchMass strategy.state Hhat Hhat ≤

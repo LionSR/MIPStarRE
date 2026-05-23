@@ -173,8 +173,8 @@ theorems or tracked `sorry` sites on source-facing statements.
 
 **File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean`
 
-- **`helper_strong_self_consistency_input_of_obligations`** (line 663): Takes `HelperStrongSelfConsistencyObligations` (a `∀` requiring local-variance and residual bounds for each `SelfImprovementHelperConclusion` output) → produces `HelperStrongSelfConsistencyInput`
-- **The actual derivation** (`helper_strong_self_consistency_obligations_of_selfConsistency_localVariance`, line 611): From a `BipartiteSSCRel` hypothesis on the helper output + local-variance/residual bounds → `HelperStrongSelfConsistencyObligations`
+- **`helper_strong_self_consistency_input_of_obligations`** (line 663): Takes `HelperStrongSelfConsistencyBounds` (a `∀` requiring local-variance and residual bounds for each `SelfImprovementHelperConclusion` output) → produces `HelperStrongSelfConsistencyInput`
+- **The actual derivation** (`helper_strong_self_consistency_bounds_of_selfConsistency_localVariance`, line 611): From a `BipartiteSSCRel` hypothesis on the helper output + local-variance/residual bounds → `HelperStrongSelfConsistencyBounds`
 - **End-to-end wrapper** (`ofBipartiteSSC_and_localVariance`, line 669): From `hssc : BipartiteSSCRel ...` + `hlocal` + `hresidual` → `HelperStrongSelfConsistencyInput`
 
 **Historical status:** the conditional lemma was proved in the audited

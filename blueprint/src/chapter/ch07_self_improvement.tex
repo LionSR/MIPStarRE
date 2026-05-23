@@ -349,9 +349,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
       - \sqrt{2\delta}
       - \frac{md}{q}.
   \]
-  The Lean formalization records this step as a named proof obligation, starting
-  with the input structure
-  \lean{MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyObligations}
+  The Lean formalization records this step by named scalar bounds, starting
+  with the internal record
+  \lean{MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyBounds}
   and the exact residual-side expansion
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_sub_release_eq_polynomial_off_diagonal}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity}
@@ -359,16 +359,15 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_residualLowerBound_of_offDiagonal_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.helper_residualLowerBound_of_paper_chain_bound}
   \lean{MIPStarRE.LDT.SelfImprovement.helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_offDiagonal}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_paperChain}
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance_scalarTransports}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_offDiagonal}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_paperChain}
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_scalarTransports}
   and then uses the proved lemma
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
   together with
-  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_obligations_of_selfConsistency_localVariance}
-  to recover the final helper-stage self-consistency conclusion.  The remaining
-  theorem-level derivation is not moved into an additional hypothesis; it is
-  the proof gap in the paper theorem below.
+  \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_bounds_of_selfConsistency_localVariance}
+  to recover the final helper-stage self-consistency conclusion.  The theorem-level
+  derivation is not moved into an additional hypothesis.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \[
