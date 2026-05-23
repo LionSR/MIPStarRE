@@ -79,7 +79,8 @@ Lean status:
 - Faithful theorem shell exists as
   `MIPStarRE.LDT.CommutativityPoints.commutativityPoints`.
 - The proof structure mirrors the paper very closely via the fields
-  `orderedLiftToMixedBridge`, `orderedLiftToLineBridge`,
+  `orderedLiftToMixedLine` (formerly `orderedLiftToMixedBridge`),
+  `orderedLiftToLineProduct` (formerly `orderedLiftToLineBridge`),
   `diagonalLineProjectiveSwap`, `reversedDropFromLineBridge`,
   `reversedDropToPointsBridge`, and `pointwiseCommutation`.
 
@@ -336,7 +337,8 @@ Notes:
 
 - The four unlabeled approximation/equality steps after
   `eq:point-diagonal-line-approx` are individually scaffolded by
-  `orderedLiftToMixedBridge`, `orderedLiftToLineBridge`,
+  `orderedLiftToMixedLine` (formerly `orderedLiftToMixedBridge`),
+  `orderedLiftToLineProduct` (formerly `orderedLiftToLineBridge`),
   `diagonalLineProjectiveSwap`, `reversedDropFromLineBridge`, and
   `reversedDropToPointsBridge`, but all five are still `sorry`.
 
