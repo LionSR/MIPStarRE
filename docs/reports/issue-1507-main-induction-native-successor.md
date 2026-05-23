@@ -19,16 +19,17 @@ Update on 2026-05-21: the predecessor answer-valued induction hypothesis no
 longer assumes `0 < params.d`.  The recursive slice route is therefore
 available also in the case `d = 0`; the side condition `1 ≤ k` is derived from
 the nontrivial branch `mainInductionError < 1`.  The checked theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier` shows
-that the small-error successor construction now reduces to the predecessor
-induction argument.  The answer-valued slice self-improvement construction is
-checked directly, and the earlier degree-zero family-and-scalar branch is
-retired as an artifact of the former internal hypothesis, not a separate
-requirement of the paper proof.
-The checked theorem `mainInductionSuccessorNext_ofRecursiveAnswerInduction`
-adds the complementary large-error branch, so the full successor conclusion is
-now available from precisely the recursive answer-valued predecessor induction
-hypothesis.
+`mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound` shows that the
+small-error successor construction reduces to the predecessor induction
+argument with the successor large-`k` bookkeeping already discharged.  The
+source-facing theorem `mainInductionSuccessorNext_ofSmallErrorConstruction`
+then supplies that predecessor argument from `answerMainInduction`.  The
+answer-valued slice self-improvement construction is checked directly, and the
+earlier degree-zero family-and-scalar branch is retired as an artifact of the
+former internal hypothesis, not a separate requirement of the paper proof.
+The checked theorem `mainInductionSuccessorNext` adds the complementary
+large-error branch, so the full successor conclusion is now available from the
+successor strategy hypotheses alone.
 
 Update on 2026-05-22: the answer-valued ambient point-consistency averaging
 step is now checked.  The lemmas
@@ -234,10 +235,10 @@ the answer-valued successor assembly above.  Thus the large-`k` side condition,
 the nonzero-`k` side condition, and the predecessor induction hypothesis are
 not additional assumptions of the public successor theorem.
 
-The newer theorem `mainInductionSuccessorNext_ofRecursiveAnswerInduction`
-records the same all-error conclusion in the current answer-carrier route:
-after the predecessor answer-valued induction hypothesis is supplied, the
-successor statement itself follows.
+The theorem `mainInductionSuccessorNext` records the all-error conclusion in
+the current answer-carrier route: the small-error branch invokes
+`mainInductionSuccessorNext_ofSmallErrorConstruction`, and the complementary
+branch invokes `mainInductionOfOneLeError`.
 The axiom audit also checks the linked base-case theorem, large-error theorem,
 restricted-probability estimates, predecessor-hypothesis predicates,
 answer/legacy conversion constructors, and averaged-pasting invocation as

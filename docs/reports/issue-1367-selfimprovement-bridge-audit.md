@@ -52,9 +52,9 @@
 > derivation by the tracked `sorry` site until it is proved.
 >
 > **Status note, 2026-05-22.**  The Section 6 corrected large-\(k\) successor
-> construction has since been proved.  Later table rows that describe
-> `answerMainInductionSuccessorNext_ofSmallErrorConstruction` as a remaining
-> proof obligation are historical.  The current live direct proof holes are the
+> construction has since been proved.  Later table rows that describe the
+> former answer-valued small-error successor theorem as a remaining proof
+> obligation are historical.  The current live direct proof holes are the
 > printed source-range obligation
 > `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`
 > and the final two-space source-boundary obligation
@@ -423,7 +423,7 @@ These were the obligation constructors for the two historical proposed
 | `self_improvement_helper_with_slackness` variants | Internal SelfImprovement route; not a public substitute for `selfImprovement` |
 | Internal SelfImprovement sub-lemmas (HelperCompleteness, PointConsistency, etc.) | All proved (conditional) |
 | Pasting theorem (`ldPasting`) | Fully proved, fully wired |
-| MainInductionStep assembly (`answerMainInductionSuccessorNext_ofSmallErrorConstruction`) | Historical Section 6 answer-valued small-error successor obligation; now proved in the corrected large-\(k\) route |
+| MainInductionStep assembly (`answerMainInduction`) | Historical Section 6 answer-valued successor obligation; now proved in the corrected large-\(k\) route |
 
 ---
 
@@ -547,7 +547,7 @@ hypotheses.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` | `selfImprovementInInductionSection`, ordinary slice transport, and ordinary self-improvement data constructors |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` | Answer-valued slice transport and answer-valued self-improvement data constructors |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` | Stage-data constructors, including conversion from answer-valued to ordinary self-improvement data |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, and the remaining `answerMainInductionSuccessorNext_ofSmallErrorConstruction` proof obligation |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `answerMainInduction`, and the checked successor construction |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Source-final statement and obligation, current same-space interface, and proved final transport |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Role-register witness constructors routed through Section 6 `mainInduction` |
 | `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | Ordinary restricted-slice weighted bounds and recursive-slice targets |

@@ -411,15 +411,16 @@ variance-bound specialization used downstream.
 In Section 10, `mainInductionSuccessorNext_ofAnswerCarrier` and
 `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound` are
 checked internal assembly theorems for the successor step, and
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`
-reduces the small-error branch to the predecessor answer-valued induction
-hypothesis.  These declarations are internal reductions below
-`thm:main-induction`; the public theorem is now proved through the genuine
+`mainInductionSuccessorNext_ofSmallErrorConstruction` is the source-facing
+small-error construction.  The latter obtains the predecessor answer-valued
+induction conclusion from the genuine strong-induction theorem
+`answerMainInduction`.  These declarations are internal reductions below
+`thm:main-induction`; the public theorem is now proved through that
 answer-valued strong induction theorem.
-The helper derives `k >= 1` from the small-error branch and the predecessor
-large-`k` bound from the successor large-`k` hypothesis, without assuming
-`0 < d`.  Thus those arithmetic side conditions and the large-error branch are
-no longer part of the remaining proof frontier.  The structure
+The helper route derives `k >= 1` from the small-error branch and the
+predecessor large-`k` bound from the successor large-`k` hypothesis, without
+assuming `0 < d`.  Thus those arithmetic side conditions and the large-error
+branch are no longer part of the remaining proof frontier.  The structure
 `CascadeHypotheses` is scalar-only: it
 records the non-vacuous numeric regime `k >= 1`, `m >= 1`, `0 <= eps <= 1`,
 `d <= q`, and `q > 0` needed for the already checked cascade estimates.  It has
@@ -721,7 +722,7 @@ checked not to import `sorryAx`.
 * In Section 10, the answer-carrier reductions
   `mainInductionSuccessorNext_ofAnswerCarrier`,
   `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`, and
-  `mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier` are
+  `mainInductionSuccessorNext_ofSmallErrorConstruction` are
   linked only in the proof discussion for the corrected induction interface.
   They are checked internal reductions, not extra hypotheses of the printed
   induction theorem.  The older slice-transport and degree-split reductions
@@ -729,6 +730,7 @@ checked not to import `sorryAx`.
 * Also in Section 10, `CascadeHypotheses` is scalar-only: it records the
   non-vacuous numerical regime used in the final error-cascade inequalities.
 
-Thus the remaining source-statement issue is not a disguised name-shape
-problem.  It is the mathematical construction gap already isolated at
-`answerMainInductionSuccessorNext_ofSmallErrorConstruction`.
+Thus the remaining source-statement issue described by this historical report
+was not a disguised name-shape problem.  The later corrected large-\(k\)
+successor route proves the construction through `answerMainInduction` and
+`mainInductionSuccessorNext_ofSmallErrorConstruction`.

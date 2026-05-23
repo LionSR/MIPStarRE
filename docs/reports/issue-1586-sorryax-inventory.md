@@ -72,11 +72,12 @@ a positive-degree assumption.  The checked strengthening
 derives the predecessor large-`k` side condition from the successor large-`k`
 hypothesis, and the nontrivial branch derives `k ≥ 1` from
 `mainInductionError < 1`.  The checked theorem
-`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`
-uses the predecessor induction hypothesis without assuming `0 < d`, so the
-former degree-zero successor construction is no longer part of the active
-frontier.  The older degree-split family route has been removed because it had
-no remaining caller after the recursive-slice theorem covered the case `d = 0`.
+`MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction` obtains
+the predecessor induction conclusion from `MainInductionStep.answerMainInduction`
+without assuming `0 < d`, so the former degree-zero successor construction is
+no longer part of the active frontier.  The older degree-split family route has
+been removed because it had no remaining caller after the recursive-slice
+theorem covered the case `d = 0`.
 `AxiomAudit.lean` checks the retained completed helpers as standard-axiom
 declarations and checks the assembled small-error construction and its public
 successor wrappers as standard-axiom clean.  It also checks

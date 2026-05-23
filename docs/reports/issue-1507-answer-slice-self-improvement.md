@@ -22,11 +22,13 @@ large-`k` hypothesis and is proof-complete.
 The active checked route is now recorded by
 `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier`,
 `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`,
-and `mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`.
-These declarations prove the successor conclusion once the predecessor
-answer-valued induction conclusion has been supplied.  The predecessor
-induction hypothesis no longer assumes `0 < params.d`; hence the former
-degree-zero family-and-scalar branch is not part of the active frontier.
+and `mainInductionSuccessorNext_ofSmallErrorConstruction`.  The first two
+declarations prove the successor conclusion once the predecessor answer-valued
+induction conclusion has been supplied.  The small-error construction theorem
+then obtains that recursive conclusion from the strong-induction theorem
+`answerMainInduction`.  The predecessor induction hypothesis no longer assumes
+`0 < params.d`; hence the former degree-zero family-and-scalar branch is not
+part of the active frontier.
 
 ## Mathematical Content
 
@@ -65,10 +67,11 @@ statement uses the confirmed correction `k >= 400md`, replacing the printed
 small-error successor construction for the corrected large-`k` interface.  It
 is now proved.
 
-`AnswerSelfImprovementData.ofAnswerCarrier` and
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier` are
-proved.  They show that the answer-valued self-improvement construction is no
-longer an open frontier item.
+`AnswerSelfImprovementData.ofAnswerCarrier`,
+`mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`, and
+`mainInductionSuccessorNext_ofSmallErrorConstruction` are proved.  They show
+that the answer-valued self-improvement construction is no longer an open
+frontier item.
 
 The predecessor answer-valued induction argument is now supplied by the proof by
 induction on the dimension, not as an additional source hypothesis on the
@@ -94,17 +97,17 @@ Verdict for `mainInduction`: corrected large-`k` statement, proof-complete.  The
 printed `k >= md` bound is not formalized verbatim; it is treated as the
 documented factor-\(400\) bug.
 
-Lean assumptions for
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`: the
-successor strategy and large-`k` hypotheses, the small-error condition, and the
-predecessor answer-valued main-induction hypothesis.
+Lean assumptions for `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`:
+the successor strategy and large-`k` hypotheses, the small-error condition, and
+the predecessor answer-valued main-induction hypothesis.
 
-Lean conclusion for
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`: the same
-successor polynomial-measurement consistency conclusion as the paper step.
+Lean conclusion for `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`:
+the same successor polynomial-measurement consistency conclusion as the paper
+step.
 
-Verdict for
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`:
-conditional internal helper, proved.  Its only non-source input is the recursive
-predecessor induction hypothesis, which must arise inside the eventual induction
-proof.  It is not advertised as `thm:main-induction`.
+Verdict for `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`:
+conditional internal helper, proved.  Its only non-source input is the
+recursive predecessor induction hypothesis.  The source-facing small-error
+theorem `mainInductionSuccessorNext_ofSmallErrorConstruction` obtains this
+input internally from `answerMainInduction` and is not a conditional statement
+of `thm:main-induction`.
