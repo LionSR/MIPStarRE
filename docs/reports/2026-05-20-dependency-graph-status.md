@@ -314,9 +314,9 @@ The same audit previously checked the transitive Section 6 route
 \(\to\) `strategySymmetrization_mainInduction`
 \(\to\) `MainFormalRoleInductionWitness.ofMainInduction`;
 the corrected large-\(k\) successor theorem on this route is now proved.  The
-remaining direct proof holes are the source-boundary interval for
-`thm:main-induction` and the final two-space source-boundary theorem, not an
-unfinished corrected large-\(k\) successor construction.
+former source-boundary interval and final two-space source-boundary nodes have
+also been superseded by the corrected theorem statements, so this dated report
+should not be read as identifying a live corrected-route proof hole.
 It also checks the answer-valued restriction, predecessor-induction,
 self-improvement transport, and small-error stage assembly constructors used by
 the successor reductions; these are axiom-clean transport mechanisms rather
@@ -345,10 +345,10 @@ measurement agreement, and apply the Section 9 theorem slice by slice.  The
 answer-valued and legacy self-improvement data records are now connected in both
 directions by `SelfImprovementData.ofAnswer` and
 `AnswerSelfImprovementData.ofLegacy`, so this conversion is not part of the
-remaining proof frontier.  Thus the remaining positive-degree issue is the
-construction of the slice self-improvement data itself: either construct
-ordinary slice strategies satisfying the verifier-visible measurement
-equalities, or prove the corresponding self-improvement theorem directly for
+remaining proof frontier.  At the May 20 snapshot, the remaining
+positive-degree issue was the construction of the slice self-improvement data:
+either construct ordinary slice strategies satisfying the verifier-visible
+measurement equalities, or prove the corresponding self-improvement theorem directly for
 the answer-valued interface.
 
 The linked declarations found by this scan have the following mathematical
