@@ -339,15 +339,10 @@ goodness predicate, direct-sum role-register block lemmas, last-direction
 notation, the heterogeneous role-register state and projective-measurement
 constructors, restricted diagonal samples, and the restricted diagonal failure
 probability are checked not to import `sorryAx`.
-The self-improvement transport checks include both the ordinary and
-answer-valued constructors which derive averaged point-operator compatibility
-from point-measurement transport, transport restricted goodness from state,
-axis-parallel, and diagonal agreement, package the full verifier-visible
-measurement agreement, and apply the Section 9 theorem slice by slice.  The
-answer-valued and legacy self-improvement data records are now connected in both
-directions by `SelfImprovementData.ofAnswer` and
-`AnswerSelfImprovementData.ofLegacy`, so this conversion is not part of the
-remaining proof frontier.  At the May 20 snapshot, the remaining
+The self-improvement transport checks include the answer-valued carrier
+construction and the ordinary forgetting map `SelfImprovementData.ofAnswer`.
+The unused reverse legacy conversions have been removed, so this conversion is
+not part of the remaining proof frontier.  At the May 20 snapshot, the remaining
 positive-degree issue was the construction of the slice self-improvement data:
 either construct ordinary slice strategies satisfying the verifier-visible
 measurement equalities, or prove the corresponding self-improvement theorem directly for
