@@ -43,10 +43,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
-import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
-import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkOneMeas
-import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.MainInductionStep.Defs
@@ -66,13 +63,8 @@ import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems
 import MIPStarRE.LDT.CommutativityPoints.AnswerTheorems
 import MIPStarRE.LDT.Commutativity.Defs
 import MIPStarRE.LDT.Commutativity.Theorems
-import MIPStarRE.LDT.Pasting.Defs.Tuples
-import MIPStarRE.LDT.Pasting.Defs.Interpolation
-import MIPStarRE.LDT.Pasting.Defs.Families
-import MIPStarRE.LDT.Pasting.Defs.Context
-import MIPStarRE.LDT.Pasting.Sandwich.Switcheroo
-import MIPStarRE.LDT.Pasting.Sandwich.GHatSandwich
-import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
+import MIPStarRE.LDT.Pasting.Defs
+import MIPStarRE.LDT.Pasting.Sandwich
 import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.Pasting.Core
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Infrastructure
