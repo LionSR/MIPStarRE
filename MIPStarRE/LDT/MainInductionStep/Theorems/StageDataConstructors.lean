@@ -8,8 +8,7 @@ Constructors for the slice restriction, per-slice induction, self-improvement,
 and averaged pasting stage records: `SliceRestrictionData.ofRestrictedProbabilities`,
 `AnswerSliceRestrictionData.ofRestrictedProbabilities`,
 `SliceRestrictionData.ofAnswer`, `PerSliceInductionData.ofRecursion`,
-`AnswerPerSliceInductionData.*`, `SelfImprovementData.ofAnswerForLegacy`,
-`SelfImprovementData.ofAnswer`, `AnswerSelfImprovementData.ofLegacy`,
+`AnswerPerSliceInductionData.*`, `SelfImprovementData.ofAnswer`,
 `AveragedPastingData.invokeLdPasting`, and `mainInductionFromStageData`.
 
 ## References
@@ -274,32 +273,6 @@ noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
         (restrictionPkg.profile.diagonal x)
         k (restrictionPkg.profile.restrictedGood x) hk_pos hk
 
-/-- View a legacy per-slice induction data record over an answer-forgotten restriction
-data record as an answer-valued data record.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
-formalization-only conversion between answer-valued and legacy restricted-slice
-interfaces for the same recursive induction call. -/
-noncomputable def AnswerPerSliceInductionData.ofLegacy
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-    (legacyInduction :
-      PerSliceInductionData params strategy eps delta gamma
-        (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k) :
-    AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k where
-  sliceError := legacyInduction.sliceError
-  sliceMeasurement := legacyInduction.sliceMeasurement
-  pointConsistency := by
-    intro x
-    simpa using legacyInduction.pointConsistency x
-  error_le := by
-    intro x
-    simpa [SliceRestrictionData.ofAnswer] using legacyInduction.error_le x
-
 /-- View answer-valued recursive slice-wise induction witnesses as legacy
 per-slice induction data after forgetting the answer-valued diagonal alphabet.
 
@@ -327,58 +300,6 @@ noncomputable def PerSliceInductionData.ofAnswer
   error_le := by
     intro x
     simpa [SliceRestrictionData.ofAnswer] using answerInduction.error_le x
-
-/-- Forget an answer-valued self-improvement data record when the target legacy
-induction data record is the one used by the legacy assembly.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:461-551`; this is a
-formalization-only conversion between answer-valued and legacy restricted-slice
-self-improvement collects. -/
-noncomputable def SelfImprovementData.ofAnswerForLegacy
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-    (legacyInduction :
-      PerSliceInductionData params strategy eps delta gamma
-        (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k)
-    (answerSelf :
-      AnswerSelfImprovementData params strategy eps delta gamma k restrictionPkg
-        (AnswerPerSliceInductionData.ofLegacy params strategy eps delta gamma k
-          restrictionPkg legacyInduction)) :
-    SelfImprovementData params strategy eps delta gamma k
-      (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg)
-      legacyInduction where
-  sliceProj := answerSelf.sliceProj
-  sliceWitness := answerSelf.sliceWitness
-  completeness := by
-    intro x
-    simpa [AnswerPerSliceInductionData.ofLegacy, SliceRestrictionData.ofAnswer,
-      sliceSelfImprovementError, answerSliceSelfImprovementError]
-      using answerSelf.completeness x
-  pointConsistency := by
-    intro x
-    simpa [AnswerPerSliceInductionData.ofLegacy, SliceRestrictionData.ofAnswer,
-      sliceSelfImprovementError, answerSliceSelfImprovementError]
-      using answerSelf.pointConsistency x
-  strongSelfConsistency := by
-    intro x
-    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
-      answerSliceSelfImprovementError]
-      using answerSelf.strongSelfConsistency x
-  selfCloseness := by
-    intro x
-    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
-      answerSliceSelfImprovementError]
-      using answerSelf.selfCloseness x
-  bounded := by
-    intro x
-    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
-      answerSliceSelfImprovementError]
-      using answerSelf.bounded x
-  dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
 
 /-- View answer-valued self-improvement data as the legacy self-improvement data
 over the answer-forgotten per-slice induction record.
@@ -433,62 +354,6 @@ noncomputable def SelfImprovementData.ofAnswer
       answerSliceSelfImprovementError]
       using answerSelf.bounded x
   dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
-
-/-- View legacy self-improvement data over the answer-forgotten slice interface
-as answer-valued self-improvement data.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:461-551`.  This is the
-reverse bookkeeping conversion to `SelfImprovementData.ofAnswer`: the
-answer-valued and legacy restricted-slice interfaces have the same point
-measurement, scalar error profile, projective slice measurements, and witness
-operators after applying `SliceRestrictionData.ofAnswer` and
-`PerSliceInductionData.ofAnswer`.  Thus a legacy self-improvement record over
-that answer-forgotten data can be read as the corresponding answer-valued record
-without changing the mathematical estimates. -/
-noncomputable def AnswerSelfImprovementData.ofLegacy
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (k : ℕ)
-    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
-    (answerInduction :
-      AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k)
-    (legacySelf :
-      SelfImprovementData params strategy eps delta gamma k
-        (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg)
-        (PerSliceInductionData.ofAnswer params strategy eps delta gamma k
-          restrictionPkg answerInduction)) :
-    AnswerSelfImprovementData params strategy eps delta gamma k restrictionPkg
-      answerInduction where
-  sliceProj := legacySelf.sliceProj
-  sliceWitness := legacySelf.sliceWitness
-  completeness := by
-    intro x
-    simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
-      sliceSelfImprovementError, answerSliceSelfImprovementError]
-      using legacySelf.completeness x
-  pointConsistency := by
-    intro x
-    simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
-      sliceSelfImprovementError, answerSliceSelfImprovementError]
-      using legacySelf.pointConsistency x
-  strongSelfConsistency := by
-    intro x
-    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
-      answerSliceSelfImprovementError]
-      using legacySelf.strongSelfConsistency x
-  selfCloseness := by
-    intro x
-    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
-      answerSliceSelfImprovementError]
-      using legacySelf.selfCloseness x
-  bounded := by
-    intro x
-    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
-      answerSliceSelfImprovementError]
-      using legacySelf.bounded x
-  dominatesAveragePointOperator := legacySelf.dominatesAveragePointOperator
 
 /-- Lean-only universe-polymorphic form of
 `AveragedPastingData.invokeLdPasting`.
