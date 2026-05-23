@@ -23,9 +23,9 @@
 > source-boundary proof hole.
 >
 > **Status note, 2026-05-22.**  The corrected large-`k` Section 6 successor
-> construction is now checked.  The source-boundary obligations above remain:
-> the printed source range for `thm:main-induction` and the final two-space
-> source theorem.
+> construction was then checked.  At that snapshot, the remaining
+> source-boundary items were the printed source range for `thm:main-induction`
+> and the final two-space source theorem.
 >
 > **Status note, 2026-05-23.**  This report is now historical as a proof-frontier
 > inventory.  The corrected large-\(k\), nonzero-sampling source route is
