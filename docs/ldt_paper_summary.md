@@ -529,7 +529,9 @@ Key Lean theorem names:
 **Lean mapping**
 
 - `MIPStarRE/LDT/CommutativityPoints/Defs.lean`
-- `MIPStarRE/LDT/CommutativityPoints/Theorem.lean`
+- `MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean`
+- `MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean`
+- `MIPStarRE/LDT/CommutativityPoints/AnswerTheorems.lean`
 
 Key Lean theorem name:
 

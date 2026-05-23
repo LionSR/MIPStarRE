@@ -10,7 +10,10 @@ Branch: `gpt55/session45-930-commutativitypoints-audit`
 
 I audited the already-formalized commutativity-of-points slice:
 
-- `MIPStarRE/LDT/CommutativityPoints/Defs.lean`, `Approximation.lean`, `SharedHelpers/Core.lean`, `SharedHelpers/SharedLine.lean`, `BridgeTheorems/LiftBridges.lean`, `BridgeTheorems/DropBridges.lean`, `BridgeTheorems.lean`, and `Theorem.lean`;
+- `MIPStarRE/LDT/CommutativityPoints/Defs.lean`, `Approximation.lean`,
+  `SharedHelpers/Core.lean`, `SharedHelpers/SharedLine.lean`,
+  `BridgeTheorems/LiftBridges.lean`, `BridgeTheorems/DropBridges.lean`,
+  `BridgeTheorems.lean`, and `AnswerTheorems.lean`;
 - the source paper section `references/ldt-paper/commutativity-points.tex:5-44`;
 - the blueprint entry `blueprint/src/chapter/ch08_commutativity.tex:5-48`.
 
@@ -23,13 +26,13 @@ Verdict: I found no undocumented mathematical discrepancy in this slice, and I d
 Targeted Lean checks in this worktree succeeded:
 
 ```text
-lake build MIPStarRE.LDT.CommutativityPoints.Theorem
+lake build MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
 lake env lean MIPStarRE/LDT/CommutativityPoints/Approximation.lean
 lake env lean MIPStarRE/LDT/CommutativityPoints/SharedHelpers/Core.lean
 lake env lean MIPStarRE/LDT/CommutativityPoints/SharedHelpers/SharedLine.lean
 lake env lean MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean
 lake env lean MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean
-lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean
+lake env lean MIPStarRE/LDT/CommutativityPoints/AnswerTheorems.lean
 ```
 
 A scratch `#check`/`#print axioms` file was run for the audited public route.  For `sampledDiagonalLineApproximation_pointWithDiagonalLine`, `orderedLiftToMixedLine`, `orderedLiftToLineProduct`, and `commutativityPoints`, `#print axioms` reported only the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound`; no audited declaration reported `sorryAx`.

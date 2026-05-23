@@ -1,8 +1,11 @@
 # Hints For GPT Agents Proving Similar Inequalities
 
-This file records proof-engineering patterns that were useful for
-`MIPStarRE/LDT/CommutativityPoints/Theorem.lean`, especially for state-dependent
-distance inequalities and consistency-to-approximation arguments.
+This file records proof-engineering patterns that were useful for the
+commutativity-at-points files, especially
+`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean` and
+`MIPStarRE/LDT/CommutativityPoints/SharedHelpers/SharedLine.lean`, where the
+state-dependent distance inequalities and consistency-to-approximation
+arguments are now located.
 
 ## Main lesson
 

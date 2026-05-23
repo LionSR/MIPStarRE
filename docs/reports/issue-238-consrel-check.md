@@ -172,8 +172,10 @@ These files use `ConsRel` or `bipartiteConsError` in a way that matches the pape
   The comments explicitly say the first family acts on the left register and the second on the right. The definitions match that commentary.
 - `MIPStarRE/LDT/MainInductionStep/Defs.lean`, lines 48-118
   Same left/right convention for point-vs-line families.
-- `MIPStarRE/LDT/CommutativityPoints/Theorem.lean`, especially lines 61-64 and 106-109
-  The proof uses `bipartiteConsError_eq_consError_placed`, which preserves left/right order explicitly.
+- `MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean` and
+  `MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean`.
+  The proof uses `bipartiteConsError_eq_consError_placed`, which preserves
+  left/right order explicitly.
 - `MIPStarRE/LDT/Preliminaries/ComparisonCore.lean`
 - `MIPStarRE/LDT/Preliminaries/DistanceBounds.lean`
 - `MIPStarRE/LDT/Preliminaries/ConsistencyBridges.lean`
