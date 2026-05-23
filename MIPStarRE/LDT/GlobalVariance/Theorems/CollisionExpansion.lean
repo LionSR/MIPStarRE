@@ -558,41 +558,6 @@ lemma generalizeBCollisionResidual_le_error
   rw [generalizeBCollisionResidual_eq_seedCollisionExpansion]
   exact generalizeBSeedCollisionExpansion_le_error params strategy G g
 
-/-- Compatibility wrapper: a seed-expansion equality hypothesis also gives the
-collision-residual estimate.
-
-The equality is now provided by
-`generalizeBCollisionResidual_eq_seedCollisionExpansion`; this lemma is retained
-for callers that still pass the reindexing identity explicitly. -/
-lemma generalizeBCollisionResidual_le_of_seedExpansion_eq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (g : Polynomial params)
-    (hreindex :
-      generalizeBCollisionResidual params strategy strategy.state G g =
-        generalizeBSeedCollisionExpansion params strategy strategy.state G g) :
-    generalizeBCollisionResidual params strategy strategy.state G g ≤
-      generalizeBError params := by
-  rw [hreindex]
-  exact generalizeBSeedCollisionExpansion_le_error params strategy G g
-
-/-- Compatibility reduction from the older line-expansion equality hypothesis. -/
-lemma generalizeBCollisionResidual_le_of_lineExpansion_eq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (g : Polynomial params)
-    (hreindex :
-      generalizeBCollisionResidual params strategy strategy.state G g =
-        generalizeBLineCollisionExpansion params strategy strategy.state G g) :
-    generalizeBCollisionResidual params strategy strategy.state G g ≤
-      generalizeBError params := by
-  rw [hreindex]
-  exact generalizeBLineCollisionExpansion_le_error params strategy G g
-
 /-- Strategy-state reduction for `lem:generalize-b` after the projective expansion.
 
 This theorem removes the conclusion-shaped pointwise norm hypothesis from the
@@ -645,49 +610,5 @@ lemma generalizeBFromSchwartzZippel
     GeneralizeBStatement params strategy strategy.state G := by
   exact generalizeBFromCollisionResidual params strategy G
     (generalizeBCollisionResidual_le_error params strategy G)
-
-/-- Strategy-state reduction for `lem:generalize-b` from the uniform line/parameter
-seed collision expansion.
-
-This compatibility route keeps the older explicit seed-expansion interface.
-The equality input is now provided by
-`generalizeBCollisionResidual_eq_seedCollisionExpansion`; callers that do not
-need to supply it separately can use `generalizeBFromSchwartzZippel`. -/
-lemma generalizeBFromSeedCollisionExpansion
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (hreindex :
-      ∀ g : Polynomial params,
-        generalizeBCollisionResidual params strategy strategy.state G g =
-          generalizeBSeedCollisionExpansion params strategy strategy.state G g) :
-    GeneralizeBStatement params strategy strategy.state G := by
-  refine generalizeBFromCollisionResidual params strategy G ?_
-  intro g
-  exact generalizeBCollisionResidual_le_of_seedExpansion_eq
-    params strategy G g (hreindex g)
-
-/-- Strategy-state reduction for `lem:generalize-b` from the explicit line/parameter
-collision expansion.
-
-This compatibility route keeps the older explicit line-expansion interface.
-The seed-expansion route now proves the needed reindexing identity and pointwise
-bound directly via `generalizeBCollisionResidual_le_error`. -/
-lemma generalizeBFromLineCollisionExpansion
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (hreindex :
-      ∀ g : Polynomial params,
-        generalizeBCollisionResidual params strategy strategy.state G g =
-          generalizeBLineCollisionExpansion params strategy strategy.state G g) :
-    GeneralizeBStatement params strategy strategy.state G := by
-  refine generalizeBFromCollisionResidual params strategy G ?_
-  intro g
-  exact generalizeBCollisionResidual_le_of_lineExpansion_eq
-    params strategy G g (hreindex g)
-
 
 end MIPStarRE.LDT.GlobalVariance
