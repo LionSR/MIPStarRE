@@ -35,7 +35,7 @@ abbrev PointDiagonalLineQuestion (params : Parameters) := DiagonalLine params ×
 abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
   DiagonalLine params × (Fq params × Fq params)
 
--- leftPlacedSubMeas / rightPlacedSubMeas are defined in Basic/SubMeasurement.lean
+-- leftPlacedSubMeas / rightPlacedSubMeas are defined in Basic/SubMeasurementFamilies.lean
 
 /-- Diagonal lines form a finite type via their base point and direction vector. -/
 noncomputable instance (params : Parameters) : Fintype (DiagonalLine params) := by

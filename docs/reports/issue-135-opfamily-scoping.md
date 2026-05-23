@@ -4,7 +4,8 @@
 
 I checked the requested files and the nearby `OpFamily` stack.
 
-The core issue is real: [`SubMeas`](../../MIPStarRE/LDT/Basic/SubMeasurement.lean) requires
+The core issue is real:
+[`SubMeas`](../../MIPStarRE/LDT/Basic/SubMeasurementCore.lean) requires
 PSD outcomes and a total bounded by the identity, so an ordered product
 `A_a * B_b` cannot in general be packaged as a `SubMeas` without extra
 commutation or positivity hypotheses. In the current codebase, though, the raw
@@ -29,7 +30,7 @@ to finish centralizing and using the raw-family layer consistently.
 
 ### 1. `SubMeas` is genuinely too strong for raw ordered products
 
-[`MIPStarRE/LDT/Basic/SubMeasurement.lean:18`](../../MIPStarRE/LDT/Basic/SubMeasurement.lean#L18)
+[`MIPStarRE/LDT/Basic/SubMeasurementCore.lean:18`](../../MIPStarRE/LDT/Basic/SubMeasurementCore.lean#L18)
 defines `SubMeas` with fields:
 
 - `outcome_pos : ∀ a, 0 ≤ outcome a`
