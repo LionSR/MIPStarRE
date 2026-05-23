@@ -111,15 +111,20 @@ is ready.
 - `MainInductionStep.PerSliceInductionData`
 - `MainInductionStep.SelfImprovementData`
 - `MainInductionStep.mainInductionPublicRestrictionData`
-- `MainInductionStep.mainInductionPublicWrapper`
 - `MakingMeasurementsProjective.SpectralTruncationStatement`
+- `MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity`
+- `Test.MainFormalRoleMeasurementWitness`
+- `Test.MainFormalRoleInductionWitness`
+- `Test.UnsymmetrizationConsistency`
+
+The following names from the original audit have since been retired from the
+Lean tree and should be treated as historical, not as live migration targets:
+
+- `MainInductionStep.mainInductionPublicWrapper`
 - `MakingMeasurementsProjective.SpectralTruncationInput`
 - `MakingMeasurementsProjective.ProjectivizationRepairInput`
 - `MakingMeasurementsProjective.LeftLiftedProjectivizationRepairInput`
 - `MakingMeasurementsProjective.ProjectivizationLine156Handoff`
-- `MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity`
-- `Test.MainFormalRoleMeasurementWitness`
-- `Test.MainFormalRoleInductionWitness`
 - `Test.MainFormalRolePackageSuccessorResidual`
 - `Test.MainFormalRolePackageBranchResidual`
 - `Test.MainFormalCascadeRolePackagedCompletionLine169Residual`
@@ -127,7 +132,6 @@ is ready.
 - `Test.MainFormalPostRolePackageLeftCompletionLine169Residual`
 - `Test.MainFormalCascadeRolePackageResidualCompletionLine169Residual`
 - `Test.MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual`
-- `Test.UnsymmetrizationConsistency`
 - `Test.StrategySymmetrizationPackage`
 
 The `Commutativity.Scaffold` namespace and file path also encode historical

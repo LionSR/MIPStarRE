@@ -70,14 +70,12 @@ the remaining proof obligations explicit.
 | `SelfImprovementData`, `AnswerSelfImprovementData` | `MIPStarRE/LDT/MainInductionStep/Statements.lean` | Internal packages for the slice-wise self-improvement output.  Their fields match the per-slice completeness, point-consistency, self-consistency, closeness, boundedness, and domination data needed by the induction proof. | Section 6 successor branch and pasting input assembly. |
 | `SelfImprovementData.SliceStrategyTransport`, `AnswerSelfImprovementData.SliceStrategyTransport` | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/` | Internal transport records for concrete slice strategies.  They record state and measurement identifications needed to run Section 9 on the slices; they are not source hypotheses of `thm:main-induction`. | Section 6 successor branch; feeds the ordinary and answer-valued self-improvement assembly. |
 | `AveragedPastingData` | `MIPStarRE/LDT/MainInductionStep/Statements.lean` | Internal input record for invoking `ldPastingInInductionSection` after averaging the slice-wise self-improvement data; docstring cites `ld-pasting.tex:12-50` and `inductive_step.tex:239-342`. | Section 6 pasting assembly; consumed by `AveragedPastingData.invokeLdPasting` and `mainInductionFromStageData`. |
-| `StrategySymmetrizationPackage` | `MIPStarRE/LDT/Test/SymmetrizationBridge.lean` | Constructed from the low individual degree test pass condition.  It packages the role-register symmetrized strategy, goodness, and normalization from `inductive_step.tex:26-68`. | Section 3 final theorem assembly before the Section 6 call. |
 | `UnsymmetrizationConsistency` | `MIPStarRE/LDT/Test/Unsymmetrization.lean` | Proven Step 3 factor-two measurement-unsymmetrization consistency statement from `inductive_step.tex:84-109`; constructed by `UnsymmetrizationConsistency.ofSymConsistency`. | Converts the Section 6 role-register measurement into the two original-role consistency estimates. |
 | `MainFormalRoleMeasurementWitness` | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister/Core.lean` | Internal role-register measurement output from the Section 6 call, after scalar rewriting to the Section 3 cascade parameter. | Feeds `UnsymmetrizationConsistency` and the final projective-completion chain. |
 | `MainFormalRoleInductionWitness` | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister/Core.lean` | Isolated witness for the Section 6 role-register measurement.  The source-facing constructors call `MainInductionStep.mainInduction`; any successor gap is the tracked gap in Section 6, not a hypothesis on `mainFormal`. | `mainFormal` non-vacuous branch; feeds `MainFormalRoleMeasurementWitness`. |
 | `MainFormalDiagonalOrthonormalizationWitness` | `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationData.lean` | Constructed from line-130 diagonal consistency using the Section 5 orthonormalization wrapper. | Step 6 projective-completion construction. |
 | `MainFormalDiagonalCompletionWitness` | `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationData.lean` | Internal witness exposing completion estimates and the two match-mass preservation obligations for the line-169 route. | Feeds `MainFormalProjectiveCompletionTransportWitness`; remaining match-mass obligations are tracked by #1566. |
 | `MainFormalProjectiveCompletionTransportWitness` | `MIPStarRE/LDT/Test/MainTheorem/ProjectiveConsistency/CompletionTransport.lean` | Final internal transport witness.  The checked theorem `mainFormal_ofProjectiveCompletionTransportWitness` consumes this record, but the paper-facing `mainFormal` now constructs it internally rather than taking it as a hypothesis. | Section 3 final theorem assembly; remaining construction obligations are tracked by #1043, #1363, #1507, and #1566. |
-| `SpectralTruncationInput` | `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean` | Explicit input form of the truncation-function step in `lem:projective-non-measurement`; not a public hypothesis of the final theorem. | Section 5 projectivization and orthonormalization route; related open work is tracked by #1032. |
 | `MainFormalStep5ExpansionBound` and related lemmas | `MIPStarRE/LDT/Test/SchwartzZippelStep.lean` | Step 5 scalar/consistency bound for the Schwartz--Zippel expansion part of the final theorem. | Pre-projective self-consistency construction before completion. |
 | Pasting and commutativity residual fact bundles | `MIPStarRE/LDT/Pasting/BridgeLemmas/LdSandwichLineOnePoint/CSSetup.lean`, `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core/FactBundles.lean`, and `MIPStarRE/LDT/Commutativity/ScalarApproximation/*` | Local fact bundles or scalar residual propositions for chapter-internal estimates; they do not occur as paper-facing theorem hypotheses under the proof-debt audit. | Chapter 9 pasting and chapter 8 commutativity scalar-chain repairs. |
 
@@ -91,14 +89,15 @@ The current bridge-like declarations group into four dependency subtrees:
    source object in this chain rather than adding hypotheses to
    `MainInductionStep.mainInduction` or `Test.mainFormal`.
 2. **Section 3 final-theorem role and completion chain.**  The role witness,
-   unsymmetrization package, diagonal orthonormalization/completion witnesses,
+   unsymmetrization consistency, diagonal orthonormalization/completion witnesses,
    and projective-completion transport witness form a single construction chain
    below `Test.mainFormal`.  The paper-facing theorem must continue to assemble
    this chain from the pass condition and Section 6 theorem, not assume it.
-3. **Section 5 projectivization.**  `SpectralTruncationInput` is a named input
-   form of a source proof step and is related to the #1032 spectral-truncation
-   proof obligation.  It should remain below the source theorem boundary unless
-   the paper explicitly assumes it.
+3. **Section 5 projectivization.**  The former `SpectralTruncationInput`
+   wrapper has been retired; the spectral-truncation step is now represented by
+   `SpectralTruncationStatement` and its direct construction theorems.  These
+   should remain below the source theorem boundary unless the paper explicitly
+   assumes them.
 4. **Chapter-internal scalar residuals.**  The pasting and commutativity residual
    fact bundles isolate local analytic or reindexing obligations.  They may be
    useful proof-frontier records, but they should not be promoted to hypotheses
