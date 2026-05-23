@@ -129,17 +129,18 @@ those comparisons through postprocessing and reindexing.
 
 ### 7. Section 10 already contains the bridge pattern Section 11 needs
 
-[`MIPStarRE/LDT/CommutativityPoints/Theorem.lean`](../../MIPStarRE/LDT/CommutativityPoints/Theorem.lean)
-already develops exactly the sort of raw-family machinery that Section 11 still
-needs to reuse:
+The Section 10 commutativity-at-points files already develop exactly the sort
+of raw-family machinery that Section 11 still needs to reuse:
 
-- direct `SDDOpRel` comparisons between raw placed families at
-  [`:698`](../../MIPStarRE/LDT/CommutativityPoints/Theorem.lean#L698)
-- a bridge from a raw ordered product to a genuine `IdxSubMeas` object via
-  `IdxSubMeas.toIdxOpFamily` at
-  [`:810`](../../MIPStarRE/LDT/CommutativityPoints/Theorem.lean#L810)
-- triangle-inequality chaining on raw families at
-  [`:1390`](../../MIPStarRE/LDT/CommutativityPoints/Theorem.lean#L1390)
+- direct `SDDOpRel` comparisons between raw placed families, in
+  [`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean`](../../MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/LiftBridges.lean)
+  and
+  [`MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean`](../../MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean);
+- bridges from raw ordered products to genuine `IdxSubMeas` objects via
+  `IdxSubMeas.toIdxOpFamily`, in the same bridge files;
+- triangle-inequality chaining on raw families, in
+  [`MIPStarRE/LDT/CommutativityPoints/SharedHelpers/SharedLine.lean`](../../MIPStarRE/LDT/CommutativityPoints/SharedHelpers/SharedLine.lean)
+  and the bridge files.
 
 This is a strong signal that Section 11 should be finished by reusing the raw
 comparison style already established in Section 10, not by trying to upgrade the
@@ -149,9 +150,8 @@ ordered products back to `SubMeas`.
 
 The generic raw ordered-product helpers currently live in
 [`MIPStarRE/LDT/CommutativityPoints/Defs.lean`](../../MIPStarRE/LDT/CommutativityPoints/Defs.lean),
-while
-[`MIPStarRE/LDT/Commutativity/Defs.lean`](../../MIPStarRE/LDT/Commutativity/Defs.lean)
-imports `MIPStarRE.LDT.CommutativityPoints.Theorem` at the top to reach them.
+while Section 11 imports the commutativity-at-points infrastructure to reach
+them.
 
 That is backwards for infrastructure:
 
@@ -199,7 +199,8 @@ submeasurement bound, such as:
 After the helper move, the likely next proof steps are:
 
 1. Add Section 11 bridge lemmas that mirror the successful Section 10 pattern in
-   `CommutativityPoints/Theorem.lean`, but for
+   `CommutativityPoints/BridgeTheorems/` and
+   `CommutativityPoints/SharedHelpers/`, but for
    `evaluatedSliceProductLeft/Right`,
    `commDataProcessedGStabilityOneLeft/Right`, and
    `commDataProcessedGStabilityTwoLeft/Right`.
