@@ -257,16 +257,16 @@ lemma selfImprovementHelper
               Real.sqrt (2 * delta) :=
         helperDeleteAClonedQuantity_abs_sub_moveOverVQuantity_le_sqrt_two_delta
           params strategy delta T.toSubMeas hpointSSC
-      have hsscObligations :
-          HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta :=
-        helper_ssc_obligations_of_scalarTransports_pointTransfer
+      have hsscBounds :
+          HelperStrongSelfConsistencyBounds params strategy T Hhat eps delta :=
+        helper_ssc_bounds_of_scalarTransports_pointTransfer
           params strategy eps delta hhelper hpointSSC hlocal hclone hmove
           (fun h => helper_slackness_eq_of_helper_with_slackness
             params strategy eps delta hhelperWithSlackness h)
           hpointTransfer
       exact
         helper_strong_self_consistency_of_helper_conclusion
-          params strategy eps delta heps hdelta hd_le_q hhelper hsscObligations
+          params strategy eps delta heps hdelta hd_le_q hhelper hsscBounds
     · have hhelperError_ge_one : 1 ≤ selfImprovementHelperError params eps delta := by
         have hdq_ge_one : 1 ≤ ((params.d : Error) / (params.q : Error)) := by
           exact (one_le_div₀ params.q_cast_pos).2 (le_of_lt (lt_of_not_ge hd_le_q))
@@ -475,9 +475,9 @@ theorem selfImprovement
           fun h =>
             helper_slackness_eq_of_helper_with_slackness
               params strategy eps delta hhelperWithSlackness h
-        have hsscObligations :
-            HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta :=
-          helper_ssc_obligations_of_scalarTransports_pointTransfer
+        have hsscBounds :
+            HelperStrongSelfConsistencyBounds params strategy T Hhat eps delta :=
+          helper_ssc_bounds_of_scalarTransports_pointTransfer
             params strategy eps delta hhelper hpointSSC hlocal hclone hmove
             hslack htransfer
         have hhelperSSC :
@@ -485,7 +485,7 @@ theorem selfImprovement
               (constSubMeasFamily Hhat)
               (selfImprovementHelperError params eps delta) :=
           helper_strong_self_consistency_of_helper_conclusion
-            params strategy eps delta heps hdelta hd_le_q hhelper hsscObligations
+            params strategy eps delta heps hdelta hd_le_q hhelper hsscBounds
         rcases MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization
             strategy.state strategy.permInvState strategy.isNormalized
             Hhat (selfImprovementHelperError params eps delta) hhelperSSC with

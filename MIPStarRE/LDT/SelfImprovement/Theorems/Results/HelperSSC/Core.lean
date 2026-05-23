@@ -1,9 +1,9 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer
 
 /-!
-# Helper strong self-consistency obligations: core reductions
+# Helper strong self-consistency bounds: core reductions
 
-Core obligation structures, the bare off-diagonal quantity, and the two
+Core scalar-bound structures, the bare off-diagonal quantity, and the two
 variance-swap identities used in the helper strong self-consistency chain.
 
 ## References
@@ -22,19 +22,17 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Named obligations for the helper-stage strong self-consistency proof.
+/-- Named scalar bounds for the helper-stage strong self-consistency proof.
 
 Paper origin: `references/ldt-paper/self_improvement.tex:255-603`
 (`\label{item:self-improvement-self}` and the subsequent add-in-`u`,
 self-consistency, and variance-swap chain).
 
-**Proof obligation:** This is an internal record for the helper-stage strong
-self-consistency proof, tracked by #1596.  It is not a hypothesis of a
-source-labelled theorem.  Elimination: derive the fields from the
-add-in-`u`, self-consistency, and global-variance estimates, and do not pass
-this record across the public statement of `lem:self-improvement-helper`.
+This is an internal record of intermediate estimates for the helper-stage
+strong self-consistency proof, tracked by #1596.  It is not a hypothesis of a
+source-labelled theorem.
 
-These fields isolate the remaining paper-side obligations in the proof of
+These fields isolate the paper-side scalar bounds in the proof of
 `item:self-improvement-self` once the reduced helper conclusion is fixed:
 
 1. the four scalar transport bounds along the chain
@@ -46,9 +44,9 @@ This structure records the actual intermediate estimates still needed from the
 add-in-`u`, self-consistency, and variance calculations, rather than restating
 the final `BipartiteSSCRel` conclusion as an input.  It is a local proof
 frontier for the helper theorem, not a hypothesis of the paper-aligned helper
-theorem; the full assembly of these obligations discharges the former #1514
+theorem; the full assembly of these scalar estimates discharges the former #1514
 gap. -/
-structure HelperStrongSelfConsistencyObligations
+structure HelperStrongSelfConsistencyBounds
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (T : Measurement (Polynomial params) ι)
@@ -87,16 +85,16 @@ structure HelperStrongSelfConsistencyObligations
           ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
         addInUError params eps delta
 
--- This constructor fills the helper SSC obligation record by composing the
+-- This constructor fills the helper SSC bound record by composing the
 -- point self-consistency bounds with the local-to-global variance transfer.
-/-- Construct the helper-stage obligations from the remaining mathematical
+/-- Construct the helper-stage scalar bounds from the remaining mathematical
 inputs after the add-in-`u` chain has been closed.
 
 The point self-consistency hypothesis supplies the two self-consistency moves
 `Q₀ → Q₁` and `Q₁ → Q₂`; the local-variance sum bound supplies the two
 global-variance moves `Q₂ → Q₃` and `Q₃ → Q₄`. The only additional scalar input
 is the residual lower bound for the released right-hand side. -/
-lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVariance
+lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
     (eps delta : Error)
@@ -118,7 +116,7 @@ lemma helper_strong_self_consistency_obligations_of_selfConsistency_localVarianc
             Real.sqrt (2 * delta) +
             ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
           addInUError params eps delta) :
-    HelperStrongSelfConsistencyObligations params strategy T Hhat eps delta := by
+    HelperStrongSelfConsistencyBounds params strategy T Hhat eps delta := by
   have hsteps :=
     add_in_u_cs_chain_global_variance_steps_of_local_sum_bound_from_factor_bounds
       params strategy eps delta T.toSubMeas hlocal

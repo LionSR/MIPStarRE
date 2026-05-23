@@ -263,7 +263,7 @@ measurement-witness constructors linked from
 `lem:sdp-matrix-slackness-output`,
 `IdxPolyFamily.SliceBoundednessInput.storedBoundedResidualBound`,
 `IdxPolyFamily.SliceBoundednessInput.averagedPoint_le_witness`,
-`SelfImprovement.HelperStrongSelfConsistencyObligations`, and
+`SelfImprovement.HelperStrongSelfConsistencyBounds`, and
 `Test.CascadeHypotheses`.  These checks do not certify that an auxiliary
 declaration is a paper theorem; rather, they ensure that these
 blueprint-linked auxiliary names do not hide the active `sorryAx` frontier.
@@ -384,8 +384,8 @@ statement constructs the rank-reduction witness from the source
 almost-projectivity estimate and applies `lem:projective-non-measurement`
 internally.
 
-In Section 7, `HelperStrongSelfConsistencyObligations` is a checked internal
-package of intermediate estimates for the helper-stage strong self-consistency
+In Section 7, `HelperStrongSelfConsistencyBounds` is a checked internal
+record of intermediate estimates for the helper-stage strong self-consistency
 proof.  The blueprint links it in the proof discussion of
 `item:self-improvement-self`, not as a source theorem hypothesis.  Its fields
 are the scalar estimates in the add-in-`u`, self-consistency, and variance-swap
@@ -735,8 +735,8 @@ checked not to import `sorryAx`.
   representation of the boundedness item supplied by the pasted polynomial
   family.  They are not separate assumptions on the paper-facing
   commutativity theorem.
-* In Section 7, `HelperStrongSelfConsistencyObligations` and the associated
-  residual-bound lemmas are an internal assembly device for the displayed
+* In Section 7, `HelperStrongSelfConsistencyBounds` and the associated
+  residual-bound lemmas are internal scalar estimates for the displayed
   estimates in `lem:self-improvement-helper`.  The public self-improvement
   theorems remain axiom-clean in `AxiomAudit.lean`.
   The SDP entries `SdpStatementWithSlackness`,

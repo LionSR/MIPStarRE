@@ -1,11 +1,11 @@
-# Issue #1596: Helper SSC Field Classification
+# Issue #1596: Helper SSC Bound Field Classification
 
 Date: 2026-05-20.
 
 ## Scope
 
 This note classifies the fields of
-`MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyObligations`, the
+`MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyBounds`, the
 internal record used in the proof of the strong self-consistency item for the
 self-improvement helper.
 
@@ -48,7 +48,7 @@ is assembled in Lean from the off-diagonal variance swaps, the two
 post-`delete-an-A` transports, the complementary-slackness relation
 `T_h A_h = T_h Z`, and the point-consistency add-in-`u` transfer.  The
 constructor
-`helper_ssc_obligations_of_scalarTransports_pointTransfer` performs this
+`helper_ssc_bounds_of_scalarTransports_pointTransfer` performs this
 assembly.
 
 ## Current Lean Boundary
@@ -70,7 +70,7 @@ record and proves the helper-stage `BipartiteSSCRel`.
 
 ## Verdict
 
-`HelperStrongSelfConsistencyObligations` is a grounded internal assembly
+`HelperStrongSelfConsistencyBounds` is a grounded internal assembly
 record.  Its first four fields are exact scalar transport estimates matching
 named paper equations.  Its final field is a residual-side scalar bound that is
 assembled from already named Lean estimates rather than assumed by a
@@ -78,9 +78,9 @@ source-facing theorem.
 
 No source-labelled theorem currently exposes this record as a non-paper
 hypothesis.  No blueprint proof-level `\leanok` overclaim is associated with
-this obligation record.  The remaining work under #1596 should therefore move
-away from this record and toward the other open bundle sites: residual
-domination in `RestrictSome` and any projectivization boundary that still
-appears as a live construction hypothesis.  The former
+this bound record.  The remaining work under #1596 should therefore move away
+from this record and toward the other open bundle sites: residual domination
+in `RestrictSome` and any projectivization boundary that still appears as a
+live construction hypothesis.  The former
 `SpectralTruncationInput` consumer rewire has been completed by replacing the
 wrapper with direct `SpectralTruncationStatement` construction theorems.

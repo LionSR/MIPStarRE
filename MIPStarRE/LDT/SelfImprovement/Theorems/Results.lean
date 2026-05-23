@@ -28,7 +28,7 @@ All original declarations remain available under the same namespace.
   helper `A`-consistency
 - `AddInUStep12` — algebraic alignment and raw CS Step 1/2 bounds
 - `AddInUStep34AndTransfer` — variance conversions, factored CS, assembly, transfer
-- `HelperSSC` — final helper strong self-consistency obligation construction
+- `HelperSSC` — final helper strong self-consistency scalar-bound construction
 - `BoundednessTransport` — off-diagonal decomposition, boundedness gap transport,
   projective-residual estimates
   (`projective_boundedness_gap_le_helper_boundedness_gap`,

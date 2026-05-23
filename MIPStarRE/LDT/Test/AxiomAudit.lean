@@ -919,7 +919,7 @@ assert_no_sorry_axiom
 assert_no_sorry_axiom
   MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput.averagedPoint_le_witness
 assert_no_sorry_axiom
-  MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyObligations
+  MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyBounds
 assert_no_sorry_axiom MIPStarRE.LDT.Test.CascadeHypotheses
 assert_no_sorry_axiom
   MIPStarRE.LDT.SelfImprovement.matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
