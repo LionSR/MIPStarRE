@@ -260,11 +260,10 @@ Per-slice bridge requiring:
 This answer-valued obligation bundle has likewise been replaced.  The current
 answer-valued construction is in
 `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean`
-and uses `AnswerSelfImprovementData.SliceStrategyTransport`,
-`AnswerSelfImprovementData.ofSelfImprovementInInductionSection`, and
-`AnswerSelfImprovementData.ofSliceStrategyTransport`.
-
-Same pattern but with `diagonalZeroCoord_eq` instead of `diagonalMeasurement_eq` (since answer types differ: `DiagonalLinePolynomial` vs `DiagonalLineAnswer`).
+and uses `AnswerSelfImprovementData.ofSelfImprovementInInductionSection` together
+with `AnswerSelfImprovementData.ofAnswerCarrier`.  The carrier construction is
+the active route: it avoids assuming ordinary polynomial diagonal measurements
+that realize the answer-valued slice interface.
 
 ### 3.3 Constructors
 

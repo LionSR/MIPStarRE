@@ -38,7 +38,7 @@ averaged point-operator compatibility needed to call
 | `def:self-improvement-slice-transport` | Unlinked formalization marker | The Lean declarations existed and matched the Lean-only blueprint definition, but the node lacked `\\leanok`. |
 | `SelfImprovementData.ofSelfImprovementInInductionSection` | Conditional helper | It packages explicit slice-wise self-improvement outputs; it is not a paper theorem and is linked only under the Lean-only definition node. |
 | `SelfImprovementData.ofSliceStrategyTransport` | Conditional helper | It calls the source-facing induction-section theorem slice-by-slice after concrete slice transport data has been supplied. |
-| `AnswerSelfImprovementData.ofSliceStrategyTransport` | Conditional helper | Answer-valued analogue of the ordinary slice-transport constructor. |
+| `AnswerSelfImprovementData.ofAnswerCarrier` | Internal construction | It applies the answer-valued carrier route and avoids an ordinary-realization hypothesis for the restricted answer slices. |
 
 ## Repair
 

@@ -214,11 +214,13 @@
 	output in \texttt{AnswerSelfImprovementData}.  Their constructors call
 	\texttt{selfImprovementInInductionSection}; they no longer carry a separate
 	bundle of Section~\ref{chap:self-improvement} proof-stage data as an input.
-	The \texttt{SliceStrategyTransport} structures are narrow formal interfaces: they
-	assume concrete per-slice symmetric strategies and measurement-transport data,
-	while averaged point-operator compatibility is derived structurally from
-	point-measurement transport.  They then convert the remaining data into the
-	ordinary or answer-valued self-improvement output.
+	The ordinary \texttt{SliceStrategyTransport} structure is a narrow formal
+	interface: it assumes concrete per-slice symmetric strategies and
+	measurement-transport data, while averaged point-operator compatibility is
+	derived structurally from point-measurement transport.  The answer-valued
+	successor route instead uses the carrier construction
+	\texttt{AnswerSelfImprovementData.ofAnswerCarrier}, so it does not assume an
+	ordinary realization of the restricted answer-valued diagonal measurements.
 \end{remark}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
@@ -502,16 +504,14 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.answerLdPastingInInductionSectionOfSmallError}
 	is also proved by the answer-valued commutativity route, the degree-zero
 	branch, and the scalar absorption estimate.  None of these constructions is a
-	separate source hypothesis.  The former answer-valued self-improvement interface mismatch is
-	resolved for the induction step by the checked carrier construction.  The
-	older ordinary-realization constructors
-	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
-	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSelfImprovementInInductionSection, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
-	remain available and show that, under the stronger ordinary-realization
-	route, the Section~9 theorem can also be applied slice by slice through the
-	checked transport interface.  Such a route still requires a low-degree support theorem
-	for the answer-valued diagonal outcomes; otherwise the ordinary polynomial
-	diagonal measurement cannot satisfy the required covariance after rebasing.
+	separate source hypothesis.  The former answer-valued self-improvement
+	interface mismatch is resolved for the induction step by the checked carrier
+	construction
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofAnswerCarrier}.
+	The remaining point-operator comparison is the structural identity
+	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.averagedPoint_eq_of_pointMeasurement_eq},
+	which rewrites the averaged point operator after the restricted-slice point
+	measurement has been identified with the ambient answer-valued slice.
 	The answer-valued ambient point-consistency averaging step is now checked by
 	\lean{MIPStarRE.LDT.MainInductionStep.answer_family_pointConsistencyError_eq_avg}
 	and

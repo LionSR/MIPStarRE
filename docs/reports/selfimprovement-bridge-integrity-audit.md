@@ -155,9 +155,10 @@ selfImprovementInInductionSection    (SelfImprovementAssembly/Core.lean)
 SelfImprovementData.ofSelfImprovementInInductionSection
 SelfImprovementData.ofSliceStrategyTransport
 AnswerSelfImprovementData.ofSelfImprovementInInductionSection
-AnswerSelfImprovementData.ofSliceStrategyTransport
-  └─ call selfImprovementInInductionSection per slice and transport
-     the resulting fields through the ordinary or answer-valued slice interface
+AnswerSelfImprovementData.ofAnswerCarrier
+  └─ call the induction-section self-improvement theorem per slice and transport
+     the resulting fields through the ordinary slice interface or through the
+     answer-valued carrier construction
 ```
 
 ```
@@ -283,11 +284,11 @@ an extra hypothesis, and it is axiom-clean in `AxiomAudit.lean`.
 ### 3.3. selfImprovementInInductionSection → SelfImprovementData: Internal assembly
 
 `SelfImprovementData.ofSelfImprovementInInductionSection`,
-`SelfImprovementData.ofSliceStrategyTransport`, and their answer-valued
-counterparts call `selfImprovementInInductionSection` per slice and transport
-the fields through the restricted-slice interface.  Any remaining obstruction is
-the Section 6 construction of the appropriate slice profile, not a Section 9
-proof debt.
+`SelfImprovementData.ofSliceStrategyTransport`, and
+`AnswerSelfImprovementData.ofAnswerCarrier` call the induction-section
+self-improvement theorem per slice and transport the fields through the
+restricted-slice interface.  Any remaining obstruction is the Section 6
+construction of the appropriate slice profile, not a Section 9 proof debt.
 
 ### 3.4. SelfImprovementData → AveragedPastingData: ✅ Complete
 
