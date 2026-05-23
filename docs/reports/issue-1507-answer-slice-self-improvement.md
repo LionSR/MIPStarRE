@@ -21,8 +21,8 @@ hypotheses, with the tracked proof hole still located in the small-error
 successor branch.
 
 The active checked route is now recorded by
-`MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier`,
-`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier`,
+`MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier`,
+`mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`,
 and `mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier`.
 These declarations prove the successor conclusion once the predecessor
 answer-valued induction conclusion has been supplied.  The predecessor

@@ -47,12 +47,9 @@ auxiliary warning links:
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-left-lifted-projectivization-repair-producer: MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer
-- blueprint/src/chapter/ch10_induction.tex:def:successor-pasting-data: MIPStarRE.LDT.MainInductionStep.DegreeZeroPastingFamilyObligation
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations
+- blueprint/src/chapter/ch10_induction.tex:def:successor-pasting-data: MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError
+- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier
+- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound
 - blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-obligations: MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
 - blueprint/src/chapter/ch10_induction.tex:def:main-formal-error-cascade: MIPStarRE.LDT.Test.CascadeHypotheses
 allowed source-like unfaithful markers:

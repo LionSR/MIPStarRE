@@ -38,7 +38,7 @@ self-improvement theorem being applied is stated in
 | --- | --- | --- |
 | `thm:main-induction` | Stated with proof hole | Unchanged.  The paper-facing theorem keeps its source hypotheses and no proof-level `\leanok` is added. |
 | `def:self-improvement-slice-transport` | Proved internal construction interface | The node now links both ordinary and answer-valued slice-output extraction theorems.  These are Lean-only internal transport theorems, not paper theorem statements. |
-| `def:successor-pasting-data` | Proved internal assembly interface | The current assembly is factored through `mainInductionSuccessorNext_ofAnswerStageObligations` and `mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions`. |
+| `def:successor-pasting-data` | Proved internal assembly interface | The current assembly is factored through `mainInductionSuccessorNext_ofAnswerCarrier` and `mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`. |
 | Lean successor-dependent Step 6 targets | Proved internal target list for the corrected large-`k` route | Retired as a theorem-like graph node.  The relevant declarations remain named in prose, but no green dependency-graph vertex is used to represent the source theorem. |
 
 ## Lean declarations

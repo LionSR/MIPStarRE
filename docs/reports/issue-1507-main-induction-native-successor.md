@@ -22,16 +22,14 @@ Update on 2026-05-21: the predecessor answer-valued induction hypothesis no
 longer assumes `0 < params.d`.  The recursive slice route is therefore
 available also in the case `d = 0`; the side condition `1 ≤ k` is derived from
 the nontrivial branch `mainInductionError < 1`.  The checked theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier` shows
+`mainInductionSuccessorNext_ofSmallErrorConstruction` shows
 that the small-error successor construction now reduces to the predecessor
 induction argument.  The answer-valued slice self-improvement construction is
 checked directly, and the earlier degree-zero family-and-scalar branch is
 retired as an artifact of the former internal hypothesis, not a separate
 requirement of the paper proof.
-The checked theorem `mainInductionSuccessorNext_ofRecursiveAnswerInduction`
-adds the complementary large-error branch, so the full successor conclusion is
-now available from precisely the recursive answer-valued predecessor induction
-hypothesis.
+The checked theorem `mainInductionSuccessorNext` supplies the full ordinary
+successor conclusion in the corrected large-`k` interface.
 
 Update on 2026-05-22: the answer-valued ambient point-consistency averaging
 step is now checked.  The lemmas
@@ -228,7 +226,7 @@ data, answer-valued per-slice induction data, and answer-valued
 self-improvement data into the desired successor conclusion.  The
 answer-valued restricted-probabilities theorem supplies the restriction data
 from `strategy.IsGood eps delta gamma`.  The internal theorem
-`mainInductionSuccessorNext_ofAnswerStageObligations_ofAnswerCarrier` records
+`mainInductionSuccessorNext_ofAnswerCarrier` records
 the corresponding reduction under a predecessor answer-valued induction
 hypothesis, the predecessor large-`k` side condition, and the nonzero-`k` side
 condition.  The strong-induction proof supplies the predecessor hypothesis, and
@@ -236,7 +234,7 @@ the elementary side conditions are derived in the successor branch rather than
 postulated.
 
 The checked theorem
-`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound_ofAnswerCarrier`
+`mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`
 removes the elementary size bookkeeping from this frontier.  From the successor
 hypothesis `400(m+1)d <= k`, Lean derives the predecessor hypothesis
 `400md <= k`; from the small-error branch it derives `k >= 1`.  It then calls
@@ -244,34 +242,23 @@ the answer-valued successor assembly above.  Thus the large-`k` side condition,
 the nonzero-`k` side condition, and the predecessor induction hypothesis are
 not additional assumptions of the public successor theorem.
 
-The checked theorem
-`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit`
-also removes the large-error case from the successor route.  It performs the
-same small-error reduction when
-`mainInductionError params.next k eps delta gamma < 1`, and otherwise applies
-the trivial-measurement theorem `mainInductionOfOneLeError`.  Consequently the
-large-error case is no longer part of the remaining construction.
-The newer theorem `mainInductionSuccessorNext_ofRecursiveAnswerInduction`
-records the same all-error conclusion in the current answer-carrier route:
-after the predecessor answer-valued induction hypothesis is supplied, the
-successor statement itself follows.
+The checked theorem `mainInductionSuccessorNext` then proves the ordinary
+successor statement in the corrected large-`k` interface.  Consequently the
+large-error case and the predecessor answer-valued induction hypothesis are no
+longer separate construction obligations at the public successor boundary.
 The axiom audit also checks the linked base-case theorem, large-error theorem,
 restricted-probability estimates, predecessor-hypothesis predicates,
 answer/legacy conversion constructors, and averaged-pasting invocation as
 free of `sorryAx`.  Thus the current proof debt is not in those bookkeeping or
 reduction declarations.
 
-The checked theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`
+The checked theorem `mainInductionSuccessorNext_ofSmallErrorConstruction`
 removes the former degree-zero obstruction.  It uses the predecessor induction
 hypothesis for the restricted slices without assuming `0 < d`, and derives
 `1 <= k` from the small-error branch.  Therefore the successor route does not
-require a separate degree-zero polynomial-family construction.  The
-older helpers `mainInductionSuccessorNext_degreeZero_ofPastingFamily`,
-`mainInductionSuccessorNext_ofDegreeSplitPastingObligations`, and
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofInternalConstructions`
-remain checked composition lemmas, but they are not the proof route for the
-current large-`k` theorem.
+require a separate degree-zero polynomial-family construction.  The older
+degree-split and recursive-slice composition lemmas have been removed from the
+checked interface.
 
 The answer-valued pasting invocation for the ambient successor strategy has
 now been proved internally in the successor route.  It has not been promoted to

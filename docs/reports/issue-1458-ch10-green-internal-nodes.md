@@ -5,9 +5,9 @@ Date: 2026-05-20.
 Update on 2026-05-21: the predecessor answer-valued induction hypothesis has
 been realigned so that it no longer assumes `0 < params.d`.  Consequently the
 successor frontier no longer contains a separate degree-zero family-and-scalar
-obligation; the recursive slice route covers `d = 0`, with `1 ≤ k` supplied by
-the small-error branch.  The checked reduction is
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`.
+obligation; the answer-valued route covers `d = 0`, with `1 ≤ k` supplied by
+the small-error branch.  The checked reduction is now
+`mainInductionSuccessorNext_ofSmallErrorConstruction`.
 
 Update on 2026-05-22: the active successor route no longer requires an
 ordinary realization of the answer-valued restricted diagonal measurement.
@@ -72,14 +72,10 @@ Blueprint node:
 Linked Lean declarations include `AveragedPastingData.invokeLdPasting`,
 `assembleAveragedPastingDataOfSmallError`,
 `mainInductionFromAnswerStageDataOfSmallError`,
-`mainInductionSuccessorNext_ofAnswerStageObligations`, and
-`mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound`.  The
-same blueprint node also links the recursive-slice reduction
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`.
-The older degree-split reductions
-`mainInductionSuccessorNext_degreeZero_ofPastingFamily` and
-`mainInductionSuccessorNext_ofDegreeSplitPastingObligations` remain checked
-composition lemmas, but they are no longer the active successor frontier.
+`mainInductionSuccessorNext_ofAnswerCarrier`, and
+`mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound`.  The obsolete
+recursive-slice and degree-split reductions have been removed from the checked
+interface.
 
 Verdict: proved internal assembly interface.
 
@@ -91,15 +87,10 @@ the paper theorem.  The source-facing ordinary successor theorem
 `mainInductionSuccessorNext_ofSmallErrorConstruction` is proved from the
 internal answer-valued induction theorem.
 
-The degree-zero family route is now only a retained checked reduction.  The theorem
-`mainInductionSuccessorNext_degreeZero_ofPastingFamily` proves that, if a
-complete and point-consistent `IdxPolyFamily` in the predecessor parameters has
-already been constructed and its scalar error is bounded by the next-stage
-main-induction error, then the degree-zero successor branch follows from
-`Pasting.degreeZeroPastedPointConsistency`.  It does not construct this
-`IdxPolyFamily` from the hypotheses that the strategy is good.  The active
-recursive-slice route avoids this obligation by using the predecessor induction
-hypothesis also when `d = 0`.  Consequently the green status of
+The former degree-zero family route has been removed.  The active answer-valued
+route uses the predecessor induction hypothesis for the restricted slices also
+when `d = 0`, so the successor reduction no longer carries a separate
+degree-zero `IdxPolyFamily` obligation.  Consequently the green status of
 `def:successor-pasting-data` should be read as a checked internal interface,
 not as evidence for or against the printed source range of
 `thm:main-induction`.
