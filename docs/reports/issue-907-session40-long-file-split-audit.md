@@ -7,7 +7,8 @@ Scope: docs-only split plan for #907. No Lean files were edited.
 > **Status note, 2026-05-20.**  This report is a session-40 snapshot of file
 > sizes and active proof debt.  The old monolithic
 > `MIPStarRE/LDT/Test/MainTheorem.lean` proof hole at line 2950 has since been
-> removed from the active route.  The current direct LDT proof holes are the
+> removed from the active route.  At that later snapshot, the direct LDT proof
+> holes were the
 > source-boundary obligations
 > `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
 > `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`, together with

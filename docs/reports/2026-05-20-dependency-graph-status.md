@@ -266,9 +266,10 @@ declaration is a paper theorem; rather, they ensure that these
 blueprint-linked auxiliary names do not hide the active `sorryAx` frontier.
 The audit also checks
 `MakingMeasurementsProjective.questionwiseNaimark`, the separate Lean-only
-Naimark interface recorded below the source theorem.  After adding the
-small-error source-range target to the Chapter 10 proof discussion, a broader
-scan over all blueprint `\lean{...}` references whose names contain
+Naimark interface recorded below the source theorem.  In the 2026-05-20
+snapshot, after adding the small-error source-range target to the Chapter 10
+proof discussion, a broader scan over all blueprint `\lean{...}` references
+whose names contain
 `Bridge`, `Package`, `Residual`, `Repair`, `Producer`, `Input`,
 `Hypotheses`, `Assumptions`, `Obligation`, `Statement`, `Slackness`,
 `Dominance`, or `Witness` reports 84 such references and no missing
@@ -291,13 +292,14 @@ proposition, corollary, or claim entries:
 | `clm:g-comm-stability` | `SliceBoundednessInput.storedBoundedResidualBound`, `SliceBoundednessInput.averagedPoint_le_witness` | Fields of the paper's displayed boundedness input in `commutativity-G.tex`; faithful boundary hypotheses for this claim. |
 | `clm:g-comm-stability2` | `SliceBoundednessInput.storedBoundedResidualBound`, `SliceBoundednessInput.averagedPoint_le_witness` | Same boundedness input as above, used in the second stability claim. |
 
-Thus the current theorem-like suspicious-link frontier is classified.  In
-particular, the source theorem entries `thm:main-formal` and
-`thm:main-induction` do not link to declarations whose names contain this
-vocabulary; their proof debt is instead represented by the named obligations
+Thus the theorem-like suspicious-link frontier in this snapshot was classified.
+In particular, the source theorem entries `thm:main-formal` and
+`thm:main-induction` did not link to declarations whose names contain this
+vocabulary; the proof debt was then represented by the named obligations
 `Test.mainFormal_sourceSmallErrorConclusion` and
 `MainInductionStep.mainInduction_sourceRangeObligation` below the source
-statements.
+statements.  Later repairs retired those obligations under the corrected
+\(k\ge400md\) and \(0<k\) source-boundary statements.
 The commutativity claims
 `clm:g-comm-stability` and `clm:g-comm-stability2` still link to fields of
 `IdxPolyFamily.SliceBoundednessInput`.  This is a faithful encoding of the

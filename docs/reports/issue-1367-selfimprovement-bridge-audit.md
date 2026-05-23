@@ -54,8 +54,8 @@
 > **Status note, 2026-05-22.**  The Section 6 corrected large-\(k\) successor
 > construction has since been proved.  Later table rows that describe the
 > former answer-valued small-error successor theorem as a remaining proof
-> obligation are historical.  The current live direct proof holes are the
-> printed source-range obligation
+> obligation are historical.  At that snapshot, the remaining direct proof
+> holes were the printed source-range obligation
 > `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`
 > and the final two-space source-boundary obligation
 > `Test.mainFormal_sourceSmallErrorConclusion`.
@@ -287,17 +287,14 @@ Same pattern but with `diagonalZeroCoord_eq` instead of `diagonalMeasurement_eq`
   small-error successor case.
 - Historical `mainInductionPublicWrapper`: removed in the 2026-05-13 PR #1539 update, so this proof-stage input is no longer exposed as a theorem adjacent to the source theorem.
 
-**Status:** The conditional assembly proof is still useful proof content, but the
-corrected large-`k` Lean interface `mainInduction` now carries the successor
-proof gap directly and is linked separately from
-`thm:main-induction-current-interface`.  The printed source theorem
-`thm:main-induction` now links to
-`MainInductionStep.mainInduction_sourceStatement`; its remaining source interval
-is isolated as `MainInductionStep.mainInduction_sourceRangeObligation`.  The
-missing successor work is to derive the restricted-slice data, recursive
-witnesses, and self-improvement packages inside the successor proof, not to
-expose them as assumptions near either the corrected interface or the source
-theorem.
+**Status:** This paragraph is historical.  The conditional assembly proof was
+useful proof content while the corrected large-`k` Lean interface carried the
+successor proof gap directly.  In the current tree, `thm:main-induction` links
+to the corrected large-`k` source statement, the former source-range obligation
+has been retired under the confirmed factor-\(400\) correction, and the
+successor construction is proved without exposing restricted-slice data,
+recursive witnesses, or self-improvement packages as source-theorem
+assumptions.
 
 ---
 

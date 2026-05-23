@@ -20,6 +20,12 @@ Date: 2026-05-14.
 > the corrected large-`k` interface is now also checked.  The remaining direct
 > proof holes are source-boundary obligations: the printed `md <= k < 400md`
 > range for `thm:main-induction` and the final two-space source theorem.
+>
+> **Status note, 2026-05-23.**  The preceding proof-hole description is
+> historical.  The current source route treats the factor \(400\) and the
+> nonzero sampling condition \(0<k\) as documented statement corrections; under
+> those corrected hypotheses, both the Section 6 induction theorem and the
+> final two-space source-boundary theorem are checked.
 
 This note records the first downstream-subtree map for issue #1584, a focused
 subtask of the definition-level audit #1571 and the source-statement
