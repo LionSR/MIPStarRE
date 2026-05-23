@@ -37,8 +37,8 @@ not add global simp lemmas or positivity extensions.
 - Use `avg_congr` for nested `avgOver_congr` boilerplate. The support-restricted fallback in
   `avg_congr ... using ...` is a narrow convenience; avoid broad migrations to it when the plain
   pointwise route is already clear.
-- Import `MIPStarRE.LDT.Tactic` only in small files that need several helpers. Otherwise prefer
-  the specific tactic module import.
+- Import the specific tactic module under `MIPStarRE.LDT.Tactic.*` that supplies the helper
+  needed by the proof.
 
 A local timing pass for issue #996 did not require `maxHeartbeats` budget tuning on the
 representative tactic and preliminary files. Re-measure locally before treating a slowdown as a
