@@ -149,8 +149,9 @@ The findings are exactly the expected staleness discrepancies:
 - the corrected Lean-only current interface
   `thm:main-formal-current-interface` was present but not proof-filled on the
   public graph;
-- the public graph had not yet picked up the now-proved Naimark display:
-  `thm:naimark` and `rem:lean-naimark-auxiliary-declarations`.
+- the public graph had not yet picked up the now-proved Naimark display
+  `thm:naimark`, and it still displayed the auxiliary Naimark remark with stale
+  proof colour.
 
 For a reader using that stale graph, the classification was:
 
@@ -161,7 +162,7 @@ For a reader using that stale graph, the classification was:
 | `thm:main-formal` and `thm:main-induction` display as green | This was misleading at the stale snapshot because the graph had not yet exposed the intermediate source-boundary nodes.  In the current local source the corrected theorem statements are proof-complete, and the source-boundary nodes are present and proof-marked. |
 | proved successor nodes `prop:main-induction-successor-answer-valued-pasting`, `prop:main-induction-successor-predecessor-induction`, and `prop:main-induction-successor-small-error-construction` are absent | Stale graph omission.  Locally these nodes are present and proof-marked; the corrected large-\(k\) successor route is not the remaining obstruction. |
 | `thm:main-formal-current-interface` is not proof-filled | Stale proof colour.  The same-space corrected-range interface is proof-complete locally, but it is not the printed two-space paper theorem. |
-| `thm:naimark` and `rem:lean-naimark-auxiliary-declarations` are not displayed as completed formalized nodes | Stale proof colour.  Locally the tensor-product Naimark theorem and its auxiliary declarations are linked and checked as standard-axiom clean. |
+| `thm:naimark` is not displayed as a completed formalized node, and `rem:lean-naimark-auxiliary-declarations` still has stale proof colour | Stale proof colour.  Locally the tensor-product Naimark theorem is linked and checked as standard-axiom clean.  The auxiliary Naimark remark is now explanatory prose rather than a Lean declaration node. |
 
 ## Successor route status at this snapshot
 
