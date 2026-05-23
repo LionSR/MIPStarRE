@@ -385,7 +385,7 @@ private lemma answerDiagonalLineProduct_outcome_swap
     (fun f => f q.2.2)
     (fun f => f q.2.1) b a
 
-/-- **Lean-only:** A local tensor-placement bridge in the answer-valued
+/-- **Lean-only:** A local tensor-placement comparison in the answer-valued
 point-commutativity chain.
 
 Paper origin: `references/ldt-paper/commutativity_points.tex`; this is one of
@@ -394,7 +394,7 @@ appearing in the paper.  It is internal to the answer-valued implementation
 tracked in issue #1507 and is not a source theorem.  Discharge: proved here from
 the already formalized point-to-diagonal-line approximation and tensor-ordering
 identities. -/
-private lemma answerOrderedLiftToMixedBridge
+private lemma answerOrderedLiftToMixedLine
     (params : Parameters)
     [FieldModel params.q]
     (strategy : AnswerSymStrat params ι)
@@ -500,7 +500,7 @@ private lemma answerOrderedLiftToMixedBridge
               exact answerPointDiagonalLineMixedProductLeft_outcome params strategy q a b)
     hreindexed
 
-/-- **Lean-only:** A local tensor-placement bridge from the mixed product to
+/-- **Lean-only:** A local tensor-placement comparison from the mixed product to
 the ordered diagonal-line product.
 
 Paper origin: `references/ldt-paper/commutativity_points.tex`; this is an
@@ -508,7 +508,7 @@ internal reindexing and tensor-ordering step in the answer-valued
 point-commutativity route tracked in issue #1507.  Discharge: proved here by
 transporting the point-to-line comparison through the explicit ordered product
 identities. -/
-private lemma answerOrderedLiftToLineBridge
+private lemma answerOrderedLiftToLineProduct
     (params : Parameters)
     [FieldModel params.q]
     (strategy : AnswerSymStrat params ι)
@@ -629,14 +629,14 @@ private lemma answerOrderedLiftToLineBridge
               exact answerDiagonalLineProductOrdered_outcome params strategy q a b)
     hcab
 
-/-- **Lean-only:** A local tensor-placement bridge from the ordered
+/-- **Lean-only:** A local tensor-placement comparison from the ordered
 diagonal-line product to the reversed mixed product.
 
 Paper origin: `references/ldt-paper/commutativity_points.tex`; this is an
 internal answer-valued implementation step for the point-commutativity argument
 tracked in issue #1507.  Discharge: proved here from the reversed
 point-to-line comparison and the explicit ordered/reversed product equality. -/
-private lemma answerOrderedDropFromLineBridge
+private lemma answerOrderedDropFromLineComparison
     (params : Parameters)
     [FieldModel params.q]
     (strategy : AnswerSymStrat params ι)
@@ -776,14 +776,14 @@ private lemma answerOrderedDropFromLineBridge
     (by intro q ab; rfl)
     hrev
 
-/-- **Lean-only:** A local tensor-placement bridge from the reversed mixed
+/-- **Lean-only:** A local tensor-placement comparison from the reversed mixed
 product back to the reversed point product.
 
 Paper origin: `references/ldt-paper/commutativity_points.tex`; this is the last
 internal answer-valued transport step in the point-commutativity chain tracked
 in issue #1507.  Discharge: proved here from the line-to-point comparison and
 the explicit tensor-placement identities. -/
-private lemma answerReversedDropToPointsBridge
+private lemma answerReversedDropToPointsComparison
     (params : Parameters)
     [FieldModel params.q]
     (strategy : AnswerSymStrat params ι)
@@ -921,8 +921,8 @@ theorem answerCommutativityPoints
       (IdxSubMeas.toIdxOpFamily (answerPointDiagonalLineMixedProductLeft params strategy))
       (answerDiagonalLineProductOrdered params strategy)
       δ δ
-      (answerOrderedLiftToMixedBridge params strategy eps delta gamma hgood)
-      (answerOrderedLiftToLineBridge params strategy eps delta gamma hgood)
+      (answerOrderedLiftToMixedLine params strategy eps delta gamma hgood)
+      (answerOrderedLiftToLineProduct params strategy eps delta gamma hgood)
   have hright :
       SDDOpRel strategy.state
         (pointPairSharedDiagonalLineDistribution params)
@@ -936,8 +936,8 @@ theorem answerCommutativityPoints
       (IdxSubMeas.toIdxOpFamily (answerPointDiagonalLineMixedProductRight params strategy))
       (answerPointMeasurementProductAlongSharedLineReversed params strategy)
       δ δ
-      (answerOrderedDropFromLineBridge params strategy eps delta gamma hgood)
-      (answerReversedDropToPointsBridge params strategy eps delta gamma hgood)
+      (answerOrderedDropFromLineComparison params strategy eps delta gamma hgood)
+      (answerReversedDropToPointsComparison params strategy eps delta gamma hgood)
   have hshared :
       SDDOpRel strategy.state
         (pointPairSharedDiagonalLineDistribution params)
