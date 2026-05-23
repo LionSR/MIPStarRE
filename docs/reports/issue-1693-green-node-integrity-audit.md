@@ -87,9 +87,10 @@ paper theorems.
 - `prop:lean-classical-test-soundness-interface`: conditional Lean interface for
   the quoted Polishchuk--Spielman theorem.  The source theorem
   `thm:classical-test-soundness` is not marked `\leanok`.
-- `rem:lean-residual-domination-declarations`: internal Section 5
+- Former `rem:lean-residual-domination-declarations`: historical Section 5
   `RestrictSome` residual-domination interface.  The generic residual
-  assumption is not advertised as a source theorem.
+  assumption was never advertised as a source theorem, and the corresponding
+  Lean-only diagnostics have since been removed from the current tree.
 - `rem:lean-line169-projectivization-match-mass`: internal projectivization
   repair bookkeeping.
 - `rem:lean-left-lifted-projectivization-repair-producer`: compatibility name
