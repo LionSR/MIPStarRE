@@ -44,8 +44,6 @@ The batch isolates the following internal mathematical implications:
   concrete slice strategies and their transport equalities, apply
   `selfImprovementInInductionSection` slice-by-slice and rewrite the output
   fields into the Section 6 restricted-slice notation.
-* `AnswerSelfImprovementData.slice_outputs_ofSliceStrategyTransport`: the
-  answer-valued analogue, already used by the answer-valued successor assembly.
 * `AnswerSelfImprovementData.slice_outputs_ofAnswerCarrier`: the active
   answer-valued route, applying the axis-parallel/self-consistency form of
   self-improvement to an ordinary carrier with an inert diagonal measurement.
