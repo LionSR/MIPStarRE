@@ -44,24 +44,21 @@ Blueprint node:
 `blueprint/src/chapter/ch10_induction.tex`, now the informational remark
 `rem:self-improvement-slice-transport`.
 
-Linked Lean declarations include
-`SelfImprovementData.SliceStrategyTransport`,
-`SelfImprovementData.ofSliceStrategyTransport`,
-`SelfImprovementData.slice_outputs_ofSliceStrategyTransport`, and their
-answer-valued analogues.
+This node was historical bookkeeping for retained ordinary-realization
+transport interfaces.  Those declarations have been retired from the checked
+interface.  The active successor proof uses the answer-valued carrier
+construction and then forgets the answer-valued data through
+`SelfImprovementData.ofAnswer`.
 
-Verdict: proved internal transport interface.
+Verdict: retired internal transport interface.
 
-The ordinary and answer-valued `SliceStrategyTransport` structures assume
-concrete slice strategies together with state and measurement-transport
-equalities.  Their constructors derive the averaged point-operator
-compatibility from point-measurement transport, and the slice-output theorems
-then apply `selfImprovementInInductionSection` slice by slice.  This is a
-checked construction interface, not a source theorem.  It remains useful for
-the stronger route through an ordinary realization of the answer-valued
-restricted diagonal measurement.  It is no longer the active obstruction to
-`thm:main-induction`, because the current successor route constructs the
-answer-valued self-improvement data directly by the carrier construction.
+The retired route assumed concrete slice strategies together with state and
+measurement-transport equalities, then applied
+`selfImprovementInInductionSection` slice by slice.  It was a checked
+construction interface, not a source theorem.  The current successor route
+constructs the answer-valued self-improvement data directly by the carrier
+construction and then obtains the ordinary data by forgetting the answer-valued
+structure.
 
 ## `def:successor-pasting-data`
 

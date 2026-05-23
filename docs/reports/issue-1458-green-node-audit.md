@@ -108,10 +108,11 @@ The largest clusters are:
 1. The former `def:self-improvement-slice-transport` in Chapter 10, now the
    informational remark `rem:self-improvement-slice-transport`, with the
    `SliceRestrictionData`, `PerSliceInductionData`,
-   `AnswerSliceRestrictionData`, `AnswerPerSliceInductionData`, and
-   `SliceStrategyTransport` interfaces.  These are internal induction-stage
-   construction data.  They should remain visibly internal and should not be
-   linked as proofs of `thm:main-induction`.
+   `AnswerSliceRestrictionData`, `AnswerPerSliceInductionData`, and the
+   retained self-improvement output records.  These are internal
+   induction-stage construction data.  They should remain visibly internal and
+   should not be linked as proofs of `thm:main-induction`.  The former
+   slice-transport records have been retired from the checked route.
 
 2. `def:successor-pasting-data` in Chapter 10, with
    `SliceRestrictionData`, `PerSliceInductionData`,

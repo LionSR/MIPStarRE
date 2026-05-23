@@ -237,13 +237,12 @@ proof of `selfImprovement`.
 
 **Former file:** `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementBridge/Core.lean:242-279`
 
-This section describes a removed interface.  The current ordinary slice
-construction lives in
-`MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean`.
-It uses `SelfImprovementData.SliceStrategyTransport`,
-`SelfImprovementData.ofSelfImprovementInInductionSection`, and
-`SelfImprovementData.ofSliceStrategyTransport`; it does not contain a
-`SliceObligations` bundle.
+This section describes removed interfaces.  The later ordinary slice-transport
+construction in
+`MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean`
+has also been retired from the checked interface.  The active successor proof
+uses the answer-valued carrier route and then forgets the answer-valued data
+through `SelfImprovementData.ofAnswer`.
 
 Per-slice bridge requiring:
 - `sliceStrategy : Fq params → SymStrat params ι` — concrete symmetric strategies per slice

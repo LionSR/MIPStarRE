@@ -214,13 +214,13 @@
 	output in \texttt{AnswerSelfImprovementData}.  Their constructors call
 	\texttt{selfImprovementInInductionSection}; they no longer carry a separate
 	bundle of Section~\ref{chap:self-improvement} proof-stage data as an input.
-	The ordinary \texttt{SliceStrategyTransport} structure is a narrow formal
-	interface: it assumes concrete per-slice symmetric strategies and
-	measurement-transport data, while averaged point-operator compatibility is
-	derived structurally from point-measurement transport.  The answer-valued
-	successor route instead uses the carrier construction
-	\texttt{AnswerSelfImprovementData.ofAnswerCarrier}, so it does not assume an
-	ordinary realization of the restricted answer-valued diagonal measurements.
+	The former ordinary slice-transport interface, which assumed concrete
+	per-slice symmetric strategies and measurement-transport data, has been
+	retired from the checked route.  The answer-valued successor route uses the
+	carrier construction \texttt{AnswerSelfImprovementData.ofAnswerCarrier} and
+	then forgets the answer-valued data through \texttt{SelfImprovementData.ofAnswer},
+	so it does not assume an ordinary realization of the restricted answer-valued
+	diagonal measurements.
 \end{remark}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
@@ -459,8 +459,6 @@
 	declaration takes restricted-probability, recursive-slice, self-improvement, or
 	pasting records as hypotheses.  The nearby formalization still names the stage data
 	\lean{MIPStarRE.LDT.MainInductionStep.SliceRestrictionData, MIPStarRE.LDT.MainInductionStep.PerSliceInductionData, MIPStarRE.LDT.MainInductionStep.SelfImprovementData, MIPStarRE.LDT.MainInductionStep.AveragedPastingData}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSliceStrategyTransport}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq}
 	that mirror the four paper stages $\text{restrict} \to \text{induct} \to
 	\text{self-improve} \to \text{paste}$, but no theorem with these data as
 	additional source-level hypotheses is advertised as

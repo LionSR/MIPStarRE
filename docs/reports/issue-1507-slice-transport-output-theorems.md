@@ -32,7 +32,7 @@ self-improvement theorem being applied is stated in
 | Node | Classification | Resolution in this batch |
 | --- | --- | --- |
 | `thm:main-induction` | Corrected source theorem | Later repaired.  The blueprint statement now records the confirmed \(k\ge400md\) correction and is proof-complete. |
-| `def:self-improvement-slice-transport` | Proved internal construction interface | The node now links both ordinary and answer-valued slice-output extraction theorems.  These are Lean-only internal transport theorems, not paper theorem statements. |
+| `def:self-improvement-slice-transport` | Historical internal construction interface | The former ordinary and answer-valued transport theorems have been removed from the checked route.  The active route uses `AnswerSelfImprovementData.ofAnswerCarrier` and then forgets to ordinary self-improvement data. |
 | `def:successor-pasting-data` | Proved internal assembly interface | The current assembly is factored through `mainInductionSuccessorNext_ofAnswerCarrier`, its successor-bound form, and the recursive answer-valued induction theorem.  The older slice-transport and degree-split internal-construction routes have been removed. |
 | Lean successor-dependent Step 6 targets | Proved internal target list for the corrected large-`k` route | Retired as a theorem-like graph node.  The relevant declarations remain named in prose, but no green dependency-graph vertex is used to represent the source theorem. |
 
@@ -40,10 +40,6 @@ self-improvement theorem being applied is stated in
 
 The batch isolates the following internal mathematical implications:
 
-* `SelfImprovementData.slice_outputs_ofSliceStrategyTransport`: from ordinary
-  concrete slice strategies and their transport equalities, apply
-  `selfImprovementInInductionSection` slice-by-slice and rewrite the output
-  fields into the Section 6 restricted-slice notation.
 * `AnswerSelfImprovementData.slice_outputs_ofAnswerCarrier`: the active
   answer-valued route, applying the axis-parallel/self-consistency form of
   self-improvement to an ordinary carrier with an inert diagonal measurement.
