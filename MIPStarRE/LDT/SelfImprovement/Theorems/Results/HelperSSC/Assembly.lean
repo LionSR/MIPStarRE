@@ -65,7 +65,7 @@ theorem helper_residualLowerBound_of_offDiagonal_bound
 After `eq:release-the-kraken`, `eq:threw-in-h-prime`, `eq:delete-an-A`, and
 `eq:move-over-v`, the paper bounds the expanded residual by
 `7√ζ_variance + √(2δ) + md/q`.  Since
-`addInUError = 4√ζ_variance`, this is exactly the pre-absorption bound
+`addInUError = 4√ζ_variance`, this is exactly the record-side bound
 `11√ζ_variance + √(2δ) + md/q - addInUError`. -/
 theorem helper_residualLowerBound_of_paper_chain_bound
     (params : Parameters) [FieldModel params.q]
@@ -516,10 +516,10 @@ theorem helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
   rw [helper_mass_sub_release_eq_polynomial_off_diagonal] at hresidual
   simpa [release, ζsqrt, sqrtTwoDelta, mdq, helperOffDiagonalBareQuantity] using hresidual
 
-/-- Construct the helper-stage scalar bounds from local variance and a named
+/-- Construct the helper-stage bounds from local variance and a named
 off-diagonal residual estimate.
 
-This produces the same named scalar bounds as
+This produces the same named bounds as
 `helper_strong_self_consistency_bounds_of_selfConsistency_localVariance`,
 but its final input is the concrete off-diagonal polynomial-pair bound obtained
 after expanding the released residual. -/
@@ -549,13 +549,13 @@ lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_off
     (helper_residualLowerBound_of_offDiagonal_bound
       params strategy eps delta hhelper hoffdiag)
 
-/-- Construct the helper-stage scalar bounds from the paper's final residual
+/-- Construct the helper-stage bounds from the paper's final residual
 chain estimate.
 
 This variant lets downstream work target the paper's natural bound
 `7√ζ_variance + √(2δ) + md/q` on the expanded off-diagonal residual.  The
-conversion to the pre-absorption bound
-`11√ζ_variance + √(2δ) + md/q - addInUError` is performed internally. -/
+conversion to the record's `11√ζ_variance + √(2δ) + md/q - addInUError`
+form is performed internally. -/
 lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_paperChain
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -581,7 +581,7 @@ lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_pap
     (helper_residualLowerBound_of_paper_chain_bound
       params strategy eps delta hhelper hoffdiag)
 
-/-- Construct the helper-stage scalar bounds directly from the scalar
+/-- Construct the helper-stage bounds directly from the scalar
 transport estimates appearing in the paper.
 
 Compared with
@@ -631,7 +631,7 @@ lemma helper_strong_self_consistency_bounds_of_selfConsistency_localVariance_sca
       (helperOffDiagonalBareQuantity_le_paper_chain_of_scalar_transports
         params strategy eps delta hhelper hleft hright hclone hmove hmoveLower)
 
-/-- Construct the helper-stage scalar bounds from the paper's scalar transports and
+/-- Construct the helper-stage bounds from the paper's scalar transports and
 the point-consistency add-in-`u` transfer.
 
 This is the same residual-chain constructor as
@@ -715,8 +715,8 @@ arithmetic absorption
 `helper_strong_self_consistency_error_le_selfImprovementHelperError`.
 
 This is the complete route from the actual helper construction and the named
-scalar bounds to helper-stage strong self-consistency. The remaining analytic
-work is therefore stated as named scalar estimates, rather than left as an
+scalar bounds to helper-stage strong self-consistency. The analytic work is
+therefore stated as named bounds, rather than left as an
 unstructured `BipartiteSSCRel` assumption. -/
 theorem helper_strong_self_consistency_of_helper_conclusion
     (params : Parameters) [FieldModel params.q]

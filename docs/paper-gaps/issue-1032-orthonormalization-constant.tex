@@ -142,14 +142,14 @@ proof.  The weaker completion-route theorem remains available under the
 separate name
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute}\).
 
-This does not close every Section~5 proof obligation.  The heterogeneous
+The heterogeneous
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma}\)
-still remains as a tracked \texttt{sorry}; it should either be proved directly
-from the paper argument or kept unmarked as an unfinished auxiliary lemma.  The
-public theorem
+is now also checked with only the standard Lean axioms.  Thus the former
+Section~5 proof-frontier language in this note is historical.  The public
+theorem
 \(\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization}\)
-does not depend on that unfinished lemma, and its scalar constant is now the
-paper constant.
+has the paper constant, and the weaker completion-route theorem remains only as
+a separate auxiliary construction.
 
 \bibliographystyle{alpha}
 \bibliography{references}

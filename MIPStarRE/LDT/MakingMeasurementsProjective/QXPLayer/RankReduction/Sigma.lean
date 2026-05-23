@@ -193,10 +193,9 @@ QXP rank-reduction layer: a chosen family `R_a` equipped with
 `RoundingToProjectorsWitness ψ A ζ R`. The abbrev gives that statement a stable
 Lean name for the blueprint and for later API cleanup, while downstream local
 lemmas usually carry a chosen witness `(q, hrounded)` directly once the rounded
-family has been fixed. The old `ProjectiveNonMeasurementBridgePackage`
-placeholder has been deleted; producing such a witness from
-`eq:A-looks-projective` remains an upstream spectral-truncation obligation
-rather than a downstream QXP bridge. -/
+family has been fixed. The old QXP placeholder has been deleted; producing such a witness from
+`eq:A-looks-projective` is handled by the upstream spectral-truncation theorem
+rather than by a downstream QXP interface. -/
 abbrev projectiveNonMeasurement {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

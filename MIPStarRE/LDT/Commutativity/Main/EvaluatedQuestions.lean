@@ -50,8 +50,8 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
   `eq:evaluate-gcom-at-points` to `eq:evaluate-gcom-at-points-part-dos`
   and the final displayed error estimate.
 
-  The remaining work is the paper-faithful transport from the full polynomial
-  products down to the evaluated products on the sampled points.
+  The paper-faithful transport below passes from the full polynomial products
+  down to the evaluated products on the sampled points.
 
   The paper first reduces to the small-parameter regime
   `γ ≤ 1`, `ζ ≤ 1`, and `d / q ≤ 1`; otherwise `comMainError` is already large

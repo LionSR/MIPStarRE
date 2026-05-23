@@ -16,20 +16,20 @@ module contains:
   conclusions of `thm:main-formal` from a constructed Section 6
   projective-completion witness.
 
-* `mainFormal_sourceObligation` and `mainFormal_sourceStatement` — record the
-  corrected two-space source theorem, including the nonzero sampling condition,
-  and prove its saturated-error branch.
+* `mainFormal_sourceConclusion` and `mainFormal_sourceStatement` — record and
+  prove the corrected two-space source theorem, including the nonzero sampling
+  condition.
 
 * `mainFormal_sourceConclusion_ofSameSpaceLargeK` — proves the source-shaped
   conclusion in the same-space corrected-range subcase by calling the current
   `mainFormal` interface.
 
-* `mainFormal` — the current same-space formal interface toward the final
+* `mainFormal` — the checked same-space formal interface toward the final
   theorem, taking a same-space projective strategy that passes the LID test with
   probability `≥ 1 − ε`, together with the explicit boundary conditions `0 < k`
   and `400md ≤ k`, and producing the three pointwise consistency targets at
-  error bound `mainFormalError`.  The remaining same-space interface restriction
-  is documented in
+  error bound `mainFormalError`.  The same-space restriction of this current
+  interface is documented in
   `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`; the
   large-`k` and `k > 0` scalar-cascade boundary is documented in
   `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  Its proof follows the
@@ -62,9 +62,8 @@ namespace Test
 The base branch of `mainFormal` needs a concrete Section 6 role witness and one
 post-role projective-completion witness.  Earlier scaffolding expressed this
 through separate bridge and obligation packages.  The current interface below
-does not keep such packages as hypotheses: the source theorem remains separate in
-the blueprint, and the missing source-boundary work is represented by named
-obligations. -/
+does not keep such packages as hypotheses: the corrected source theorem is
+proved by a separate two-space source route in the blueprint. -/
 
 /--
 Trivial saturated-error branch for the printed two-space theorem
@@ -250,15 +249,15 @@ theorem mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
       simpa [σsrc, ζ₁src, ζ₂src, ηsrc, ζ₃src] using hsourceSelf) hQQ
 
 /--
-Small-error internal proof obligation for the corrected two-space theorem
+Small-error branch for the corrected two-space theorem
 `thm:main-formal`.
 
 Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
 
 This theorem records the small-error branch of the corrected source theorem.
 It is not an additional hypothesis of `thm:main-formal`; the source-boundary
-reduction below calls this obligation only after the saturated-error branch has
-been discharged by `mainFormal_source_trivial_witness`.
+reduction below calls it only after the saturated-error branch has been
+discharged by `mainFormal_source_trivial_witness`.
 
 The heterogeneous role-register symmetrization, factor-two
 unsymmetrization, point-agreement branch, heterogeneous triangle step,
@@ -268,7 +267,7 @@ transport, final point-evaluation triangle, and scalar absorption into
 scalar-cascade boundary `0 < k` is supplied.  This nonzero boundary is the
 correction recorded in
 `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`. -/
-theorem mainFormal_sourceSmallErrorObligation
+theorem mainFormal_sourceSmallErrorConclusion
     (params : Parameters)
     [FieldModel params.q]
     {ιA ιB : Type*}
@@ -300,18 +299,18 @@ theorem mainFormal_sourceSmallErrorObligation
       params strategy eps hpass k hk hk0 hsmall
 
 /--
-Internal proof-obligation reduction for the corrected two-space theorem
+Source-boundary reduction for the corrected two-space theorem
 `thm:main-formal`.
 
 Paper origin: `references/ldt-paper/test_definition.tex:180-202`.
 
-This theorem removes the saturated-error branch from the source-boundary
-frontier.  If `mainFormalError params k eps ≥ 1`, the conclusion follows from
+This theorem closes the saturated-error branch of the source-boundary
+argument.  If `mainFormalError params k eps ≥ 1`, the conclusion follows from
 `mainFormal_source_trivial_witness`; otherwise the proof is exactly the named
-small-error obligation `mainFormal_sourceSmallErrorObligation`.  This reduction
+small-error branch `mainFormal_sourceSmallErrorConclusion`.  This reduction
 is not an additional hypothesis of `thm:main-formal`.
 -/
-theorem mainFormal_sourceObligation
+theorem mainFormal_sourceConclusion
     (params : Parameters)
     [FieldModel params.q]
     {ιA ιB : Type*}
@@ -339,7 +338,7 @@ theorem mainFormal_sourceObligation
             (mainFormalError params k eps) := by
   by_cases hlarge : 1 ≤ mainFormalError params k eps
   · exact mainFormal_source_trivial_witness params strategy eps k hlarge
-  · exact mainFormal_sourceSmallErrorObligation params strategy eps hpass k hk hk0 hlarge
+  · exact mainFormal_sourceSmallErrorConclusion params strategy eps hpass k hk hk0 hlarge
 
 /--
 Corrected source statement of `thm:main-formal`.
@@ -379,7 +378,7 @@ theorem mainFormal_sourceStatement
             (constSubMeasFamily G_A.toSubMeas)
             (constSubMeasFamily G_B.toSubMeas)
             (mainFormalError params k eps) := by
-  exact mainFormal_sourceObligation params strategy eps hpass k hk hk0
+  exact mainFormal_sourceConclusion params strategy eps hpass k hk hk0
 
 
 /-- The role-register witness used by the `m = 1` branch of
@@ -441,8 +440,8 @@ large-`k` and `k > 0` scalar-cascade boundary is documented in
 `docs/paper-gaps/issue-906-main-formal-k-bound.tex`.
 
 The statement does not assume repaired auxiliary data, role-register witness
-data, or final projective-completion hypotheses. Those remain open steps to be
-derived from the pass condition and the preceding sections.
+data, or final projective-completion hypotheses.  In the checked proof these
+objects are constructed from the pass condition and the preceding sections.
 
 The hypothesis `hk : 400 * params.m * params.d ≤ k`, together with `hk0`,
 records the strengthened boundary from issue #906 and

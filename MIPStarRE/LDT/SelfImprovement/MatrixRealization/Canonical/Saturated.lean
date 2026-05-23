@@ -328,7 +328,7 @@ theorem matrixSdpPrimalTotalEqOne_extracted_of_canonicalSlackBlock_eq_zero
   rw [matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement]
   exact hSlack
 
-/-- Package a paper-form optimal witness from canonical complementary
+/-- Assemble a paper-form optimal witness from canonical complementary
 slackness and an explicitly saturated slack block.
 
 The hypotheses are precisely the canonical SDP data needed after the
@@ -359,7 +359,7 @@ theorem matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness
   complementarySlackness :=
     matrixSdpComplementarySlacknessDefect_of_canonical params model T Z hcanonical
 
-/-- Package a paper-form optimal witness from an arbitrary feasible canonical
+/-- Assemble a paper-form optimal witness from an arbitrary feasible canonical
 matrix with zero slack block.
 
 The extracted polynomial diagonal blocks form the paper primal measurement.
@@ -402,7 +402,7 @@ theorem matrixSdpOptimalWitness_of_canonicalFeasibleSaturatedComplementarySlackn
   · rw [matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement]
     exact hSlack
 
-/-- Package the canonical block-SDP conclusions as the matrix-level statement
+/-- Assemble the canonical block-SDP conclusions as the matrix-level statement
 with an explicitly saturated slack block.
 
 This is the statement form of
@@ -431,7 +431,7 @@ theorem matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackn
       matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness
         params model T Z hdual hstrong hcanonical hSlack⟩
 
-/-- Package the canonical block-SDP conclusions as the matrix-level statement
+/-- Assemble the canonical block-SDP conclusions as the matrix-level statement
 with zero slack block.
 
 For a feasible canonical primal matrix `X`, the hypothesis

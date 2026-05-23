@@ -16,23 +16,42 @@
 
 \section{At a glance}
 
+This note is now historical.  As of 2026-05-23, the interface restriction
+recorded below has been removed from the corrected source theorem.  The Lean declaration
+\leanid{MIPStarRE.LDT.Test.mainFormal\_sourceStatement} is stated for a
+general two-space projective strategy \leanid{MIPStarRE.LDT.ProjStrat} on
+\(\mathcal H_{\mathrm A}\otimes\mathcal H_{\mathrm B}\).  The heterogeneous
+role-register construction and the subsequent unsymmetrization,
+orthonormalization, completion, line-169 transport, final point-evaluation
+triangle, and scalar absorption are checked under the corrected assumptions
+\(k\ge 400md\) and \(0<k\).  The old same-space restriction is no longer a
+current obstruction.
+
+The same-space theorem \leanid{MIPStarRE.LDT.Test.mainFormal} remains as a
+useful Lean interface, but it is no longer the source theorem.  The remaining
+differences from the literal printed statement are the documented large-\(k\)
+correction and the nonzero sampling boundary, not the old same-space
+role-register restriction.
+
 \begin{itemize}
-  \item \textbf{Difficulty: medium.}  The remaining discrepancy is an interface
-  restriction: the formal theorem uses a same-space, swap-compatible strategy
-  object, while the paper starts from an arbitrary two-space projective
+  \item \textbf{Difficulty: resolved.}  The former discrepancy was an interface
+  restriction: the earlier checked theorem used a same-space, swap-compatible
+  strategy object, while the paper starts from an arbitrary two-space projective
   strategy and then symmetrizes it.
-  \item \textbf{Estimated weight:} about \textbf{5--10 theorem interfaces} and
-  \textbf{300--800 lines}, depending on whether the existing same-space
-  symmetrization bridge is generalized directly or wrapped by a two-space
-  reduction theorem.
-  \item \textbf{Mathlib/project split:} approximately \textbf{20\% Mathlib} and
-  \textbf{80\% project-local}.  Mathlib supplies finite type and matrix
-  bookkeeping; the role-register symmetrization is project-specific.
+  \item \textbf{Estimated weight: completed source-boundary repair.}  The
+  checked route now includes the heterogeneous role-register construction,
+  unsymmetrization, two-sided orthonormalization and completion, line-169
+  transport, point-evaluation triangle, and scalar absorption.
+  \item \textbf{Mathlib/project split:} mostly project-local.  Mathlib supplies
+  finite type, matrix-order, and tensor-placement infrastructure; the
+  role-register and source-boundary constructions are project-specific.
   \item \textbf{Key Mathlib inputs:} finite direct sums or tagged products,
-  matrix block embeddings, and tensor-placement identities.  The project-local
-  inputs are \leanid{MIPStarRE.LDT.ProjStrat},
-  \leanid{MIPStarRE.LDT.SameSpaceProjStrat}, and the Step~1
-  symmetrization bridge.  Tracked in \ghissue{930}.
+  matrix block embeddings, tensor-placement identities, state-dependent
+  distance estimates, and order monotonicity for expectations.  The
+  project-local inputs are \leanid{MIPStarRE.LDT.ProjStrat},
+  \leanid{MIPStarRE.LDT.SameSpaceProjStrat}, the heterogeneous role-register
+  construction, and the Section~5 projectivization route.  Tracked in
+  \ghissue{930}.
 \end{itemize}
 
 \section{Key theorem forms}
@@ -46,9 +65,9 @@ The comparison separates the source theorem from the current formal interface.
   is already symmetric.  The Lean declaration
   \leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement} records this source
   statement and factors the remaining source-boundary work through the named
-  wrapper \leanid{MIPStarRE.LDT.Test.mainFormal_sourceObligation}.  This wrapper
+  wrapper \leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion}.  This wrapper
   proves the saturated-error branch and leaves the non-vacuous branch as
-  \leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation}.
+  \leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion}.
   \item \textbf{Current formal-interface form.}  The Lean theorem
   \leanid{MIPStarRE.LDT.Test.mainFormal} is stated for the same-space strategy
   interface \leanid{MIPStarRE.LDT.SameSpaceProjStrat}.  The source-labelled
@@ -93,22 +112,18 @@ main induction theorem can be applied.
 
 \section{The formal interface}
 
-The present formal development now contains a paper-faithful two-space container
-for general projective strategies, but the public main-formal interface has not
-yet been generalized to it. The current theorem is stated for the same-space
-special case in which both provers use a common local carrier and the starting
-bipartite state is equipped with swap-invariance data. The role-register
-symmetrization bridge used by the theorem has the same restricted input shape:
-it builds the symmetrized strategy only from this same-space, already
-swap-compatible strategy object.\footnote{The two-space strategy container is
-\leanid{MIPStarRE.LDT.ProjStrat}; the same-space special case is
-\leanid{MIPStarRE.LDT.SameSpaceProjStrat}. Pull request \ghpr{958} closed
-\ghissue{560} by making \leanid{ProjStrat} two-space, but
-\leanid{MIPStarRE.LDT.Test.mainFormal} in
-\doclink{MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean} and the Step~1 bridge
-\leanid{MIPStarRE.LDT.SameSpaceProjStrat.strategySymmetrization} in
-\doclink{MIPStarRE/LDT/Test/SymmetrizationBridge.lean} still take
-\leanid{SameSpaceProjStrat}.}
+The present formal development contains a paper-faithful two-space container
+for general projective strategies, \leanid{MIPStarRE.LDT.ProjStrat}, and the
+corrected source theorem
+\leanid{MIPStarRE.LDT.Test.mainFormal\_sourceStatement} is stated for that
+container.  The same-space theorem \leanid{MIPStarRE.LDT.Test.mainFormal}
+remains as a separate auxiliary interface for the symmetric carrier, but it is
+not the theorem advertised as the source statement.\footnote{The two-space
+strategy container is \leanid{MIPStarRE.LDT.ProjStrat}; the same-space special
+case is \leanid{MIPStarRE.LDT.SameSpaceProjStrat}.  Pull request \ghpr{958}
+closed \ghissue{560} by making \leanid{ProjStrat} two-space.  The later
+source-boundary repair generalized the final theorem route through the
+heterogeneous role-register construction.}
 
 The blueprint records the same interface boundary. It describes the paper's
 general projective strategy in the source theorem
@@ -122,27 +137,21 @@ explicit.\footnote{See
 and the formal soundness target section for the source theorem and the separate
 current-interface entry.}
 
-Thus the formal theorem is not presently a theorem about every projective
-strategy in the sense of the paper. A general strategy on
-$\mathcal H_{\mathrm A}\otimes\mathcal H_{\mathrm B}$ with different local
-spaces, or with a nonsymmetric starting state, is an input to the paper theorem
-but not an input to the current public formal statement. To reach the paper
-statement, the role-register construction must be carried out directly for the
-two-space strategy container, producing a symmetric strategy on the appropriate
-direct-sum role space without first assuming a common local carrier or
-swap-invariance of the original state.  The former positive-degree restriction
-is no longer present in the public Lean statement.
+Thus the former same-space interface restriction is no longer a current
+obstruction to the corrected source theorem.  A general strategy on
+\(\mathcal H_{\mathrm A}\otimes\mathcal H_{\mathrm B}\) with different local
+spaces, or with a nonsymmetric starting state, is now an input to
+\leanid{MIPStarRE.LDT.Test.mainFormal\_sourceStatement}.  The former
+positive-degree restriction is also no longer present in the public Lean
+statement.
 
 \section{Conclusion}
 
-The discrepancy is a formal-interface restriction, not a flaw in the paper's
-strategy-reduction argument. The paper theorem starts from an arbitrary general
-projective strategy and then symmetrizes it. The current formal statement starts
-from a narrower same-space, swap-compatible strategy object. This restriction
-should remain visible until the Step~1 symmetrization bridge and the
-main-formal theorem are generalized to the paper-faithful two-space strategy
-interface, or until a wrapper proves that the paper's general strategy reduces
-to the formal statement.
+The discrepancy recorded in this note has been resolved.  The corrected source
+theorem starts from the paper's general two-space projective strategy, and the
+heterogeneous role-register reduction is checked.  This note remains in the
+paper-gap directory as a historical record of the former same-space
+restriction.
 
 \bibliographystyle{alpha}
 \bibliography{references}

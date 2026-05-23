@@ -6,9 +6,16 @@ three scalar proof inputs from the averaged pasting constructor used in the
 small-error branch of the main induction step.
 
 Update, 2026-05-22: the corrected large-\(k\) successor branch has since been
-proved.  The current unfinished source-facing work is not the small-error
-successor construction, but the printed source range \(md \le k < 400md\) for
-`thm:main-induction` and the final two-space source-boundary theorem.
+proved.  The unfinished source-facing work at that date was no longer the
+small-error successor construction, but the printed source range
+\(md \le k < 400md\) for `thm:main-induction` and the final two-space
+source-boundary theorem.
+
+Update, 2026-05-23: after adopting the confirmed correction
+`k >= 400md` and the explicit nonzero-sampling boundary `0 < k`, those later
+source-boundary wrappers have been retired.  This report is now a historical
+record of the scalar side-condition removal in the small-error successor
+assembly, not a current proof-frontier report.
 
 ## Source Comparison
 
@@ -26,7 +33,7 @@ small-error hypothesis, not additional hypotheses of the successor step.
 | --- | --- | --- | --- |
 | `def:successor-pasting-data` | Green statement node | Boundary-condition discharge | Added `assembleAveragedPastingDataOfSmallError`, which derives \(\gamma\le 1\), \(\zeta\le 1\), and \(d\le q\) from `mainInductionError params.next k eps delta gamma < 1`. |
 | `def:successor-pasting-data` | Green statement node | Answer-valued successor assembly | Added `mainInductionFromAnswerStageDataOfSmallError`, which converts the answer-valued restriction, induction, and self-improvement data to the legacy pasting interface, builds the small-error averaged pasting data, and calls `mainInductionFromStageData`. |
-| `thm:main-induction` | Source theorem with tracked source-range proof hole | Stated with proof hole | The scalar side-condition inputs were removed in this batch.  Later work proved the corrected large-\(k\) small-error successor branch; the remaining proof hole is now the printed interval \(md \le k < 400md\), not the successor assembly. |
+| `thm:main-induction` | Corrected source theorem | Checked under the corrected source hypotheses | The scalar side-condition inputs were removed in this batch.  Later work proved the corrected large-\(k\) small-error successor branch and then treated the factor \(400\) as a confirmed statement correction; no live source-range obligation remains under the corrected statement. |
 
 ## Statement Integrity Audit
 

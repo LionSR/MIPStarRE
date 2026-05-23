@@ -71,12 +71,12 @@ ALLOWED_SOURCE_WARNINGS = {
         "averagedPoint_le_witness",
     ),
     (
-        "prop:main-formal-source-obligation",
-        "MIPStarRE.LDT.Test.mainFormal_sourceObligation",
+        "prop:main-formal-source-reduction",
+        "MIPStarRE.LDT.Test.mainFormal_sourceConclusion",
     ),
     (
-        "prop:main-formal-source-small-error-obligation",
-        "MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation",
+        "prop:main-formal-source-small-error",
+        "MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion",
     ),
 }
 

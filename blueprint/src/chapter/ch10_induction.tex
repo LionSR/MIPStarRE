@@ -208,15 +208,7 @@
 	\texttt{Pasting.ldPasting}.
 \end{remark}
 
-\begin{definition}[Self-improvement slice transport for the successor step]\label{def:self-improvement-slice-transport}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSelfImprovementInInductionSection}
-	\lean{MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.ofSliceStrategyTransport}
-	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSelfImprovementInInductionSection, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
-	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
-	\lean{MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofPointMeasurementEq, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.SelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
-	\leanok
-	\uses{thm:self-improvement-in-induction-section}
+\begin{remark}[Lean self-improvement slice transport for the successor step]\label{rem:self-improvement-slice-transport}
 	The successor step records the slice-wise self-improvement output in
 	\texttt{SelfImprovementData}, and the answer-valued route records the analogous
 	output in \texttt{AnswerSelfImprovementData}.  Their constructors call
@@ -227,7 +219,7 @@
 	while averaged point-operator compatibility is derived structurally from
 	point-measurement transport.  They then convert the remaining data into the
 	ordinary or answer-valued self-improvement output.
-\end{definition}
+\end{remark}
 
 \begin{definition}[Pasting data for the successor step]\label{def:successor-pasting-data}
 	\lean{MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingData, MIPStarRE.LDT.MainInductionStep.assembleAveragedPastingDataOfSmallError}
@@ -443,14 +435,14 @@
 	the scalar absorption estimate.
 \end{proof}
 
-\paragraph{Proof frontier for the corrected induction interface.}
+\paragraph{Checked status of the corrected induction interface.}
 	In Lean, the base case is formalized through
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionBaseCase}.
 	The answer-valued analogue needed by the simultaneous recursive route uses
 	the same one-dimensional axis-parallel-line construction and does not involve
 	the diagonal answer interface.
-	The printed source range \(md\le k<400md\) is no longer represented as a
-	frontier obligation: the missing implication to the pasting size hypothesis is
+	The printed source range \(md\le k<400md\) is excluded from the corrected
+	theorem statement: the missing implication to the pasting size hypothesis is
 	a confirmed statement gap, and Theorem~\ref{thm:main-induction} is stated
 	with the corrected large-\(k\) hypothesis.  The successor step of
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInduction} is isolated in its
@@ -496,11 +488,12 @@
 	successor-bound form also derives the predecessor
 	large-\(k\) and \(k\ge1\) side conditions from the successor large-\(k\)
 	hypothesis together with the small-error assumption, so these elementary
-	arithmetic conditions are no longer additional hypotheses in the successor
-	proof.  The answer-carrier route shows that the separate degree-zero family
-	route is not needed for the successor reduction: the predecessor induction
-	hypothesis is used for the restricted slices also when \(d=0\), while
-	\(k\ge1\) comes from the nontrivial error branch.  The obsolete
+	arithmetic conditions are no
+	longer additional hypotheses in the successor proof.  The answer-carrier
+	route shows that the separate degree-zero
+	family route is not needed for the successor reduction: the predecessor
+	induction hypothesis is used for the restricted slices also when \(d=0\),
+	while \(k\ge1\) comes from the nontrivial error branch.  The obsolete
 	slice-transport and degree-split family routes have therefore been removed
 	from the checked interface.  Thus the ordinary small-error construction theorem
 	\lean{MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction}
@@ -515,9 +508,8 @@
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.SliceStrategyTransport.ofMeasurementEq}
 	\lean{MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSelfImprovementInInductionSection, MIPStarRE.LDT.MainInductionStep.AnswerSelfImprovementData.ofSliceStrategyTransport}
 	remain available and show that, under the stronger ordinary-realization
-	route, the Section~9 theorem can also be applied slice by slice without
-	importing the remaining \texttt{sorryAx}.  Such a route still requires a
-	low-degree support theorem
+	route, the Section~9 theorem can also be applied slice by slice through the
+	checked transport interface.  Such a route still requires a low-degree support theorem
 	for the answer-valued diagonal outcomes; otherwise the ordinary polynomial
 	diagonal measurement cannot satisfy the required covariance after rebasing.
 	The answer-valued ambient point-consistency averaging step is now checked by
@@ -810,25 +802,25 @@
 	\texttt{strategySymmetrization\_mainInduction} records this
 	application, and \texttt{MainFormalRoleInductionWitness.ofMainInduction}
 	builds the role-register witness from it.  These successor-dependent targets
-	are proof-complete for the current same-space corrected-range interface.  They
-	are not an added hypothesis of Theorem~\ref{thm:main-formal}; the remaining
-	source-boundary work lies in the two-space role-register reduction and the
-	printed \(k\ge md\) range, not in the corrected large-\(k\) successor
-	construction.
+	are proof-complete for the corrected large-\(k\) interface.  They are not an
+	added hypothesis of Theorem~\ref{thm:main-formal}; the two-space
+	role-register reduction is now checked separately, and the printed
+	\(k\ge md\) range has been replaced by the documented \(k\ge400md\)
+	statement correction.
 
 
-\begin{remark}[Projective-completion construction]\label{rem:main-formal-successor-completion-obligation}
+\begin{remark}[Projective-completion construction]\label{rem:main-formal-successor-completion-construction}
 	The projective-completion witness consumed by
 	\texttt{mainFormal\_ofProjectiveCompletionTransportWitness} is now constructed
 	in the proof of the current same-space corrected-range interface.  This
 	construction is not a separate assumption in the statement of
-	Theorem~\ref{thm:main-formal}.  The source theorem is still not proof-complete,
-	because it starts from a general two-space strategy and the printed range
-	\(k\ge md\), while the checked interface assumes same-space strategies and
-	\(k\ge400md\) together with the scalar-cascade boundary \(k>0\).
+	Theorem~\ref{thm:main-formal}.  The corrected source theorem is now
+	proof-complete: the general two-space role-register passage has been
+	assembled, and the theorem statement records the documented \(k\ge400md\)
+	and \(k>0\) boundary corrections.
 \end{remark}
 
-\begin{remark}[Lean measurement-unsymmetrization consistency]\label{rem:main-formal-unsymmetrization-bridge}
+\begin{remark}[Lean measurement-unsymmetrization consistency]\label{rem:main-formal-unsymmetrization-consistency}
 	Lean now isolates the Step~3 extraction from \texttt{inductive\_step.tex}
 	lines 84--108.  In the same-space route, the principal-block map
 	\texttt{extractRoleBlock} turns a role-register POVM \(G\) into the two POVMs
@@ -997,7 +989,7 @@ role-register Section~6 measurement behind a concrete role-witness record.
 That record can now be obtained directly from the
 \texttt{mainInduction} theorem by
 \texttt{MainFormalRoleInductionWitness.ofMainInduction}; the successor
-case is therefore a tracked \texttt{sorry} in Section~6, not a separate
+case is handled by the checked Section~6 theorem, so it is not a separate
 boundary hypothesis in Section~3.  Lean also records that every non-base
 parameter choice has a predecessor via
 \texttt{Parameters.successorDecompositionOfNeOne}, and it retains the explicit

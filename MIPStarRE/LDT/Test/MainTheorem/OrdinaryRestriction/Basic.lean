@@ -22,9 +22,8 @@ uses `xRestrictedStrategy` (ordinary diagonal restriction) as the per-slice
 recursive strategy.  This route is kept only at the level of the source
 mathematics that remains useful: weighted restricted-probability targets and
 recursive-slice targets.  The former conditional boundary record, which bundled
-unproved self-improvement input into a Section 3 interface, has been removed; the
-missing successor proof is represented by the `mainInduction`
-proof obligation instead.
+unproved self-improvement input into a Section 3 interface, has been removed.
+The active proof uses the corrected Section 6 theorem instead.
 
 **Note:** `xRestrictedStrategy` uses `restrictDiagonalMeasurement`, which
 post-processes the diagonal outcome to the `zeroCoord` readout and re-embeds it

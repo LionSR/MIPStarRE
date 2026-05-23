@@ -25,9 +25,9 @@ interface as the paper statement.
 
 Update, final 2026-05-20 audit state: the source-labelled theorem now links to
 `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, whose proof factors through
-the named wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation`.  That
+the named wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion`.  That
 wrapper proves the saturated-error branch and leaves
-`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation` as the current direct
+`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` as the current direct
 proof-term `sorry` frontier in the Test slice; the current same-space interface
 `mainFormal` no longer inherits proof debt through the corrected large-\(k\)
 Section 6 successor theorem
@@ -188,7 +188,7 @@ Scratch `#print axioms` checks showed only `[propext, Classical.choice,
 Quot.sound]` for `razSafra`, `classicalTestSoundness`,
 `mainFormal_trivial_witness`, the final main-formal target weakening theorem,
 and `SameSpaceProjStrat.strategySymmetrization_isGood_three_mul`.  The former
-unused `SameSpaceProjStrat.strategySymmetrizationPackage` intermediate record has since been
+unused `SameSpaceProjStrat.strategySymmetrizationPackage` layer has since been
 removed.  The same scratch file showed
 `sorryAx` for `mainFormal`, exactly as expected from the excluded live residual
 in the audit snapshot.  That historical `sorryAx` route through the Section 6
@@ -206,8 +206,8 @@ found only documentation mentions of the former ambient axiom and the expected
 `sorry` comment/proof term in `MainTheorem.lean`; the only actual proof-term
 `sorry` was then at `MainTheorem.lean:4117`.  In the current tree, the direct
 Test-slice proof-term `sorry` is the named small-error source-boundary
-obligation `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`; its
-wrapper `MIPStarRE.LDT.Test.mainFormal_sourceObligation` proves the
+obligation `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`; its
+wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` proves the
 saturated-error branch.  The current same-space interface inherits the
 proved corrected large-\(k\) Section 6 theorem named in the status update above;
 the source theorem still has the separate two-space and \(k\ge md\)

@@ -119,9 +119,9 @@ completion construction:
 it asks only for the Section 6 role-register polynomial measurement and its
 symmetrized consistency estimate at the pre-cascade main-induction error.  The
 constructors below show how to view either a raw Section 6 witness or the
-`mainInduction` theorem as this witness.  The former syntactic
-successor wrapper was removed because it asked for non-paper boundary data
-instead of leaving the successor case as a proof obligation in Section 6. -/
+`mainInduction` theorem as this witness.  The former syntactic successor wrapper
+was removed because the checked Section 6 theorem now supplies the successor
+case without adding non-paper boundary data here. -/
 structure MainFormalRoleInductionWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

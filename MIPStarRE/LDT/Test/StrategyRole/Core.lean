@@ -234,12 +234,6 @@ noncomputable def classicalRoleSymmState {ι : Type*} [Fintype ι] [DecidableEq 
     _ = (classicalRoleSymmState ψ).density := by
           simp [classicalRoleSymmState, add_comm]
 
-lemma normalizedTrace_swapDensity {ι : Type*} [Fintype ι]
-    (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    MIPStarRE.Quantum.normalizedTrace (swapDensity X) = MIPStarRE.Quantum.normalizedTrace X := by
-  simpa [swapDensity_eq_reindex] using
-    MIPStarRE.Quantum.normalizedTrace_reindex (Equiv.prodComm ι ι) X
-
 private lemma normalizedTrace_rolePairProj (rL rR : Role) :
     MIPStarRE.Quantum.normalizedTrace (rolePairProj rL rR) = (1 / 4 : ℂ) := by
   have hRole : Fintype.card Role = 2 := by decide
@@ -399,79 +393,6 @@ lemma ev_swapQuantumState {ι : Type*} [Fintype ι] [DecidableEq ι]
           rw [swapDensity_mul, swapDensity_swapDensity]
     _ = MIPStarRE.Quantum.normalizedTrace (ψ.density * swapDensity Z) :=
           normalizedTrace_swapDensity _
-
-lemma swapDensity_opTensor {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (X Y : MIPStarRE.Quantum.Op ι) :
-    swapDensity (opTensor X Y) = opTensor Y X := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  simp [swapDensity, opTensor, mul_comm]
-
-theorem ev_swapDensity_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι))
-    (hfix : swapDensity ψ.density = ψ.density)
-    (Z : MIPStarRE.Quantum.Op (ι × ι)) :
-    ev ψ (swapDensity Z) = ev ψ Z := by
-  unfold ev
-  apply congrArg Complex.re
-  calc
-    MIPStarRE.Quantum.normalizedTrace (ψ.density * swapDensity Z)
-      = MIPStarRE.Quantum.normalizedTrace (swapDensity (ψ.density * Z)) := by
-          rw [swapDensity_mul]
-          simp [hfix]
-    _ = MIPStarRE.Quantum.normalizedTrace (ψ.density * Z) :=
-          normalizedTrace_swapDensity _
-
-theorem ev_opTensor_swap_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι))
-    (hfix : swapDensity ψ.density = ψ.density)
-    (X Y : MIPStarRE.Quantum.Op ι) :
-    ev ψ (opTensor X Y) = ev ψ (opTensor Y X) := by
-  rw [show opTensor Y X = swapDensity (opTensor X Y) by
-    rw [swapDensity_opTensor]]
-  exact (ev_swapDensity_of_density_fixed ψ hfix (opTensor X Y)).symm
-
-theorem qBipartiteMatchMass_symm_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι))
-    (hfix : swapDensity ψ.density = ψ.density)
-    {Outcome : Type*} [Fintype Outcome]
-    (A B : SubMeas Outcome ι) :
-    qBipartiteMatchMass ψ A B = qBipartiteMatchMass ψ B A := by
-  unfold qBipartiteMatchMass
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  exact ev_opTensor_swap_of_density_fixed ψ hfix (A.outcome a) (B.outcome a)
-
-theorem qBipartiteConsDefect_symm_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι))
-    (hfix : swapDensity ψ.density = ψ.density)
-    {Outcome : Type*} [Fintype Outcome]
-    (A B : SubMeas Outcome ι) :
-    qBipartiteConsDefect ψ A B = qBipartiteConsDefect ψ B A := by
-  simp [qBipartiteConsDefect,
-    qBipartiteMatchMass_symm_of_density_fixed ψ hfix,
-    ev_opTensor_swap_of_density_fixed ψ hfix]
-
-theorem consRel_symm_of_density_fixed {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι))
-    (hfix : swapDensity ψ.density = ψ.density)
-    {Question Outcome : Type*} [Fintype Outcome]
-    (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome ι)
-    (δ : Error) :
-    ConsRel ψ 𝒟 A B δ → ConsRel ψ 𝒟 B A δ := by
-  intro ⟨h⟩
-  constructor
-  unfold bipartiteConsError at *
-  calc
-    avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (B q) (A q))
-      = avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q)) := by
-          apply avgOver_congr
-          intro q
-          symm
-          exact qBipartiteConsDefect_symm_of_density_fixed ψ hfix (A q) (B q)
-    _ ≤ δ := h
 
 /-- For a swap-invariant same-space bipartite state, the averaged bipartite
 consistency defect is symmetric in the two indexed submeasurement families. -/

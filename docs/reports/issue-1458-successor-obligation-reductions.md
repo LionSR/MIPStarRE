@@ -15,13 +15,11 @@ organize the remaining proof obligations in the successor branch.
 `def:successor-pasting-data` remains the green node for the Lean construction of
 the averaged pasting datum and its scalar side conditions.
 
-`def:successor-obligation-reductions` is a Lean-only blueprint node.  It records
-proved internal reductions such as
-`mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations` and
-the former degree-split successor reductions.  These theorems
-are not paper statements and are not additional hypotheses of
-`thm:main-induction`; they reduce the source-facing successor proof to named
-construction obligations.
+The former `def:successor-obligation-reductions` node has been retired.  The
+older degree-split family reductions that it described were Lean-only
+conditional routes, not paper statements or additional hypotheses of
+`thm:main-induction`; after the recursive-slice theorem covered the case
+`d = 0`, those reductions had no remaining caller and were removed.
 
 ## Statement integrity audit
 
@@ -36,6 +34,7 @@ a polynomial measurement with the stated consistency bound.
 
 Lean conclusion: unchanged.
 
-Verdict: blueprint classification cleanup.  The green status of the internal
-successor reductions is retained, but those reductions are now displayed in a
-Lean-only node rather than in the pasting-data node itself.
+Verdict: blueprint classification cleanup, followed by removal of the obsolete
+degree-split family route.  The active successor proof now runs through the
+answer-valued recursive-slice construction and the checked answer-carrier
+assembly.

@@ -10,6 +10,12 @@ The audit was run on commit `e3d69726b` of `origin/main`, before the open PRs
 `#1763`--`#1766` were merged.  Those PRs further refine the same boundary, but
 the classification below concerns the current mainline state.
 
+> **Status note, 2026-05-23.**  This report is now historical.  The current
+> local tree has removed the direct proof holes listed below and the green-node
+> integrity audit passes under the corrected source statements.  The remaining
+> differences from the literal printed theorem are the documented
+> factor-\(400\) large-\(k\) correction and the final-theorem boundary \(0<k\).
+
 ## Method
 
 The initial audit was implemented by `scripts/audit_green_node_integrity.py`.
@@ -81,8 +87,14 @@ paper theorems.
 - `prop:lean-classical-test-soundness-interface`: conditional Lean interface for
   the quoted Polishchuk--Spielman theorem.  The source theorem
   `thm:classical-test-soundness` is not marked `\leanok`.
+- `rem:lean-residual-domination-declarations`: internal Section 5
+  `RestrictSome` residual-domination interface.  The generic residual
+  assumption is not advertised as a source theorem.
 - `rem:lean-line169-projectivization-match-mass`: internal projectivization
   repair bookkeeping.
+- `rem:lean-left-lifted-projectivization-repair-producer`: compatibility name
+  for the construction theorem.  The blueprint text explicitly says that
+  `Producer` is not a hypothesis.
 - `def:successor-pasting-data`: internal successor-stage constructors.  The
   declarations ending in `ofDegreeSplitPastingObligations` are construction
   targets inside the still-open `mainInduction` proof route.
@@ -93,20 +105,19 @@ paper theorems.
   `CascadeHypotheses` names the displayed scalar hypotheses for this local
   calculation, not a paper theorem.
 
-## Remaining non-green source boundary
+## Historical Non-Green Source Boundary
 
-The audit also confirms the current direct proof holes on `origin/main`:
+At the audited snapshot, the direct proof holes on `origin/main` were:
 
 - `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean:382`, the
   Naimark tensor-product correlation theorem;
 - `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean:599`, the
   main-induction successor branch.
 
-Thus the green-node question is distinct from the remaining proof frontier.  The
-mainline graph has many green nodes, and the warning-term audit does not find a
-hidden obligation among the source-like green nodes.  The remaining source
-frontier is concentrated in the two explicit proof holes and the source theorem
-nodes that are intentionally not marked `\leanok`.
+Thus the green-node question was distinct from the proof frontier at that
+snapshot.  The warning-term audit did not find a hidden obligation among the
+source-like green nodes.  In the current local tree, the two proof holes named
+above have been removed under the corrected source statements.
 
 ## Follow-up
 

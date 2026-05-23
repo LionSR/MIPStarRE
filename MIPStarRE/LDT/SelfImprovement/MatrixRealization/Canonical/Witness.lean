@@ -63,7 +63,7 @@ structure MatrixSdpOptimalWitnessWithDominance (params : Parameters)
     MatrixSdpOptimalWitness params model T Z
   dualDominatesIdentity : (1 : MatrixOperator model.space) ≤ Z
 
-/-- Package a dominance-carrying matrix witness from canonical block SDP
+/-- Assemble a dominance-carrying matrix witness from canonical block SDP
 conclusions.
 
 The hypotheses are the canonical pieces supplied by the finite-dimensional SDP
@@ -99,7 +99,7 @@ theorem matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
         matrixSdpComplementarySlacknessDefect_of_canonical params model T Z hcanonical }
   dualDominatesIdentity := hOneLe
 
-/-- Package a dominance-carrying optimal witness directly from an arbitrary
+/-- Assemble a dominance-carrying optimal witness directly from an arbitrary
 feasible canonical primal matrix.
 
 The theorem combines the two block-diagonal reductions: the extracted paper
@@ -187,7 +187,7 @@ structure MatrixSdpStatementWithSlacknessAndDominance (params : Parameters)
       ∃ Z : MatrixOperator model.space,
         MatrixSdpOptimalWitnessWithDominance params model T Z
 
-/-- Package the canonical block-SDP conclusions as the Lean-only matrix-level
+/-- Assemble the canonical block-SDP conclusions as the Lean-only matrix-level
 statement with the dominance hypothesis retained.
 
 This is the statement form of
@@ -218,7 +218,7 @@ theorem matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySla
       matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
         params model T Z hdual hstrong hcanonical hOneLe⟩
 
-/-- Package a dominance-carrying matrix SDP statement from an arbitrary feasible
+/-- Assemble a dominance-carrying matrix SDP statement from an arbitrary feasible
 canonical primal matrix satisfying objective equality and complementary
 slackness.
 

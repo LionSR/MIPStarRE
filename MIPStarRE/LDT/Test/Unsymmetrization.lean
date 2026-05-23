@@ -408,9 +408,9 @@ Paper origin: `references/ldt-paper/inductive_step.tex:84-109`
 
 The extracted POVMs are not additional fields: they are definitionally
 `unsymmetrizedLeftPOVM G` and `unsymmetrizedRightPOVM G`, i.e. the two principal
-role blocks of the role-register measurement `G`.  The two remaining proof fields
-are exactly the paper's factor-two consistency estimates `eq:cons-a` and
-`eq:cons-b` from `inductive_step.tex` lines 97--108.  The constructor
+role blocks of the role-register measurement `G`.  The two proof fields are
+exactly the paper's factor-two consistency estimates `eq:cons-a` and `eq:cons-b`
+from `inductive_step.tex` lines 97--108.  The constructor
 `UnsymmetrizationConsistency.ofSymConsistency` proves these two estimates from
 the symmetrized role-register consistency estimate. -/
 structure UnsymmetrizationConsistency (params : Parameters) [FieldModel params.q]

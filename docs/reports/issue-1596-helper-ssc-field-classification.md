@@ -1,4 +1,4 @@
-# Issue #1596: Helper SSC Bound Field Classification
+# Issue #1596: Helper SSC Field Classification
 
 Date: 2026-05-20.
 
@@ -78,9 +78,9 @@ source-facing theorem.
 
 No source-labelled theorem currently exposes this record as a non-paper
 hypothesis.  No blueprint proof-level `\leanok` overclaim is associated with
-this bound record.  The remaining work under #1596 should therefore move away
-from this record and toward the other open bundle sites: residual domination
-in `RestrictSome` and any projectivization boundary that still appears as a
-live construction hypothesis.  The former
+this obligation record.  The remaining work under #1596 should therefore move
+away from this record and toward the other open bundle sites: residual
+domination in `RestrictSome` and any projectivization boundary that still
+appears as a live construction hypothesis.  The former
 `SpectralTruncationInput` consumer rewire has been completed by replacing the
 wrapper with direct `SpectralTruncationStatement` construction theorems.

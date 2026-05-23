@@ -16,23 +16,30 @@
 > `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
 > tracked by #1507.  The source-labelled `thm:main-formal` and
 > `thm:main-induction` statements also have named source-boundary obligations,
-> respectively `mainFormal_sourceObligation` and
+> respectively `mainFormal_sourceConclusion` and
 > `mainInduction_sourceRangeObligation`.
 > The final-theorem wrapper proves the saturated-error branch and leaves
-> `mainFormal_sourceSmallErrorObligation` as the remaining direct final
+> `mainFormal_sourceSmallErrorConclusion` as the remaining direct final
 > source-boundary proof hole.
 >
 > **Status note, 2026-05-22.**  The corrected large-`k` Section 6 successor
 > construction is now checked.  The source-boundary obligations above remain:
 > the printed source range for `thm:main-induction` and the final two-space
 > source theorem.
+>
+> **Status note, 2026-05-23.**  This report is now historical as a proof-frontier
+> inventory.  The corrected large-\(k\), nonzero-sampling source route is
+> proof-complete, including the two-space role-register final theorem.  The
+> remaining differences from the literal printed paper are documented statement
+> corrections: \(k\ge 400md\) in place of the printed \(k\ge md\), and the
+> final-theorem boundary \(0<k\).  The older source-range and small-error
+> obligation names mentioned below are no longer live Lean declarations.
 
-This note replaces the obsolete 2026-05-07 description of the old
-conditional route into the final theorem.  The current `mainFormal` statement
-is source-facing: it has no non-paper proof-obligation input in its public
-theorem statement.  The remaining work is recorded either as named construction
-lemmas or as named source-boundary obligations below the source-facing
-theorems.
+This note replaces the obsolete 2026-05-07 description of the old conditional
+route into the final theorem.  Its body is retained as a dated audit of the
+orthonormalization chain; the current source-facing theorem statements no longer
+carry non-paper proof-obligation inputs, and the corrected source route has no
+live source-range obligation declarations.
 
 ## Current Verdict
 
@@ -45,17 +52,15 @@ derives the pre-completion projective submeasurements directly from the
 line-130 cross consistency using
 `MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair`.
 
-The remaining proof debt for the same-space theorem `mainFormal` is now
-transitive through Section 6: `mainFormal` calls the checked
-projective-completion route after invoking `MainInductionStep.mainInduction`.
-The only construction proof hole on this route is
-`mainInductionSuccessorNext_ofSmallErrorConstruction`, the nontrivial
-small-error successor step for `thm:main-induction`.
+The former proof debt for the same-space theorem `mainFormal` was transitive
+through Section 6.  That Section 6 successor construction is now checked for the
+corrected large-\(k\) interface, and the final theorem source-boundary route is
+checked under the documented boundary corrections.
 
 Thus #1359 is no longer a warning that the paper theorem has an
 orthonormalization-input assumption.  It is now an audit record explaining which
-orthonormalization obligations were discharged and why the remaining analytic
-obligation lies in Section 6 rather than in orthonormalization.
+orthonormalization obligations were discharged and why the later Section 6 work,
+now checked, was separate from orthonormalization.
 
 ## Layer 1: Section 5 Orthonormalization
 

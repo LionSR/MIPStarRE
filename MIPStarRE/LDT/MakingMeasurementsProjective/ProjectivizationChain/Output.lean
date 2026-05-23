@@ -44,7 +44,7 @@ The theorem `orthonormalizeAndComplete` separately records that the returned
 `Q` has underlying measurement exactly
 `completeAtOutcome P.toSubMeas a0`. Projectivity of that witness is supplied by
 `Preliminaries.completeAtOutcomeProj`, so the structure below stores only the
-analytic closeness obligations. -/
+analytic closeness assertions. -/
 structure OrthonormalizeAndCompleteStatement
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome] [DecidableEq Outcome]

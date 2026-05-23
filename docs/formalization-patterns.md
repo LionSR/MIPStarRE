@@ -216,34 +216,15 @@ as a lemma or a visibly conditional helper with a planned discharge.  It should
 not remain a headline replacement for the paper theorem, and it should not be
 the target of a source-labelled blueprint `\leanok`.
 
-### The remaining proof obligations in `MainFormal.lean`
+### Former proof obligations in `MainFormal.lean`
 
-The direct tracked `sorry` in `MainFormal.lean` records the remaining
-construction obligation for the paper theorem.  The proof must construct, from
-the hypotheses of `thm:main-formal`, the projective-completion witness consumed
-by `mainFormal_ofProjectiveCompletionTransportWitness`.  The Section 6 role witness is
-now obtained by applying the theorem `MainInductionStep.mainInduction`
-through `MainFormalRoleInductionWitness.ofMainInduction`; the successor
-branch of that call remains the tracked `sorry` in the source Section 6 theorem,
-not an added hypothesis of `mainFormal`.  The remaining Section 3 work includes:
-
-1. The successor projective-completion obligation.  It must construct the
-   line-130 orthonormalization witness from cross consistency and supply the
-   completion data used after `completingToMeasurement`.
-2. The base-case projective-completion witness obligation, whose active target
-   is a direct
-   `Nonempty (MainFormalProjectiveCompletionTransportWitness ...)`
-   needed by the final transport.
-
-These are data-construction obligations.  Once the per-slice self-improvement
-proof obligations and recursive induction data are threaded through, the
-paper-labelled theorem should construct the witness and call
-`mainFormal_ofProjectiveCompletionTransportWitness`, without adding obligations to the
-theorem statement.
-
-This is the intended cleanup direction: use the conditional helper only to
-identify reusable proof content, then prove the witness construction or keep
-the paper-aligned theorem with the remaining proof gap visible.
+The former direct tracked proof obligations in `MainFormal.lean` and the
+Section 6 successor route have been discharged under the corrected source
+statements.  The theorem `MIPStarRE.LDT.Test.mainFormal_sourceStatement` is now
+the corrected two-space source theorem; `MIPStarRE.LDT.Test.mainFormal` remains
+as the same-space auxiliary interface.  Neither theorem carries bridge,
+residual, repair, package, producer, generic hypotheses, or proof-obligation
+inputs in its public statement.
 
 ### Distinction from anti-patterns
 
@@ -301,28 +282,16 @@ appeared non-green there (Ch09 pasting lemmas, Ch10 induction helpers)
 already have `\leanok` in the current blueprint source files.  The web
 build needs regeneration.
 
-### Deliberate withholding of `\leanok`
+### Current `\leanok` status
 
-Some nodes have `\lean{}` but deliberately omit either statement-level or
-proof-level `\leanok`:
-
-- **`thm:orthonormalization`** (ch04): The Lean statement is source-facing.
-  PR #1632 restored the paper constant and the public theorem now has only
-  the standard Lean axioms.  The separate heterogeneous
-  `orthonormalizationMainLemma` remains a tracked issue-#1032 proof
-  obligation.
-
-- **`thm:naimark`** (ch04): The full tensor-product correlation theorem has
-  no attached Lean declaration.  The formalized questionwise local interface is
-  recorded separately in the restricted Lean remark
-  `rem:lean-questionwise-naimark`.
-
-- **`thm:main-formal`** (ch02): The blueprint links to
-  `MIPStarRE.LDT.Test.mainFormal`, the intended Lean transcription of the
-  theorem statement.  The tracked `sorry` sites in `MainFormal.lean` mean the
-  proof chain is not yet closed, so `\leanok` is deliberately withheld for this
-  theorem until the repaired-hypotheses and successor-residual obligations are
-  discharged.
+The former deliberate withholding cases for `thm:orthonormalization`,
+`thm:naimark`, `thm:main-induction`, and `thm:main-formal` have been resolved
+in the current blueprint under the documented statement corrections.  The
+project now treats the factor-\(400\) large-\(k\) condition and the nonzero
+sampling boundary \(0<k\) as corrections to the printed source statement, not
+as proof obligations.  Under those corrected statements, the relevant blueprint
+nodes carry proof-level `\leanok` and the linked declarations are checked by the
+standard axiom and proof-debt audits.
 
 - **`thm:ld-pasting`** (ch09) and
   **`thm:ld-pasting-in-induction-section`** (ch10): The paper theorem in

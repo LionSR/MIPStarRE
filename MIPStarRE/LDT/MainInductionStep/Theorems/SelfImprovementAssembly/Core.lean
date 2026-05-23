@@ -68,7 +68,7 @@ induction-level self-improvement conclusion.
 The Section 6 conclusion records the original input submeasurement only as a
 parameter; its six mathematical fields concern the output projective
 submeasurement and the dual witness.  This lemma isolates that transport, so
-the remaining proof obligation is not confused with measurement-completion
+the induction-section self-improvement target is not confused with measurement-completion
 bookkeeping. -/
 theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
     (params : Parameters)
@@ -412,7 +412,7 @@ state and the measurements used by the three LDT subtests agree with
 
 This is a structural helper for the successor route: it uses the
 `restrictedGood` field already stored in `SliceRestrictionData.profile` and
-does not touch the remaining Section 9 analytic obligations. -/
+does not introduce additional Section 9 analytic assumptions. -/
 theorem SelfImprovementData.SliceStrategyTransport.good_of_restrictedGood
     (params : Parameters)
     [FieldModel params.q]
@@ -668,8 +668,8 @@ they are used in the main-induction proof.
 
 **Source-faithful transport:** This theorem invokes the unrestricted formal
 theorem `Pasting.ldPasting` and projects its point-consistency field into the
-induction-section conclusion record.  It carries no additional proof
-obligation beyond the already formalized pasting theorem. -/
+induction-section conclusion record.  It carries no additional assumption beyond
+the already formalized pasting theorem. -/
 theorem ldPastingInInductionSection
     (params : Parameters)
     [FieldModel params.q]

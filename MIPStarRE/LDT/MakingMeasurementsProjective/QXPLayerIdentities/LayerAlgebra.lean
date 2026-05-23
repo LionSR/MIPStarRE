@@ -316,8 +316,8 @@ lemma pa_eq_xHatA_adjoint_mul_xHatA {Outcome : Type*}
 /-- If the `XHat` construction preserves one row block, then the corresponding
 `Q` and `P` outcomes agree.
 
-This lemma isolates the construction-level obligation needed for the fresh
-outcome in the option-completed orthonormalization step. -/
+This lemma isolates the row-block identity used for the fresh outcome in the
+option-completed orthonormalization step. -/
 lemma qa_eq_pa_of_xHatA_eq_xa {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -333,12 +333,10 @@ lemma qa_eq_pa_of_xHatA_eq_xa {Outcome : Type*}
 in the option-completed QXP layer.
 
 This is only a QXP-internal comparison: it upgrades fresh-row preservation to
-`Q_none ≤ P_none`.  The former generic `RestrictSome` monotone-total route would
-also have needed a source-to-`Q` comparison
-`(optionCompletion A).outcome none ≤ Q_none`; that comparison is not part of
-this lemma, and the present formal development no longer uses that generic
-route.  See
-`docs/reports/issue-1642-restrictsome-residual-domination-obstruction.md`. -/
+`Q_none ≤ P_none`.  To use the conditional `RestrictSome` monotonicity lemmas
+downstream one still needs an additional source-to-`Q` comparison
+`(optionCompletion A).outcome none ≤ Q_none`, and that comparison is not part of
+this lemma. -/
 lemma fresh_outcome_le_of_xHatA_eq_xa {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]

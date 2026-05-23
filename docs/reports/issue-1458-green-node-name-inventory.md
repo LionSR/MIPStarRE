@@ -18,9 +18,10 @@ The scan below removes full-line TeX comments before looking for active
 an unfinished source theorem appear green.
 
 Update on 2026-05-22: issue #1786 reclassified several prose-only entries.  The
-former compatibility-name remark for the left-lifted projectivization repair is
-no longer present, and the completion-route orthonormalization entry is now the
-proposition `prop:orthonormalization-completion-route`.
+compatibility name
+`rem:lean-left-lifted-projectivization-construction-name` is now an ordinary
+remark with no active Lean metadata, and the completion-route orthonormalization
+entry is now the proposition `prop:orthonormalization-completion-route`.
 The remaining Chapter 4 and Chapter 7 entries whose labels already began with
 `rem:` are also ordinary remarks without active Lean metadata.  The Chapter 10
 base-case Step~6 construction list is now
@@ -73,6 +74,7 @@ PY
 | `prop:simeq-data-processing` and `prop:self-consistency-implies-data-processing` | `simeqDataProcessing`, `selfConsistencyImpliesDataProcessing` | Standard use of the mathematical term data processing.  These are source-facing preliminary lemmas proved from their displayed hypotheses; the word `Data` is not construction-data vocabulary here. |
 | `thm:naimark` | `NaimarkTensorProductCorrelationStatement` | Source-facing Naimark tensor-product correlation statement in the projective-submeasurement form produced by the one-measurement construction.  It is linked to the proved theorem `naimarkTensorProductCorrelation`; the statement wrapper records the displayed mathematical assertion, not an extra hypothesis. |
 | `rem:lean-questionwise-naimark` | `NaimarkStatement`, `OneMeasNaimarkData.toProjSubMeas` | Restricted Lean-only questionwise dilation interface and the projection back to the original-outcome submeasurement.  This is now an ordinary remark without active Lean metadata; the proved source theorem remains `thm:naimark`. |
+| `rem:lean-restricted-completion-total-mass` | `restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le`, `restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le` | Lean-only restricted-completion total-mass declarations.  This is now an ordinary remark rather than a green definition node. |
 | `rem:lean-right-register-completion-helpers` | `OrthonormalizeAndCompleteStatement.completedCloseness_liftRight`, `ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements` | Lean-only tensor-factor bookkeeping for the projectivization chain.  This is now an ordinary remark rather than a green definition node. |
 | `rem:lean-line169-projectivization-match-mass` | `ProjectivizationLine169Repair.*` | Lean-only line-169 consistency and match-mass repair lemmas.  This is now an ordinary remark rather than a green definition node. |
 | `lem:orthonormalization-main-lemma-formalized-envelope` | `orthonormalizationMeasurement_of_consistency_from_projectivizationRepair` | Same-space corollary of the source orthogonalization lemma with the weaker public envelope stated in the blueprint.  The repair appears as an internal proof construction. |
@@ -90,22 +92,19 @@ PY
 | `lem:comm-data-processed-g` | `commDataProcessedG` | Source-facing commutativity preprocessing lemma.  The word `Data` is descriptive of the constructed commutativity datum, while the only high-risk public input is the faithful boundedness hypothesis recorded by the proof-debt audit. |
 | `clm:g-comm-stability` and `clm:g-comm-stability2` | `SliceBoundednessInput.*` | Faithful encoding of the paper boundedness hypothesis from the commutativity and pasting route. |
 | `lem:weighted-restricted-probability-bounds` | `RestrictedProbabilitiesStatement.ofWeightedBounds` | Internal weighted-probability statement constructor used in the induction assembly. |
-| `def:self-improvement-slice-transport` | `SelfImprovementData.*`, `AnswerSelfImprovementData.*`, `selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion` | Lean-only slice-transport interface.  It does not prove `thm:main-induction`.  The transport records are proved internal interfaces for the stronger ordinary-realization route; the active successor route now uses the checked answer-carrier construction, so these records are not the remaining source-theorem obstruction. |
+| `rem:self-improvement-slice-transport` | `SelfImprovementData.*`, `AnswerSelfImprovementData.*`, `selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion` | Lean-only slice-transport interface.  It is now an informational remark rather than a green definition node, and it does not prove `thm:main-induction`.  The transport records are proved internal interfaces for the stronger ordinary-realization route; the active successor route now uses the checked answer-carrier construction. |
 | `def:successor-pasting-data` | `AveragedPastingData.*`, `mainInductionFromAnswerStageDataOfSmallError` | Lean-only successor assembly interface.  The node is green because the conditional assembly is checked, not because the source successor theorem has been discharged. |
-| `prop:main-formal-source-obligation` | `mainFormal_sourceObligation` | Statement-level final-theorem source-boundary theorem.  It proves the saturated-error branch but remains proof-incomplete through `mainFormal_sourceSmallErrorObligation`; it is not an added paper hypothesis. |
-| `prop:main-formal-source-small-error-obligation` | `mainFormal_sourceSmallErrorObligation` | Statement-level non-vacuous final-theorem source-boundary proof hole.  It records the missing branch explicitly instead of hiding it inside `thm:main-formal`. |
+| `prop:main-formal-source-reduction` | `mainFormal_sourceConclusion` | Statement-level final-theorem source-boundary theorem.  It proves the saturated-error branch and delegates the small-error branch to the checked scalar-boundary theorem; it is not an added paper hypothesis. |
+| `prop:main-formal-source-small-error` | `mainFormal_sourceSmallErrorConclusion` | Statement-level non-vacuous final-theorem source-boundary theorem under the corrected large-\(k\) and nonzero sampling hypotheses. |
 | `rem:main-formal-step6-constructions` | `MainFormal*Witness`, `mainFormalBaseRoleInductionWitness`, `mainFormal_ofProjectiveCompletionTransportWitness` | Lean-only final-transport route depending on a Section 6 role witness.  This is now an ordinary remark rather than a green definition node. |
 | `def:main-formal-error-cascade` | `CascadeHypotheses` | Faithful finite-regime hypothesis package for the scalar error calculation. |
 
 ## Verdict
 
-After the 2026-05-22 proof-frontier update, the current local dependency graph
-no longer gives green statement borders to the source-frontier nodes whose
-proofs remain open.  In particular,
-`prop:main-formal-source-obligation`,
-and `prop:main-formal-source-small-error-obligation` are deliberately
-blue/unfilled: their Lean declarations name the missing assertions, but the
-blueprint does not mark them `\leanok`.  The remaining green high-risk-name node in this part of
+After the 2026-05-22 proof-status update and the subsequent final-theorem
+boundary repair, the current local dependency graph marks the corrected
+source-boundary propositions as proof-complete.  The remaining green
+high-risk-name node in this part of
 the inventory is `lem:sdp-uniform-feasible-witness`, the elementary Slater
 witness \(T_g=(2|\mathrm{Poly}|)^{-1}I\), \(Z=2I\), not an assumed obligation.
 Earlier green nodes whose labels contained "obligations", "bridge", "repair",
@@ -126,20 +125,10 @@ The nodes divide into five classes:
 4. source-construction contexts in Chapter 4; and
 5. Lean-only internal construction frontiers in Chapter 10.
 
-The internal frontier nodes should remain separate from source theorem labels.
-In particular, the green status of `def:self-improvement-slice-transport`
-should not be read as closing
-`thm:main-formal` or `thm:main-induction`.  The large-`k` correction for
-`thm:main-induction` is now the source-facing statement, so the remaining
-source-facing proof debt lies in the final theorem boundary, not in the
-corrected Section 6 successor assembly.
-
-The final-theorem small-error frontier is now split into two explicit
-blueprint sub-obligations without Lean completion tags:
-`prop:main-formal-source-two-space-role-register`,
-and `prop:main-formal-source-k-range-boundary`.  These name the two-space
-role-register reduction and the zero-sampling \(k\)-boundary, respectively.
-They are not assumptions of `thm:main-formal`.
+The internal construction nodes should remain separate from source theorem
+labels.  In particular, the transport data formerly displayed at
+`def:self-improvement-slice-transport` have been moved to an informational
+remark so that a reader does not mistake them for a source definition.
 
 The corrected large-\(k\) successor frontier is now proof-complete.  The
 answer-valued restricted-probability theorem, the slice-wise recursive
@@ -152,7 +141,7 @@ correction.
 The former degree-zero family sub-obligation has been retired.  The recursive
 predecessor hypothesis is now stated without an artificial `0 < d` assumption,
 and the checked theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction`
+`mainInductionSuccessorNext_ofAnswerCarrier`
 uses the same recursive slice route when `d = 0`; the nontrivial branch supplies
 `k ≥ 1` from `mainInductionError < 1`.
 
@@ -166,19 +155,21 @@ matching the narrow high-risk vocabulary:
 `lem:left-lifted-projectivization-repair`,
 `lem:sdp-uniform-feasible-witness`,
 `lem:symmetrization-bridge`,
-`rem:lean-residual-domination-declarations`, and
-`rem:lean-left-lifted-projectivization-repair-producer`.
+`rem:lean-left-lifted-projectivization-repair-producer`, and
+`rem:lean-residual-domination-declarations`.
 
 Those labels are stale with respect to the current local graph except for
 `lem:sdp-uniform-feasible-witness`.  The current source has renamed the
 symmetrization node to `lem:role-register-symmetrization`, the
 locality-preserving projectivization theorem to
-`lem:locality-preserving-projectivization`.  The former
+`lem:locality-preserving-projectivization`.  The compatibility name
+`rem:lean-left-lifted-projectivization-construction-name` is now an ordinary
+non-green remark.  The former
 	successor-obligation node is no longer a separate green graph vertex; the
 	corrected large-\(k\) successor route is proved, and the final-theorem source
 	frontier is displayed by the two unproved final-theorem propositions.  The
-	residual-domination remark and the former projectivization producer remark
-are no longer local graph nodes.  Thus the public Pages graph is not evidence
-that these obligations have been accepted as paper-facing hypotheses; it is a
-stale rendering whose misleading labels are removed or reclassified in the
-rebuilt local graph.
+	residual-domination remark is no
+longer a local graph node.  Thus the public Pages graph is not evidence that
+these obligations have been accepted as paper-facing hypotheses; it is a stale
+rendering whose misleading labels are removed or reclassified in the rebuilt
+local graph.

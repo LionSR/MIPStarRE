@@ -349,8 +349,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
       - \sqrt{2\delta}
       - \frac{md}{q}.
   \]
-  The Lean formalization records this step by named scalar bounds, starting
-  with the internal record
+  The Lean formalization records this step as named internal bounds, starting
+  with the structure
   \lean{MIPStarRE.LDT.SelfImprovement.HelperStrongSelfConsistencyBounds}
   and the exact residual-side expansion
   \lean{MIPStarRE.LDT.SelfImprovement.helper_mass_sub_release_eq_polynomial_off_diagonal}
@@ -366,8 +366,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_of_helper_conclusion}
   together with
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_bounds_of_selfConsistency_localVariance}
-  to recover the final helper-stage self-consistency conclusion.  The theorem-level
-  derivation is not moved into an additional hypothesis.
+  to recover the final helper-stage self-consistency conclusion.  The
+  theorem-level derivation is therefore not moved into an additional hypothesis.
   The paper's arithmetic shows that the right-hand error is at most
   \lean{MIPStarRE.LDT.SelfImprovement.helper_strong_self_consistency_error_le_selfImprovementHelperError}
   \[
@@ -976,7 +976,7 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   Several auxiliary results are used to prove Theorem~\ref{thm:self-improvement}
   from the helper output and the orthonormalization theorem.  They record
   local intermediate estimates and final-field assembly lemmas.  The
-  former orthonormalization spectral-obligation record has been retired; the
+  former orthonormalization spectral-transport record has been retired; the
   spectral-truncation part of the construction is now represented directly by
   \texttt{spectralTruncationStatement\_of\_sourceAlmostProjective}.  This result is
   not a locality-preserving repair theorem.  The theorem below records the
@@ -1091,12 +1091,12 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
   formal QXP algebra only isolates the construction-level statement
   \(Q_{\mathrm{none}} \leq P_{\mathrm{none}}\), obtained when the repair
   preserves the fresh row block \(\widehat X_{\mathrm{none}}=X_{\mathrm{none}}\).
-  The former generic ``RestrictSome'' monotone-total route would have required
-  one to turn this into the source-facing inequality
-  \(\widehat A_{\bot} \leq \widehat P_{\bot}\), by adding a comparison between
-  the completed source residual and the ``Q''-layer fresh outcome.  The present
-  formal development no longer uses that generic route, and the comparison is
-  false without additional hypotheses; see
+  To turn this into the source-facing inequality
+  \(\widehat A_{\bot} \leq \widehat P_{\bot}\) needed by the conditional
+  ``RestrictSome'' monotonicity lemmas, one would still need an additional
+  comparison between the completed source residual and the ``Q''-layer fresh
+  outcome.  The present formal development does not provide such a comparison in
+  general; see
   \texttt{docs/reports/issue-1642-restrictsome-residual-domination-obstruction.md}.
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_totalGap}
   \lean{MIPStarRE.LDT.Preliminaries.triangleSub_right_subMeas_total_le}

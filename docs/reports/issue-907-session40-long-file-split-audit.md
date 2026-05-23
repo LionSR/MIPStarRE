@@ -10,11 +10,17 @@ Scope: docs-only split plan for #907. No Lean files were edited.
 > removed from the active route.  The current direct LDT proof holes are the
 > source-boundary obligations
 > `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
-> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`, together with
+> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`, together with
 > `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
 > in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`, tracked by
 > #1507.  The split recommendations below should therefore be read as
 > historical refactor planning, not as a current proof-frontier inventory.
+>
+> **Status note, 2026-05-23.**  The proof-frontier part of the preceding note
+> is also historical.  The corrected source route now uses `k >= 400md`, and the
+> final theorem records the nonzero-sampling boundary `0 < k`; under these
+> corrected hypotheses the former Section 6 source-range and final two-space
+> obligation declarations are no longer live.
 
 ## Executive summary
 

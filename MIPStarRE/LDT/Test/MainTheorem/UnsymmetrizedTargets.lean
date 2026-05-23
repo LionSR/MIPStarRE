@@ -21,7 +21,7 @@ the native `ζ₄` point-consistency targets.
   (`\label{eq:G-self-consistency}`; lines 109–133), and projective
   assembly (lines 134–172).
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
-  `\label{rem:main-formal-unsymmetrization-bridge}` and
+  `\label{rem:main-formal-unsymmetrization-consistency}` and
   `\label{rem:main-formal-lean-witness-records}`.
 -/
 
