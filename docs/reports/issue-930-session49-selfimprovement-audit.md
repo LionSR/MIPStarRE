@@ -17,30 +17,31 @@ Branch: `gpt55/issue-930-selfimprovement-audit`
 > `SelfImprovement.OrthonormalizationInput`, and `SelfImprovement.FinalFieldsInput`
 > bundles have been removed.  The old Section 9 submeasurement wrappers
 > `selfImprovementFromSubMeas` and `selfImprovementFromObligationsSubMeas` have
-> also been removed.  The remaining helper strong-self-consistency,
-> orthonormalization, and final-field derivations are tracked proof obligations
-> on the source-facing theorem and its named construction lemmas, especially
-> #1514 and #1515.
+> also been removed.  At this May 13 snapshot, the remaining helper
+> strong-self-consistency, orthonormalization, and final-field derivations were
+> tracked proof obligations on the source-facing theorem and its named
+> construction lemmas, especially #1514 and #1515.
 >
 > **Status note, 2026-05-20.**  This final sentence is historical for the
 > current code.  The Section 9 theorem `selfImprovement` and the induction
 > wrapper `selfImprovementInInductionSection` are now checked without
 > `sorry` or `axiom`; the former #1514, #1515, and #1503 proof gaps are not
-> live Section 9 obligations.  The remaining transitive proof frontier for the
-> current same-space theorem `mainFormal` is the Section 6 small-error
+> live Section 9 obligations.  At this May 20 snapshot, the remaining transitive
+> proof frontier for the same-space theorem `mainFormal` was the Section 6 small-error
 > successor construction
 > `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
 > tracked by #1507.  The source-labelled final-theorem route additionally
-> contains the named source-boundary obligations
+> contained the named source-boundary obligations
 > `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
 > `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`; the wrapper
-> `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` proves the saturated-error
+> `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` proved the saturated-error
 > branch.
 >
 > **Status note, 2026-05-22.**  The Section 6 small-error successor construction
-> is now checked for the corrected large-`k` interface.  The live proof frontier
-> is the printed source range `md <= k < 400md` for `thm:main-induction` and the
-> final two-space source-boundary obligation for `thm:main-formal`.
+> was then checked for the corrected large-`k` interface.  At this snapshot, the
+> proof frontier was the printed source range `md <= k < 400md` for
+> `thm:main-induction` and the final two-space source-boundary obligation for
+> `thm:main-formal`.
 >
 > **Status note, 2026-05-23.**  The preceding frontier is now historical.
 > Under the corrected assumptions `k >= 400md` and `0 < k`, the Section 6

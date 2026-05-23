@@ -26,10 +26,10 @@ interface as the paper statement.
 Update, final 2026-05-20 audit state: the source-labelled theorem then linked to
 `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, whose proof factors through
 the named wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion`.  That
-wrapper proves the saturated-error branch and leaves
-`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` as the current direct
-proof-term `sorry` frontier in the Test slice; the current same-space interface
-`mainFormal` no longer inherits proof debt through the corrected large-\(k\)
+wrapper proved the saturated-error branch and left
+`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` as the direct
+proof-term `sorry` frontier in the Test slice at that snapshot; the same-space
+interface `mainFormal` no longer inherited proof debt through the corrected large-\(k\)
 Section 6 successor theorem
 `MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`, which
 is now proved.  At that snapshot, the remaining final-theorem proof debt was
