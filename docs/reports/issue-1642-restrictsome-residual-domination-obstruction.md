@@ -5,6 +5,14 @@ Date: 2026-05-18
 Scope: `MIPStarRE/LDT/MakingMeasurementsProjective/` and the downstream
 `SelfImprovement` monotone-total route.
 
+> **Status note, 2026-05-23.**  This report is now a historical mathematical
+> analysis of a route that is no longer used by the source-boundary proof.  The
+> generic `RestrictSome` residual-domination declarations named below have been
+> removed from Lean, because the current orthonormalization and final-theorem
+> route no longer appeals to the residual-domination implication they were meant
+> to diagnose.  The substantive lesson of the report remains: the generic
+> implication is false without additional hypotheses.
+
 ---
 
 ## Executive Summary
@@ -42,9 +50,9 @@ a stronger special case, or replaced by a different downstream argument.
 
 ---
 
-## The live Lean chain
+## Historical Lean Chain
 
-The current formal development establishes the following.
+At the audited snapshot, the formal development established the following.
 
 1. In
    `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities/LayerAlgebra.lean`,
@@ -54,22 +62,13 @@ The current formal development establishes the following.
    prove that preserving the fresh `none` row block yields
    `data.qLayer.q.outcome none ≤ Pa data none`.
 
-2. In
-   `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization/RestrictSome.lean`,
-   the lemmas
-   `restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le` and
-   `restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le`
-   consume the stronger hypothesis
-   `(optionCompletion A).outcome none ≤ P.outcome none`.
-   The theorems
-   `restrictSomeProjSubMeas_total_not_le_obstruction` and
-   `optionCompletion_outcome_none_not_le_obstruction` formalize the two
-   one-dimensional failures obtained by omitting this hypothesis from the generic
-   restriction lemma.  The combined existential theorem
-   `restrictSomeProjSubMeas_total_le_requires_residual_hypothesis` packages the
-   same example: a zero one-outcome source submeasurement and a completed
-   projective submeasurement with all mass on the original outcome give
-   `P_total = I` and `A_total = 0`.
+2. The former generic `RestrictSome` residual-domination lemmas consumed the
+   stronger hypothesis
+   `(optionCompletion A).outcome none ≤ P.outcome none`.  The former Lean-only
+   obstruction declarations formalized the one-dimensional failure obtained by
+   omitting this hypothesis from the generic restriction lemma: a zero
+   one-outcome source submeasurement and a completed projective submeasurement
+   with all mass on the original outcome give `P_total = I` and `A_total = 0`.
 
 3. In
    `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities/ProjectorApprox.lean`,
@@ -145,23 +144,22 @@ The problem is not merely that the current Lean proof is missing.  The route is
 mathematically too strong unless extra hypotheses are added or the construction
 is specialized.
 
-The Lean theorems `restrictSomeProjSubMeas_total_not_le_obstruction` and
-`optionCompletion_outcome_none_not_le_obstruction` record the two smaller formal
-obstructions directly at the `RestrictSome` interface.  They do not attempt to
-model the spectral-truncation construction above; instead they show that the
+The Lean obstruction theorems formerly recorded two smaller formal
+obstructions directly at the `RestrictSome` interface.  They did not attempt to
+model the spectral-truncation construction above; instead they showed that the
 generic restriction lemma itself cannot drop the residual hypothesis.  In the
 example, the source total is zero, the restricted projective total is the
 identity, and the completed source residual is also the identity, so each
-failed inequality would force `I ≤ 0`.  The theorem
-`restrictSomeProjSubMeas_total_le_requires_residual_hypothesis` packages both
-negations as a single existential witness.
+failed inequality would force `I ≤ 0`.  These declarations have since been
+removed as dead Lean-only diagnostics after the active route stopped using the
+generic residual-domination implication.
 
 ---
 
 ## Consequences for the repository
 
-1. The conditional `RestrictSome` lemmas are still mathematically useful and
-   should remain as conditional order-theoretic statements.
+1. The generic `RestrictSome` residual-domination route is not part of the
+   current source-boundary proof.
 
 2. The current comments claiming that the monotone-total route is reduced merely
    to proving `XHat_none = X_none` are too strong.  That proof yields the QXP

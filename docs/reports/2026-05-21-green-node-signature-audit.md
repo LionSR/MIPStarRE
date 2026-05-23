@@ -25,6 +25,13 @@ The parser also ignores TeX line comments before deciding that a block contains
 `\leanok`.  Thus a comment saying that a theorem is not marked `\leanok` is not
 itself counted as a green node.
 
+> **Status note, 2026-05-23.**  The numerical output below is a May 21
+> snapshot.  The current local tree has removed the residual-domination
+> `RestrictSome` diagnostics from Lean and the current green-node integrity
+> audit should be read from a fresh run of
+> `scripts/audit_green_node_integrity.py --root . --ci`, not from the historical
+> block below.
+
 On the current `main` snapshot, the script reports:
 
 ```text
@@ -39,9 +46,6 @@ allowed source-like unfaithful markers: 4
 auxiliary unfaithful markers: 2
 auxiliary warning links: 16
 auxiliary warning links:
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_requires_residual_hypothesis
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd
 - blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss
@@ -79,9 +83,9 @@ current, explicit exceptions.  The 29 signature warnings consist of:
 - 6 scalar-cascade links whose statements use `CascadeHypotheses`, the standing
   numerical regime for the cascade estimates.
 
-After the #1642 residual-domination obstruction split, one additional auxiliary
-warning link is expected: the Lean-only residual-obstruction declaration under
-`rem:lean-residual-domination-declarations`.  It is not a source theorem.
+The #1642 residual-domination obstruction declarations were formerly listed as
+auxiliary warning links.  They have since been removed from Lean together with
+the corresponding blueprint remark.
 
 The four source-like unfaithful markers are the two source-shaped public
 statements and the two current formal interfaces for `thm:main-formal` and
