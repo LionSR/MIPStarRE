@@ -379,7 +379,7 @@ almost-projectivity estimate and applies `lem:projective-non-measurement`
 internally.
 
 In Section 7, `HelperStrongSelfConsistencyBounds` is a checked internal
-package of intermediate estimates for the helper-stage strong self-consistency
+record of intermediate estimates for the helper-stage strong self-consistency
 proof.  The blueprint links it in the proof discussion of
 `item:self-improvement-self`, not as a source theorem hypothesis.  Its fields
 are the scalar estimates in the add-in-`u`, self-consistency, and variance-swap
@@ -703,7 +703,7 @@ checked not to import `sorryAx`.
   family.  They are not separate assumptions on the paper-facing
   commutativity theorem.
 * In Section 7, `HelperStrongSelfConsistencyBounds` and the associated
-  residual-bound lemmas are an internal assembly device for the displayed
+  residual-bound lemmas are internal scalar estimates for the displayed
   estimates in `lem:self-improvement-helper`.  The public self-improvement
   theorems remain axiom-clean in `AxiomAudit.lean`.
   The SDP entries `SdpStatementWithSlackness`,

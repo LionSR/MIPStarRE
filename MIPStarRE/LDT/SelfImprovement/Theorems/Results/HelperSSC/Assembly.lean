@@ -65,7 +65,7 @@ theorem helper_residualLowerBound_of_offDiagonal_bound
 After `eq:release-the-kraken`, `eq:threw-in-h-prime`, `eq:delete-an-A`, and
 `eq:move-over-v`, the paper bounds the expanded residual by
 `7√ζ_variance + √(2δ) + md/q`.  Since
-`addInUError = 4√ζ_variance`, this is exactly the record-side bound
+`addInUError = 4√ζ_variance`, this is exactly the pre-absorption bound
 `11√ζ_variance + √(2δ) + md/q - addInUError`. -/
 theorem helper_residualLowerBound_of_paper_chain_bound
     (params : Parameters) [FieldModel params.q]
