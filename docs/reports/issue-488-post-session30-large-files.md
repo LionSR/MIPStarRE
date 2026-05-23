@@ -73,7 +73,7 @@ moved to later proof-development files.
 | 949 | 9 | `Test/StrategySymmetrized.lean` | Thin barrel from PR #621. |
 | 939 | 9 | `Pasting/Sandwich.lean` | Thin barrel; content moved under `Sandwich/`. |
 | 937 | deleted | `MakingMeasurementsProjective/Naimark.lean` | Former thin barrel; concrete Naimark content lives in `NaimarkCore.lean`, `NaimarkOneMeas.lean`, and `NaimarkFull.lean`. |
-| 932 | 11 | `Basic/ParametersCore.lean` | Thin barrel; Basic area is active this wave. |
+| 932 | deleted | `Basic/ParametersCore.lean` | Former thin barrel; the core parameter, line, and polynomial declarations live in the concrete `Basic/` modules. |
 | 913 | 1670 | `Pasting/SwitcherooCompletion.lean` | Still large and grew with completion helpers. |
 | 881 | 9 | `Preliminaries/SelfConsistency.lean` | Thin barrel; content moved under `SelfConsistency/`. |
 | 870 | 9 | `Commutativity/ScalarApproximation.lean` | Thin barrel; avoid `ProcessedG` owners. |
