@@ -50,34 +50,39 @@ MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
   (hpass := hpass) (k := k) (scalars := scalars)
 ```
 
-The old dependency list in the nearby TODO is now partly stale.  In particular,
-#601, #707, #672, #714, #715, #732, and #759 are closed on GitHub and no longer
-explain the live local proof hole.  The actionable blockers are now:
+The old dependency list in the nearby TODO was already partly stale at the
+audit snapshot.  In particular, #601, #707, #672, #714, #715, #732, and #759
+were closed on GitHub and no longer explained the local proof hole observed in
+that tree.  The actionable blockers at the snapshot were:
 
-1. **Section 6 / role-residual construction:** PR #924 is open and depends on #931 for
-   closed self-improvement inputs.  It touches `MIPStarRE/LDT/Test/MainTheorem.lean`,
-   so this report deliberately avoids editing that file.
+1. **Section 6 / role-residual construction:** PR #924 was open and depended
+   on #931 for closed self-improvement inputs.  It touched
+   `MIPStarRE/LDT/Test/MainTheorem.lean`, so this report deliberately avoided
+   editing that file.
 2. **Line-169 transport choice:** at the time of this audit, PR #950 was still
    pursuing an exact P-level match-mass bridge instead of the generic
    `triangleSub` route that loses an extra `sqrt ζ₂`.  The current tree has
    since retired that exact bridge and uses the repaired pre-completion
    line-169 route instead.
-3. **Signature churn:** PR #958 is open and rewrites `ProjStrat`/`MainTheorem` for
-   separate Alice/Bob local spaces.  Any proof branch closing #834 should rebase
-   after #958, or otherwise be prepared for substantial signature repair.
+3. **Signature churn:** PR #958 was open and rewrote
+   `ProjStrat`/`MainTheorem` for separate Alice/Bob local spaces.  A proof
+   branch closing #834 was expected to rebase after #958, or otherwise to
+   require substantial signature repair.
 
-No new residual was found that is not already covered by #834/#821/#422, #924/#931,
-#950/#903, #958/#560, or the existing projectivization umbrella #426.
+No new residual was found at the snapshot that was not already covered by
+#834/#821/#422, #924/#931, #950/#903, #958/#560, or the existing
+projectivization umbrella #426.
 
-## Current Lean target
+## Historical Lean target
 
-The public theorem is `MIPStarRE.LDT.Test.mainFormal`, with statement and final
-assembly in `MIPStarRE/LDT/Test/MainTheorem.lean:2878-2967`.  The theorem already
-contains the issue-#906 statement fix: the public hypothesis is
+At the audit snapshot, the public theorem was `MIPStarRE.LDT.Test.mainFormal`,
+with statement and final assembly in
+`MIPStarRE/LDT/Test/MainTheorem.lean:2878-2967`.  The theorem already contained
+the issue-#906 statement fix: the public hypothesis was
 `400 * params.m * params.d ≤ k`, not just the paper's printed `md ≤ k`
 (`MainTheorem.lean:2885`).
 
-The non-vacuous branch builds scalar data and then stops at the live residual:
+The non-vacuous branch built scalar data and then stopped at the residual:
 
 ```lean
 let scalars : MainFormalCascadeScalars params eps k :=
@@ -146,8 +151,8 @@ Existing downstream conversions are already checked:
 - `MainFormalProjectiveCompletionTransportWitness.toMainFormal` only
   weakens the native `ζ₄` and `ζ₃/2` estimates to `mainFormalError`.
 
-Thus the live proof work is upstream data construction, not downstream triangle or
-scalar absorption.
+Thus the proof work in that tree was upstream data construction, not downstream
+triangle or scalar absorption.
 
 ## Paper anchors
 
@@ -167,7 +172,7 @@ $$
 G^{\mathrm A}_g\otimes I \simeq_\nu I\otimes G^{\mathrm B}_g.
 $$
 
-The live residual corresponds to the proof of `thm:main-formal` in
+The historical residual corresponded to the proof of `thm:main-formal` in
 `references/ldt-paper/inductive_step.tex`:
 
 | Paper lines | Paper step | Current Lean status |
@@ -201,18 +206,19 @@ inspect `blueprint/web/dep_graph_document.html`.
   - `thm:zeta-bounds-main-formal -> thm:main-formal`.
 - The graph has outgoing edge `thm:main-formal -> thm:main-informal`.
 
-The more detailed Lean residual context is documented in
-`blueprint/src/chapter/ch10_induction.tex:610-651`: it correctly explains that the
-active residual is
+At the snapshot, the more detailed Lean residual context was documented in
+`blueprint/src/chapter/ch10_induction.tex:610-651`: it explained that the
+active residual was
 `MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual`, that Bob's
 completion estimate is supplied left-lifted and transported by #869, and that exact
 line-169 still needs construction-level match-mass preservation rather than generic
 `triangle-sub`.
 
-## Stale or no-longer-local blockers in the current TODO
+## Stale or no-longer-local blockers in the snapshot TODO
 
-The TODO near `MainTheorem.lean:2921-2929` still lists several issues as active
-upstream dependencies.  GitHub status on this audit shows:
+At the snapshot, the TODO near `MainTheorem.lean:2921-2929` still listed
+several issues as active upstream dependencies.  GitHub status on this audit
+showed:
 
 | Issue / PR | Current state | Dependency-audit verdict |
 | --- | --- | --- |
@@ -226,36 +232,41 @@ upstream dependencies.  GitHub status on this audit shows:
 | #869 right-register completion transport | Merged 2026-04-27 | Already consumed by the current residual conversion. |
 | #906 `k ≥ 400md` statement fix | Closed 2026-04-29 | Already reflected in `mainFormal`. |
 
-Two open older trackers are also not direct fields of the present residual:
+Two older trackers that were open at the snapshot were also not direct fields
+of the residual:
 
-- #424 is still open, but the factor-two unsymmetrization estimates are no longer
-  explicit residual fields; the current route obtains them from
+- #424 was still open, but the factor-two unsymmetrization estimates were no
+  longer explicit residual fields; the current route obtains them from
   `MainFormalRoleMeasurementWitness.toUnsymmetrizationConsistency`.
-- #427 is still open, but the scalar cascade bounds and final weakening are already
-  checked in `MainFormalCascadeScalars` and
+- #427 was still open, but the scalar cascade bounds and final weakening were
+  already checked in `MainFormalCascadeScalars` and
   `MainFormalProjectiveCompletionTransportWitness.toMainFormal`; the local TODO
   marker `TODO(#427)` is stale as a description of the remaining proof term.
 
-A future PR that edits `MainTheorem.lean` should refresh these TODO comments after
-#924/#958 land.  This report intentionally does not do that refresh to avoid
-conflicting with the active `MainTheorem.lean` PRs.
+A future PR that edited `MainTheorem.lean` was expected to refresh these TODO
+comments after #924/#958 landed.  This report intentionally did not do that
+refresh, in order to avoid conflicting with the then-active `MainTheorem.lean`
+PRs.
 
-## Live blockers / active PRs
+## Historical blockers and active PRs
 
 ### #924 / #931: Section 6 role residual
 
-PR #924 (`feat(LDT): add answer-valued Section 6 residual bridge`) is open and
-touches `MIPStarRE/LDT/Test/MainTheorem.lean`, `MIPStarRE/LDT/Test/StrategyCore.lean`,
-and Section 6 files.  Its PR body states that it adds answer-valued Section 6
-restriction plumbing and tightens the live `mainFormal` boundary to a `Nonempty`
-Step 6 witness residual.  It explicitly remains blocked on #931.
+At the audit snapshot, PR #924
+(`feat(LDT): add answer-valued Section 6 residual bridge`) was open and touched
+`MIPStarRE/LDT/Test/MainTheorem.lean`,
+`MIPStarRE/LDT/Test/StrategyCore.lean`, and Section 6 files.  Its PR body stated
+that it added answer-valued Section 6 restriction plumbing and tightened the
+then-live `mainFormal` boundary to a `Nonempty` Step 6 witness residual.  It
+explicitly remained blocked on #931.
 
-Issue #931 is open and asks for closed self-improvement inputs for Section 6.  In
-current `main`, `MainFormalRoleInductionWitness` can be produced from the checked
-base handoff or a syntactic successor boundary, but the general successor-boundary
-construction still needs the Section 6 self-improvement/recursion inputs that #931
-tracks.  Therefore the first field of the live residual should not be attacked in
-parallel with #924 unless #924 closes or merges.
+Issue #931 was open and asked for closed self-improvement inputs for Section 6.
+In that tree, `MainFormalRoleInductionWitness` could be produced from the
+checked base handoff or a syntactic successor boundary, but the general
+successor-boundary construction still needed the Section 6
+self-improvement/recursion inputs that #931 tracked.  Therefore the first field
+of the residual was not to be attacked in parallel with #924 unless #924 closed
+or merged.
 
 ### #950 / #903: exact line-169 match mass
 
@@ -268,28 +279,29 @@ witness.
 
 ### #958 / #560: separate local spaces in `ProjStrat`
 
-PR #958 is open and touches `MIPStarRE/LDT/Test/MainTheorem.lean` plus most
-`Test/Strategy*.lean` files.  It currently has failing build / blueprint-sync checks
-and requested changes.  Because it may change `ProjStrat` signatures throughout
-`mainFormal`, any proof PR for #834 should be based after #958 is resolved, or at
-least expect nontrivial rebase work.
+At the audit snapshot, PR #958 was open and touched
+`MIPStarRE/LDT/Test/MainTheorem.lean` plus most `Test/Strategy*.lean` files.
+It had failing build / blueprint-sync checks and requested changes.  Because it
+could change `ProjStrat` signatures throughout `mainFormal`, any proof PR for
+#834 was expected to be based after #958 was resolved, or at least to expect
+nontrivial rebase work.
 
-### Other active overlap to avoid
+### Other historical overlap to avoid
 
 - #957/#894 is a mathlib-quality cleanup touching commutativity and pasting helper
-  files; it is not a direct #834 proof blocker but should not be overlapped for
-  cleanup edits.
-- #926/#927 touches `MIPStarRE/LDT/Test/StrategyRole.lean`; avoid StrategyRole edits
-  while it is open.
+  files; it was not a direct #834 proof blocker but was not to be overlapped
+  for cleanup edits.
+- #926/#927 touched `MIPStarRE/LDT/Test/StrategyRole.lean`; the audit advised
+  avoiding `StrategyRole` edits while it was open.
 
-## Recommended first proof PR after #924/#950/#958 land
+## Historical recommended proof PR after #924/#950/#958 land
 
 1. Rebase on a main commit containing the relevant merged PRs, especially #958 and
    #924 if they change `MainTheorem.lean` signatures, and #950 for the line-169
    match-mass bridge.
-2. Re-audit the exact live target.  If #924 lands as described, the target may no
-   longer be the two-field residual listed above; it may be a `Nonempty` Step 6
-   witness residual tied to answer-valued Section 6 data.
+2. Re-audit the exact target.  If #924 landed as described, the target might no
+   longer be the two-field residual listed above; it might be a `Nonempty`
+   Step 6 witness residual tied to answer-valued Section 6 data.
 3. Refresh the stale TODO block in `MainTheorem.lean` to remove #601/#707/#672/#714/#715/#732/#759
    and to name the actual post-merge blockers, if any.
 4. Construct the role residual from the merged Section 6 construction rather than from an
