@@ -153,7 +153,7 @@ correction.
 The former degree-zero family sub-obligation has been retired.  The recursive
 predecessor hypothesis is now stated without an artificial `0 < d` assumption,
 and the checked theorem
-`mainInductionSuccessorNext_ofSmallErrorConstruction_ofRecursiveSliceTransport`
+`mainInductionSuccessorNext_ofSmallErrorConstruction`
 uses the same recursive slice route when `d = 0`; the nontrivial branch supplies
 `k ≥ 1` from `mainInductionError < 1`.
 

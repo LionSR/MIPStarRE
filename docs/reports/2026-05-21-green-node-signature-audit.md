@@ -28,75 +28,49 @@ itself counted as a green node.
 On the current `main` snapshot, the script reports:
 
 ```text
-leanok environments: 185
-source-like labels: 127
-definition or remark labels: 58
-source-like labels without warning terms or unfaithful markers: 100
-source-like labels with warning terms or unfaithful markers: 27
-allowed source-like warning links: 6
-allowed source-like signature warnings: 29
-allowed source-like unfaithful markers: 4
-auxiliary unfaithful markers: 2
-auxiliary warning links: 16
+leanok environments: 178
+source-like labels: 138
+definition or remark labels: 40
+source-like labels without warning terms or unfaithful markers: 112
+source-like labels with warning terms or unfaithful markers: 26
+allowed source-like warning links: 8
+allowed source-like signature warnings: 30
+allowed source-like unfaithful markers: 0
+auxiliary unfaithful markers: 0
+auxiliary warning links: 1
 auxiliary warning links:
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_of_optionCompletion_residual_le
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_rightTensor_total_ev_le_of_optionCompletion_residual_le
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-residual-domination-declarations: MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas_total_le_requires_residual_hypothesis
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_of_completion_and_sdd
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_of_completion_and_sdd
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.leftConsistency_with_orthonormalization_loss
-- blueprint/src/chapter/ch04_projective.tex:rem:lean-line169-projectivization-match-mass: MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency_with_orthonormalization_loss
-- blueprint/src/chapter/ch10_induction.tex:def:successor-pasting-data: MIPStarRE.LDT.MainInductionStep.DegreeZeroPastingFamilyObligation
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligations
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBound
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNextOfSmallError_ofDegreeSplitPastingObligations
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerStageObligationsFromSuccessorBoundSplit
-- blueprint/src/chapter/ch10_induction.tex:def:successor-obligation-reductions: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofDegreeSplitPastingObligations
-- blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-obligations: MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
 - blueprint/src/chapter/ch10_induction.tex:def:main-formal-error-cascade: MIPStarRE.LDT.Test.CascadeHypotheses
-allowed source-like unfaithful markers:
-- blueprint/src/chapter/ch02_test.tex:thm:main-formal: MIPStarRE.LDT.Test.mainFormal_sourceStatement
-- blueprint/src/chapter/ch02_test.tex:thm:main-formal-current-interface: MIPStarRE.LDT.Test.mainFormal
-- blueprint/src/chapter/ch10_induction.tex:thm:main-induction: MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement
-- blueprint/src/chapter/ch10_induction.tex:thm:main-induction-current-interface: MIPStarRE.LDT.MainInductionStep.mainInduction
-auxiliary unfaithful markers:
-- blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-successor-targets: MIPStarRE.LDT.Test.strategySymmetrization_mainInduction
-- blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-successor-targets: MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction
 OK: no unexpected warning links or unfaithful markers in green source-like blueprint nodes.
 ```
 
-Thus 100 source-like green nodes have no warning-shaped declaration name, no
+Thus 112 source-like green nodes have no warning-shaped declaration name, no
 warning-shaped public Lean header, and no linked declaration docstring marked
-`**Unfaithful:**` under this audit.  The other 27 source-like green nodes are
+`**Unfaithful:**` under this audit.  The other 26 source-like green nodes are
 not hidden: their warning-shaped dependencies or unfaithful proof markers are
-current, explicit exceptions.  The 29 signature warnings consist of:
+current, explicit exceptions.  The 30 signature warnings consist of:
 
-- 23 Section 8 and Section 9 commutativity/pasting links whose statements use
+- 8 Section 8 commutativity links whose statements use
   `IdxPolyFamily.SliceBoundednessInput` or its residual projections.  These are
   the source-style boundedness hypotheses for the processed polynomial family,
   and should remain visible rather than hidden behind a green node.
+- 16 Section 9 and Section 10 pasting links whose statements use the displayed
+  slice-boundedness input, including the answer-valued pasting construction in
+  the successor step.
 - 6 scalar-cascade links whose statements use `CascadeHypotheses`, the standing
   numerical regime for the cascade estimates.
 
-After the #1642 residual-domination obstruction split, one additional auxiliary
-warning link is expected: the Lean-only residual-obstruction declaration under
-`rem:lean-residual-domination-declarations`.  It is not a source theorem.
-
-The four source-like unfaithful markers are the two source-shaped public
-statements and the two current formal interfaces for `thm:main-formal` and
-`thm:main-induction`.  They are green only in the statement-boundary sense: the
-Lean declarations expose the paper-facing statements or the documented
-large-\(k\) formal interfaces, but their docstrings correctly record that the
-present proof still passes through the tracked Section 6 and source-range
-obligations.
+There are currently no source-like or auxiliary `**Unfaithful:**` markers in
+the green-node audit.  The remaining auxiliary warning link is
+`def:main-formal-error-cascade`, where the displayed blueprint statement
+explicitly introduces the numerical regime `CascadeHypotheses`.
 
 Thus the present graph is not being certified as "green with no obligations".
 It is certified as "green with the current known obligation-shaped signatures
-and unfaithful proof markers enumerated".  A new green source-like blueprint
-link with an obligation-shaped name, an obligation-shaped public signature, or
-an `**Unfaithful:**` docstring now fails the audit until it is either removed,
-moved to an auxiliary/non-source entry, or added deliberately to the explicit
-exception list with a mathematical justification.
+enumerated".  A new green source-like blueprint link with an obligation-shaped
+name, an obligation-shaped public signature, or an `**Unfaithful:**` docstring
+now fails the audit until it is either removed, moved to an auxiliary/non-source
+entry, or added deliberately to the explicit exception list with a mathematical
+justification.
 
 ## Reading a green node
 
@@ -115,10 +89,11 @@ classes.
    paper theorem, lemma, proposition, corollary, or claim.  These nodes may be
    useful checked interfaces, but they must not be counted as closed source
    theorems.
-4. A source-boundary green node has a source-shaped Lean statement, but the
-   linked Lean declaration is marked `**Unfaithful:**`.  Such a node is useful
-   because it prevents statement drift, but it is not a genuinely proved paper
-   theorem until the cited proof obligation is discharged.
+4. A source-boundary green node has a source-shaped Lean statement whose
+   displayed blueprint text records a remaining source-boundary proposition or
+   construction theorem.  Such a node is useful because it prevents statement
+   drift, but it is not a completed proof of the paper theorem until the cited
+   proposition or construction theorem is proved from the paper hypotheses.
 
 The May 21 audit found no source-like green node whose warning term or
 unfaithful marker was both unexpected and hidden.  The known exceptions are
@@ -127,7 +102,7 @@ mathematical record rather than a bare allow-list in a script.
 
 ## Source-like declaration-name exceptions
 
-These six source-like links contain a warning term in the Lean declaration name.
+These eight source-like links contain a warning term in the Lean declaration name.
 Each is an allowed exception because the displayed blueprint statement already
 contains the corresponding mathematical data or because the word names a
 construction stage rather than an additional hypothesis.
@@ -149,10 +124,17 @@ construction stage rather than an additional hypothesis.
   and
   `MIPStarRE.LDT.IdxPolyFamily.SliceBoundednessInput.averagedPoint_le_witness`.
   These are faithful boundary fields of the displayed boundedness input.
+- `prop:main-formal-source-obligation` links to
+  `MIPStarRE.LDT.Test.mainFormal_sourceObligation`.  The blueprint statement is
+  itself the source-boundary reduction proposition, so the obligation is not a
+  hidden hypothesis of a theorem labelled as the final source theorem.
+- `prop:main-formal-source-small-error-obligation` links to
+  `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorObligation`.  The blueprint
+  statement is the small-error branch of the same source-boundary reduction.
 
 ## Source-like public-signature exceptions
 
-These twenty-nine links have neutral declaration names but public Lean headers
+These thirty links have neutral declaration names but public Lean headers
 whose hypotheses mention an audited warning term.  They are not hidden proof
 obligations: the corresponding blueprint statements display the boundedness or
 scalar-regime assumptions explicitly.
@@ -162,16 +144,18 @@ scalar-regime assumptions explicitly.
   `clm:g-comm-stability2`, and `thm:com-main` mention `Input` or `Residual`.
   These are commutativity statements using the displayed boundedness data for
   the processed polynomial family.
-- Section 9:
+- Section 9 and Section 10:
   `thm:ld-pasting`, `lem:ld-pasting-sub-measurement`,
   `cor:commuting-with-G-complete`, `cor:commuting-with-G-incomplete`,
   `cor:G-hat-facts`, `lem:commute-g-half-sandwich`,
   `lem:line-interpolation-averaging-estimates`,
   `lem:ld-sandwich-line-one-point`, `lem:h-b-consistency`,
   `cor:h-a-consistency`, `lem:over-all-outcomes`, `lem:from-H-to-G`,
-  `cor:ld-pasting-N-completeness`, and
-  `thm:ld-pasting-in-induction-section` mention `Input`.  These are pasting
-  statements using the displayed slice-boundedness input.
+  `cor:ld-pasting-N-completeness`,
+  `thm:ld-pasting-in-induction-section`, and
+  `prop:main-induction-successor-answer-valued-pasting` mention `Input`.
+  These are pasting and successor-step statements using the displayed
+  slice-boundedness input.
 - Scalar cascade:
   `thm:sigma-bound-main-formal`, `thm:zeta-bounds-main-formal`, and
   `thm:error-cascade-main-formal` mention `Hypotheses`.  These are scalar
@@ -179,42 +163,16 @@ scalar-regime assumptions explicitly.
 
 ## Source-like unfaithful markers
 
-These four source-like links point to Lean declarations whose immediate
-docstrings contain the marker `**Unfaithful:**`.  They are allowed exceptions
-because the blueprint text already says that the displayed node is only a
-source-shaped boundary or the current corrected formal interface, and because
-the remaining proof obligation is named explicitly.
-
-- `thm:main-formal` links to
-  `MIPStarRE.LDT.Test.mainFormal_sourceStatement`.  Its statement matches the
-  printed two-space theorem with the paper range \(k\ge md\), but its proof is
-  routed through `mainFormal_sourceObligation`, whose non-vacuous branch is
-  `mainFormal_sourceSmallErrorObligation`.
-- `thm:main-formal-current-interface` links to
-  `MIPStarRE.LDT.Test.mainFormal`.  This is the same-space, corrected
-  large-\(k\) interface.  It has no additional construction hypothesis, but its
-  proof transitively uses the open Section 6 successor construction.
-- `thm:main-induction` links to
-  `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`.  Its
-  statement records the printed \(k\ge md\) range, while the source interval
-  below \(400md\) remains the named range obligation.
-- `thm:main-induction-current-interface` links to
-  `MIPStarRE.LDT.MainInductionStep.mainInduction`.  This is the corrected
-  large-\(k\) formal interface, and its proof still depends on the named
-  small-error successor construction.
+There are currently no source-like green links whose Lean declarations carry an
+immediate `**Unfaithful:**` marker.  Source-boundary propositions are instead
+displayed as propositions in the blueprint and audited through their declaration
+names or public signatures.
 
 ## Auxiliary green nodes
 
-The audit also found the sixteen warning-term links listed in the command output
-above in green definition or remark nodes.  They are intentionally auxiliary:
-they record internal Lean interfaces, construction targets, or bookkeeping
-lemmas.  They are green in the sense that the attached Lean declarations exist
-and the local interface is checked; they are not green source theorems.  In
-particular, the successor-pasting and main-formal Step 6 obligation nodes
-belong to this auxiliary class until their source-facing theorems are proved
-without the named internal obligations.
-
-The two auxiliary unfaithful markers occur in
-`def:main-formal-step6-successor-targets`, where the blueprint deliberately
-records the successor-dependent Section 6 targets that remain downstream of
-issue #1507.
+The audit found one warning-term link in a green definition node:
+`def:main-formal-error-cascade` links to
+`MIPStarRE.LDT.Test.CascadeHypotheses`.  This is an auxiliary scalar-regime
+definition, not a source theorem, and the displayed statement makes the
+numerical hypotheses explicit.  There are no auxiliary green nodes whose Lean
+declarations carry an immediate `**Unfaithful:**` marker.
