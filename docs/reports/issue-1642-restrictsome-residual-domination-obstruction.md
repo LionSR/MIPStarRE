@@ -17,8 +17,8 @@ Scope: `MIPStarRE/LDT/MakingMeasurementsProjective/` and the downstream
 
 ## Executive Summary
 
-The current issue-#1642 route is not blocked by a missing two-line bridge.
-It is blocked by a mathematical gap in the proposed implication.
+The historical issue-#1642 route was not blocked by a missing two-line bridge.
+It was blocked by a mathematical gap in the proposed implication.
 
 The existing Lean algebra proves only the construction-level statement
 
@@ -27,7 +27,7 @@ Q_none ≤ P_none
 ```
 
 for the QXP layer, under extra coisometry hypotheses on the sigma-space matrix
-`X`.  The `RestrictSome` lemmas needed by the monotone-total route consume the
+`X`.  The former generic `RestrictSome` monotone-total route consumed the
 strictly stronger source-facing hypothesis
 
 ```text
@@ -79,8 +79,8 @@ At the audited snapshot, the formal development established the following.
    subnormalization input `∑ q_a ≤ 1`, which is stronger than the current
    `RankReductionWitness.total_le` bound.
 
-Thus the present code isolates a QXP-internal fresh-outcome comparison, but it
-does not prove the source-facing residual comparison required by `RestrictSome`.
+Thus the Lean code isolated a QXP-internal fresh-outcome comparison, but did not
+prove the source-facing residual comparison required by that generic route.
 
 ---
 
@@ -227,9 +227,9 @@ generic residual-domination implication.
 
 ## Verdict
 
-The current issue-#1642 route should be treated as an obstruction note, not as a
-small missing bridge.  The repository already contains the strongest valid
-generic QXP statement currently justified by the code:
+Issue #1642 should be treated as a historical obstruction note, not as a small
+missing bridge.  At the audited snapshot, the repository already contained the
+strongest valid generic QXP statement justified by the code:
 
 ```text
 Q_none ≤ P_none.
