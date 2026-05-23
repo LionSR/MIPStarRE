@@ -74,7 +74,7 @@
 > `ProjectivizationRepairInput` and `LeftLiftedProjectivizationRepairInput`
 > abbreviations.  Mentions of those names below are historical descriptions of
 > the old formalization boundary; the current construction uses
-> `leftLiftedProjectivizationRepairProducer` directly.
+> `leftLiftedProjectivizationRepair` directly.
 
 ---
 

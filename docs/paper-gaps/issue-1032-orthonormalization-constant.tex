@@ -16,6 +16,9 @@
 
 \section{At a glance}
 
+This note concerns the constant in the Section~5 orthonormalization theorem of
+\cite{Ji2020LowIndividualDegree}.
+
 \begin{itemize}
   \item \textbf{Difficulty.} Medium.  The discrepancy is a scalar loss, but
   recovering the paper constant requires aligning the local repair lemma with
@@ -24,7 +27,7 @@
   moderate amount of project-local scalar and transport work.
   \item \textbf{Mathlib/project split.} Mostly project-local; Mathlib supplies
   the elementary real-power inequalities and matrix order infrastructure.
-  \item \textbf{Key inputs.} The Section~5 completion step, the conversion from
+  \item \textbf{Key mathematical inputs.} The Section~5 completion step, the conversion from
   consistency to almost-projectivity, and the local \(Q/X/\widehat X/P\) repair
   theorem.
 \end{itemize}
@@ -68,9 +71,9 @@ with a separate proved completion-route comparison.%
 \footnote{The source theorem is
 \path{references/ldt-paper/orthonormalization.tex:67-75}
 (\path{thm:orthonormalization}).  The relevant declarations are
-\path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization},
-\path{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute},
-and \path{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer\_of\_sourceAlmostProjective\_two\_mul}.
+\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization},
+\leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute},
+and \leanid{MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepair\_of\_sourceAlmostProjective\_two\_mul}.
 This note is attached to \ghissue{1032}; the constant discrepancy is resolved
 by proving the source-aligned theorem statement.  The heterogeneous
 \path{lem:orthonormalization-main-lemma} proof remains a separate tracked

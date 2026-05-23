@@ -57,7 +57,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkOneMeas
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.Producers
+import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
 import MIPStarRE.LDT.MainInductionStep.Defs
 import MIPStarRE.LDT.MainInductionStep.Statements

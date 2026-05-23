@@ -5,7 +5,7 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.Producers
+import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.Test.Classical
@@ -25,8 +25,8 @@ Polishchuk--Spielman axiom by the explicit hypothesis
 The audits for
 `MakingMeasurementsProjective.orthonormalizationCompletionRoute` and
 `MakingMeasurementsProjective.orthonormalization` require the standard Lean
-axioms only: the locality-preserving repair obligation in
-`MakingMeasurementsProjective/Producers.lean` has been discharged for both the
+axioms only: the locality-preserving repair theorem in
+`MakingMeasurementsProjective/LocalityPreservingRepair.lean` has been discharged for both the
 documented completion-route construction and the paper-facing
 `100\zeta^{1/4}` theorem.
 
@@ -851,8 +851,6 @@ assert_standard_axioms MIPStarRE.LDT.SelfImprovement.sdp_slackness_measurement
 
 assert_no_sorry_axiom
   MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepair
-assert_no_sorry_axiom
-  MIPStarRE.LDT.MakingMeasurementsProjective.leftLiftedProjectivizationRepairProducer
 assert_no_sorry_axiom
   MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
 assert_no_sorry_axiom

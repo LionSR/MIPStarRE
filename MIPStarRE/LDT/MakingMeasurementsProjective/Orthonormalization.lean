@@ -3,7 +3,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSom
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
-import MIPStarRE.LDT.MakingMeasurementsProjective.Producers
+import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.Completion
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.ErrorBounds
@@ -80,7 +80,7 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
     exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
       (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
   obtain ⟨P, hP⟩ :=
-    leftPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+    leftPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
       (ψ := ψ) (hψ := hψ) (A := A) (ζ := ζ) hζ <| by
         simpa [consistencyToAlmostProjectiveError] using
           hAlmost.sourceAlmostProjective
@@ -337,7 +337,7 @@ lemma orthonormalizationMeasurement_right_of_consistency_from_projectivizationRe
     exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective_right
       (ψ := ψ) (A := A) (B := B) (ζ := ζ) hCons
   obtain ⟨P, hP⟩ :=
-    rightPlacedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+    rightPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
       (ψ := ψ) (hψ := hψ) (B := B) (ζ := ζ) hζ <| by
         simpa [consistencyToAlmostProjectiveError] using
           hAlmost.sourceAlmostProjective
@@ -491,7 +491,7 @@ theorem orthonormalization {Outcome : Type*}
     exact MIPStarRE.LDT.MakingMeasurementsProjective.consistencyToAlmostProjective
       (ψ := ψ) (A := Ahat) (B := Ahat) (ζ := 2 * ζ) hCons
   obtain ⟨P, hRounded⟩ :=
-    leftLiftedProjectivizationRepairProducer_of_sourceAlmostProjective_two_mul
+    leftLiftedProjectivizationRepair_of_sourceAlmostProjective_two_mul
       ψ hψ Ahat (2 * ζ) (by nlinarith [hζ_nonneg]) <| by
         simpa [consistencyToAlmostProjectiveError] using
           hAlmost.sourceAlmostProjective
