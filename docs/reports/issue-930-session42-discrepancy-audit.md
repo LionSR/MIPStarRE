@@ -32,11 +32,10 @@ paper gap:
 1. `laplacianRewrite` is intentionally not a formal proof of the paper's
    edge-difference formula; the blueprint explicitly withholds `\leanok` from
    `prop:laplacian-rewrite` and records this Lean-local gap.
-2. `globalVarianceOfPoints` is a legacy wrapper with conclusion-shaped inputs,
-   but the paper-faithful route is present through the stricter lemmas
-   `localVarianceTransportChainBound` and
-   `globalVarianceOfPointsFromTransportChainBound`.  This is a blueprint mapping
-   hygiene point, not a new paper discrepancy.
+2. The global-variance route has since been aligned with the paper-faithful
+   transport-chain construction: `globalVarianceOfPoints` now follows
+   `globalVarianceOfPointsFromTransportChainBound`, and the obsolete
+   supplied-bounds local wrapper is no longer listed in the active blueprint.
 
 No follow-up issue was opened: the only suspicious items were either confirmed as
 already documented, already covered by active blueprint-sync work, or harmless
@@ -202,15 +201,16 @@ This is documented in the Lean comment
 (`MIPStarRE/LDT/GlobalVariance/Theorems/CollisionExpansion.lean:631-635`) and is
 not a strengthened mathematical hypothesis.
 
-## Finding 6: `globalVarianceOfPoints` is legacy API, but the stricter route is present
+## Finding 6: Global variance now uses the transport-chain route
 
-One mild blueprint-sync caveat remains.  The blueprint entry for
-`lem:global-variance-of-points` links to `MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints`
-(`blueprint/src/chapter/ch06_variance.tex:60-62`).  That declaration is a legacy
-wrapper with explicit conclusion-shaped inputs for the local and global
-pointwise bounds (`MIPStarRE/LDT/GlobalVariance/Theorems/MainTheorems.lean:308-345`).
+This audit originally recorded a blueprint-sync caveat: the blueprint entry for
+`lem:global-variance-of-points` linked to a supplied-bounds wrapper rather than
+to the transport-chain route.  That caveat has now been resolved.
+`globalVarianceOfPoints` delegates to `globalVarianceOfPointsFromTransportChainBound`,
+and the obsolete local-variance supplied-bounds wrapper has been removed from
+the active blueprint entry for `lem:local-variance-of-points`.
 
-The stricter, strategy-state route is already present:
+The paper-faithful, strategy-state route is:
 
 - `localVarianceTransportChainBound` proves the paper's six-step edge transport
   on the native hypercube-edge sampler
@@ -222,14 +222,8 @@ The stricter, strategy-state route is already present:
   transfer to obtain the global statement
   (`MIPStarRE/LDT/GlobalVariance/Theorems/MainTheorems.lean:288-306`).
 
-The blueprint already lists `globalVarianceOfPointsFromTransportChainBound` in
-the `\lean{...}` block for `lem:local-variance-of-points`
-(`blueprint/src/chapter/ch06_variance.tex:24-26`).  Thus the formal route exists,
-but the declaration is attached to the preceding blueprint item rather than to
-the global-variance item.  I treated this as blueprint mapping hygiene, not a
-new issue #930 paper discrepancy, especially because the global-variance proof
-block is not marked `\leanok` (`blueprint/src/chapter/ch06_variance.tex:72-104`)
-and active blueprint-sync PRs are already open.
+Thus this item no longer records an active discrepancy.  It remains here only to
+explain why no paper-gap note was opened during the original audit.
 
 ## Minor source typos observed
 

@@ -86,63 +86,12 @@ private lemma matrixGlobalVarianceOfPoints_from_local
         (globalVarianceOfPointsError params eps delta) hglobal
 
 
-/-- Legacy reduction for `lem:local-variance-of-points` with arbitrary bipartite
-state and both pointwise bounds supplied explicitly.
-
-For the paper-faithful strategy state, prefer
-`localVarianceOfPointsFromEdgeDeviation`, which derives the local-variance bound
-from the edgewise weighted norm estimate. -/
-lemma localVarianceOfPoints
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta _gamma : Error)
-    (_hgood : strategy.IsGood eps delta _gamma)
-    (G : SubMeas (Polynomial params) ι)
-    (ψbi : QuantumState (ι × ι))
-    (hedge :
-      ∀ g : Polynomial params,
-        localVarianceDeviationAtPolynomial params strategy ψbi G g ≤
-          localVarianceOfPointsError params eps delta)
-    (hlocal :
-      ∀ g : Polynomial params,
-        pointConditionedLocalVarianceAtPolynomial params strategy G g ≤
-          localVarianceOfPointsError params eps delta) :
-    LocalVarianceOfPointsStatement params strategy ψbi G eps delta := by
-  refine
-    { aggregateEdgeComparison := by
-        exact sddRel_unit_family_of_pointwise ψbi
-          (rerandomizeCoord params)
-          (localVarianceLeftFamily params strategy G)
-          (localVarianceRightFamily params strategy G)
-          (fun uv g =>
-            weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
-          (fun uv g =>
-            weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
-          (by
-            intro uv
-            simp [localVarianceLeftFamily])
-          (by
-            intro uv
-            simp [localVarianceRightFamily])
-          (localVarianceOfPointsError params eps delta) (by
-            intro g
-            simpa [localVarianceDeviationAtPolynomial] using hedge g)
-      pointwiseEdgeNormBound := hedge
-      pointwiseLocalVarianceBound := hlocal
-      averagedLocalVarianceBound := by
-        simpa [pointConditionedLocalVariance] using
-          avgOver_polynomialDistribution_le_of_pointwise params
-            (fun g => pointConditionedLocalVarianceAtPolynomial params strategy G g)
-            (localVarianceOfPointsError params eps delta) hlocal }
-
-
 /-! ## Strategy-state reductions -/
 
 /-- Strict reduction for `lem:local-variance-of-points` on the strategy state.
 
-Compared with the legacy theorem `localVarianceOfPoints`, this theorem no longer
-requires the local-variance bound as a separate hypothesis: it derives it from
+Compared with the former supplied-bounds reduction, this theorem does not require
+the local-variance bound as a separate hypothesis: it derives it from
 the edgewise weighted squared-norm estimate using
 `localVarianceDeviationAtPolynomial_eq_two_pointConditionedLocalVarianceAtPolynomial`.
 The remaining analytic input is exactly the paper's six-step edge transport
