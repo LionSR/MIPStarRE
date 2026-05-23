@@ -64,8 +64,8 @@ auxiliary warning links:
 - blueprint/src/chapter/ch10_induction.tex:def:successor-pasting-data: MIPStarRE.LDT.MainInductionStep.AveragedPastingData
 - blueprint/src/chapter/ch10_induction.tex:rem:main-induction-successor-assembly: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier
 - blueprint/src/chapter/ch10_induction.tex:rem:main-induction-successor-assembly: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrierFromSuccessorBound
-- blueprint/src/chapter/ch10_induction.tex:rem:main-induction-successor-assembly: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction_ofAnswerCarrier
-- blueprint/src/chapter/ch10_induction.tex:rem:main-induction-successor-assembly: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofRecursiveAnswerInduction
+- blueprint/src/chapter/ch10_induction.tex:rem:main-induction-successor-assembly: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction
+- blueprint/src/chapter/ch10_induction.tex:rem:main-induction-successor-assembly: MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext
 - blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-obligations: MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
 - blueprint/src/chapter/ch10_induction.tex:def:main-formal-error-cascade: MIPStarRE.LDT.Test.CascadeHypotheses
 allowed source-like unfaithful markers:
