@@ -12,6 +12,14 @@ Audit date: 2026-04-09
 > proved tensor-product theorem `naimarkTensorProductCorrelation`.  For the
 > current public/local dependency graph status, use
 > `docs/reports/2026-05-20-dependency-graph-status.md`.
+>
+> **Status note, 2026-05-23.**  The `sorryAx` classification in the summary
+> and tables below is also historical.  The current
+> `MIPStarRE/LDT/Test/AxiomAudit.lean` file records standard-axiom checks for
+> the later source-facing main-induction, final-theorem, pasting,
+> self-improvement, and SDP routes.  The rows below should therefore be read as
+> a snapshot of the April 9 blueprint-color audit, not as a current list of
+> declarations that block `\leanok`.
 
 Scope:
 - `blueprint/src/chapter/ch03_preliminaries.tex`
@@ -29,12 +37,15 @@ Method:
 3. For every block missing `\leanok`, run `#print axioms` on the referenced Lean declaration(s).
 4. Treat any declaration whose axiom list contains `sorryAx` as not eligible for `\leanok`.
 
-Summary:
+Historical summary:
 - Found 72 `\lean{...}` tags covering 74 Lean declaration references.
 - Found 28 blocks with `\lean{...}` but no nearby `\leanok`.
-- Added `\leanok` to 10 blocks whose referenced declarations are sorry-free.
-- Left 18 blocks without `\leanok` because at least one referenced declaration still depends on `sorryAx`.
-- Found 1 pre-existing `\leanok` tag whose Lean declaration still depends on `sorryAx`.
+- Added `\leanok` to 10 blocks whose referenced declarations were sorry-free
+  at that snapshot.
+- Left 18 blocks without `\leanok` because at least one referenced declaration
+  then depended on `sorryAx`.
+- Found 1 pre-existing `\leanok` tag whose Lean declaration then depended on
+  `sorryAx`.
 
 ## Added `\leanok`
 
@@ -53,9 +64,12 @@ These blocks are the sorry-free candidates from the audit. In this checkout they
 | `ch08_commutativity.tex` `thm:commutativity-points` | `MIPStarRE.LDT.CommutativityPoints.commutativityPoints` |
 | `ch09_pasting.tex` `lem:g-complete-self-consistency` | `MIPStarRE.LDT.Pasting.gCompleteSelfConsistency` |
 
-## Still Missing `\leanok` Because Lean Uses `sorryAx`
+## Historical Missing `\leanok` Rows
 
-These blocks still have `\lean{...}` but were not given `\leanok` because the referenced declaration depends on `sorryAx`.
+At the audit snapshot, these blocks had `\lean{...}` but were not given
+`\leanok` because the referenced declaration depended on `sorryAx`.  Many of
+these declarations have since been proved, renamed, split into source-facing and
+Lean-only interface entries, or placed under explicit axiom-audit coverage.
 
 | Blueprint block | Lean declaration(s) |
 | --- | --- |
@@ -89,9 +103,11 @@ These blocks still have `\lean{...}` but were not given `\leanok` because the re
 | `ch10_induction.tex` `thm:ld-pasting-in-induction-section` | `MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection` |
 | `ch10_induction.tex` `thm:main-induction` | `MIPStarRE.LDT.MainInductionStep.mainInduction` |
 
-## Pre-existing `\leanok` Mismatch
+## Historical Pre-existing `\leanok` Mismatch
 
-This block already had `\leanok`, but `#print axioms` still reports `sorryAx` in the referenced declaration.
+At the audit snapshot this block already had `\leanok`, but `#print axioms`
+reported `sorryAx` in the referenced declaration.  This row should not be read
+as a current axiom-closure finding.
 
 | Blueprint block | Lean declaration |
 | --- | --- |
