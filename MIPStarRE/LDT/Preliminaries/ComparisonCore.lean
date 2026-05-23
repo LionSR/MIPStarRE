@@ -3,8 +3,8 @@ import MIPStarRE.LDT.Preliminaries.Defs
 /-!
 # Preliminary comparison theorems: core layer
 
-Core comparison lemmas and measurement-agreement translations extracted from
-`MIPStarRE.LDT.Preliminaries.Theorems`.
+Core comparison lemmas and measurement-agreement translations for the
+preliminaries chapter.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

@@ -174,7 +174,9 @@ These files use `ConsRel` or `bipartiteConsError` in a way that matches the pape
   Same left/right convention for point-vs-line families.
 - `MIPStarRE/LDT/CommutativityPoints/Theorem.lean`, especially lines 61-64 and 106-109
   The proof uses `bipartiteConsError_eq_consError_placed`, which preserves left/right order explicitly.
-- `MIPStarRE/LDT/Preliminaries/Theorems.lean`
+- `MIPStarRE/LDT/Preliminaries/ComparisonCore.lean`
+- `MIPStarRE/LDT/Preliminaries/DistanceBounds.lean`
+- `MIPStarRE/LDT/Preliminaries/ConsistencyBridges.lean`
   The bridge from `ConsRel` to `BipartiteSDDRel` is always via left-placement for the first family and right-placement for the second.
 - `MIPStarRE/LDT/Preliminaries/Triangles.lean`
   Both triangle lemmas keep the first family on the left and the second on the right; they rewrite through the placement bridge rather than silently swapping arguments.

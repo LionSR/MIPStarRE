@@ -3,8 +3,7 @@ import MIPStarRE.LDT.Preliminaries.ComparisonCore
 /-!
 # Preliminary comparison theorems: distance bounds
 
-Triangle-inequality style bounds for `SDDRel` and `SDDOpRel` extracted from
-`MIPStarRE.LDT.Preliminaries.Theorems`.
+Triangle-inequality style bounds for `SDDRel` and `SDDOpRel`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
