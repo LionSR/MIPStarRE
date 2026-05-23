@@ -72,7 +72,7 @@ moved to later proof-development files.
 | 968 | 10 | `MakingMeasurementsProjective/QXPLayerData.lean` | Thin barrel; content moved under `QXPLayer/`. |
 | 949 | 9 | `Test/StrategySymmetrized.lean` | Thin barrel from PR #621. |
 | 939 | 9 | `Pasting/Sandwich.lean` | Thin barrel; content moved under `Sandwich/`. |
-| 937 | 9 | `MakingMeasurementsProjective/Naimark.lean` | Thin barrel; one-measurement file remains moderate. |
+| 937 | deleted | `MakingMeasurementsProjective/Naimark.lean` | Former thin barrel; concrete Naimark content lives in `NaimarkCore.lean`, `NaimarkOneMeas.lean`, and `NaimarkFull.lean`. |
 | 932 | 11 | `Basic/ParametersCore.lean` | Thin barrel; Basic area is active this wave. |
 | 913 | 1670 | `Pasting/SwitcherooCompletion.lean` | Still large and grew with completion helpers. |
 | 881 | 9 | `Preliminaries/SelfConsistency.lean` | Thin barrel; content moved under `SelfConsistency/`. |
