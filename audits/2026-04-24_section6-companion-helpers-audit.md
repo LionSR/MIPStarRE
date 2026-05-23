@@ -61,15 +61,12 @@ All three relevant constructors live in `MIPStarRE/LDT/MainInductionStep/Theorem
 
 These are exactly the names suggested by issue #653, so there is no missing export to add.
 
-### 3. `SelfImprovementData.ofSelfImprovementInInductionSection` already received the same promotion
+### 3. Historical note on the self-improvement constructor
 
-The analogous self-improvement constructor from PR #659 is also already public on `main`:
-
-- `SelfImprovementData.ofSelfImprovementInInductionSection`
-  - data-bearing package constructor
-  - correctly declared as a `noncomputable def`
-
-So the natural “third companion helper” has already been promoted in the same style.
+At the time of this audit, the analogous ordinary self-improvement constructor
+from PR #659 was public on `main`.  That retained constructor has since been
+retired: the active successor proof uses the answer-valued carrier route and
+then forgets the answer-valued data through `SelfImprovementData.ofAnswer`.
 
 ### 4. Naming and declaration kinds are consistent
 
@@ -81,7 +78,9 @@ The current naming scheme is internally coherent:
 That means:
 
 - `RestrictedProbabilitiesStatement.ofWeightedBounds` being a lemma is appropriate because `RestrictedProbabilitiesStatement ...` is a proposition;
-- `SliceRestrictionData.ofRestrictedProbabilities`, `PerSliceInductionData.ofRecursion`, and `SelfImprovementData.ofSelfImprovementInInductionSection` being `noncomputable def`s is appropriate because they return structures carrying data.
+- `SliceRestrictionData.ofRestrictedProbabilities` and
+  `PerSliceInductionData.ofRecursion` being `noncomputable def`s is appropriate
+  because they return structures carrying data.
 
 No renaming is recommended.
 
@@ -101,7 +100,8 @@ Issue #653 is a **no-action API audit**:
 
 - `SliceRestrictionData.ofRestrictedProbabilities` is already public;
 - `PerSliceInductionData.ofRecursion` is already public;
-- `SelfImprovementData.ofSelfImprovementInInductionSection` is already public;
+- the former ordinary self-improvement constructor has been retired in favor of
+  the active answer-valued carrier route;
 - `RestrictedProbabilitiesStatement.ofWeightedBounds` is already public and correctly theorem-valued;
 - `mainInductionPublicWrapper` on PR #649 already leans on those public names rather than on a private bridge helper.
 

@@ -152,13 +152,11 @@ selfImprovementInInductionSection    (SelfImprovementAssembly/Core.lean)
 ```
 
 ```
-SelfImprovementData.ofSelfImprovementInInductionSection
-SelfImprovementData.ofSliceStrategyTransport
 AnswerSelfImprovementData.ofSelfImprovementInInductionSection
 AnswerSelfImprovementData.ofAnswerCarrier
-  └─ call the induction-section self-improvement theorem per slice and transport
-     the resulting fields through the ordinary slice interface or through the
-     answer-valued carrier construction
+SelfImprovementData.ofAnswer
+  └─ call the induction-section self-improvement theorem per answer-valued slice
+     and then forget the answer-valued data to the ordinary pasting interface
 ```
 
 ```
@@ -283,12 +281,11 @@ an extra hypothesis, and it is axiom-clean in `AxiomAudit.lean`.
 
 ### 3.3. selfImprovementInInductionSection → SelfImprovementData: Internal assembly
 
-`SelfImprovementData.ofSelfImprovementInInductionSection`,
-`SelfImprovementData.ofSliceStrategyTransport`, and
-`AnswerSelfImprovementData.ofAnswerCarrier` call the induction-section
-self-improvement theorem per slice and transport the fields through the
-restricted-slice interface.  Any remaining obstruction is the Section 6
-construction of the appropriate slice profile, not a Section 9 proof debt.
+`AnswerSelfImprovementData.ofAnswerCarrier` calls the induction-section
+self-improvement theorem per answer-valued slice.  The successor proof then uses
+`SelfImprovementData.ofAnswer` to forget the answer-valued data to the ordinary
+pasting interface.  Any remaining obstruction is the Section 6 construction of
+the appropriate slice profile, not a Section 9 proof debt.
 
 ### 3.4. SelfImprovementData → AveragedPastingData: ✅ Complete
 
@@ -409,8 +406,8 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationInputConstructors.lean` | Removed orphan module; unused obligation-package constructors no longer exist |
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean` | Matrix-level SDP realization (used by orphan SDP bridges only) |
 | `MIPStarRE/LDT/Pasting/Core.lean` | `ldPasting` — consumed by `ldPastingInInductionSection` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` | `selfImprovementInInductionSection`, `SelfImprovementData.ofSelfImprovementInInductionSection`, `SelfImprovementData.ofSliceStrategyTransport` |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` | answer-valued slice self-improvement transport constructors |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` | `selfImprovementInInductionSection` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` | answer-valued carrier self-improvement construction |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionSuccessorNext_ofSmallErrorConstruction` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` | ordinary and answer-valued stage-data conversions |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingData` |

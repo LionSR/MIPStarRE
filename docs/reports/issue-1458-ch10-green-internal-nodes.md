@@ -44,13 +44,13 @@ Blueprint node:
 `blueprint/src/chapter/ch10_induction.tex`, now the informational remark
 `rem:self-improvement-slice-transport`.
 
-Linked Lean declarations include
-`SelfImprovementData.SliceStrategyTransport`,
-`SelfImprovementData.ofSliceStrategyTransport`,
-`SelfImprovementData.slice_outputs_ofSliceStrategyTransport`, and their
-answer-valued analogues.
+This node was historical bookkeeping for retained ordinary-realization
+transport interfaces.  Those declarations have been retired from the checked
+interface.  The active successor proof uses the answer-valued carrier
+construction and then forgets the answer-valued data through
+`SelfImprovementData.ofAnswer`.
 
-Verdict: proved internal transport interface.
+Verdict: retired internal transport interface.
 
 The ordinary and answer-valued `SliceStrategyTransport` structures assume
 concrete slice strategies together with state and measurement-transport
