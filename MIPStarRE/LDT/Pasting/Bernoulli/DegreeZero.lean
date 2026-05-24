@@ -20,16 +20,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The degree-zero appended-slice candidate has the same total operator as the
-averaged slice submeasurement. -/
-private theorem averagedSliceAppendedSubMeas_total
-    (params : Parameters)
-    [FieldModel params.q]
-    (family : IdxPolyFamily params ι) :
-    (averagedSliceAppendedSubMeas params family).total =
-      family.averagedSubMeas.total := by
-  rw [averagedSliceAppendedSubMeas, postprocess_total]
-
 /-- Evaluating the degree-zero appended-slice candidate is the height average of
 the original evaluated slice family at the same old point. -/
 private theorem polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average
