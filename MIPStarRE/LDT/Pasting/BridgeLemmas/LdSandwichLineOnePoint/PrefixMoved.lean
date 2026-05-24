@@ -131,52 +131,6 @@ lemma ldSandwichLineOnePointPrefixMoved_rawCommutation
   have hi_succ : 2 ≤ i + 1 := by omega
   exact (hcomm (i + 1) hi_succ).repeatedCommutation
 
-/-- Raw commutation after rotating the last prefix coordinate to the front. -/
-lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_reindexed
-    (params : Parameters)
-    [FieldModel params.q]
-    (ψ : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hcomm : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ψ family gamma zeta j)
-    {i : ℕ} (hi0 : i ≠ 0) :
-    SDDOpRel ψ
-      (uniformDistribution (PointTuple params (i + 1)))
-      (fun xs =>
-        gHatHalfSandwichLeft params family (i + 1)
-          ((pointTupleLastFrontEquiv params i) xs))
-      (fun xs =>
-        gHatHalfSandwichRight params family (i + 1)
-          ((pointTupleLastFrontEquiv params i) xs))
-      (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
-  have hraw := ldSandwichLineOnePointPrefixMoved_rawCommutation
-    params ψ family gamma zeta hcomm hi0
-  exact (sddOpRel_uniform_equiv (pointTupleLastFrontEquiv params i).symm ψ
-    (gHatHalfSandwichLeft params family (i + 1))
-    (gHatHalfSandwichRight params family (i + 1))
-    (commuteGHalfSandwichError params gamma zeta (i + 1))).1 hraw
-
-/-- Left-placed raw half-sandwich family for the rotated prefix. -/
-noncomputable def ldSandwichLineOnePointPrefixMovedRawLeftFamily
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    {k i : ℕ} (_hi : i < k) :
-    IdxOpFamily (SandwichedLineQuestion params k) (GHatTupleOutcome params (i + 1)) (ι × ι) :=
-  fun q =>
-    gHatHalfSandwichLeft params family (i + 1)
-      ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
-
-/-- Right cyclic raw half-sandwich family for the rotated prefix. -/
-noncomputable def ldSandwichLineOnePointPrefixMovedRawRightFamily
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    {k i : ℕ} (_hi : i < k) :
-    IdxOpFamily (SandwichedLineQuestion params k) (GHatTupleOutcome params (i + 1)) (ι × ι) :=
-  fun q =>
-    gHatHalfSandwichRight params family (i + 1)
-      ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
-
 /-- Expand a half-product into the prefix product times the last slice operator. -/
 lemma gHatHalfProduct_prefix_mul_last
     (params : Parameters)
