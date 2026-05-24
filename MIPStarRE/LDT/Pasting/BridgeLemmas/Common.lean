@@ -24,35 +24,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Multiplying a left tensor into a full tensor only affects the left factor. -/
-lemma leftTensor_mul_opTensor
-    (A B C : MIPStarRE.Quantum.Op ι) :
-    leftTensor (ι₂ := ι) A * opTensor B C = opTensor (A * B) C := by
-  calc
-    leftTensor (ι₂ := ι) A * opTensor B C
-        = leftTensor (ι₂ := ι) A * (leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) C) := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B) * rightTensor (ι₁ := ι) C := by
-          rw [Matrix.mul_assoc]
-    _ = leftTensor (ι₂ := ι) (A * B) * rightTensor (ι₁ := ι) C := by
-          rw [leftTensor_mul_leftTensor]
-    _ = opTensor (A * B) C := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-
-/-- Multiplying a full tensor by a left tensor only affects the left factor. -/
-lemma opTensor_mul_leftTensor
-    (A B C : MIPStarRE.Quantum.Op ι) :
-    opTensor A C * leftTensor (ι₂ := ι) B = opTensor (A * B) C := by
-  calc
-    opTensor A C * leftTensor (ι₂ := ι) B
-        = (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) C) * leftTensor (ι₂ := ι) B := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-    _ = leftTensor (ι₂ := ι) A * (rightTensor (ι₁ := ι) C * leftTensor (ι₂ := ι) B) := by
-          rw [Matrix.mul_assoc]
-    _ = leftTensor (ι₂ := ι) A * opTensor B C := by
-          rw [rightTensor_mul_leftTensor_eq_opTensor]
-    _ = opTensor (A * B) C := leftTensor_mul_opTensor A B C
-
 lemma postprocess_postprocess
     {α β γ : Type*} [Fintype α] [Fintype β] [Fintype γ]
     (A : SubMeas α ι) (f : α → β) (g : β → γ) :
