@@ -696,22 +696,4 @@ theorem thirty_selfImprovementHelperError_le_selfImprovementError
         finalStagePowerSum params eps delta (1 / (32 : Error)) :=
         mul_le_mul_of_nonneg_left hmono h3000m_nn
 
-/-- A direct corollary of `thirty_selfImprovementHelperError_le_selfImprovementError`:
-the literal helper threshold is itself dominated by `selfImprovementError`. -/
-theorem selfImprovementHelperError_le_selfImprovementError
-    (params : Parameters) [FieldModel params.q]
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
-    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
-    selfImprovementHelperError params eps delta ≤
-      selfImprovementError params eps delta := by
-  have h30 :=
-    thirty_selfImprovementHelperError_le_selfImprovementError params eps delta
-      heps heps_le_one hdelta hdelta_le_one hd_le_q
-  have hhelper_nn : 0 ≤ selfImprovementHelperError params eps delta :=
-    selfImprovementHelperError_nonneg params eps delta
-  linarith
-
-
 end MIPStarRE.LDT.SelfImprovement
