@@ -249,9 +249,13 @@ rewriting the theorem surface during active proof work.
 - #966: bridge `uniformDistribution` to `PMF.uniformOfFintype`.
 - #967: optional finite-measure adapter for non-probability distributions.
 
-**Sequencing.** Let #974 / #966 land first. Then add optional adapter modules
-with no imports from foundational `Distribution.lean` into the main LDT barrel
-unless a concrete downstream user needs them.
+The optional adapter modules that came from this track were later removed because
+they had no downstream Lean consumers.  Reintroduce such adapters only when a
+specific theorem uses the PMF or measure interface.
+
+**Sequencing.** Do not add optional adapter modules preemptively.  If a concrete
+downstream user needs them, add the smallest adapter in a separate file and keep
+it out of the main LDT barrel unless the dependent theorem requires it.
 
 **Non-goals.** Do not globally replace `Distribution`, `avgOver`, or existing
 operator-valued averages in a friendliness pass.
