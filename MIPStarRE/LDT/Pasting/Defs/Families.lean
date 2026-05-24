@@ -103,23 +103,6 @@ noncomputable def interpolateCompletedSlices (params : Parameters) [FieldModel p
       else
         fallbackInterpolatedPolynomial params
 
-/-- On ineligible but globally consistent tuples, `interpolateCompletedSlices`
-returns an actual witness polynomial. -/
-theorem interpolateCompletedSlices_spec_of_not_eligible
-    (params : Parameters) [FieldModel params.q] {k : ℕ}
-    (xs : PointTuple params k) (gs : GHatTupleOutcome params k)
-    (hNotEligible : ¬ InterpolationEligible params gs)
-    (hGlobal : IsGloballyConsistent params xs gs)
-    (i : Fin k) (hi : (gs i).isSome = true) :
-    (Polynomial.restrictAtHeight params
-      (interpolateCompletedSlices params k xs gs) (xs i)).poly =
-        ((gs i).get hi).poly := by
-  cases k with
-  | zero => cases i.2
-  | succ k =>
-      simpa [interpolateCompletedSlices, hNotEligible, hGlobal] using
-        globallyConsistentWitness_spec params xs gs hGlobal i hi
-
 /-- Aggregate the polynomial outcomes of `G^x` into its complete part `G^x`. -/
 noncomputable def completePartSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
