@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Test.MainTheorem.ClassicalAndBase
-import MIPStarRE.LDT.Test.MainTheorem.OrdinaryRestriction
 import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 import MIPStarRE.LDT.Test.MainTheorem.ErrorScalars
 import MIPStarRE.LDT.Test.MainTheorem.RoleRegister
@@ -28,7 +27,6 @@ consistency bounds (`eq:one-goal`, `eq:another-goal`, `eq:third-goal`).
 
 The imported modules carry the split proof assembly:
 * `ClassicalAndBase` — classical soundness and the base case `m = 1`
-* `OrdinaryRestriction` — ordinary `x`-restricted successor route
 * `AnswerValuedRestriction` — answer-valued `x`-restricted successor route
 * `ErrorScalars` — the Section 3 error cascade `σ, ζ₁, …, ζ₄`
 * `RoleRegister` — role-register measurement and branch witness
