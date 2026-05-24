@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Commutativity.Main.Auxiliary
-import MIPStarRE.LDT.Commutativity.Main.EvaluatedQuestions
 import MIPStarRE.LDT.Commutativity.Main.Results
 
 /-!

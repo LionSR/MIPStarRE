@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Commutativity.Scaffold.Core
-import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
 import MIPStarRE.LDT.Commutativity.Scaffold.Products
 
 /-!

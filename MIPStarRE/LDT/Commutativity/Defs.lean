@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Commutativity.Defs.Core
-import MIPStarRE.LDT.Commutativity.Defs.Stability
 import MIPStarRE.LDT.Commutativity.Defs.Normalization
 
 /-!

@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Core
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.PostDeleteA
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Assembly
 
 /-!

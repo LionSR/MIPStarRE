@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseFive
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainReverse
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainTail
 

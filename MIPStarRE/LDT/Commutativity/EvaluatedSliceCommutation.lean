@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
 
 /-!
