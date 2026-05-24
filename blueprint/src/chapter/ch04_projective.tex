@@ -157,10 +157,11 @@
 	$G^{\mathrm A}\simeq_{\zeta_1}G^{\mathrm B}$ and
 	$G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ one obtains
 	$Q^{\mathrm A}\simeq_{\zeta_1+\sqrt{\zeta_2}}G^{\mathrm B}$, and similarly
-	on the other tensor factor.  The declarations
-	\texttt{leftConsistency\_with\_triangleSub\_loss} and
-	\texttt{rightConsistency\_with\_triangleSub\_loss} are checked lemmas for
-	this direct square-root-loss route.
+	on the other tensor factor.  This direct square-root-loss route is an
+	immediate specialization of the general Lean declarations
+	\texttt{MIPStarRE.LDT.Preliminaries.triangleSub} and
+	\texttt{MIPStarRE.LDT.Preliminaries.triangleSub\_right} to the handoff
+	fields, and is no longer maintained as separate named projectivization API.
 
 	Lean also proves a more local repaired transport that keeps the comparison at
 	the pre-completion stage.  If $P^{\mathrm A}$ is the orthonormalized
