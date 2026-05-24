@@ -656,44 +656,4 @@ theorem final_fields_self_closeness_error_le_selfImprovementError
     _ = selfImprovementError params eps delta := by
       rw [selfImprovementError_eq_finalStagePowerSum]
 
-/-- `30 * selfImprovementHelperError ≤ selfImprovementError` for unit-interval
-parameters.
-
-This formalizes the leading exponent-monotonicity step of the paper's chained
-absorption in `self_improvement.tex`, lines 803--810. It is the foundational
-final-stage threshold from which the projective-output absorptions are
-derived.  The hypothesis `hd_le_q` records the paper's
-small-error branch `d/q ≤ 1`, using positivity of `q`. -/
-theorem thirty_selfImprovementHelperError_le_selfImprovementError
-    (params : Parameters) [FieldModel params.q]
-    (eps delta : Error)
-    (heps : 0 ≤ eps) (heps_le_one : eps ≤ 1)
-    (hdelta : 0 ≤ delta) (hdelta_le_one : delta ≤ 1)
-    (hd_le_q : (params.d : Error) ≤ (params.q : Error)) :
-    30 * selfImprovementHelperError params eps delta ≤
-      selfImprovementError params eps delta := by
-  have hdq_le_one : ((params.d : Error) / (params.q : Error)) ≤ 1 :=
-    d_q_ratio_le_one_of_d_le_q params hd_le_q
-  have hmono :
-      finalStagePowerSum params eps delta (1 / (2 : Error)) ≤
-        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
-    finalStagePowerSum_le_of_exponent_ge params eps delta heps heps_le_one hdelta
-      hdelta_le_one hdq_le_one (by norm_num) (by norm_num)
-  have h3000m_nn : (0 : Error) ≤ 3000 * (params.m : Error) := by positivity
-  -- Both sides expand to `3000 m * sum_p` for matching exponents `p`.
-  rw [selfImprovementHelperError_eq_finalStagePowerSum,
-    selfImprovementError_eq_finalStagePowerSum]
-  calc
-    30 *
-        (100 * (params.m : Error) *
-          finalStagePowerSum params eps delta (1 / (2 : Error)))
-        =
-      3000 * (params.m : Error) *
-        finalStagePowerSum params eps delta (1 / (2 : Error)) := by
-            ring
-    _ ≤
-      3000 * (params.m : Error) *
-        finalStagePowerSum params eps delta (1 / (32 : Error)) :=
-        mul_le_mul_of_nonneg_left hmono h3000m_nn
-
 end MIPStarRE.LDT.SelfImprovement
