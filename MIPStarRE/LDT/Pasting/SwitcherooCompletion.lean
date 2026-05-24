@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.SwitcherooContraction.Raw
+import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Utilities
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.FourthTermChain

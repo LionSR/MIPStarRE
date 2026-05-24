@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Main.Results
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 
 /-!
