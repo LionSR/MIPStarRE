@@ -2,7 +2,6 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.Decom
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.PointConsistency
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.PointConsistencyLiteral
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.Agreement
 
 /-!
 # Final-fields projective-residual boundedness transport
@@ -20,8 +19,6 @@ monolithic file was split for issue #1647.
   literal-threshold transports.
 - `BoundednessTransport.BoundednessGap` contains the helper boundedness-gap,
   data-processing transport, and final boundedness constructors.
-- `BoundednessTransport.Agreement` preserves the old helper-agreement import
-  path.
 
 ## References
 
