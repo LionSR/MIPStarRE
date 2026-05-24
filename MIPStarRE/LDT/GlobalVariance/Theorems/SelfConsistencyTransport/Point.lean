@@ -206,45 +206,6 @@ lemma pointConditionedEventSelfConsistency_weighted_point_sum
           rightTensor (ι₁ := ι) (S * A)
         exact rightTensor_mul_rightTensor S A)
 
-/-- The first weighted self-consistency move on the actual hypercube-edge
-sampling distribution `(u,v) ∼ C`.
-
-This combines `pointConditionedEventSelfConsistency_weighted_point` with the
-uniform first-marginal identity for `rerandomizeCoord`, closing the line-305 to
-line-306 edge-distribution substep of `lem:local-variance-of-points`. -/
-lemma pointConditionedEventSelfConsistency_weighted_leftEdge
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (G : SubMeas (Polynomial params) ι)
-    (g : Polynomial params) :
-    avgOver (rerandomizeCoord params)
-      (fun uv =>
-        let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
-          weightedPointConditionedRightOperatorAtPolynomial params strategy G g uv.1
-        ev strategy.state (Dᴴ * D)) ≤
-      2 * delta := by
-  calc
-    avgOver (rerandomizeCoord params)
-        (fun uv =>
-          let D := weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1 -
-            weightedPointConditionedRightOperatorAtPolynomial params strategy G g uv.1
-          ev strategy.state (Dᴴ * D))
-      = avgOver (uniformDistribution (Point params))
-          (fun u =>
-            let D := weightedPointConditionedOperatorAtPolynomial params strategy G g u -
-              weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
-            ev strategy.state (Dᴴ * D)) := by
-          exact avgOver_rerandomizeCoord_fst params
-            (fun u =>
-              let D := weightedPointConditionedOperatorAtPolynomial params strategy G g u -
-                weightedPointConditionedRightOperatorAtPolynomial params strategy G g u
-              ev strategy.state (Dᴴ * D))
-    _ ≤ 2 * delta := pointConditionedEventSelfConsistency_weighted_point
-      params strategy eps delta gamma hgood G g
-
 /-- Sum-level first self-consistency endpoint on the hypercube-edge sampler.
 
 This is the `u`-endpoint version of `references/ldt-paper/expansion.tex`, lines
