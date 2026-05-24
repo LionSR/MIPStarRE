@@ -10,90 +10,11 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 
-/-! ## Second-slice lift and move-back chain
+/-! ## Move-back chain
 
-`secondSliceLift`, the `moveBackChainFamily` and its step and endpoint lemmas,
-which reverse the commutation to bring the leading `Ĝ` back into position.
+The `moveBackChainFamily` and its endpoint lemmas reverse the commutation to
+bring the leading `Ĝ` back into position.
 -/
-lemma commuteGHalfSandwich_secondSliceLift
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) (r : ℕ)
-    (A B : IdxOpFamily
-      (MoveQ params r)
-      (MoveO params r)
-      (ι × ι))
-    (δ : Error)
-    (hAB : SDDOpRel ψbi
-      (uniformDistribution (MoveQ params r))
-      A B
-      δ) :
-    SDDOpRel ψbi
-      (uniformDistribution (MoveQ params (r + 1)))
-      (commuteGHalfSandwich_secondSliceLiftFamily params family r A)
-      (commuteGHalfSandwich_secondSliceLiftFamily params family r B)
-      δ := by
-  let eQ :
-      (MoveQ params (r + 1)) ≃
-        (MoveQ params (r + 1)) :=
-    { toFun := fun q => (q.2.1, q.1, q.2.2)
-      invFun := fun q => (q.2.1, q.1, q.2.2)
-      left_inv := by
-        intro q
-        rcases q with ⟨x₁, x₂, xs⟩
-        rfl
-      right_inv := by
-        intro q
-        rcases q with ⟨x₁, x₂, xs⟩
-        rfl }
-  let eO :
-      (MoveO params (r + 1)) ≃
-        (MoveO params (r + 1)) :=
-    { toFun := fun ogs => (ogs.2.1, ogs.1, ogs.2.2)
-      invFun := fun ogs => (ogs.2.1, ogs.1, ogs.2.2)
-      left_inv := by
-        intro ogs
-        rcases ogs with ⟨g₁, g₂, gs⟩
-        rfl
-      right_inv := by
-        intro ogs
-        rcases ogs with ⟨g₁, g₂, gs⟩
-        rfl }
-  have hlift :=
-    commuteGHalfSandwich_moveChainLift params ψbi family r A B δ hAB
-  have hswapQ :
-      SDDOpRel ψbi
-        (uniformDistribution (MoveQ params (r + 1)))
-        (fun q =>
-          commuteGHalfSandwich_moveChainLiftFamily params family r A (eQ.symm q))
-        (fun q =>
-          commuteGHalfSandwich_moveChainLiftFamily params family r B (eQ.symm q))
-        δ :=
-    (sddOpRel_uniform_equiv eQ ψbi
-      (commuteGHalfSandwich_moveChainLiftFamily params family r A)
-      (commuteGHalfSandwich_moveChainLiftFamily params family r B)
-      δ).1 hlift
-  have hreindex := CommutativityPoints.sddOpRel_reindex eO
-    ψbi
-    (uniformDistribution (MoveQ params (r + 1)))
-    (fun q =>
-      commuteGHalfSandwich_moveChainLiftFamily params family r A (eQ.symm q))
-    (fun q =>
-      commuteGHalfSandwich_moveChainLiftFamily params family r B (eQ.symm q))
-    δ hswapQ
-  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
-    (uniformDistribution (MoveQ params (r + 1)))
-    _ _
-    (commuteGHalfSandwich_secondSliceLiftFamily params family r A)
-    (commuteGHalfSandwich_secondSliceLiftFamily params family r B)
-    δ
-    (fun q ogs => by
-      simp [eQ, eO, commuteGHalfSandwich_moveChainLiftFamily,
-        commuteGHalfSandwich_secondSliceLiftFamily])
-    (fun q ogs => by
-      simp [eQ, eO, commuteGHalfSandwich_moveChainLiftFamily,
-        commuteGHalfSandwich_secondSliceLiftFamily])
-    hreindex
 
 noncomputable def commuteGHalfSandwich_moveBackChainFamily
     (params : Parameters) [FieldModel params.q]
