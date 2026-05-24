@@ -617,16 +617,6 @@ noncomputable def localDirectSumBlock {ιA ιB : Type*}
     MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB) :=
   Matrix.fromBlocks A 0 0 B
 
-/-- Embed an Alice-local operator into the Alice summand of `ιA ⊕ ιB`. -/
-noncomputable def aliceLocalDirectSumBlock {ιA ιB : Type*}
-    (A : MIPStarRE.Quantum.Op ιA) : MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB) :=
-  localDirectSumBlock A 0
-
-/-- Embed a Bob-local operator into the Bob summand of `ιA ⊕ ιB`. -/
-noncomputable def bobLocalDirectSumBlock {ιA ιB : Type*}
-    (B : MIPStarRE.Quantum.Op ιB) : MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB) :=
-  localDirectSumBlock 0 B
-
 @[simp] theorem localDirectSumBlock_inl_inl {ιA ιB : Type*}
     (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB)
     (i j : ιA) : localDirectSumBlock A B (Sum.inl i) (Sum.inl j) = A i j :=
@@ -645,16 +635,6 @@ noncomputable def bobLocalDirectSumBlock {ιA ιB : Type*}
 @[simp] theorem localDirectSumBlock_inr_inr {ιA ιB : Type*}
     (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB)
     (i j : ιB) : localDirectSumBlock A B (Sum.inr i) (Sum.inr j) = B i j :=
-  rfl
-
-@[simp] theorem aliceLocalDirectSumBlock_eq {ιA ιB : Type*}
-    (A : MIPStarRE.Quantum.Op ιA) :
-    aliceLocalDirectSumBlock (ιB := ιB) A = localDirectSumBlock A 0 :=
-  rfl
-
-@[simp] theorem bobLocalDirectSumBlock_eq {ιA ιB : Type*}
-    (B : MIPStarRE.Quantum.Op ιB) :
-    bobLocalDirectSumBlock (ιA := ιA) B = localDirectSumBlock 0 B :=
   rfl
 
 @[simp] theorem localDirectSumBlock_one {ιA ιB : Type*}
