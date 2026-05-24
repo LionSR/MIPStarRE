@@ -765,52 +765,6 @@ private lemma qxpProjSubMeas_leftTensor_total_ev_le_of_total_le {Outcome : Type*
       ev ψ (leftTensor (ι₂ := ιRight) A.total) :=
   ev_mono ψ _ _ <| leftTensor_mono hTotal
 
-/-- Outcomewise domination of the QXP projectors gives the corresponding scalar
-expectation comparison for the total operator. -/
-lemma qxpProjSubMeas_total_ev_le_of_outcome_le {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι)
-    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
-    (hpoint : ∀ a : Outcome, Pa data a ≤ A.outcome a) :
-    ev ψ (qxpProjSubMeas data).toSubMeas.total ≤ ev ψ A.total :=
-  qxpProjSubMeas_total_ev_le_of_total_le ψ data A
-    (qxpProjSubMeas_total_le_of_outcome_le data A hpoint)
-
-/-- Outcomewise domination of the QXP projectors gives the corresponding
-right-register expectation comparison.
-
-The proof is only the operator inequality from
-`qxpProjSubMeas_total_le_of_outcome_le`, followed by monotonicity of right
-tensor placement and of the state expectation. -/
-lemma qxpProjSubMeas_rightTensor_total_ev_le_of_outcome_le {Outcome : Type*}
-    {ιLeft ι : Type*} [Fintype ιLeft] [DecidableEq ιLeft]
-    [Fintype ι] [DecidableEq ι] [Fintype Outcome]
-    (ψ : QuantumState (ιLeft × ι))
-    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
-    (hpoint : ∀ a : Outcome, Pa data a ≤ A.outcome a) :
-    ev ψ (rightTensor (ι₁ := ιLeft) (qxpProjSubMeas data).toSubMeas.total) ≤
-      ev ψ (rightTensor (ι₁ := ιLeft) A.total) :=
-  qxpProjSubMeas_rightTensor_total_ev_le_of_total_le ψ data A
-    (qxpProjSubMeas_total_le_of_outcome_le data A hpoint)
-
-/-- Outcomewise domination of the QXP projectors gives the corresponding
-left-register expectation comparison.
-
-The proof is the same operator comparison as in
-`qxpProjSubMeas_total_le_of_outcome_le`, transported through left tensor
-placement and then evaluated in the ambient state. -/
-lemma qxpProjSubMeas_leftTensor_total_ev_le_of_outcome_le {Outcome : Type*}
-    {ι ιRight : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype ιRight] [DecidableEq ιRight] [Fintype Outcome]
-    (ψ : QuantumState (ι × ιRight))
-    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
-    (hpoint : ∀ a : Outcome, Pa data a ≤ A.outcome a) :
-    ev ψ (leftTensor (ι₂ := ιRight) (qxpProjSubMeas data).toSubMeas.total) ≤
-      ev ψ (leftTensor (ι₂ := ιRight) A.total) :=
-  qxpProjSubMeas_leftTensor_total_ev_le_of_total_le ψ data A
-    (qxpProjSubMeas_total_le_of_outcome_le data A hpoint)
-
 /-- Total-domination invariant for the QXP repair.
 
 This proposition is the construction-level operator comparison required by the
