@@ -113,16 +113,6 @@ lemma looksEasyButTookMeAWhile
           _ = 2 * Real.rpow (lambda ^ (d + 1) * (1 - lambda)) e := by
             rw [← hmul_rpow]
 
-/-- A unit-valued `postprocess` has the same outcome as the total of the underlying
-submeasurement. -/
-lemma postprocess_unit_outcome_eq_total
-    {Outcome : Type*} [Fintype Outcome]
-    (A : SubMeas Outcome ι) :
-    (postprocess A (fun _ => ())).outcome () =
-      (postprocess A (fun _ => ())).total := by
-  rw [← (postprocess A (fun _ => ())).sum_eq_total]
-  simp
-
 /-- `lem:q-sdd-complete-part-slice-bound`. -/
 lemma qSDD_completePart_le_slice
     (params : Parameters)
