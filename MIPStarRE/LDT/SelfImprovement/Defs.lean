@@ -183,10 +183,6 @@ noncomputable def sdpPrimalObjective (params : Parameters)
     (T : SubMeas (Polynomial params) ι) : Error :=
   Complex.re (Matrix.trace (sdpPrimalObjectiveOperator params strategy T))
 
-/-- The dual objective value `Tr(Z)`. -/
-noncomputable def sdpDualObjective (Z : MIPStarRE.Quantum.Op ι) : Error :=
-  Complex.re (Matrix.trace Z)
-
 /-- The dual slack operator `Z - A_g`. -/
 noncomputable def sdpDualSlackOperator (params : Parameters)
     [FieldModel params.q]
