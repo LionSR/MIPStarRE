@@ -280,11 +280,6 @@ for a small error $\Delta = \poly(m)\cdot \poly(\eps,\delta,\gamma,\zeta,d/q)$. 
 \end{equation}
 The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar inequality.
 
-% ORPHAN: This lemma is used only in the expository first construction
-% (sec:construction-numba-one), a motivational discussion of a discarded
-% approach.  The final pasting proof proceeds through the second construction
-% (sec:construction-numba-two) instead.  No formal proof node depends on
-% this lemma; it is an intentional island in the dependency graph.
 \begin{lemma}[A scalar inequality for the first construction]\label{lem:looks-easy-but-took-me-a-while}
 	\lean{MIPStarRE.LDT.Pasting.looksEasyButTookMeAWhile}
 	\leanok
@@ -296,6 +291,25 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \begin{proof}
 	\leanok
 	Compare $1-\lambda^d$ with $(1-\lambda)(1+\lambda+\cdots+\lambda^{d-1})$ and use that $d^{1/(d+1)} \le 2$.
+\end{proof}
+
+\begin{corollary}[First-construction spectral comparison]\label{cor:first-construction-spectral-comparison}
+	\uses{lem:looks-easy-but-took-me-a-while}
+	Suppose that the first-construction spectral distribution satisfies
+	\[
+		\Delta \ge
+		\E_{i\sim\mu}[\lambda_i^{d+1}(1-\lambda_i)].
+	\]
+	Then the scalar inequality from
+	Lemma~\ref{lem:looks-easy-but-took-me-a-while} gives
+	\[
+		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
+		\le 2\Delta^{1/(d+1)}.
+	\]
+\end{corollary}
+\begin{proof}
+	Apply Lemma~\ref{lem:looks-easy-but-took-me-a-while} pointwise and then use
+	the concavity of \(a \mapsto a^{1/(d+1)}\).
 \end{proof}
 
 As in the paper, Lemma~\ref{lem:looks-easy-but-took-me-a-while} now converts
@@ -1154,7 +1168,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\label{cor:h-a-consistency-completed}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed}
 	\leanok
-	\uses{cor:h-a-consistency, cor:ld-pasting-N-completeness}
+	\uses{cor:h-a-consistency, cor:ld-pasting-N-completeness,
+		lem:h-a-consistency-completed-from-submeas}
 	Let $H_{\mathrm{meas}}$ be the completion of $H$ at the fallback outcome.
 	On average over $(u,x) \sim \F_q^{m+1}$,
 	\[
@@ -1182,6 +1197,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\label{lem:h-a-consistency-completed-from-submeas}
 	\lean{MIPStarRE.LDT.Pasting.hAConsistency_completed_from_submeas}
 	\leanok
+	\uses{cor:ld-pasting-N-completeness}
 	Let $H$ be any polynomial-valued submeasurement. Suppose that the pointwise
 	evaluations of $H$ are consistent with Alice's point measurement with error
 	$\nu$, and that $H$ has the lower mass bound used in
