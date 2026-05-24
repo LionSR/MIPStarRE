@@ -65,19 +65,6 @@ noncomputable def pullSndOpFamily {α β : Type*} [Fintype α] [Fintype β] {κ 
   outcome := fun ab => A.outcome ab.2
   total := (Fintype.card α : ℂ) • A.total
 
-/-- Outcomewise tensor product of same-indexed raw families on opposite registers. -/
-noncomputable def sameOutcomeTensorOpFamily {α : Type*} [Fintype α]
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : OpFamily α ιA) (B : OpFamily α ιB) :
-    OpFamily α (ιA × ιB) where
-  outcome := fun a =>
-    leftTensor (ι₂ := ιB) (A.outcome a) *
-      rightTensor (ι₁ := ιA) (B.outcome a)
-  total :=
-    ∑ a : α,
-      leftTensor (ι₂ := ιB) (A.outcome a) *
-        rightTensor (ι₁ := ιA) (B.outcome a)
-
 /-- Sandwiched product `A_a B_b A_a`.
 
 Its total operator should be the sum-of-sandwiches
@@ -207,16 +194,6 @@ noncomputable def evaluatedSliceSandwichFirstFactor (params : Parameters) [Field
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       evaluatedSliceSandwichRaw params _strategy family q
-
-/-- Bob's second evaluated point measurement, reindexed to the pair outcome `(a,b)`. -/
-noncomputable def evaluatedSlicePointMeasurementSecondExpanded (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) ι :=
-  fun q =>
-    show OpFamily (EvaluatedSliceOutcome params) ι from
-      pullSndOpFamily (α := Fq params.next) <|
-        ((strategy.pointMeasurement q.2).toSubMeas : OpFamily (Fq params.next) ι)
 
 /-- Bob's ordered evaluated point product `A^{u,x}_a A^{v,y}_b`,
 reindexed by the pair outcome `(a,b)`. -/

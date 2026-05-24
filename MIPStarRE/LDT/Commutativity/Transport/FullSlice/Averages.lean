@@ -240,27 +240,6 @@ noncomputable def fullSliceBABAtensorAvg
             rightTensor (ι₁ := ι)
               ((family.meas xy.1).toSubMeas.outcome gh.1)))
 
-/-- Evaluated-slice `BAB ⊗ A` tensor average
-(evaluated-side analogue of `fullSliceBABAtensorAvg`):
-`E_{u,v,x,y} ∑_{a,b} ⟨ψ|
-   G^y_[h(v)=b] G^x_[g(u)=a] G^y_[h(v)=b] ⊗ G^x_[g(u)=a] |ψ⟩`.
-
-Evaluated-side partner used by the tensor-form Schwartz–Zippel
-marginalization. Internal per #713. -/
-noncomputable def evaluatedSliceBABAtensorAvg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
-  avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-    (fun q =>
-      ∑ ab : EvaluatedSliceOutcome params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              ((evaluatedSliceSecondFactor params family q).outcome ab.2 *
-                (evaluatedSliceFirstFactor params family q).outcome ab.1 *
-                (evaluatedSliceSecondFactor params family q).outcome ab.2) *
-            rightTensor (ι₁ := ι)
-              ((evaluatedSliceFirstFactor params family q).outcome ab.1)))
-
 /-- Full-slice `ABA ⊗ B` tensor average (y-side analogue):
 `E_{x,y} ∑_{g,h} ⟨ψ| G^x_g G^y_h G^x_g ⊗ G^y_h |ψ⟩`.
 
