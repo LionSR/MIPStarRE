@@ -81,14 +81,6 @@ def ofPrime (m q d : ℕ) (hm : 0 < m) (hqPrime : Nat.Prime q) : Parameters :=
 def ofTwo (m d : ℕ) (hm : 0 < m) : Parameters :=
   ofPrime m 2 d hm Nat.prime_two
 
-/-- Convenience constructor for the ternary field. -/
-def ofThree (m d : ℕ) (hm : 0 < m) : Parameters :=
-  ofPrime m 3 d hm Nat.prime_three
-
-/-- Convenience constructor for the quadratic extension field of size `4`. -/
-def ofFour (m d : ℕ) (hm : 0 < m) : Parameters :=
-  ofPrimePower m 4 d 2 2 hm Nat.prime_two (by decide) (by decide)
-
 /-- Paper finite fields have at least two elements: `q = p^n` with `p` prime
 and `0 < n` (see `preliminaries.tex`, lines 17--19 and 89--93). -/
 theorem two_le_q (params : Parameters) : 2 ≤ params.q := by
@@ -181,7 +173,6 @@ instance {params : Parameters} : NeZero params.q :=
 abbrev Fq (params : Parameters) := Fin params.q
 abbrev Point (params : Parameters) := Fin params.m → Fq params
 abbrev PointTuple (params : Parameters) (k : ℕ) := Fin k → Fq params
-abbrev HilbertIndex (n : ℕ) := Fin n
 
 instance {params : Parameters} : Inhabited (Fin params.m) :=
   ⟨⟨0, params.hm⟩⟩
