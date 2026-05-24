@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
+import MIPStarRE.LDT.CommutativityPoints.Approximation
 
 /-!
 # Reindexing and evaluation utilities for the evaluated-slice paper chain
