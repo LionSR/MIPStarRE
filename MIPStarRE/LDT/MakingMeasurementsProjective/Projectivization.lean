@@ -551,16 +551,6 @@ lemma consistencyToAlmostProjective_right {Outcome : Type*}
             nlinarith [hζ_nonneg]
   · exact sourceAlmostProjective_of_ssc ψ B_lifted _ hsscBound
 
-/-- Increase the allowed error bound for a rounded-projective witness. -/
-lemma roundedProjMeasStatement_mono {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
-    {ψ : QuantumState ι} {A : Measurement Outcome ι} {P : ProjSubMeas Outcome ι}
-    {ζ₁ ζ₂ : Error}
-    (h : RoundedProjMeasStatement ψ A P ζ₁) (hζ : ζ₁ ≤ ζ₂) :
-    RoundedProjMeasStatement ψ A P ζ₂ := by
-  exact ⟨⟨le_trans h.closeness.squaredDistanceBound hζ⟩⟩
-
 /-- The zero family is a projective submeasurement. This supplies trivial
 large-error branches where the target error bound is already at least the
 universal `qSDD ≤ 1` estimate. -/
