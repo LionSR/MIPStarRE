@@ -3,8 +3,7 @@ import MIPStarRE.LDT.Test.MainTheorem.ErrorScalars
 /-!
 # Role-register core witnesses
 
-Core role-register records and predecessor-transport helpers used by the
-`mainFormal` assembly.
+Core role-register records used by the `mainFormal` assembly.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -219,39 +218,6 @@ def roleWitness
   witness.toRoleMeasurementWitness scalars
 
 end MainFormalRoleInductionWitness
-
-/-- Reuse the current base-universe field model on the predecessor of a
-successor decomposition.
-
-If `successor.pred.next = params`, then `successor.pred.q = params.q`; this helper
-transports the ambient base-universe field model along that cardinality equality.
-The explicit equality cast keeps the transport visible to callers, rather than
-hiding it behind a tactic-mode `rw; infer_instance` definition. -/
-@[reducible] noncomputable def fieldModelOfSuccessorDecomposition
-    {params : Parameters} [FieldModel.{0} params.q]
-    (successor : Parameters.SuccessorDecomposition params) :
-    FieldModel.{0} successor.pred.q :=
-  let h : successor.pred.q = params.q := by
-    have hnext := congrArg Parameters.q successor.next_eq
-    simpa [Parameters.next] using hnext
-  h ▸ inferInstance
-
-/-- View a strategy over `params` as a strategy over the syntactic successor in a
-predecessor decomposition.
-
-This helper keeps the predecessor transport explicit at the base universe used
-by the current Section 6 API. -/
-noncomputable def projStratTransportSuccessor
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι)
-    (successor : Parameters.SuccessorDecomposition params) :
-    letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
-    SameSpaceProjStrat successor.pred.next ι := by
-  classical
-  rcases successor with ⟨pred, hnext⟩
-  subst params
-  exact strategy
 
 end Test
 
