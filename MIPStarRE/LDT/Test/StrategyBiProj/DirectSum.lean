@@ -813,23 +813,6 @@ theorem roleBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
   change roleBlock A B = (roleBlock C D)ᴴ * roleBlock C D
   rw [roleBlock_conjTranspose, roleBlock_mul, ← hC', ← hD']
 
-/-- The trace of a role-blocked operator is the sum of its two role-sector
-traces. This wraps Mathlib's `Matrix.trace_blockDiagonal` across the
-`Role × (ιA ⊕ ιB)` / `(ιA ⊕ ιB) × Role` reindexing used by `roleBlock`. -/
-theorem trace_roleBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
-    (A B : MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB)) :
-    Matrix.trace (roleBlock A B) = Matrix.trace A + Matrix.trace B := by
-  classical
-  rw [show Matrix.trace (roleBlock A B) =
-      Matrix.trace (Matrix.blockDiagonal (roleBlockFamily A B)) by
-        unfold roleBlock
-        rw [Matrix.trace_reindex]]
-  rw [Matrix.trace_blockDiagonal]
-  change Finset.sum ({Role.A, Role.B} : Finset Role)
-      (fun r => Matrix.trace (roleBlockFamily A B r)) =
-    Matrix.trace A + Matrix.trace B
-  simp [roleBlockFamily]
-
 /-- Finite sums commute through role-register blocks.
 
 This is the role-sector analogue of `localDirectSumBlock_finset_sum` and is the main

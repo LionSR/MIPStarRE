@@ -253,21 +253,6 @@ noncomputable def projStratTransportSuccessor
   subst params
   exact strategy
 
-/-- Transport the low-individual-degree passing proof across a predecessor
-identity, using the same base-universe field-model transport as
-`projStratTransportSuccessor`. -/
-theorem passesLowIndividualDegreeTest_transportSuccessor
-    {params : Parameters} [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {strategy : SameSpaceProjStrat params ι} {eps : Error}
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (successor : Parameters.SuccessorDecomposition params) :
-    letI : FieldModel.{0} successor.pred.q := fieldModelOfSuccessorDecomposition successor
-    (projStratTransportSuccessor strategy successor).PassesLowIndividualDegreeTest eps := by
-  rcases successor with ⟨pred, hnext⟩
-  subst params
-  simpa [projStratTransportSuccessor, fieldModelOfSuccessorDecomposition] using hpass
-
 end Test
 
 end MIPStarRE.LDT
