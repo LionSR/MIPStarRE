@@ -9,11 +9,11 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Recursive source/target families and the split-succ equivalence
+/-! ## Recursive target family and the split-succ equivalence
 
 These are the basic building blocks for the half-sandwich commutation chain:
-type abbreviations, the recursive source and target families, and the
-split-succ equivalence (`split_succ_iff`) plus the prefix-second-slice-left lemma.
+type abbreviations, the recursive target family, and the split-succ equivalence
+(`split_succ_iff`) plus the prefix-second-slice-left lemma.
 -/
 abbrev MoveQ (params : Parameters) (r : ℕ) :=
   SliceQuestion params × SliceQuestion params × PointTuple params r
@@ -26,18 +26,6 @@ abbrev MoveTailQ (params : Parameters) (r : ℕ) :=
 
 abbrev MoveTailO (params : Parameters) [FieldModel params.q] (r : ℕ) :=
   GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r
-
-noncomputable def commuteGHalfSandwich_recursiveSourceFamily
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (r : ℕ) :
-    IdxOpFamily (MoveQ params r)
-      (MoveO params r)
-      (ι × ι) :=
-  fun q =>
-    { outcome := fun ogs =>
-        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
-          (headTailOrderedFamily params family r (q.1, q.2.2)).outcome (ogs.1, ogs.2.2)
-      total := 0 }
 
 noncomputable def commuteGHalfSandwich_recursiveTargetFamily
     (params : Parameters) [FieldModel params.q]
