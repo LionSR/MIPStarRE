@@ -11,9 +11,9 @@ The audit was run on commit `e3d69726b` of `origin/main`, before the open PRs
 the classification below is the audit state at that commit.
 
 > **Status note, 2026-05-23.**  This report is now historical.  The current
-> local tree has removed the direct proof holes listed below and the green-node
-> integrity audit passes under the corrected source statements.  The remaining
-> differences from the literal printed theorem are the documented
+> repository state has removed the direct proof holes listed below, and the
+> green-node integrity audit passes under the corrected source statements.  The
+> remaining differences from the literal printed theorem are the documented
 > factor-\(400\) large-\(k\) correction and the final-theorem boundary \(0<k\).
 
 ## Method
