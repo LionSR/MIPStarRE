@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Core
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Left
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Middle
 

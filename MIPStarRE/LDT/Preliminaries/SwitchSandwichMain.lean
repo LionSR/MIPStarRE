@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.LeftTransfer
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.RightTransfer
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.Completeness
 
 /-!
