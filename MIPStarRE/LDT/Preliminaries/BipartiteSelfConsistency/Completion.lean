@@ -3,8 +3,9 @@ import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 /-!
 # Preliminary comparison theorems: bipartite self-consistency (completion)
 
-Completion-transfer lemmas for bipartite self-consistency: reducing `consError`
-on a `Unit`-indexed constant family to the underlying `qConsDefect`.
+Completion-transfer lemmas for bipartite self-consistency.  The constant
+`Unit`-family reductions identify `sddError` and `sscError` with their pointwise
+forms, and the later lemmas compare a submeasurement with its completion.
 
 ## References
 
@@ -16,16 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
-
-/-- For a constant `Unit`-indexed family, `consError` reduces to `qConsDefect`. -/
-lemma constFamily_cons_unit
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
-    consError ψ (uniformDistribution Unit)
-      (constSubMeasFamily A) (constSubMeasFamily B) =
-      qConsDefect ψ A B := by
-  simp [consError, avgOver, uniformDistribution, constSubMeasFamily]
 
 /-- For a constant `Unit`-indexed family, `sddError` reduces to `qSDD`. -/
 lemma constFamily_sdd_unit
