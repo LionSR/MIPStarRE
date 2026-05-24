@@ -203,8 +203,6 @@ lemma orthonormalizationMeasurement {Outcome : Type*}
     (A := A) (B := A) (ζ := ζ) hζ
     (bipartiteSSCRel_self_of_measurement (ψ := ψ) A ζ hssc)
 
--- The direct locality-preserving repair route below still uses `[DecidableEq Outcome]`
--- through the concrete QXP-layer construction.
 set_option linter.unusedDecidableInType false in
 /-- Measurement-level orthonormalization from cross consistency, using the
 locality-preserving Section 5 repair construction directly.
@@ -349,7 +347,6 @@ lemma orthonormalizationMeasurement_right_of_consistency_from_projectivizationRe
   rcases hP with ⟨hP⟩
   exact ⟨hP.trans hbound⟩
 
-set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 /-- Completion-route orthonormalization with the documented weakened constant.
 
@@ -434,7 +431,6 @@ theorem orthonormalizationCompletionRoute {Outcome : Type*}
   simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
     (le_trans hPsomeq hcoeff)
 
-set_option linter.unusedFintypeInType false in
 set_option linter.unusedDecidableInType false in
 /-- `thm:orthonormalization`.
 

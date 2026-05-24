@@ -20,7 +20,6 @@ open MIPStarRE.LDT.Preliminaries
 
 /-! ### Output data -/
 
-set_option linter.unusedFintypeInType false in
 /-- Paper origin: `references/ldt-paper/orthonormalization.tex:282-538`
 (`\label{lem:orthonormalization-main-lemma}`), with the completion-to-measurement
 step from `references/ldt-paper/inductive_step.tex:130-149`
@@ -149,7 +148,6 @@ end ProjectivizationSelfConsistencyHandoff
 
 /-! ### Main theorem -/
 
-set_option linter.unusedFintypeInType false in
 /-- Orthonormalization and completion chain in the inductive step.
 
 Given:
