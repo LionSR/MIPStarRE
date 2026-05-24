@@ -21,26 +21,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma ldGbcon_consRel_symm_of_density_fixed
-    (ψ : QuantumState (ι × ι))
-    (hfix : swapDensity ψ.density = ψ.density)
-    {Question Outcome : Type*} [Fintype Outcome]
-    (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome ι)
-    (δ : Error) :
-    ConsRel ψ 𝒟 A B δ → ConsRel ψ 𝒟 B A δ := by
-  intro ⟨h⟩
-  constructor
-  unfold bipartiteConsError at *
-  calc
-    avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (B q) (A q))
-      = avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q)) := by
-          apply avgOver_congr
-          intro q
-          symm
-          exact qBipartiteConsDefect_symm_of_density_fixed ψ hfix (A q) (B q)
-    _ ≤ δ := h
-
 private noncomputable def ldGbconAxisLineMeasurement
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
@@ -441,7 +421,7 @@ theorem ldGbcon_of_axis_self
         (IdxProjSubMeas.toIdxSubMeas family.meas))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       zeta := by
-        exact ldGbcon_consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+        exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
           (uniformDistribution (Point params.next))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
           (evaluateFiberFamilyAtNextPoint params
