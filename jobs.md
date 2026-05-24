@@ -211,8 +211,8 @@ Last updated: 2026-04-23
 - **Completed on this pass**:
   - confirmed `completionMissingMassBound` is the only live `sorry` in `Preliminaries`
   - traced the intended proof through `bipartiteSSCSquaredMass`,
-    `easyApproxFromApproxDelta`, and the existing completion lemmas in
-    `Preliminaries/Theorems.lean`
+    `easyApproxFromApproxDelta`, and the existing completion lemmas in the
+    Preliminaries split files
   - checked the paper/blueprint statement at
     `references/ldt-paper/preliminaries.tex:1143-1174` and
     `blueprint/src/chapter/ch03_preliminaries.tex:626-636`
@@ -384,7 +384,8 @@ Last updated: 2026-04-23
   - identified that `ldGbcon` is blocked by the conditioned last-direction axis-line encoding: the axis test uses the sampled ambient basepoint, while the pasting theorem needs the canonical vertical-line family based at height `0`
   - proved `Pasting.truncatedTypeSumRecurrence` via a `Fin.cons` decomposition of Boolean types, positivity of each operator monomial, and a recursive full-sum identity `∑_τ G^|τ| (I-G)^(k-|τ|) = I`
   - added `\leanok` tags in `blueprint/src/chapter/ch09_pasting.tex` for `commutingWithGComplete`, `gHatFacts`, and `truncatedTypeSumRecurrence`
-  - verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean` still typechecks with 12 remaining local `sorry`s
+  - verified the then-current monolithic Pasting theorem file still typechecked
+    with 12 remaining local `sorry`s
   - attempted `leanblueprint web`, but the `leanblueprint` command is not installed in the current environment
   - confirmed `fromHToG` is blocked by the current scaffold: `fromHToGRecurrenceLeftFamily` / `RightFamily` already collapse to endpoint families times a weight operator, so they do not encode the paper's suffix-indexed intermediate quantities
   - confirmed `commuteGHalfSandwich` is blocked at the theorem interface: the statement no longer carries the small-error assumptions needed to weaken the `2 * zeta` self-consistency cost from `GHatFactsStatement` to the displayed `zeta^(1/16)` bound
@@ -421,12 +422,17 @@ Last updated: 2026-04-23
   - attempted the second `√ζ` step and the final `√χ` collapse-to-`firstTerm` step, but reverted those partial proofs after they introduced elaboration/heartbeat blowups and nontrivial rewrite obligations; the file is back to a compiling state
   - current concrete blocker: the remaining fourth-term chain needs one more `closenessOfInnerProduct_right` step plus the final `χ` step. The obstacle is not a missing statement now, but proof-engineering complexity: the right-action witness must be chosen so that `hC` reuses the existing left contraction, and the resulting expressions must be rewritten to the target scalar without triggering Lean heartbeat timeouts on large tensor/adjoint normal forms
   - best next step once resuming: prove the second `√ζ` step with a tightly controlled `closenessOfInnerProduct_right` proof that uses an adjointed witness to recycle `switcherooAggregateFourthTerm_once_commuted_contraction_left`, then package the final `√χ` step and exact collapse to `switcherooAggregateFirstTerm`; only after that mirror the argument for the third term to `switcherooAggregateTargetSwapped`
-  - re-surveyed the target and confirmed there are currently 12 executable `sorry`s in `Pasting/Theorems.lean`
+  - re-surveyed the then-current monolithic Pasting theorem file and confirmed
+    there were 12 executable `sorry`s
   - identified a mismatch with the statement in the paper for the pasted consistency chain: the current Lean scaffolding states the pasted submeasurement consistency at the final induction error `σ`, but the paper/blueprint give the intermediate `ν` before completion and only add the missing-mass term when passing to the completed measurement
   - repaired that interface mismatch so `LdPastingSubMeasConclusion` and `hAConsistency_submeas` now carry the paper's intermediate `ν`, while `hAConsistency_completed` is the separate completion step to the final induction error `σ`
   - proved `hAConsistency_completed` by showing evaluation commutes with `completeAtOutcome`, bounding completion's extra off-diagonal mass by the residual total mass, and then using the completeness lower bound to absorb that residual into the final `σ`
-  - re-verified `lake env lean MIPStarRE/LDT/Pasting/Theorems.lean`; the file now typechecks with 12 remaining local `sorry`s
-  - re-checked the live `sorry` count with `rg -n "\bsorry\b"`: this branch has 12 executable `sorry`s in `Pasting/Theorems.lean`, while `main` still has 13, so the board count of 12 is a correction of stale tracking rather than an increase
+  - re-verified the then-current monolithic Pasting theorem file; it typechecked
+    with 12 remaining local `sorry`s
+  - re-checked the live `sorry` count with `rg -n "\bsorry\b"`: that branch had
+    12 executable `sorry`s in the monolithic Pasting theorem file, while `main`
+    still had 13, so the board count of 12 was a correction of stale tracking
+    rather than an increase
   - resumed the active split-file bridge work directly in `Pasting/BridgeLemmas.lean` and added the reusable half-product contraction lemma `gHatHalfProduct_sum_adjoint_mul_le_one`
   - corrected the successor split transport for the recursive half-sandwich scaffold by adding `splitSuccQuestionEquiv` / `splitSuccOutcomeEquiv` and rewiring `commuteGHalfSandwich_split_succ_iff` to use those instead of the earlier mismatched `moveTail*` equivalences
   - repaired `commuteGHalfSandwich_recursiveTarget_eq_split`, so the recursive target now matches the rotated successor split in the intended `(x₁, x₂ :: xs)` form
@@ -609,9 +615,9 @@ Last updated: 2026-04-23
 ## PRs Created
 
 ### PR #333: Pasting transport scaffold (`fix/pasting-consistency-transport`)
-**Scope:**
-- `MIPStarRE/LDT/Pasting/Theorems.lean`
-- `MIPStarRE/LDT/Preliminaries/Theorems.lean`
+**Historical scope at the time of the PR:**
+- the then-current monolithic Pasting theorem file
+- the then-current monolithic Preliminaries theorem file
 - `jobs.md`
 
 **What it records:**
@@ -631,10 +637,12 @@ Last updated: 2026-04-23
 **Infrastructure fixes:**
 - `QXPLayer.lean`: Added 7 invariant fields to `QXPLayerData` (`qa_eq`, `qa_projective`, `xHat_coisometry`, `x_gram_right`, `x_gram_left_svd`, `q_total_svd`, `xHat_mixed`)
 - `MMP/Theorems.lean`: Added `0 ≤ ζ` and `ζ ≤ 1` hypotheses to `orthonormalizationMainLemma_error_bound` and threaded through call site
-- `Pasting/Theorems.lean`: Fixed `G` type mismatch in `commutingWithGComplete` (`Fq params → SubMeas` → `SubMeas`)
+- former Pasting theorem file: fixed `G` type mismatch in
+  `commutingWithGComplete` (`Fq params → SubMeas` → `SubMeas`)
 - `SelfImprovement/Theorems.lean`: Updated blocker documentation with exact missing ingredients
 
-**Files changed:** QXPLayer.lean, MMP/Theorems.lean, Pasting/Theorems.lean, SelfImprovement/Theorems.lean
+**Files changed:** QXPLayer.lean, MMP/Theorems.lean, the former Pasting theorem
+file, SelfImprovement/Theorems.lean
 
 ### PR #241: Wave 2 (`feat/ldt-sorry-elimination-wave2`)
 **Sorrys eliminated (4):**
@@ -673,9 +681,18 @@ Last updated: 2026-04-23
 
 ---
 
-## Remaining 25 Executable Sorrys — Detailed Breakdown
+## Historical Remaining 25 Executable Sorrys — Detailed Breakdown
 
-### Pasting/Theorems.lean (11 sorrys)
+This section is retained as a historical wave record.  It is not the current
+proof-debt ledger: the old monolithic `Pasting/Theorems.lean` and
+`Preliminaries/Theorems.lean` files have been split, and the current
+`Pasting`, `GlobalVariance`, `Commutativity`, `MainInductionStep`,
+`SelfImprovement`, `MakingMeasurementsProjective`, and `Preliminaries` trees
+contain no executable `sorry`s.  As of this update, the only textual LDT
+occurrence found by `rg -n "\bsorry\b" MIPStarRE/LDT` is a prose note in
+`Test/AxiomAudit.lean`, not a proof hole.
+
+### Former Pasting/Theorems.lean (11 sorrys)
 | Lemma | Status | Blocker |
 |-------|--------|---------|
 | `ldGbcon` | BLOCKED | The conditioned axis test indexes the last-direction line by the sampled ambient basepoint, while `verticalLineMeasurementFamily` uses the canonical base at height `0`; no invariance/reparameterization lemma currently connects the two encodings |
