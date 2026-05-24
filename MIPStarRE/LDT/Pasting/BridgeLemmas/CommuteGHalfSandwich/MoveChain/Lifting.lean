@@ -295,19 +295,6 @@ noncomputable def commuteGHalfSandwich_secondSliceLiftFamily
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
           (F (q.1, q.2.2 0, pointTupleTail q.2.2)).total }
 
-lemma commuteGHalfSandwich_secondSliceLift_moveSource
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : MoveQ params (r + 1))
-    (ogs : MoveO params (r + 1)) :
-    (commuteGHalfSandwich_secondSliceLiftFamily params family r
-      (commuteGHalfSandwich_moveSourceFamily params family r) q).outcome
-        ogs =
-      (commuteGHalfSandwich_recursiveSourceFamily params family (r + 1) q).outcome ogs := by
-  simp [commuteGHalfSandwich_secondSliceLiftFamily,
-    commuteGHalfSandwich_recursiveSourceFamily, commuteGHalfSandwich_moveSourceFamily,
-    headTailOrderedFamily, gHatHalfProductOutcomeOperator, leftTensor_mul_leftTensor, mul_assoc]
-
 lemma commuteGHalfSandwich_prefixSecondSliceLeft_splitSuccLift_eq_secondSliceLift
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
