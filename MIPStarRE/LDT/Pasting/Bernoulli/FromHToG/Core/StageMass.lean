@@ -503,39 +503,4 @@ lemma fromHToGStageMass_telescope
     (fun ℓ => fromHToGStageMass params ψbi family k ℓ)
     (fromHToGRecurrenceError params gamma zeta k) k hstep
 
-/-- Reduce the final scalar `fromHToG` conclusion to the paper-local stage facts:
-the adjacent-stage recurrence, the Lean stage `0` and stage `k` endpoint
-identifications, and the scalar absorption into the displayed error term. -/
-lemma fromHToG_bernoulliPolynomialRewrite_of_stageEndpoints
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error) (k : ℕ)
-    (hstep : ∀ ℓ : ℕ, ℓ < k →
-      |fromHToGStageMass params ψbi family k ℓ -
-          fromHToGStageMass params ψbi family k (ℓ + 1)| ≤
-        fromHToGRecurrenceError params gamma zeta k)
-    (hstage0 :
-      fromHToGStageMass params ψbi family k 0 =
-        fromHToGAllOutcomesMass params strategy ψbi family k)
-    (hstagek :
-      fromHToGStageMass params ψbi family k k =
-        fromHToGBernoulliTailMass params ψbi family k)
-    (herror :
-      (k : Error) * fromHToGRecurrenceError params gamma zeta k ≤
-        fromHToGError params gamma zeta k) :
-    |fromHToGAllOutcomesMass params strategy ψbi family k -
-        fromHToGBernoulliTailMass params ψbi family k| ≤
-      fromHToGError params gamma zeta k := by
-  have htelescope :=
-    fromHToGStageMass_telescope params ψbi family gamma zeta k hstep
-  have hmass :
-      |fromHToGAllOutcomesMass params strategy ψbi family k -
-          fromHToGBernoulliTailMass params ψbi family k| ≤
-        (k : Error) * fromHToGRecurrenceError params gamma zeta k := by
-    simpa [hstage0, hstagek] using htelescope
-  exact le_trans hmass herror
-
 end MIPStarRE.LDT.Pasting
