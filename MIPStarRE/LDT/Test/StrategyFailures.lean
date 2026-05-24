@@ -199,6 +199,19 @@ theorem answer_gamma_nonneg_of_isGood
   exact le_trans (answer_diagonalFailureProbability_nonneg params strategy)
     hgood.diagonalLineTest
 
+/-- If three nonnegative summands have average at most `eps`, each summand is at
+most `3 * eps`. -/
+lemma three_summand_bounds_of_average_le
+    {axis point diagonal eps : Error}
+    (haxis : 0 ≤ axis) (hpoint : 0 ≤ point) (hdiagonal : 0 ≤ diagonal)
+    (hmain : (axis + point + diagonal) / 3 ≤ eps) :
+    axis ≤ 3 * eps ∧ point ≤ 3 * eps ∧ diagonal ≤ 3 * eps := by
+  constructor
+  · linarith
+  constructor
+  · linarith
+  · linarith
+
 namespace SameSpaceProjStrat
 
 /-- View the left prover's local data as a symmetric-strategy-style package. -/
@@ -448,17 +461,6 @@ theorem eps_nonneg_of_passes {params : Parameters}
     (hpass : strategy.PassesLowIndividualDegreeTest eps) :
     0 ≤ eps :=
   (lowIndividualDegreeFailureProbability_nonneg strategy).trans hpass.soundnessHypothesis
-
-private lemma three_summand_bounds_of_average_le
-    {axis point diagonal eps : Error}
-    (haxis : 0 ≤ axis) (hpoint : 0 ≤ point) (hdiagonal : 0 ≤ diagonal)
-    (hmain : (axis + point + diagonal) / 3 ≤ eps) :
-    axis ≤ 3 * eps ∧ point ≤ 3 * eps ∧ diagonal ≤ 3 * eps := by
-  constructor
-  · linarith
-  constructor
-  · linarith
-  · linarith
 
 /-- Passing the full test bounds the role-averaged axis-parallel branch by
 `3 * eps`, since it is one of the three nonnegative summands in

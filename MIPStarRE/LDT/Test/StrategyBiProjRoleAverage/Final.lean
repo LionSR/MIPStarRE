@@ -98,17 +98,6 @@ theorem diagonalRoleAverage_nonneg
     linarith
   · norm_num
 
-private lemma three_summand_bounds_of_average_le
-    {axis point diagonal eps : Error}
-    (haxis : 0 ≤ axis) (hpoint : 0 ≤ point) (hdiagonal : 0 ≤ diagonal)
-    (hmain : (axis + point + diagonal) / 3 ≤ eps) :
-    axis ≤ 3 * eps ∧ point ≤ 3 * eps ∧ diagonal ≤ 3 * eps := by
-  constructor
-  · linarith
-  constructor
-  · linarith
-  · linarith
-
 /-- The heterogeneous role-register symmetrization of a two-space projective
 strategy is `(3ε, 3ε, 3ε)`-good whenever the original strategy passes the full
 low individual degree test with error `ε`. -/
@@ -131,11 +120,14 @@ theorem roleRegisterSymmStrategy_is_good_three_mul
     simpa [ProjStrat.lowIndividualDegreeFailureProbability] using
       hpass.soundnessHypothesis
   have haxis : strategy.axisParallelRoleAverage ≤ 3 * eps :=
-    (three_summand_bounds_of_average_le haxis_nonneg hpoint_nonneg hdiag_nonneg hmain).1
+    (MIPStarRE.LDT.three_summand_bounds_of_average_le
+      haxis_nonneg hpoint_nonneg hdiag_nonneg hmain).1
   have hpoint : strategy.pointAgreementFailureProbability ≤ 3 * eps :=
-    (three_summand_bounds_of_average_le haxis_nonneg hpoint_nonneg hdiag_nonneg hmain).2.1
+    (MIPStarRE.LDT.three_summand_bounds_of_average_le
+      haxis_nonneg hpoint_nonneg hdiag_nonneg hmain).2.1
   have hdiag : strategy.diagonalRoleAverage ≤ 3 * eps :=
-    (three_summand_bounds_of_average_le haxis_nonneg hpoint_nonneg hdiag_nonneg hmain).2.2
+    (MIPStarRE.LDT.three_summand_bounds_of_average_le
+      haxis_nonneg hpoint_nonneg hdiag_nonneg hmain).2.2
   refine ⟨?_, ?_, ?_⟩
   · rw [roleRegisterSymmStrategy_axisParallel_eq_roleAverage strategy]
     exact haxis
