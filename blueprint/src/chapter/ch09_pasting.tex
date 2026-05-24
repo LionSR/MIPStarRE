@@ -101,7 +101,8 @@ The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, o
 \begin{definition}[Nontrivial-regime pasting context]\label{def:ld-pasting-context}
 	\lean{MIPStarRE.LDT.Pasting.LdPastingNontrivialContext}
 	\leanok
-	\uses{def:good-strategy, def:polymeasurements, def:simeq, def:approx_delta}
+	\uses{thm:ld-pasting, def:good-strategy, def:polymeasurements, def:simeq,
+		def:approx_delta}
 	The Lean context linked here is the nontrivial-regime context used after the
 	reduction explained above.  It consists of the data and hypotheses from
 	Theorem~\ref{thm:ld-pasting}: an $(\eps,\delta,\gamma)$-good symmetric strategy
@@ -308,6 +309,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\]
 \end{corollary}
 \begin{proof}
+	\uses{lem:looks-easy-but-took-me-a-while}
 	Apply Lemma~\ref{lem:looks-easy-but-took-me-a-while} pointwise and then use
 	the concavity of \(a \mapsto a^{1/(d+1)}\).
 \end{proof}
