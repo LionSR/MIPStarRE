@@ -101,37 +101,61 @@ noncomputable def localPairBABlock {ιA ιB : Type*}
   cases x₁ <;> cases x₂ <;> cases y₁ <;> cases y₂ <;>
     simp [localPairBABlock]
 
-set_option linter.flexible false in
 @[simp] theorem localPairABBlock_mul {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
     (X Y : MIPStarRE.Quantum.Op (ιA × ιB)) :
     localPairABBlock X * localPairABBlock Y = localPairABBlock (X * Y) := by
   ext x y
   rcases x with ⟨x₁, x₂⟩
   rcases y with ⟨y₁, y₂⟩
-  cases x₁ <;> cases x₂ <;> cases y₁ <;> cases y₂ <;>
-    simp [localPairABBlock, Matrix.mul_apply]
-  rename_i i j i' j'
-  rw [Fintype.sum_prod_type]
-  simp
-  exact (Fintype.sum_prod_type'
-    (f := fun x : ιA => fun y : ιB =>
-      X (i, j) (x, y) * Y (x, y) (i', j'))).symm
+  cases x₁ with
+  | inl i =>
+      cases x₂ with
+      | inl j =>
+          cases y₁ <;> cases y₂ <;> simp [localPairABBlock, Matrix.mul_apply]
+      | inr j =>
+          cases y₁ with
+          | inl i' =>
+              cases y₂ with
+              | inl j' => simp [localPairABBlock, Matrix.mul_apply]
+              | inr j' =>
+                  rw [Matrix.mul_apply, Fintype.sum_prod_type]
+                  simp only [Fintype.sum_sum_type, localPairABBlock, Matrix.of_apply,
+                    zero_mul, Finset.sum_const_zero, zero_add, add_zero]
+                  exact (Fintype.sum_prod_type'
+                    (f := fun x : ιA => fun y : ιB =>
+                      X (i, j) (x, y) * Y (x, y) (i', j'))).symm
+          | inr i' =>
+              cases y₂ <;> simp [localPairABBlock, Matrix.mul_apply]
+  | inr i =>
+      cases x₂ <;> cases y₁ <;> cases y₂ <;> simp [localPairABBlock, Matrix.mul_apply]
 
-set_option linter.flexible false in
 @[simp] theorem localPairBABlock_mul {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
     (X Y : MIPStarRE.Quantum.Op (ιB × ιA)) :
     localPairBABlock X * localPairBABlock Y = localPairBABlock (X * Y) := by
   ext x y
   rcases x with ⟨x₁, x₂⟩
   rcases y with ⟨y₁, y₂⟩
-  cases x₁ <;> cases x₂ <;> cases y₁ <;> cases y₂ <;>
-    simp [localPairBABlock, Matrix.mul_apply]
-  rename_i i j i' j'
-  rw [Fintype.sum_prod_type]
-  simp
-  exact (Fintype.sum_prod_type'
-    (f := fun x : ιB => fun y : ιA =>
-      X (i, j) (x, y) * Y (x, y) (i', j'))).symm
+  cases x₁ with
+  | inl i =>
+      cases x₂ <;> cases y₁ <;> cases y₂ <;> simp [localPairBABlock, Matrix.mul_apply]
+  | inr i =>
+      cases x₂ with
+      | inl j =>
+          cases y₁ with
+          | inl i' =>
+              cases y₂ <;> simp [localPairBABlock, Matrix.mul_apply]
+          | inr i' =>
+              cases y₂ with
+              | inl j' =>
+                  rw [Matrix.mul_apply, Fintype.sum_prod_type]
+                  simp only [Fintype.sum_sum_type, localPairBABlock, Matrix.of_apply,
+                    zero_mul, Finset.sum_const_zero, zero_add, add_zero]
+                  exact (Fintype.sum_prod_type'
+                    (f := fun x : ιB => fun y : ιA =>
+                      X (i, j) (x, y) * Y (x, y) (i', j'))).symm
+              | inr j' => simp [localPairBABlock, Matrix.mul_apply]
+      | inr j =>
+          cases y₁ <;> cases y₂ <;> simp [localPairBABlock, Matrix.mul_apply]
 
 theorem localPairABBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {X : MIPStarRE.Quantum.Op (ιA × ιB)} (hX : 0 ≤ X) :
