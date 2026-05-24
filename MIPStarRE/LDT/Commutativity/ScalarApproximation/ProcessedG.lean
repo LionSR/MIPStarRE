@@ -1,10 +1,8 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChain
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Phase67Residual
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
 import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseFive
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.MainChain
 
 /-!
@@ -31,8 +29,6 @@ The formerly monolithic file has been split into focused leaf modules:
 
 - `ProcessedG.PhaseTwo`: Phase 2 stability-defect infrastructure
   (`evaluatedSlicePhaseTwoStabilityDefect`, finite reindexing, subtraction algebra)
-- `ProcessedG.PhaseFive`: Phase 5 stability-defect infrastructure
-  (`evaluatedSlicePhaseFiveStabilityDefect`, fiber-collapse helpers)
 - `ProcessedG.MainChain`: The main `evaluatedSlice_scalar_chain_bound` assembly
 
 This file remains as a compatibility module exporting `commDataProcessedG`.
