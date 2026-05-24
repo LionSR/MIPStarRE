@@ -733,16 +733,6 @@ lemma qxpProjSubMeas_total_le_of_outcome_le {Outcome : Type*}
     _ ≤ ∑ a, A.outcome a := Finset.sum_le_sum fun a _ => hpoint a
     _ = A.total := A.sum_eq_total
 
-/-- Expectation form of a supplied QXP total-operator comparison. -/
-private lemma qxpProjSubMeas_total_ev_le_of_total_le {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι)
-    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
-    (hTotal : (qxpProjSubMeas data).toSubMeas.total ≤ A.total) :
-    ev ψ (qxpProjSubMeas data).toSubMeas.total ≤ ev ψ A.total :=
-  ev_mono ψ _ _ hTotal
-
 /-- Right-register expectation form of a supplied QXP total-operator comparison. -/
 private lemma qxpProjSubMeas_rightTensor_total_ev_le_of_total_le {Outcome : Type*}
     {ιLeft ι : Type*} [Fintype ιLeft] [DecidableEq ιLeft]
@@ -753,17 +743,6 @@ private lemma qxpProjSubMeas_rightTensor_total_ev_le_of_total_le {Outcome : Type
     ev ψ (rightTensor (ι₁ := ιLeft) (qxpProjSubMeas data).toSubMeas.total) ≤
       ev ψ (rightTensor (ι₁ := ιLeft) A.total) :=
   ev_mono ψ _ _ <| rightTensor_mono hTotal
-
-/-- Left-register expectation form of a supplied QXP total-operator comparison. -/
-private lemma qxpProjSubMeas_leftTensor_total_ev_le_of_total_le {Outcome : Type*}
-    {ι ιRight : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype ιRight] [DecidableEq ιRight] [Fintype Outcome]
-    (ψ : QuantumState (ι × ιRight))
-    (data : QXPLayerData Outcome ι) (A : SubMeas Outcome ι)
-    (hTotal : (qxpProjSubMeas data).toSubMeas.total ≤ A.total) :
-    ev ψ (leftTensor (ι₂ := ιRight) (qxpProjSubMeas data).toSubMeas.total) ≤
-      ev ψ (leftTensor (ι₂ := ιRight) A.total) :=
-  ev_mono ψ _ _ <| leftTensor_mono hTotal
 
 /-- Total-domination invariant for the QXP repair.
 
@@ -792,16 +771,6 @@ theorem of_outcome_le {Outcome : Type*}
     QXPLayerTotalDomination data A where
   total_le := qxpProjSubMeas_total_le_of_outcome_le data A hpoint
 
-/-- A QXP total-domination witness gives the scalar expectation comparison for
-the total operators. -/
-theorem ev_total_le {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype Outcome]
-    {ψ : QuantumState ι}
-    {data : QXPLayerData Outcome ι} {A : SubMeas Outcome ι}
-    (hdom : QXPLayerTotalDomination data A) :
-    ev ψ (qxpProjSubMeas data).toSubMeas.total ≤ ev ψ A.total :=
-  qxpProjSubMeas_total_ev_le_of_total_le ψ data A hdom.total_le
-
 /-- A QXP total-domination witness gives the scalar right-register comparison
 used by the final-fields transport. -/
 theorem rightTensor_total_ev_le {Outcome : Type*}
@@ -813,17 +782,6 @@ theorem rightTensor_total_ev_le {Outcome : Type*}
     ev ψ (rightTensor (ι₁ := ιLeft) (qxpProjSubMeas data).toSubMeas.total) ≤
       ev ψ (rightTensor (ι₁ := ιLeft) A.total) :=
   qxpProjSubMeas_rightTensor_total_ev_le_of_total_le ψ data A hdom.total_le
-
-/-- A QXP total-domination witness gives the scalar left-register comparison. -/
-theorem leftTensor_total_ev_le {Outcome : Type*}
-    {ι ιRight : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype ιRight] [DecidableEq ιRight] [Fintype Outcome]
-    {ψ : QuantumState (ι × ιRight)}
-    {data : QXPLayerData Outcome ι} {A : SubMeas Outcome ι}
-    (hdom : QXPLayerTotalDomination data A) :
-    ev ψ (leftTensor (ι₂ := ιRight) (qxpProjSubMeas data).toSubMeas.total) ≤
-      ev ψ (leftTensor (ι₂ := ιRight) A.total) :=
-  qxpProjSubMeas_leftTensor_total_ev_le_of_total_le ψ data A hdom.total_le
 
 end QXPLayerTotalDomination
 
