@@ -229,58 +229,6 @@ lemma fullSlice_selfConsistency_snd_bound
     _ ≤ zeta := by
           simpa [sddError] using hself.sliceSelfConsistency.squaredDistanceBound
 
-/-- Evaluated-slice point self-consistency pulled to the first coordinate of an
-evaluated-slice question.
-
-The point-level input needed by the averaged `closenessOfIP` bridge is derived
-from slice strong self-consistency by
-`evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent`. -/
-lemma evaluatedSlice_selfConsistency_fst_bound
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hself : family.StronglySelfConsistent strategy.state zeta) :
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q =>
-          qSDDCore strategy.state
-            (fun a : Fq params =>
-              leftTensor (ι₂ := ι) ((evaluatedSliceFirstFactor params family q).outcome a))
-            (fun a : Fq params =>
-              rightTensor (ι₁ := ι)
-                ((evaluatedSliceFirstFactor params family q).outcome a))) ≤
-      zeta := by
-  have hpoint :=
-    evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
-      params strategy family zeta hself
-  have hfst :=
-    avgOver_uniform_fst (α := Point params.next) (β := Point params.next)
-      (f := fun u =>
-        qSDD strategy.state
-          (evaluatedPointFamilyLeft params family u)
-          (evaluatedPointFamilyRight params family u))
-  calc
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q =>
-          qSDDCore strategy.state
-            (fun a : Fq params =>
-              leftTensor (ι₂ := ι) ((evaluatedSliceFirstFactor params family q).outcome a))
-            (fun a : Fq params =>
-              rightTensor (ι₁ := ι)
-                ((evaluatedSliceFirstFactor params family q).outcome a)))
-      = avgOver (uniformDistribution (Point params.next × Point params.next))
-          (fun q =>
-            qSDD strategy.state
-              (evaluatedPointFamilyLeft params family q.1)
-              (evaluatedPointFamilyRight params family q.1)) := by
-          rfl
-    _ = avgOver (uniformDistribution (Point params.next))
-          (fun u =>
-            qSDD strategy.state
-              (evaluatedPointFamilyLeft params family u)
-              (evaluatedPointFamilyRight params family u)) := hfst
-    _ ≤ zeta := by
-          simpa [sddError] using hpoint.squaredDistanceBound
-
 /-- Evaluated-slice point self-consistency pulled to the second coordinate of an
 evaluated-slice question. -/
 lemma evaluatedSlice_selfConsistency_snd_bound

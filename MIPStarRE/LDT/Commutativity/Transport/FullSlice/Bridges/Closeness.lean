@@ -288,34 +288,6 @@ private lemma xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABtensor
     (xEvaluatedFullSliceABABtensorAvg params strategy family)
   linarith
 
-/-- Full-slice prefix bound for the y-side scalar quartic.
-
-This packages the paper's first three y-prefix steps: the scalar-to-tensor
-`√ζ` bridge, the x-marginalization `md/q` step, and the mixed x-evaluated
-bridge to the `xEvaluatedFullSliceABABtensorAvg` endpoint. -/
-lemma fullSliceABAB_to_xEvaluatedFullSliceABABtensorAvg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (hself : family.StronglySelfConsistent strategy.state zeta) :
-    |fullSliceABABAvg params strategy family -
-        xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
-      (↑params.m : Error) * ↑params.d / ↑params.q + 3 * Real.sqrt zeta := by
-  have h1 := fullSliceABAB_scalar_to_BABAtensor params strategy family zeta hnorm hself
-  have h2 := fullSliceBABA_tensor_marginalize_x params strategy family hnorm
-  have h3 := xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABtensor
-    params strategy family zeta hnorm hself
-  have htri := abs_sub_le
-    (fullSliceABABAvg params strategy family)
-    (fullSliceBABAtensorAvg params strategy family)
-    (xEvaluatedFullSliceABABtensorAvg params strategy family)
-  have hmid := abs_sub_le
-    (fullSliceBABAtensorAvg params strategy family)
-    (xEvaluatedSliceBABAtensorAvg params strategy family)
-    (xEvaluatedFullSliceABABtensorAvg params strategy family)
-  linarith
-
 /-- Evaluated-slice y-side scalar-to-tensor bridge: move the trailing
 `G^y_[h(v)=b]` in the scalar quartic to the right register, producing the tensor
 form in paper `commutativity-G.tex` line 360. -/
