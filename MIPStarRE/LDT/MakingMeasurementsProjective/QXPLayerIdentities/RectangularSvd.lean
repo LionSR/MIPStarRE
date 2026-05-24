@@ -151,19 +151,6 @@ theorem rectangularSvd_xHat_mixed_of_sqrtQ
     xᴴ * (U * Iro * Vᴴ) = CFC.sqrt Q := by
   rw [rectangularSvd_xHat_mixed_raw x U V S Iro hU_right hx, hSqrt]
 
-/-- The mixed rectangular SVD identity in the right Gram form. -/
-theorem rectangularSvd_xHat_mixed
-    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
-    [NonUnitalContinuousFunctionalCalculus ℝ (Matrix ι ι ℂ) IsSelfAdjoint]
-    (x : Matrix μ ι ℂ)
-    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
-    (S Iro : Matrix μ ι ℂ)
-    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
-    (hx : x = U * S * Vᴴ)
-    (hSqrt : V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt (xᴴ * x)) :
-    xᴴ * (U * Iro * Vᴴ) = CFC.sqrt (xᴴ * x) := by
-  exact rectangularSvd_xHat_mixed_of_sqrtQ x U V S Iro (xᴴ * x) hU_right hx hSqrt
-
 /-- The rectangular SVD data determine a candidate `Xhat` and its two primitive
 identities.
 

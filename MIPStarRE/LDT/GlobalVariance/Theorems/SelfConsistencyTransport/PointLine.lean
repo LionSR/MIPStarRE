@@ -105,44 +105,6 @@ private lemma axisParallelBaseEventConsistency_measurement
     axisParallelBaseLineEventMeasurement] using
     axisParallelBaseEventConsistency params strategy eps delta gamma hgood g
 
-/-- The corresponding `2ε` approximation interface obtained from
-`axisParallelBaseEventConsistency` by `prop:simeq-to-approx`.
-
-This is the base-point form of the second move in the six-step chain.  The
-remaining edge-transport assembly must still reindex it along the line-sampling
-presentation where `v ∼ ℓ`, and then apply the square-root weighting used in the
-operators `B^ℓ_[f(u)=g(u)] ⊗ (G_g)^{1/2}`. -/
-lemma axisParallelBaseEventApproximation
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (g : Polynomial params) :
-    SDDRel strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (IdxSubMeas.liftLeft
-        (fun s : AxisParallelTestSample params =>
-          pointConditionedEventSubMeasAtPolynomial params strategy g s.1))
-      (IdxSubMeas.liftRight
-        (fun s : AxisParallelTestSample params =>
-          postprocess (axisParallelLineAnswerFamily strategy s)
-            (fun a : Fq params => if a = g s.1 then some () else none)))
-      (2 * eps) := by
-  let pointMeas := axisParallelBasePointEventMeasurement params strategy g
-  let lineMeas := axisParallelBaseLineEventMeasurement params strategy g
-  have hcons := axisParallelBaseEventConsistency_measurement
-    params strategy eps delta gamma hgood g
-  have happrox :
-      BipartiteSDDRel strategy.state (uniformDistribution (AxisParallelTestSample params))
-        (IdxMeas.toIdxSubMeas pointMeas)
-        (IdxMeas.toIdxSubMeas lineMeas) (2 * eps) :=
-    simeqToApprox strategy.state (uniformDistribution (AxisParallelTestSample params))
-      pointMeas lineMeas eps hcons
-  refine ⟨?_⟩
-  simpa [pointMeas, lineMeas, axisParallelBasePointEventMeasurement,
-    axisParallelBaseLineEventMeasurement] using
-    happrox.leftRightSquaredDistanceBound
-
 /-- The symmetric `2ε` approximation interface for the point-line event.
 
 This is the orientation used in `expansion.tex`, lines 306--307 and 309--310:
