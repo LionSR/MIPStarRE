@@ -160,12 +160,6 @@ noncomputable def matrixOperatorNonnegativeProperCone
   isClosed' := by
     simpa using isClosed_matrixOperator_nonnegative H
 
-@[simp]
-theorem mem_matrixOperatorNonnegativeProperCone
-    (H : FiniteHilbertSpace) (X : MatrixOperator H) :
-    X ∈ matrixOperatorNonnegativeProperCone H ↔ 0 ≤ X :=
-  Iff.rfl
-
 /-- A canonical block-diagonal operator is Hermitian when all diagonal blocks are
 Hermitian. -/
 theorem matrixSdpCanonicalBlockDiagonal_isHermitian
