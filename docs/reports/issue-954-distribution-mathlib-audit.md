@@ -282,6 +282,12 @@ The local distribution definitions are also more varied than a simple uniform
 Do not migrate the existing codebase in one PR.  If Mathlib integration is
 wanted, do it by small adapters that do not change current statement shapes.
 
+Update after the subsequent cleanup: the optional `DistributionMeasure.lean` and
+`DistributionPMF.lean` adapters that were later introduced from this plan were
+removed again because no downstream LDT module imported them.  The plan below is
+therefore historical guidance for a future proof that has a concrete need for a
+Mathlib `PMF` or measure interface, not a description of live infrastructure.
+
 1. **Add an optional adapter file, not a foundational import.**
    Create something like `MIPStarRE/LDT/Basic/DistributionPMF.lean` importing
    `MIPStarRE.LDT.Basic.Distribution` and Mathlib `PMF` APIs.  Do not import it
@@ -316,6 +322,11 @@ wanted, do it by small adapters that do not change current statement shapes.
   document the exact `toReal` simplification for uniform weights.
 - #967: add a measure-valued adapter for finite nonnegative `Distribution`s that
   are not known to have mass `1`.
+
+These follow-up adapters should not be read as current API.  They were useful
+Mathlib experiments, but the implemented modules were later deleted as unused
+boilerplate.  A future reintroduction should be tied to an actual downstream
+theorem, not added preemptively.
 
 A later TV-distance scout may also be useful: check whether the signed-measure
 `totalVariation` API can recover the local finite `totalVariationDistance`

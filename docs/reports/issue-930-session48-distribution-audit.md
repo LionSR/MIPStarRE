@@ -11,8 +11,6 @@ Branch: `gpt55/session48-930-distribution-audit`
 I audited the distribution and average infrastructure used by the LDT formalization:
 
 - `MIPStarRE/LDT/Basic/Distribution.lean`;
-- `MIPStarRE/LDT/Basic/DistributionMeasure.lean`;
-- `MIPStarRE/LDT/Basic/DistributionPMF.lean`;
 - directly related average and distribution constructors in `MIPStarRE/LDT/Test/Defs.lean`, `MIPStarRE/LDT/Test/StrategyCore.lean`, `MIPStarRE/LDT/Test/StrategyFailures.lean`, `MIPStarRE/LDT/Test/StrategyRoleAverage.lean`, `MIPStarRE/LDT/Preliminaries/Defs.lean`, `MIPStarRE/LDT/Pasting/Defs/Tuples.lean`, `MIPStarRE/LDT/Pasting/Core.lean`, `MIPStarRE/LDT/Pasting/BridgeLemmas/Common.lean`, and `MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation/Averaging.lean`.
 
 I compared these files with the paper's distribution conventions in:
@@ -22,11 +20,11 @@ I compared these files with the paper's distribution conventions in:
 - `references/ldt-paper/ld-pasting.tex:167-213`, where the distinct-tuple distribution and its total-variation comparison are used;
 - blueprint nodes `def:simeq`, `def:approx_delta`, `def:good-strategy`, `def:low-individual-degree-test`, and `def:distinct-tuples` in `blueprint/src/chapter/ch02_test.tex`, `ch03_preliminaries.tex`, and `ch09_pasting.tex`.
 
-Scope check before the audit: the only open PR was draft #889, the Lean/Mathlib upgrade, and it does not touch the audited distribution files.  The open zhengfeng/deng work is #931 on self-improvement inputs and #888 on blueprint warning annotations; neither overlaps this distribution slice.  Issue #997, which introduced and documented the optional PMF/measure adapters, is closed and merged.
+Scope check before the audit: the only open PR was draft #889, the Lean/Mathlib upgrade, and it does not touch the audited distribution files.  The open zhengfeng/deng work is #931 on self-improvement inputs and #888 on blueprint warning annotations; neither overlaps this distribution slice.  At the time of the original audit, issue #997 had introduced optional PMF/measure adapters; those adapters have since been removed because no downstream Lean module imported them.
 
 Verdict: I found one already-formalized paper boundary repair.  The paper writes the distinct-tuple distribution as a uniform probability distribution for every `k >= 1`, but that support is empty when `k > q`.  Lean extends this object to a finite nonnegative weight for all `k`, proves it is a probability distribution under `k <= q`, and treats the `k > q` total-variation bound as a trivial large-error case.  I documented this in `docs/paper-gaps/issue-930-distinct-tuple-support.tex`.  No Lean theorem statement or proof needs to change.
 
-Apart from that boundary issue, I found no hidden change to constants or hypotheses.  The ordinary paper-facing test distributions remain genuine uniform probabilities, the PMF adapter is reserved for normalized distributions, and the measure adapter is intentionally opt-in for finite weights that may be subnormalized or empty.
+Apart from that boundary issue, I found no hidden change to constants or hypotheses.  The ordinary paper-facing test distributions remain genuine uniform probabilities.  The optional PMF and finite-measure adapters mentioned in the historical audit snapshot are no longer part of the live Lean tree.
 
 ## Finding 1: project-local distributions are finite weights, with a separate probability predicate
 
@@ -47,13 +45,11 @@ The paper's verifier chooses each of the three subtests with probability `1/3`, 
 
 All denominators are guarded by the parameter assumptions already present in `Parameters`: `0 < params.m`, `0 < params.q`, and the prime-power field witness.  I found no altered branch weight or missing nonemptiness hypothesis in these uniform test distributions.
 
-## Finding 3: the PMF and measure adapters are opt-in and coherent
+## Finding 3: the former PMF and measure adapters were unused
 
-The merged #997 changes left the foundational distribution API PMF-free and measure-theory-free.  `DistributionMeasure.lean` imports `Distribution.lean` and provides a finite measure adapter for arbitrary nonnegative weights, including subnormalized weights and empty support (`DistributionMeasure.lean:6-18`).  Its main bridge proves that integrating a scalar function against this measure is the same finite weighted sum as `avgOver` (`DistributionMeasure.lean:94-121`).
+The merged #997 changes left the foundational distribution API PMF-free and measure-theory-free.  It also introduced optional adapter modules `DistributionMeasure.lean` and `DistributionPMF.lean`.  A later reachability check showed that no downstream LDT module imported either adapter: `DistributionPMF.lean` was unimported, and `DistributionMeasure.lean` was imported only by `DistributionPMF.lean`.
 
-`DistributionPMF.lean` imports the measure adapter and Mathlib PMF theory, but it requires an `IsProbability` proof to build `Distribution.toPMF` (`DistributionPMF.lean:28-45`).  It proves both finite-sum and integral expectation bridges for scalar `avgOver` expressions under that probability hypothesis (`DistributionPMF.lean:87-113`), and the singleton-mass coherence lemmas added by #997 agree with the finite-measure adapter (`DistributionPMF.lean:65-83`).
-
-A grep of the Lean tree showed that no downstream LDT module imports `MIPStarRE.LDT.Basic.DistributionMeasure` except `DistributionPMF.lean`, and no downstream module imports `MIPStarRE.LDT.Basic.DistributionPMF`.  Thus the PMF/measure choices are quarantined adapter APIs.  They do not silently migrate operator-valued averages or pull measure theory into the foundational distribution layer.
+Those optional adapters have therefore been removed as unused Mathlib bridge infrastructure.  The live distribution API remains the project-local finite-support structure in `Distribution.lean`, together with the finite-sum `avgOver` and `averageOperatorOverDistribution` definitions used by the paper formalization.
 
 ## Finding 4: the distinct-tuple distribution is the only paper boundary repair
 
@@ -81,17 +77,15 @@ Validation was run after adding this report and the paper-gap note:
 
 ```text
 lake env lean MIPStarRE/LDT/Basic/Distribution.lean
-lake env lean MIPStarRE/LDT/Basic/DistributionMeasure.lean
-lake env lean MIPStarRE/LDT/Basic/DistributionPMF.lean
 lake env lean MIPStarRE/LDT/Test/Defs.lean
 lake env lean MIPStarRE/LDT/Test/StrategyFailures.lean
 lake env lean MIPStarRE/LDT/Test/StrategyRoleAverage.lean
 lake env lean MIPStarRE/LDT/Pasting/Defs/Tuples.lean
 lake env lean MIPStarRE/LDT/Pasting/Core.lean
 lake env lean MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation/Averaging.lean
-rg -n "\b(sorry|axiom|admit)\b" MIPStarRE/LDT/Basic/Distribution*.lean MIPStarRE/LDT/Pasting/Defs/Tuples.lean MIPStarRE/LDT/Pasting/Core.lean MIPStarRE/LDT/Pasting/BridgeLemmas/Common.lean MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation/Averaging.lean || true
+rg -n "\b(sorry|axiom|admit)\b" MIPStarRE/LDT/Basic/Distribution.lean MIPStarRE/LDT/Pasting/Defs/Tuples.lean MIPStarRE/LDT/Pasting/Core.lean MIPStarRE/LDT/Pasting/BridgeLemmas/Common.lean MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation/Averaging.lean || true
 cd docs/paper-gaps && latexmk -pdf -interaction=nonstopmode issue-930-distinct-tuple-support.tex
 git diff --check
 ```
 
-A scratch `#check`/`#print axioms` file was also run for the audited public declarations `uniformDistribution_isProbability`, `avgOver_uniform_prod`, `Distribution.toPMF`, `Distribution.toMeasure`, `distinctTupleDistribution_weight_sum_le_one`, `distinctTupleDistribution_weight_sum_eq_one_of_le`, `ldDnoteq`, and `avgOver_distinct_bounded_le_avgOver_uniform_add_tv_of_any_k`; the only reported axioms were the standard Lean axioms `propext`, `Classical.choice`, and `Quot.sound`.
+A scratch `#check`/`#print axioms` file was also run at the audited snapshot.  The then-existing adapter declarations `Distribution.toPMF` and `Distribution.toMeasure` have since been retired as unused.  The current distribution route continues to use the audited finite-sum declarations such as `uniformDistribution_isProbability`, `avgOver_uniform_prod`, `distinctTupleDistribution_weight_sum_le_one`, `distinctTupleDistribution_weight_sum_eq_one_of_le`, `ldDnoteq`, and `avgOver_distinct_bounded_le_avgOver_uniform_add_tv_of_any_k`.
