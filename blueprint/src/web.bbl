@@ -1,9 +1,10 @@
-\begin{thebibliography}{JNV+20}
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{JNV{\etalchar{+}}20}
 
-\bibitem[JNV+20]{Ji2020LowIndividualDegree}
+\bibitem[JNV{\etalchar{+}}20]{Ji2020LowIndividualDegree}
 Zhengfeng Ji, Anand Natarajan, Thomas Vidick, John Wright, and Henry Yuen.
-\newblock Quantum soundness of the classical low individual degree test.
-\newblock arXiv:2009.12982, 2020.
+\newblock Quantum soundness of the classical low individual degree test, 2020.
+\newblock arXiv:2009.12982.
 
 \bibitem[Sch80]{Sch80}
 Jacob~T. Schwartz.
