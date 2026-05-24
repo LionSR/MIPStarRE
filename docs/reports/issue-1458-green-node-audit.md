@@ -111,8 +111,9 @@ The largest clusters are:
    `AnswerSliceRestrictionData`, `AnswerPerSliceInductionData`, and the
    retained self-improvement output records.  These are internal
    induction-stage construction data.  They should remain visibly internal and
-   should not be linked as proofs of `thm:main-induction`.  The former
-   slice-transport records have been retired from the checked route.
+   should not be linked as proofs of `thm:main-induction`.  The broad
+   slice-transport route has been removed as a theorem-level obstruction; the
+   retained `SliceStrategyTransport` records are narrow Lean-only interfaces.
 
 2. `def:successor-pasting-data` in Chapter 10, with
    `SliceRestrictionData`, `PerSliceInductionData`,
