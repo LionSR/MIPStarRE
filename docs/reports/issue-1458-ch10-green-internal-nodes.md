@@ -8,6 +8,9 @@ successor frontier no longer contains a separate degree-zero family-and-scalar
 obligation; the answer-carrier route covers `d = 0`, with `1 ≤ k` supplied by
 the small-error branch.  The former recursive slice-transport reduction was
 later removed when the answer-carrier route became the active checked route.
+The retained `SliceStrategyTransport` structures are narrower Lean-only
+interfaces: they convert concrete slice strategies and measurement-transport
+data into the ordinary or answer-valued self-improvement output records.
 
 Update on 2026-05-22: the active successor route no longer requires an
 ordinary realization of the answer-valued restricted diagonal measurement.

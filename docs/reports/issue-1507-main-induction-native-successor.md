@@ -348,12 +348,14 @@ realization of the answer-valued diagonal interface.  It is a
 `RestrictedSymStrat`, not a `SymStrat`, and its diagonal measurement keeps only
 the sampled base-point value before re-embedding it into the degree-bounded
 slice-polynomial alphabet.
-The former ordinary-realization slice-transport constructors have been retired
-from the checked route.  The active route no longer needs such ordinary
-realizations: it applies the axis-parallel/self-consistency form of
-self-improvement to the ordinary carrier of the answer-valued slice.  A
-low-degree support theorem is therefore not needed for this stage, though it
-would still be the theorem needed for a stronger ordinary-realization route.
+The former ordinary-realization obstruction has been narrowed.  The active route
+no longer needs ordinary realizations as hypotheses of the successor theorem: it
+applies the axis-parallel/self-consistency form of self-improvement to the
+ordinary carrier of the answer-valued slice.  The retained
+`SliceStrategyTransport` constructors remain useful only after concrete
+ordinary slice strategies and measurement-transport data have been supplied.
+A low-degree support theorem is therefore not needed for this stage, though it
+would still be the theorem needed for the stronger ordinary-realization route.
 The older degree-bounded restricted strategy `xRestrictedStrategy` cannot simply
 fill this role.  Its diagonal measurement `restrictDiagonalMeasurement`
 postprocesses an ambient slice-preserving diagonal answer to the value at

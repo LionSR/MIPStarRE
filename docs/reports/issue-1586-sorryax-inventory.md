@@ -186,9 +186,12 @@ under the corrected scalar-cascade boundary `0 < k`.  The scalar lemma
 zero-sampling corner is a statement-level boundary: at `k = 0` the displayed
 final error is exactly zero.
 
-The former slice-transport datum had a precise formal meaning: it asked for
-ordinary `SymStrat` slice strategies on which the existing Section 9 theorem
-could be applied.  The active route avoids this requirement.  It applies
+The old theorem-level slice-transport datum had a precise formal meaning: it
+asked for ordinary `SymStrat` slice strategies on which the existing Section 9
+theorem could be applied.  The active route avoids this requirement.  The
+retained `SliceStrategyTransport` interfaces are narrower Lean-only records
+available after such concrete slice strategies and measurement-transport data
+have been supplied.  The checked successor proof instead applies
 `selfImprovementInInductionSection_of_axisParallel_selfConsistency` to the
 ordinary carrier of `xRestrictedAnswerSymStrat`, whose diagonal component is
 inert.
