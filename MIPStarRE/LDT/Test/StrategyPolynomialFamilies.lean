@@ -73,13 +73,6 @@ theorem ofSliceMeas_dominationTarget_le_witness {params : Parameters}
     (ofSliceMeas meas).dominationTarget x g ≤ (ofSliceMeas meas).witness x := by
   simpa using ((meas x).toSubMeas.outcome_le_total g)
 
-theorem ofSliceMeas_sliceDominatesTarget {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (x : Fq params) (g : Polynomial params) :
-    0 ≤ (ofSliceMeas meas).witness x - (ofSliceMeas meas).dominationTarget x g := by
-  exact sub_nonneg.mpr (ofSliceMeas_dominationTarget_le_witness meas x g)
-
 /-- The averaged submeasurement `G = E_x G^x`: average the slice
 measurements over the uniform distribution on slice heights `x ∈ F_q`. -/
 noncomputable def averagedSubMeas {params : Parameters}
@@ -181,15 +174,6 @@ noncomputable def averagedSliceTotalOperator {params : Parameters}
   averageOperatorOverDistribution (uniformDistribution (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.total)
 
-theorem averagedSliceTotalOperator_nonneg {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι) (x : Fq params) :
-    0 ≤ averagedSliceTotalOperator strategy x := by
-  unfold averagedSliceTotalOperator averageOperatorOverDistribution
-  exact Finset.sum_nonneg fun u _ =>
-    smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
-      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.total_nonneg)
-
 @[simp] theorem averagedSliceTotalOperator_eq_one {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SymStrat params.next ι) (x : Fq params) :
@@ -281,14 +265,6 @@ theorem ofSymStrat_dominationTarget_le_witness {params : Parameters}
     (ofSymStrat strategy meas).dominationTarget x g ≤ (ofSymStrat strategy meas).witness x := by
   simpa [ofSymStrat_witness_eq_averagedSliceTotalOperator] using
     averagedSlicePointEvaluationOperator_le_averagedSliceTotalOperator strategy x g
-
-theorem ofSymStrat_sliceDominatesTarget {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (x : Fq params) (g : Polynomial params) :
-    0 ≤ (ofSymStrat strategy meas).witness x - (ofSymStrat strategy meas).dominationTarget x g := by
-  exact sub_nonneg.mpr (ofSymStrat_dominationTarget_le_witness strategy meas x g)
 
 structure Complete {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
