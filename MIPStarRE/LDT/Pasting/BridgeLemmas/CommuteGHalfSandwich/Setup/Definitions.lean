@@ -140,25 +140,6 @@ noncomputable def commuteGHalfSandwich_commuteFamily
           rightTensor (ι₁ := ι)
             (gHatHalfProductTotalOperator params family r q.2.2) }
 
-noncomputable def commuteGHalfSandwich_moveBackFamily
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (r : ℕ) :
-    IdxOpFamily
-      (SliceQuestion params × SliceQuestion params × PointTuple params r)
-      (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r)
-      (ι × ι) :=
-  fun q =>
-    { outcome := fun ogs =>
-        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
-          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).outcome ogs.1) *
-          leftTensor (ι₂ := ι)
-            (gHatHalfProductOutcomeOperator params family r q.2.2 ogs.2.2)
-      total :=
-        leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).total) *
-          leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
-          leftTensor (ι₂ := ι)
-            (gHatHalfProductTotalOperator params family r q.2.2) }
-
 lemma gHatHalfSandwichLeft_split_outcome
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ)
@@ -239,20 +220,6 @@ lemma sddOpRel_uniform_equiv
 
 /-! ### Base cases and consistency lifts -/
 
-lemma commuteGHalfSandwich_split_zero
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι) :
-    SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × PointTuple params 0))
-      (headTailOrderedFamily params family 0)
-      (headTailRotatedFamily params family 0)
-      0 := by
-  refine ⟨?_⟩
-  unfold sddErrorOp qSDDOp qSDDCore headTailOrderedFamily headTailRotatedFamily
-  simp only [gHatHalfProductOutcomeOperator, leftTensor_one, mul_one]
-  simp [avgOver, uniformDistribution, ev_zero]
-
 lemma gHatSelfConsistency_sddOpRel
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -292,27 +259,6 @@ lemma sddOpRel_uniform_fst
       = avgOver (uniformDistribution α) (fun a => qSDDOp ψ (A a) (B a)) := by
           exact avgOver_uniform_fst (fun a => qSDDOp ψ (A a) (B a))
     _ ≤ δ := h
-
-lemma gHatSelfConsistency_sddOpRel_triple
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (zeta : Error) (r : ℕ)
-    (hsc : SDDRel ψbi
-      (uniformDistribution (SliceQuestion params))
-      (gHatSelfConsistencyLeftFamily params family)
-      (gHatSelfConsistencyRightFamily params family)
-      (gHatSelfConsistencyError zeta)) :
-    SDDOpRel ψbi
-      (uniformDistribution (SliceQuestion params × SliceQuestion params × PointTuple params r))
-      (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family)) q.1)
-      (fun q => (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family)) q.1)
-      (gHatSelfConsistencyError zeta) := by
-  exact sddOpRel_uniform_fst ψbi
-    (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyLeftFamily params family))
-    (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family))
-    (gHatSelfConsistencyError zeta)
-    (gHatSelfConsistency_sddOpRel params ψbi family zeta hsc)
 
 lemma gHatPairProduct_sddOpRel_triple
     (params : Parameters) [FieldModel params.q]
