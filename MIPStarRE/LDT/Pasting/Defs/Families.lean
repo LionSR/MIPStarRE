@@ -65,17 +65,6 @@ noncomputable def globallyConsistentWitness (params : Parameters) [FieldModel pa
   open Classical in
     Classical.choose hGlobal
 
-/-- The chosen witness polynomial agrees with every genuine completed slice. -/
-theorem globallyConsistentWitness_spec (params : Parameters) [FieldModel params.q]
-    {k : ℕ} (xs : PointTuple params k) (gs : GHatTupleOutcome params k)
-    (hGlobal : IsGloballyConsistent params xs gs)
-    (i : Fin k) (hi : (gs i).isSome = true) :
-    (Polynomial.restrictAtHeight params
-      (globallyConsistentWitness params xs gs hGlobal) (xs i)).poly =
-        ((gs i).get hi).poly := by
-  open Classical in
-    simpa [globallyConsistentWitness] using (Classical.choose_spec hGlobal i hi)
-
 /-- Recover a global polynomial from a completed-slice tuple.
 
 On the actual pasting path this map is only applied after restricting to tuples in
