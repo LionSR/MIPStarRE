@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 
 /-!

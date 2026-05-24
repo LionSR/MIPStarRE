@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.LiftBridges
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
 
 /-!

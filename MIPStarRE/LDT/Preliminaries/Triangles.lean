@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Preliminaries.Triangles.Core
 import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 
 /-!
