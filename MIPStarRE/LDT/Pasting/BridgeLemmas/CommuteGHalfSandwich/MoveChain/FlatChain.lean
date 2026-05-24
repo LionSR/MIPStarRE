@@ -20,14 +20,6 @@ def commuteGHalfSandwich_postMoveFlatLength : ℕ → ℕ
   | 0 => 1
   | r + 1 => commuteGHalfSandwich_postMoveFlatLength r + 2
 
-lemma commuteGHalfSandwich_postMoveFlatLength_pos
-    (r : ℕ) :
-    1 ≤ commuteGHalfSandwich_postMoveFlatLength r := by
-  induction r with
-  | zero => simp [commuteGHalfSandwich_postMoveFlatLength]
-  | succ r ih =>
-      simp [commuteGHalfSandwich_postMoveFlatLength]
-
 noncomputable def commuteGHalfSandwich_postMoveFlatFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
