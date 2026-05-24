@@ -107,24 +107,6 @@ lemma qBipartiteMatchMass_nonneg
   exact Finset.sum_nonneg fun a _ =>
     ev_nonneg_of_psd ψ _ <| opTensor_nonneg (A.outcome_pos a) (B.outcome_pos a)
 
-/-- If Bob's `none` outcome is the zero operator, the option-valued bipartite
-match mass is the sum over genuine `some` outcomes. -/
-lemma qBipartiteMatchMass_option_right_none_zero
-    {α ιA ιB : Type*}
-    [Fintype α] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB))
-    (A : SubMeas (Option α) ιA) (B : SubMeas (Option α) ιB)
-    (hBnone : B.outcome none = 0) :
-    qBipartiteMatchMass ψ A B =
-      ∑ a : α, ev ψ (opTensor (A.outcome (some a)) (B.outcome (some a))) := by
-  unfold qBipartiteMatchMass
-  rw [Fintype.sum_option, hBnone]
-  have hzeroTensor : opTensor (A.outcome none) (0 : MIPStarRE.Quantum.Op ιB) = 0 := by
-    simp [opTensor]
-  have hzeroEv : ev ψ (opTensor (A.outcome none) (0 : MIPStarRE.Quantum.Op ιB)) = 0 := by
-    rw [hzeroTensor, ev_zero]
-  rw [hzeroEv, zero_add]
-
 lemma qBipartiteConsDefect_le_one
     {Outcome : Type*} [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
