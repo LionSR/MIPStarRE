@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.Core
 import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.SumForm
 
 /-! # TransportChain — compatibility module
