@@ -86,7 +86,7 @@ structure HelperStrongSelfConsistencyBounds
           ((params.m : Error) * (params.d : Error) / (params.q : Error))) -
         addInUError params eps delta
 
--- This constructor fills the helper SSC bound record by composing the
+-- This constructor fills the helper SSC bounds record by composing the
 -- point self-consistency bounds with the local-to-global variance transfer.
 /-- Construct the helper-stage bounds from the mathematical inputs after the
 add-in-`u` chain has been closed.
