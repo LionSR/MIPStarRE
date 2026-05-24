@@ -72,7 +72,6 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
       (orthonormalizationMainLemmaError ζ) := by
   classical
   intro hCons
-  letI : DecidableEq Outcome := Classical.decEq Outcome
   have hAlmost :
       MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
         ψ (leftLiftedMeasurement (ιB := ιB) A)
@@ -163,6 +162,7 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
           (constSubMeasFamily A.toSubMeas.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
+  classical
   intro hCons
   obtain ⟨P, hP⟩ :=
     orthonormalizationMainLemma (ψ := ψ) (hψ := hψ) (A := A) (B := B)
@@ -203,7 +203,6 @@ lemma orthonormalizationMeasurement {Outcome : Type*}
     (A := A) (B := A) (ζ := ζ) hζ
     (bipartiteSSCRel_self_of_measurement (ψ := ψ) A ζ hssc)
 
-set_option linter.unusedDecidableInType false in
 /-- Measurement-level orthonormalization from cross consistency, using the
 locality-preserving Section 5 repair construction directly.
 
@@ -214,7 +213,7 @@ repair-input hypothesis. -/
 lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
     {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (hψ : ψ.IsNormalized)
     (A B : Measurement Outcome ι) (ζ : Error)
@@ -227,6 +226,7 @@ lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
           (constSubMeasFamily A.toSubMeas.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
+  letI : DecidableEq Outcome := Classical.decEq Outcome
   intro hCons
   have hAlmost :
       MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
@@ -347,7 +347,6 @@ lemma orthonormalizationMeasurement_right_of_consistency_from_projectivizationRe
   rcases hP with ⟨hP⟩
   exact ⟨hP.trans hbound⟩
 
-set_option linter.unusedDecidableInType false in
 /-- Completion-route orthonormalization with the documented weakened constant.
 
 This theorem preserves the proved construction obtained by completing the
@@ -360,7 +359,7 @@ the sharper `orthonormalizationError ζ = 100 * ζ^(1/4)` bound and is stated be
 as a separate proved theorem. -/
 theorem orthonormalizationCompletionRoute {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (hperm : PermInvState ψ)
     (hψ : ψ.IsNormalized)
@@ -372,6 +371,8 @@ theorem orthonormalizationCompletionRoute {Outcome : Type*}
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationCompletionRouteError ζ) := by
+  classical
+  letI : DecidableEq Outcome := Classical.decEq Outcome
   intro hssc
   have hζ_nonneg : 0 ≤ ζ :=
     le_trans
@@ -431,7 +432,6 @@ theorem orthonormalizationCompletionRoute {Outcome : Type*}
   simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using
     (le_trans hPsomeq hcoeff)
 
-set_option linter.unusedDecidableInType false in
 /-- `thm:orthonormalization`.
 
 A strongly self-consistent submeasurement on a permutation-invariant normalized
@@ -448,7 +448,7 @@ locality-preserving Section 5 repair route, recovering the paper's scalar
 constant. -/
 theorem orthonormalization {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome] [DecidableEq Outcome]
+    [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
     (hperm : PermInvState ψ)
     (hψ : ψ.IsNormalized)
@@ -460,6 +460,8 @@ theorem orthonormalization {Outcome : Type*}
           (constSubMeasFamily A.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
+  classical
+  letI : DecidableEq Outcome := Classical.decEq Outcome
   intro hssc
   have hζ_nonneg : 0 ≤ ζ :=
     le_trans
