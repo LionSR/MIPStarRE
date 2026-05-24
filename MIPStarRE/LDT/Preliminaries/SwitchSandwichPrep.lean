@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
 
 /-!

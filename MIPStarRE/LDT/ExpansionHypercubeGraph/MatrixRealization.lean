@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.Core
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
 
 /-!

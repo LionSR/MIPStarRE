@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Core
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Fourier
 
 /-!
