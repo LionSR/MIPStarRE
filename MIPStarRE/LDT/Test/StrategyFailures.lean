@@ -270,24 +270,6 @@ noncomputable def axisParallelPointLeftLineRightFailureProbability
     (axisParallelPointAnswerFamily strategy.leftAsSymmetric)
     (axisParallelLineAnswerFamily strategy.rightAsSymmetric)
 
-/-- Self-consistency branch component for the left prover's point measurement. -/
-noncomputable def pointLeftSelfConsistencyFailureProbability
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) : Error :=
-  bipartiteSSCError strategy.state
-    (uniformDistribution (Point params))
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-
-/-- Self-consistency branch component for the right prover's point measurement. -/
-noncomputable def pointRightSelfConsistencyFailureProbability
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) : Error :=
-  bipartiteSSCError strategy.state
-    (uniformDistribution (Point params))
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-
 /-- Diagonal branch component where the left prover is queried with a diagonal
 line and the right prover is queried with the sampled base point.
 
