@@ -256,13 +256,6 @@ lemma postprocess_decide_false_add_true_eq_total
   rw [htotal] at hsum
   exact hsum
 
-lemma postprocess_decide_eq_false_outcome
-    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
-    (A : SubMeas Outcome ι) (a0 : Outcome) :
-    (postprocess A (fun a => decide (a = a0))).outcome false =
-      A.total - A.outcome a0 := by
-  exact eq_sub_iff_add_eq.mpr (postprocess_decide_false_add_true_eq_total A a0)
-
 lemma qBipartiteConsDefect_eq_sum_singleOutcome
     {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (ψ : QuantumState (ι × ι))
@@ -356,15 +349,6 @@ noncomputable def ldSandwichLineOnePointRightMeasurement
         direction := lastCoord params }
     simpa [ldSandwichLineOnePointRightFamily, verticalLineMeasurementFamily, i.2,
       postprocess_total, ℓ] using (strategy.axisParallelMeasurement ℓ).total_eq_one
-
-lemma ldSandwichLineOnePointRightMeasurement_outcome_none_eq_zero
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) :
-    (ldSandwichLineOnePointRightMeasurement params strategy family i q).outcome none = 0 := by
-  simp [ldSandwichLineOnePointRightMeasurement, ldSandwichLineOnePointRightFamily,
-    postprocess, i.2]
 
 lemma ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum
     (params : Parameters) [FieldModel params.q]

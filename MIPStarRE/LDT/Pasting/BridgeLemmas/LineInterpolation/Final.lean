@@ -20,26 +20,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-lemma not_interpolationEligible_exists_none
-    (params : Parameters) [FieldModel params.q]
-    {k : ℕ}
-    (gs : GHatTupleOutcome params k)
-    (hk : params.d + 1 ≤ k)
-    (hNot : ¬ InterpolationEligible params gs) :
-    ∃ i : Fin k, (gs i).isSome = false := by
-  by_contra hnone
-  push Not at hnone
-  apply hNot
-  unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
-  have hfull : (Finset.univ.filter fun i : Fin k => (gs i).isSome).card = k := by
-    have hEq : (Finset.univ.filter fun i : Fin k => (gs i).isSome) = Finset.univ := by
-      refine Finset.eq_univ_iff_forall.2 ?_
-      intro i
-      simp [hnone i]
-    simp [hEq]
-  rw [hfull]
-  exact hk
-
 lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
     (ψ : QuantumState (ι × ι))
     (A B : SubMeas Bool ι)

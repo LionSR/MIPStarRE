@@ -78,32 +78,6 @@ def BadLineEvent
       ∃ i : Fin k,
         Option.map (fun g : Polynomial params => g u) (gs i) ≠ some (f (xs i))
 
-lemma badLineEvent_of_not_interpolationEligible
-    (params : Parameters) [FieldModel params.q]
-    {k : ℕ}
-    (u : Point params)
-    (xs : PointTuple params k)
-    (gs : GHatTupleOutcome params k)
-    (f : AxisLinePolynomial params.next)
-    (hk : params.d + 1 ≤ k)
-    (hNot : ¬ InterpolationEligible params gs) :
-    BadLineEvent params u xs gs f := by
-  let _ := hk
-  refine Or.inl hNot
-
-lemma badLineEvent_of_nonglobal
-    (params : Parameters) [FieldModel params.q]
-    {k : ℕ}
-    (u : Point params)
-    (xs : PointTuple params k)
-    (gs : GHatTupleOutcome params k)
-    (f : AxisLinePolynomial params.next)
-    (hNGlobal : ¬ IsGloballyConsistent params xs gs) :
-    BadLineEvent params u xs gs f := by
-  rcases nonglobal_gives_slice_mismatch_against_interpolant params xs gs hNGlobal with
-    ⟨i, hiSome, hslice⟩
-  exact Or.inr <| Or.inl hNGlobal
-
 lemma badLineEvent_of_eval_mismatch
     (params : Parameters) [FieldModel params.q]
     {k : ℕ}
