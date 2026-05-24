@@ -51,10 +51,6 @@ structure MatrixOperatorFamilyRealization (params : Parameters) where
   state : PositiveMatrixState space
   family : Point params → MatrixOperator space
 
-/-- The actual hypercube edge set used in the local variance average. -/
-def hypercubeEdgePairFinset (params : Parameters) : Finset (Point params × Point params) :=
-  Finset.univ.filter (fun uv => IsHypercubeEdge params uv.1 uv.2)
-
 /-- The Section 7.1 edge distribution used by the matrix model. -/
 noncomputable def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
