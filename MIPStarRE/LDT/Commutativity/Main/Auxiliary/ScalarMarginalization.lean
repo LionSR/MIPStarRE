@@ -31,43 +31,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- A real-line triangle helper for the #713 hybrid scalar/tensor route.
-
-If the scalar full endpoint is within `sqrtz` of a full tensor endpoint, the two
-tensor endpoints are within `mdq`, and the evaluated scalar endpoint is within
-`sqrtz` of the evaluated tensor endpoint, then the scalar endpoints are within
-`mdq + 2 * sqrtz`. -/
-private lemma abs_sub_le_of_tensor_triangle
-    {fullScalar evalScalar fullTensor evalTensor mdq sqrtz : Error}
-    (hfull : |fullScalar - fullTensor| ≤ sqrtz)
-    (htensor : |fullTensor - evalTensor| ≤ mdq)
-    (heval : |evalScalar - evalTensor| ≤ sqrtz) :
-    |fullScalar - evalScalar| ≤ mdq + 2 * sqrtz := by
-  have heval' : |evalTensor - evalScalar| ≤ sqrtz := by
-    rwa [abs_sub_comm]
-  have htri :
-      |fullScalar - evalScalar| ≤
-        |fullScalar - fullTensor| + |fullTensor - evalTensor| +
-          |evalTensor - evalScalar| := by
-    have hdecomp :
-        fullScalar - evalScalar =
-          (fullScalar - fullTensor) + (fullTensor - evalTensor) +
-            (evalTensor - evalScalar) := by
-      ring
-    calc
-      |fullScalar - evalScalar|
-        = |(fullScalar - fullTensor) + (fullTensor - evalTensor) +
-            (evalTensor - evalScalar)| := by rw [hdecomp]
-      _ ≤ |(fullScalar - fullTensor) + (fullTensor - evalTensor)| +
-            |evalTensor - evalScalar| := abs_add_le _ _
-      _ ≤ (|fullScalar - fullTensor| + |fullTensor - evalTensor|) +
-            |evalTensor - evalScalar| := by
-          gcongr
-          exact abs_add_le _ _
-      _ = |fullScalar - fullTensor| + |fullTensor - evalTensor| +
-            |evalTensor - evalScalar| := by ring
-  linarith
-
 /-- The evaluated point family, bundled as a projective submeasurement family. -/
 private noncomputable def evaluatedPointProj
     (params : Parameters) [FieldModel params.q]
