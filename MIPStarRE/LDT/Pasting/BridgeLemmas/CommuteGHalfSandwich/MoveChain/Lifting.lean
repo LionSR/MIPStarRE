@@ -275,21 +275,6 @@ lemma commuteGHalfSandwich_splitSuccLift
     (fun _ _ => rfl)
     hsplit
 
-lemma commuteGHalfSandwich_splitSuccLift_moveSource
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (r : ℕ)
-    (q : SliceQuestion params × PointTuple params (r + 1))
-    (ogs : GHatOutcome params × GHatTupleOutcome params (r + 1)) :
-    (commuteGHalfSandwich_splitSuccLiftFamily params r
-      (commuteGHalfSandwich_moveSourceFamily params family r) q).outcome
-        ogs =
-      (headTailOrderedFamily params family (r + 1) q).outcome ogs := by
-  simpa [commuteGHalfSandwich_splitSuccLiftFamily, splitSuccQuestionEquiv,
-      splitSuccOutcomeEquiv] using
-    commuteGHalfSandwich_moveSource_eq_split params family r
-      ((splitSuccQuestionEquiv params r) q)
-      ((splitSuccOutcomeEquiv params r) ogs)
-
 noncomputable def commuteGHalfSandwich_secondSliceLiftFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
