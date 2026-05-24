@@ -407,14 +407,6 @@ noncomputable def localVarianceDeviation (params : Parameters) [FieldModel param
   avgOver (polynomialDistribution params)
     (fun g => localVarianceDeviationAtPolynomial params strategy ψbi G g)
 
-/-- The polynomial-averaged global squared norm expression. -/
-noncomputable def globalVarianceDeviation (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (ψbi : QuantumState (ι × ι))
-    (G : SubMeas (Polynomial params) ι) : Error :=
-  avgOver (polynomialDistribution params)
-    (fun g => globalVarianceDeviationAtPolynomial params strategy ψbi G g)
-
 /-- The displayed error term in `lem:generalize-b`. -/
 noncomputable def generalizeBError (params : Parameters) : Error :=
   ((params.m : Error) * (params.d : Error)) / (params.q : Error)
