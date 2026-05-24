@@ -4,8 +4,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 # Section 6 — Corrected source-boundary induction theorem
 
 This module contains the corrected large-`k` source-facing theorem for
-`thm:main-induction`, together with the public restricted-probability
-constructors used by the final soundness handoff.
+`thm:main-induction`, together with the answer-valued restricted-probability
+constructor used by the final soundness handoff.
 
 ## References
 
@@ -48,32 +48,6 @@ theorem mainInduction_sourceStatement
         (polynomialEvaluationFamily params G.toSubMeas)
         (mainInductionError params k eps delta gamma) := by
   exact mainInduction params strategy eps delta gamma k hgood hk
-
-/-- Restricted-probabilities data built from the explicit weighted bounds in the
-successor proof of `thm:main-induction`.
-
-Paper origin: `references/ldt-paper/inductive_step.tex:374-412`
-(`\label{lem:restricted-probabilities}`), used in the proof of
-`\label{thm:main-induction}` at
-`references/ldt-paper/inductive_step.tex:441-454`. -/
-noncomputable def mainInductionPublicRestrictionData
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (haxisWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedStrategy params strategy x).axisParallelFailureProbability) ≤ eps)
-    (hdiagonalWeightedBound :
-      avgOver (uniformDistribution (Fq params))
-          (fun x => sliceTransverseDirectionWeight params *
-            (xRestrictedStrategy params strategy x).diagonalFailureProbability) ≤ gamma) :
-    SliceRestrictionData params strategy eps delta gamma :=
-  SliceRestrictionData.ofRestrictedProbabilities params strategy eps delta gamma
-    (RestrictedProbabilitiesStatement.ofWeightedBounds params strategy eps delta gamma
-      hgood haxisWeightedBound hdiagonalWeightedBound)
 
 /-- Answer-valued restricted-probabilities data record built from explicit weighted
 answer-valued slice bounds.
