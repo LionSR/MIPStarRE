@@ -71,7 +71,16 @@ The completeness and almost-projectivity constants match the paper and blueprint
 
 The formal API records only the `X`, `\widehat X`, and mixed-product identities needed downstream, not an explicit rectangular SVD object. This is already explained in the blueprint at `def:svd-of-X`: the paper writes `X=UΣV†`, while Lean stores the downstream consequences `X†X=Q`, `\widehat X\widehat X†=I`, and `X†\widehat X=√Q` (`blueprint/src/chapter/ch04_projective.tex:695-708`; `QXPLayer/Core.lean:129-147`). The proof of `squaredDifference` derives the same inequality from these primitive identities (`QXPLayerIdentities.lean:245-322`), and `pQApprox` derives the paper's `30ζ^{1/4}` bound without storing an additional closeness field in the data package (`QXPLayerIdentities.lean:702-824`). This is an explicit formal packaging choice, not an undocumented paper discrepancy.
 
-I also checked the auxiliary lemma `aLooksProjective` in `QXPLayer/RankReduction.lean`. Its public statement assumes the comparison measurement is projective, whereas the paper's displayed derivation of `eq:A-looks-projective` only needs a measurement. This does not create a new gap in the formalized proof route: the general measurement-level route is supplied by `consistencyToAlmostProjective`, whose private helper `qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect` works for arbitrary measurements and is the theorem used by the orthonormalization wrapper (`Projectivization.lean:175-183`, `:328-377`). The projective variant is therefore a redundant strengthened helper, not the formal substitute for the paper step.
+The former auxiliary lemma `aLooksProjective` in `QXPLayer/RankReduction.lean`
+was a redundant strengthened helper: its public statement assumed the comparison
+measurement was projective, whereas the paper's displayed derivation of
+`eq:A-looks-projective` only needs a measurement.  The formal proof route uses
+the general measurement-level theorem `consistencyToAlmostProjective`; its
+private helper `qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect`
+works for arbitrary measurements and is the theorem used by the
+orthonormalization wrapper (`Projectivization.lean:175-183`, `:328-377`).
+Thus the projective variant was not the formal substitute for the paper step
+and has been removed.
 
 ### Bipartite self-consistency and completion support
 
