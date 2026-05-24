@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.PhaseFourFive
+import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
 
 /-!
 # Section 11 commutativity: evaluated-slice averaged expansion
