@@ -40,11 +40,6 @@ def matrixTensorOperator {H K : FiniteHilbertSpace}
 abbrev RectangularMatrixOperator (H K : FiniteHilbertSpace) :=
   Matrix K.carrier H.carrier ℂ
 
-/-- Uniform average of an operator-valued observable on a finite type. -/
-noncomputable def matrixAverageOperator {α : Type*} [Fintype α]
-    {H : FiniteHilbertSpace} (f : α → MatrixOperator H) : MatrixOperator H :=
-  ((Fintype.card α : ℂ)⁻¹) • ∑ a, f a
-
 /-- The concrete matrix family underlying the variance calculations. -/
 structure MatrixOperatorFamilyRealization (params : Parameters) where
   space : FiniteHilbertSpace.{u}
