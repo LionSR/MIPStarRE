@@ -673,20 +673,4 @@ lemma qSDD_rightPlaced_zeroProjSubMeas_le_one {Outcome : Type*}
     MIPStarRE.LDT.Preliminaries.subMeas_diagMass_le_one ψ hψ
       (rightPlacedSubMeas (ιA := ιA) A)
 
-/-- Square-register specialization of
-`qSDD_leftPlaced_zeroProjSubMeas_le_one`.
-
-This is the same bound expressed in the `SubMeas.liftLeft` notation; it follows
-from the heterogeneous left-placement estimate with `ιA = ιB`. -/
-lemma qSDD_liftLeft_zeroProjSubMeas_le_one {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
-    (A : SubMeas Outcome ι) :
-    qSDD ψ A.liftLeft
-      ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤ 1 := by
-  simpa [SubMeas.liftLeft, leftPlacedSubMeas] using
-    qSDD_leftPlaced_zeroProjSubMeas_le_one
-      (Outcome := Outcome) (ιA := ι) (ιB := ι) ψ hψ A
-
 end MIPStarRE.LDT.MakingMeasurementsProjective
