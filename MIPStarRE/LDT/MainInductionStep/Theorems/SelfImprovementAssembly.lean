@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.Core
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
 
 /-!

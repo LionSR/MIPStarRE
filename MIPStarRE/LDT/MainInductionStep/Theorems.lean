@@ -1,10 +1,8 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities
 import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors
 import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 
 /-!

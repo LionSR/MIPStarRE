@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors.Core
 import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors.Successor
 
 /-!
