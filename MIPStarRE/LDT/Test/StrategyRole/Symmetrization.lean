@@ -54,40 +54,6 @@ noncomputable def symmetrizedIdxProjMeas
 
 /-- Transport covariance is preserved by block-diagonal symmetrization over the
 role register. -/
-private theorem symmetrizedAxisParallelReparamInvariant
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {MA MB : IdxProjMeas (AxisParallelLine params)
-      (AxisLinePolynomial params) ι}
-    (hA : AxisParallelMeasurementTransportInvariant params MA)
-    (hB : AxisParallelMeasurementTransportInvariant params MB) :
-    AxisParallelMeasurementTransportInvariant params
-      (symmetrizedIdxProjMeas MA MB) := by
-  intro ℓ t
-  classical
-  ext a
-  simp [symmetrizedIdxProjMeas, AxisParallelLine.transportMeasurement,
-    ProjMeas.transport, Measurement.transport, SubMeas.transport, hA ℓ t, hB ℓ t]
-
-/-- Transport covariance is preserved by block-diagonal symmetrization over the
-role register. -/
-private theorem symmetrizedDiagonalReparamInvariant
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {MA MB : IdxProjMeas (DiagonalLine params)
-      (DiagonalLinePolynomial params) ι}
-    (hA : DiagonalMeasurementTransportInvariant params MA)
-    (hB : DiagonalMeasurementTransportInvariant params MB) :
-    DiagonalMeasurementTransportInvariant params
-      (symmetrizedIdxProjMeas MA MB) := by
-  intro ℓ t
-  classical
-  ext a
-  simp [symmetrizedIdxProjMeas, DiagonalLine.transportMeasurement,
-    ProjMeas.transport, Measurement.transport, SubMeas.transport, hA ℓ t, hB ℓ t]
-
-/-- Transport covariance is preserved by block-diagonal symmetrization over the
-role register. -/
 private theorem symmetrizedAxisParallelTransportInvariant
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

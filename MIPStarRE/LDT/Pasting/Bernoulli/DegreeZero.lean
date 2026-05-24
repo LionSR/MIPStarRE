@@ -30,45 +30,6 @@ private theorem averagedSliceAppendedSubMeas_total
       family.averagedSubMeas.total := by
   rw [averagedSliceAppendedSubMeas, postprocess_total]
 
-/-- Completeness of the averaged slice family transfers to the degree-zero
-appended-slice candidate. -/
-private theorem averagedSliceAppendedSubMeas_completeness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma kappa zeta : Error)
-    (family : IdxPolyFamily params ι)
-    (hcomplete : family.Complete strategy.state kappa)
-    (k : ℕ)
-    (hν_nonneg :
-      0 ≤ MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) :
-    CompletenessAtLeast strategy.state
-      (averagedSliceAppendedSubMeas params family).liftLeft
-      (ldPastingCompletenessLowerBound params kappa
-        (MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta) k) := by
-  let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
-  have hν_nonneg' : 0 ≤ ν := by simpa [ν] using hν_nonneg
-  have hlower :
-      ldPastingCompletenessLowerBound params kappa ν k ≤ 1 - kappa := by
-    have hcoef_nonneg : 0 ≤ kappa * ((params.m : Error)⁻¹) * (1 / 100 : Error) := by
-      have hkappa_nonneg : 0 ≤ kappa := kappa_nonneg_of_complete params strategy family hcomplete
-      positivity
-    have hexp_nonneg :
-        0 ≤ Real.exp ((k : Error) * ((params.m : Error)⁻¹) ^ (2 : ℕ) * (-1 / 80000)) :=
-      le_of_lt (Real.exp_pos _)
-    simp [ldPastingCompletenessLowerBound]
-    ring_nf
-    nlinarith [hν_nonneg', hexp_nonneg, hcoef_nonneg]
-  refine ⟨?_⟩
-  calc
-    ldPastingCompletenessLowerBound params kappa ν k
-      ≤ 1 - kappa := hlower
-    _ ≤ subMeasMass strategy.state family.averagedSubMeas.liftLeft :=
-        hcomplete.averageCompleteness.lowerBound
-    _ = subMeasMass strategy.state
-          (averagedSliceAppendedSubMeas params family).liftLeft := by
-        simp [subMeasMass, SubMeas.liftLeft, averagedSliceAppendedSubMeas_total params family]
-
 /-- Evaluating the degree-zero appended-slice candidate is the height average of
 the original evaluated slice family at the same old point. -/
 private theorem polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average
