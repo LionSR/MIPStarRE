@@ -277,14 +277,12 @@ theorem normalizedTrace_heterogeneousSwapDensity {ιA ιB : Type*}
   MIPStarRE.Quantum.normalizedTrace_reindex (Equiv.prodComm ιA ιB) X
 
 @[simp] theorem rolePairProj_AB_mul_BA :
-    rolePairProj Role.A Role.B * rolePairProj Role.B Role.A = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_A_mul_B, roleProj_B_mul_A]
-  simp [opTensor]
+    rolePairProj Role.A Role.B * rolePairProj Role.B Role.A = 0 :=
+  MIPStarRE.LDT.rolePairProj_AB_mul_BA
 
 @[simp] theorem rolePairProj_BA_mul_AB :
-    rolePairProj Role.B Role.A * rolePairProj Role.A Role.B = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_B_mul_A, roleProj_A_mul_B]
-  simp [opTensor]
+    rolePairProj Role.B Role.A * rolePairProj Role.A Role.B = 0 :=
+  MIPStarRE.LDT.rolePairProj_BA_mul_AB
 
 /-- Place a direct-sum bipartite operator in a chosen pair of role sectors. -/
 noncomputable def rolePairDirectSumCond {ιA ιB : Type*}
