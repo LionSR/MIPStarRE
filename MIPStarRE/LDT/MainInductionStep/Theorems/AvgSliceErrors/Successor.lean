@@ -286,7 +286,7 @@ theorem answerSuccessorSelfImprovementOutputs_ofMainInductionHypothesis
         fun y => answerSelfImprovementCarrier params
           (xRestrictedAnswerSymStratOfAnswer params strategy y)
       have havg_all :=
-        AnswerSelfImprovementData.averagedPoint_eq_of_pointMeasurement_eq
+        AnswerSelfImprovementData.SliceStrategyTransport.averagedPoint_eq_of_pointMeasurement_eq
           params ambientCarrier sliceStrategy (by intro y; rfl)
       have havg :
           IdxPolyFamily.averagedPointEvaluationOperator carrier h =
