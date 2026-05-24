@@ -382,33 +382,6 @@ lemma ldSandwichLineOnePointLeftFamily_eq_prefixOriginal
           rw [← (ldSandwichLineOnePointPrefixOriginalFamily params family hi q).sum_eq_total]
           exact Finset.sum_congr rfl fun o _ho => hout o
 
-/-- Unpack the raw prefix commutation package into the `qSDDCore` bound expected by
-`closenessOfIP` and `closenessOfIPAdjoint`. -/
-lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_qSDDCore_bound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    {k i : ℕ} (hi : i < k)
-    (hprefixRaw :
-      SDDOpRel strategy.state
-        (uniformDistribution (SandwichedLineQuestion params k))
-        (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily params family hi)
-        (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily params family hi)
-        (commuteGHalfSandwichError params gamma zeta (i + 1))) :
-    avgOver (uniformDistribution (SandwichedLineQuestion params k))
-      (fun q =>
-        qSDDCore strategy.state
-          (fun gs =>
-            (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily
-              params family hi q).outcome gs)
-          (fun gs =>
-            (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
-              params family hi q).outcome gs))
-      ≤ commuteGHalfSandwichError params gamma zeta (i + 1) := by
-  simpa [sddErrorOp, qSDDOp] using hprefixRaw.squaredDistanceBound
-
 -- This arithmetic absorption proof expands several nested error estimates from the paper.
 /-- Scalar absorption for the post-tail-deletion one-point estimate.
 

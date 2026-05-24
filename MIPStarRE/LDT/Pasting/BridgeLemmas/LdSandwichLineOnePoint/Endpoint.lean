@@ -248,27 +248,6 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift_of_axis_self
           exact (postprocess_postprocess _ _ _).symm)
   simpa [endpointLeft, endpointRight, iFin] using hlift
 
-lemma ldSandwichLineOnePoint_endpoint_ldGbcon_lift
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (k i : ℕ) (hi : i < k) :
-    ConsRel strategy.state
-      (uniformDistribution (SandwichedLineQuestion params k))
-      (fun q =>
-        postprocess
-          (evaluateAt params q.1 ((family.meas (q.2 ⟨i, hi⟩)).toSubMeas))
-          some)
-      (ldSandwichLineOnePointRightFamily params strategy family k i)
-      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  exact ldSandwichLineOnePoint_endpoint_ldGbcon_lift_of_axis_self
-    params strategy eps delta zeta hgood.axisParallelTest hgood.selfConsistencyTest
-    family hcons k i hi
-
 lemma gHatIdxMeas_outcome_some_eq_evaluateAt
     (params : Parameters)
     [FieldModel params.q]
@@ -343,100 +322,6 @@ lemma gHatSandwichFamily_restrict_zero_outcome_none_eq_zero
   · rcases Option.isSome_iff_exists.mp hsome with ⟨g, hg⟩
     simp [hg]
   · simp [hsome]
-
-lemma ldSandwichLineOnePoint_zero_halfProduct_sum_eq_endpoint
-    (params : Parameters)
-    [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    {k : ℕ} (hk : 0 < k)
-    (q : SandwichedLineQuestion params k) (a : Fq params) :
-    (∑ gs : GHatTupleOutcome params k,
-      if Option.map (fun g : Polynomial params => g q.1) (gs ⟨0, hk⟩) = some a then
-        gHatHalfProductOutcomeOperator params family k q.2 gs
-      else
-        0) =
-      (evaluateAt params q.1 ((family.meas (q.2 ⟨0, hk⟩)).toSubMeas)).outcome a := by
-  cases k with
-  | zero => cases hk
-  | succ r =>
-      let xs : PointTuple params (r + 1) := q.2
-      let u : Point params := q.1
-      let G : GHatOutcome params → MIPStarRE.Quantum.Op ι := fun g =>
-        (gHatIdxMeas params family (xs 0)).outcome g
-      let T : GHatTupleOutcome params r → MIPStarRE.Quantum.Op ι := fun gs =>
-        gHatHalfProductOutcomeOperator params family r (pointTupleTail xs) gs
-      have hsplit :
-          (∑ gs : GHatTupleOutcome params (r + 1),
-            if Option.map (fun g : Polynomial params => g u) (gs 0) = some a then
-              gHatHalfProductOutcomeOperator params family (r + 1) xs gs
-            else
-              0) =
-            ∑ p : GHatOutcome params × GHatTupleOutcome params r,
-              if Option.map (fun g : Polynomial params => g u) p.1 = some a then
-                G p.1 * T p.2
-              else
-                0 := by
-        exact Fintype.sum_equiv (gHatTupleOutcomeConsEquiv' params r)
-          (fun gs : GHatTupleOutcome params (r + 1) =>
-            if Option.map (fun g : Polynomial params => g u) (gs 0) = some a then
-              gHatHalfProductOutcomeOperator params family (r + 1) xs gs
-            else
-              0)
-          (fun p : GHatOutcome params × GHatTupleOutcome params r =>
-            if Option.map (fun g : Polynomial params => g u) p.1 = some a then
-              G p.1 * T p.2
-            else
-              0)
-          (by
-            intro gs
-            simp [gHatTupleOutcomeConsEquiv', gHatHalfProductOutcomeOperator, T, G])
-      calc
-        (∑ gs : GHatTupleOutcome params (r + 1),
-            if Option.map (fun g : Polynomial params => g u) (gs 0) = some a then
-              gHatHalfProductOutcomeOperator params family (r + 1) xs gs
-            else
-              0)
-            = ∑ p : GHatOutcome params × GHatTupleOutcome params r,
-                if Option.map (fun g : Polynomial params => g u) p.1 = some a then
-                  G p.1 * T p.2
-                else
-                  0 := hsplit
-        _ = ∑ g : GHatOutcome params,
-              ∑ gs : GHatTupleOutcome params r,
-                if Option.map (fun g' : Polynomial params => g' u) g = some a then
-                  G g * T gs
-                else
-                  0 := by
-              rw [← Finset.univ_product_univ, Finset.sum_product]
-        _ = ∑ g : GHatOutcome params,
-              if Option.map (fun g' : Polynomial params => g' u) g = some a then
-                G g
-              else
-                0 := by
-              refine Finset.sum_congr rfl ?_
-              intro g _hg
-              by_cases hg : Option.map (fun g' : Polynomial params => g' u) g = some a
-              · calc
-                  (∑ gs : GHatTupleOutcome params r,
-                    if Option.map (fun g' : Polynomial params => g' u) g = some a then
-                      G g * T gs
-                    else
-                      0) = ∑ gs : GHatTupleOutcome params r, G g * T gs := by
-                        simp [hg]
-                  _ = G g * (∑ gs : GHatTupleOutcome params r, T gs) := by
-                        rw [Matrix.mul_sum]
-                  _ = G g := by
-                        simp [T, G, gHatHalfProduct_sum_eq_total,
-                          gHatHalfProductTotalOperator_eq_one]
-                  _ = if Option.map (fun g' : Polynomial params => g' u) g = some a then
-                        G g
-                      else
-                        0 := by
-                        simp [hg]
-              · simp [hg]
-        _ = (evaluateAt params u ((family.meas (xs 0)).toSubMeas)).outcome a := by
-              simpa [G] using
-                gHatIdxMeas_outcome_some_eq_evaluateAt params family (xs 0) u a
 
 lemma ldSandwichLineOnePointLeftFamily_zero_outcome_some_eq_endpoint
     (params : Parameters)
