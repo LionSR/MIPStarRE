@@ -783,7 +783,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{lemma}[One-step completed sandwich commutation]\label{lem:one-step-completed-sandwich-commutation}
 	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_step_commute, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_prefixFirstSliceLeft_move, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveSource_eq_split, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_move_recursive_zero, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_split_one_iff, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core_two, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveStepMid_toTarget, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
 	\leanok
-	\uses{cor:G-hat-facts, lem:completed-sandwich-normalization, prop:triangle-inequality-for-approx_delta}
+	\uses{cor:G-hat-facts, lem:completed-sandwich-normalization,
+		lem:commute-g-half-sandwich, prop:triangle-inequality-for-approx_delta}
 	Given the completed-measurement self-consistency and commutation estimates
 	from Corollary~\ref{cor:G-hat-facts}, the following one-step estimates hold.
 	\begin{enumerate}
@@ -878,7 +879,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{lemma}[Line-interpolation mismatch estimates]\label{lem:line-interpolation-mismatch-estimates}
 	\lean{MIPStarRE.LDT.Pasting.tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch, MIPStarRE.LDT.Pasting.interpolationEligibleSandwich_mismatch_sum_mono, MIPStarRE.LDT.Pasting.interpolationEligibleSandwich_exists_mismatch_sum_le_sum, MIPStarRE.LDT.Pasting.qBipartiteConsDefect_postprocess_eq_singleOutcome, MIPStarRE.LDT.Pasting.qBipartiteConsDefect_eq_sum_singleOutcome, MIPStarRE.LDT.Pasting.ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum, MIPStarRE.LDT.Pasting.hBConsistencyCoordMass_le_linePointDefect, MIPStarRE.LDT.Pasting.hBConsistencyBadMass_le_one, MIPStarRE.LDT.Pasting.pastedInterpolation_verticalLine_defect_le_badMass}
 	\leanok
-	\uses{lem:vertical-restriction-identities, lem:ld-gbcon}
+	\uses{lem:vertical-restriction-identities, lem:ld-gbcon,
+		lem:ld-sandwich-line-one-point}
 	If the tuple of completed slices does not interpolate to the sampled
 	vertical-line value, then some active coordinate witnesses a line-value
 	mismatch. Concretely, for every direction $u$ and injective tuple
@@ -923,7 +925,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.hBConsistencyBadMass_le_one}
 	\lean{MIPStarRE.LDT.Pasting.pastedInterpolation_verticalLine_defect_le_badMass}
 	\leanok
-	\uses{lem:vertical-restriction-identities, lem:ld-gbcon}
+	\uses{lem:vertical-restriction-identities, lem:ld-gbcon,
+		lem:ld-sandwich-line-one-point}
 	The proof first identifies a failed vertical-line interpolation with a
 	particular active coordinate whose slice value disagrees with the line
 	answer. The operator sum over all such failures is then bounded by the sum
@@ -934,7 +937,8 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \begin{lemma}[Averaging the line-interpolation defect]\label{lem:line-interpolation-averaging-estimates}
 	\lean{MIPStarRE.LDT.Pasting.avgOver_distinct_bounded_le_avgOver_uniform_add_tv, MIPStarRE.LDT.Pasting.qBipartiteMatchMass_averageIdxSubMeas_left, MIPStarRE.LDT.Pasting.ev_opTensor_total_averageIdxSubMeas_left, MIPStarRE.LDT.Pasting.qBipartiteConsDefect_averageIdxSubMeas_left_le, MIPStarRE.LDT.Pasting.hBConsistency_fixed_u_defect_le_avgOver_distinct, MIPStarRE.LDT.Pasting.one_div_q_le_rpow_degreeRatio, MIPStarRE.LDT.Pasting.avgOver_uniform_badMass_le_k_mul_ldSandwichLineOnePointError, MIPStarRE.LDT.Pasting.avgOver_distinct_badMass_le_hBConsistencyError, MIPStarRE.LDT.Pasting.qBipartiteConsDefect_eq_false_mass_of_bool_right_true, MIPStarRE.LDT.Pasting.avgOver_distinct_pasted_defect_le_badMass}
 	\leanok
-	\uses{prop:ld-dnoteq, lem:line-interpolation-mismatch-estimates}
+	\uses{prop:ld-dnoteq, lem:line-interpolation-mismatch-estimates,
+		lem:ld-sandwich-line-one-point}
 	Replacing distinct tuples by independent tuples costs the total-variation
 	error $k^2/q$ from Proposition~\ref{prop:ld-dnoteq}. After averaging over
 	$u$ and $\mathbf{x}\sim\mathsf{Distinct}_k$, the expected bad mass and the
