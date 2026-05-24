@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.GlobalVariance.Defs.Core
-import MIPStarRE.LDT.GlobalVariance.Defs.Operators
 import MIPStarRE.LDT.GlobalVariance.Defs.Families
 
 /-!
