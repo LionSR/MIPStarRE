@@ -169,20 +169,8 @@ private lemma rolePairCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
 @[simp] private lemma swapDensity_leftTensor {ι : Type*} [Fintype ι] [DecidableEq ι]
     (M : MIPStarRE.Quantum.Op ι) :
     swapDensity (leftTensor (ι₂ := ι) M) = rightTensor (ι₁ := ι) M := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-    simp [swapDensity, leftTensor, rightTensor, h₁, h₂, mul_comm]
-
-@[simp] private lemma swapDensity_rightTensor {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (M : MIPStarRE.Quantum.Op ι) :
-    swapDensity (rightTensor (ι₁ := ι) M) = leftTensor (ι₂ := ι) M := by
-  ext x y
-  rcases x with ⟨i₁, i₂⟩
-  rcases y with ⟨j₁, j₂⟩
-  by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-    simp [swapDensity, leftTensor, rightTensor, h₁, h₂, mul_comm]
+  simpa [leftTensor, rightTensor] using
+    (swapDensity_opTensor M (1 : MIPStarRE.Quantum.Op ι))
 
 /-- Swapping the density of a rank-one pure state swaps the underlying state
 vector. -/
