@@ -112,42 +112,6 @@ lemma switcherooPointProductCommutation_coreBound
       chi := by
   simpa [sddErrorOp, qSDDOp] using hcomm.squaredDistanceBound
 
-/-- If `|f q| ≤ c` pointwise and the distribution has total weight at most `1`, then
-its weighted average is bounded by `c`. -/
-private lemma avgOver_abs_le_of_bound
-    {Question : Type*}
-    (𝒟 : Distribution Question)
-    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
-    (f : Question → Error)
-    (c : Error)
-    (hc : 0 ≤ c)
-    (hf : ∀ q, |f q| ≤ c) :
-    |avgOver 𝒟 f| ≤ c := by
-  calc
-    |avgOver 𝒟 f|
-      = |∑ q ∈ 𝒟.support, 𝒟.weight q * f q| := rfl
-    _ ≤ ∑ q ∈ 𝒟.support, |𝒟.weight q * f q| := Finset.abs_sum_le_sum_abs _ _
-    _ = ∑ q ∈ 𝒟.support, 𝒟.weight q * |f q| := by
-          refine Finset.sum_congr rfl ?_
-          intro q _
-          rw [abs_mul, abs_of_nonneg (𝒟.nonnegative q)]
-    _ ≤ ∑ q ∈ 𝒟.support, 𝒟.weight q * c := by
-          refine Finset.sum_le_sum ?_
-          intro q _
-          exact mul_le_mul_of_nonneg_left (hf q) (𝒟.nonnegative q)
-    _ = c * ∑ q ∈ 𝒟.support, 𝒟.weight q := by
-          calc
-            ∑ q ∈ 𝒟.support, 𝒟.weight q * c
-              = ∑ q ∈ 𝒟.support, c * 𝒟.weight q := by
-                  refine Finset.sum_congr rfl ?_
-                  intro q _
-                  ring
-            _ = c * ∑ q ∈ 𝒟.support, 𝒟.weight q := by
-                  rw [Finset.mul_sum]
-    _ ≤ c * 1 := by
-          exact mul_le_mul_of_nonneg_left h𝒟 hc
-    _ = c := by ring
-
 lemma avgOver_abs_le_avgOver_abs
     {α : Type*}
     (𝒟 : Distribution α) (f : α → Error) :
@@ -164,15 +128,6 @@ lemma avgOver_abs_le_avgOver_abs
           rw [abs_mul, abs_of_nonneg (𝒟.nonnegative a)]
     _ = avgOver 𝒟 (fun a => |f a|) := by
           rfl
-
-/-- The total of a submeasurement is bounded between `0` and `1`. -/
-private lemma subMeas_total_opBounded01
-    {Outcome : Type*} [Fintype Outcome]
-    (A : SubMeas Outcome ι) :
-    Preliminaries.OpBounded01 A.total := by
-  constructor
-  · exact A.total_nonneg
-  · exact sub_nonneg.mpr A.total_le_one
 
 /-- A projective sandwich family with middle operator bounded by `1` sums to at
 most `1`. -/

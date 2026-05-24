@@ -21,29 +21,6 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 
-/-! ### Local helpers for the large-error branch -/
-
-/-- In the large-`ζ` branch, the zero projective submeasurement satisfies the
-orthonormalization SDD bound. -/
-private lemma qSDD_liftLeft_zeroProjSubMeas_le_orthonormalizationError
-    {Outcome : Type*} {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState (ι × ι)) (hψ : ψ.IsNormalized)
-    (A : SubMeas Outcome ι) (ζ : Error)
-    (hζhalf : ¬ ζ ≤ 1 / 2) :
-    qSDD ψ A.liftLeft
-        ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤
-      orthonormalizationError ζ := by
-  have hq :
-      qSDD ψ A.liftLeft
-          ((zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.liftLeft) ≤
-        1 := by
-    exact qSDD_liftLeft_zeroProjSubMeas_le_one (ψ := ψ) (hψ := hψ) (A := A)
-  have hδ :
-      1 ≤ orthonormalizationError ζ :=
-    Orthonormalization.ErrorBounds.orthonormalizationError_ge_one_of_half_lt ζ
-      (lt_of_not_ge hζhalf)
-  exact hq.trans hδ
-
 /-- `lem:orthonormalization-main-lemma`.
 
 Paper origin: `references/ldt-paper/orthonormalization.tex:282-310`
