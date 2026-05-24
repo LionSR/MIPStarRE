@@ -419,12 +419,6 @@ noncomputable def pastedMeasurementTotal
     (H : SubMeas α ι) : IdxSubMeas Unit Unit ι :=
   constSubMeasFamily (postprocess H (fun _ => ()))
 
-/-- The total operator of the specifically constructed pasted submeasurement. -/
-noncomputable def constructedPastedMeasurementTotal (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (k : ℕ) :
-    IdxSubMeas Unit Unit ι :=
-  pastedMeasurementTotal (constructedPastedSubMeas params family k)
-
 /-- The expansion over all outcome types `τ`, written as the
 total mass of the averaged sandwich family restricted to `|τ| ≥ d+1`. -/
 noncomputable def allOutcomesExpansionFamily (params : Parameters) [FieldModel params.q]
