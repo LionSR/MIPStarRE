@@ -163,37 +163,6 @@ lemma switcherooAggregateLeftFront_contraction
                       hmid_le (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
             _ = 1 := by simp [leftTensor]
 
-/-- The left-front explicit scalar appearing in the final `sqrt chi` switcheroo step. -/
-noncomputable def switcherooLeftFrontCoreScalar
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
-  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
-    ∑ go : Polynomial params × Outcome,
-      ev ψbi
-        (leftTensor (ι₂ := ι)
-          (((family.meas q.1).outcome go.1) *
-            (M q.2).outcome go.2 *
-            (family.meas q.1).outcome go.1 *
-            (M q.2).outcome go.2)))
-
-/-- The split-by-`g` scalar that collapses to the first positive switcheroo term. -/
-noncomputable def switcherooFirstSplitCoreScalar
-    {Outcome : Type*} [Fintype Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (ψbi : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (M : IdxProjSubMeas (Fq params) Outcome ι) : Error :=
-  avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
-    ∑ go : Polynomial params × Outcome,
-      ev ψbi
-        (leftTensor (ι₂ := ι)
-          ((M q.2).outcome go.2 *
-            (family.meas q.1).outcome go.1 *
-            (M q.2).outcome go.2)))
-
 /-- Normalize the pointwise self-product in the final switcheroo left-front
 step to the split-by-`g` scalar. -/
 lemma switcherooPointProductLeft_self_eq_firstSplit_point
