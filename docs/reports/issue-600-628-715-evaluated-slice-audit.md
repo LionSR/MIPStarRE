@@ -92,20 +92,19 @@ and has no `gamma` argument.  The only phase-five `gamma` cost is the separate
 right-register point-measurement swap in `ProcessedG.lean`'s `hphase5paper`
 block.
 
-## Historical leftovers that are not #600 blockers
+## Deleted historical leftovers that were not #600 blockers
 
-Two pieces of source remain intentionally historical/cleanup-only:
+Two historical pieces of source have since been removed after import checks:
 
-1. `Phase67Residual.lean` records the stricter BAB-side/tensor-first endpoint
-   from the #732 audit.  The current scalar-chain assembly instead uses the
-   paper endpoint packaged by `evaluatedSlice_phaseSixSeven_reverse_bound`.
-2. `ProcessedG.lean` still contains private, proved phase-five local-scaffold
-   lemmas around `evaluatedSlicePhaseFiveStabilityDefect`.  They are not used by
-   the final `hphase5paper` assembly, which follows the raw-defect route in
+1. `Phase67Residual.lean` recorded the stricter BAB-side/tensor-first endpoint
+   from the #732 audit.  The current scalar-chain assembly uses the paper
+   endpoint packaged by `evaluatedSlice_phaseSixSeven_reverse_bound`.
+2. `ProcessedG/PhaseFive.lean` contained proved phase-five local-scaffold
+   lemmas around `evaluatedSlicePhaseFiveStabilityDefect`.  They were not used
+   by the final `hphase5paper` assembly, which follows the raw-defect route in
    `PaperChainPhaseFive.lean`.
 
-These are simplifier-pass cleanup candidates, not proof debt for
-`commDataProcessedG`.
+These deletions do not change the proof obligations for `commDataProcessedG`.
 
 ## Recommended issue action
 

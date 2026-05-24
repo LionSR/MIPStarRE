@@ -65,14 +65,14 @@ The following remaining vocabulary is below the source theorem boundary.
 | Declaration family | Location | Classification | Status |
 | --- | --- | --- | --- |
 | Former phase-67 first-reverse residual declarations | `ScalarApproximation/Phase67Residual.lean` | Historical analytic endpoint for an older BAB-side reverse-insertion route | Deleted after import checks; not a hypothesis of `commDataProcessedG`, whose scalar chain uses the paper line-99--104 route through `evaluatedSlice_phaseSixSeven_reverse_bound` |
-| `evaluatedSlicePhaseFiveStabilityDefect` and its reindexing lemmas | `ScalarApproximation/ProcessedG/PhaseFive.lean` | Older phase-five local scaffold | Not used by the final paper-chain assembly; candidate for a later simplifier pass |
+| Former `evaluatedSlicePhaseFiveStabilityDefect` declarations | `ScalarApproximation/ProcessedG/PhaseFive.lean` | Older phase-five local scaffold | Deleted after import checks; the final paper-chain assembly uses `PaperChainPhaseFive.lean` |
 | `fullSliceABAB_scalar_to_BABAtensor`, `xEvaluatedSliceBABAtensor_to_BABAScalar`, and related full-slice closeness lemmas | `Transport/FullSlice/Bridges/*` | Proved `closenessOfIP` scalar-to-tensor estimates | Internal construction lemmas, not theorem hypotheses |
 | `FullSliceScalarMarginalizeYFirstCloseness` | `Main/Auxiliary/ScalarMarginalization.lean` | Private local structure bundling a proved line-359 estimate | Harmless local proof organization |
 
 These objects should not be promoted to assumptions of a source-labelled
-theorem.  The phase-67 residual scaffold has been deleted after import checks;
-the remaining rows may be reconsidered in later cleanup after their import
-dependencies are checked.
+theorem.  The phase-67 residual scaffold and the older phase-five stability
+defect scaffold have been deleted after import checks; the remaining rows may
+be reconsidered in later cleanup after their import dependencies are checked.
 
 ## Statement Integrity Audit
 

@@ -9,11 +9,11 @@ old exact-swap/BABA shortcut described in the issue body.  Its final assembly
 follows the paper route through the point-measurement commutation step and pays
 both `6 * sqrt (gamma * (m + 1))` losses explicitly.
 
-The remaining live item is cleanup-only: `ProcessedG.lean` still contains some
-private phase-five scaffolding from the older collapsed route, and
-`Phase67Residual.lean` documents that older endpoint.  Those declarations are not
-used by the final paper-chain assembly, so they can be audited by a future
-simplifier pass, but they do not affect `commDataProcessedG`.
+The former cleanup-only items have been removed after import checks:
+`ProcessedG/PhaseFive.lean` contained phase-five scaffolding from the older
+collapsed route, and `Phase67Residual.lean` documented the corresponding
+BAB-side endpoint.  Neither file was used by the final paper-chain assembly, and
+their deletion does not affect `commDataProcessedG`.
 
 ## Paper anchors
 
@@ -92,21 +92,20 @@ save any `gamma` budget.
 
 These observations are not correctness blockers for #760:
 
-- `ProcessedG.lean:582-1191` still contains private lemmas for the older
-  collapsed phase-five stability defect (`evaluatedSlicePhaseFiveStabilityDefect`
-  and its question-level reindexing).  The final `hphase5paper` block uses the
-  newer `PaperChainPhaseFive` raw-defect route instead.
-- `Phase67Residual.lean` documents the older BAB-side endpoint residual.  Its
-  prose now labels that endpoint as historical; the final paper-faithful assembly
-  uses `evaluatedSlicePhaseFivePaperRemoved` and
-  `evaluatedSlice_phaseSixSeven_reverse_bound` instead.
+- The former `ProcessedG/PhaseFive.lean` lemmas for the older collapsed
+  phase-five stability defect (`evaluatedSlicePhaseFiveStabilityDefect` and its
+  question-level reindexing) have been deleted after import checks.  The final
+  `hphase5paper` block uses the newer `PaperChainPhaseFive` raw-defect route.
+- The former `Phase67Residual.lean` BAB-side endpoint residual has also been
+  deleted.  The final paper-faithful assembly uses
+  `evaluatedSlicePhaseFivePaperRemoved` and
+  `evaluatedSlice_phaseSixSeven_reverse_bound`.
 - The unused `avgBABA` binding noted in the original audit has been removed.
 
-A follow-up simplifier pass could remove or reclassify the remaining private
-phase-five scaffold after checking import dependencies.
+No phase-five or phase-67 scaffold remains in the checked scalar-chain
+interface.
 
 ## Recommended issue action
 
-Close #760 as settled by the current `PaperChainPhaseFive` route, or retitle it
-as a cleanup task for the stale private phase-five/phase-67 scaffolding.  The
-faithfulness concern itself is resolved.
+Close #760 as settled by the current `PaperChainPhaseFive` route.  The
+faithfulness concern and the associated cleanup-only remnants are resolved.
