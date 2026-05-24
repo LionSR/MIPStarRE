@@ -143,15 +143,6 @@ lemma fromHToGRecurrenceWeight_sandwich_one_sub_base_le
     (sub_nonneg.mpr family.averagedSubMeas.total_le_one)
     (fromHToGRecurrenceWeight_commute_one_sub_base params family prefixLen τtail)
 
-omit [DecidableEq ι] in
-/-- The adjoint-oriented half-sandwich commutator square appearing in the second
-paper commutation is the opposite square of the first commutator. -/
-lemma fromHToG_adjoint_commutator_square_eq
-    (U T : MIPStarRE.Quantum.Op ι) (hU : Uᴴ = U) :
-    ((Tᴴ * U - U * Tᴴ)ᴴ * (Tᴴ * U - U * Tᴴ)) =
-      (U * T - T * U) * (U * T - T * U)ᴴ := by
-  simp [Matrix.conjTranspose_sub, Matrix.conjTranspose_mul, hU]
-
 /-- Completed `ĝ` measurement outcomes are Hermitian.  This packages the
 positivity-to-Hermitian conversion used when orienting the adjoint
 half-sandwich commutator in the `M₂ → M₃` move. -/
