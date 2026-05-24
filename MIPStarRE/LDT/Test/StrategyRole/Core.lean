@@ -25,7 +25,8 @@ lemma sum_role_eq_add {α : Type*} [AddCommMonoid α] (f : Role → α) :
 def roleProj (r : Role) : MIPStarRE.Quantum.Op Role :=
   Matrix.single r r (1 : ℂ)
 
-private lemma roleProj_nonneg (r : Role) : 0 ≤ roleProj r := by
+/-- The basis projector onto a role sector is positive semidefinite. -/
+lemma roleProj_nonneg (r : Role) : 0 ≤ roleProj r := by
   refine Matrix.nonneg_iff_posSemidef.mpr ?_
   let col : Matrix Role Unit ℂ := Matrix.single r () 1
   simpa [roleProj, col] using Matrix.posSemidef_self_mul_conjTranspose col
@@ -138,7 +139,8 @@ noncomputable def rolePairCond {ι : Type*} [Fintype ι] [DecidableEq ι]
   Matrix.reindex (roleRegisterPairLocalEquiv ι) (roleRegisterPairLocalEquiv ι)
     (opTensor (rolePairProj rL rR) X)
 
-private lemma rolePairProj_nonneg (rL rR : Role) : 0 ≤ rolePairProj rL rR :=
+/-- The projection onto a pair of role sectors is positive semidefinite. -/
+lemma rolePairProj_nonneg (rL rR : Role) : 0 ≤ rolePairProj rL rR :=
   opTensor_nonneg (roleProj_nonneg rL) (roleProj_nonneg rR)
 
 private lemma rolePairCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -234,7 +236,8 @@ noncomputable def classicalRoleSymmState {ι : Type*} [Fintype ι] [DecidableEq 
     _ = (classicalRoleSymmState ψ).density := by
           simp [classicalRoleSymmState, add_comm]
 
-private lemma normalizedTrace_rolePairProj (rL rR : Role) :
+/-- The normalized trace of a two-role sector projection is `1 / 4`. -/
+lemma normalizedTrace_rolePairProj (rL rR : Role) :
     MIPStarRE.Quantum.normalizedTrace (rolePairProj rL rR) = (1 / 4 : ℂ) := by
   have hRole : Fintype.card Role = 2 := by decide
   calc

@@ -276,29 +276,6 @@ theorem normalizedTrace_heterogeneousSwapDensity {ιA ιB : Type*}
       MIPStarRE.Quantum.normalizedTrace X :=
   MIPStarRE.Quantum.normalizedTrace_reindex (Equiv.prodComm ιA ιB) X
 
-private lemma roleProj_nonneg_forDirectSum (r : Role) : 0 ≤ roleProj r := by
-  refine Matrix.nonneg_iff_posSemidef.mpr ?_
-  let col : Matrix Role Unit ℂ := Matrix.single r () 1
-  simpa [roleProj, col] using Matrix.posSemidef_self_mul_conjTranspose col
-
-private lemma rolePairProj_nonneg_forDirectSum (rL rR : Role) :
-    0 ≤ rolePairProj rL rR :=
-  opTensor_nonneg (roleProj_nonneg_forDirectSum rL)
-    (roleProj_nonneg_forDirectSum rR)
-
-private lemma normalizedTrace_rolePairProj_forDirectSum (rL rR : Role) :
-    MIPStarRE.Quantum.normalizedTrace (rolePairProj rL rR) = (1 / 4 : ℂ) := by
-  have hRole : Fintype.card Role = 2 := by decide
-  calc
-    MIPStarRE.Quantum.normalizedTrace (rolePairProj rL rR)
-      = MIPStarRE.Quantum.normalizedTrace (roleProj rL) *
-          MIPStarRE.Quantum.normalizedTrace (roleProj rR) :=
-            normalizedTrace_opTensor (roleProj rL) (roleProj rR)
-    _ = (1 / 2 : ℂ) * (1 / 2 : ℂ) := by
-          cases rL <;> cases rR <;>
-            simp [MIPStarRE.Quantum.normalizedTrace, roleProj, hRole]
-    _ = (1 / 4 : ℂ) := by norm_num
-
 @[simp] theorem rolePairProj_AB_mul_BA :
     rolePairProj Role.A Role.B * rolePairProj Role.B Role.A = 0 := by
   rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_A_mul_B, roleProj_B_mul_A]
@@ -327,7 +304,7 @@ theorem rolePairDirectSumCond_nonneg {ιA ιB : Type*}
       (LocalCarrierSum ιA ιB × LocalCarrierSum ιA ιB)}
     (hX : 0 ≤ X) : 0 ≤ rolePairDirectSumCond rL rR X :=
   MIPStarRE.Quantum.reindex_nonneg (roleRegisterPairLocalEquiv ιA ιB)
-    (opTensor_nonneg (rolePairProj_nonneg_forDirectSum rL rR) hX)
+    (opTensor_nonneg (MIPStarRE.LDT.rolePairProj_nonneg rL rR) hX)
 
 theorem normalizedTrace_rolePairDirectSumCond {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Nonempty ιA]
@@ -350,7 +327,7 @@ theorem normalizedTrace_rolePairDirectSumCond {ιA ιB : Type*}
           MIPStarRE.Quantum.normalizedTrace X := by
             simpa using normalizedTrace_opTensor (rolePairProj rL rR) X
     _ = (1 / 4 : ℂ) * MIPStarRE.Quantum.normalizedTrace X := by
-          rw [normalizedTrace_rolePairProj_forDirectSum]
+          rw [MIPStarRE.LDT.normalizedTrace_rolePairProj]
 
 @[simp] theorem rolePairDirectSumCond_mul_same {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
