@@ -525,46 +525,6 @@ private lemma ev_opTensor_left_mul_comm_of_hermitian
   rw [← ev_conjTranspose ψ]
   rw [conjTranspose_opTensor, Matrix.conjTranspose_mul, hA, hH, hT]
 
-private lemma helper_leftTensor_mul_opTensor
-    (A B C : MIPStarRE.Quantum.Op ι) :
-    leftTensor (ι₂ := ι) A * opTensor B C = opTensor (A * B) C := by
-  calc
-    leftTensor (ι₂ := ι) A * opTensor B C =
-        leftTensor (ι₂ := ι) A *
-          (leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) C) := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-    _ = (leftTensor (ι₂ := ι) A * leftTensor (ι₂ := ι) B) *
-          rightTensor (ι₁ := ι) C := by
-          rw [Matrix.mul_assoc]
-    _ = leftTensor (ι₂ := ι) (A * B) * rightTensor (ι₁ := ι) C := by
-          rw [leftTensor_mul_leftTensor]
-    _ = opTensor (A * B) C := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-
-private lemma helper_rightTensor_mul_opTensor
-    (A B C : MIPStarRE.Quantum.Op ι) :
-    rightTensor (ι₁ := ι) A * opTensor B C = opTensor B (A * C) := by
-  calc
-    rightTensor (ι₁ := ι) A * opTensor B C =
-        rightTensor (ι₁ := ι) A *
-          (leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) C) := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-    _ = (rightTensor (ι₁ := ι) A * leftTensor (ι₂ := ι) B) *
-          rightTensor (ι₁ := ι) C := by
-          rw [Matrix.mul_assoc]
-    _ = opTensor B A * rightTensor (ι₁ := ι) C := by
-          rw [rightTensor_mul_leftTensor_eq_opTensor]
-    _ = (leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) A) *
-          rightTensor (ι₁ := ι) C := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-    _ = leftTensor (ι₂ := ι) B *
-          (rightTensor (ι₁ := ι) A * rightTensor (ι₁ := ι) C) := by
-          rw [Matrix.mul_assoc]
-    _ = leftTensor (ι₂ := ι) B * rightTensor (ι₁ := ι) (A * C) := by
-          rw [rightTensor_mul_rightTensor]
-    _ = opTensor B (A * C) := by
-          rw [leftTensor_mul_rightTensor_eq_opTensor]
-
 private lemma ev_opTensor_right_mul_comm_of_hermitian
     (ψ : QuantumState (ι × ι))
     (H T A : MIPStarRE.Quantum.Op ι)
@@ -727,13 +687,13 @@ theorem helperDeleteAClonedQuantity_abs_sub_moveOverVQuantity_le_sqrt_two_delta
     have hleft :
         ev strategy.state (leftTensor (ι₂ := ι) Av * opTensor Hh' (T.outcome hh.1)) =
           ev strategy.state (opTensor (Hh' * Av) (T.outcome hh.1)) := by
-      rw [helper_leftTensor_mul_opTensor]
+      rw [leftTensor_mul_opTensor]
       simpa using ev_opTensor_left_mul_comm_of_hermitian strategy.state Av Hh'
         (T.outcome hh.1) hAv hH hT
     have hright :
         ev strategy.state (rightTensor (ι₁ := ι) Av * opTensor Hh' (T.outcome hh.1)) =
           ev strategy.state (opTensor Hh' (T.outcome hh.1 * Av)) := by
-      rw [helper_rightTensor_mul_opTensor]
+      rw [rightTensor_mul_opTensor]
       simpa using ev_opTensor_right_mul_comm_of_hermitian strategy.state Hh'
         (T.outcome hh.1) Av hH hT hAv
     rw [hleft, hright]

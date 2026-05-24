@@ -339,6 +339,41 @@ theorem leftTensor_mul_leftTensor
     (Matrix.mul_kronecker_mul
       A B (1 : MIPStarRE.Quantum.Op ι₂) (1 : MIPStarRE.Quantum.Op ι₂)).symm
 
+/-- Multiplying a left tensor into a full tensor only affects the left factor. -/
+theorem leftTensor_mul_opTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
+    leftTensor (ι₂ := ι₂) A * opTensor B C = opTensor (A * B) C := by
+  calc
+    leftTensor (ι₂ := ι₂) A * opTensor B C
+        = leftTensor (ι₂ := ι₂) A *
+            (leftTensor (ι₂ := ι₂) B * rightTensor (ι₁ := ι₁) C) := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ = (leftTensor (ι₂ := ι₂) A * leftTensor (ι₂ := ι₂) B) *
+          rightTensor (ι₁ := ι₁) C := by
+          rw [Matrix.mul_assoc]
+    _ = leftTensor (ι₂ := ι₂) (A * B) * rightTensor (ι₁ := ι₁) C := by
+          rw [leftTensor_mul_leftTensor]
+    _ = opTensor (A * B) C := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+
+/-- Multiplying a full tensor by a left tensor only affects the left factor. -/
+theorem opTensor_mul_leftTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
+    opTensor A C * leftTensor (ι₂ := ι₂) B = opTensor (A * B) C := by
+  calc
+    opTensor A C * leftTensor (ι₂ := ι₂) B
+        = (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) C) *
+            leftTensor (ι₂ := ι₂) B := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ = leftTensor (ι₂ := ι₂) A *
+          (rightTensor (ι₁ := ι₁) C * leftTensor (ι₂ := ι₂) B) := by
+          rw [Matrix.mul_assoc]
+    _ = leftTensor (ι₂ := ι₂) A * opTensor B C := by
+          rw [rightTensor_mul_leftTensor_eq_opTensor]
+    _ = opTensor (A * B) C := leftTensor_mul_opTensor A B C
+
 /-- Scalar multiplication commutes with left tensor placement. -/
 theorem leftTensor_smul
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
@@ -367,6 +402,33 @@ theorem rightTensor_mul_rightTensor
   simpa [rightTensor, opTensor] using
     (Matrix.mul_kronecker_mul
       (1 : MIPStarRE.Quantum.Op ι₁) (1 : MIPStarRE.Quantum.Op ι₁) A B).symm
+
+/-- Multiplying a right tensor into a full tensor only affects the right factor. -/
+theorem rightTensor_mul_opTensor
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (A : MIPStarRE.Quantum.Op ι₂) (B : MIPStarRE.Quantum.Op ι₁)
+    (C : MIPStarRE.Quantum.Op ι₂) :
+    rightTensor (ι₁ := ι₁) A * opTensor B C = opTensor B (A * C) := by
+  calc
+    rightTensor (ι₁ := ι₁) A * opTensor B C
+        = rightTensor (ι₁ := ι₁) A *
+            (leftTensor (ι₂ := ι₂) B * rightTensor (ι₁ := ι₁) C) := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ = (rightTensor (ι₁ := ι₁) A * leftTensor (ι₂ := ι₂) B) *
+          rightTensor (ι₁ := ι₁) C := by
+          rw [Matrix.mul_assoc]
+    _ = opTensor B A * rightTensor (ι₁ := ι₁) C := by
+          rw [rightTensor_mul_leftTensor_eq_opTensor]
+    _ = (leftTensor (ι₂ := ι₂) B * rightTensor (ι₁ := ι₁) A) *
+          rightTensor (ι₁ := ι₁) C := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+    _ = leftTensor (ι₂ := ι₂) B *
+          (rightTensor (ι₁ := ι₁) A * rightTensor (ι₁ := ι₁) C) := by
+          rw [Matrix.mul_assoc]
+    _ = leftTensor (ι₂ := ι₂) B * rightTensor (ι₁ := ι₁) (A * C) := by
+          rw [rightTensor_mul_rightTensor]
+    _ = opTensor B (A * C) := by
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
 
 /-- Conjugate transpose distributes over `opTensor`. -/
 theorem conjTranspose_opTensor
