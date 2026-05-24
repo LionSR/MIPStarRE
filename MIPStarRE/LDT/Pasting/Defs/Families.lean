@@ -180,12 +180,6 @@ theorem gHatIdxMeas_proj
   | some p =>
       simp [gHatIdxMeas, completeSubMeas, (family.meas x).proj p]
 
-/-- The submeasurement view of the completed family `\widehat G`. -/
-noncomputable def gHatIdxSubMeas (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) :
-    IdxSubMeas (Fq params) (GHatOutcome params) ι :=
-  IdxMeas.toIdxSubMeas (gHatIdxMeas params family)
-
 /-- Left tensor-placement for the complete part `G^x`
 on the bipartite space `d * d`. -/
 noncomputable def completePartLeftFamily (params : Parameters) [FieldModel params.q]
