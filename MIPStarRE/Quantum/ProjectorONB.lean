@@ -1,9 +1,6 @@
 import MIPStarRE.Quantum.FiniteMatrix
 import Mathlib.Analysis.Matrix.Spectrum
 
-set_option linter.unusedDecidableInType false
-set_option linter.unusedSectionVars false
-
 /-!
 # Projector Range Orthonormal Bases
 
@@ -108,6 +105,7 @@ lemma IsProj.eq_sum_nonzero_eigenvector_projectors (P : Op ι) (hP : IsProj P) :
           rw [← Finset.sum_subtype_eq_sum_filter]
           simp [p]
 
+omit [DecidableEq ι] in
 /-- The trace of a finite-dimensional orthogonal projector equals its rank. -/
 lemma IsProj.trace_eq_rank (Q : Op ι) (hQ : IsProj Q) :
     Q.trace = (Q.rank : ℂ) := by
@@ -150,17 +148,21 @@ namespace ProjectorRangeONB
 
 variable {P : Op ι} {hP : IsProj P} (b : ProjectorRangeONB P hP)
 
+omit [DecidableEq ι] in
 /-- The rank-one projector attached to one vector of a projector range ONB. -/
 noncomputable def rankOne (i : Fin P.rank) : Op ι :=
   Matrix.vecMulVec (b.vec i) (star (b.vec i))
 
+omit [DecidableEq ι] in
 /-- The partial projector obtained by summing a subset of range ONB rank-one projectors. -/
 noncomputable def subprojector (S : Finset (Fin P.rank)) : Op ι :=
   ∑ i ∈ S, b.rankOne i
 
+omit [DecidableEq ι] in
 @[simp] lemma rankOne_apply (i : Fin P.rank) :
     b.rankOne i = Matrix.vecMulVec (b.vec i) (star (b.vec i)) := rfl
 
+omit [DecidableEq ι] in
 /-- Rank-one projectors from an orthonormal family multiply as Kronecker deltas. -/
 lemma rankOne_mul (i j : Fin P.rank) :
     b.rankOne i * b.rankOne j = if i = j then b.rankOne i else 0 := by
@@ -174,6 +176,7 @@ lemma rankOne_mul (i j : Fin P.rank) :
     rw [hzero]
     simp [hij]
 
+omit [DecidableEq ι] in
 /-- A rank-one projector from the chosen range basis acts by the corresponding
 Kronecker delta on basis vectors. -/
 lemma rankOne_mulVec_vec (i j : Fin P.rank) :
@@ -188,6 +191,7 @@ lemma rankOne_mulVec_vec (i j : Fin P.rank) :
     rw [hzero]
     simp [hij]
 
+omit [DecidableEq ι] in
 /-- Each vector in the chosen orthonormal basis of the range is fixed by the
 projector. -/
 lemma mulVec_vec (i : Fin P.rank) :
@@ -212,6 +216,7 @@ lemma mulVec_vec (i : Fin P.rank) :
           · intro hi
             exact False.elim (hi (Finset.mem_univ i))
 
+omit [DecidableEq ι] in
 /-- A selected sum of orthonormal rank-one projectors is Hermitian. -/
 lemma subprojector_isHermitian (S : Finset (Fin P.rank)) :
     (b.subprojector S).IsHermitian := by
@@ -220,6 +225,7 @@ lemma subprojector_isHermitian (S : Finset (Fin P.rank)) :
   rw [Matrix.IsHermitian]
   simp [Matrix.conjTranspose_sum, Matrix.conjTranspose_vecMulVec]
 
+omit [DecidableEq ι] in
 /-- A selected sum of orthonormal rank-one projectors is idempotent. -/
 lemma subprojector_idempotent (S : Finset (Fin P.rank)) :
     b.subprojector S * b.subprojector S = b.subprojector S := by
@@ -245,12 +251,14 @@ lemma subprojector_idempotent (S : Finset (Fin P.rank)) :
           · intro hi_not
             exact False.elim (hi_not hi)
 
+omit [DecidableEq ι] in
 /-- A selected sum of orthonormal rank-one projectors is a projector. -/
 lemma subprojector_isProj (S : Finset (Fin P.rank)) :
     IsProj (b.subprojector S) where
   isHermitian := b.subprojector_isHermitian S
   idempotent := b.subprojector_idempotent S
 
+omit [DecidableEq ι] in
 /-- The partial projector's trace is the number of selected vectors. -/
 lemma subprojector_trace (S : Finset (Fin P.rank)) :
     (b.subprojector S).trace = (S.card : ℂ) := by
@@ -267,6 +275,7 @@ lemma subprojector_trace (S : Finset (Fin P.rank)) :
           simpa [dotProduct_comm] using b.orthonormal i i
     _ = (S.card : ℂ) := by simp
 
+omit [DecidableEq ι] in
 /-- The rank of a selected sum is exactly the number of selected ONB vectors. -/
 lemma subprojector_rank (S : Finset (Fin P.rank)) :
     (b.subprojector S).rank = S.card := by
@@ -276,6 +285,7 @@ lemma subprojector_rank (S : Finset (Fin P.rank)) :
     rw [← htrace_rank, htrace_card]
   exact_mod_cast hcast
 
+omit [DecidableEq ι] in
 /-- A partial projector plus its complementary partial projector is the original projector. -/
 lemma subprojector_add_compl (S : Finset (Fin P.rank)) :
     b.subprojector S + b.subprojector (Sᶜ : Finset (Fin P.rank)) = P := by
@@ -286,6 +296,7 @@ lemma subprojector_add_compl (S : Finset (Fin P.rank)) :
     _ = ∑ i : Fin P.rank, b.rankOne i := by rw [Finset.sum_add_sum_compl]
     _ = P := by simpa [rankOne] using b.decomposition.symm
 
+omit [DecidableEq ι] in
 /-- The difference between a projector and a partial projector is the
 complementary partial projector. -/
 lemma subprojector_diff_eq_compl (S : Finset (Fin P.rank)) :
@@ -297,6 +308,7 @@ lemma subprojector_diff_eq_compl (S : Finset (Fin P.rank)) :
     abel
   exact h.trans hcancel
 
+omit [DecidableEq ι] in
 /-- A partial projector is dominated by the original projector. -/
 lemma subprojector_le (S : Finset (Fin P.rank)) :
     b.subprojector S ≤ P := by
