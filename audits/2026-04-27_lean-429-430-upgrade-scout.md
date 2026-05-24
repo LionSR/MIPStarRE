@@ -69,7 +69,12 @@ Mathlib:
   v4.30.0-rc2  Pre-release  2026-04-18
 ```
 
-Remote tag probing found matching Mathlib tags for `v4.29.0`, `v4.29.1`, `v4.30.0-rc1`, and `v4.30.0-rc2`. For `leanprover-community/repl`, matching tags exist for `v4.29.0`, `v4.30.0-rc1`, and `v4.30.0-rc2`, but I did **not** find a `v4.29.1` tag. Since this project currently declares `repl` as a direct dependency but I did not find project source imports of `Repl`, a 4.29.1 upgrade should either (a) test whether `repl` `v4.29.0` works with Lean 4.29.1, or (b) drop the direct `repl` dependency if it is unused.
+Remote tag probing found matching Mathlib tags for `v4.29.0`, `v4.29.1`,
+`v4.30.0-rc1`, and `v4.30.0-rc2`. For `leanprover-community/repl`, matching
+tags exist for `v4.29.0`, `v4.30.0-rc1`, and `v4.30.0-rc2`, but I did
+**not** find a `v4.29.1` tag. At the time of this audit the project declared
+`repl` as a direct dependency, but no project source imported `Repl`. That
+unused direct dependency has since been dropped from the Lake configuration.
 
 Mathlib-side toolchain/dependency checks:
 
