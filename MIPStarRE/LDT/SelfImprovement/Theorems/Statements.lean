@@ -140,14 +140,6 @@ end SdpOptimalPairWithSlackness
 
 namespace SdpStatementWithSlackness
 
-/-- Forget complementary slackness and recover the reduced SDP statement. -/
-theorem toSdpStatement {params : Parameters} [FieldModel params.q]
-    {strategy : SymStrat params ι}
-    (h : SdpStatementWithSlackness params strategy) :
-    SdpStatement params strategy := by
-  obtain ⟨T, Z, hpair⟩ := h.witness
-  exact ⟨T, Z, hpair.toSdpOptimalPair⟩
-
 /-- A slackness-carrying SDP statement gives the displayed paper-form
 measurement and dual witness.
 
