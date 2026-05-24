@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Common
 import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.First
 import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
 import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Second
