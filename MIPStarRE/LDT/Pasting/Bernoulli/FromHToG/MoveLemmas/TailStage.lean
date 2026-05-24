@@ -16,11 +16,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Combined outcome index for the local self-consistency moves in one adjacent
-`fromHToG` stage. -/
-abbrev FromHToGMoveOutcome (params : Parameters) [FieldModel params.q] (n : ℕ) :=
-  Bool × GHatType n × GHatOutcome params × GHatTupleOutcome params n
-
 /-- Split a nonempty point tuple into its head and tail. -/
 def fromHToGPointTupleConsEquiv (params : Parameters) (n : ℕ) :
     PointTuple params (n + 1) ≃ Fq params × PointTuple params n where
