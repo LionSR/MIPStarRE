@@ -46,15 +46,6 @@ noncomputable def matrixSdpCanonicalConstraintOperatorCLM
           (r := r)).symm }
     (continuous_matrixSdpCanonicalConstraintOperator params model)
 
-@[simp]
-theorem matrixSdpCanonicalConstraintOperatorCLM_apply
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
-    matrixSdpCanonicalConstraintOperatorCLM params model X =
-      matrixSdpCanonicalConstraintOperator params model X :=
-  rfl
-
 /-- The canonical primal objective as a continuous real-linear functional. -/
 noncomputable def matrixSdpCanonicalPrimalObjectiveCLM
     (params : Parameters) [FieldModel params.q]
@@ -72,15 +63,6 @@ noncomputable def matrixSdpCanonicalPrimalObjectiveCLM
         exact Complex.smul_re r
           (Matrix.trace (matrixSdpCanonicalObjectiveOperator params model * X)) }
     (continuous_matrixSdpCanonicalPrimalObjective params model)
-
-@[simp]
-theorem matrixSdpCanonicalPrimalObjectiveCLM_apply
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
-    matrixSdpCanonicalPrimalObjectiveCLM params model X =
-      Complex.re (Matrix.trace (matrixSdpCanonicalObjectiveOperator params model * X)) :=
-  rfl
 
 /-- The map sending a primal matrix to its constraint image and objective value. -/
 noncomputable def matrixSdpCanonicalPrimalConeMap
