@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.Common
 
 Interpolation-support, vertical-line restriction, and completed-slice
 interpolation lemmas from `ld-pasting.tex` that form the foundation for the
-bad-line and bad-mass layers.
+line-interpolation estimates.
 
 ## References
 
@@ -59,29 +59,6 @@ lemma axisLinePolynomial_ne_gives_support_eval_ne
   cases g
   cases hpoly
   rfl
-
-lemma exists_onePoint_family_witness_of_eval_mismatch
-    (params : Parameters) [FieldModel params.q]
-    {k : ℕ}
-    (u : Point params)
-    (xs : PointTuple params k)
-    (gs : GHatTupleOutcome params k)
-    {f : AxisLinePolynomial params.next}
-    (hmismatch :
-      ∃ i : Fin k, ∃ hiSome : (gs i).isSome = true, ((gs i).get hiSome) u ≠ f (xs i)) :
-    ∃ i : Fin k,
-      Option.map (fun g : Polynomial params => g u) (gs i) ≠ some (f (xs i)) := by
-  classical
-  rcases hmismatch with ⟨i, hiSome, hiNe⟩
-  refine ⟨i, ?_⟩
-  cases hgi : gs i with
-  | none =>
-      simp [Option.isSome, hgi] at hiSome
-  | some g =>
-      have hiNe' : g u ≠ f (xs i) := by
-        simpa [hgi] using hiNe
-      intro h
-      exact hiNe' (Option.some.inj h)
 
 lemma nonglobal_gives_slice_mismatch_against_interpolant
     (params : Parameters) [FieldModel params.q]
