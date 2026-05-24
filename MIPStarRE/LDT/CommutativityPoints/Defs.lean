@@ -59,42 +59,12 @@ noncomputable def orderedProductOpFamily {α β : Type*} [Fintype α] [Fintype �
   outcome := fun | (a, b) => A.outcome a * B.outcome b
   total := A.total * B.total
 
-/-- The outcomes sum to the displayed total operator. -/
-theorem orderedProductOpFamily_sum_eq_total {α β : Type*} [Fintype α] [Fintype β]
-    (A : SubMeas α ι) (B : SubMeas β ι) :
-    ∑ ab : α × β, (orderedProductOpFamily A B).outcome ab =
-      (orderedProductOpFamily A B).total := by
-    calc
-      ∑ ab : α × β, A.outcome ab.1 * B.outcome ab.2
-          = ∑ a : α, ∑ b : β, A.outcome a * B.outcome b := by
-              simpa using
-                (Fintype.sum_prod_type' (f := fun a b => A.outcome a * B.outcome b))
-      _ = (∑ a : α, A.outcome a) * ∑ b : β, B.outcome b := by
-            rw [← Fintype.sum_mul_sum]
-      _ = A.total * B.total := by
-            rw [A.sum_eq_total, B.sum_eq_total]
-
 /-- Reversed product of two submeasurements viewed as a raw operator family. -/
 noncomputable def reversedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
     OpFamily (α × β) ι where
   outcome := fun | (a, b) => B.outcome b * A.outcome a
   total := B.total * A.total
-
-/-- The reversed outcomes sum to the displayed total operator. -/
-theorem reversedProductOpFamily_sum_eq_total {α β : Type*} [Fintype α] [Fintype β]
-    (A : SubMeas α ι) (B : SubMeas β ι) :
-    ∑ ab : α × β, (reversedProductOpFamily A B).outcome ab =
-      (reversedProductOpFamily A B).total := by
-    calc
-      ∑ ab : α × β, B.outcome ab.2 * A.outcome ab.1
-          = ∑ b : β, ∑ a : α, B.outcome b * A.outcome a := by
-              simpa using
-                (Fintype.sum_prod_type_right' (f := fun a b => B.outcome b * A.outcome a))
-      _ = (∑ b : β, B.outcome b) * ∑ a : α, A.outcome a := by
-            rw [← Fintype.sum_mul_sum]
-      _ = B.total * A.total := by
-            rw [B.sum_eq_total, A.sum_eq_total]
 
 /-- Tensor-product bridge `A_a ⊗ B_b` on the bipartite space `ι × ι`. -/
 noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
