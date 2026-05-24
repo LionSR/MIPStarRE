@@ -610,6 +610,48 @@ lemma sigmaFinCard_le_of_sum_le {Outcome : Type*} [Fintype Outcome]
   simp only [Fintype.card_fin]
   exact hm
 
+/-- **Paper source:** `references/ldt-paper/orthonormalization.tex:540-553`
+(`\label{lem:projective-low-rank-sum}`).
+
+A rank-reduction witness can be viewed on the canonical sigma-range auxiliary
+space attached to the same projective family.  This is a Lean-only transport
+from an arbitrary auxiliary model of the projective family to the finite
+enumeration of its range bases; the mathematical hypotheses are exactly the
+rank-reduction witness fields.
+
+**Faithful encoding:** The theorem changes only the auxiliary-space model used
+to present the same projective family `Q_a`; it is not an additional
+mathematical assumption or proof obligation. -/
+theorem RankReductionWitness.toSigmaRangeQLayer
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))] :
+    RankReductionWitness ψ A ζ (sigmaRangeQLayer qLayer.q) where
+  projective := by
+    simpa [sigmaRangeQLayer, Qa] using hRank.projective
+  outcome_nonneg := by
+    simpa [sigmaRangeQLayer, Qa] using hRank.outcome_nonneg
+  sum_eq_total := by
+    simpa [sigmaRangeQLayer, Qa, QTotal] using hRank.sum_eq_total
+  source_almost_projective := hRank.source_almost_projective
+  closeness := by
+    simpa [sigmaRangeQLayer] using hRank.closeness
+  total_le := by
+    simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
+  totalRank_le := by
+    simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
+  auxDim_le := by
+    change Fintype.card (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ≤ Fintype.card ι
+    rw [Fintype.card_ulift]
+    exact sigmaFinCard_le_of_sum_le
+      (m := fun a : Outcome => (qLayer.q.outcome a).rank)
+      (ι := ι) hRank.totalRank_le
+
 /-- If the sigma auxiliary space has dimension at most the ambient Hilbert
 space, then there is a rectangular matrix `Xhat` whose rows are orthonormal.
 
