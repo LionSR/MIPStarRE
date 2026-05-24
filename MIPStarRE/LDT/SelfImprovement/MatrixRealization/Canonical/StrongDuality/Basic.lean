@@ -166,63 +166,6 @@ theorem mem_matrixOperatorNonnegativeProperCone
     X ∈ matrixOperatorNonnegativeProperCone H ↔ 0 ≤ X :=
   Iff.rfl
 
-/-- The canonical primal equality-constraint operator preserves real affine combinations. -/
-theorem matrixSdpCanonicalConstraintOperator_affine_combination
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (X Y : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (a b : ℝ) :
-    matrixSdpCanonicalConstraintOperator params model (a • X + b • Y) =
-      a • matrixSdpCanonicalConstraintOperator params model X +
-        b • matrixSdpCanonicalConstraintOperator params model Y := by
-  classical
-  ext i j
-  unfold matrixSdpCanonicalConstraintOperator matrixSdpCanonicalDiagonalBlock
-  simp only [Matrix.sum_apply, Matrix.add_apply, Matrix.smul_apply]
-  rw [Finset.sum_add_distrib]
-  have hsumX : (∑ x, a • X (x, i) (x, j)) = a • (∑ x, X (x, i) (x, j)) := by
-    rw [Fintype.sum_option]
-    conv_rhs => rw [Fintype.sum_option]
-    have hsome : (∑ x, a • X (some x, i) (some x, j)) =
-        a • (∑ x, X (some x, i) (some x, j)) := by
-      simpa using (Finset.smul_sum (s := Finset.univ)
-        (f := fun x => X (some x, i) (some x, j)) (r := a)).symm
-    rw [hsome]
-    module
-  have hsumY : (∑ x, b • Y (x, i) (x, j)) = b • (∑ x, Y (x, i) (x, j)) := by
-    rw [Fintype.sum_option]
-    conv_rhs => rw [Fintype.sum_option]
-    have hsome : (∑ x, b • Y (some x, i) (some x, j)) =
-        b • (∑ x, Y (some x, i) (some x, j)) := by
-      simpa using (Finset.smul_sum (s := Finset.univ)
-        (f := fun x => Y (some x, i) (some x, j)) (r := b)).symm
-    rw [hsome]
-    module
-  rw [hsumX, hsumY]
-
-/-- Each paper-form dual slack preserves real affine combinations. -/
-theorem matrixSdpDualSlackOperator_affine_combination
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (Z W : MatrixOperator model.space) (g : Polynomial params)
-    (a b : ℝ) (hab : a + b = 1) :
-    matrixSdpDualSlackOperator params model (a • Z + b • W) g =
-      a • matrixSdpDualSlackOperator params model Z g +
-        b • matrixSdpDualSlackOperator params model W g := by
-  unfold matrixSdpDualSlackOperator
-  calc
-    a • Z + b • W - matrixAveragedPointOperator params model g =
-        a • Z + b • W - (a + b) • matrixAveragedPointOperator params model g := by
-      conv_lhs =>
-        rw [show matrixAveragedPointOperator params model g =
-            (a + b) • matrixAveragedPointOperator params model g by
-          rw [hab]
-          ext i j
-          simp]
-    _ = a • (Z - matrixAveragedPointOperator params model g) +
-        b • (W - matrixAveragedPointOperator params model g) := by
-      module
-
 /-- A canonical block-diagonal operator is Hermitian when all diagonal blocks are
 Hermitian. -/
 theorem matrixSdpCanonicalBlockDiagonal_isHermitian

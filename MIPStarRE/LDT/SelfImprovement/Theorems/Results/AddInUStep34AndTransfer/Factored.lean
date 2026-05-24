@@ -78,25 +78,6 @@ contraction, and total-mass estimates.  In particular, `T` is a submeasurement
 in these statements; any `≤ 1` input corresponds to a `total_le_one`-style
 bound rather than a measurement equality. -/
 
-/-- Convert a squared `Q₂ → Q₃` real bound to an absolute-value sqrt bound.
-
-This lemma is only the `Real.abs_le_sqrt` conversion.  The hypothesis `hsq`
-must already contain any operator Cauchy--Schwarz and submeasurement estimates
-needed to prove the squared bound. -/
-lemma add_in_u_cs_chain_q2_q3_abs_le_sqrt_of_sq_le
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι)
-    (hsq :
-      (addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T) ^ 2 ≤
-        ∑ g : Polynomial params,
-          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :
-    |addInUCSChainQ2 params strategy T - addInUCSChainQ3 params strategy T| ≤
-      Real.sqrt
-        (∑ g : Polynomial params,
-          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-  Real.abs_le_sqrt hsq
-
 /-- Convert factored `Q₂ → Q₃` sqrt bounds to the summed-deviation sqrt bound.
 
 This lemma assumes the Cauchy--Schwarz product bound as `hCS`, a bound on the
@@ -120,25 +101,6 @@ lemma add_in_u_cs_chain_q2_q3_le_sqrt_of_factor_bounds
         (∑ g : Polynomial params,
           globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
   addInU_le_sqrt_of_factor_bounds_right hCS hD₁_le hD₂_le_one
-
-/-- Convert a squared `Q₃ → Q₄` real bound to an absolute-value sqrt bound.
-
-This lemma is only the `Real.abs_le_sqrt` conversion.  The hypothesis `hsq`
-must already contain any operator Cauchy--Schwarz and submeasurement estimates
-needed to prove the squared bound. -/
-lemma add_in_u_cs_chain_q3_q4_abs_le_sqrt_of_sq_le
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (T : SubMeas (Polynomial params) ι)
-    (hsq :
-      (addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T) ^ 2 ≤
-        ∑ g : Polynomial params,
-          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :
-    |addInUCSChainQ3 params strategy T - addInUCSChainQ4 params strategy T| ≤
-      Real.sqrt
-        (∑ g : Polynomial params,
-          globalVarianceDeviationAtPolynomial params strategy strategy.state T g) :=
-  Real.abs_le_sqrt hsq
 
 /-- Convert factored `Q₃ → Q₄` sqrt bounds to the summed-deviation sqrt bound.
 
