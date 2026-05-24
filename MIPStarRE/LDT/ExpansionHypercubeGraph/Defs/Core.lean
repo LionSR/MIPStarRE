@@ -4,8 +4,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 /-!
 # Section 7 hypercube graph: core definitions
 
-Vertex-set cardinality and base-`q` digit encoding for points in `F_q^m`,
-used to index the hypercube graph operators.
+Vertex-set cardinality and the hypercube graph edge relation on `F_q^m`.
 
 ## References
 
@@ -23,10 +22,6 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 /-- The number of vertices in the hypercube graph `C`. -/
 def hypercubeVertexCount (params : Parameters) : ℕ :=
   params.q ^ params.m
-
-/-- Encode a point `u ∈ F_q^m` by its base-`q` digit expansion. -/
-def pointCode (params : Parameters) (u : Point params) : ℕ :=
-  ∑ i : Fin params.m, (u i).1 * params.q ^ i.1
 
 /-- The set of coordinates on which two points disagree. -/
 def coordinateDisagreementSet (params : Parameters)

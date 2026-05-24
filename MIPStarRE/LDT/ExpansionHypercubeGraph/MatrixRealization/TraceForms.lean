@@ -40,11 +40,6 @@ noncomputable def matrixGlobalVariance (params : Parameters)
       matrixSquaredDifferenceExpectation model.state
         (model.family uv.1) (model.family uv.2))
 
-/-- The actual average operator `E_u A^u`. -/
-noncomputable def matrixAveragePointOperator (params : Parameters)
-    (model : MatrixOperatorFamilyRealization params) : MatrixOperator model.space :=
-  matrixAverageOperator model.family
-
 /-- The matrix-level combined column operator used for the trace rewrites.
 Its `u`-th block is `(A^u)ᴴ`, so that the trace witnesses match the
 quadratic forms `τ(ρ · (A^u - A^v)ᴴ (A^u - A^v))` for arbitrary families. -/

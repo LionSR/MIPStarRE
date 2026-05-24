@@ -180,17 +180,6 @@ noncomputable def fourierBasisProjector (params : Parameters)
   Matrix.vecMulVec (fourierBasisState params α)
     (star (fourierBasisState params α))
 
-/-- The constant-mode projector `|φ_0⟩⟨φ_0| = (1/M) J` where `J` is the all-ones matrix.
-This is `fourierBasisProjector params 0`, i.e. the α = 0 case where all phases are 1. -/
-noncomputable def constantModeProjector (params : Parameters) :
-    MIPStarRE.Quantum.Op (Point params) :=
-  Matrix.of fun _ _ => (hypercubeVertexCount params : ℂ)⁻¹
-
-/-- The orthogonal-complement projector `I - |φ_0⟩⟨φ_0|`. -/
-noncomputable def orthogonalModeProjector (params : Parameters) :
-    MIPStarRE.Quantum.Op (Point params) :=
-  1 - constantModeProjector params
-
 /-- Paper origin: `references/ldt-paper/expansion.tex:145-154`
 (`\label{lem:local-rewrite}`); trace witness for the local-variance rewrite. -/
 noncomputable def localVarianceTraceWitness (params : Parameters)
