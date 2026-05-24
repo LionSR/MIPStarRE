@@ -2,10 +2,13 @@ import MIPStarRE.LDT.Commutativity.Scaffold.Products
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
-# Section 11 commutativity: evaluated-slice bounds for phases 1 and 3
+# Section 11 commutativity: the phase-1 evaluated-slice insertion bound
 
 Closeness-of-inner-product side conditions for inserting Bob's measurement
-into the evaluated-slice step (phases 1 and 3 in the paper proof).
+into the first evaluated-slice step of the paper proof.  The normalization
+lemmas remain formulated at the level needed by the evaluated-slice transport
+arguments, but the public bound in this file is now the phase-1 insertion
+estimate.
 
 ## References
 
@@ -239,146 +242,5 @@ lemma evaluatedSlice_phaseOne_insert_bound
     _ = 2 * Real.sqrt zeta := by
           rw [Real.sqrt_mul (show 0 ≤ (4 : Error) by positivity)]
           norm_num
-
-/-- Phase-3 `eq:add-an-a` insertion on the first coordinate.
-
-This mirrors `evaluatedSlice_phaseOne_insert_bound` with the roles of the two
-evaluated points swapped: transport the `consSubMeas` control to the first
-coordinate of an evaluated-slice question, then apply `closenessOfIP` to the
-explicit `B A B * (G^x \otimes A_a^{u,x})` summand that feeds the later
-`commutativityPoints` step. -/
-lemma evaluatedSlice_phaseThree_insert_bound
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (hcombined_fst : SDDRel strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (fun q => evaluatedPointFamilyLeft params family q.1)
-      (fun q =>
-        (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-          (evaluatedPointFamily params family)
-          (evaluatedSlicePointMeas params strategy) q.1))
-      (4 * zeta)) :
-    let 𝒟 := uniformDistribution (EvaluatedSliceQuestion params)
-    let inserted : EvaluatedSliceQuestion params → Error := fun q =>
-      ∑ a : Fq params, ∑ b : Fq params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι)
-              (((evaluatedSliceSecondFactor params family q).outcome b) *
-                ((evaluatedSliceFirstFactor params family q).outcome a) *
-                ((evaluatedSliceSecondFactor params family q).outcome b)) *
-            ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-              (evaluatedPointFamily params family)
-              (evaluatedSlicePointMeas params strategy) q.1).outcome a))
-    |avgOver 𝒟
-        (fun q => ∑ ab : EvaluatedSliceOutcome params,
-          evaluatedSliceBABATerm params strategy family q ab) -
-      avgOver 𝒟 inserted| ≤ 2 * Real.sqrt zeta := by
-  let pointMeas : IdxMeas (Point params.next) (Fq params) ι :=
-    evaluatedSlicePointMeas params strategy
-  let 𝒟 : Distribution (EvaluatedSliceQuestion params) :=
-    uniformDistribution (EvaluatedSliceQuestion params)
-  let A : EvaluatedSliceQuestion params → Fq params → MIPStarRE.Quantum.Op (ι × ι) :=
-    fun q a => leftTensor (ι₂ := ι) ((evaluatedSliceFirstFactor params family q).outcome a)
-  let B : EvaluatedSliceQuestion params → Fq params → MIPStarRE.Quantum.Op (ι × ι) :=
-    fun q a =>
-      ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-        (evaluatedPointFamily params family)
-        pointMeas q.1).outcome a)
-  let C : EvaluatedSliceQuestion params → Fq params → Fq params →
-      MIPStarRE.Quantum.Op (ι × ι) :=
-    fun q a b =>
-      leftTensor (ι₂ := ι)
-        (((evaluatedSliceSecondFactor params family q).outcome b) *
-          ((evaluatedSliceFirstFactor params family q).outcome a) *
-          ((evaluatedSliceSecondFactor params family q).outcome b))
-  have h𝒟 :
-      ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
-    simpa [𝒟] using
-      uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
-  have hAB :
-      avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤ 4 * zeta := by
-    simpa [𝒟, A, B, pointMeas, Parameters.next, qSDD, evaluatedSliceFirstFactor,
-      evaluatedPointFamily, IdxSubMeas.liftLeft, SubMeas.liftLeft] using
-      hcombined_fst.squaredDistanceBound
-  have hC :
-      ∀ q, ∑ a : Fq params, (∑ b : Fq params, C q a b) * (∑ b : Fq params, C q a b)ᴴ ≤ 1 := by
-    intro q
-    simpa [C, evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
-      evaluatedSliceSecondProj] using
-      leftTensor_normalizationConditionSquare_le_one
-        (ι := ι)
-        (P := evaluatedSliceFirstFactor params family q)
-        (Q := evaluatedSliceSecondProj params family q)
-  have hzeta_nonneg : 0 ≤ zeta := by
-    have hsdd_nonneg :
-        0 ≤ sddError strategy.state
-          (uniformDistribution (EvaluatedSliceQuestion params))
-          (fun q => (IdxSubMeas.liftLeft (evaluatedPointFamily params family)) q.1)
-          (fun q =>
-            (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-              (evaluatedPointFamily params family)
-              pointMeas q.1)) := by
-      exact sddError_nonneg strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q => (IdxSubMeas.liftLeft (evaluatedPointFamily params family)) q.1)
-        (fun q =>
-          (MIPStarRE.LDT.Preliminaries.totalSandwichFamily
-            (evaluatedPointFamily params family)
-            pointMeas q.1))
-    have hfour : 0 ≤ 4 * zeta := le_trans hsdd_nonneg hcombined_fst.squaredDistanceBound
-    nlinarith
-  have hBABA :
-      avgOver 𝒟
-          (fun q => ∑ ab : EvaluatedSliceOutcome params,
-            evaluatedSliceBABATerm params strategy family q ab) =
-        avgOver 𝒟
-          (fun q => ∑ a : Fq params, ∑ b : Fq params,
-            ev strategy.state
-              (C q a b * A q a)) := by
-    apply avgOver_congr
-    intro q
-    calc
-      ∑ ab : EvaluatedSliceOutcome params, evaluatedSliceBABATerm params strategy family q ab
-        = ∑ a : Fq params, ∑ b : Fq params,
-            ev strategy.state
-              (leftTensor (ι₂ := ι)
-                (((evaluatedSliceSecondFactor params family q).outcome b) *
-                  ((evaluatedSliceFirstFactor params family q).outcome a) *
-                  ((evaluatedSliceSecondFactor params family q).outcome b) *
-                  ((evaluatedSliceFirstFactor params family q).outcome a))) := by
-              simpa [evaluatedSliceBABATerm, leftTensor_mul_leftTensor, mul_assoc] using
-                (Fintype.sum_prod_type' (f := fun a : Fq params => fun b : Fq params =>
-                  ev strategy.state
-                    (leftTensor (ι₂ := ι)
-                      (((evaluatedSliceSecondFactor params family q).outcome b) *
-                        ((evaluatedSliceFirstFactor params family q).outcome a) *
-                        ((evaluatedSliceSecondFactor params family q).outcome b) *
-                        ((evaluatedSliceFirstFactor params family q).outcome a)))))
-      _ = ∑ a : Fq params, ∑ b : Fq params,
-            ev strategy.state (C q a b * A q a) := by
-              simp [A, C, leftTensor_mul_leftTensor, mul_assoc]
-  have hclose :=
-    MIPStarRE.LDT.Preliminaries.closenessOfIP
-      strategy.state hnorm 𝒟 h𝒟 A B C (4 * zeta) hAB hC
-  calc
-    |avgOver 𝒟
-        (fun q => ∑ ab : EvaluatedSliceOutcome params,
-          evaluatedSliceBABATerm params strategy family q ab) -
-      avgOver 𝒟
-        (fun q => ∑ a : Fq params, ∑ b : Fq params,
-          ev strategy.state (C q a b * B q a))| =
-        |avgOver 𝒟 (fun q => ∑ a : Fq params, ∑ b : Fq params,
-            ev strategy.state (C q a b * A q a)) -
-          avgOver 𝒟 (fun q => ∑ a : Fq params, ∑ b : Fq params,
-            ev strategy.state (C q a b * B q a))| := by
-          rw [hBABA]
-    _ ≤ Real.sqrt (4 * zeta) := hclose
-    _ = 2 * Real.sqrt zeta := by
-          rw [Real.sqrt_mul (show 0 ≤ (4 : Error) by positivity)]
-          norm_num
-
 
 end MIPStarRE.LDT.Commutativity
