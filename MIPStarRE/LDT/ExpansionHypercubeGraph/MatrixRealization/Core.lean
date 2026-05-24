@@ -60,11 +60,6 @@ noncomputable def matrixHypercubeEdgeDistribution (params : Parameters) :
     Distribution (Point params × Point params) :=
   rerandomizeCoord params
 
-/-- The rank-one projector `|u⟩⟨u|` on the vertex register. -/
-def pointBasisProjectorMatrix (params : Parameters) (u : Point params) :
-    MatrixOperator (pointHilbertSpace params) :=
-  Matrix.diagonal (fun v => if v = u then (1 : ℂ) else 0)
-
 /-- The normalized all-ones projector onto the constant mode. -/
 noncomputable def constantModeProjectorMatrix (params : Parameters) :
     MatrixOperator (pointHilbertSpace params) :=
