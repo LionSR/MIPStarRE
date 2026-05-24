@@ -349,34 +349,6 @@ noncomputable def QXPLayerData.ofQLayerAndSvdIdentities
   x_gram_right := xSquared_of_qa_eq qLayer q_sum_eq_total x qa_eq
   xHat_mixed := xHat_mixed
 
-/-- Existence form of `QXPLayerData.ofQLayerAndSvdIdentities`,
-matching the shape requested by issue #1117.
-
-Given a `Q`-layer, supplied projectivity and total-sum hypotheses, the matrix
-decomposition `X`, the chosen `Xhat`, and the two SVD-derived primitives, there
-is a `QXPLayerData` whose `qLayer`, `x`, and `xHat` are exactly the supplied
-data, with the latter two compared after transport along the `qLayer` equality.
-The propositional fields are filled by the supplied hypotheses, except
-`x_gram_right`, which is proved internally from `qa_eq` and the measurement
-identity for `T`. -/
-theorem exists_qxpLayerData_ofQLayerAndSvdIdentities
-    {Outcome : Type uOutcome} [Fintype Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (qLayer : QLayerData Outcome ι)
-    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (Qa qLayer a))
-    (q_sum_eq_total : ∑ a : Outcome, Qa qLayer a = QTotal qLayer)
-    (x : Matrix qLayer.auxSpace.carrier ι ℂ)
-    (xHat : Matrix qLayer.auxSpace.carrier ι ℂ)
-    (qa_eq : ∀ a : Outcome, qLayer.q.outcome a = xᴴ * Ta qLayer a * x)
-    (xHat_coisometry : xHat * xHatᴴ = (1 : MIPStarRE.Quantum.Op qLayer.auxSpace.carrier))
-    (xHat_mixed : xᴴ * xHat = CFC.sqrt (QTotal qLayer)) :
-    ∃ data : QXPLayerData Outcome ι,
-      ∃ hq : data.qLayer = qLayer,
-        hq ▸ data.x = x ∧ hq ▸ data.xHat = xHat :=
-  ⟨QXPLayerData.ofQLayerAndSvdIdentities qLayer qa_projective q_sum_eq_total
-      x xHat qa_eq xHat_coisometry xHat_mixed, rfl, rfl, rfl⟩
-
-
 end
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
