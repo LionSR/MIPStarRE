@@ -142,25 +142,6 @@ theorem classicalRoleSymmStrategy_selfConsistency_le_three_mul
   rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
   exact point_agreement_le_three_mul hpass
 
-/-- The role-register symmetrized strategy's self-consistency is bounded by any
-available cross-prover point-agreement bound.
-
-The full low-individual-degree failure surrogate does not itself provide such a
-point-agreement bound: its self-consistency branch contains the separate SSC
-defects of the two point measurements. This conditional lemma records the
-correct bridge when an independent point-agreement estimate is available. -/
-theorem classicalRoleSymmStrategy_selfConsistency_le_of_pointAgreement
-    {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    {strategy : SameSpaceProjStrat params ι} {delta : Error}
-    (hpoint :
-      bipartiteConsError strategy.state (uniformDistribution (Point params))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ delta) :
-    (strategy.classicalRoleSymmStrategy).selfConsistencyFailureProbability ≤ delta := by
-  rw [classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement strategy]
-  exact hpoint
-
 end SameSpaceProjStrat
 
 end MIPStarRE.LDT
