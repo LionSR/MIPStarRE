@@ -8,8 +8,8 @@ import Mathlib.Analysis.Matrix.Spectrum
 /-!
 # Section 5 — Q/X/XHat/P rank reduction
 
-Almost-projectivity, scalar truncation, and rank-reduction lemmas for the
-paper's `Q/X/XHat/P` intermediate layer.
+Sigma-space projectors and rank-reduction lemmas for the paper's `Q/X/XHat/P`
+intermediate layer.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -21,63 +21,6 @@ open MIPStarRE.LDT
 noncomputable section
 
 universe uOutcome uι
-
-/-- **Scalar truncation inequality** (`lem:trunc-inequality`).
-
-For `x ∈ [0,1]`, truncating at threshold `1 - δ` changes `x` by at most
-`(1 / δ) * (x - x^2)` in squared distance. -/
-lemma truncationInequality (δ x : Error) :
-    0 < δ →
-      δ ≤ 1 / 2 →
-      0 ≤ x →
-      x ≤ 1 →
-      let trunc : Error := if 1 - δ ≤ x then 1 else 0
-      (x - trunc) ^ (2 : Nat) ≤ (1 / δ) * (x - x ^ (2 : Nat)) := by
-  intro hδ hδhalf hx hx1
-  simp only []
-  split
-  · next h =>
-    have h1x : 0 ≤ 1 - x := by linarith
-    have hxd : 1 - x ≤ δ := by linarith
-    rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
-    nlinarith [sq_nonneg (1 - x), sq_nonneg δ]
-  · next h =>
-    push Not at h
-    simp only [sub_zero]
-    rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
-    have hlt : 0 ≤ 1 - δ - x := by linarith
-    nlinarith [mul_nonneg hx hlt,
-      mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
-        (by linarith : (0 : ℝ) ≤ 1 - x)]
-
-/-- The truncation error is nonnegative on nonnegative input. -/
-lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
-    0 ≤ spectralTruncationError ζ := by
-  dsimp [spectralTruncationError]
-  exact Real.rpow_nonneg hζ _
-
-/-- The truncation error is `√ζ`. -/
-lemma spectralTruncationError_eq_sqrt (ζ : Error) :
-    spectralTruncationError ζ = Real.sqrt ζ := by
-  simp [spectralTruncationError, Real.sqrt_eq_rpow]
-
-/-- **Rounding to projectors** (`lem:projective-non-measurement`).
-
-This declaration now records the honest statement from the paper consumed by the
-QXP rank-reduction layer: a chosen family `R_a` equipped with
-`RoundingToProjectorsWitness ψ A ζ R`. The abbrev gives that statement a stable
-Lean name for the blueprint and for later API cleanup, while downstream local
-lemmas usually carry a chosen witness `(q, hrounded)` directly once the rounded
-family has been fixed. The old QXP placeholder has been deleted; producing such a witness from
-`eq:A-looks-projective` is handled by the upstream spectral-truncation theorem
-rather than by a downstream QXP interface. -/
-abbrev projectiveNonMeasurement {Outcome : Type uOutcome}
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error) : Prop :=
-  ∃ R : OpFamily Outcome ι,
-    RoundingToProjectorsWitness ψ A ζ R
 
 /-- If a family of projectors sums to at most the identity, then the sum of their
 ranks is at most the ambient dimension. -/

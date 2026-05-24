@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
+import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement
 
 /-!
 # Spectral truncation statement conversions
@@ -96,6 +97,33 @@ lemma projectiveLowRankSum_of_spectralTruncationStatement
       RankReductionWitness ψ A ζ data :=
   projectiveLowRankSum_of_roundingWitness ψ A ζ hψ hζ hζ_le hSpectral.roundedFamily
     hSpectral.toRoundingToProjectorsWitness hsource
+
+/-- **Rank reduction** (`\label{lem:projective-low-rank-sum}`).
+
+Paper origin: `references/ldt-paper/orthonormalization.tex:540-658`.
+
+The paper first applies `\label{lem:projective-non-measurement}` to obtain the
+rounded projective family `R_a`, and then performs the rank-reduction argument.
+This theorem keeps that source-facing boundary: the rounded family is produced
+internally from the source almost-projectivity estimate and is then passed to
+the internal constructor `projectiveLowRankSum_of_roundingWitness`. -/
+lemma projectiveLowRankSum {Outcome : Type uOutcome}
+    {ι : Type uι} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error)
+    (hψ : ψ.IsNormalized)
+    (hζ : 0 ≤ ζ) (hζ_le : ζ ≤ 1 / 4)
+    (source_almost_projective :
+      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ) :
+    ∃ data : QLayerData Outcome ι,
+      RankReductionWitness ψ A ζ data := by
+  classical
+  obtain ⟨q, hrounded⟩ :=
+    projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
+      ψ A ζ hψ source_almost_projective
+  exact projectiveLowRankSum_of_roundingWitness ψ A ζ hψ hζ hζ_le q hrounded
+    source_almost_projective
 
 /-- Build a `SpectralTruncationStatement` from the named
 `lem:projective-non-measurement` witness.
