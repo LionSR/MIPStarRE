@@ -467,57 +467,6 @@ lemma fromHToG_closenessOfIP_avgContext
     _ ≤ Real.sqrt γ := by
           simpa using Real.sqrt_le_sqrt hAB
 
-/-- Averaged-context variant of `closenessOfIPAdjoint`. -/
-lemma fromHToG_closenessOfIPAdjoint_avgContext
-    {Question OutcomeA OutcomeB : Type*}
-    [Fintype OutcomeA] [Fintype OutcomeB]
-    (ψ : QuantumState (ι × ι)) (_hψ : ψ.IsNormalized)
-    (𝒟 : Distribution Question)
-    (_h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
-    (A B : Question → OutcomeA → MIPStarRE.Quantum.Op (ι × ι))
-    (C : Question → OutcomeA → OutcomeB → MIPStarRE.Quantum.Op (ι × ι))
-    (γ : Error)
-    (hAB : avgOver 𝒟 (fun q => qSDDCore ψ (fun a => (A q a)ᴴ) (fun a => (B q a)ᴴ)) ≤ γ)
-    (hC : avgOver 𝒟 (fun q =>
-      ∑ a : OutcomeA, ev ψ ((∑ b : OutcomeB, C q a b)ᴴ * (∑ b : OutcomeB, C q a b))) ≤ 1) :
-    |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) -
-        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b))| ≤
-      Real.sqrt γ := by
-  have hleft :=
-    fromHToG_closenessOfIP_avgContext ψ _hψ 𝒟 _h𝒟
-      (fun q a => (A q a)ᴴ)
-      (fun q a => (B q a)ᴴ)
-      (fun q a b => (C q a b)ᴴ)
-      γ hAB (by
-        simpa [Matrix.conjTranspose_sum] using hC)
-  have hA :
-      avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C q a b)ᴴ * (A q a)ᴴ)) =
-        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) := by
-    refine avgOver_congr _ _ _ ?_
-    intro q
-    refine Finset.sum_congr rfl ?_
-    intro a _ha
-    refine Finset.sum_congr rfl ?_
-    intro b _hb
-    simpa [Matrix.conjTranspose_mul] using fromHToG_ev_adjoint_eq ψ (A q a * C q a b)
-  have hB :
-      avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C q a b)ᴴ * (B q a)ᴴ)) =
-        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b)) := by
-    refine avgOver_congr _ _ _ ?_
-    intro q
-    refine Finset.sum_congr rfl ?_
-    intro a _ha
-    refine Finset.sum_congr rfl ?_
-    intro b _hb
-    simpa [Matrix.conjTranspose_mul] using fromHToG_ev_adjoint_eq ψ (B q a * C q a b)
-  simpa [hA, hB] using hleft
-
-/-- Rewrite a nested Boolean/type sum as a sum over the product index. -/
-lemma fromHToG_bool_type_sum_product {α : Type*} [Fintype α]
-    (F : Bool → α → Error) :
-    (∑ b : Bool, ∑ a : α, F b a) = ∑ p : Bool × α, F p.1 p.2 := by
-  rw [← Finset.univ_product_univ, Finset.sum_product]
-
 /-- Collapse a type-filtered completed-outcome sum to an unfiltered sum. -/
 lemma fromHToG_type_filtered_outcome_sum
     (params : Parameters) [FieldModel params.q] {n : ℕ} {R : Type*} [AddCommMonoid R]
