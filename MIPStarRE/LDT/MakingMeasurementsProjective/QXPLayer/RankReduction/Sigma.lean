@@ -598,21 +598,6 @@ noncomputable def pointProjMeas {Outcome : Type uOutcome}
     intro a
     by_cases h : a = a0 <;> simp [h]
 
-/-- If `R_a` are orthogonal projectors with `∑_a R_a ≤ I`, then the lifted
-finite-enumeration model of `Σ a, Fin (rank R_a)` has dimension at most the
-ambient one. -/
-lemma sigmaFinCard_le_of_projectors {Outcome : Type*} [Fintype Outcome]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (R : Outcome → MIPStarRE.Quantum.Op ι)
-    (hproj : ∀ a, MIPStarRE.Quantum.IsProj (R a))
-    (htotal_le_one : (∑ a, R a) ≤ (1 : MIPStarRE.Quantum.Op ι)) :
-    Fintype.card (FiniteHilbertSpace.sigmaFinCarrier (fun a : Outcome => (R a).rank)) ≤
-      Fintype.card ι := by
-  rw [← Fintype.card_congr (sigmaFinCarrierEquiv (m := fun a : Outcome => (R a).rank))]
-  rw [Fintype.card_sigma]
-  simp only [Fintype.card_fin]
-  exact sum_rank_le_card_of_projectors_le_one R hproj htotal_le_one
-
 /-- The lifted finite-enumeration model of `Σ a, Fin (m a)` has cardinality
 bounded by the ambient dimension whenever the total multiplicity is bounded. -/
 lemma sigmaFinCard_le_of_sum_le {Outcome : Type*} [Fintype Outcome]
