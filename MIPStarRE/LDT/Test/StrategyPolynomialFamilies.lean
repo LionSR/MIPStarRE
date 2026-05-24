@@ -333,21 +333,6 @@ structure StronglySelfConsistent {params : Parameters} [FieldModel params.q]
       (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas))
       zeta
 
-structure Bounded {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (family : IdxPolyFamily params ι)
-    (ψ : QuantumState (ι × ι)) (zeta : Error) : Prop where
-  sliceOpPSD : ∀ x, 0 ≤ family.witness x
-  sliceBoundedness :
-    avgOver (uniformDistribution (Fq params))
-      (fun x =>
-        ev ψ <|
-          leftTensor (ι₂ := ι) (1 - (family.meas x).toSubMeas.total) *
-            rightTensor (ι₁ := ι) (family.witness x)) ≤ zeta
-  sliceDominatesTarget :
-    ∀ x : Fq params, ∀ g : Polynomial params,
-      0 ≤ family.witness x - family.dominationTarget x g
-
 /-- Paper-faithful boundedness input for slice-indexed polynomial families.
 
 This structure encodes the boundedness item in
