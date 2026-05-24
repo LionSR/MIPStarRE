@@ -17,16 +17,6 @@ private lemma rolePairProj_mul_same (rL rR : Role) :
     rolePairProj rL rR * rolePairProj rL rR = rolePairProj rL rR := by
   simp [rolePairProj, opTensor_mul, roleProj_mul_self]
 
-private lemma rolePairProj_AB_mul_BA :
-    rolePairProj Role.A Role.B * rolePairProj Role.B Role.A = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_A_mul_B, roleProj_B_mul_A]
-  simp [opTensor]
-
-private lemma rolePairProj_BA_mul_AB :
-    rolePairProj Role.B Role.A * rolePairProj Role.A Role.B = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_B_mul_A, roleProj_A_mul_B]
-  simp [opTensor]
-
 private lemma rolePairProj_AB_mul_AA :
     rolePairProj Role.A Role.B * rolePairProj Role.A Role.A = 0 := by
   rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_mul_self, roleProj_B_mul_A]
@@ -81,12 +71,14 @@ private lemma rolePairCond_mul_eq_zero {ι : Type*} [Fintype ι] [DecidableEq ι
 private lemma rolePairCond_AB_mul_BA {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.A Role.B X * rolePairCond Role.B Role.A Y = 0 := by
-  exact rolePairCond_mul_eq_zero Role.A Role.B Role.B Role.A X Y rolePairProj_AB_mul_BA
+  exact rolePairCond_mul_eq_zero Role.A Role.B Role.B Role.A X Y
+    MIPStarRE.LDT.rolePairProj_AB_mul_BA
 
 private lemma rolePairCond_BA_mul_AB {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.B Role.A X * rolePairCond Role.A Role.B Y = 0 := by
-  exact rolePairCond_mul_eq_zero Role.B Role.A Role.A Role.B X Y rolePairProj_BA_mul_AB
+  exact rolePairCond_mul_eq_zero Role.B Role.A Role.A Role.B X Y
+    MIPStarRE.LDT.rolePairProj_BA_mul_AB
 
 private lemma rolePairCond_AB_mul_AA {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
