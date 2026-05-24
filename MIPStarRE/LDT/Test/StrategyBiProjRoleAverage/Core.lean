@@ -97,7 +97,6 @@ private lemma opTensor_roleBlock_eq_rolePairDirectSumCond_sum {ιA ιB : Type*}
     simp [opTensor, rolePairDirectSumCond, rolePairProj, roleProj,
       roleRegisterPairLocalEquiv]
 
-set_option linter.flexible false in
 private lemma localPairABBlock_mul_opTensor_localDirectSumBlocks {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (X : MIPStarRE.Quantum.Op (ιA × ιB))
@@ -123,7 +122,9 @@ private lemma localPairABBlock_mul_opTensor_localDirectSumBlocks {ιA ιB : Type
                   simp [localPairABBlock, opTensor]
               | inr j' =>
                   rw [Matrix.mul_apply, Fintype.sum_prod_type]
-                  simp [localPairABBlock, opTensor]
+                  simp only [Fintype.sum_sum_type, localPairABBlock, opTensor,
+                    localDirectSumBlock, Matrix.of_apply, zero_mul, Finset.sum_const_zero,
+                    zero_add, add_zero]
                   exact (Fintype.sum_prod_type'
                     (f := fun x : ιA => fun y : ιB =>
                       X (i, j) (x, y) * (A x i' * D y j'))).symm
@@ -135,7 +136,6 @@ private lemma localPairABBlock_mul_opTensor_localDirectSumBlocks {ιA ιB : Type
       cases x₂ <;> cases y₁ <;> cases y₂ <;>
         simp [localPairABBlock, Matrix.mul_apply]
 
-set_option linter.flexible false in
 private lemma localPairBABlock_mul_opTensor_localDirectSumBlocks {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (X : MIPStarRE.Quantum.Op (ιB × ιA))
@@ -163,7 +163,9 @@ private lemma localPairBABlock_mul_opTensor_localDirectSumBlocks {ιA ιB : Type
               cases y₂ with
               | inl j' =>
                   rw [Matrix.mul_apply, Fintype.sum_prod_type]
-                  simp [localPairBABlock, opTensor]
+                  simp only [Fintype.sum_sum_type, localPairBABlock, opTensor,
+                    localDirectSumBlock, Matrix.of_apply, zero_mul, Finset.sum_const_zero,
+                    zero_add, add_zero]
                   exact (Fintype.sum_prod_type'
                     (f := fun x : ιB => fun y : ιA =>
                       X (i, j) (x, y) * (B x i' * A y j'))).symm
