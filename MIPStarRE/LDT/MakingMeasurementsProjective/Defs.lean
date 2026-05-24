@@ -29,11 +29,9 @@ register has dimension `|α| + 1`, with the extra dimension absorbing the
 ### Questionwise Naimark data
 
 For a prospective full bipartite assembly, one-measurement Naimark is applied
-independently to each question on each side. The lifted index type is
-`ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`,
-reflecting the tensor product of per-question auxiliary registers.  The current
-formal interface records these questionwise local data and their marginal
-preservation identities, not the full tensor-product correlation theorem.
+independently to each question on each side.  The current formal interface
+records these questionwise local data and their marginal preservation
+identities, not the full tensor-product correlation theorem.
 
 ## Matrix-level witnesses
 
@@ -68,11 +66,6 @@ abbrev MatrixOperator (H : FiniteHilbertSpace) :=
 structure PositiveMatrixState (H : FiniteHilbertSpace) where
   matrix : MatrixOperator H
   positive : 0 ≤ matrix
-
-/-- A normalized density operator. -/
-structure DensityMatrixState (H : FiniteHilbertSpace)
-    extends PositiveMatrixState H where
-  normalized : MIPStarRE.Quantum.normalizedTrace matrix = 1
 
 /-- Concrete submeasurements on a finite Hilbert space. -/
 abbrev MatrixSubmeasurement (Outcome : Type*)
@@ -162,20 +155,7 @@ theorem OneMeasNaimarkData.lifted_pos {α : Type*} [Fintype α] [DecidableEq α]
 /-! ### Questionwise Naimark data
 
 The current Lean data applies one-measurement Naimark independently to each
-question on each side. The lifted index type is
-`ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)`. -/
-
-/-- The lifted index type for Naimark dilation. For each question on each
-side, an auxiliary register of dimension `|Outcome| + 1` is tensored in.
-The type `QuestionA → Option OutcomeA` represents the tensor product
-`⊗_x ℂ^{|OutcomeA|+1}` of per-question Alice auxiliaries, and similarly
-for Bob. -/
--- Note: The `Fintype` instance for `QuestionA → Option OutcomeA` has cardinality
--- `(|OutcomeA| + 1)^|QuestionA|`, which grows exponentially. This is fine for the
--- abstract proofs but may cause performance issues with `decide`/`Finset.sum` when
--- filling in real proofs. See #98 for tracking.
-abbrev NaimarkLiftedIndex (ι : Type*) (QuestionA OutcomeA QuestionB OutcomeB : Type*) :=
-  ι × (QuestionA → Option OutcomeA) × (QuestionB → Option OutcomeB)
+question on each side. -/
 
 /-- Questionwise Naimark data for the prospective full assembly.
 
@@ -198,27 +178,6 @@ structure NaimarkData (QuestionA OutcomeA QuestionB OutcomeB : Type*)
 -- constructing defaults for projective measurements is mathematically non-canonical
 -- and would require additional assumptions on outcome types.
 
-/-! ### Abstract-level probability definitions -/
-
-/-- The single-outcome probability `⟨ψ|A_a|ψ⟩`. -/
-noncomputable def singleOutcomeProbability {Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : SubMeas Outcome ι) (a : Outcome) : Error :=
-  ev ψ (A.outcome a)
-
-/-- The joint outcome probability `Tr(ρ · A_a · B_b)`.
-Uses the operator product on the shared algebra.
-When the measurements commute (as guaranteed after Naimark dilation), this
-equals the tensor-product formulation `⟨ψ| (A_a ⊗ B_b) |ψ⟩`. -/
-noncomputable def jointOutcomeProbability {OutcomeA OutcomeB : Type*}
-    {ι : Type*} [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : SubMeas OutcomeA ι)
-    (B : SubMeas OutcomeB ι)
-    (a : OutcomeA) (b : OutcomeB) : Error :=
-  ev ψ (A.outcome a * B.outcome b)
-
 /-! ### Error functions for orthonormalization -/
 
 /-- The explicit error in `thm:orthonormalization`. -/
@@ -233,10 +192,6 @@ into a `4ζ` source-almost-projective estimate, and therefore uses this weaker
 named envelope. -/
 noncomputable def orthonormalizationCompletionRouteError (ζ : Error) : Error :=
   120 * Real.rpow ζ (1 / (4 : Error))
-
-/-- The strong self-consistency error after completing a submeasurement to a measurement. -/
-def orthonormalizationCompletionError (ζ : Error) : Error :=
-  2 * ζ
 
 /-- The explicit error in the measurement version of the lemma. -/
 noncomputable def orthonormalizationMainLemmaError (ζ : Error) : Error :=
