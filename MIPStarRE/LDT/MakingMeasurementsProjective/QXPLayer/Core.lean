@@ -3,8 +3,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 /-!
 # Section 5 — Q/X/XHat/P core data
 
-Core data structures and shared operator-family definitions for the paper's
-`Q/X/XHat/P` intermediate layer.
+Scalar error estimates, core data structures, and shared operator-family
+definitions for the paper's `Q/X/XHat/P` intermediate layer.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -27,6 +27,45 @@ lemma zetaQuarterRoot_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
     0 ≤ zetaQuarterRoot ζ := by
   dsimp [zetaQuarterRoot]
   exact Real.rpow_nonneg hζ _
+
+/-- **Scalar truncation inequality** (`lem:trunc-inequality`).
+
+For `x ∈ [0,1]`, truncating at threshold `1 - δ` changes `x` by at most
+`(1 / δ) * (x - x^2)` in squared distance. -/
+lemma truncationInequality (δ x : Error) :
+    0 < δ →
+      δ ≤ 1 / 2 →
+      0 ≤ x →
+      x ≤ 1 →
+      let trunc : Error := if 1 - δ ≤ x then 1 else 0
+      (x - trunc) ^ (2 : Nat) ≤ (1 / δ) * (x - x ^ (2 : Nat)) := by
+  intro hδ hδhalf hx hx1
+  simp only []
+  split
+  · next h =>
+    have h1x : 0 ≤ 1 - x := by linarith
+    have hxd : 1 - x ≤ δ := by linarith
+    rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
+    nlinarith [sq_nonneg (1 - x), sq_nonneg δ]
+  · next h =>
+    push Not at h
+    simp only [sub_zero]
+    rw [div_mul_eq_mul_div, le_div_iff₀ hδ]
+    have hlt : 0 ≤ 1 - δ - x := by linarith
+    nlinarith [mul_nonneg hx hlt,
+      mul_nonneg (mul_nonneg (le_of_lt hδ) hx)
+        (by linarith : (0 : ℝ) ≤ 1 - x)]
+
+/-- The truncation error is nonnegative on nonnegative input. -/
+lemma spectralTruncationError_nonneg {ζ : Error} (hζ : 0 ≤ ζ) :
+    0 ≤ spectralTruncationError ζ := by
+  dsimp [spectralTruncationError]
+  exact Real.rpow_nonneg hζ _
+
+/-- The truncation error is `√ζ`. -/
+lemma spectralTruncationError_eq_sqrt (ζ : Error) :
+    spectralTruncationError ζ = Real.sqrt ζ := by
+  simp [spectralTruncationError, Real.sqrt_eq_rpow]
 
 /-- A raw operator family viewed as a constant indexed family on the trivial
 question set. -/
@@ -92,6 +131,20 @@ structure RoundingToProjectorsWitness {Outcome : Type*}
   total_le :
     R.total ≤ (((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
       (1 : MIPStarRE.Quantum.Op ι)
+
+/-- **Rounding to projectors** (`lem:projective-non-measurement`).
+
+This is the paper-facing proposition consumed by the QXP rank-reduction layer:
+there is a rounded projective family `R_a` equipped with the bounds recorded in
+`RoundingToProjectorsWitness ψ A ζ R`. The constructive spectral-truncation
+theorem supplies this witness from `eq:A-looks-projective`. -/
+abbrev projectiveNonMeasurement {Outcome : Type uOutcome}
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (ψ : QuantumState ι)
+    (A : Measurement Outcome ι) (ζ : Error) : Prop :=
+  ∃ R : OpFamily Outcome ι,
+    RoundingToProjectorsWitness ψ A ζ R
 
 /-- Paper origin: `references/ldt-paper/orthonormalization.tex:540-553`
 (`\label{lem:projective-low-rank-sum}`; rank-reduction lemma with
