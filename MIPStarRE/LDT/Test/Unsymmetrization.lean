@@ -199,32 +199,6 @@ noncomputable def extractRoleBMeasurement {params : Parameters} [FieldModel para
   ext i j
   simp [extractRoleBlock, roleBlock, roleCond, roleProj, opTensor]
 
-/-- Extracting the `A` block from a block-diagonal role symmetrization recovers the
-left input family. -/
-theorem extractRole_symmetrizedIdxProjMeas_A {Question Outcome ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (MA MB : IdxProjMeas Question Outcome ι) (q : Question) :
-    ((symmetrizedIdxProjMeas MA MB q).toMeasurement.extractRole Role.A).toSubMeas =
-      (MA q).toSubMeas := by
-  refine SubMeas.ext ?_ ?_
-  · intro a
-    simp [symmetrizedIdxProjMeas, SubMeas.extractRole]
-  · simpa [symmetrizedIdxProjMeas, SubMeas.extractRole] using
-      (MA q).total_eq_one.symm
-
-/-- Extracting the `B` block from a block-diagonal role symmetrization recovers the
-right input family. -/
-theorem extractRole_symmetrizedIdxProjMeas_B {Question Outcome ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (MA MB : IdxProjMeas Question Outcome ι) (q : Question) :
-    ((symmetrizedIdxProjMeas MA MB q).toMeasurement.extractRole Role.B).toSubMeas =
-      (MB q).toSubMeas := by
-  refine SubMeas.ext ?_ ?_
-  · intro a
-    simp [symmetrizedIdxProjMeas, SubMeas.extractRole]
-  · simpa [symmetrizedIdxProjMeas, SubMeas.extractRole] using
-      (MB q).total_eq_one.symm
-
 /-- Evaluating a polynomial submeasurement after role extraction agrees with
 extracting the role block after point-evaluation postprocessing. -/
 theorem polynomialEvaluationFamily_extractRole {params : Parameters} [FieldModel params.q]

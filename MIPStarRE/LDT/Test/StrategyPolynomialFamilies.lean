@@ -121,24 +121,6 @@ noncomputable def evaluatedAtNextPoint {params : Parameters} [FieldModel params.
     evaluateAt params (truncatePoint params u)
       ((family.meas (pointHeight params u)).toSubMeas)
 
-/-- In degree zero, the evaluated slice family is independent of the old point
-coordinates once the slice height is fixed.
-
-Lean-only helper for the degree-zero branch of `thm:ld-pasting`; the source
-context is `references/ldt-paper/ld-pasting.tex:12-55`.  This does not identify
-different slice heights.  The height-compatibility step is handled separately in
-the degree-zero pasting construction in `Pasting/Bernoulli/Final.lean`. -/
-theorem evaluatedAtNextPoint_eq_of_same_height_degree_zero {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (family : IdxPolyFamily params ι) (hd : params.d = 0)
-    {u v : Point params.next} (hheight : pointHeight params u = pointHeight params v) :
-    family.evaluatedAtNextPoint u = family.evaluatedAtNextPoint v := by
-  unfold evaluatedAtNextPoint
-  rw [← hheight]
-  exact evaluateAt_eq_of_degree_zero params
-    ((family.meas (pointHeight params u)).toSubMeas) hd
-    (truncatePoint params u) (truncatePoint params v)
-
 /-- Averaged point operator `E_u A^u_{h(u)}` appearing in source-style
 boundedness assumptions. -/
 noncomputable def averagedPointEvaluationOperator {params : Parameters}
@@ -190,17 +172,6 @@ noncomputable def averagedSliceTotalOperator {params : Parameters}
           rw [Finset.sum_smul]
     _ = 1 := by
           rw [uniformDistribution_weight_sum_eq_one (Point params), one_smul]
-
-theorem averagedSlicePointEvaluationOperator_le_averagedSliceTotalOperator
-    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι) (x : Fq params) (g : Polynomial params) :
-    averagedSlicePointEvaluationOperator strategy x g ≤ averagedSliceTotalOperator strategy x := by
-  unfold averagedSlicePointEvaluationOperator averagedSliceTotalOperator
-    averageOperatorOverDistribution
-  exact Finset.sum_le_sum fun u _ =>
-    smul_le_smul_of_nonneg_left
-      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome_le_total (g u))
-      ((uniformDistribution (Point params)).nonnegative u)
 
 /-- Paper-facing constructor: bundle a slice submeasurement with a symmetric
 strategy so that both the domination target and the witness are derived from the
