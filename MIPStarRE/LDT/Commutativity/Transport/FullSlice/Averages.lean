@@ -372,21 +372,6 @@ noncomputable def xEvaluatedSliceBABAScalarAvg
         ev strategy.state
           (leftTensor (ι₂ := ι) (B.outcome h * A.outcome a * B.outcome h * A.outcome a)))
 
-/-- The x-evaluated first factor as a projective submeasurement at mixed
-`(u, x, y)` data. -/
-noncomputable def xEvaluatedFirstProj
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    (ux : Point params × FullSliceQuestion params) :
-    ProjSubMeas (Fq params) ι :=
-  { toSubMeas := evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
-    proj := by
-      intro a
-      simpa [evaluatedPointFamily, IdxPolyFamily.evaluatedAtNextPoint, evaluateAt,
-        truncatePoint_appendPoint, pointHeight_appendPoint] using
-        evaluatedPointFamily_outcome_proj params family
-          (appendPoint params ux.1 ux.2.1) a }
-
 /-- Reindex mixed x-evaluated data `(u, x, y)` as `(appendPoint u x, y)`. -/
 def xEvaluatedQuestionPointNextEquiv
     (params : Parameters) [FieldModel params.q] :
