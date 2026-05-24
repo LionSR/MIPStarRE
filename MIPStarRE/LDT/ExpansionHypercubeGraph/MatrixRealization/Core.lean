@@ -40,14 +40,6 @@ def matrixTensorOperator {H K : FiniteHilbertSpace}
 abbrev RectangularMatrixOperator (H K : FiniteHilbertSpace) :=
   Matrix K.carrier H.carrier ℂ
 
-/-- Uniform average of a real-valued observable on a finite type. -/
-noncomputable def finiteAverage {α : Type*} [Fintype α] (f : α → Error) : Error :=
-  ((Fintype.card α : Error)⁻¹) * ∑ a, f a
-
-/-- Uniform average of a real-valued observable over a finite set. -/
-noncomputable def finsetAverage {α : Type*} (s : Finset α) (f : α → Error) : Error :=
-  ((s.card : Error)⁻¹) * (s.sum f)
-
 /-- Uniform average of an operator-valued observable on a finite type. -/
 noncomputable def matrixAverageOperator {α : Type*} [Fintype α]
     {H : FiniteHilbertSpace} (f : α → MatrixOperator H) : MatrixOperator H :=
