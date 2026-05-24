@@ -20,12 +20,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-/-- Distinct outcomes of a projective submeasurement are orthogonal. -/
-lemma projSubMeas_outcome_orthogonal
-    {α : Type*} [Fintype α]
-    (P : ProjSubMeas α ι) (a b : α) (hab : a ≠ b) :
-    P.outcome a * P.outcome b = 0 := by
-  simpa using ProjSubMeas.outcome_orthogonal P a b hab
 
 /-- Postprocessing a projective submeasurement preserves outcome projectivity. -/
 lemma postprocess_proj_outcome

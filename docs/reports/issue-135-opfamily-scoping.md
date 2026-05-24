@@ -98,8 +98,6 @@ already returns `IdxOpFamily` for the raw ordered/reversed product objects:
   [`:169`](../../MIPStarRE/LDT/Commutativity/Defs.lean#L169)
 - `evaluatedSliceProductRight` at
   [`:179`](../../MIPStarRE/LDT/Commutativity/Defs.lean#L179)
-- `evaluatedSlicePointMeasurementProduct` at
-  [`:220`](../../MIPStarRE/LDT/Commutativity/Defs.lean#L220)
 - `fullSliceProductLeft` at
   [`:243`](../../MIPStarRE/LDT/Commutativity/Defs.lean#L243)
 - `fullSliceProductRight` at

@@ -58,13 +58,6 @@ noncomputable def appendRightTotalOpFamily {α : Type*} [Fintype α] {κ : Type*
   outcome := fun a => A.outcome a * X
   total := A.total * X
 
-/-- Reindex a family on `β` to a pair outcome by reading only the second component. -/
-noncomputable def pullSndOpFamily {α β : Type*} [Fintype α] [Fintype β] {κ : Type*}
-    [Fintype κ] [DecidableEq κ]
-    (A : OpFamily β κ) : OpFamily (α × β) κ where
-  outcome := fun ab => A.outcome ab.2
-  total := (Fintype.card α : ℂ) • A.total
-
 /-- Sandwiched product `A_a B_b A_a`.
 
 Its total operator should be the sum-of-sandwiches
@@ -194,17 +187,6 @@ noncomputable def evaluatedSliceSandwichFirstFactor (params : Parameters) [Field
   fun q =>
     leftPlacedSubMeas (ιB := ι) <|
       evaluatedSliceSandwichRaw params _strategy family q
-
-/-- Bob's ordered evaluated point product `A^{u,x}_a A^{v,y}_b`,
-reindexed by the pair outcome `(a,b)`. -/
-noncomputable def evaluatedSlicePointMeasurementProduct (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) :
-    IdxOpFamily (EvaluatedSliceQuestion params) (EvaluatedSliceOutcome params) ι :=
-  fun q =>
-    show OpFamily (EvaluatedSliceOutcome params) ι from
-      orderedProductOpFamily
-        ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
-        ((strategy.pointMeasurement q.2).toSubMeas : SubMeas (Fq params.next) ι)
 
 /-- The first full slice measurement `G^x`. -/
 def fullSliceFirstFactor (params : Parameters) [FieldModel params.q]
