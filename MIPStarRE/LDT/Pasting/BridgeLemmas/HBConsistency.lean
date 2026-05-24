@@ -103,37 +103,6 @@ private lemma hBConsistency_core_of_axis_self
               params strategy family eps delta gamma zeta k hd
               heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hline
 
-private lemma hBConsistency_core
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hd : 0 < params.d)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hself : family.StronglySelfConsistent strategy.state zeta)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta)
-    (k : ℕ)
-    (hline : ∀ i : ℕ, i < k →
-      LdSandwichLineOnePointStatement params strategy family
-        eps delta gamma zeta k i) :
-    ConsRel strategy.state
-      (uniformDistribution (VerticalLineQuestion params))
-      (hRestrictionToVerticalLine params
-        (constructedPastedSubMeas params family k))
-      (verticalLineMeasurementFamily params strategy)
-      (hBConsistencyError params eps delta gamma zeta k) := by
-  have hgamma_nonneg : 0 ≤ gamma := by
-    have : 0 ≤ strategy.diagonalFailureProbability := by
-      unfold SymStrat.diagonalFailureProbability
-      exact mul_nonneg (by positivity)
-        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-    exact le_trans this hgood.diagonalLineTest
-  exact hBConsistency_core_of_axis_self params strategy eps delta gamma zeta
-    hgood.axisParallelTest hgood.selfConsistencyTest hgamma_nonneg hd family hcons
-    hself hbound k hline
-
 /-- Internal form of `lem:h-b-consistency` after applying
 `lem:ld-sandwich-line-one-point` at each coordinate.
 

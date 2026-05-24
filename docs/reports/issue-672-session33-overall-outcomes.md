@@ -48,7 +48,7 @@ The relevant paper route is `references/ldt-paper/ld-pasting.tex`:
 
 | Paper lines | Step | Current Lean status |
 | --- | --- | --- |
-| 1041-1091 | `lem:h-b-consistency`: expand the bad mass, swap from uniform to distinct tuples, union-bound over coordinates, and pay `k * ν₅ + k²/q`. | Proved in `HBConsistency.lean` via `hBConsistency_core` and `avgOver_distinct_badMass_le_hBConsistencyError`; no `sorryAx`. |
+| 1041-1091 | `lem:h-b-consistency`: expand the bad mass, swap from uniform to distinct tuples, union-bound over coordinates, and pay `k * ν₅ + k²/q`. | Proved in `HBConsistency.lean` via `hBConsistency_ofLinePointBounds_of_axis_self` and `avgOver_distinct_badMass_le_hBConsistencyError`; no `sorryAx`. |
 | 1140-1173 | Start of `lem:over-all-outcomes`: compare pasted/global mass with the all-outcomes expansion. | Proved by the mass-splitting and distinctness lemmas in `OverAllOutcomes.lean`. |
 | 1174-1232 | Insert the vertical-line measurement `B`, split the nonglobal mass into bad-line and line-consistent parts, then sum out `B`. | Proved by `nonglobal_mass_eq_inserted_vertical_measurement`, `overAllOutcomes_distinct_nonglobal_mass_le_bad_line_mass_add_lineConsistent`, and `lineConsistentNonglobalMass_le_indicatorMass`. |
 | 1235-1275 | Choose the interpolant `h*`, use nonglobality to find a disagreeing slice, and apply Schwartz--Zippel for the `md/q` term. | Proved by `lineConsistentIndicator_probability_le_mdq`, `lineConsistentIndicatorLocal_avg_le_mdq`, and `overAllOutcomes_distinct_lineConsistent_indicator_mass_le_mdq`. |
