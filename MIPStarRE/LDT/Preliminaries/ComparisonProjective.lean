@@ -186,7 +186,6 @@ theorem approxToSimeq {Question Outcome : Type*}
           ((IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas B)) q)) ≤ δ
   linarith
 
-set_option maxHeartbeats 800000 in
 -- The heterogeneous proof expands the projective identity on the tensor-product
 -- space; the final algebra is the same as the same-space theorem above, but the
 -- generated matrix expressions are larger.

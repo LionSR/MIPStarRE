@@ -62,7 +62,6 @@ theorem roleRegisterSymmStrategy_sourceMainInduction
         (strategy := strategy) (eps := eps) hpass)
       hk
 
-set_option maxHeartbeats 800000 in
 -- The proof compares two averaged consistency defects after expanding the
 -- role-register symmetrization and polynomial-evaluation extraction maps.
 /-- Unsymmetrize the two point-consistency estimates obtained from a
