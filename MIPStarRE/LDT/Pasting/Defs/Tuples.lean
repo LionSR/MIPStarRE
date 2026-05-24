@@ -98,25 +98,6 @@ def prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) : GHatType (k + 1)
   | ⟨0, _⟩ => b
   | ⟨n + 1, hn⟩ => τ ⟨n, Nat.lt_of_succ_lt_succ hn⟩
 
-/-- Drop the first `prefixLen` bits of a type.
-
-In the `fromHToG` recurrence the natural index is the number of prefix bits
-already converted to the Bernoulli polynomial.  This helper turns a full
-`k`-type into the remaining tail `τ_{≥ prefixLen}` using zero-based indexing.
-
-Note: because `k - prefixLen` uses `Nat` subtraction, passing `prefixLen > k`
-silently returns `GHatType 0` (the empty tuple) rather than being a type error.
-Callers in the `fromHToG` recurrence always satisfy `prefixLen ≤ k`, so this
-wraparound is never triggered; reviewers should treat `prefixLen ≤ k` as an
-invariant of all call sites. -/
-def gHatTypeSuffix {k : ℕ} (prefixLen : ℕ) (τ : GHatType k) : GHatType (k - prefixLen) :=
-  fun i => τ ⟨prefixLen + i.val, by omega⟩
-
-/-- The operator contribution of one type bit: `G` for `1`, `I - G` for `0`. -/
-noncomputable def gHatTypeBitOperator (G : MIPStarRE.Quantum.Op ι) (bit : Bool) :
-    MIPStarRE.Quantum.Op ι :=
-  if bit then G else 1 - G
-
 /-- The operator monomial associated with a type `τ`. -/
 noncomputable def gHatTypeOperator (G : MIPStarRE.Quantum.Op ι) {k : ℕ}
     (τ : GHatType k) : MIPStarRE.Quantum.Op ι :=
