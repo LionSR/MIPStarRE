@@ -473,14 +473,16 @@ Last updated: 2026-04-23
   - [x] Read `references/ldt-paper/commutativity-points.tex`
   - [x] Read `blueprint/src/chapter/ch08_commutativity.tex`
   - [x] Read `docs/proof-hints.md`
-  - [x] Inspect `CommutativityPoints/Theorem.lean` and
+  - [x] Inspect `CommutativityPoints/Approximation.lean`,
+    `CommutativityPoints/BridgeTheorems/DropBridges.lean`, and
     `CommutativityPoints/Defs.lean`
   - [x] Inspect `Test/Strategy.lean` definitions for
     `RestrictedDiagonalSample`, `diagonalPointAnswerFamily`, and
     `diagonalLineAnswerFamily`
   - [x] Inspect the old `pointDiagonalLineQuestionEquiv` route in git history
   - [x] Prove `sampledDiagonalLineApproximation_pointWithDiagonalLine`
-  - [x] Run `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean`
+  - [x] Run `lake env lean MIPStarRE/LDT/CommutativityPoints/Approximation.lean`
+  - [x] Run `lake env lean MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean`
   - [x] Verify no `sorry`s remain in `MIPStarRE/LDT/CommutativityPoints`
   - [x] Add `\leanok` / `\uses` updates in `blueprint/src/chapter/ch08_commutativity.tex`
   - [x] Run `lake build`
@@ -497,11 +499,11 @@ Last updated: 2026-04-23
     `pointDiagonalLineQuestionEquiv` when the diagonal test used the old
     `DiagonalTestSample`; commit `ad33e7b` removed that route when the test was
     corrected to `RestrictedDiagonalSample`
-  - verified `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean`
-    still typechecks except for the single remaining transport `sorry`
+  - verified the then-current `CommutativityPoints` development still
+    typechecked except for the single remaining transport `sorry`
   - verified `grep` finds exactly one executable `sorry` under
     `MIPStarRE/LDT/CommutativityPoints`
-  - added local rebasing helpers in `CommutativityPoints/Theorem.lean`:
+  - added local rebasing helpers in `CommutativityPoints/Approximation.lean`:
     `rebaseDiagonalLine`, `rebaseDiagonalLine_pointAt_zero`,
     `DiagonalEvaluationReparamInvariant`, and
     `sampledDiagonalLineEvaluation_rebase`
@@ -524,8 +526,10 @@ Last updated: 2026-04-23
     invariant
   - verified `grep` finds no executable `sorry` in
     `MIPStarRE/LDT/CommutativityPoints`
-  - verified `lake env lean MIPStarRE/LDT/CommutativityPoints/Theorem.lean`
-    succeeds
+  - verified `lake env lean MIPStarRE/LDT/CommutativityPoints/Approximation.lean`
+    and
+    `lake env lean MIPStarRE/LDT/CommutativityPoints/BridgeTheorems/DropBridges.lean`
+    succeed
   - verified `lake build` succeeds after the strategy-model update
   - synced `blueprint/src/chapter/ch08_commutativity.tex` with the completed
     Lean theorem without overclaiming statement-level `\leanok`
