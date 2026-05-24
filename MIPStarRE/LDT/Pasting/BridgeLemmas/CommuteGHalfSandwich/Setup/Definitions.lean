@@ -364,18 +364,6 @@ def thirdSliceFrontEquiv (params : Parameters) (r : ℕ) :
     rcases q with ⟨x₃, x₁, x₂, xs⟩
     rfl
 
-def firstTwoSlicesFrontEquiv (params : Parameters) (r : ℕ) :
-    (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
-      (SlicePairQuestion params × (SliceQuestion params × PointTuple params r)) where
-  toFun q := ((q.1, q.2.1), (q.2.2.1, q.2.2.2))
-  invFun q := (q.1.1, q.1.2, q.2.1, q.2.2)
-  left_inv q := by
-    rcases q with ⟨x₁, x₂, x₃, xs⟩
-    rfl
-  right_inv q := by
-    rcases q with ⟨⟨x₁, x₂⟩, x₃, xs⟩
-    rfl
-
 /-! ### Question/outcome equivalences -/
 
 def splitQuestionEquiv (params : Parameters) (r : ℕ) :
