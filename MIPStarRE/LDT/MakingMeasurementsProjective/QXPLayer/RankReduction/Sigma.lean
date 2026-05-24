@@ -664,52 +664,6 @@ lemma sigmaFinXHatCoisometry_spec
       (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) :=
   Classical.choose_spec (exists_sigmaFin_xHat_coisometry_of_sum_le m hm)
 
-/-- Transport a rank-reduction witness to the canonical sigma-space layer with
-the same operator family.
-
-The analytic fields of `RankReductionWitness` depend only on the operator
-family `Q_a` and its total operator.  The only genuinely auxiliary-space field
-is the dimension bound, and for the sigma-space layer it follows from the
-stored total-rank estimate. -/
-theorem RankReductionWitness.toSigmaRangeQLayer
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
-    {qLayer : QLayerData Outcome ι}
-    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (hRank : RankReductionWitness ψ A ζ qLayer) :
-    RankReductionWitness ψ A ζ (sigmaRangeQLayer qLayer.q) := by
-  classical
-  refine
-    { projective := ?_
-      outcome_nonneg := ?_
-      sum_eq_total := ?_
-      source_almost_projective := hRank.source_almost_projective
-      closeness := ?_
-      total_le := ?_
-      totalRank_le := ?_
-      auxDim_le := ?_ }
-  · intro a
-    simpa [sigmaRangeQLayer, Qa] using hRank.projective a
-  · intro a
-    simpa [sigmaRangeQLayer, Qa] using hRank.outcome_nonneg a
-  · simpa [sigmaRangeQLayer, Qa, QTotal] using hRank.sum_eq_total
-  · simpa [sigmaRangeQLayer] using hRank.closeness
-  · simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
-  · simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
-  · have hcard :
-        Fintype.card (FiniteHilbertSpace.sigmaFinCarrier
-          (fun a : Outcome => (qLayer.q.outcome a).rank)) ≤ Fintype.card ι :=
-      sigmaFinCard_le_of_sum_le
-        (ι := ι) (m := fun a : Outcome => (qLayer.q.outcome a).rank)
-        hRank.totalRank_le
-    change Fintype.card (ULift (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ≤ Fintype.card ι
-    rw [Fintype.card_ulift]
-    exact hcard
-
-
 end
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
