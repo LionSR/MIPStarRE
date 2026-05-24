@@ -1,9 +1,6 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Core
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Fourier
+import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Foundations
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Matrix
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
+import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems
 
 /-!
 # LDT/ExpansionHypercubeGraph — imports

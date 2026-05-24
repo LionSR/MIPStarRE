@@ -42,9 +42,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
-import MIPStarRE.LDT.MainInductionStep.Defs
-import MIPStarRE.LDT.MainInductionStep.Statements
-import MIPStarRE.LDT.MainInductionStep.Theorems
+import MIPStarRE.LDT.MainInductionStep
 import MIPStarRE.LDT.ExpansionHypercubeGraph
 import MIPStarRE.LDT.GlobalVariance.Defs
 import MIPStarRE.LDT.GlobalVariance.Theorems
