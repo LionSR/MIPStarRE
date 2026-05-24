@@ -102,11 +102,11 @@ this label has been retired from `blueprint/src/chapter/ch10_induction.tex`.
 The declarations are now mentioned in an unnumbered remark, so they no longer
 form a dependency-graph node.
 
-Linked Lean declarations include the restricted-probability targets
-`MainFormalSuccessorAxisWeightedBound`,
-`MainFormalSuccessorDiagonalWeightedBound`,
-`mainFormalSuccessorRestrictionData`, and the ordinary and answer-valued
-recursive-slice targets.
+Linked Lean declarations now include only the answer-valued
+restricted-probability targets, the answer-valued restricted data constructor,
+and the answer-valued recursive-slice target.  The ordinary compatibility
+targets were removed because the checked successor route is answer-valued and
+the ordinary targets had no Lean callers outside blueprint and report prose.
 
 Verdict: Lean-only target list, not a completed final-theorem step.
 

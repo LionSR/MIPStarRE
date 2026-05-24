@@ -5,15 +5,13 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 # Answer-valued restricted-slice recursion
 
 Answer-valued `x`-restricted successor route for the `mainFormal` comparison.
-This module parallels `OrdinaryRestriction` but works with the answer-side
-(`A`-register) specialization of the `x`-restricted strategy
-(paper `references/ldt-paper/inductive_step.tex` defines the single
-`x`-restricted strategy around line 363; the answer-valued variant is a
-Lean-side adaptation restricted to the `A`-register).  It retains the useful
+The paper `references/ldt-paper/inductive_step.tex` defines the single
+`x`-restricted strategy around line 363.  The answer-valued variant used here is
+a Lean-side adaptation restricted to the `A`-register.  It retains the useful
 answer-valued restricted-probability targets and recursive-slice target.  The
-former conditional boundary, public wrapper, and slice-data witness data record,
-which took unproved recursive, self-improvement, or concrete slice-strategy data
-as inputs, have been removed.
+former ordinary compatibility route, conditional boundary, public wrapper, and
+slice-data witness data record, which took unproved recursive,
+self-improvement, or concrete slice-strategy data as inputs, have been removed.
 
 ## References
 
@@ -23,8 +21,7 @@ as inputs, have been removed.
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
   `\label{def:restricted-strategy}`,
   `\label{lem:restricted-probabilities}`, and the unnumbered paragraph
-  "Lean successor restricted-recursion targets for the Section 3 proof"
-  (answer-valued aliases).
+  "Lean successor restricted-recursion targets for the Section 3 proof".
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -126,9 +123,9 @@ def MainFormalSuccessorAnswerRecursiveSlices (params : Parameters)
 /-- A Section 6 answer-valued per-slice induction data record supplies the
 answer-side recursive slice witnesses used in the successor analysis.
 
-As in the ordinary-register constructor, this only exposes the data record fields as
-recursive-slice targets; the predecessor induction data record must come from a
-non-circular induction hypothesis. -/
+This only exposes the data record fields as recursive-slice targets; the
+predecessor induction data record must come from a non-circular induction
+hypothesis. -/
 theorem mainFormalSuccessorAnswerRecursiveSlices_ofInductionData
     (params : Parameters) [FieldModel.{0} params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

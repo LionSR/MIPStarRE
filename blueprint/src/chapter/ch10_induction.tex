@@ -747,15 +747,14 @@
 \end{proof}
 
 \paragraph{Lean successor restricted-recursion targets for the Section 3 proof.}
-	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorRestrictionData, MIPStarRE.LDT.Test.MainFormalSuccessorRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorDiagonalWeightedBound_ofPass}
-	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorRecursiveSlices_ofInductionData}
 	\lean{MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRecursiveSlices_ofInductionData}
 	\lean{MIPStarRE.LDT.Test.MainFormalSuccessorAnswerAxisWeightedBound, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerDiagonalWeightedBound, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerRestrictionData, MIPStarRE.LDT.Test.MainFormalSuccessorAnswerRecursiveSlices, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerAxisWeightedBound_ofPass, MIPStarRE.LDT.Test.mainFormalSuccessorAnswerDiagonalWeightedBound_ofPass}
-	These Lean-only declarations name the restricted-probability and recursive-slice
-	targets appearing in the successor comparison with
+	These Lean-only declarations name the answer-valued restricted-probability and
+	recursive-slice targets appearing in the successor comparison with
 	Remark~\ref{rem:main-induction-successor-assembly}.  The public weighted-bound
 	helper lemmas discharge the weighted restricted-axis and restricted-diagonal
-	fields from the symmetrized passing strategy.  The former Lean boundary records,
+	fields from the symmetrized passing strategy.  The former ordinary
+	compatibility route and the former Lean boundary records,
 	which also required a supplied self-improvement input, have been removed:
 	that missing work is part of the proof of
 	Theorem~\ref{thm:main-induction}, not an additional

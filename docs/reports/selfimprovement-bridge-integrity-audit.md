@@ -413,5 +413,4 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingData` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | source-final statement and obligation, current same-space interface, and proved final transport |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | role-register witness constructors routed through Section 6 `mainInduction` |
-| `MIPStarRE/LDT/Test/MainTheorem/OrdinaryRestriction/Basic.lean` | Ordinary restricted-slice weighted bounds and recursive-slice targets |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued restricted-slice weighted bounds and recursive-slice targets |
