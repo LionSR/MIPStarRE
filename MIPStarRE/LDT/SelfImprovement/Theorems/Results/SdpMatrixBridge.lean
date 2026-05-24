@@ -141,37 +141,6 @@ structure MatrixSdpCanonicalOptimalPair
 
 namespace MatrixSdpCanonicalOptimalPair
 
-/-- Build a saturated canonical optimal pair from feasible primal-dual data,
-zero duality gap, and an explicitly vanishing slack block.
-
-The product complementary-slackness equation is derived from zero duality gap by
-`matrixSdpCanonicalComplementarySlackness_of_strongDuality`.  Thus the remaining
-Watrous/Slater data are feasible witnesses with equal objective values and a
-saturated slack block. -/
-theorem ofFeasibleStrongDualitySlackBlock
-    {params : Parameters}
-    [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
-    {Z : MatrixOperator model.space}
-    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
-    (hdual :
-      ∀ g : Polynomial params,
-        0 ≤ matrixSdpDualSlackOperator params model Z g)
-    (hstrong :
-      Complex.re (Matrix.trace
-          (matrixSdpCanonicalObjectiveOperator params model * X)) =
-        matrixSdpDualObjective model Z)
-    (hSlack : matrixSdpCanonicalDiagonalBlock params model X none = 0) :
-    MatrixSdpCanonicalOptimalPair params model X Z where
-  feasible := hX
-  dualFeasible := hdual
-  strongDuality := hstrong
-  complementarySlackness :=
-    matrixSdpCanonicalComplementarySlackness_of_strongDuality
-      params model X hX Z hdual hstrong
-  slackBlock_eq_zero := hSlack
-
 /-- Build a saturated canonical optimal pair by completing the primal slack
 block at `sdpDistinguishedPolynomial params`.
 
