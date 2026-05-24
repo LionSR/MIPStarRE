@@ -112,25 +112,6 @@ lemma ldSandwichLineOnePointPrefixMoved_consRel_endpoint_of_axis_self
     params strategy eps delta zeta haxis hself family hcons k i hi
   simpa [ldSandwichLineOnePointPrefixMoved_eq_endpoint params strategy family hi] using hend
 
-/-- Endpoint consistency for the rotated prefix family. -/
-lemma ldSandwichLineOnePointPrefixMoved_consRel_endpoint
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    {k i : ℕ} (hi : i < k) :
-    ConsRel strategy.state
-      (uniformDistribution (SandwichedLineQuestion params k))
-      (ldSandwichLineOnePointPrefixMovedFamily params family hi)
-      (ldSandwichLineOnePointRightFamily params strategy family k i)
-      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  exact ldSandwichLineOnePointPrefixMoved_consRel_endpoint_of_axis_self
-    params strategy eps delta zeta hgood.axisParallelTest hgood.selfConsistencyTest
-    family hcons hi
-
 /-- Raw commutation for the nonempty prefix before adding the remaining question tail. -/
 lemma ldSandwichLineOnePointPrefixMoved_rawCommutation
     (params : Parameters)
@@ -259,33 +240,6 @@ noncomputable def ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily
         (ldSandwichLineOnePointPrefixMovedRawRightFamily params family hi q).outcome
           ((gHatTupleOutcomeLastFrontEquiv params i) gs)
       total := (ldSandwichLineOnePointPrefixMovedRawRightFamily params family hi q).total }
-
-/-- Raw prefix commutation stated in the original outcome indexing. -/
-lemma ldSandwichLineOnePointPrefixMoved_rawCommutation_originalOutcome
-    (params : Parameters)
-    [FieldModel params.q]
-    (ψ : QuantumState (ι × ι))
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hcomm : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params ψ family gamma zeta j)
-    {k i : ℕ} (hi : i < k) (hi0 : i ≠ 0) :
-    SDDOpRel ψ
-      (uniformDistribution (SandwichedLineQuestion params k))
-      (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily params family hi)
-      (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily params family hi)
-      (commuteGHalfSandwichError params gamma zeta (i + 1)) := by
-  have hfull := ldSandwichLineOnePointPrefixMoved_rawCommutation_full
-    params ψ family gamma zeta hcomm hi hi0
-  simpa [ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily,
-    ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily] using
-    CommutativityPoints.sddOpRel_reindex (gHatTupleOutcomeLastFrontEquiv params i).symm
-      ψ
-      (uniformDistribution (SandwichedLineQuestion params k))
-      (ldSandwichLineOnePointPrefixMovedRawLeftFamily params family hi)
-      (ldSandwichLineOnePointPrefixMovedRawRightFamily params family hi)
-      (commuteGHalfSandwichError params gamma zeta (i + 1))
-      hfull
 
 /-- Expand a half-product into the prefix product times the last slice operator. -/
 lemma gHatHalfProduct_prefix_mul_last
@@ -570,42 +524,5 @@ lemma gHatRotatedHalfProduct_lastReverse_eq_conjTranspose_lastFront
       rw [hprefixAdj]
       rw [hfront, Matrix.conjTranspose_mul, hhead]
       rfl
-
-/-- The reindexed rotated raw right outcome is the original prefix half-product. -/
-lemma ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcome_eq_prefixHalf
-    (params : Parameters)
-    [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    {k i : ℕ} (hi : i < k)
-    (q : SandwichedLineQuestion params k)
-    (gs : GHatTupleOutcome params (i + 1)) :
-    (ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily params family hi q).outcome gs =
-      leftTensor (ι₂ := ι)
-        (gHatHalfProductOutcomeOperator params family (i + 1)
-          (fun j => q.2 ⟨j.1, by omega⟩) gs) := by
-  simp [ldSandwichLineOnePointPrefixMovedRawRightOriginalOutcomeFamily,
-    ldSandwichLineOnePointPrefixMovedRawRightFamily, gHatHalfSandwichRight,
-    gHatRotatedHalfProduct_lastFront_eq_halfProduct, OpFamily.leftPlacedOpFamily]
-
-/-- The reindexed rotated raw left outcome is the selected-last prefix half-product.
-
-This is the source-side operator that the first Cauchy--Schwarz transport in
-`ld-pasting.tex` lines 984--1001 replaces by the ordered prefix half-product. -/
-lemma ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcome_eq_lastFrontHalf
-    (params : Parameters)
-    [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    {k i : ℕ} (hi : i < k)
-    (q : SandwichedLineQuestion params k)
-    (gs : GHatTupleOutcome params (i + 1)) :
-    (ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily params family hi q).outcome gs =
-      leftTensor (ι₂ := ι)
-        (gHatHalfProductOutcomeOperator params family (i + 1)
-          ((pointTupleLastFrontEquiv params i) (fun j => q.2 ⟨j.1, by omega⟩))
-          ((gHatTupleOutcomeLastFrontEquiv params i) gs)) := by
-  simp [ldSandwichLineOnePointPrefixMovedRawLeftOriginalOutcomeFamily,
-    ldSandwichLineOnePointPrefixMovedRawLeftFamily, gHatHalfSandwichLeft,
-    OpFamily.leftPlacedOpFamily]
-
 
 end MIPStarRE.LDT.Pasting
