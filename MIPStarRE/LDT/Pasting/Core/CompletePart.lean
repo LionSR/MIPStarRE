@@ -18,8 +18,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- `lem:looks-easy-but-took-me-a-while`. -/
-lemma looksEasyButTookMeAWhile
+/-- Scalar inequality for the first spectral construction in `lem:ld-pasting`. -/
+lemma first_construction_scalar_inequality
     (lambda : Error) (d : ℕ)
     (h0 : 0 ≤ lambda) (h1 : lambda ≤ 1) :
     lambda * (1 - lambda ^ d)

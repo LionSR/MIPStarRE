@@ -635,7 +635,7 @@ Key Lean theorem names:
 - `ldPasting`
 - `ldPastingSubMeas`
 - `ldDnoteq`
-- `looksEasyButTookMeAWhile`
+- `first_construction_scalar_inequality`
 - `gCompleteSelfConsistency`
 - `gBotSelfConsistency`
 - `commutativitySwitcheroo`
