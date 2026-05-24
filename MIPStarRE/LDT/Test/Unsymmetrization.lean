@@ -225,30 +225,6 @@ theorem extractRole_symmetrizedIdxProjMeas_B {Question Outcome ι : Type*}
   · simpa [symmetrizedIdxProjMeas, SubMeas.extractRole] using
       (MB q).total_eq_one.symm
 
-/-- Extracting the `A` block of the symmetrized point measurement recovers the
-original Alice point measurement. -/
-theorem strategySymmetrization_point_extractRole_A {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (u : Point params) :
-    (((strategy.strategySymmetrization).pointMeasurement u).toMeasurement.extractRole
-        Role.A).toSubMeas =
-      (strategy.pointMeasurementA u).toSubMeas := by
-  simpa [SameSpaceProjStrat.strategySymmetrization, SameSpaceProjStrat.classicalRoleSymmStrategy,
-    SameSpaceProjStrat.symmetrizedPointMeasurement] using
-    extractRole_symmetrizedIdxProjMeas_A strategy.pointMeasurementA strategy.pointMeasurementB u
-
-/-- Extracting the `B` block of the symmetrized point measurement recovers the
-original Bob point measurement. -/
-theorem strategySymmetrization_point_extractRole_B {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) (u : Point params) :
-    (((strategy.strategySymmetrization).pointMeasurement u).toMeasurement.extractRole
-        Role.B).toSubMeas =
-      (strategy.pointMeasurementB u).toSubMeas := by
-  simpa [SameSpaceProjStrat.strategySymmetrization, SameSpaceProjStrat.classicalRoleSymmStrategy,
-    SameSpaceProjStrat.symmetrizedPointMeasurement] using
-    extractRole_symmetrizedIdxProjMeas_B strategy.pointMeasurementA strategy.pointMeasurementB u
-
 /-- Evaluating a polynomial submeasurement after role extraction agrees with
 extracting the role block after point-evaluation postprocessing. -/
 theorem polynomialEvaluationFamily_extractRole {params : Parameters} [FieldModel params.q]
