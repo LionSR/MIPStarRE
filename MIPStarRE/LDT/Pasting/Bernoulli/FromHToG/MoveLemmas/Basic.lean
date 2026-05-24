@@ -345,27 +345,6 @@ lemma fromHToG_avgOver_sub {Question : Type*}
           intro q _hq
           ring
 
-lemma fromHToG_ev_adjoint_eq
-    (ψ : QuantumState (ι × ι)) (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    ev ψ Xᴴ = ev ψ X := by
-  have hρ : ψ.densityᴴ = ψ.density :=
-    (Matrix.nonneg_iff_posSemidef.mp ψ.density_psd).isHermitian.eq
-  have htrace :
-      MIPStarRE.Quantum.normalizedTrace (ψ.density * Xᴴ) =
-        star (MIPStarRE.Quantum.normalizedTrace (ψ.density * X)) := by
-    calc
-      MIPStarRE.Quantum.normalizedTrace (ψ.density * Xᴴ)
-        = MIPStarRE.Quantum.normalizedTrace ((X * ψ.density)ᴴ) := by
-            rw [Matrix.conjTranspose_mul, hρ]
-      _ = star (MIPStarRE.Quantum.normalizedTrace (X * ψ.density)) := by
-            unfold MIPStarRE.Quantum.normalizedTrace
-            simpa [star_div₀, star_natCast] using
-              congrArg (fun z : ℂ => z / (Fintype.card (ι × ι) : ℂ))
-                (Matrix.trace_conjTranspose (X * ψ.density))
-      _ = star (MIPStarRE.Quantum.normalizedTrace (ψ.density * X)) := by
-            rw [MIPStarRE.Quantum.normalizedTrace_mul_comm]
-  simpa [ev, Complex.star_def, Complex.conj_re] using congrArg Complex.re htrace
-
 /-- Averaged-context variant of `closenessOfIP`: the contraction side condition is
 only required after averaging over the question distribution. -/
 lemma fromHToG_closenessOfIP_avgContext
