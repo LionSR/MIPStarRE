@@ -254,9 +254,7 @@ The manifestly-PSD tensor-form partner of `fullSliceABABAvg` reached from it by
 the right). Each summand factors as `V† V` with
 `V = (G^y_h G^x_g) ⊗ √(G^y_h)`. Internal per #713.
 
-The evaluated-side analogue is `evaluatedSliceSandwichedRightAvg` in
-`MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean`, which predates this PR and is
-already used by the linear/sandwiched right-register transport bridge. -/
+The evaluated-side analogue is `evaluatedSliceABABtensorAvg` below. -/
 noncomputable def fullSliceABABtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
@@ -282,9 +280,9 @@ This is the second tensor-form endpoint in paper `commutativity-G.tex` lines
 reaches it by moving the trailing `G^y_[h(v)=b]` factor from the left register
 to the right register.
 
-This intentionally mirrors the older private `evaluatedSliceSandwichedRightAvg`
-in `Commutativity/Main/Auxiliary.lean`; `Auxiliary` imports this file, so the
-shared tensor endpoint lives here for the #601 assembly boundary. -/
+The shared tensor endpoint lives here for the #601 assembly boundary, so the
+evaluated-side transport lemmas can use the same notation as the full-slice
+transport lemmas. -/
 noncomputable def evaluatedSliceABABtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
