@@ -410,20 +410,6 @@ def restrictAtHeight (params : Parameters) (f : DiagonalLineAnswer params.next)
     restrictAtHeight params f x t = f t :=
   rfl
 
-/-- Slice extension is an equivalence for paper-level diagonal-line answers. -/
-def appendAtHeightEquiv (params : Parameters) (x : Fq params) :
-    DiagonalLineAnswer params ≃ DiagonalLineAnswer params.next where
-  toFun := fun f => appendAtHeight params f x
-  invFun := fun f => restrictAtHeight params f x
-  left_inv := by
-    intro f
-    funext t
-    rfl
-  right_inv := by
-    intro f
-    funext t
-    rfl
-
 @[simp] theorem appendAtHeight_reparamAt {params : Parameters} [FieldModel params.q]
     (f : DiagonalLineAnswer params) (t x : Fq params) :
     appendAtHeight params (reparamAt f t) x =
