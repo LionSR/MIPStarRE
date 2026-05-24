@@ -473,27 +473,6 @@ theorem matrixSdpCanonicalObjective_le_normalizedSeparator_on_primalConeMap
   rw [matrixSdpCanonicalNormalizedSeparatorFunctional_apply]
   exact (le_inv_mul_iff₀' hpositiveCoeff).mpr hmul
 
-/-- On a feasible canonical primal matrix, the normalized separator bounds the
-canonical objective at the identity constraint value.
-
-This is only a continuous real-linear functional bound; it does not represent
-the normalized separator by a trace-pairing matrix. -/
-theorem matrixSdpCanonicalObjective_le_normalizedSeparator_of_feasible
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
-    (hφ : ∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, 0 ≤ φ z)
-    (hcoeff : matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
-    Complex.re (Matrix.trace
-        (matrixSdpCanonicalObjectiveOperator params model * X)) ≤
-      matrixSdpCanonicalNormalizedSeparatorFunctional φ
-        (1 : MatrixOperator model.space) := by
-  simpa [hX.constraintEqOne] using
-    matrixSdpCanonicalObjective_le_normalizedSeparator_on_primalConeMap
-      params model φ hφ hcoeff X hX.nonnegative
-
 /-- A separator negative at `(1, t)` places its normalized constraint-coordinate
 functional below `t` at the identity.
 

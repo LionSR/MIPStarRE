@@ -3,7 +3,7 @@ import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical
 /-!
 # Section 9 -- Canonical SDP strong-duality preliminaries
 
-This module contains the feasibility, compactness, closedness, convexity, and
+This module contains the feasibility, compactness, closedness, and
 objective-continuity lemmas used in the finite-dimensional strong-duality
 argument for the canonical matrix SDP.
 
@@ -31,123 +31,6 @@ theorem matrixSdpCanonicalPrimalFeasible_nonempty
   ⟨matrixSdpCanonicalPrimalBlockMatrix params model
       (matrixSdpStrictPrimalSubmeasurement params model),
     matrixSdpCanonicalStrictPrimalBlockMatrix_feasible params model⟩
-
-/-- The uniform strict-primal Slater weight is positive.
-
-This is a Slater-interiority prerequisite for the canonical primal SDP, not an
-optimality or zero-gap theorem. -/
-theorem sdpStrictPrimalWeight_pos
-    (params : Parameters) [FieldModel params.q] :
-    0 < sdpStrictPrimalWeight params := by
-  have hcard : 0 < (Fintype.card (Polynomial params) : Error) := by
-    exact_mod_cast (Fintype.card_pos_iff.mpr ⟨sdpDistinguishedPolynomial params⟩)
-  unfold sdpStrictPrimalWeight
-  positivity
-
-/-- The uniform strict-primal Slater weight is at most the slack coefficient
-`1/2`.
-
-This bound is only a feasibility-interiority prerequisite for the canonical
-primal SDP; it does not assert optimality or strong duality. -/
-theorem sdpStrictPrimalWeight_le_half
-    (params : Parameters) [FieldModel params.q] :
-    sdpStrictPrimalWeight params ≤ 1 / 2 := by
-  have hcardNat : 1 ≤ Fintype.card (Polynomial params) := by
-    exact Nat.succ_le_of_lt
-      (Fintype.card_pos_iff.mpr ⟨sdpDistinguishedPolynomial params⟩)
-  have hcard : (1 : Error) ≤ Fintype.card (Polynomial params) := by
-    exact_mod_cast hcardNat
-  have hden : 0 < (2 : Error) * Fintype.card (Polynomial params) := by
-    positivity
-  unfold sdpStrictPrimalWeight
-  rw [div_le_iff₀ hden]
-  nlinarith
-
-/-- The canonical strict-primal block matrix dominates the positive scalar
-multiple of the identity determined by the uniform Slater weight.
-
-This is the strict-primal Slater lower bound needed as a prerequisite for a
-finite-dimensional SDP theorem; it is not an optimality or zero-gap statement. -/
-theorem matrixSdpCanonicalStrictPrimalBlockMatrix_weight_le
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    (sdpStrictPrimalWeight params : Error) •
-        (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) ≤
-      matrixSdpCanonicalPrimalBlockMatrix params model
-        (matrixSdpStrictPrimalSubmeasurement params model) := by
-  rw [← sub_nonneg]
-  let T := matrixSdpStrictPrimalSubmeasurement params model
-  let w := sdpStrictPrimalWeight params
-  let B := matrixSdpCanonicalPrimalBlockFamily params model T
-  have hsub :
-      matrixSdpCanonicalPrimalBlockMatrix params model T -
-          w • (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) =
-        matrixSdpCanonicalBlockDiagonal params model
-          (fun b => B b - w • (1 : MatrixOperator model.space)) := by
-    ext x y
-    rcases x with ⟨b, i⟩
-    rcases y with ⟨c, j⟩
-    by_cases hbc : b = c
-    · subst c
-      by_cases hij : i = j
-      · subst j
-        change (if b = b then B b i i else 0) -
-            w • (if (b, i) = (b, i) then (1 : ℂ) else 0) =
-          (if b = b then (B b - w • (1 : MatrixOperator model.space)) i i else 0)
-        simp [Matrix.sub_apply, Matrix.smul_apply]
-      · change (if b = b then B b i j else 0) -
-            w • (if (b, i) = (b, j) then (1 : ℂ) else 0) =
-          (if b = b then (B b - w • (1 : MatrixOperator model.space)) i j else 0)
-        simp [Matrix.sub_apply, Matrix.smul_apply, Prod.ext_iff, hij]
-    · change (if b = c then B b i j else 0) -
-          w • (if (b, i) = (c, j) then (1 : ℂ) else 0) =
-        (if b = c then (B b - w • (1 : MatrixOperator model.space)) i j else 0)
-      simp [Prod.ext_iff, hbc]
-  rw [show matrixSdpCanonicalPrimalBlockMatrix params model
-        (matrixSdpStrictPrimalSubmeasurement params model) =
-      matrixSdpCanonicalPrimalBlockMatrix params model T by rfl]
-  rw [show (sdpStrictPrimalWeight params : Error) •
-        (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) =
-      w • (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) by rfl]
-  rw [hsub]
-  refine matrixSdpCanonicalBlockDiagonal_nonneg params model
-    (fun b => B b - w • (1 : MatrixOperator model.space)) ?_
-  intro b
-  cases b with
-  | none =>
-      have hslack : B none = (1 / 2 : Error) • (1 : MatrixOperator model.space) := by
-        simpa [B, T, matrixSdpCanonicalPrimalBlockMatrix] using
-          matrixSdpCanonicalStrictPrimalBlockMatrix_slack_half params model
-      change 0 ≤ B none - w • (1 : MatrixOperator model.space)
-      rw [hslack]
-      have hscalar :
-          (1 / 2 : Error) • (1 : MatrixOperator model.space) -
-              w • (1 : MatrixOperator model.space) =
-            ((1 / 2 : Error) - w) • (1 : MatrixOperator model.space) := by
-        ext i j
-        by_cases hij : i = j
-        · subst j
-          simp [Matrix.sub_apply, Matrix.smul_apply]
-        · simp [Matrix.sub_apply, Matrix.smul_apply, hij]
-      rw [hscalar]
-      exact smul_nonneg (sub_nonneg.mpr (sdpStrictPrimalWeight_le_half params))
-        (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MatrixOperator model.space))
-  | some g =>
-      have hblock : B (some g) = w • (1 : MatrixOperator model.space) := by
-        simp [B, T, matrixSdpStrictPrimalSubmeasurement, sdpStrictPrimalSubMeas, w]
-      change 0 ≤ B (some g) - w • (1 : MatrixOperator model.space)
-      rw [hblock, sub_self]
-
-/-- The paper-form canonical dual feasibility inequalities are nonempty,
-supplied by the explicit strict dual witness. -/
-theorem matrixSdpCanonicalDualFeasible_nonempty
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    ∃ Z : MatrixOperator model.space,
-      ∀ g : Polynomial params,
-        0 ≤ matrixSdpDualSlackOperator params model Z g :=
-  ⟨matrixSdpStrictDualWitness model,
-    matrixSdpStrictDualWitness_dualFeasible params model⟩
 
 /-- The canonical equality-constraint operator preserves trace. -/
 theorem matrixSdpCanonicalConstraintOperator_trace_eq
@@ -283,16 +166,6 @@ theorem mem_matrixOperatorNonnegativeProperCone
     X ∈ matrixOperatorNonnegativeProperCone H ↔ 0 ≤ X :=
   Iff.rfl
 
-/-- The positive-semidefinite cone of finite matrix operators is convex. -/
-theorem matrixOperator_nonnegative_convex
-    (H : FiniteHilbertSpace) :
-    Convex ℝ {X : MatrixOperator H | 0 ≤ X} := by
-  rw [convex_iff_add_mem]
-  intro X hX Y hY a b ha hb _hab
-  change 0 ≤ a • X + b • Y
-  exact add_nonneg (smul_nonneg ha (show 0 ≤ X from hX))
-    (smul_nonneg hb (show 0 ≤ Y from hY))
-
 /-- The canonical primal equality-constraint operator preserves real affine combinations. -/
 theorem matrixSdpCanonicalConstraintOperator_affine_combination
     (params : Parameters) [FieldModel params.q]
@@ -327,26 +200,6 @@ theorem matrixSdpCanonicalConstraintOperator_affine_combination
     module
   rw [hsumX, hsumY]
 
-/-- The feasible set of the canonical primal SDP is convex. -/
-theorem matrixSdpCanonicalPrimalFeasible_convex
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    Convex ℝ
-      {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) |
-        MatrixSdpCanonicalPrimalFeasible params model X} := by
-  rw [convex_iff_add_mem]
-  intro X hX Y hY a b ha hb hab
-  refine ⟨?_, ?_⟩
-  · change 0 ≤ a • X + b • Y
-    exact add_nonneg (smul_nonneg ha hX.nonnegative) (smul_nonneg hb hY.nonnegative)
-  · rw [matrixSdpCanonicalConstraintOperator_affine_combination,
-      hX.constraintEqOne, hY.constraintEqOne]
-    ext i j
-    by_cases hij : i = j
-    · subst j
-      simpa [Matrix.one_apply] using (show (a : ℂ) + (b : ℂ) = 1 by exact_mod_cast hab)
-    · simp [hij]
-
 /-- Each paper-form dual slack preserves real affine combinations. -/
 theorem matrixSdpDualSlackOperator_affine_combination
     (params : Parameters) [FieldModel params.q]
@@ -369,19 +222,6 @@ theorem matrixSdpDualSlackOperator_affine_combination
     _ = a • (Z - matrixAveragedPointOperator params model g) +
         b • (W - matrixAveragedPointOperator params model g) := by
       module
-
-/-- The paper-form canonical dual feasible set is convex. -/
-theorem matrixSdpCanonicalDualFeasible_convex
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    Convex ℝ
-      {Z : MatrixOperator model.space |
-        ∀ g : Polynomial params,
-          0 ≤ matrixSdpDualSlackOperator params model Z g} := by
-  rw [convex_iff_add_mem]
-  intro Z hZ W hW a b ha hb hab g
-  rw [matrixSdpDualSlackOperator_affine_combination params model Z W g a b hab]
-  exact add_nonneg (smul_nonneg ha (hZ g)) (smul_nonneg hb (hW g))
 
 /-- A canonical block-diagonal operator is Hermitian when all diagonal blocks are
 Hermitian. -/
