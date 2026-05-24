@@ -214,23 +214,23 @@ theorem heterogeneousSwapDensity_nonneg {ιA ιB : Type*}
   cases x₁ <;> cases x₂ <;> cases y₁ <;> cases y₂ <;>
     simp [swapDensity, localPairABBlock, localPairBABlock, heterogeneousSwapDensity]
 
-set_option linter.flexible false in
 theorem trace_localPairABBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
     (X : MIPStarRE.Quantum.Op (ιA × ιB)) :
     Matrix.trace (localPairABBlock X) = Matrix.trace X := by
   unfold Matrix.trace
   rw [Fintype.sum_prod_type]
-  simp [localPairABBlock]
+  simp only [Matrix.diag_apply, Fintype.sum_sum_type, localPairABBlock, Matrix.of_apply,
+    Finset.sum_const_zero, zero_add, add_zero]
   exact (Fintype.sum_prod_type'
     (f := fun i : ιA => fun j : ιB => X (i, j) (i, j))).symm
 
-set_option linter.flexible false in
 theorem trace_localPairBABlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
     (X : MIPStarRE.Quantum.Op (ιB × ιA)) :
     Matrix.trace (localPairBABlock X) = Matrix.trace X := by
   unfold Matrix.trace
   rw [Fintype.sum_prod_type]
-  simp [localPairBABlock]
+  simp only [Matrix.diag_apply, Fintype.sum_sum_type, localPairBABlock, Matrix.of_apply,
+    Finset.sum_const_zero, zero_add, add_zero]
   exact (Fintype.sum_prod_type'
     (f := fun i : ιB => fun j : ιA => X (i, j) (i, j))).symm
 
