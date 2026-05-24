@@ -256,17 +256,6 @@ lemma gHatHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel para
       simp [gHatIdxMeas, completeSubMeas,
         gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
 
-/-- The total operator of the rotated half-product is always the identity. -/
-lemma gHatRotatedHalfProductTotalOperator_eq_one (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) :
-    ∀ k (xs : PointTuple params k), gHatRotatedHalfProductTotalOperator params family k xs = 1
-  | 0, _xs => by
-      simp [gHatRotatedHalfProductTotalOperator]
-  | k + 1, xs => by
-      rw [gHatRotatedHalfProductTotalOperator]
-      simp [gHatIdxMeas, completeSubMeas,
-        gHatHalfProductTotalOperator_eq_one params family k (pointTupleTail xs)]
-
 /-- Summing the ordered half-product over all completed outcomes gives its total operator. -/
 lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
@@ -319,65 +308,5 @@ lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
         _ = gHatHalfProductTotalOperator params family (k + 1) xs := by
               rw [(gHatIdxMeas params family (xs 0)).sum_eq_total]
               simp [gHatHalfProductTotalOperator]
-
-/-- Summing the rotated half-product over all completed outcomes gives its total operator. -/
-lemma gHatRotatedHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) :
-    ∀ k (xs : PointTuple params k),
-      (∑ gs : GHatTupleOutcome params k,
-        gHatRotatedHalfProductOutcomeOperator params family k xs gs) =
-          gHatRotatedHalfProductTotalOperator params family k xs
-  | 0, _xs => by
-      simp [gHatRotatedHalfProductOutcomeOperator, gHatRotatedHalfProductTotalOperator]
-  | k + 1, xs => by
-      have hsplit :
-          (∑ gs : GHatTupleOutcome params (k + 1),
-              gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs) =
-            ∑ p : GHatOutcome params × GHatTupleOutcome params k,
-              gHatRotatedHalfProductOutcomeOperator
-                params family (k + 1) xs (Fin.cons p.1 p.2) := by
-        symm
-        exact (Fintype.sum_equiv (gHatTupleOutcomeConsEquiv params k)
-          (fun gs => gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs gs)
-          (fun p =>
-            gHatRotatedHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2))
-          (by intro gs; rfl)).symm
-      rw [hsplit]
-      simp only [gHatRotatedHalfProductOutcomeOperator, Fin.cons_zero]
-      rw [← Finset.univ_product_univ, Finset.sum_product]
-      calc
-        ∑ g : GHatOutcome params,
-            ∑ gs : GHatTupleOutcome params k,
-              gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs *
-                (gHatIdxMeas params family (xs 0)).outcome g
-          = ∑ gs : GHatTupleOutcome params k,
-              ∑ g : GHatOutcome params,
-                gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs *
-                  (gHatIdxMeas params family (xs 0)).outcome g := by
-              rw [Finset.sum_comm]
-        _ = ∑ gs : GHatTupleOutcome params k,
-              gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs *
-                ∑ g : GHatOutcome params, (gHatIdxMeas params family (xs 0)).outcome g := by
-              apply Finset.sum_congr rfl
-              intro gs _hgs
-              rw [Matrix.mul_sum]
-        _ = ∑ gs : GHatTupleOutcome params k,
-              gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs *
-                (gHatIdxMeas params family (xs 0)).total := by
-              apply Finset.sum_congr rfl
-              intro gs _hgs
-              rw [(gHatIdxMeas params family (xs 0)).sum_eq_total]
-        _ = (∑ gs : GHatTupleOutcome params k,
-              gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs) *
-                (gHatIdxMeas params family (xs 0)).total := by
-              symm
-              exact
-                Finset.sum_mul Finset.univ
-                  (fun gs =>
-                    gHatHalfProductOutcomeOperator params family k (pointTupleTail xs) gs)
-                  ((gHatIdxMeas params family (xs 0)).total)
-        _ = gHatRotatedHalfProductTotalOperator params family (k + 1) xs := by
-              rw [gHatHalfProduct_sum_eq_total params family k (pointTupleTail xs)]
-              simp [gHatRotatedHalfProductTotalOperator]
 
 end MIPStarRE.LDT.Pasting
