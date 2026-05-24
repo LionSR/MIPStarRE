@@ -407,39 +407,6 @@ theorem toSdpStatementWithSlackness
   exact ⟨matrixSubmeasurementToSubMeas T, Z,
     hopt.toSdpOptimalPairWithSlackness⟩
 
-/-- A saturated matrix SDP statement for the point realization of a strategy gives
-the paper-form abstract SDP measurement witness.
-
-This translation deliberately avoids the auxiliary dominance condition `I ≤ Z`:
-it records only the saturated primal measurement, positivity and feasibility of
-the dual operator, and the complementary-slackness equations. -/
-theorem toSdpMeasurementWitness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (h : MatrixSdpStatementWithSlackness params
-      (matrixSdpPointRealizationOfStrategy params strategy)) :
-    ∃ T : Measurement (Polynomial params) ι,
-      ∃ Z : MIPStarRE.Quantum.Op ι,
-        0 ≤ Z ∧
-        (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
-        ∀ g : Polynomial params,
-          sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
-  obtain ⟨Tsub, Z, hopt⟩ := h.witness
-  have htotal : (matrixSubmeasurementToSubMeas Tsub).total = 1 := by
-    simpa [matrixSubmeasurementToSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
-      hopt.primalTotalEqOne
-  let T : Measurement (Polynomial params) ι :=
-    (matrixSubmeasurementToSubMeas Tsub).toMeasurement htotal
-  refine ⟨T, Z, hopt.dualPositive, ?_, ?_⟩
-  · intro g
-    simpa [matrixSdpDualSlackOperator_ofPointRealization] using hopt.dualFeasible g
-  · intro g
-    simpa [T, matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
-      matrixSdpComplementarySlacknessEquation,
-      matrixAveragedPointOperator_ofPointRealization] using
-        hopt.complementarySlacknessEquation g
-
 end MatrixSdpStatementWithSlackness
 
 namespace MatrixSdpStatementWithSlacknessAndDominance
