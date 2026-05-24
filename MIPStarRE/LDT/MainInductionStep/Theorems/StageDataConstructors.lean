@@ -8,7 +8,8 @@ Constructors for the slice restriction, per-slice induction, self-improvement,
 and averaged pasting stage records: `SliceRestrictionData.ofRestrictedProbabilities`,
 `AnswerSliceRestrictionData.ofRestrictedProbabilities`,
 `SliceRestrictionData.ofAnswer`, `PerSliceInductionData.ofRecursion`,
-`AnswerPerSliceInductionData.*`, `SelfImprovementData.ofAnswer`,
+`AnswerPerSliceInductionData.*`, `SelfImprovementData.ofAnswerForPerSliceInductionData`,
+`SelfImprovementData.ofAnswer`, `AnswerSelfImprovementData.ofSelfImprovementData`,
 `AveragedPastingData.invokeLdPasting`, and `mainInductionFromStageData`.
 
 ## References
@@ -73,8 +74,8 @@ noncomputable def AnswerSliceRestrictionData.ofRestrictedProbabilities
       diagonalAverageBound := hdiagonalAverage }
 
 /-- Forget the answer-valued diagonal alphabet after recording the verifier-visible
-failure probabilities.  The three tests agree with the legacy restricted strategy
-at the sampled answer level.
+failure probabilities.  The three tests agree with the ordinary restricted
+strategy at the sampled answer level.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
 formalization-only transport between two encodings of the same restricted slice
@@ -273,7 +274,33 @@ noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
         (restrictionPkg.profile.diagonal x)
         k (restrictionPkg.profile.restrictedGood x) hk_pos hk
 
-/-- View answer-valued recursive slice-wise induction witnesses as legacy
+/-- View a per-slice induction data record over an answer-forgotten restriction
+data record as an answer-valued data record.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:441-454`; this is a
+formalization-only conversion between answer-valued and ordinary restricted-slice
+interfaces for the same recursive induction call. -/
+noncomputable def AnswerPerSliceInductionData.ofPerSliceInductionData
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (perSliceInduction :
+      PerSliceInductionData params strategy eps delta gamma
+        (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k) :
+    AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k where
+  sliceError := perSliceInduction.sliceError
+  sliceMeasurement := perSliceInduction.sliceMeasurement
+  pointConsistency := by
+    intro x
+    simpa using perSliceInduction.pointConsistency x
+  error_le := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer] using perSliceInduction.error_le x
+
+/-- View answer-valued recursive slice-wise induction witnesses as ordinary
 per-slice induction data after forgetting the answer-valued diagonal alphabet.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:441-454`.  The point
@@ -301,13 +328,65 @@ noncomputable def PerSliceInductionData.ofAnswer
     intro x
     simpa [SliceRestrictionData.ofAnswer] using answerInduction.error_le x
 
-/-- View answer-valued self-improvement data as the legacy self-improvement data
+/-- Forget an answer-valued self-improvement data record when the target
+per-slice induction data record is the one used by the ordinary assembly.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`; this is a
+formalization-only conversion between answer-valued and ordinary restricted-slice
+self-improvement collects. -/
+noncomputable def SelfImprovementData.ofAnswerForPerSliceInductionData
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (perSliceInduction :
+      PerSliceInductionData params strategy eps delta gamma
+        (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k)
+    (answerSelf :
+      AnswerSelfImprovementData params strategy eps delta gamma k restrictionPkg
+        (AnswerPerSliceInductionData.ofPerSliceInductionData params strategy eps delta gamma k
+          restrictionPkg perSliceInduction)) :
+    SelfImprovementData params strategy eps delta gamma k
+      (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg)
+      perSliceInduction where
+  sliceProj := answerSelf.sliceProj
+  sliceWitness := answerSelf.sliceWitness
+  completeness := by
+    intro x
+    simpa [AnswerPerSliceInductionData.ofPerSliceInductionData, SliceRestrictionData.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using answerSelf.completeness x
+  pointConsistency := by
+    intro x
+    simpa [AnswerPerSliceInductionData.ofPerSliceInductionData, SliceRestrictionData.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using answerSelf.pointConsistency x
+  strongSelfConsistency := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.strongSelfConsistency x
+  selfCloseness := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.selfCloseness x
+  bounded := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using answerSelf.bounded x
+  dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
+
+/-- View answer-valued self-improvement data as the self-improvement data
 over the answer-forgotten per-slice induction record.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:461-551`.  This is the
 direct conversion needed by the source proof of `thm:main-induction`: the
 recursive induction hypothesis naturally produces answer-valued restricted
-slices, while the existing pasting assembly consumes the legacy slice family.
+slices, while the existing pasting assembly consumes the ordinary slice family.
 The conversion changes only the formal restricted-strategy interface, not the
 slice projective measurements, witnesses, or inequalities. -/
 noncomputable def SelfImprovementData.ofAnswer
@@ -354,6 +433,62 @@ noncomputable def SelfImprovementData.ofAnswer
       answerSliceSelfImprovementError]
       using answerSelf.bounded x
   dominatesAveragePointOperator := answerSelf.dominatesAveragePointOperator
+
+/-- View self-improvement data over the answer-forgotten slice interface
+as answer-valued self-improvement data.
+
+Paper origin: `references/ldt-paper/inductive_step.tex:461-551`.  This is the
+reverse bookkeeping conversion to `SelfImprovementData.ofAnswer`: the
+answer-valued and ordinary restricted-slice interfaces have the same point
+measurement, scalar error profile, projective slice measurements, and witness
+operators after applying `SliceRestrictionData.ofAnswer` and
+`PerSliceInductionData.ofAnswer`.  Thus a self-improvement record over
+that answer-forgotten data can be read as the corresponding answer-valued record
+without changing the mathematical estimates. -/
+noncomputable def AnswerSelfImprovementData.ofSelfImprovementData
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta gamma : Error)
+    (k : ℕ)
+    (restrictionPkg : AnswerSliceRestrictionData params strategy eps delta gamma)
+    (answerInduction :
+      AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k)
+    (selfImprovement :
+      SelfImprovementData params strategy eps delta gamma k
+        (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg)
+        (PerSliceInductionData.ofAnswer params strategy eps delta gamma k
+          restrictionPkg answerInduction)) :
+    AnswerSelfImprovementData params strategy eps delta gamma k restrictionPkg
+      answerInduction where
+  sliceProj := selfImprovement.sliceProj
+  sliceWitness := selfImprovement.sliceWitness
+  completeness := by
+    intro x
+    simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using selfImprovement.completeness x
+  pointConsistency := by
+    intro x
+    simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
+      sliceSelfImprovementError, answerSliceSelfImprovementError]
+      using selfImprovement.pointConsistency x
+  strongSelfConsistency := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using selfImprovement.strongSelfConsistency x
+  selfCloseness := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using selfImprovement.selfCloseness x
+  bounded := by
+    intro x
+    simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
+      answerSliceSelfImprovementError]
+      using selfImprovement.bounded x
+  dominatesAveragePointOperator := selfImprovement.dominatesAveragePointOperator
 
 /-- Lean-only universe-polymorphic form of
 `AveragedPastingData.invokeLdPasting`.
