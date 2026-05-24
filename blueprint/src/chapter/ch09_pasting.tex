@@ -101,11 +101,11 @@ The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, o
 \begin{definition}[Nontrivial-regime pasting context]\label{def:ld-pasting-context}
 	\lean{MIPStarRE.LDT.Pasting.LdPastingNontrivialContext}
 	\leanok
-	\uses{thm:ld-pasting, def:good-strategy, def:polymeasurements, def:simeq,
+	\uses{def:good-strategy, def:polymeasurements, def:simeq,
 		def:approx_delta}
 	The Lean context linked here is the nontrivial-regime context used after the
-	reduction explained above.  It consists of the data and hypotheses from
-	Theorem~\ref{thm:ld-pasting}: an $(\eps,\delta,\gamma)$-good symmetric strategy
+	reduction explained above.  It consists of the data and hypotheses from the
+	pasting theorem at the beginning of this chapter: an $(\eps,\delta,\gamma)$-good symmetric strategy
 	$(\psi,A,B,L)$ for the $(m+1,q,d)$ low individual degree test, a family of
 	projective submeasurements $\{G^x\}_{x \in \F_q}$ in $\polysub{m}{q}{d}$
 	satisfying \ref{item:ld-pasting-completeness}--\ref{item:ld-pasting-boundedness},
@@ -314,20 +314,23 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	the concavity of \(a \mapsto a^{1/(d+1)}\).
 \end{proof}
 
-As in the paper, Lemma~\ref{lem:looks-easy-but-took-me-a-while} now converts
-\eqref{eq:equivalent-way-of-writing-grand-plan} into the estimate
-\[
-	\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
-	\le 2\cdot \E_{i\sim\mu}\Big[(\lambda_i^{d+1}(1-\lambda_i))^{1/(d+1)}\Big]
-	\le 2\cdot \Delta^{1/(d+1)},
-\]
-where the middle step uses concavity of $a \mapsto a^{1/(d+1)}$. Equivalently,
-\[
-	\bra{\psi} G \ot I \ket{\psi} - \bra{\psi} G^{d+1} \ot I \ket{\psi}
-	\le 2\cdot \Delta^{1/(d+1)}.
-\]
-For constant~$d$, this is exactly the heuristic completeness comparison for the
-first construction recorded in `references/ldt-paper/ld-pasting.tex`.
+\begin{corollary}[First-construction completeness comparison]\label{cor:first-construction-completeness-comparison}
+	\uses{cor:first-construction-spectral-comparison, lem:looks-easy-but-took-me-a-while}
+	As in the paper, Lemma~\ref{lem:looks-easy-but-took-me-a-while} now converts
+	\eqref{eq:equivalent-way-of-writing-grand-plan} into the estimate
+	\[
+		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
+		\le 2\cdot \E_{i\sim\mu}\Big[(\lambda_i^{d+1}(1-\lambda_i))^{1/(d+1)}\Big]
+		\le 2\cdot \Delta^{1/(d+1)},
+	\]
+	where the middle step uses concavity of $a \mapsto a^{1/(d+1)}$. Equivalently,
+	\[
+		\bra{\psi} G \ot I \ket{\psi} - \bra{\psi} G^{d+1} \ot I \ket{\psi}
+		\le 2\cdot \Delta^{1/(d+1)}.
+	\]
+	For constant~$d$, this is exactly the heuristic completeness comparison for the
+	first construction recorded in `references/ldt-paper/ld-pasting.tex`.
+\end{corollary}
 
 \subsubsection{The Second Construction}\label{sec:construction-numba-two}
 
@@ -786,7 +789,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_step_commute, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_prefixFirstSliceLeft_move, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveSource_eq_split, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_move_recursive_zero, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_split_one_iff, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core_two, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_moveStepMid_toTarget, MIPStarRE.LDT.Pasting.commuteGHalfSandwich_core}
 	\leanok
 	\uses{cor:G-hat-facts, lem:completed-sandwich-normalization,
-		lem:commute-g-half-sandwich, prop:triangle-inequality-for-approx_delta}
+		prop:triangle-inequality-for-approx_delta}
 	Given the completed-measurement self-consistency and commutation estimates
 	from Corollary~\ref{cor:G-hat-facts}, the following one-step estimates hold.
 	\begin{enumerate}
@@ -833,7 +836,7 @@ first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 			second tensor factor where these appear in the commutation step.
 	\end{enumerate}
 	These are the elementary building blocks assembled by the recursive chain
-	construction of Lemma~\ref{lem:commute-g-half-sandwich}.
+	construction in the following lemma.
 \end{lemma}
 \begin{proof}
 	\lean{MIPStarRE.LDT.Pasting.gHatSelfConsistency_sddOpRel_quadThird}
