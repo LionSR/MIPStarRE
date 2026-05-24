@@ -80,13 +80,4 @@ noncomputable def matrixHelperBoundednessGap (params : Parameters)
   Complex.re (matrixExpectation model.state
     (Z - matrixHelperAgreementAverageOperator params model H))
 
-/-- The concrete projective residual gap `Re τ(ρ (Z (I - Σ_h H_h)))`. -/
-noncomputable def matrixProjectiveResidualGap (params : Parameters)
-    [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (H : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
-    (Z : MatrixOperator model.space) : Error :=
-  let total := MIPStarRE.Quantum.Submeasurement.total H
-  Complex.re (matrixExpectation model.state (Z * (1 - total)))
-
 end MIPStarRE.LDT.SelfImprovement
