@@ -32,13 +32,6 @@ lemma fromHToG_gHatSandwichFamily_sum_eq_one
   rw [(gHatSandwichFamily params family n xs).sum_eq_total]
   exact fromHToG_gHatSandwichFamily_total_eq_one params family n xs
 
-/-- The total operator of a fixed-type averaged tail sandwich. -/
-noncomputable def fromHToGAveragedSandwichByTypeTotal
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) (n : ℕ) (τ : GHatType n) :
-    MIPStarRE.Quantum.Op ι :=
-  (averagedSandwichByTypeSubMeas params family n τ).total
-
 /-- Expectation-level branch sum with an `S · U · S` sandwich. -/
 lemma fromHToG_ev_sum_isSome_sandwich_weight
     (params : Parameters) [FieldModel params.q]
