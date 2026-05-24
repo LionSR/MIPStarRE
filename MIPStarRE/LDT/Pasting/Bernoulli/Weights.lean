@@ -68,22 +68,6 @@ theorem fromHToGRecurrenceWeight_le_one
     fromHToGRecurrenceWeight params family prefixLen τtail ≤ 1 :=
   (fromHToGRecurrenceWeight_recurrence params family prefixLen τtail).2.2.1
 
-/-- A recurrence weight is a positive contraction, so its square is bounded by
-itself.  This is the local boundedness fact used when normalizing the right
-context in the first self-consistency move. -/
-private lemma fromHToGRecurrenceWeight_sq_le_self
-    (params : Parameters)
-    [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    (prefixLen : ℕ)
-    {tailLen : ℕ} (τtail : GHatType tailLen) :
-    fromHToGRecurrenceWeight params family prefixLen τtail *
-        fromHToGRecurrenceWeight params family prefixLen τtail ≤
-      fromHToGRecurrenceWeight params family prefixLen τtail := by
-  exact MIPStarRE.Quantum.sq_le_self
-    (fromHToGRecurrenceWeight_nonneg params family prefixLen τtail)
-    (fromHToGRecurrenceWeight_le_one params family prefixLen τtail)
-
 /-- `fromHToGRecurrenceWeight` commutes with the averaged complete operator `G`. -/
 lemma fromHToGRecurrenceWeight_commute_base
     (params : Parameters)
