@@ -18,8 +18,6 @@ The current active proof-following track is:
 
 The in-repo paper source mirror lives at `references/ldt-paper/`.
 
-The older 2111 tensor-code track is **preserved** as a blueprint snapshot only (see `blueprint/legacy/`) and is no longer the active source of truth.
-
 ## Source-of-truth order (LDT)
 
 When working on the active track, consult these locations in this order:
@@ -62,7 +60,6 @@ Top-level directories:
 
 - `MIPStarRE/` — Lean source (see above)
 - `blueprint/src/` — active LDT blueprint (chapters under `blueprint/src/chapter/`)
-- `blueprint/legacy/` — preserved 2111 blueprint snapshots
 - `references/ldt-paper/` — in-repo TeX source for the LDT paper
 - `docs/` — contributor guides, style, naming, proof integrity, CI notes
 - `audits/` — dated chapter-by-chapter dependency-scouting reports
