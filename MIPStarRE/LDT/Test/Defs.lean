@@ -76,13 +76,6 @@ noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [Decidabl
     IdxSubMeas (Point params) (Fq params) ι :=
   fun u => evaluateAt params u G
 
-/-- Evaluate each member of an indexed polynomial family at the same point. -/
-noncomputable def evaluateFiberFamilyAt {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (params : Parameters) [FieldModel params.q] (u : Point params)
-    (G : IdxSubMeas (Fq params) (Polynomial params) ι) :
-    IdxSubMeas (Fq params) (Fq params) ι :=
-  fun x => evaluateAt params u (G x)
-
 /-- Evaluate an indexed slice family at a point `(u, x)` in `F_q^{m+1}`. -/
 noncomputable def evaluateFiberFamilyAtNextPoint {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters) [FieldModel params.q]
