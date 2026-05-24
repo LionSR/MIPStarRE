@@ -66,13 +66,6 @@ def ofSliceMeas {params : Parameters} [FieldModel params.q]
     (x : Fq params) (g : Polynomial params) :
     (ofSliceMeas meas).dominationTarget x g = (meas x).toSubMeas.outcome g := rfl
 
-theorem ofSliceMeas_dominationTarget_le_witness {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (x : Fq params) (g : Polynomial params) :
-    (ofSliceMeas meas).dominationTarget x g ≤ (ofSliceMeas meas).witness x := by
-  simpa using ((meas x).toSubMeas.outcome_le_total g)
-
 /-- The averaged submeasurement `G = E_x G^x`: average the slice
 measurements over the uniform distribution on slice heights `x ∈ F_q`. -/
 noncomputable def averagedSubMeas {params : Parameters}
@@ -256,15 +249,6 @@ theorem ofSymStrat_witness_eq_averagedSliceTotalOperator {params : Parameters}
     (x : Fq params) (g : Polynomial params) :
     (ofSymStrat strategy meas).dominationTarget x g =
       averagedSlicePointEvaluationOperator strategy x g := rfl
-
-theorem ofSymStrat_dominationTarget_le_witness {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SymStrat params.next ι)
-    (meas : IdxProjSubMeas (Fq params) (Polynomial params) ι)
-    (x : Fq params) (g : Polynomial params) :
-    (ofSymStrat strategy meas).dominationTarget x g ≤ (ofSymStrat strategy meas).witness x := by
-  simpa [ofSymStrat_witness_eq_averagedSliceTotalOperator] using
-    averagedSlicePointEvaluationOperator_le_averagedSliceTotalOperator strategy x g
 
 structure Complete {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
