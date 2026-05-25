@@ -117,8 +117,9 @@ noncomputable def cascadeZeta4Repaired (σ ζ₁ ζ₃ : Error) : Error :=
   2 * σ + 2 * Real.sqrt (cascadeLine169RepairError ζ₁ + ζ₃ / 2)
 
 /-- Paper origin: `references/ldt-paper/inductive_step.tex:130-211`
-(`\label{eq:G-self-consistency}` through `\label{eq:another-goal}`, error cascade
-ζ₁–ζ₄); blueprint `\label{def:main-formal-error-cascade}`.
+(`\label{eq:G-self-consistency}` through
+`\label{eq:final-right-point-consistency}`, error cascade ζ₁–ζ₄); blueprint
+`\label{def:main-formal-error-cascade}`.
 
 Standing numeric regime used throughout the cascade bounds: parameters
 satisfy the unit scale, and `ε, d/q ∈ [0, 1]`. -/
