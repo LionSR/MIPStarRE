@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Helper
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
 
 /-!
