@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Pasting.Sandwich.Switcheroo
-import MIPStarRE.LDT.Pasting.Sandwich.GHatSandwich
 import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 
 /-!
