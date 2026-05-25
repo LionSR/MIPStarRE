@@ -168,14 +168,17 @@ including the long files in this report:
 - `MIPStarRE.LDT.Pasting.BridgeLemmas`
 - `MIPStarRE.LDT.Pasting.SwitcherooCompletion`
 
-Several subtree barrels already exist and should be preserved as compatibility modules:
+Several subtree barrels existed at the audit snapshot and were then worth
+preserving as compatibility modules:
 
 - `MIPStarRE/LDT/MainInductionStep.lean` imports `Defs`, `Statements`, `Theorems`.
 - `MIPStarRE/LDT/GlobalVariance/Theorems.lean` imports `Statements`, `Averaging`, `Results`.
-- `MIPStarRE/LDT/Commutativity/Transport.lean` imports `EvaluationSpecialization`, `Pullback`,
-  `FullSlice`.
-- `MIPStarRE/LDT/Commutativity/ScalarApproximation.lean` imports `Core`, `ProcessedG`,
-  `Pointwise`.
+- `MIPStarRE/LDT/Commutativity/Transport.lean` imported
+  `EvaluationSpecialization`, `Pullback`, and `FullSlice`.  This unused barrel
+  has since been removed; current code imports the needed leaves directly.
+- `MIPStarRE/LDT/Commutativity/ScalarApproximation.lean` imported `Core`,
+  `ProcessedG`, and `Pointwise`.  This unused barrel has since been removed;
+  current code imports the needed leaves directly.
 - `MIPStarRE/LDT/Pasting/BridgeLemmas.lean` imports `CommuteGHalfSandwich`,
   `LdSandwichLineOnePoint`, `HBConsistency`, `HAConsistency`, and `OverAllOutcomes`.
 
@@ -200,7 +203,7 @@ motion.
 |---:|---|---:|---|---|---:|---|
 | 1 | `Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean` | 3827 | `Pasting.BridgeLemmas.CommuteGHalfSandwich` | `Pasting/BridgeLemmas.lean`, `HBConsistency.lean`, `ContextWrappers.lean`, `Pasting/Theorems.lean` | 2 public / 95 private | Largest, sorry-free, but high private-helper coupling. Defer. |
 | 2 | `MainInductionStep/Theorems.lean` | 3484 | Section 6 statements plus Test failures, commutativity core, Pasting final, self-improvement results | `LDT.lean`, `MainInductionStep.lean`, `Test/MainTheorem.lean` | 17 public / 56 private | Sorry-free but active Section 6 area. Wait for #924. |
-| 3 | `Commutativity/Transport/FullSlice.lean` | 3203 | `Transport.Pullback`, `Scaffold.Products`, `EvaluatedSliceCommutation.Averages`, `PolynomialAgreement` | `LDT.lean`, `Commutativity/Main/Auxiliary.lean`, `Commutativity/Theorems.lean`, `Commutativity/Transport.lean` | 20 public / 51 private | Best high-payoff split candidate. |
+| 3 | `Commutativity/Transport/FullSlice.lean` | 3203 | `Transport.Pullback`, `Scaffold.Products`, `EvaluatedSliceCommutation.Averages`, `PolynomialAgreement` | `LDT.lean`, `Commutativity/Main/Auxiliary.lean`, `Commutativity/Theorems.lean`; the former `Commutativity/Transport.lean` barrel has since been removed | 20 public / 51 private | Best high-payoff split candidate at the snapshot. |
 | 4 | `Test/MainTheorem.lean` | 2971 | Main induction, projectivization, preliminaries, Test cascade/strategy files | `LDT.lean`, `Test/AxiomAudit.lean` | 103 public / 4 private | In the snapshot, contained the only live `sorry` at line 2950. Defer. |
 | 5 | `GlobalVariance/Theorems/Results.lean` | 2950 | expansion results, Cauchy-Schwarz, completion transfer, GlobalVariance statements/averaging, Test failures | `LDT.lean`, `GlobalVariance/Theorems.lean`, `SelfImprovement/Theorems/Results.lean` | 42 public / 53 private | Good candidate after checking no GlobalVariance PR is active. |
 | 6 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2902 | `Pasting.BridgeLemmas.Common` | `Pasting/BridgeLemmas/HBConsistency.lean` | 64 public / 0 private | Good candidate; Pasting-nearby, so wait for Pasting PRs. |

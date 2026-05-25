@@ -62,13 +62,14 @@ Rows marked "skip now" overlap current ownership constraints or active proof wor
 ## Comparison with the original #488 table
 
 The table in the #488 issue body should now be treated as historical.  Most rows from that
-snapshot are thin barrels after session22--session30 splits; the current large-file pressure has
-moved to later proof-development files.
+snapshot were split during session22--session30; several later thin barrels have also been
+deleted after import-reachability checks showed that they had no in-repository importers.
+The current large-file pressure has moved to later proof-development files.
 
 | Old LOC | Current LOC | Original file | Current note |
 |---:|---:|---|---|
 | 994 | 9 | `ExpansionHypercubeGraph/Theorems.lean` | Thin barrel; content moved under `Theorems/`. |
-| 972 | 9 | `Commutativity/Scaffold.lean` | Thin barrel; content moved under `Scaffold/`. |
+| 972 | deleted | `Commutativity/Scaffold.lean` | Former thin barrel; content lives under `Scaffold/`. |
 | 968 | 10 | `MakingMeasurementsProjective/QXPLayerData.lean` | Thin barrel; content moved under `QXPLayer/`. |
 | 949 | 9 | `Test/StrategySymmetrized.lean` | Thin barrel from PR #621. |
 | 939 | 9 | `Pasting/Sandwich.lean` | Thin barrel; content moved under `Sandwich/`. |
@@ -76,12 +77,12 @@ moved to later proof-development files.
 | 932 | deleted | `Basic/ParametersCore.lean` | Former thin barrel; the core parameter, line, and polynomial declarations live in the concrete `Basic/` modules. |
 | 913 | 1670 | `Pasting/SwitcherooCompletion.lean` | Still large and grew with completion helpers. |
 | 881 | 9 | `Preliminaries/SelfConsistency.lean` | Thin barrel; content moved under `SelfConsistency/`. |
-| 870 | 9 | `Commutativity/ScalarApproximation.lean` | Thin barrel; avoid `ProcessedG` owners. |
-| 868 | 9 | `ExpansionHypercubeGraph/Defs.lean` | Thin barrel; `Defs/Fourier.lean` is 658 LOC. |
+| 870 | deleted | `Commutativity/ScalarApproximation.lean` | Former thin barrel; concrete scalar approximation modules remain under `ScalarApproximation/`. |
+| 868 | deleted | `ExpansionHypercubeGraph/Defs.lean` | Former thin barrel; the concrete definition leaves remain under `Defs/`. |
 | 854 | 857 | `Pasting/SwitcherooContraction.lean` | Still a medium-sized candidate. |
 | 812 | 9 | `Commutativity/GCommStability.lean` | Thin barrel; `GCommStability/Scalar.lean` is now large. |
 | 783 | 924 | `Test/StrategyRole.lean` | Still sizable, but Test strategy area is active. |
-| 778 | 9 | `Commutativity/EvaluatedSliceCommutation.lean` | Thin barrel. |
+| 778 | deleted | `Commutativity/EvaluatedSliceCommutation.lean` | Former thin barrel; concrete evaluated-slice commutation modules remain under `EvaluatedSliceCommutation/`. |
 | 741 | 9 | `Preliminaries/SwitchSandwichMain.lean` | Thin barrel. |
 | 715 | 9 | `Preliminaries/SwitchSandwichPrep.lean` | Thin barrel. |
 | 711 | 1207 | `Pasting/Core.lean` | Grew beyond the old snapshot. |
