@@ -671,6 +671,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \end{equation}
 \end{lemma}
 \begin{proof}
+  \uses{lem:sdp-matrix-feasible-bounds}
   \leanok
   Rewrite~\eqref{eq:primal-objective} in canonical block form. Let $r$ be the dimension of the space on which~$A$ acts, let $M = |\polyfunc{m}{q}{d}|$, and fix an ordering $g_1,\ldots,g_M$ of the polynomials. Consider
   \begin{align}
@@ -747,7 +748,8 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   strong-duality output and the abstract theorem
   \texttt{sdp\_statement\_with\_slackness} specializes it to the paper's
   self-improvement setting.  The explicit Slater witnesses used above are
-  separately recorded by \texttt{matrixSdpStrictPrimalSubmeasurement},
+  isolated in Lemma~\ref{lem:sdp-matrix-feasible-bounds} and separately recorded
+  by \texttt{matrixSdpStrictPrimalSubmeasurement},
   \texttt{matrixSdpStrictDualWitness}, and
   \texttt{matrixSdpFeasibleBounds\_canonical}; the dual feasibility of \(2I\)
   follows from \texttt{matrixAveragedPointOperator\_le\_one}.
