@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 
