@@ -39,7 +39,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean` | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | **Largest file** (3,827 lines), 137 `simp` calls |
 | `Pasting/Bernoulli/FromHToG/Core.lean` | 1,339 | 20.6 | 24.3 | 1× 800,000 | 7 | 54 `simp`, rpow expansions |
 | `Pasting/CommutingWithG/Complete.lean` | 476 | 17.5 | 22.5 | 1× 1,000,000 | 1 | Sqrt/rpow chain |
-| split; `Test/ErrorCascade/{Definitions,EnvelopeBounds,CascadeBounds}.lean` carry the cascade | 1,482 | 16.1 | 39.7 | none | 2 | Former bottleneck now a 28-line compatibility wrapper |
+| split; `Test/ErrorCascade/Definitions.lean`, `Test/ErrorCascade/EnvelopeBounds.lean`, and `Test/ErrorCascade/CascadeBounds/` carry the cascade | 1,482 | 16.1 | 39.7 | none | 2 | Former compatibility wrapper removed |
 | `Commutativity/ScalarApproximation/ProcessedG.lean` | 2,035 | 15.2 | 23.4 | 1× 5,000,000 + 1× 210,000 | 5 | Largest heartbeat override proof (809 lines) |
 
 ### Files Taking 8–15 Seconds

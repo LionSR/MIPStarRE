@@ -2,9 +2,10 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
 import MIPStarRE.LDT.Preliminaries.ComparisonProjective
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
 import MIPStarRE.LDT.Preliminaries.Triangles
-import MIPStarRE.LDT.Test.ErrorCascade
+import MIPStarRE.LDT.Test.ErrorCascade.CascadeBounds.Final
 import MIPStarRE.LDT.Test.SchwartzZippelStep
 import MIPStarRE.LDT.Test.StrategyFailures
+import MIPStarRE.LDT.Test.SurfaceVsPoint
 import MIPStarRE.LDT.Test.SymmetrizationBridge
 import MIPStarRE.LDT.Test.Unsymmetrization
 

@@ -195,11 +195,11 @@ definition equals itself.
 
 Distinguish from legitimate bookkeeping where a named equation is literally
 how something was defined. Example: `mainFormalError_eq_envelope` in
-`Test/ErrorCascade.lean` unfolds the definition of `mainFormalError` to its
-envelope factorization. The mathematical content is elsewhere (the envelope
-is derived from per-step bounds); the `rfl` theorem is a naming convenience
-only. The test is: **does the `def` body encode a paper identity, or does it
-just name a compound expression?**
+`Test/ErrorCascade/Definitions.lean` unfolds the definition of
+`mainFormalError` to its envelope factorization. The mathematical content is
+elsewhere (the envelope is derived from per-step bounds); the `rfl` theorem is
+a naming convenience only. The test is: **does the `def` body encode a paper
+identity, or does it just name a compound expression?**
 
 ### How to fix it
 
