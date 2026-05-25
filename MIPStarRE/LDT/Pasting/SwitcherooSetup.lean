@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Pasting.SwitcherooSetup.Infrastructure
-import MIPStarRE.LDT.Pasting.SwitcherooSetup.Centers
 import MIPStarRE.LDT.Pasting.SwitcherooSetup.Terms
 
 /-!
