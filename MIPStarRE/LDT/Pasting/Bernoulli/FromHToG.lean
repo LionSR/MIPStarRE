@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain
+import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Telescope
 
 /-!
 # Section 12 pasting: from-H-to-G theorem
