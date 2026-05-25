@@ -46,7 +46,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 
 | File | Lines | Real | User | Heartbeats |
 |------|-------|------|------|------------|
-| `Pasting/Bernoulli/FromHToG/PaperMoveChain.lean` | 986 | 11.5 | 11.2 | 2× 500,000 |
+| deleted; `Pasting/Bernoulli/FromHToG/PaperMoveChain/{Moves,Telescope}.lean` carries the chain | 986 | 11.5 | 11.2 | 2× 500,000 |
 | `Pasting/Core.lean` | 1,202 | 11.5 | 13.7 | none |
 | `Pasting/BridgeLemmas/OverAllOutcomes.lean` | 1,547 | 11.0 | 15.2 | none |
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | 10.8 | 24.6 | none |
