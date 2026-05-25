@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.Definitions
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.SumBounds
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas
 
 /-!
