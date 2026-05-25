@@ -203,6 +203,7 @@
 \begin{lemma}\label{lem:naimark-helper}
 	\lean{MIPStarRE.LDT.MakingMeasurementsProjective.oneMeasNaimark}
 	\leanok
+	\uses{def:submeasurement}
 	Let $A = \{A_a\}$ be a sub-measurement with $k$ distinct outcomes $a \in \mathcal A$, and let $\ket{\mathsf{aux}} \in \C^{k+1}$ be any state. Then there exists a projective sub-measurement $\widehat{A} = \{\widehat{A}_a\}$ such that for each outcome $a$,
 	\[
 		(I \ot \bra{\mathsf{aux}}) \cdot \widehat{A}_a \cdot (I \ot \ket{\mathsf{aux}})
@@ -987,6 +988,7 @@
 	\begin{lemma}\label{lem:xa-t}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xa_t}
 		\leanok
+		\uses{def:matrix-decomposition-Q}
 		For each $a$,
 		\[
 			X_a = T_a \cdot X.
@@ -1160,6 +1162,7 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_sigmaFin_xHat_coisometry_of_sum_le}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaFinXHatCoisometry_spec}
 		\leanok
+		\uses{def:svd-of-X}
 		\begin{equation*}
 			\widehat{X} \cdot \widehat{X}^\dagger = I_{m \times m}.
 		\end{equation*}
