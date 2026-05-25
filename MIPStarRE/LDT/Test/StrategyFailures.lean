@@ -3,8 +3,8 @@ import MIPStarRE.LDT.Test.StrategyRole
 /-!
 # Symmetrized-strategy failure probabilities and test bounds
 
-Failure-probability surrogates and basic low-individual-degree test bounds
-extracted from `MIPStarRE.LDT.Test.StrategySymmetrized`.
+Failure-probability surrogates and basic low-individual-degree test bounds for
+the split strategy interface.
 -/
 
 namespace MIPStarRE.LDT

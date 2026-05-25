@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
-import MIPStarRE.LDT.Test.StrategySymmetrized
+import MIPStarRE.LDT.Test.StrategyRoleAverage
 import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!

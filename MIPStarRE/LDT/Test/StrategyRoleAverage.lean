@@ -3,8 +3,8 @@ import MIPStarRE.LDT.Test.StrategySelfConsistency
 /-!
 # Symmetrized-strategy role averages
 
-Role-average comparison lemmas for the classical role-register
-symmetrization, extracted from `MIPStarRE.LDT.Test.StrategySymmetrized`.
+Role-average comparison lemmas for the classical role-register symmetrization.
+This module is re-exported by `MIPStarRE.LDT.Test.Strategy`.
 -/
 
 namespace MIPStarRE.LDT
