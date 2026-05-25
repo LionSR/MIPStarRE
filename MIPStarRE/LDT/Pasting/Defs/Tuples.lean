@@ -1,7 +1,6 @@
 import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Basic.OpFamily
-import Mathlib.LinearAlgebra.Lagrange
 
 /-!
 # Section 12 — Definitions: tuples and operators
