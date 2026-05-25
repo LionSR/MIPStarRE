@@ -62,7 +62,8 @@ import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 The direct reverse imports are small:
 
 - `MIPStarRE/LDT.lean` imports it as part of the project barrel.
-- `MIPStarRE/LDT/Commutativity/Transport.lean` imports it as the transport barrel.
+- The former `MIPStarRE/LDT/Commutativity/Transport.lean` barrel imported it
+  at the audit snapshot; that unused barrel has since been removed.
 - `MIPStarRE/LDT/Commutativity/Theorems.lean` imports it from the theorem bundle.
 - `MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean` imports it for the final scalar route.
 
