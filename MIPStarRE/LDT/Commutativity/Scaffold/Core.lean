@@ -19,9 +19,6 @@ open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-/-- Operator domination, written in source order as `X ≤ Y`. -/
-abbrev OperatorDominatedBy (X Y : MIPStarRE.Quantum.Op ι) : Prop :=
-  X ≤ Y
 
 /-- Displayed error term for `lem:comm-data-processed-g`. -/
 noncomputable def commDataProcessedGError (params : Parameters) (gamma zeta : Error) : Error :=
@@ -82,9 +79,7 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
     normalizationConditionAdjointSquareOperator P Q =
       normalizationConditionSquareOperator P Q
   sandwichedBoundedByIdentity :
-    OperatorDominatedBy
-      (normalizationConditionSquareOperator P Q)
-      (normalizationConditionIdentityBound P Q)
+    normalizationConditionSquareOperator P Q ≤ normalizationConditionIdentityBound P Q
 
 
 end MIPStarRE.LDT.Commutativity
