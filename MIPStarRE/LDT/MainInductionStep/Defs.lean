@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Test.StrategyCore
 # Section 6 — Definitions
 
 This file contains restriction/lifting maps, section-local error terms,
-averaging operators, and temporary tensor-placement helpers.
+averaging operators, and tensor-placement bookkeeping for the induction step.
 
 ## References
 
@@ -58,10 +58,6 @@ structure RestrictedSymStrat (params : Parameters) [FieldModel params.q]
 
 namespace RestrictedSymStrat
 
--- Note: these sampled answer families duplicate the `SymStrat` API in
--- `MIPStarRE.LDT.Test.Strategy`. A future refactor around shared helpers
--- can be considered once the restricted-slice bookkeeping has stabilized.
-
 /-- Sampled point answers in the axis-parallel lines test.
 Point player receives `u` (base point) and answers at `u`. -/
 noncomputable def axisParallelPointAnswerFamily
@@ -70,7 +66,7 @@ noncomputable def axisParallelPointAnswerFamily
     (strategy : RestrictedSymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
-  fun s => (strategy.pointMeasurement s.1).toSubMeas
+  MIPStarRE.LDT.axisParallelPointAnswerFamilyOf strategy.pointMeasurement
 
 /-- Sampled line answers in the axis-parallel lines test,
 evaluated at the base point `u` (parameter `zeroCoord`). -/
@@ -80,12 +76,7 @@ noncomputable def axisParallelLineAnswerFamily
     (strategy : RestrictedSymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
-  fun s =>
-    let ℓ : AxisParallelLine params :=
-      { base := s.1, direction := s.2 }
-    postprocess
-      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-      (· zeroCoord)
+  MIPStarRE.LDT.axisParallelLineAnswerFamilyOf strategy.axisParallelMeasurement
 
 /-- Sampled point answers in the `j`-restricted diagonal test.
 Point player receives `u` and answers at `u`. -/
@@ -96,7 +87,7 @@ noncomputable def restrictedDiagonalPointAnswerFamily
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j)
       (Fq params) ι :=
-  fun s => (strategy.pointMeasurement s.1).toSubMeas
+  MIPStarRE.LDT.diagonalPointAnswerFamilyOf strategy.pointMeasurement j
 
 /-- Sampled diagonal-line answers in the `j`-restricted diagonal
 test, evaluated at the base point (parameter `zeroCoord`). -/
@@ -107,13 +98,7 @@ noncomputable def restrictedDiagonalLineAnswerFamily
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j)
       (Fq params) ι :=
-  fun s =>
-    let v := extendRestrictedDirection j s.2
-    let ℓ : DiagonalLine params :=
-      { base := s.1, direction := v }
-    postprocess
-      ((strategy.diagonalMeasurement ℓ).toSubMeas)
-      (· zeroCoord)
+  MIPStarRE.LDT.diagonalLineAnswerFamilyOf strategy.diagonalMeasurement (· zeroCoord) j
 
 /-- Failure surrogate for the axis-parallel lines test. -/
 noncomputable def axisParallelFailureProbability

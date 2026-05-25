@@ -83,6 +83,7 @@ private lemma liftLeft_lineAnswerMeasurement_outcome_at_g
   classical
   simp only [IdxSubMeas.liftLeft, IdxMeas.toIdxSubMeas,
     axisParallelLineAnswerMeasurement, axisParallelLineAnswerFamily,
+    axisParallelLineAnswerFamilyOf,
     generalizeBLeftOperatorAtPolynomial, generalizeBLeftEventSubMeasAtPolynomial,
     axisParallelLineQuestionParameter, subCoord, zeroCoord,
     SubMeas.toMeasurement_toSubMeas, mkLeftPlacedSubMeas_outcome, postprocess]

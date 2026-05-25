@@ -116,6 +116,24 @@ private theorem restrictAnswerDiagonalAnswerMeasurement_transportInvariant
       ProjMeas.transport, Measurement.transport, A, eNext, eSlice, f,
       DiagonalLine.appendAtHeight_rebaseAt, htransport] using hpost
 
+/-- Evaluating the answer-valued restricted diagonal measurement at the base point
+recovers the ambient answer-valued diagonal readout. -/
+@[simp] theorem restrictAnswerDiagonalAnswerMeasurement_postprocess_zero
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : AnswerSymStrat params.next ι)
+    (x : Fq params)
+    (ℓ : DiagonalLine params) :
+    postprocess ((restrictAnswerDiagonalAnswerMeasurement params strategy x ℓ).toSubMeas)
+        (fun f : DiagonalLineAnswer params => f zeroCoord) =
+      postprocess
+        ((strategy.diagonalMeasurement
+          (DiagonalLine.appendAtHeight params ℓ x)).toSubMeas)
+        (fun f : DiagonalLineAnswer params.next => f zeroCoord) := by
+  simp [restrictAnswerDiagonalAnswerMeasurement, ProjMeas.postprocess_toSubMeas,
+    SubMeas.postprocess_comp, DiagonalLineAnswer.restrictAtHeight]
+  rfl
+
 /-- The `x`-restricted strategy of an answer-valued successor strategy.
 
 Paper origin: `references/ldt-paper/inductive_step.tex:436-455`, in the
@@ -375,7 +393,21 @@ theorem AnswerSelfImprovementData.SliceStrategyTransport.good_of_restrictedGood
         AnswerSymStrat.diagonalFailureProbability
         diagonalPointAnswerFamily AnswerSymStrat.diagonalPointAnswerFamily
         diagonalLineAnswerFamily AnswerSymStrat.diagonalLineAnswerFamily
-      simp [state_eq x, pointMeasurement_eq x, diagonalZeroCoord_eq x]
+      simp only [one_div, xRestrictedAnswerSymStrat_state, mul_eq_mul_left_iff,
+        inv_eq_zero, Nat.cast_eq_zero]
+      left
+      refine Finset.sum_congr rfl ?_
+      intro j _
+      have hB :
+          diagonalLineAnswerFamilyOf (sliceStrategy x).diagonalMeasurement.toIdxProjMeas
+              (fun f : DiagonalLinePolynomial params => f.toFun zeroCoord) j =
+            diagonalLineAnswerFamilyOf
+              (xRestrictedAnswerSymStrat params strategy x).diagonalMeasurement.toIdxProjMeas
+              (fun f : DiagonalLineAnswer params => f zeroCoord) j := by
+        funext s
+        exact diagonalZeroCoord_eq x
+          { base := s.1, direction := extendRestrictedDirection j s.2 }
+      simp [hB, state_eq x, pointMeasurement_eq x]
     simpa [hfail] using hgood.diagonalLineTest
 
 /-- Build answer-valued `SliceStrategyTransport` from concrete slice strategies and

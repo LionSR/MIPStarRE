@@ -451,6 +451,58 @@ instance restrictedDiagonalSampleNonempty (params : Parameters) (j : Fin params.
     Nonempty (RestrictedDiagonalSample params j) :=
   inferInstance
 
+/-- Sampled point answers in the axis-parallel lines test, obtained from a
+point measurement. -/
+noncomputable abbrev axisParallelPointAnswerFamilyOf
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (pointMeasurement : IdxProjMeas (Point params) (Fq params) ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+  fun s => (pointMeasurement s.1).toSubMeas
+
+/-- Sampled line answers in the axis-parallel lines test, obtained from an
+axis-parallel measurement and evaluated at the base point. -/
+noncomputable abbrev axisParallelLineAnswerFamilyOf
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (axisParallelMeasurement :
+      AxisParallelLine params → ProjMeas (AxisLinePolynomial params) ι) :
+    IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
+  fun s =>
+    let ℓ : AxisParallelLine params :=
+      { base := s.1, direction := s.2 }
+    postprocess
+      ((axisParallelMeasurement ℓ).toSubMeas)
+      (· zeroCoord)
+
+/-- Sampled point answers in the restricted diagonal test, obtained from a
+point measurement. -/
+noncomputable abbrev diagonalPointAnswerFamilyOf
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (pointMeasurement : IdxProjMeas (Point params) (Fq params) ι)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+  fun s => (pointMeasurement s.1).toSubMeas
+
+/-- Sampled diagonal-line answers in the restricted diagonal test, obtained from
+a diagonal-line measurement and evaluated at the base point. -/
+noncomputable abbrev diagonalLineAnswerFamilyOf
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {Answer : Type*} [Fintype Answer]
+    (diagonalMeasurement : DiagonalLine params → ProjMeas Answer ι)
+    (evalAtBase : Answer → Fq params)
+    (j : Fin params.m) :
+    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
+  fun s =>
+    let v := extendRestrictedDirection j s.2
+    let ℓ : DiagonalLine params :=
+      { base := s.1, direction := v }
+    postprocess
+      ((diagonalMeasurement ℓ).toSubMeas)
+      evalAtBase
+
 /-- Sampled point answers in the axis-parallel lines test.
 The point player receives `u` (the base point) and answers with
 their measurement at `u`. -/
@@ -460,7 +512,7 @@ noncomputable def axisParallelPointAnswerFamily
     (strategy : SymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
-  fun s => (strategy.pointMeasurement s.1).toSubMeas
+  axisParallelPointAnswerFamilyOf strategy.pointMeasurement
 
 /-- Sampled line answers in the axis-parallel lines test,
 evaluated at the base point `u`.
@@ -473,12 +525,7 @@ noncomputable def axisParallelLineAnswerFamily
     (strategy : SymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params)
       (Fq params) ι :=
-  fun s =>
-    let ℓ : AxisParallelLine params :=
-      { base := s.1, direction := s.2 }
-    postprocess
-      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-      (· zeroCoord)
+  axisParallelLineAnswerFamilyOf strategy.axisParallelMeasurement
 
 -- Paper: `not:conditioned-on-last-direction` abbreviates the axis-parallel
 -- line in the last coordinate direction of `F_q^(m+1)` by its base point `u`.
@@ -510,7 +557,7 @@ noncomputable def diagonalPointAnswerFamily
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j)
       (Fq params) ι :=
-  fun s => (strategy.pointMeasurement s.1).toSubMeas
+  diagonalPointAnswerFamilyOf strategy.pointMeasurement j
 
 /-- Sampled diagonal-line answers in the `j`-restricted diagonal
 test, evaluated at the base point `u`.
@@ -523,13 +570,7 @@ noncomputable def diagonalLineAnswerFamily
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j)
       (Fq params) ι :=
-  fun s =>
-    let v := extendRestrictedDirection j s.2
-    let ℓ : DiagonalLine params :=
-      { base := s.1, direction := v }
-    postprocess
-      ((strategy.diagonalMeasurement ℓ).toSubMeas)
-      (· zeroCoord)
+  diagonalLineAnswerFamilyOf strategy.diagonalMeasurement (· zeroCoord) j
 
 namespace AnswerSymStrat
 
@@ -540,7 +581,7 @@ noncomputable def axisParallelPointAnswerFamily
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : AnswerSymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
-  fun s => (strategy.pointMeasurement s.1).toSubMeas
+  axisParallelPointAnswerFamilyOf strategy.pointMeasurement
 
 /-- Sampled line answers in the axis-parallel lines test for an answer-valued
 symmetric strategy, evaluated at the base point. -/
@@ -549,12 +590,7 @@ noncomputable def axisParallelLineAnswerFamily
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : AnswerSymStrat params ι) :
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ι :=
-  fun s =>
-    let ℓ : AxisParallelLine params :=
-      { base := s.1, direction := s.2 }
-    postprocess
-      ((strategy.axisParallelMeasurement ℓ).toSubMeas)
-      (· zeroCoord)
+  axisParallelLineAnswerFamilyOf strategy.axisParallelMeasurement
 
 /-- Sampled point answers in the restricted diagonal test for an answer-valued
 symmetric strategy. -/
@@ -564,7 +600,7 @@ noncomputable def diagonalPointAnswerFamily
     (strategy : AnswerSymStrat params ι)
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
-  fun s => (strategy.pointMeasurement s.1).toSubMeas
+  diagonalPointAnswerFamilyOf strategy.pointMeasurement j
 
 /-- Sampled diagonal-line answers in the restricted diagonal test for an
 answer-valued symmetric strategy, evaluated at the base point. -/
@@ -574,13 +610,7 @@ noncomputable def diagonalLineAnswerFamily
     (strategy : AnswerSymStrat params ι)
     (j : Fin params.m) :
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
-  fun s =>
-    let v := extendRestrictedDirection j s.2
-    let ℓ : DiagonalLine params :=
-      { base := s.1, direction := v }
-    postprocess
-      ((strategy.diagonalMeasurement ℓ).toSubMeas)
-      (· zeroCoord)
+  diagonalLineAnswerFamilyOf strategy.diagonalMeasurement (· zeroCoord) j
 
 /-- Axis-parallel failure surrogate for an answer-valued symmetric strategy. -/
 noncomputable def axisParallelFailureProbability
