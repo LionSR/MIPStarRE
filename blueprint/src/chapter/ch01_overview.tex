@@ -7,6 +7,7 @@ test paper of Ji, Natarajan, Vidick, Wright, and Yuen
 arXiv:2009.12982.
 
 \begin{theorem}[Raz--Safra]\label{thm:raz-safra}
+	\uses{def:polyfunc}
 	Suppose Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the $k=2$ surface-versus-point low-degree test with probability $1-\eps$. Then there exists a degree-$d$ polynomial $g \colon \F_q^m \to \F_q$ such that
 	\[
 		\Prb_{u \sim \F_q^m}[g(u)=a] \ge 1-\eps-\poly(m)\cdot\poly(d/q).
@@ -19,6 +20,7 @@ arXiv:2009.12982.
 	in the repository; it is not used to mark this source theorem as formalized.
 \end{remark}
 \begin{proof}
+	\uses{def:polyfunc}
 	See Raz--Safra [RS97].
 \end{proof}
 
