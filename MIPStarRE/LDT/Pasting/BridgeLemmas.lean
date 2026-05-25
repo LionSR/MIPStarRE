@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.Final
 
