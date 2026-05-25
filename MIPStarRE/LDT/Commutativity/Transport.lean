@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Commutativity.Transport.EvaluationSpecialization
-import MIPStarRE.LDT.Commutativity.Transport.Pullback
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice
 
 /-!
