@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
 
