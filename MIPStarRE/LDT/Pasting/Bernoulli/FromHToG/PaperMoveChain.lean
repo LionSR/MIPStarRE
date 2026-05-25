@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Moves
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Telescope
 
 /-!
