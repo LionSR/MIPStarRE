@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities
+import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.AnswerValued
 
 /-!
 # Section 6 — Stage-Data Constructors
