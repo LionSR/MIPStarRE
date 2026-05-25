@@ -18,8 +18,6 @@ import MIPStarRE.LDT.Test.SurfaceVsPoint
 import MIPStarRE.LDT.Test.SymmetrizationBridge
 import MIPStarRE.LDT.Test.Unsymmetrization
 import MIPStarRE.LDT.Test.MainTheorem
-import MIPStarRE.LDT.Test.SchwartzZippelStep
-import MIPStarRE.LDT.Test.ErrorCascade
 import MIPStarRE.LDT.Preliminaries.FiniteFields
 import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Preliminaries.ComparisonCore
