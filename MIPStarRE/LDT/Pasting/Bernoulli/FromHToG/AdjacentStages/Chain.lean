@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain.HalfSandwich
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain.FinalMove
 
 /-!
