@@ -56,14 +56,12 @@ theorem questionwiseOneMeasNaimarkData_source_effect
           simpa [(A x).sum_eq_total] using (A x).total_le_one
       } : MIPStarRE.Quantum.Submeasurement Outcome ι)
 
-/-- Questionwise one-measurement Naimark data.
+/-- Lean-only questionwise Naimark interface.
 
-For each question on each side, apply `oneMeasNaimark` to the corresponding
-submeasurement. This records the local projective dilations and their
-single-measurement expectation-preservation identities used both by the
-Lean-only questionwise interface and by the tensor-product assembly below. -/
-private lemma exists_questionwiseNaimarkData
-    {QuestionA OutcomeA QuestionB OutcomeB : Type*}
+This theorem proves `NaimarkStatement`, the restricted interface consisting of
+per-question local dilations and single-outcome marginal preservation.  It is
+not the full tensor-product preservation statement of `thm:naimark`. -/
+theorem questionwiseNaimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
     {ι : Type*}
     [Fintype QuestionA] [DecidableEq QuestionA]
     [Fintype OutcomeA] [DecidableEq OutcomeA]
@@ -92,25 +90,6 @@ private lemma exists_questionwiseNaimarkData
     simpa [leftData, hleft x] using (leftData x).expectation_preservation ρ a
   · intro y ρ b
     simpa [rightData, hright y] using (rightData y).expectation_preservation ρ b
-
-/-- Lean-only questionwise Naimark interface.
-
-This theorem proves `NaimarkStatement`, the restricted interface consisting of
-per-question local dilations and single-outcome marginal preservation.  It is
-not the full tensor-product preservation statement of `thm:naimark`. -/
-theorem questionwiseNaimark {QuestionA OutcomeA QuestionB OutcomeB : Type*}
-    {ι : Type*}
-    [Fintype QuestionA] [DecidableEq QuestionA]
-    [Fintype OutcomeA] [DecidableEq OutcomeA]
-    [Fintype QuestionB] [DecidableEq QuestionB]
-    [Fintype OutcomeB] [DecidableEq OutcomeB]
-    [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : IdxSubMeas QuestionA OutcomeA ι)
-    (B : IdxSubMeas QuestionB OutcomeB ι) :
-    ∃ data : NaimarkData QuestionA OutcomeA QuestionB OutcomeB ι,
-      NaimarkStatement ψ A B data :=
-  exists_questionwiseNaimarkData ψ A B
 
 /-! ### Full tensor-product Naimark interface -/
 
