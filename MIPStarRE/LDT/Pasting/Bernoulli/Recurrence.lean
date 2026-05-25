@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.Weights
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
 import MIPStarRE.LDT.Pasting.Bernoulli.MatrixChernoff
 
