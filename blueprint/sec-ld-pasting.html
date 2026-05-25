@@ -144,10 +144,10 @@
   <span class="expand-toc">▶</span>
   <ul class="sub-toc-2">
      <li class="">
-  <a href="sec-ld-pasting.html#sec:construction-numba-one"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
+  <a href="sec-ld-pasting.html#sec:first-construction"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
  </li>
 <li class="">
-  <a href="sec-ld-pasting.html#sec:construction-numba-two"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
+  <a href="sec-ld-pasting.html#sec:second-construction"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
  </li>
 
   </ul>
@@ -865,17 +865,17 @@
   </div>
 </div>
 <p>We first record the natural construction obtained by sampling \(d+1\) slices and interpolating. It motivates the eventual argument but is not the construction used in the formal theorem. </p>
-<h3 id="sec:construction-numba-one">The First Construction</h3>
+<h3 id="sec:first-construction">The First Construction</h3>
 
 <p>The first construction samples \(d+1\) slice outcomes \(g_1,\dots ,g_{d+1}\in \mathcal{P}(m,q,d)\), interpolates them to a global polynomial \(h \in \mathcal{P}(m+1,q,d)\), and then averages over distinct interpolation points. Its consistency is governed by the commutation of the slice measurements, but its completeness is subtler. The heuristic comparison is </p>
 <div class="displaymath" id="a0000000465">
   \[  \langle \psi  \rvert  H \otimes I \lvert \psi  \rangle  \approx \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle .  \]
 </div>
 <p> Thus one would like to show </p>
-<div class="equation" id="eq:subtract-a-G">
+<div class="equation" id="eq:first-construction-g-power-comparison">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:subtract-a-G} \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle  \approx \langle \psi  \rvert  G \otimes I \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:first-construction-g-power-comparison} \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle  \approx \langle \psi  \rvert  G \otimes I \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">8</span>
 </p>
@@ -891,19 +891,19 @@
 </div>
 <p> which is too weak for the induction. </p>
 <p>The key input is that one can first show </p>
-<div class="equation" id="eq:step-one-of-grand-plan">
+<div class="equation" id="eq:first-construction-power-increment">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:step-one-of-grand-plan} \langle \psi  \rvert  G^{d+2} \otimes I \lvert \psi  \rangle  \approx _\Delta \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle , \end{equation}
+    \begin{equation} \label{eq:first-construction-power-increment} \langle \psi  \rvert  G^{d+2} \otimes I \lvert \psi  \rangle  \approx _\Delta \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle , \end{equation}
   </div>
   <span class="equation_label">10</span>
 </p>
 </div>
 <p> for a small error \(\Delta = \operatorname{poly}(m)\cdot \operatorname{poly}(\varepsilon ,\delta ,\gamma ,\zeta ,d/q)\). Writing the eigendecomposition \(G=\sum _i \lambda _i \lvert v_i \rangle \langle v_i \rvert \) and the induced spectral distribution \(\mu (i)=\langle \psi  \rvert (\lvert v_i \rangle \langle v_i \rvert \otimes I)\lvert \psi  \rangle \), this is equivalent to </p>
-<div class="equation" id="eq:equivalent-way-of-writing-grand-plan">
+<div class="equation" id="eq:first-construction-spectral-defect">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:equivalent-way-of-writing-grand-plan} \Delta \ge \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle  - \langle \psi  \rvert  G^{d+2} \otimes I \lvert \psi  \rangle  = \mathbb {E}_{i\sim \mu }[\lambda _i^{d+1}(1-\lambda _i)]. \end{equation}
+    \begin{equation} \label{eq:first-construction-spectral-defect} \Delta \ge \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle  - \langle \psi  \rvert  G^{d+2} \otimes I \lvert \psi  \rangle  = \mathbb {E}_{i\sim \mu }[\lambda _i^{d+1}(1-\lambda _i)]. \end{equation}
   </div>
   <span class="equation_label">11</span>
 </p>
@@ -1083,7 +1083,7 @@
         </div>
   </div>
   <div class="corollary_thmcontent">
-  <p>  As in the paper, Lemma&#160;<a href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">9.8</a> now converts <a href="sec-ld-pasting.html#eq:equivalent-way-of-writing-grand-plan" class="eqref">11</a> into the estimate </p>
+  <p>  As in the paper, Lemma&#160;<a href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">9.8</a> now converts <a href="sec-ld-pasting.html#eq:first-construction-spectral-defect" class="eqref">11</a> into the estimate </p>
 <div class="displaymath" id="a0000000471">
   \[  \mathbb {E}_{i\sim \mu }[\lambda _i(1-\lambda _i^d)] \le 2\cdot \mathbb {E}_{i\sim \mu }\Big[(\lambda _i^{d+1}(1-\lambda _i))^{1/(d+1)}\Big] \le 2\cdot \Delta ^{1/(d+1)},  \]
 </div>
@@ -1095,7 +1095,7 @@
 
   </div>
 </div>
-<h3 id="sec:construction-numba-two">The Second Construction</h3>
+<h3 id="sec:second-construction">The Second Construction</h3>
 
 <div class="definition_thmwrapper theorem-style-definition" id="def:G-hat">
   <div class="definition_thmheading">
@@ -1855,36 +1855,36 @@
   \begin{align}  \mathbb {E}_{x,y} \sum _o \langle \psi  \rvert  G^x M_o^y G^x M_o^y \otimes I \lvert \psi  \rangle  &  = \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  G^x M_o^y G_g^x G_g^x M_o^y \otimes I \lvert \psi  \rangle  \nonumber \\ &  \approx _{\sqrt{\chi }} \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  G^x M_o^y G_g^x M_o^y G_g^x \otimes I \lvert \psi  \rangle . \label{eq:split-G-and-commute} \end{align}
 </div>
 <p> This is the Cauchy–Schwarz estimate coming from <a href="sec-ld-pasting.html#eq:M-commutes-with-G">14</a>. Next, </p>
-<div class="equation" id="eq:move-G-for-great-justice">
+<div class="equation" id="eq:move-G-to-right-factor">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:move-G-for-great-justice} \eqref{eq:split-G-and-commute} \approx _{\sqrt{\zeta }} \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  G^x M_o^y G_g^x M_o^y \otimes G_g^x \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:move-G-to-right-factor} \eqref{eq:split-G-and-commute} \approx _{\sqrt{\zeta }} \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  G^x M_o^y G_g^x M_o^y \otimes G_g^x \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">17</span>
 </p>
 </div>
 <p> Here the error is bounded using <a href="sec-ld-pasting.html#item:ld-pasting-self-consistency">3</a>. Then </p>
-<div class="equation" id="eq:move-G-for-even-greater-justice">
+<div class="equation" id="eq:move-G-back-to-left-factor">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:move-G-for-even-greater-justice} \eqref{eq:move-G-for-great-justice} \approx _{\sqrt{\zeta }} \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  G_g^x G^x M_o^y G_g^x M_o^y \otimes I \lvert \psi  \rangle , \end{equation}
+    \begin{equation} \label{eq:move-G-back-to-left-factor} \eqref{eq:move-G-to-right-factor} \approx _{\sqrt{\zeta }} \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  G_g^x G^x M_o^y G_g^x M_o^y \otimes I \lvert \psi  \rangle , \end{equation}
   </div>
   <span class="equation_label">18</span>
 </p>
 </div>
 <p> again by strong self-consistency of \(G_g^x\). Since \(G\) is projective, </p>
 <div class="displaymath" id="a0000000491">
-  \begin{align}  \eqref{eq:move-G-for-even-greater-justice} &  = \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  G_g^x M_o^y G_g^x M_o^y \otimes I \lvert \psi  \rangle  \nonumber \\ &  \approx _{\sqrt{\chi }} \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  M_o^y G_g^x G_g^x M_o^y \otimes I \lvert \psi  \rangle . \label{eq:commute-the-G-yet-again} \end{align}
+  \begin{align}  \eqref{eq:move-G-back-to-left-factor} &  = \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  G_g^x M_o^y G_g^x M_o^y \otimes I \lvert \psi  \rangle  \nonumber \\ &  \approx _{\sqrt{\chi }} \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  M_o^y G_g^x G_g^x M_o^y \otimes I \lvert \psi  \rangle . \label{eq:commuted-G-after-transfer} \end{align}
 </div>
 <p> Finally, </p>
 <div class="displaymath" id="a0000000492">
-  \begin{align*}  \eqref{eq:commute-the-G-yet-again} &  = \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  M_o^y G_g^x M_o^y \otimes I \lvert \psi  \rangle  \\ &  = \mathbb {E}_y \sum _o \langle \psi  \rvert  M_o^y G M_o^y \otimes I \lvert \psi  \rangle  \\ &  \approx _{2\sqrt{\omega }} \mathbb {E}_y \sum _o \langle \psi  \rvert  G \otimes M_o^y \lvert \psi  \rangle  \tag {by \ref{prop:switch-sandwich} and \ref{eq:M-self-consistent}} \\ &  = \langle \psi  \rvert  G \otimes M \lvert \psi  \rangle . \end{align*}
+  \begin{align*}  \eqref{eq:commuted-G-after-transfer} &  = \mathbb {E}_{x,y} \sum _{o,g} \langle \psi  \rvert  M_o^y G_g^x M_o^y \otimes I \lvert \psi  \rangle  \\ &  = \mathbb {E}_y \sum _o \langle \psi  \rvert  M_o^y G M_o^y \otimes I \lvert \psi  \rangle  \\ &  \approx _{2\sqrt{\omega }} \mathbb {E}_y \sum _o \langle \psi  \rvert  G \otimes M_o^y \lvert \psi  \rangle  \tag {by \ref{prop:switch-sandwich} and \ref{eq:M-self-consistent}} \\ &  = \langle \psi  \rvert  G \otimes M \lvert \psi  \rangle . \end{align*}
 </div>
 <p> Therefore </p>
-<div class="equation" id="eq:term-three-for-use-right-now">
+<div class="equation" id="eq:third-error-term-bound">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:term-three-for-use-right-now} \mathbb {E}_{x,y} \sum _o \langle \psi  \rvert  G^x M_o^y G^x M_o^y \otimes I \lvert \psi  \rangle  \approx _{2\sqrt{\zeta }+2\sqrt{\omega }+2\sqrt{\chi }} \langle \psi  \rvert  G \otimes M \lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:third-error-term-bound} \mathbb {E}_{x,y} \sum _o \langle \psi  \rvert  G^x M_o^y G^x M_o^y \otimes I \lvert \psi  \rangle  \approx _{2\sqrt{\zeta }+2\sqrt{\omega }+2\sqrt{\chi }} \langle \psi  \rvert  G \otimes M \lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">20</span>
 </p>
@@ -2974,27 +2974,27 @@
 </div>
 <p> Write \(\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}} = \widehat G_{g_1}^{x_1}\cdots \widehat G_{g_{i-1}}^{x_{i-1}}\). Then </p>
 <div class="displaymath" id="a0000000530">
-  \begin{align}  \eqref{eq:delete-extraneous-coordinates} &  = \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_1,\dots ,g_i\, :\, g_i\ne \bot } \langle \psi  \rvert  \widehat G_{g_{{\lt}i}}^{x_{{\lt}i}} \widehat G_{g_i}^{x_i}\widehat G_{g_i}^{x_i} (\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger \otimes (I-B_{[f(x_i)=g_i(u)]}^u)\lvert \psi  \rangle \nonumber \\ &  \approx _{\sqrt{\nu _4}} \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_1,\dots ,g_i\, :\, g_i\ne \bot } \langle \psi  \rvert  \widehat G_{g_i}^{x_i}\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}}\widehat G_{g_i}^{x_i}(\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger \otimes (I-B_{[f(x_i)=g_i(u)]}^u)\lvert \psi  \rangle . \label{eq:gonna-need-a-bigger-cauchy-schwarz} \end{align}
+  \begin{align}  \eqref{eq:delete-extraneous-coordinates} &  = \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_1,\dots ,g_i\, :\, g_i\ne \bot } \langle \psi  \rvert  \widehat G_{g_{{\lt}i}}^{x_{{\lt}i}} \widehat G_{g_i}^{x_i}\widehat G_{g_i}^{x_i} (\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger \otimes (I-B_{[f(x_i)=g_i(u)]}^u)\lvert \psi  \rangle \nonumber \\ &  \approx _{\sqrt{\nu _4}} \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_1,\dots ,g_i\, :\, g_i\ne \bot } \langle \psi  \rvert  \widehat G_{g_i}^{x_i}\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}}\widehat G_{g_i}^{x_i}(\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger \otimes (I-B_{[f(x_i)=g_i(u)]}^u)\lvert \psi  \rangle . \label{eq:half-sandwich-first-commutation} \end{align}
 </div>
 <p> The Cauchy–Schwarz argument uses </p>
-<div class="equation" id="eq:add-in-the-bot">
+<div class="equation" id="eq:completed-outcome-commutator">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:add-in-the-bot} \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_1,\dots ,g_i} \langle \psi  \rvert  \bigl((\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}}\widehat G_{g_i}^{x_i} - \widehat G_{g_i}^{x_i}\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}}) (\widehat G_{g_i}^{x_i}(\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger - (\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger \widehat G_{g_i}^{x_i})\bigr) \otimes I \lvert \psi  \rangle , \end{equation}
+    \begin{equation} \label{eq:completed-outcome-commutator} \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_1,\dots ,g_i} \langle \psi  \rvert  \bigl((\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}}\widehat G_{g_i}^{x_i} - \widehat G_{g_i}^{x_i}\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}}) (\widehat G_{g_i}^{x_i}(\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger - (\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger \widehat G_{g_i}^{x_i})\bigr) \otimes I \lvert \psi  \rangle , \end{equation}
   </div>
   <span class="equation_label">27</span>
 </p>
 </div>
 <p> which is at most \(\nu _4\) by Lemma&#160;<a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">9.27</a>. A second Cauchy–Schwarz step gives </p>
-<div class="equation" id="eq:even-bigger-CS">
+<div class="equation" id="eq:half-sandwich-second-commutation">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:even-bigger-CS} \eqref{eq:gonna-need-a-bigger-cauchy-schwarz} \approx _{\sqrt{\nu _4}} \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_1,\dots ,g_i\, :\, g_i\ne \bot } \langle \psi  \rvert  \widehat G_{g_i}^{x_i}\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}}(\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger \widehat G_{g_i}^{x_i} \otimes (I-B_{[f(x_i)=g_i(u)]}^u)\lvert \psi  \rangle . \end{equation}
+    \begin{equation} \label{eq:half-sandwich-second-commutation} \eqref{eq:half-sandwich-first-commutation} \approx _{\sqrt{\nu _4}} \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_1,\dots ,g_i\, :\, g_i\ne \bot } \langle \psi  \rvert  \widehat G_{g_i}^{x_i}\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}}(\widehat G_{g_{{\lt}i}}^{x_{{\lt}i}})^\dagger \widehat G_{g_i}^{x_i} \otimes (I-B_{[f(x_i)=g_i(u)]}^u)\lvert \psi  \rangle . \end{equation}
   </div>
   <span class="equation_label">28</span>
 </p>
 </div>
-<p> Summing over \(g_1,\dots ,g_{i-1}\) collapses the middle factor to \(I\), so <a href="sec-ld-pasting.html#eq:even-bigger-CS">28</a> becomes </p>
+<p> Summing over \(g_1,\dots ,g_{i-1}\) collapses the middle factor to \(I\), so <a href="sec-ld-pasting.html#eq:half-sandwich-second-commutation">28</a> becomes </p>
 <div class="displaymath" id="a0000000531">
   \[  \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_i} \sum _{g_i\, :\, g_i\ne \bot } \langle \psi  \rvert  \widehat G_{g_i}^{x_i} \otimes (I-B_{[f(x_i)=g_i(u)]}^u)\lvert \psi  \rangle  \le \nu _1  \]
 </div>
@@ -3097,17 +3097,17 @@
   <div class="proof_content">
   <p>The inconsistency with \(B^u\) expands as </p>
 <div class="displaymath" id="a0000000536">
-  \begin{align} &  \mathbb {E}_u \sum _{f\ne f'} \langle \psi  \rvert  H_{[h|_u=f']} \otimes B_f^u \lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_u \sum _h \sum _{f\ne h|_u} \langle \psi  \rvert  H_h \otimes B_f^u \lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_k} \sum _h \sum _{f\ne h|_u} \langle \psi  \rvert  H_h^{x_1,\dots ,x_k} \otimes B_f^u \lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_k} \sum _h \sum _{w:|w|\ge d+1} \sum _{(g_1,\dots ,g_k)=h_w} \sum _{f\ne h|_u} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes B_f^u \lvert \psi  \rangle . \label{eq:keep-on-expandin} \end{align}
+  \begin{align} &  \mathbb {E}_u \sum _{f\ne f'} \langle \psi  \rvert  H_{[h|_u=f']} \otimes B_f^u \lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_u \sum _h \sum _{f\ne h|_u} \langle \psi  \rvert  H_h \otimes B_f^u \lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_k} \sum _h \sum _{f\ne h|_u} \langle \psi  \rvert  H_h^{x_1,\dots ,x_k} \otimes B_f^u \lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_k} \sum _h \sum _{w:|w|\ge d+1} \sum _{(g_1,\dots ,g_k)=h_w} \sum _{f\ne h|_u} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes B_f^u \lvert \psi  \rangle . \label{eq:h-b-consistency-expanded-sum} \end{align}
 </div>
 <p> If \(|w|\ge d+1\) and \(f \ne h|_u\), then some active coordinate \(i\) must satisfy \(g_i \ne \bot \) and \(g_i(u)\ne f(x_i)\). Hence </p>
 <div class="displaymath" id="a0000000537">
-  \begin{align}  \eqref{eq:keep-on-expandin} \le {} &  \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_k} \sum _{g_1,\dots ,g_k} \sum _{\substack {f:\exists i,\  g_i\ne \bot , \\ \begin{bgroup} g_i(u)\ne f(x_i)
+  \begin{align}  \eqref{eq:h-b-consistency-expanded-sum} \le {} &  \mathbb {E}_u \mathbb {E}_{x_1,\dots ,x_k} \sum _{g_1,\dots ,g_k} \sum _{\substack {f:\exists i,\  g_i\ne \bot , \\ \begin{bgroup} g_i(u)\ne f(x_i)
 
-\end{bgroup}}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes B_f^u \lvert \psi  \rangle . \label{eq:keep-on-contractin} \end{align}
+\end{bgroup}}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{x_1,\dots ,x_k} \otimes B_f^u \lvert \psi  \rangle . \label{eq:h-b-consistency-bad-coordinate-union} \end{align}
 </div>
 <p> Passing from independent tuples to distinct tuples costs at most \(k^2/q\) by Lemma&#160;<a href="sec-ld-pasting.html#prop:ld-dnoteq">9.7</a>. A union bound over the offending coordinate then gives </p>
 <div class="displaymath" id="a0000000538">
-  \[  \eqref{eq:keep-on-contractin} \le \sum _{i=1}^k \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{g_1,\dots ,g_k\, :\, g_i\ne \bot } \sum _{a\ne g_i(u)} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_{[f(y_i)=a]}^u \lvert \psi  \rangle  \le k\nu _5.  \]
+  \[  \eqref{eq:h-b-consistency-bad-coordinate-union} \le \sum _{i=1}^k \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{g_1,\dots ,g_k\, :\, g_i\ne \bot } \sum _{a\ne g_i(u)} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_{[f(y_i)=a]}^u \lvert \psi  \rangle  \le k\nu _5.  \]
 </div>
 <p> Therefore </p>
 <div class="displaymath" id="a0000000539">
@@ -3644,22 +3644,22 @@
 </div>
 <p> Since the right-hand side is at least the left-hand side, it suffices to bound the difference: </p>
 <div class="displaymath" id="a0000000556">
-  \begin{align}  \eqref{eq:remove-the-restriction} - \eqref{eq:sum-restricted-to-global-polynomial} &  = \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes I \lvert \psi  \rangle \nonumber \\ &  = \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _f \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_f^u \lvert \psi  \rangle . \label{eq:B-appears-out-of-thin-air} \end{align}
+  \begin{align}  \eqref{eq:remove-the-restriction} - \eqref{eq:sum-restricted-to-global-polynomial} &  = \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes I \lvert \psi  \rangle \nonumber \\ &  = \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _f \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_f^u \lvert \psi  \rangle . \label{eq:insert-line-measurement-resolution} \end{align}
 </div>
 <p> We next insert an indicator recording consistency along the sampled line: </p>
 <div class="equation" id="eq:add-in-indicator-for-f-and-g">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:add-in-indicator-for-f-and-g} \eqref{eq:B-appears-out-of-thin-air} \approx _{\frac{k^2}{q}+k\nu _5} \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _f \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_f^u \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[[\right]\forall i\in \tau ,\  f(y_i)=g_i(u)]. \end{equation}
+    \begin{equation} \label{eq:add-in-indicator-for-f-and-g} \eqref{eq:insert-line-measurement-resolution} \approx _{\frac{k^2}{q}+k\nu _5} \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _f \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_f^u \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[[\right]\forall i\in \tau ,\  f(y_i)=g_i(u)]. \end{equation}
   </div>
   <span class="equation_label">35</span>
 </p>
 </div>
 <p> The discarded part is </p>
-<div class="equation" id="eq:about-to-swap-x-for-y">
+<div class="equation" id="eq:discarded-line-inconsistency-term">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:about-to-swap-x-for-y} \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _f \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_f^u \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[[\right]\exists i\in \tau ,\  f(y_i)\ne g_i(u)], \end{equation}
+    \begin{equation} \label{eq:discarded-line-inconsistency-term} \mathbb {E}_u \mathbb {E}_{y_1,\dots ,y_k} \sum _{\tau :\, |\tau |\ge d+1} \sum _f \sum _{(g_1,\dots ,g_k)\in \overline{\mathsf{Global}_\tau (y)}} \langle \psi  \rvert  \widehat H_{g_1,\dots ,g_k}^{y_1,\dots ,y_k} \otimes B_f^u \lvert \psi  \rangle  \cdot \mathbf{1}\! \left[[\right]\exists i\in \tau ,\  f(y_i)\ne g_i(u)], \end{equation}
   </div>
   <span class="equation_label">36</span>
 </p>
@@ -4037,8 +4037,8 @@
   \begin{align}  \eqref{eq:move-rightmost-g-to-second-factor} &  = \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_\ell }^{x_\ell }\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle \nonumber \\ &  \approx _{\sqrt{\nu _4}} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}\widehat G_{g_\ell }^{x_\ell }(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:commute-g-part-one} \end{align}
 </div>
 <p> The associated Cauchy–Schwarz estimate is </p>
-<div class="displaymath" id="eq:call-this-later">
-  \begin{multline} \label{eq:call-this-later} \Bigl| \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl([\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }] \otimes I\bigr) \bigl((\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \otimes (S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell })\bigr) \lvert \psi  \rangle  \Bigr|\\ \le \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  [\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }] [\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }]^\dagger \otimes I \lvert \psi  \rangle  } \cdot \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(\widehat G_{g_\ell }^{x_\ell }(S_{\tau _{\ge \ell }})^2\widehat G_{g_\ell }^{x_\ell }\bigr) \lvert \psi  \rangle  }. \end{multline}
+<div class="displaymath" id="eq:adjoint-commutator-cauchy-schwarz">
+  \begin{multline} \label{eq:adjoint-commutator-cauchy-schwarz} \Bigl| \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl([\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }] \otimes I\bigr) \bigl((\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \otimes (S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell })\bigr) \lvert \psi  \rangle  \Bigr|\\ \le \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  [\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }] [\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }},\widehat G_{g_\ell }^{x_\ell }]^\dagger \otimes I \lvert \psi  \rangle  } \cdot \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(\widehat G_{g_\ell }^{x_\ell }(S_{\tau _{\ge \ell }})^2\widehat G_{g_\ell }^{x_\ell }\bigr) \lvert \psi  \rangle  }. \end{multline}
 </div>
 <p> The first square root is bounded by \(\nu _4\) via Lemma&#160;<a href="sec-ld-pasting.html#lem:commute-g-half-sandwich">9.27</a>, and the second by \(1\) since \(S_{\tau _{\ge \ell }}\le I\). </p>
 <p>Continue commuting: </p>
@@ -4049,7 +4049,7 @@
 <div class="displaymath" id="eq:second-cauchy-schwarz-bound">
   \begin{multline} \label{eq:second-cauchy-schwarz-bound} \Bigl| \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes (S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell })\bigr) \bigl([(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }] \otimes I\bigr) \lvert \psi  \rangle  \Bigr|\\ \le \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }S_{\tau _{\ge \ell }}\bigr) \lvert \psi  \rangle  } \cdot \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  [(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }]^\dagger [(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }] \otimes I \lvert \psi  \rangle  }. \end{multline}
 </div>
-<p> By <a href="sec-ld-pasting.html#eq:S-sandwich">46</a>, the first square root is at most \(1\), and the second matches the first square root in <a href="sec-ld-pasting.html#eq:call-this-later">51</a>, hence is at most \(\nu _4\). </p>
+<p> By <a href="sec-ld-pasting.html#eq:S-sandwich">46</a>, the first square root is at most \(1\), and the second matches the first square root in <a href="sec-ld-pasting.html#eq:adjoint-commutator-cauchy-schwarz">51</a>, hence is at most \(\nu _4\). </p>
 <p>Finally move the remaining \(\widehat G_{g_\ell }^{x_\ell }\) to the second tensor factor: </p>
 <div class="displaymath" id="eq:h-ot-mgg">
   \begin{align}  \eqref{eq:commute-g-part-two} \approx _{\sqrt{2\zeta }} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\widehat G_{g_\ell }^{x_\ell }\bigr) \lvert \psi  \rangle . \label{eq:h-ot-mgg} \end{align}
@@ -4243,9 +4243,9 @@
 </div>
 <p> Hence </p>
 <div class="displaymath" id="a0000000585">
-  \begin{align}  \langle \psi  \rvert  F(X) \otimes I \lvert \psi  \rangle  &  = \operatorname{Tr}(F(X)\rho )\nonumber \\ &  = \sum _i F(\lambda _i)\langle v_i \rvert \rho \lvert v_i \rangle \nonumber \\ &  = \mathbb {E}_{i\sim \mu } F(\lambda _i)\nonumber \\ &  \ge \Pr _{i\sim \mu }[\lambda _i \ge \theta ]\cdot F(\theta )\nonumber \\ &  \ge \left(1-\frac{\kappa }{1-\theta }\right)\cdot F(\theta ) \tag {by \ref{eq:in-other-words}}\nonumber \\ &  \ge \left(1-\frac{\kappa }{1-\theta }\right)\cdot \left(1-\exp \Bigl(-2\Bigl(\theta -\frac{d}{k}\Bigr)^2k\Bigr)\right). \label{eq:almost-done-with-this-giant-proof} \end{align}
+  \begin{align}  \langle \psi  \rvert  F(X) \otimes I \lvert \psi  \rangle  &  = \operatorname{Tr}(F(X)\rho )\nonumber \\ &  = \sum _i F(\lambda _i)\langle v_i \rvert \rho \lvert v_i \rangle \nonumber \\ &  = \mathbb {E}_{i\sim \mu } F(\lambda _i)\nonumber \\ &  \ge \Pr _{i\sim \mu }[\lambda _i \ge \theta ]\cdot F(\theta )\nonumber \\ &  \ge \left(1-\frac{\kappa }{1-\theta }\right)\cdot F(\theta ) \tag {by \ref{eq:in-other-words}}\nonumber \\ &  \ge \left(1-\frac{\kappa }{1-\theta }\right)\cdot \left(1-\exp \Bigl(-2\Bigl(\theta -\frac{d}{k}\Bigr)^2k\Bigr)\right). \label{eq:bernoulli-polynomial-spectral-lower-bound} \end{align}
 </div>
-<p> Since \((1-b)(1-c)\ge 1-b-c\) for \(b,c\ge 0\), <a href="sec-ld-pasting.html#eq:almost-done-with-this-giant-proof">59</a> implies </p>
+<p> Since \((1-b)(1-c)\ge 1-b-c\) for \(b,c\ge 0\), <a href="sec-ld-pasting.html#eq:bernoulli-polynomial-spectral-lower-bound">59</a> implies </p>
 <div class="displaymath" id="a0000000586">
   \[  \langle \psi  \rvert  F(X) \otimes I \lvert \psi  \rangle  \ge 1-\frac{\kappa }{1-\theta } - \exp \Bigl(-2\Bigl(\theta -\frac{d}{k}\Bigr)^2k\Bigr).  \]
 </div>

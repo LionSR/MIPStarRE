@@ -144,10 +144,10 @@
   <span class="expand-toc">▶</span>
   <ul class="sub-toc-2">
      <li class="">
-  <a href="sec-ld-pasting.html#sec:construction-numba-one"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
+  <a href="sec-ld-pasting.html#sec:first-construction"><span class="toc_ref"></span> <span class="toc_entry">The First Construction</span></a>
  </li>
 <li class="">
-  <a href="sec-ld-pasting.html#sec:construction-numba-two"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
+  <a href="sec-ld-pasting.html#sec:second-construction"><span class="toc_ref"></span> <span class="toc_entry">The Second Construction</span></a>
  </li>
 
   </ul>
@@ -2516,10 +2516,10 @@
   \[  \nu = 10000k^2m^2\left(\varepsilon ^{1/1024}+(d/q)^{1/1024}\right), \qquad \sigma = m^2\left(\nu +e^{-k/(80000m^2)}\right).  \]
 </div>
 <p> Theorem&#160;<a href="sec-induction.html#thm:main-induction">10.14</a> applied to the symmetrized strategy produces a measurement \(G=\{ G_g\}  \in \mathrm{PolyMeas}(m,q,d)\) such that </p>
-<div class="equation" id="eq:just-applied-induction">
+<div class="equation" id="eq:symmetrized-induction-point-consistency">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:just-applied-induction} (A_{\mathrm{sym}})_a^u \otimes I \simeq _\sigma I \otimes G_{[g(u)=a]}, \qquad G_{[g(u)=a]} \otimes I \simeq _\sigma I \otimes (A_{\mathrm{sym}})_a^u. \end{equation}
+    \begin{equation} \label{eq:symmetrized-induction-point-consistency} (A_{\mathrm{sym}})_a^u \otimes I \simeq _\sigma I \otimes G_{[g(u)=a]}, \qquad G_{[g(u)=a]} \otimes I \simeq _\sigma I \otimes (A_{\mathrm{sym}})_a^u. \end{equation}
   </div>
   <span class="equation_label">2</span>
 </p>
@@ -2580,10 +2580,10 @@
   \[  \zeta _3 = 6\zeta _1 + 6\zeta _2.  \]
 </div>
 <p> Because both measurements are projective, Lemma&#160;<a href="sec-prelims.html#prop:simeq-to-approx">3.21</a> converts this to </p>
-<div class="equation" id="eq:third-goal">
+<div class="equation" id="eq:completed-polynomial-consistency">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:third-goal} Q_g^{\mathrm A} \otimes I \simeq _{\zeta _3/2} I \otimes Q_g^{\mathrm B}. \end{equation}
+    \begin{equation} \label{eq:completed-polynomial-consistency} Q_g^{\mathrm A} \otimes I \simeq _{\zeta _3/2} I \otimes Q_g^{\mathrm B}. \end{equation}
   </div>
   <span class="equation_label">7</span>
 </p>
@@ -2602,19 +2602,19 @@
   \[  Q_g^{\mathrm A} \otimes I \simeq _{\zeta _1} I \otimes G_g^{\mathrm B}.  \]
 </div>
 <p> Data processing then gives </p>
-<div class="equation" id="eq:ok-almost-there-ok">
+<div class="equation" id="eq:left-completed-point-with-original-polynomial">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:ok-almost-there-ok} Q_{[g(u)=a]}^{\mathrm A} \otimes I \simeq _{\zeta _1} I \otimes G_{[g(u)=a]}^{\mathrm B}. \end{equation}
+    \begin{equation} \label{eq:left-completed-point-with-original-polynomial} Q_{[g(u)=a]}^{\mathrm A} \otimes I \simeq _{\zeta _1} I \otimes G_{[g(u)=a]}^{\mathrm B}. \end{equation}
   </div>
   <span class="equation_label">9</span>
 </p>
 </div>
-<p> Applying Lemma&#160;<a href="sec-prelims.html#prop:simeq-triangle-inequality">3.29</a> to <a href="sec-induction.html#eq:cons-b">4</a>, <a href="sec-induction.html#eq:ok-almost-there-ok">9</a>, and <a href="sec-induction.html#eq:point-evaluation-data-processing">8</a> yields </p>
-<div class="equation" id="eq:one-goal">
+<p> Applying Lemma&#160;<a href="sec-prelims.html#prop:simeq-triangle-inequality">3.29</a> to <a href="sec-induction.html#eq:cons-b">4</a>, <a href="sec-induction.html#eq:left-completed-point-with-original-polynomial">9</a>, and <a href="sec-induction.html#eq:point-evaluation-data-processing">8</a> yields </p>
+<div class="equation" id="eq:final-left-point-consistency">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:one-goal} A_a^{\mathrm A,u} \otimes I \simeq _{\zeta _4} I \otimes Q_{[g(u)=a]}^{\mathrm B}, \end{equation}
+    \begin{equation} \label{eq:final-left-point-consistency} A_a^{\mathrm A,u} \otimes I \simeq _{\zeta _4} I \otimes Q_{[g(u)=a]}^{\mathrm B}, \end{equation}
   </div>
   <span class="equation_label">10</span>
 </p>
@@ -2624,10 +2624,10 @@
   \[  \zeta _4 = 2\sigma + 2\sqrt{\zeta _1+\zeta _3/2}.  \]
 </div>
 <p> The same argument with the roles reversed gives </p>
-<div class="equation" id="eq:another-goal">
+<div class="equation" id="eq:final-right-point-consistency">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:another-goal} I \otimes A_a^{\mathrm B,u} \simeq _{\zeta _4} Q_{[g(u)=a]}^{\mathrm A} \otimes I. \end{equation}
+    \begin{equation} \label{eq:final-right-point-consistency} I \otimes A_a^{\mathrm B,u} \simeq _{\zeta _4} Q_{[g(u)=a]}^{\mathrm A} \otimes I. \end{equation}
   </div>
   <span class="equation_label">11</span>
 </p>
@@ -2657,7 +2657,7 @@
 <div class="displaymath" id="a0000000687">
   \[  100000k^2m^4\left(\varepsilon ^{1/40000}+(d/q)^{1/40000}+e^{-k/(2560000m^2)}\right).  \]
 </div>
-<p> Hence <a href="sec-induction.html#eq:one-goal">10</a>, <a href="sec-induction.html#eq:another-goal">11</a>, and <a href="sec-induction.html#eq:third-goal">7</a> give the three claimed conclusions, with \(Q^{\mathrm A}\) and \(Q^{\mathrm B}\) renamed as the theorem’s \(G^{\mathrm A}\) and \(G^{\mathrm B}\). </p>
+<p> Hence <a href="sec-induction.html#eq:final-left-point-consistency">10</a>, <a href="sec-induction.html#eq:final-right-point-consistency">11</a>, and <a href="sec-induction.html#eq:completed-polynomial-consistency">7</a> give the three claimed conclusions, with \(Q^{\mathrm A}\) and \(Q^{\mathrm B}\) renamed as the theorem’s \(G^{\mathrm A}\) and \(G^{\mathrm B}\). </p>
 
   </div>
 </div>
