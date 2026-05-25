@@ -22,40 +22,27 @@ projectivization/completion and line-169 handoff in the proof of
 `\label{thm:main-formal}`.
 
 This witness records only the data that remains after the checked
-role-unsymmetrization and pre-projective consistency steps.  The Section 6
-consistency field of `UnsymmetrizationConsistency` and the pre-projective
-consistency field of `ProjectivizationSelfConsistencyHandoff` are reconstructed
-downstream from the two paper factor-two role-block estimates and `hpass` via
-the checked line-116 triangle and Step 5 Schwartz--Zippel theorem.
-The remaining open data are exactly what is still missing after those mechanical
-steps:
+role-unsymmetrization and pre-projective consistency steps.  It stores the
+concrete role-register witness, not separate copies of the two factor-two
+role-block estimates from `inductive_step.tex` lines 97--108; those estimates
+are reconstructed from the role witness by
+`MainFormalRoleMeasurementWitness.toUnsymmetrizationConsistency`.  The
+pre-projective consistency field of `ProjectivizationSelfConsistencyHandoff` is
+also reconstructed downstream from the role witness and `hpass` via the checked
+line-116 triangle and Step 5 Schwartz--Zippel theorem.  The remaining open data
+are exactly what is still missing after those mechanical steps:
 
-* the role-register measurement and the two factor-two estimates from
-  `inductive_step.tex` lines 97--108;
 * the two completion-closeness estimates from lines 146--147; and
- * the two repaired polynomial line-169 links (Alice side and the role-reversed
-   Bob-side analogue), before line-171 data processing. -/
+* the two repaired polynomial line-169 links (Alice side and the role-reversed
+  Bob-side analogue), before line-171 data processing. -/
 structure MainFormalProjectiveCompletionTransportWitness
     (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι) (eps : Error) (k : ℕ)
     (scalars : MainFormalCascadeScalars params eps k) where
-  /-- The role-register polynomial POVM produced by the Section 6 induction call. -/
-  roleMeasurement : Measurement (Polynomial params) (Role × ι)
-  /-- Paper `eq:cons-b` / lines 97--108: original Alice point measurements are
-  consistent with the Bob-role extraction, with the factor-two loss. -/
-  pointARightPOVMConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-      (polynomialEvaluationFamily params (unsymmetrizedRightPOVM roleMeasurement).toSubMeas)
-      (2 * scalars.sigma)
-  /-- Paper `eq:cons-a` / lines 105--108: the Alice-role extraction is consistent
-  with original Bob point measurements, with the factor-two loss. -/
-  leftPOVMPointBConsistency :
-    ConsRel strategy.state (uniformDistribution (Point params))
-      (polynomialEvaluationFamily params (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas)
-      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-      (2 * scalars.sigma)
+  /-- The Section 6 role-register witness from which the unsymmetrized
+  factor-two estimates are reconstructed. -/
+  roleWitness : MainFormalRoleMeasurementWitness params strategy eps k scalars
   /-- The completed projective measurement denoted $Q^{\mathrm A}$. -/
   leftMeasurement : ProjMeas (Polynomial params) ι
   /-- The completed projective measurement denoted $Q^{\mathrm B}$. -/
@@ -63,13 +50,13 @@ structure MainFormalProjectiveCompletionTransportWitness
   /-- Left-register completion closeness, paper line 146 (`eq:G-with-Q-A`). -/
   leftCompletionCloseness :
     SDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas.liftLeft)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas.liftLeft)
       (constSubMeasFamily leftMeasurement.toSubMeas.liftLeft)
       scalars.zeta2
   /-- Right-register completion closeness, paper line 147. -/
   rightCompletionCloseness :
     SDDRel strategy.state (uniformDistribution Unit)
-      (constSubMeasFamily (unsymmetrizedRightPOVM roleMeasurement).toSubMeas.liftRight)
+      (constSubMeasFamily (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas.liftRight)
       (constSubMeasFamily rightMeasurement.toSubMeas.liftRight)
       scalars.zeta2
   /-- Repaired line 169, before the data-processing step at lines 171--173:
@@ -77,19 +64,30 @@ structure MainFormalProjectiveCompletionTransportWitness
   leftProjectiveRightPOVMPolynomialConsistency :
     ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily leftMeasurement.toSubMeas)
-      (constSubMeasFamily (unsymmetrizedRightPOVM roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedRightPOVM roleWitness.roleMeasurement).toSubMeas)
       scalars.line169Error
   /-- Bob-role mirror of the repaired line-169 estimate, before point-evaluation
   data processing. -/
   rightProjectiveLeftPOVMPolynomialConsistency :
     ConsRel strategy.state (uniformDistribution Unit)
       (constSubMeasFamily rightMeasurement.toSubMeas)
-      (constSubMeasFamily (unsymmetrizedLeftPOVM roleMeasurement).toSubMeas)
+      (constSubMeasFamily (unsymmetrizedLeftPOVM roleWitness.roleMeasurement).toSubMeas)
       scalars.line169Error
 
 namespace MainFormalProjectiveCompletionTransportWitness
 
-/-- View the factor-two role-block fields as the pre-projective target record. -/
+/-- The role-register polynomial POVM underlying the completion witness. -/
+def roleMeasurement
+    {params : Parameters} [FieldModel params.q]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {strategy : SameSpaceProjStrat params ι} {eps : Error} {k : ℕ}
+    {scalars : MainFormalCascadeScalars params eps k}
+    (witness : MainFormalProjectiveCompletionTransportWitness
+      params strategy eps k scalars) :
+    Measurement (Polynomial params) (Role × ι) :=
+  witness.roleWitness.roleMeasurement
+
+/-- Reconstruct the factor-two role-block fields as the pre-projective target record. -/
 noncomputable def toUnsymmetrizedPOVMTargets
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -100,8 +98,10 @@ noncomputable def toUnsymmetrizedPOVMTargets
     MainFormalCascadeUnsymmetrizedPOVMTargets params strategy eps k scalars where
   leftPOVM := unsymmetrizedLeftPOVM witness.roleMeasurement
   rightPOVM := unsymmetrizedRightPOVM witness.roleMeasurement
-  leftPOVMPointBConsistency := witness.leftPOVMPointBConsistency
-  pointARightPOVMConsistency := witness.pointARightPOVMConsistency
+  leftPOVMPointBConsistency :=
+    (witness.roleWitness.toUnsymmetrizationConsistency).pointBConsistency
+  pointARightPOVMConsistency :=
+    (witness.roleWitness.toUnsymmetrizationConsistency).pointAConsistency
 
 /-- Reconstruct paper line 116 from the factor-two role-block estimates and the
 original point-agreement bound. -/
@@ -226,7 +226,7 @@ theorem pointAConsistency_ofLine169Consistency
       (polynomialEvaluationFamily params
         (unsymmetrizedRightPOVM witness.roleMeasurement).toSubMeas)
       (2 * scalars.sigma)
-    exact witness.pointARightPOVMConsistency
+    exact (witness.roleWitness.toUnsymmetrizationConsistency).pointAConsistency
   have hCB : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas leftQ) (IdxMeas.toIdxSubMeas rightG)
       η := by
@@ -321,7 +321,7 @@ theorem pointBConsistency_ofLine169Consistency
         (unsymmetrizedLeftPOVM witness.roleMeasurement).toSubMeas)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
       (2 * scalars.sigma)
-    exact witness.leftPOVMPointBConsistency
+    exact (witness.roleWitness.toUnsymmetrizationConsistency).pointBConsistency
   have hAB : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas pointB) (IdxMeas.toIdxSubMeas leftG)
       (2 * scalars.sigma) := by

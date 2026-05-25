@@ -80,10 +80,7 @@ noncomputable def mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutc
     MainFormalProjectiveCompletionTransportWitness params strategy eps k scalars :=
   let leftMeasurement := Preliminaries.completeAtOutcomeProj P_A a_A
   let rightMeasurement := Preliminaries.completeAtOutcomeProj P_B a_B
-  let consistency := roleWitness.toUnsymmetrizationConsistency
-  { roleMeasurement := roleWitness.roleMeasurement
-    pointARightPOVMConsistency := consistency.pointAConsistency
-    leftPOVMPointBConsistency := consistency.pointBConsistency
+  { roleWitness := roleWitness
     leftMeasurement := leftMeasurement
     rightMeasurement := rightMeasurement
     leftCompletionCloseness := by

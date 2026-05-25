@@ -358,21 +358,16 @@ Paper origin: `references/ldt-paper/inductive_step.tex:84-109`
 
 The extracted POVMs are not additional fields: they are definitionally
 `unsymmetrizedLeftPOVM G` and `unsymmetrizedRightPOVM G`, i.e. the two principal
-role blocks of the role-register measurement `G`.  The two proof fields are
-exactly the paper's factor-two consistency estimates `eq:cons-a` and `eq:cons-b`
-from `inductive_step.tex` lines 97--108.  The constructor
-`UnsymmetrizationConsistency.ofSymConsistency` proves these two estimates from
-the symmetrized role-register consistency estimate. -/
+role blocks of the role-register measurement `G`.  The proof fields are exactly
+the paper's factor-two consistency estimates `eq:cons-a` and `eq:cons-b` from
+`inductive_step.tex` lines 97--108.  The constructor
+`UnsymmetrizationConsistency.ofSymConsistency` proves these estimates from the
+symmetrized role-register consistency estimate, but the estimate itself is not
+stored in this record. -/
 structure UnsymmetrizationConsistency (params : Parameters) [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (strategy : SameSpaceProjStrat params ι)
     (G : Measurement (Polynomial params) (Role × ι)) (sigma : Error) : Prop where
-  /-- The main-induction consistency input on the role-register symmetrized strategy. -/
-  symConsistency :
-    ConsRel (strategy.strategySymmetrization).state (uniformDistribution (Point params))
-      (IdxProjMeas.toIdxSubMeas (strategy.strategySymmetrization).pointMeasurement)
-      (polynomialEvaluationFamily params G.toSubMeas)
-      sigma
   /-- Paper `eq:cons-b` / lines 97--108: original Alice point measurements are
   consistent with the Bob-role extraction, with the factor-two loss. -/
   pointAConsistency :
@@ -409,8 +404,7 @@ theorem ofSymConsistency (params : Parameters) [FieldModel params.q]
     UnsymmetrizationConsistency params strategy G sigma := by
   haveI : Nonempty ι := strategy.isNormalized.nonempty.map Prod.fst
   refine
-    { symConsistency := h
-      pointAConsistency := ?_
+    { pointAConsistency := ?_
       pointBConsistency := ?_ }
   · constructor
     unfold bipartiteConsError
