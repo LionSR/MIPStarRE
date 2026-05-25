@@ -430,7 +430,7 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
                   (((IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy j)) s).outcome a) := by
               intro a
               simp [IdxSubMeas.liftLeft, sampledPointMeasurement, diagonalPointAnswerFamily,
-                hpoint]
+                diagonalPointAnswerFamilyOf, hpoint]
             have hB : ∀ a,
                 (((IdxSubMeas.liftRight (sampledDiagonalLineEvaluation params strategy))
                     (e (s, t))).outcome a) =
@@ -712,7 +712,8 @@ lemma answer_sampledDiagonalLineApproximation_pointWithDiagonalLine
                   (((IdxSubMeas.liftLeft
                     (AnswerSymStrat.diagonalPointAnswerFamily strategy j)) s).outcome a) := by
               intro a
-              simp [IdxSubMeas.liftLeft, AnswerSymStrat.diagonalPointAnswerFamily, hpoint]
+              simp [IdxSubMeas.liftLeft, AnswerSymStrat.diagonalPointAnswerFamily,
+                diagonalPointAnswerFamilyOf, hpoint]
             have hB : ∀ a,
                 (((IdxSubMeas.liftRight
                     (fun q => postprocess ((strategy.diagonalMeasurement q.1).toSubMeas)
