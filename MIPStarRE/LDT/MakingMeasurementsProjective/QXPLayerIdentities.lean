@@ -1,6 +1,3 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.RectangularSvd
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
 
 /-!
