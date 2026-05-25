@@ -70,7 +70,7 @@ The current large-file pressure has moved to later proof-development files.
 |---:|---:|---|---|
 | 994 | 9 | `ExpansionHypercubeGraph/Theorems.lean` | Thin barrel; content moved under `Theorems/`. |
 | 972 | deleted | `Commutativity/Scaffold.lean` | Former thin barrel; content lives under `Scaffold/`. |
-| 968 | 10 | `MakingMeasurementsProjective/QXPLayerData.lean` | Thin barrel; content moved under `QXPLayer/`. |
+| 968 | deleted | `MakingMeasurementsProjective/QXPLayerData.lean` | Former thin barrel; content lives under `QXPLayer/`. |
 | 949 | 9 | `Test/StrategySymmetrized.lean` | Thin barrel from PR #621. |
 | 939 | 9 | `Pasting/Sandwich.lean` | Thin barrel; content moved under `Sandwich/`. |
 | 937 | deleted | `MakingMeasurementsProjective/Naimark.lean` | Former thin barrel; concrete Naimark content lives in `NaimarkCore.lean`, `NaimarkOneMeas.lean`, and `NaimarkFull.lean`. |
