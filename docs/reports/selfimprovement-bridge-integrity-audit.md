@@ -82,12 +82,13 @@ removed or replaced by checked construction theorems under the corrected source
 statements.
 
 The SelfImprovement module compiles with all its lemmas, the Pasting module
-compiles independently, and the MainInductionStep module wires them together in
-principle.  The remaining gap is now represented in the current Lean interfaces
-rather than as extra hypotheses on the source-labelled blueprint theorems.  The
-proved final-transport theorem
-`mainFormal_ofProjectiveCompletionTransportWitness` is retained as useful proof content,
-but no public theorem supplies completion data as an additional hypothesis.
+compiles independently, and the MainInductionStep module wires them together
+through the checked successor construction.  The former gap described in the
+audit snapshot is no longer represented as an extra hypothesis on a
+source-labelled blueprint theorem.  The proved final-transport theorem
+`mainFormal_ofProjectiveCompletionTransportWitness` is retained as useful proof
+content, but no public theorem supplies completion data as an additional
+hypothesis.
 
 Under the current corrected theorem statements, the architecture described
 above is no longer incomplete.  The theorem boundary differs from the literal
@@ -185,11 +186,11 @@ mainInductionSuccessorNext_ofSmallErrorConstruction   (MainTheorems.lean)
 
 **The key observation:** the current corrected large-\(k\) Lean interface for
 `mainInduction` does not take a self-improvement package as a public hypothesis.
-The remaining non-base work is isolated in
-`mainInductionSuccessorNext_ofSmallErrorConstruction`.  The source-labelled
-`thm:main-induction` remains separate in the printed paper form, while the
-corrected large-\(k\) interface records the successor proof frontier tracked by
-#1507.
+The former non-base frontier was isolated in
+`mainInductionSuccessorNext_ofSmallErrorConstruction`; it has since been
+checked under the corrected large-\(k\) boundary.  The source-labelled
+`thm:main-induction` records the corrected paper-facing theorem, with the
+factor-\(400\) boundary documented separately.
 
 ### 1.4. MainFormal (Final Assembly)
 
@@ -413,7 +414,7 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixHelperBridge.lean` | Removed orphan module; direct SDP-to-helper wrappers no longer exist |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/ResidualDomination.lean` | Removed compatibility module; top-level residual-domination variants no longer exist |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationInputConstructors.lean` | Removed orphan module; unused obligation-package constructors no longer exist |
-| `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean` | Matrix-level SDP realization (used by orphan SDP bridges only) |
+| `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean` | Compatibility module for the canonical matrix realization and strong-duality route used by the SDP matrix bridge |
 | `MIPStarRE/LDT/Pasting/Core.lean` | `ldPasting` — consumed by `ldPastingInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` | `selfImprovementInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` | answer-valued carrier self-improvement construction |
