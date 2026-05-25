@@ -466,7 +466,7 @@ assert_standard_axioms
 -- Issue #1230 has been repaired for the public self-improvement theorem.
 assert_standard_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
 assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
--- Issue #1230 has also been repaired for the induction-section wrapper.
+-- Issue #1230 has also been repaired for the induction-section theorem.
 assert_standard_axioms MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection
 assert_standard_axioms
   MIPStarRE.LDT.SelfImprovement.selfImprovement_of_axisParallel_selfConsistency
