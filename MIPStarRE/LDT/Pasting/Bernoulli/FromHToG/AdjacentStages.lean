@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.StageA0M1
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain
 
 /-!
