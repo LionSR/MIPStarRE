@@ -92,8 +92,8 @@ largest files are:
   lines.
 - `MIPStarRE/LDT/Pasting/SwitcherooCompletion.lean` -- 1673 lines.
 - `MIPStarRE/LDT/Pasting/BridgeLemmas/OverAllOutcomes.lean` -- 1547 lines.
-- `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages.lean` -- 1533
-  lines.
+- deleted; the adjacent-stage chain now lives under
+  `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages/Chain.lean`.
 - `MIPStarRE/LDT/Test/ErrorCascade.lean` -- 1482 lines.
 
 The current proof-integrity grep finds one real `sorry` token:
