@@ -5,7 +5,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Assembly
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.FinalFields
 import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement

@@ -263,7 +263,7 @@ option-completed helper measurement.
 
 | Module | Used by |
 |--------|---------|
-| `SelfImprovement/Theorems/Results/HelperSSC` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
+| `SelfImprovement/Theorems/Results/HelperSSC/Assembly.lean` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
 | `SelfImprovement/Theorems/Results/BoundednessTransport/BoundednessGap.lean` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
 | `SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `MainInductionStep/SelfImprovementAssembly/Core.lean` |
 | `Pasting/Core.lean` → `ldPasting` | `MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` through `ldPastingInInductionSection`, then the successor-stage assembly |

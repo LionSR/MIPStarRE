@@ -200,7 +200,7 @@ theorems or tracked `sorry` sites on source-facing statements.
 
 #### `helperStrongSelfConsistency` — historical conditional route
 
-**File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean`
+**File:** `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC/Assembly.lean`
 
 - **`helper_strong_self_consistency_input_of_obligations`** (line 663): Takes `HelperStrongSelfConsistencyBounds` (a `∀` requiring local-variance and residual bounds for each `SelfImprovementHelperConclusion` output) → produces `HelperStrongSelfConsistencyInput`
 - **The actual derivation** (`helper_strong_self_consistency_bounds_of_selfConsistency_localVariance`, line 611): From a `BipartiteSSCRel` hypothesis on the helper output + local-variance/residual bounds → `HelperStrongSelfConsistencyBounds`
@@ -564,7 +564,7 @@ hypothesis route was not adopted as the paper-facing final theorem interface.
 |------|------|
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean` | `SelfImprovementHelperConclusion`, `SelfImprovementConclusion`, and remaining statement types; the former `SelfImprovementObligations` bundle has been removed |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `selfImprovementHelper`, `selfImprovement`; the former `selfImprovementFromObligations` theorem has been removed |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC.lean` | `helperStrongSelfConsistency` construction used by Section 9 |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC/Assembly.lean` | `helperStrongSelfConsistency` construction used by Section 9 |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/FinalFields.lean` | Final-field transport used in the checked `selfImprovement` proof |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/Statements.lean` | Current projectivization statements; the former orthonormalization and repair-input bundles are historical |
 | `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` | `spectralTruncationStatement_of_sourceAlmostProjective` (PROVED) |
