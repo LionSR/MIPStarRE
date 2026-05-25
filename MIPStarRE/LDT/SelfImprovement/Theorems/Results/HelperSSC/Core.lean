@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer
 
 /-!
 # Helper strong self-consistency bounds: core reductions
