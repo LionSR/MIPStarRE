@@ -403,15 +403,23 @@ Why this is a problem:
 
 ## Dead code
 
-I searched `MIPStarRE/LDT` for definitions whose names appear only at their definition site and never in any theorem statement or proof. These are dead in the current development.
+This table records definitions whose names appeared only at their definition
+site in the audited snapshot.  It is not a current deletion list.
+
+**Status note, 2026-05-25.**  The three self-improvement matrix-realization
+entries and `orthonormalizationCompletionError` are no longer live Lean
+declarations.  The remaining `spectralTruncationError` entry is stale in the
+opposite direction: the definition is now used throughout the spectral
+truncation, `QXPLayer`, and locality-preserving repair developments, and should
+not be treated as dead code.
 
 | Lean location | Lean code | What the paper says | Severity |
 | --- | --- | --- | --- |
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean:106-111` | `matrixAveragedSandwichedPolynomialOutcomeOperator` | Corresponds to the paper’s averaged `H_h = E_u A^u_{h(u)} T_h A^u_{h(u)}` from `references/ldt-paper/self_improvement.tex:203-205`, but no theorem uses it. | low |
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean:186-191` | `matrixHelperBoundednessGap` | Corresponds to the helper boundedness quantity from `references/ldt-paper/self_improvement.tex:51-58`, but it is not referenced by any theorem. | low |
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean:194-199` | `matrixProjectiveResidualGap` | Corresponds to the projective-output boundedness quantity used after self-improvement/pasting, but no theorem uses it. | low |
-| `MIPStarRE/LDT/MakingMeasurementsProjective/Defs.lean:297-298` | `orthonormalizationCompletionError` | Intended to encode the completion-to-measurement loss from the orthonormalization wrapper, but it is never referenced anywhere. | low |
-| `MIPStarRE/LDT/MakingMeasurementsProjective/Defs.lean:310-311` | `spectralTruncationError` | Intended to encode the `√ζ` truncation loss from `references/ldt-paper/orthonormalization.tex:447-529`, but the theorem layer never uses it. | low |
+| `MIPStarRE/LDT/MakingMeasurementsProjective/Defs.lean:297-298` | `orthonormalizationCompletionError` | Historical finding.  This declaration is no longer present in the active Lean tree. | low |
+| `MIPStarRE/LDT/MakingMeasurementsProjective/Defs.lean:310-311` | `spectralTruncationError` | Historical finding, now resolved in the other direction.  This declaration is live and used by the spectral-truncation, `QXPLayer`, and locality-preserving repair developments. | low |
 
 ## Category summary
 

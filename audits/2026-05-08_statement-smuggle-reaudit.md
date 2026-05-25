@@ -8,6 +8,12 @@ Section 5 follow-ups #1641 and #1642.  The live `*Statement` ledger remains
 #1379, with #1435 tracking the still-actionable spectral-truncation input
 cleanup.
 
+**Status note (2026-05-25).**  The one dead declaration found here,
+`MatrixAddInUTransferStatement`, is no longer present in the active Lean tree.
+Rows and recommendations below should therefore be read as the May 8 audit
+snapshot.  They are not an open instruction to re-delete or reintroduce that
+statement.
+
 ## Purpose
 
 Re-runs the audit prescribed by `docs/anti_patterns.md` §A6 ("External `*Statement`
@@ -89,7 +95,7 @@ explicit tracking entry.
 | 29 | `FromHToGStatement` | `Pasting/Statements.lean:451` | `Bernoulli/FromHToG.lean:34` | `ContextWrappers.lean:174` | — | **G**. |
 | 30 | `ChernoffBernoulliMatrixStatement` | `Pasting/Statements.lean:468` | `Bernoulli/MatrixChernoff.lean:97` | none external | A6 §"Acceptable" lists it explicitly | **G** — internally produced by `chernoffBernoulliMatrix` in `MatrixChernoff.lean:97`. (Originally classified E because A6 names it; the structure now has its own producer, so G is the correct verdict.) |
 | 31 | `LdPastingNCompletenessStatement` | `Pasting/Statements.lean:490` | `Bernoulli/Final.lean:300, 399` | `ContextWrappers.lean:64` | — | **G**. |
-| 32 | `MatrixAddInUTransferStatement` | `SelfImprovement/MatrixRealization.lean:148` | **none** | **none** | only mentioned in `docs/reports/issue-930-session49-selfimprovement-audit.md:164` | **D** — **DEAD**. Defined, never produced, never consumed. The session-49 audit notes "These are …" and the sentence is cut off in the report. Either delete or surface a docstring + tracker explaining its purpose. |
+| 32 | `MatrixAddInUTransferStatement` | `SelfImprovement/MatrixRealization.lean:148` | **none** | **none** | only mentioned in `docs/reports/issue-930-session49-selfimprovement-audit.md:164` | **D** — **DEAD** at the May 8 snapshot; removed from the active Lean tree by 2026-05-25. |
 | 33 | `MatrixSdpStatementWithSlackness` | `SelfImprovement/MatrixRealization/Canonical/Witness.lean:145` | `Canonical/Saturated.lean:143, 175`; `Witness.lean:292`; `SdpMatrixBridge.lean:152` | consumed by `SdpStatementWithSlackness` producer in `SdpMatrixBridge.lean:335, 358, 402` | #1230 | **G** — added 2026-04-30/05-01 (PRs #1346, #1347, #1340). Connected to abstract `SdpStatementWithSlackness` via the matrix bridge. |
 | 34 | `MatrixSdpStatementWithSlacknessAndDominance` | `SelfImprovement/MatrixRealization/Canonical/Witness.lean:159` | `Witness.lean:191, 223`; `SdpMatrixBridge.lean:196` | `Witness.lean:291, 302`; `SdpMatrixBridge.lean:356` | #1230 | **G** — added 2026-04-30. Same comment. |
 | 35 | `AddInUStatement` | `SelfImprovement/Theorems/Statements.lean:276` | `Results/HelperCompleteness/Bracketed.lean:573` | `Statements.lean:308` (internal) | #1230 (indirect) | **G**, connected internally. Verify it's consumed beyond its own helper. |
@@ -119,9 +125,9 @@ lapsed.**
 
 - **38 of 39** Statements are either grounded (producer exists), tracked
   (open issue documents the missing producer), or genuine external citations.
-- **1 of 39** is dead scaffolding: `MatrixAddInUTransferStatement` —
-  zero producers, zero consumers. Should be deleted, or have a docstring +
-  tracker explaining why it is being kept.
+- **1 of 39** was dead scaffolding at the audit snapshot:
+  `MatrixAddInUTransferStatement`, with zero producers and zero consumers.  It
+  has since been deleted from the active Lean tree.
 
 **Verdict counts** (sum to 39):
 - **G** (grounded): 33 — including row 30 `ChernoffBernoulliMatrixStatement`
@@ -134,7 +140,8 @@ lapsed.**
 - **E** (genuine external citation): 2 — `RazSafraSoundnessStatement` and
   `PolishchukSpielmanClassicalSoundnessStatement`.
 - **P** (paper-faithful packaging): 1 — `NormalizationConditionStatement`.
-- **D** (dead): 1 — `MatrixAddInUTransferStatement`.
+- **D** (dead): 1 at the audit snapshot — `MatrixAddInUTransferStatement`,
+  now removed.
 
 ## Strengthened policy (per maintainer 2026-05-08): "earn your place"
 
@@ -232,7 +239,7 @@ the surface area, and one entry (`MatrixAddInUTransferStatement`) was never
 wired up. Future SDP work should produce *into* the existing abstract layer
 rather than mirror-add a third layer.
 
-### 2. `MatrixAddInUTransferStatement` is dead
+### 2. `MatrixAddInUTransferStatement` was dead at the audit snapshot
 
 ```
 MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean:148:structure MatrixAddInUTransferStatement {Outcome : Type*} [Fintype Outcome]
@@ -240,12 +247,9 @@ docs/reports/issue-930-session49-selfimprovement-audit.md:164: ... `MatrixAddInU
 ```
 
 The session-49 audit was about to explain what these are, then the sentence
-trails off. Today the structure is referenced nowhere except its own
-definition and that audit comment. Either:
-
-- delete the structure and its file dependencies, or
-- write a docstring explaining the planned producer + consumer + open a
-  tracker.
+trails off.  At the May 8 snapshot the structure was referenced nowhere except
+its own definition and that audit comment.  The active Lean tree no longer
+contains the declaration.
 
 ### 3. Two `*Statement` entries need consumer/producer chain verification
 
@@ -274,9 +278,8 @@ was a static snapshot, not a CI-checked invariant.
 
 ### Immediate (this audit)
 
-1. **Delete or justify `MatrixAddInUTransferStatement`.** Smallest possible
-   change. Either remove the declaration and any imports of
-   `MatrixRealization.lean:148` it produces, or add a docstring + tracker.
+1. The `MatrixAddInUTransferStatement` deletion has been completed.  Future
+   audit work should only reopen this item if the name is reintroduced.
 2. **Verify `LdSandwichLineOnePointStatement` and `SdpStatement` chains.**
    ~10 min of grep each. If the consumer/producer chain checks out, mark them
    **G**; otherwise file a tracker.
