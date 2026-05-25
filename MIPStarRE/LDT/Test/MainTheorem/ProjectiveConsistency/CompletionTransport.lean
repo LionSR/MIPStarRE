@@ -254,8 +254,8 @@ theorem pointAConsistency_ofLine169Consistency
   simpa [pointA, rightG, leftQ, rightQ, polynomialEvaluationMeasurementFamily,
     add_assoc] using htriangle
 
-/-- Derive paper `eq:one-goal` from `eq:cons-b`, line 172 obtained by data
-processing line 169, and evaluated line 164. -/
+/-- Derive the final left point-consistency relation from `eq:cons-b`, line 172
+obtained by data processing line 169, and evaluated line 164. -/
 theorem pointAConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -369,8 +369,9 @@ theorem pointBConsistency_ofLine169Consistency
       (2 * scalars.sigma + 2 * Real.sqrt (η + scalars.zeta3 / 2)) htriangle
   simpa [pointB, leftG, rightQ, leftQ, polynomialEvaluationMeasurementFamily] using htarget
 
-/-- Derive paper `eq:another-goal` by the Bob-role mirror of the `eq:one-goal`
-triangle, again data-processing the polynomial line-169 mirror first. -/
+/-- Derive the final right point-consistency relation by the Bob-role mirror of
+the preceding triangle, again data-processing the polynomial line-169 mirror
+first. -/
 theorem pointBConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]

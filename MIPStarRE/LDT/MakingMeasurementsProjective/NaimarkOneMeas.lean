@@ -244,9 +244,7 @@ Define `P̂_a = V†(I ⊗ |a⟩⟨a|)V`. Then `P̂_a` is an orthogonal projecti
 `(I⊗⟨⊥|) P̂_a (I⊗|⊥⟩) = √M_a · √M_a = M_a` gives the result.
 
 The proof uses `CFC.sqrt` for PSD operators together with lemmas such as
-`CFC.sqrt_mul_sqrt_self`. A future refactor could re-express the argument
-using a more specialized positive-semidefinite square-root interface if
-that becomes more convenient. -/
+`CFC.sqrt_mul_sqrt_self`. -/
 theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (M : MIPStarRE.Quantum.Submeasurement α d) :

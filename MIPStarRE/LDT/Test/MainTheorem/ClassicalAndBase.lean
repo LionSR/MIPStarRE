@@ -24,7 +24,7 @@ axis-parallel line test directly.
 ## References
 
 * Paper: `references/ldt-paper/inductive_step.tex`,
-  base case for `m = 1` in the proof of `\Cref{thm:main-induction}`.
+  base case for `m = 1` in the proof of `thm:main-induction`.
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
   `\label{lem:main-induction-base}` and
   `\label{lem:main-formal-base-case-handoff}`.

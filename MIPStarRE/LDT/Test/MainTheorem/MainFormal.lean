@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Test.StrategyBiProj
 # Main-formal soundness theorem
 
 Base handoff, final projective-completion transport, and the current same-space
-formal interface toward `thm:main-formal` (`\Cref{thm:main-formal}`).  This
+formal interface toward `thm:main-formal`.  This
 module contains:
 
 * `mainFormalBaseRoleInductionWitness` — names the Section 6 role-register witness
@@ -42,7 +42,7 @@ module contains:
 ## References
 
 * Paper: `references/ldt-paper/test_definition.tex`,
-  `\Cref{thm:main-formal}` at line 180; its proof is in
+  `thm:main-formal` at line 180; its proof is in
   `references/ldt-paper/inductive_step.tex` (lines 26–236).
 * Blueprint: `blueprint/src/chapter/ch02_test.tex`,
   `\label{thm:main-formal-current-interface}`; and
