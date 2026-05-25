@@ -1,7 +1,4 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Completeness
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.SelfCloseness
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.FinalFields
 
 /-!
 # Self-improvement theorem and final-fields constructors
