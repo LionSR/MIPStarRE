@@ -1,6 +1,3 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.BernoulliTail
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.AveragesAndOps
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.StageMass
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.FactBundles
 
 /-!
