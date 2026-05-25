@@ -384,7 +384,7 @@ compatibility module imports all the proof leaves.
 |--------|---------|
 | **Compilation parallelism** | Lean's per-file compilation is single-threaded per file; smaller files mean faster individual type-checking loops |
 | **Dependency isolation** | A proof leaf in `Pasting/Sandwich/` only depends on `Pasting/Defs.lean` and `Pasting/Statements.lean`, not on the entire pasting proof chain |
-| **Edit locality** | Changing a helper in `SelfImprovement/Theorems/Results/AddInUStep12.lean` does not re-elaborate `AddInUStep34AndTransfer.lean` unless the helper's type changed |
+| **Edit locality** | Changing a helper in `SelfImprovement/Theorems/Results/AddInUStep12/Raw.lean` does not re-elaborate unrelated downstream leaves unless the helper's type changed |
 | **Reviewability** | A 200-line proof leaf is easier to review than a 4000-line monolithic proof block |
 | **Parallel agent work** | Different agents can work on different proof leaves concurrently without merge conflicts |
 
