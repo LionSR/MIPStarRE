@@ -46,7 +46,7 @@ of repeating the finite-fiber calculation for identity postprocessing.
 
 The only self-improvement call site found by the audit is the private lemma
 `polynomialEvaluationFamily_outcome_eq_fiber_sum`, currently in
-`MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness.lean`.
+`MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness/Bracketed.lean`.
 That proof rewrites the evaluated polynomial family by
 `SubMeas.postprocess_outcome`.
 
