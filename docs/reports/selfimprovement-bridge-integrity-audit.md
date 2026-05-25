@@ -359,12 +359,13 @@ by additional hypotheses:
 
 ### Is the architecture broken?
 
-The architecture is usable but incomplete.  The assembly functions from
-`RoleRegister.lean` describe the intended construction.  A conditional helper is
-acceptable only as an explicitly named proof-frontier object with a discharge
-plan; it must not be advertised as the paper theorem.  The source theorem itself
-must not acquire non-paper bridge hypotheses.  What remains missing is an
-internal proof that supplies these inputs from the paper hypotheses.
+The architecture is usable but incomplete.  The assembly declarations in
+`RoleRegister/Core.lean` describe the intended construction.  A conditional
+helper is acceptable only as an explicitly named proof-frontier object with a
+discharge plan; it must not be advertised as the paper theorem.  The source
+theorem itself must not acquire non-paper bridge hypotheses.  What remains
+missing is an internal proof that supplies these inputs from the paper
+hypotheses.
 
 ### What would close the gap?
 
@@ -422,5 +423,5 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` | ordinary and answer-valued stage-data conversions |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly/Successor.lean` | `assembleAveragedPastingData` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | source-final statement and obligation, current same-space interface, and proved final transport |
-| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | role-register witness constructors routed through Section 6 `mainInduction` |
+| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister/Core.lean` | role-register witness constructors routed through Section 6 `mainInduction` |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued restricted-slice weighted bounds and recursive-slice targets |

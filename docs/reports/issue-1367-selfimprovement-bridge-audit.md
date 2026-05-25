@@ -127,7 +127,8 @@ As of 2026-05-08, this report identified the successor-case branch at
 
 At the time of this report, PR #1374 proposed adding two new hypotheses to
 `mainFormal` and replacing the `sorry` with a call to existing constructors in
-`RoleRegister.lean`.  Under the current #1458 policy, that route is historical:
+the former `RoleRegister.lean` compatibility module.  Under the current #1458
+policy, that route is historical:
 the paper-facing theorem should instead keep the paper statement and discharge
 the missing analytic content through named obligation theorems or separately named
 conditional helpers.
@@ -322,7 +323,10 @@ assumptions.
 
 ### 4.1 Historical RoleRegister wiring
 
-**File:** `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean`
+**Former file:** `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean`
+
+The live role-register measurement witness is now in
+`MIPStarRE/LDT/Test/MainTheorem/RoleRegister/Core.lean`.
 
 The older branch-residual route used the following proved wiring functions:
 - `successorOfObligations` (line 547): takes `hrec` and the corresponding
@@ -353,8 +357,13 @@ does not permit this as the paper-facing theorem shape:
 ```
 
 Where:
-- **`MainFormalSuccessorAnswerSliceWitness`** (new `abbrev`, line ~23): Expands `answerSuccessorRecursiveSlicesInput` from `RoleRegister.lean` — a `Prop` asserting per-slice induction conclusions for the transported predecessor
-- **`MainFormalSuccessorAnswerSliceBridge`** (new `abbrev`, line ~41): Expands `answerSuccessorSelfImprovementObligations` from `RoleRegister.lean` — a type recording per-slice self-improvement obligations
+- **`MainFormalSuccessorAnswerSliceWitness`** (new `abbrev`, line ~23): Expanded
+  `answerSuccessorRecursiveSlicesInput` from the former `RoleRegister.lean`
+  route: a `Prop` asserting per-slice induction conclusions for the transported
+  predecessor
+- **`MainFormalSuccessorAnswerSliceBridge`** (new `abbrev`, line ~41): Expanded
+  `answerSuccessorSelfImprovementObligations` from the former `RoleRegister.lean`
+  route: a type recording per-slice self-improvement obligations
 
 The historical branch then used these two new parameters to construct a role
 residual and call the old conditional assembly route.
@@ -564,7 +573,7 @@ hypothesis route was not adopted as the paper-facing final theorem interface.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` | Stage-data constructors, including conversion from answer-valued to ordinary self-improvement data |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `answerMainInduction`, and the checked successor construction |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Source-final statement and obligation, current same-space interface, and proved final transport |
-| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | Role-register witness constructors routed through Section 6 `mainInduction` |
+| `MIPStarRE/LDT/Test/MainTheorem/RoleRegister/Core.lean` | Role-register witness constructors routed through Section 6 `mainInduction` |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued restricted-slice weighted bounds and recursive-slice targets |
 | `MIPStarRE/LDT/Test/MainTheorem/OrthonormalizationData.lean` | Current line-130 orthonormalization residual construction |
 

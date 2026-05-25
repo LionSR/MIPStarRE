@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.MainTheorem.RoleRegister
+import MIPStarRE.LDT.Test.MainTheorem.RoleRegister.Core
 
 /-!
 # Unsymmetrized target records

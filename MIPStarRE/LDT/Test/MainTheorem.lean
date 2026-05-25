@@ -21,7 +21,7 @@ The imported modules carry the split proof assembly:
 * `ClassicalAndBase` — classical soundness and the base case `m = 1`
 * `AnswerValuedRestriction` — answer-valued `x`-restricted successor route
 * `ErrorScalars` — the Section 3 error cascade `σ, ζ₁, …, ζ₄`
-* `RoleRegister` — role-register measurement and branch witness
+* `RoleRegister.Core` — role-register measurement and branch witness
 * `UnsymmetrizedTargets` — factor-two unsymmetrization and projective assembly
 * `ProjectiveConsistency` — projective-consistency transport through lines 154–172
 * `CompletionTransport` — post-role completion transport witnesses
