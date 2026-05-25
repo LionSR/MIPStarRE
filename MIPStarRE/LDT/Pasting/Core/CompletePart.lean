@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Pasting.Statements
-import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 
 /-!
