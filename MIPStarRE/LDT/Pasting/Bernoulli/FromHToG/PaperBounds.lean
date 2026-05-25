@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds.SandwichContext
 
 /-!
