@@ -17,7 +17,7 @@ All original declarations remain available under the same namespace.
 - `AddInUDiagonalAndDefs` — diagonal add-in-u specialization, Q₀–Q₄ CS chain defs
 - `AddInUPointConsistency` — off-diagonal add-in-u selection infrastructure for
   helper `A`-consistency
-- `AddInUStep12` — algebraic alignment and raw CS Step 1/2 bounds
+- `AddInUStep12.{Raw,Selected}` — algebraic alignment and raw CS Step 1/2 bounds
 - `AddInUStep34AndTransfer` — variance conversions, factored CS, assembly, transfer
 - `HelperSSC` — final helper strong self-consistency bounds construction
 - `BoundednessTransport` — off-diagonal decomposition, boundedness gap transport,

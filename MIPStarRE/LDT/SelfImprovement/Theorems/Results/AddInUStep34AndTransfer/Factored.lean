@@ -5,7 +5,8 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Raw
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Selected
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 
 /-!
