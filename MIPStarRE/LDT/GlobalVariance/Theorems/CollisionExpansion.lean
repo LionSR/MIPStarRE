@@ -558,27 +558,6 @@ lemma generalizeBCollisionResidual_le_error
   rw [generalizeBCollisionResidual_eq_seedCollisionExpansion]
   exact generalizeBSeedCollisionExpansion_le_error params strategy G g
 
-/-- Strategy-state reduction for `lem:generalize-b` after the projective expansion.
-
-This theorem removes the conclusion-shaped pointwise norm hypothesis from the
-legacy wrapper.  The residual input is exactly the line-collision quantity
-bounded above by `generalizeBCollisionResidual_le_error`, following
-`expansion.tex`, lines 286--288. -/
-lemma generalizeBFromCollisionResidual
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (hcollision :
-      ∀ g : Polynomial params,
-        generalizeBCollisionResidual params strategy strategy.state G g ≤
-          generalizeBError params) :
-    GeneralizeBStatement params strategy strategy.state G := by
-  refine generalizeB_of_pointwise params strategy G strategy.state ?_
-  intro g
-  rw [generalizeBDeviationAtPolynomial_eq_collisionResidual]
-  exact hcollision g
-
 /-- Pointwise Schwartz--Zippel bound for the strategy-state form of
 `lem:generalize-b`.
 
@@ -608,7 +587,8 @@ lemma generalizeBFromSchwartzZippel
     (_hgood : strategy.IsGood _eps _delta _gamma)
     (G : SubMeas (Polynomial params) ι) :
     GeneralizeBStatement params strategy strategy.state G := by
-  exact generalizeBFromCollisionResidual params strategy G
-    (generalizeBCollisionResidual_le_error params strategy G)
+  refine generalizeB_of_pointwise params strategy G strategy.state ?_
+  intro g
+  exact generalizeBPointwiseSchwartzZippel params strategy G g
 
 end MIPStarRE.LDT.GlobalVariance
