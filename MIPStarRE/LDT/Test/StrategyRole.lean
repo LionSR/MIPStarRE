@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Test.StrategyRole.Core
 import MIPStarRE.LDT.Test.StrategyRole.Algebra
 import MIPStarRE.LDT.Test.StrategyRole.Symmetrization
 
