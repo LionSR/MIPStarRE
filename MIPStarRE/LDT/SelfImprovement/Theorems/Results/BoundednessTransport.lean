@@ -1,6 +1,3 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.Decomposition
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.PointConsistency
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.PointConsistencyLiteral
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
 
 /-!
