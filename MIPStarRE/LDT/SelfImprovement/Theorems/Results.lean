@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
 # Section 9 — Self-improvement theorem wrappers
@@ -29,7 +29,8 @@ All original declarations remain available under the same namespace.
   (`projective_boundedness_gap_le_helper_boundedness_gap`,
   `final_fields_projective_residual_bound_natural`,
   `final_fields_projective_residual_bound`, `final_fields_bounded`)
-- `SelfImprovementTop` — `selfImprovement` wrappers and final-field targets
+- `SelfImprovementTop.{Completeness,SelfCloseness,FinalFields,Core}` —
+  `selfImprovement` wrappers and final-field targets
 
 ## References
 
