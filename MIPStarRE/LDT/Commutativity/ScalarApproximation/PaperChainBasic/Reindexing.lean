@@ -1,5 +1,4 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
+import MIPStarRE.LDT.Commutativity.Scaffold.Products
 import MIPStarRE.LDT.CommutativityPoints.Approximation
 
 /-!
