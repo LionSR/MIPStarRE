@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Completeness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.SelfCloseness
 

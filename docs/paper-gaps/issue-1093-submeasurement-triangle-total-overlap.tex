@@ -14,7 +14,25 @@
 \begin{document}
 \maketitle
 
-\section{The cited step}
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty.} Medium.  The issue is a missing
+  submeasurement-total term in a triangle-substitution step, rather than a
+  failure of the underlying state-dependent distance estimate.
+  \item \textbf{Estimated weight.} One project-local transport estimate and its
+  scalar absorption into the self-improvement final-fields construction.
+  \item \textbf{Mathlib/project split.} The obstruction is project-local:
+  Mathlib supplies the elementary order and square-root inequalities, while the
+  additional term comes from the project's submeasurement consistency
+  definitions.
+  \item \textbf{Key mathematical inputs.} The measurement-valued triangle
+  substitution lemma, the submeasurement total-overlap displacement, and the
+  projective point-consistency transport in the self-improvement final-fields
+  route.
+\end{itemize}
+
+\section{Key theorem forms for the projective point-consistency transport}
 
 This note concerns the projective point-consistency step in the
 self-improvement theorem of \cite[Section~9]{Ji2020LowIndividualDegree}.%
@@ -91,7 +109,7 @@ explicitly.%
 \doclink{MIPStarRE/LDT/Preliminaries/Triangles.lean}.  The self-improvement
 wrappers are \leanid{final\_fields\_point\_consistency\_totalGap\_natural} and
 \leanid{final\_fields\_point\_consistency\_totalGap} in
-\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean}.}
+\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport/PointConsistencyLiteral.lean}.}
 In ordinary mathematical terms, the formal lemma says that if the helper
 point-consistency error is at most $\delta$, the state-dependent distance
 between the two right-register submeasurement families is at most $\varepsilon$,

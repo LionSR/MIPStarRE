@@ -21,8 +21,10 @@ All original declarations remain available under the same namespace.
 - `AddInUStep12.{Raw,Selected}` — algebraic alignment and raw CS Step 1/2 bounds
 - `AddInUStep34AndTransfer` — variance conversions, factored CS, assembly, transfer
 - `HelperSSC` — final helper strong self-consistency bounds construction
-- `BoundednessTransport` — off-diagonal decomposition, boundedness gap transport,
-  projective-residual estimates
+- `BoundednessTransport.Decomposition`, `BoundednessTransport.PointConsistency`,
+  `BoundednessTransport.PointConsistencyLiteral`, and `BoundednessTransport.BoundednessGap`
+  — off-diagonal decomposition, boundedness gap transport, projective-residual
+  estimates
   (`projective_boundedness_gap_le_helper_boundedness_gap`,
   `final_fields_projective_residual_bound_natural`,
   `final_fields_projective_residual_bound`, `final_fields_bounded`)

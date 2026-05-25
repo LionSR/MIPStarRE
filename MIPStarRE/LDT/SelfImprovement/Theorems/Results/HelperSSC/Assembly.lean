@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.PostDeleteA
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
 
 /-!
 # Helper strong self-consistency bounds: residual assembly
