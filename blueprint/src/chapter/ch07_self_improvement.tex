@@ -1180,13 +1180,13 @@ the passage from~$\widehat H$ to a projective submeasurement~$H$.
     ={}& \bra{\psi} Z \ot I \ket{\psi} - \sum_h \bra{\psi} Z \ot H_h \ket{\psi} \notag\\
     \leq{}& \bra{\psi} Z \ot I \ket{\psi} - \sum_h \bra{\psi} \E_{u} A^{u}_{h(u)} \ot H_h \ket{\psi} \notag\\
     ={}& \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_h \bra{\psi}  A^{u}_{h(u)} \ot H_h \ket{\psi} \notag\\
-    ={}& \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}. \label{eq:almost-there-self-improvement-edition}
+    ={}& \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot H_{[h(u)=a]} \ket{\psi}. \label{eq:projective-boundedness-expanded}
   \end{align}
   Proposition~\ref{prop:easy-approx-from-approx-delta} upgrades
   \lean{MIPStarRE.LDT.SelfImprovement.helper_boundedness_gap_transport_through_data_processing}
   \eqref{eq:approx-data-processed} to the scalar estimate
   \[
-    \eqref{eq:almost-there-self-improvement-edition}
+    \eqref{eq:projective-boundedness-expanded}
     \le \bra{\psi} Z \ot I \ket{\psi} -\E_{u} \sum_a \bra{\psi}  A^{u}_{a} \ot \widehat H_{[h(u)=a]} \ket{\psi} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}},
   \]
   and now \ref{item:self-improvement-boundedness} of Lemma~\ref{lem:self-improvement-helper} bounds this by $\widehat{\zeta} + \sqrt{\widehat{\zeta}_{\mathrm{dataprocess}}}$.
