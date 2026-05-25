@@ -19,6 +19,14 @@ Thus the inventory below should be read as a snapshot of former `sorryAx`
 dependencies, not as a current list of declarations intentionally allowed to
 depend on `sorryAx`.
 
+**Status note (2026-05-25).**  The QXP-repair qualification below is also
+historical.  The declarations
+`MakingMeasurementsProjective.orthonormalizationCompletionRoute`,
+`MakingMeasurementsProjective.orthonormalizationMainLemma`, and
+`MakingMeasurementsProjective.orthonormalization` are now audited in
+`MIPStarRE/LDT/Test/AxiomAudit.lean` as standard-axiom clean, and issue #1032 is
+closed as completed.
+
 ## Purpose
 
 This note originally recorded the status of `sorryAx` and explicit axiom-like
@@ -77,8 +85,8 @@ audit records that `globalVarianceOfPoints`,
 `laplacianSpectralGapOrdered`, `classicalTestSoundness`, and the
 orthonormalization completion route do not depend on `sorryAx`.  The public
 theorem `MakingMeasurementsProjective.orthonormalization` also no longer
-depends on `sorryAx`: PR #1632 restored the paper constant while leaving the
-heterogeneous `orthonormalizationMainLemma` as the remaining issue-#1032 direct
+depends on `sorryAx`; the heterogeneous `orthonormalizationMainLemma` is now
+checked by the same standard-axiom audit, so issue #1032 is no longer a live
 proof obligation.
 
 ## Verdict
