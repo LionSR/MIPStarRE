@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Test.StrategyBiProj.DirectSum
-import MIPStarRE.LDT.Test.StrategyBiProj.Measurements
 import MIPStarRE.LDT.Test.StrategyBiProj.SameSpace
 
 /-!
