@@ -1,5 +1,4 @@
 import Mathlib.Analysis.Convex.SpecificFunctions.Pow
-import Mathlib.Analysis.MeanInequalitiesPow
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
 
