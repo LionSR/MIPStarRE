@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain
+import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.SumForm
 
 namespace MIPStarRE.LDT.GlobalVariance
 
