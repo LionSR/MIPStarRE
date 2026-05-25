@@ -205,7 +205,7 @@ where
 \end{lemma}
 \begin{proof}
 	\leanok
-	\uses{lem:h-b-consistency, cor:ld-pasting-N-completeness, prop:triangle-sub}
+	\uses{def:pasted-measurement, lem:h-b-consistency, cor:ld-pasting-N-completeness, prop:triangle-sub}
 	Let $H$ be the pasted submeasurement constructed in Definition~\ref{def:pasted-measurement}. Lemma~\ref{lem:h-b-consistency} implies
 	\begin{equation}\label{eq:h-b-consistency-at-a-point}
 		H_{[h(u,x)=a]} \ot I \simeq_{\nu_6} I \ot B^u_{[f(x)=a]}.
@@ -450,6 +450,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{corollary}
 \begin{proof}
 	\leanok
+	\uses{lem:g-complete-self-consistency}
 	Since $G_\bot^x = I-G^x$,
 	\[
 		G_\bot^x \ot I - I \ot G_\bot^x = I \ot G^x - G^x \ot I,
@@ -624,6 +625,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{corollary}
 \begin{proof}
 	\leanok
+	\uses{lem:commutativity-switcheroo}
 	By \ref{eq:complete-slice-commutativity},
 	\begin{equation}\label{eq:complete-outcome-commutativity}
 		G_g^x G_h^y \ot I \approx_{\nu_{\mathrm{com}}} G_h^y G_g^x \ot I.
@@ -660,6 +662,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{corollary}
 \begin{proof}
 	\leanok
+	\uses{cor:commuting-with-G-complete}
 	The identities
 	\[
 		G_g^x G_\bot^y - G_\bot^y G_g^x = G^y G_g^x - G_g^x G^y
@@ -1011,6 +1014,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{lemma}
 \begin{proof}
 	\leanok
+	\uses{lem:commute-g-half-sandwich, lem:ld-gbcon}
 	Summing out the coordinates to the right of $i$ gives
 	\begin{equation}\label{eq:sum-out-right-coordinates}
 		\begin{aligned}
@@ -1085,6 +1089,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{lemma}
 \begin{proof}
 	\leanok
+	\uses{def:pasted-measurement, prop:ld-dnoteq, lem:ld-sandwich-line-one-point,
+		lem:line-interpolation-averaging-estimates}
 	The inconsistency with $B^u$ expands as
 	\begin{align}
 		    & \E_u \sum_{f\ne f'} \bra{\psi} H_{[h|_u=f']} \ot B_f^u \ket{\psi}\nonumber                                   \\
@@ -1189,6 +1195,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{corollary}
 \begin{proof}
 	\leanok
+	\uses{cor:h-a-consistency, cor:ld-pasting-N-completeness,
+		lem:h-a-consistency-completed-from-submeas}
 	Corollary~\ref{cor:h-a-consistency} gives
 	\[
 		H_{[h(u,x)=a]} \ot I \simeq_{\nu} I \ot A_a^{u,x}.
@@ -1252,6 +1260,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{lemma}
 \begin{proof}
 	\leanok
+	\uses{def:outcomes-by-type, prop:ld-dnoteq, lem:ld-sandwich-line-one-point,
+		lem:schwartz-zippel-individual}
 	Let $(y_1,\dots,y_k)\sim \mathsf{Distinct}_k$. By definition,
 	\begin{align}
 		\bra{\psi} H \ot I \ket{\psi}
@@ -1395,6 +1405,9 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{lemma}
 \begin{proof}
 	\leanok
+	\uses{cor:G-hat-facts, lem:q-sdd-complete-part-slice-bound,
+		lem:commute-g-half-sandwich, def:pasted-measurement,
+		def:truncated-type-sums, lem:truncated-type-sum-recurrence}
 	For a type $\tau \in \{0,1\}^k$, write $\tau_{<\ell}$, $\tau_{>\ell}$, $\tau_{\le \ell}$, and $\tau_{\ge \ell}$ for the obvious truncations, and similarly for tuples $g$. Also write
 	\[
 		\widehat G_{g_{\ge \ell}}^{x_{\ge \ell}}
@@ -1761,6 +1774,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{corollary}
 \begin{proof}
 	\leanok
+	\uses{lem:over-all-outcomes, lem:from-H-to-G, lem:chernoff-bernoulli-matrix}
 	Lemma~\ref{lem:over-all-outcomes} gives
 	\[
 		\bra{\psi} H \ot I \ket{\psi}

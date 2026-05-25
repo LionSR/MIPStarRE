@@ -508,103 +508,6 @@ theorem roleRegisterSymmState_isNormalized {ιA ιB : Type*}
   field_simp [hA, hB]
   ring_nf
 
-theorem ev_roleRegisterSymmState_rolePair_AB_localPairABBlock {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Nonempty ιA]
-    [Fintype ιB] [DecidableEq ιB] [Nonempty ιB]
-    (ψ : QuantumState (ιA × ιB)) (Z : MIPStarRE.Quantum.Op (ιA × ιB)) :
-    ev (roleRegisterSymmState ψ)
-      (rolePairDirectSumCond Role.A Role.B (localPairABBlock Z)) =
-      (1 / 2 : Error) * ev ψ Z := by
-  unfold ev roleRegisterSymmState
-  change Complex.re (MIPStarRE.Quantum.normalizedTrace (((roleRegisterDensityScale ιA ιB : ℂ) •
-      rolePairDirectSumCond Role.A Role.B (localPairABBlock ψ.density) +
-      (roleRegisterDensityScale ιA ιB : ℂ) •
-        rolePairDirectSumCond Role.B Role.A
-          (localPairBABlock (heterogeneousSwapDensity ψ.density))) *
-        rolePairDirectSumCond Role.A Role.B (localPairABBlock Z))) =
-    (1 / 2 : Error) * ev ψ Z
-  rw [Matrix.add_mul, MIPStarRE.Quantum.normalizedTrace_add]
-  rw [smul_mul_assoc, smul_mul_assoc]
-  rw [rolePairDirectSumCond_mul_same, rolePairDirectSumCond_BA_mul_AB]
-  rw [localPairABBlock_mul]
-  rw [MIPStarRE.Quantum.normalizedTrace_smul, MIPStarRE.Quantum.normalizedTrace_smul]
-  simp only [MIPStarRE.Quantum.normalizedTrace_zero, mul_zero, add_zero]
-  rw [normalizedTrace_rolePairDirectSumCond, normalizedTrace_localPairABBlock]
-  let T := MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)
-  let R : ℂ :=
-    (Fintype.card ιA : ℂ) * (Fintype.card ιB : ℂ) /
-      ((Fintype.card (LocalCarrierSum ιA ιB) : ℂ) ^ (2 : ℕ))
-  have hA : (Fintype.card ιA : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  have hB : (Fintype.card ιB : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  have hS : (Fintype.card (LocalCarrierSum ιA ιB) : ℂ) ≠ 0 :=
-    Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  have hscalar :
-      (roleRegisterDensityScale ιA ιB : ℂ) * ((1 / 4 : ℂ) * R) = (1 / 2 : ℂ) := by
-    subst R
-    unfold roleRegisterDensityScale
-    field_simp [hA, hB, hS, Nat.cast_pow, Nat.cast_mul]
-    norm_num [Nat.cast_pow, Nat.cast_mul]
-    field_simp [hA, hB]
-    ring_nf
-  change Complex.re ((roleRegisterDensityScale ιA ιB : ℂ) * ((1 / 4 : ℂ) * (R * T))) =
-    (1 / 2 : Error) * ev ψ Z
-  rw [show ev ψ Z = Complex.re T by rfl]
-  rw [show (roleRegisterDensityScale ιA ιB : ℂ) * ((1 / 4 : ℂ) * (R * T)) =
-      ((roleRegisterDensityScale ιA ιB : ℂ) * ((1 / 4 : ℂ) * R)) * T by
-    ring]
-  rw [hscalar]
-  norm_num [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
-
-theorem ev_roleRegisterSymmState_rolePair_BA_localPairBABlock_swap {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Nonempty ιA]
-    [Fintype ιB] [DecidableEq ιB] [Nonempty ιB]
-    (ψ : QuantumState (ιA × ιB)) (Z : MIPStarRE.Quantum.Op (ιA × ιB)) :
-    ev (roleRegisterSymmState ψ)
-      (rolePairDirectSumCond Role.B Role.A
-        (localPairBABlock (heterogeneousSwapDensity Z))) =
-      (1 / 2 : Error) * ev ψ Z := by
-  unfold ev roleRegisterSymmState
-  change Complex.re (MIPStarRE.Quantum.normalizedTrace (((roleRegisterDensityScale ιA ιB : ℂ) •
-      rolePairDirectSumCond Role.A Role.B (localPairABBlock ψ.density) +
-      (roleRegisterDensityScale ιA ιB : ℂ) •
-        rolePairDirectSumCond Role.B Role.A
-          (localPairBABlock (heterogeneousSwapDensity ψ.density))) *
-        rolePairDirectSumCond Role.B Role.A
-          (localPairBABlock (heterogeneousSwapDensity Z)))) =
-    (1 / 2 : Error) * ev ψ Z
-  rw [Matrix.add_mul, MIPStarRE.Quantum.normalizedTrace_add]
-  rw [smul_mul_assoc, smul_mul_assoc]
-  rw [rolePairDirectSumCond_AB_mul_BA, rolePairDirectSumCond_mul_same]
-  rw [localPairBABlock_mul, ← heterogeneousSwapDensity_mul]
-  rw [MIPStarRE.Quantum.normalizedTrace_smul, MIPStarRE.Quantum.normalizedTrace_smul]
-  simp only [MIPStarRE.Quantum.normalizedTrace_zero, mul_zero, zero_add]
-  rw [normalizedTrace_rolePairDirectSumCond, normalizedTrace_localPairBABlock,
-    normalizedTrace_heterogeneousSwapDensity]
-  let T := MIPStarRE.Quantum.normalizedTrace (ψ.density * Z)
-  let R : ℂ :=
-    (Fintype.card ιA : ℂ) * (Fintype.card ιB : ℂ) /
-      ((Fintype.card (LocalCarrierSum ιA ιB) : ℂ) ^ (2 : ℕ))
-  have hA : (Fintype.card ιA : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  have hB : (Fintype.card ιB : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  have hS : (Fintype.card (LocalCarrierSum ιA ιB) : ℂ) ≠ 0 :=
-    Nat.cast_ne_zero.mpr Fintype.card_ne_zero
-  have hscalar :
-      (roleRegisterDensityScale ιA ιB : ℂ) * ((1 / 4 : ℂ) * R) = (1 / 2 : ℂ) := by
-    subst R
-    unfold roleRegisterDensityScale
-    field_simp [hA, hB, hS, Nat.cast_pow, Nat.cast_mul]
-    norm_num [Nat.cast_pow, Nat.cast_mul]
-    field_simp [hA, hB]
-    ring_nf
-  change Complex.re ((roleRegisterDensityScale ιA ιB : ℂ) * ((1 / 4 : ℂ) * (R * T))) =
-    (1 / 2 : Error) * ev ψ Z
-  rw [show ev ψ Z = Complex.re T by rfl]
-  rw [show (roleRegisterDensityScale ιA ιB : ℂ) * ((1 / 4 : ℂ) * (R * T)) =
-      ((roleRegisterDensityScale ιA ιB : ℂ) * ((1 / 4 : ℂ) * R)) * T by
-    ring]
-  rw [hscalar]
-  norm_num [Complex.mul_re, Complex.ofReal_re, Complex.ofReal_im]
-
 /-- Block-diagonal operator on `ιA ⊕ ιB`, with Alice's block in the
 `Sum.inl` sector and Bob's block in the `Sum.inr` sector.
 
@@ -679,16 +582,6 @@ theorem localDirectSumBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
   have hD' : B = Dᴴ * D := hD
   change localDirectSumBlock A B = (localDirectSumBlock C D)ᴴ * localDirectSumBlock C D
   rw [localDirectSumBlock_conjTranspose, localDirectSumBlock_mul, ← hC', ← hD']
-
-/-- The trace of a direct-sum block is the sum of the block traces.
-
-This is the `Matrix.fromBlocks` specialization of the block-diagonal trace
-calculation needed later for the normalized symmetrized state. -/
-theorem trace_localDirectSumBlock {ιA ιB : Type*} [Fintype ιA] [Fintype ιB]
-    (A : MIPStarRE.Quantum.Op ιA) (B : MIPStarRE.Quantum.Op ιB) :
-    Matrix.trace (localDirectSumBlock A B) = Matrix.trace A + Matrix.trace B := by
-  classical
-  simp [localDirectSumBlock, Matrix.trace, Fintype.sum_sum_type]
 
 /-- Finite sums commute through direct-sum blocks.
 

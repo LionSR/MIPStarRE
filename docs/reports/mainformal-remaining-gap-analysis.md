@@ -97,13 +97,8 @@ Date: 2026-05-07
 > `MIPStarRE.LDT.ProjStrat.roleRegisterProjMeas` constructs the corresponding
 > projective measurements, with point, axis-parallel, and diagonal measurement
 > families, and `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy` packages the
-> state and these covariant measurements as a `SymStrat`.  The occupied-sector
-> expectation identities
-> `MIPStarRE.LDT.ProjStrat.ev_roleRegisterSymmState_rolePair_AB_localPairABBlock`
-> and
-> `MIPStarRE.LDT.ProjStrat.ev_roleRegisterSymmState_rolePair_BA_localPairBABlock_swap`
-> now prove the two half-weight trace calculations from which the branch
-> averages follow.  The branch-probability comparison has also been assembled:
+> state and these covariant measurements as a `SymStrat`.  The
+> branch-probability comparison has also been assembled:
 > `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_axisParallel_eq_roleAverage`,
 > `MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_selfConsistency_eq_pointAgreement`,
 > and

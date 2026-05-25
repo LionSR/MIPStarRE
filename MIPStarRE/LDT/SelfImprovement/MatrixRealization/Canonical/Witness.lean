@@ -187,37 +187,6 @@ structure MatrixSdpStatementWithSlacknessAndDominance (params : Parameters)
       ∃ Z : MatrixOperator model.space,
         MatrixSdpOptimalWitnessWithDominance params model T Z
 
-/-- Assemble the canonical block-SDP conclusions as the Lean-only matrix-level
-statement with the dominance hypothesis retained.
-
-This is the statement form of
-`matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness`: the
-canonical complementary-slackness equation supplies the primal normalization and
-the defect-zero equations, while the remaining hypotheses record paper dual
-feasibility, equality of the paper primal and dual objectives, and the auxiliary
-bound \(I \le Z\). -/
-theorem matrixSdpStatementWithSlacknessAndDominance_of_canonicalComplementarySlackness
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space)
-    (Z : MatrixOperator model.space)
-    (hdual :
-      ∀ g : Polynomial params,
-        0 ≤ matrixSdpDualSlackOperator params model Z g)
-    (hstrong :
-      matrixSdpPrimalObjective params model T = matrixSdpDualObjective model Z)
-    (hcanonical :
-      matrixSdpCanonicalPrimalBlockMatrix params model T *
-          (matrixSdpCanonicalDualOperator params model Z -
-            matrixSdpCanonicalObjectiveOperator params model) =
-        0)
-    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
-    MatrixSdpStatementWithSlacknessAndDominance params model where
-  witness :=
-    ⟨T, Z,
-      matrixSdpOptimalWitnessWithDominance_of_canonicalComplementarySlackness
-        params model T Z hdual hstrong hcanonical hOneLe⟩
-
 /-- Assemble a dominance-carrying matrix SDP statement from an arbitrary feasible
 canonical primal matrix satisfying objective equality and complementary
 slackness.

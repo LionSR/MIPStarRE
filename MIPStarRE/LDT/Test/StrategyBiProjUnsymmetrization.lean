@@ -741,56 +741,6 @@ theorem qBipartiteConsDefect_extractRoleRegisterAlice_le_two_symm
     qBipartiteConsDefect_nonneg ψ MA.toSubMeas (G.extractRoleRegisterBob).toSubMeas
   linarith
 
-theorem roleRegisterProjMeas_extractAlice {Outcome ιA ιB : Type*}
-    [Inhabited Outcome] [Fintype Outcome]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (MA : ProjMeas Outcome ιA) (MB : ProjMeas Outcome ιB) :
-    (roleRegisterProjMeas MA MB).toMeasurement.extractRoleRegisterAlice.toSubMeas =
-      MA.toSubMeas := by
-  refine SubMeas.ext ?_ ?_
-  · intro a
-    ext i j
-    rfl
-  · rw [(Measurement.extractRoleRegisterAlice
-        ((roleRegisterProjMeas MA MB).toMeasurement)).total_eq_one,
-      MA.total_eq_one]
-
-theorem roleRegisterProjMeas_extractBob {Outcome ιA ιB : Type*}
-    [Inhabited Outcome] [Fintype Outcome]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (MA : ProjMeas Outcome ιA) (MB : ProjMeas Outcome ιB) :
-    (roleRegisterProjMeas MA MB).toMeasurement.extractRoleRegisterBob.toSubMeas =
-      MB.toSubMeas := by
-  refine SubMeas.ext ?_ ?_
-  · intro a
-    ext i j
-    rfl
-  · rw [(Measurement.extractRoleRegisterBob
-        ((roleRegisterProjMeas MA MB).toMeasurement)).total_eq_one,
-      MB.total_eq_one]
-
-theorem roleRegisterSymmStrategy_point_extractAlice
-    {params : Parameters} [FieldModel params.q]
-    {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
-    {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
-    (strategy : ProjStrat params ιA ιB) (u : Point params) :
-    (Measurement.extractRoleRegisterAlice
-      (((strategy.roleRegisterSymmStrategy).pointMeasurement u).toMeasurement)).toSubMeas =
-        (strategy.pointMeasurementA u).toSubMeas := by
-  exact roleRegisterProjMeas_extractAlice
-    (strategy.pointMeasurementA u) (strategy.pointMeasurementB u)
-
-theorem roleRegisterSymmStrategy_point_extractBob
-    {params : Parameters} [FieldModel params.q]
-    {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
-    {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
-    (strategy : ProjStrat params ιA ιB) (u : Point params) :
-    (Measurement.extractRoleRegisterBob
-      (((strategy.roleRegisterSymmStrategy).pointMeasurement u).toMeasurement)).toSubMeas =
-        (strategy.pointMeasurementB u).toSubMeas := by
-  exact roleRegisterProjMeas_extractBob
-    (strategy.pointMeasurementA u) (strategy.pointMeasurementB u)
-
 /-- Polynomial evaluation commutes with Alice extraction from a heterogeneous
 role-register polynomial submeasurement. -/
 theorem polynomialEvaluationFamily_extractRoleRegisterAlice

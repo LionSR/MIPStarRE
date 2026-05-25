@@ -36,8 +36,8 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Test/StrategyRoleAverage.lean` | 422 | 31.6 | 47.2 | 2× 1,000,000 | 1 | Massive `calc` blocks with `ev_add`, `abel_nf` expansions |
 | `MainInductionStep/Theorems.lean` | 3,484 | 26.1 | 71.4 | 1× 1,000,000 | 9 | 71 `positivity` calls, 6 `field_simp`, re-export file |
 | `Pasting/SwitcherooCompletion.lean` | 1,673 | 23.1 | 34.8 | 1× 1,000,000 | 2 | Heavy sqrt/rpow chain |
-| `Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean` | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | **Largest file** (3,827 lines), 137 `simp` calls |
-| `Pasting/Bernoulli/FromHToG/Core.lean` | 1,339 | 20.6 | 24.3 | 1× 800,000 | 7 | 54 `simp`, rpow expansions |
+| split; `Pasting/BridgeLemmas/LdSandwichLineOnePoint/` carries the line-one-point bridge | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | Former compatibility wrapper is now 16 lines |
+| split; `Pasting/Bernoulli/FromHToG/Core/` carries the core recurrence lemmas | 1,339 | 20.6 | 24.3 | 1× 800,000 | 7 | Former compatibility wrapper is now 18 lines |
 | `Pasting/CommutingWithG/Complete.lean` | 476 | 17.5 | 22.5 | 1× 1,000,000 | 1 | Sqrt/rpow chain |
 | split; `Test/ErrorCascade/Definitions.lean`, `Test/ErrorCascade/EnvelopeBounds.lean`, and `Test/ErrorCascade/CascadeBounds/` carry the cascade | 1,482 | 16.1 | 39.7 | none | 2 | Former compatibility wrapper removed |
 | `Commutativity/ScalarApproximation/ProcessedG.lean` | 2,035 | 15.2 | 23.4 | 1× 5,000,000 + 1× 210,000 | 5 | Largest heartbeat override proof (809 lines) |
@@ -53,12 +53,12 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2,902 | 10.2 | 24.1 | none |
 | `Commutativity/GCommStability/Scalar/RawSecond.lean` | 648 | 10.2 | 9.2 | 1× 1,200,000 |
 | split; `CommuteGHalfSandwich/MoveChain/{Base,Lifting,Chain,BackChain,FlatChain,FlatChainStep,Core}.lean` carries the chain | 2,409 | 9.9 | 17.7 | none |
-| `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` | 1,886 | 8.9 | 18.3 | none |
+| split; `CommuteGHalfSandwich/Setup/{Definitions,SumBounds,StepLemmas}` carries setup | 1,886 | 8.9 | 18.3 | none |
 | `Test/MainTheorem.lean` | 2,971 | 8.8 | 8.5 | none |
 | `Commutativity/Main/Auxiliary.lean` | 1,139 | 8.7 | 9.6 | none |
 | deleted; `GlobalVariance/Theorems/MainTheorems.lean` carries the final reductions | 2,950 | 8.6 | 14.9 | none |
 | `Pasting/Bernoulli/FromHToG/PaperBounds.lean` | 1,004 | 8.2 | 7.7 | 1× 1,000,000 |
-| `Test/StrategyRole.lean` | 1,101 | 14.7 | 28.8 | none |
+| split; `Test/StrategyRole/{Core,Algebra,Symmetrization}.lean` carries role-register algebra | 1,101 | 14.7 | 28.8 | none |
 | `Commutativity/ScalarApproximation/PaperChainBasic.lean` | 901 | 7.9 | 9.6 | 1× 3,000,000 + 1× 800,000 |
 | `Commutativity/ScalarApproximation/PaperChainPhaseSix.lean` | 226 | 7.4 | 4.1 | 1× 10,000,000 |
 | `Commutativity/ScalarApproximation/PaperChainTail.lean` | 238 | 7.1 | 3.9 | 1× 10,000,000 |
@@ -102,7 +102,7 @@ Files sorted by heartbeat override magnitude:
 
 | File | Lines | Compile Time | Heartbeat Override | Key Tactics |
 |------|-------|-------------|-------------------|-------------|
-| `BridgeLemmas/LdSandwichLineOnePoint.lean` | 3,827 | 22.3s | 400K | 137 simp |
+| split; `BridgeLemmas/LdSandwichLineOnePoint/` carries the bridge | 3,827 | 22.3s | 400K | 137 simp |
 | `MainInductionStep/Theorems.lean` | 3,484 | 26.1s | 1M | 47 simp, 71 positivity, 6 field_simp |
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | 10.8s | — | 56 simp |
 | `Test/MainTheorem.lean` | 2,971 | 8.8s | — | 1 simp (mostly assembly) |
@@ -110,15 +110,15 @@ Files sorted by heartbeat override magnitude:
 | `BridgeLemmas/LineInterpolation.lean` | 2,902 | 10.2s | — | 119 simp |
 | split; `CommuteGHalfSandwich/MoveChain/{Base,Lifting,Chain,BackChain,FlatChain,FlatChainStep,Core}.lean` carries the chain | 2,409 | 9.9s | — | 74 simp |
 | `ScalarApproximation/ProcessedG.lean` | 2,035 | 15.2s | 5M | 27 simp, 30 calc |
-| `CommuteGHalfSandwich/Setup.lean` | 1,886 | 8.9s | — | 48 simp |
+| split; `CommuteGHalfSandwich/Setup/` carries setup | 1,886 | 8.9s | — | 48 simp |
 | `SwitcherooCompletion.lean` | 1,673 | 23.1s | 1M | 28 simp |
 | `BridgeLemmas/OverAllOutcomes.lean` | 1,547 | 11.0s | — | 24 simp |
 | deleted; `FromHToG/AdjacentStages/Chain/{HalfSandwich,FinalMove}.lean` now carries the chain | 1,533 | 7.8s | — | 0 simp (mostly arithmetic) |
 | split; `Test/ErrorCascade/{Definitions,EnvelopeBounds,CascadeBounds}.lean` carries the cascade | 1,482 | 16.1s | — | 3 simp |
-| `FromHToG/Core.lean` | 1,339 | 20.6s | 800K | 54 simp |
+| split; `FromHToG/Core/` carries core recurrence lemmas | 1,339 | 20.6s | 800K | 54 simp |
 | `Pasting/Core.lean` | 1,202 | 11.5s | — | 35 simp |
 | `Commutativity/Main/Auxiliary.lean` | 1,139 | 8.7s | — | 25 simp |
-| `Test/StrategyRole.lean` | 1,101 | 14.7s | — | 69 simp |
+| split; `Test/StrategyRole/{Core,Algebra,Symmetrization}.lean` carries role-register algebra | 1,101 | 14.7s | — | 69 simp |
 | `FromHToG/PaperBounds.lean` | 1,004 | 8.2s | 1M | 18 simp |
 
 ---
@@ -147,10 +147,13 @@ change trigger a large rebuild.
 
 ### P0 — High Impact / Low Effort
 
-1. **Break `LdSandwichLineOnePoint.lean` (3,827 lines) into submodules**
-   - Currently the largest single file at 3,827 lines with one import.
-   - Split by proof clusters (e.g., `tupleSection`, `lineOnePoint`, `sandwichClosure`) into 3–4 submodules.
-   - **Expected benefit:** ~40% reduction per-file, better parallel compilation.
+1. **Keep the `LdSandwichLineOnePoint` split focused on proof-bearing leaves**
+   - The former 3,827-line wrapper has been split into leaf modules under
+     `Pasting/BridgeLemmas/LdSandwichLineOnePoint/`.
+   - Future compile-time work should optimize the leaves, not the compatibility
+     re-export file.
+   - **Expected benefit:** smaller per-file iteration targets and better
+     parallel compilation.
 
 2. **Break `MainInductionStep/Theorems.lean` (3,484 lines) into submodules**
    - Currently has 71 `positivity` calls and 47 `simp` calls.
@@ -217,7 +220,7 @@ change trigger a large rebuild.
 
 | Current File | Lines | Suggested Split |
 |-------------|-------|-----------------|
-| `Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean` | 3,827 | `TupleSetup`, `LineOnePoint`, `SandwichClosure` |
+| split; `Pasting/BridgeLemmas/LdSandwichLineOnePoint/` | 3,827 | Keep optimizing proof-bearing leaves |
 | `MainInductionStep/Theorems.lean` | 3,484 | `SlicePrep`, `PastingBridge`, `FinalTelescope` |
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | `BaseSlice`, `SliceEvaluation`, `FullSlice` |
 | `Test/MainTheorem.lean` | 2,971 | Already mostly assembly — low priority |
@@ -228,7 +231,10 @@ change trigger a large rebuild.
 
 ## Quick Wins Implemented
 
-- *None yet — audit report is the primary deliverable. Quick wins can be implemented in follow-up PRs.*
+- Several files named in the original audit have since been split into
+  proof-bearing leaf modules plus short compatibility re-exports.  This report
+  now points optimization work at those leaves rather than at the re-export
+  wrappers.
 
 ---
 

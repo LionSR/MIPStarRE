@@ -80,7 +80,7 @@ The associated theorem names should migrate in the same PR, for example:
 
 - `payloadBlock_inl_inl` to `localDirectSumBlock_inl_inl`;
 - `payloadBlock_nonneg` to `localDirectSumBlock_nonneg`;
-- `trace_payloadBlock` to `trace_localDirectSumBlock`;
+- `trace_payloadBlock` should be dropped if it has no current consumer;
 - `payloadBlock_finset_sum` to `localDirectSumBlock_finset_sum`;
 - `payloadBlockMeasurement_outcome` to `localDirectSumMeasurement_outcome`;
 - `payloadBlockProjMeas_outcome` to `localDirectSumProjMeas_outcome`.
