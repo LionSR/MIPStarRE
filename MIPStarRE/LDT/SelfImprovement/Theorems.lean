@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results
 
 /-!
