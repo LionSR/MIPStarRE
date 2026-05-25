@@ -64,8 +64,11 @@ cleanup requested by issue #1114 is closed for the self-improvement files.
 
 The audit used the `rg` invocation displayed in the `Scope` section. The PR
 which records this audit also validated the touched self-improvement module by
-building `MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer`
-and checking the blueprint declaration list.
+building the then-current
+`MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer`
+aggregate and checking the blueprint declaration list.  The current live leaf
+for that route is
+`MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer`.
 
 ## Review Use
 
