@@ -94,7 +94,9 @@ largest files are:
 - `MIPStarRE/LDT/Pasting/BridgeLemmas/OverAllOutcomes.lean` -- 1547 lines.
 - deleted; the adjacent-stage chain now lives under
   `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages/Chain/`.
-- `MIPStarRE/LDT/Test/ErrorCascade.lean` -- 1482 lines.
+- split; `MIPStarRE/LDT/Test/ErrorCascade/Definitions.lean`,
+  `MIPStarRE/LDT/Test/ErrorCascade/EnvelopeBounds.lean`, and the leaves under
+  `MIPStarRE/LDT/Test/ErrorCascade/CascadeBounds/` now carry the error cascade.
 
 The current proof-integrity grep finds one real `sorry` token:
 

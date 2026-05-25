@@ -106,7 +106,7 @@ git diff --check
 | 10 | 1673 | `MIPStarRE/LDT/Pasting/SwitcherooCompletion.lean` |
 | 11 | 1547 | `MIPStarRE/LDT/Pasting/BridgeLemmas/OverAllOutcomes.lean` |
 | 12 | deleted | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages/Chain/` |
-| 13 | split | `MIPStarRE/LDT/Test/ErrorCascade/{Definitions,EnvelopeBounds,CascadeBounds}.lean`; the former `ErrorCascade.lean` is now a compatibility wrapper |
+| 13 | split | `MIPStarRE/LDT/Test/ErrorCascade/Definitions.lean`, `MIPStarRE/LDT/Test/ErrorCascade/EnvelopeBounds.lean`, and the leaves under `MIPStarRE/LDT/Test/ErrorCascade/CascadeBounds/`; the former `ErrorCascade.lean` wrapper has been removed |
 | 14 | 1339 | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core.lean` |
 | 15 | 1202 | `MIPStarRE/LDT/Pasting/Core.lean` |
 | 16 | 1132 | `MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean` |

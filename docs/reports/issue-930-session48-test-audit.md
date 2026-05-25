@@ -89,7 +89,9 @@ Lean files inspected:
 - `MIPStarRE/LDT/Test/StrategyFailures.lean`
 - `MIPStarRE/LDT/Test/SymmetrizationBridge.lean`
 - `MIPStarRE/LDT/Test/Unsymmetrization.lean`
-- `MIPStarRE/LDT/Test/ErrorCascade.lean`
+- `MIPStarRE/LDT/Test/ErrorCascade/Definitions.lean`
+- `MIPStarRE/LDT/Test/ErrorCascade/EnvelopeBounds.lean`
+- `MIPStarRE/LDT/Test/ErrorCascade/CascadeBounds/Final.lean`
 - `MIPStarRE/LDT/Test/SchwartzZippelStep.lean`
 - `MIPStarRE/LDT/Test/MainTheorem.lean`
 - `MIPStarRE/LDT/Test/Classical.lean`
@@ -143,7 +145,7 @@ recorded in `docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`.
 
 The current `mainFormal` statement assumes `400 * params.m * params.d ≤ k`, whereas the paper prints `k ≥ md`. This is already documented as a genuine side-condition gap in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`, so I did not create a second note for it.
 
-The error envelope in `mainFormalError` matches the paper's final displayed formula after that large-`k` correction (`ErrorCascade.lean:48-72`; `ch10_induction.tex:422-440`). The formal cascade widens the paper's printed `ζ₂` coefficient from `40` to `42`; that deviation is already explained in `docs/paper-gaps/issue-904-zeta2-completion.tex` and in the blueprint at `ch10_induction.tex:446-465` and `ch10_induction.tex:743-762`.
+The error envelope in `mainFormalError` matches the paper's final displayed formula after that large-`k` correction (`ErrorCascade/Definitions.lean:47-56`; `ch10_induction.tex:422-440`). The formal cascade widens the paper's printed `ζ₂` coefficient from `40` to `42`; that deviation is already explained in `docs/paper-gaps/issue-904-zeta2-completion.tex` and in the blueprint at `ch10_induction.tex:446-465` and `ch10_induction.tex:743-762`.
 
 Strategy-level normalization is not an undocumented discrepancy in this slice. Both `SymStrat` and `ProjStrat` bundle `state.IsNormalized` (`StrategyCore.lean:284-292`, `520-538`), matching the paper convention that strategies use normalized states. The broader distinction between the base `QuantumState` type and normalized strategy states is already documented in `docs/paper-gaps/issue-933-quantumstate-normalization.tex`.
 
@@ -201,7 +203,7 @@ lake env lean MIPStarRE/LDT/Test/StrategyBiProj.lean
 lake env lean MIPStarRE/LDT/Test/StrategyFailures.lean
 lake env lean MIPStarRE/LDT/Test/SymmetrizationBridge.lean
 lake env lean MIPStarRE/LDT/Test/Unsymmetrization.lean
-lake env lean MIPStarRE/LDT/Test/ErrorCascade.lean
+lake env lean MIPStarRE/LDT/Test/ErrorCascade/CascadeBounds/Final.lean
 lake env lean MIPStarRE/LDT/Test/SchwartzZippelStep.lean
 lake env lean MIPStarRE/LDT/Test/Classical.lean
 lake env lean MIPStarRE/LDT/Test/SurfaceVsPoint.lean
