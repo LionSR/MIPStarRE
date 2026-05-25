@@ -23,8 +23,8 @@ Branch: `gpt55/issue-930-selfimprovement-audit`
 > construction lemmas, especially #1514 and #1515.
 >
 > **Status note, 2026-05-20.**  This final sentence is historical for the
-> current code.  The Section 9 theorem `selfImprovement` and the induction
-> wrapper `selfImprovementInInductionSection` are now checked without
+> current code.  The Section 9 theorem `selfImprovement` and the
+> induction-section theorem `selfImprovementInInductionSection` are now checked without
 > `sorry` or `axiom`; the former #1514, #1515, and #1503 proof gaps are not
 > live Section 9 obligations.  At this May 20 snapshot, the remaining transitive
 > proof frontier for the same-space theorem `mainFormal` was the Section 6 small-error
