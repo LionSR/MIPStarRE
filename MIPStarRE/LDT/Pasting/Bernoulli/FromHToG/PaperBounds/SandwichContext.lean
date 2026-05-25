@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages
+import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain
 
 /-!
 # Section 12 pasting: from-H-to-G S U S context-average bounds
