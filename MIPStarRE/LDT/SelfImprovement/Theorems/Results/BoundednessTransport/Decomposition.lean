@@ -5,8 +5,6 @@ import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.Preliminaries.Triangles
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency
 
 /-!
