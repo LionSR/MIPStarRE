@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.Results
+import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 
 /-!
 # Section 8 — Theorems
