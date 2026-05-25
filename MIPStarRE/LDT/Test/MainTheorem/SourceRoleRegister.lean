@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Core
-import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Completion
 import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Final
 
 /-!
