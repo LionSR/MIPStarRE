@@ -27,7 +27,7 @@ The audited Lean scope was `MIPStarRE/LDT/GlobalVariance/**`:
 `Theorems/AlgebraicIdentity.lean`, `Theorems/Averaging.lean`,
 `Theorems/CollisionExpansion.lean`, `Theorems/MainTheorems.lean`,
 `Theorems/Results.lean`, `Theorems/SelfConsistencyTransport.lean`,
-`Theorems/Statements.lean`, `Theorems/TransportChain.lean`,
+`Theorems/Statements.lean`, the split `Theorems/TransportChain/` modules,
 and the barrel files `Defs.lean`, `Theorems.lean`.
 
 This scope intentionally excludes the already-audited `ExpansionHypercubeGraph/**`
@@ -69,7 +69,7 @@ The internal six-step transport chain error
 steps `2δ+2ε+md/q+md/q+2ε+2δ`, each multiplied by triangle-inequality factor `k=6`)
 matches the paper, and the absorption lemma
 `localVarianceTransportChainError_le_localVarianceOfPointsError`
-(`TransportChain.lean:581-595`) proves `6*(4ε+4δ+2md/q) ≤ 24*(ε+δ+md/q)` by
+(`TransportChain/Core.lean:583-595`) proves `6*(4ε+4δ+2md/q) ≤ 24*(ε+δ+md/q)` by
 `linarith` using nonnegativity of `ε`, `δ`, and `md/q`.
 
 ### `lem:generalize-b`
@@ -142,9 +142,9 @@ The proof route follows the paper's six-step chain (`expansion.tex`, lines 305-3
 5. `≈_{2ε} I ⊗ (G_g)^{1/2} A^v_{g(v)}` — good-strategy ≈
 6. `≈_{2δ} A^v_{g(v)} ⊗ (G_g)^{1/2}` — self-consistency transport
 
-These six steps are assembled in `TransportChain.lean` with the triangle-inequality
-bound (`prop:triangle-inequality-for-approx_delta` with `k=6`), producing
-`localVarianceTransportChainBound`.
+These six steps are assembled in `TransportChain/Core.lean` with the
+triangle-inequality bound (`prop:triangle-inequality-for-approx_delta` with
+`k=6`), producing `localVarianceTransportChainBound`.
 
 The `MainTheorems.lean` file provides multiple wrapper lemmas at different abstraction
 levels:

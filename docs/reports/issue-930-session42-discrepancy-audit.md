@@ -180,7 +180,7 @@ inequality to the paper's errors `2δ`, `2ε`, `md/q`, `md/q`, `2ε`, and `2δ`
 `localVarianceTransportChainError_le_localVarianceOfPointsError` then absorbs
 this residual into the displayed `24(ε + δ + md/q)` slack using nonnegativity
 from `strategy.IsGood`
-(`MIPStarRE/LDT/GlobalVariance/Theorems/TransportChain.lean:574-595`).
+(`MIPStarRE/LDT/GlobalVariance/Theorems/TransportChain/Core.lean:583-595`).
 
 This is a useful formal bookkeeping refinement, not a widened paper constant.
 The public displayed errors remain the paper's errors.
@@ -214,7 +214,7 @@ The paper-faithful, strategy-state route is:
 
 - `localVarianceTransportChainBound` proves the paper's six-step edge transport
   on the native hypercube-edge sampler
-  (`MIPStarRE/LDT/GlobalVariance/Theorems/TransportChain.lean:548-572`);
+  (`MIPStarRE/LDT/GlobalVariance/Theorems/TransportChain/Core.lean:556-581`);
 - `localVarianceOfPointsFromTransportChainBound` absorbs the residual into
   `24(ε + δ + md/q)`
   (`MIPStarRE/LDT/GlobalVariance/Theorems/MainTheorems.lean:262-286`);
