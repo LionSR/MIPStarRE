@@ -152,7 +152,7 @@ where
 	\nu_1 = \zeta + \sqrt{8m\eps+4\delta}.
 \end{equation}
 Finally, \ref{thm:com-main} gives
-\begin{equation}\label{eq:quote-com-main}
+\begin{equation}\label{eq:complete-slice-commutativity}
 	G_g^x G_h^y \ot I \approx_{\nu_{\mathrm{com}}} G_h^y G_g^x \ot I,
 \end{equation}
 where
@@ -622,15 +622,15 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{corollary}
 \begin{proof}
 	\leanok
-	By \ref{eq:quote-com-main},
-	\begin{equation}\label{eq:com-main-copy}
+	By \ref{eq:complete-slice-commutativity},
+	\begin{equation}\label{eq:complete-outcome-commutativity}
 		G_g^x G_h^y \ot I \approx_{\nu_{\mathrm{com}}} G_h^y G_g^x \ot I.
 	\end{equation}
-	Applying Lemma~\ref{lem:commutativity-switcheroo} to \ref{eq:com-main-copy}, with $\{M_o^y\}$ equal to the outcome family $\{G_h^y\}$, gives
-	\begin{equation}\label{eq:applied-the-lemma-to-com-main-copy}
+	Applying Lemma~\ref{lem:commutativity-switcheroo} to \ref{eq:complete-outcome-commutativity}, with $\{M_o^y\}$ equal to the outcome family $\{G_h^y\}$, gives
+	\begin{equation}\label{eq:complete-total-commutes-with-outcome}
 		G_g^x G^y \ot I \approx_{\theta_1} G^y G_g^x \ot I,
 	\end{equation}
-	where $\theta_1 = 12\sqrt{\zeta} + 4\sqrt{\nu_{\mathrm{com}}}$. Applying Lemma~\ref{lem:commutativity-switcheroo} again to \ref{eq:applied-the-lemma-to-com-main-copy}, now with the one-outcome family $M_o^y = G^y$, gives
+	where $\theta_1 = 12\sqrt{\zeta} + 4\sqrt{\nu_{\mathrm{com}}}$. Applying Lemma~\ref{lem:commutativity-switcheroo} again to \ref{eq:complete-total-commutes-with-outcome}, now with the one-outcome family $M_o^y = G^y$, gives
 	\[
 		G^x G^y \ot I \approx_{\theta_2} G^y G^x \ot I,
 	\]
@@ -677,8 +677,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\uses{lem:g-complete-self-consistency, cor:g-bot-self-consistency, cor:commuting-with-G-complete, cor:commuting-with-G-incomplete}
 	The completed measurements $\widehat G^x$ satisfy
 	\begin{align}
-		\widehat G_g^x \ot I                & \approx_{2\zeta} I \ot \widehat G_g^x, \label{eq:gselfconall}           \\
-		\widehat G_g^x \widehat G_h^y \ot I & \approx_{\nu_3} \widehat G_h^y \widehat G_g^x \ot I, \label{eq:gcomall}
+		\widehat G_g^x \ot I                & \approx_{2\zeta} I \ot \widehat G_g^x, \label{eq:g-hat-self-consistency}           \\
+		\widehat G_g^x \widehat G_h^y \ot I & \approx_{\nu_3} \widehat G_h^y \widehat G_g^x \ot I, \label{eq:g-hat-commutativity}
 	\end{align}
 	where
 	\[
@@ -687,12 +687,12 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{corollary}
 \begin{proof}
 	\leanok
-	For \ref{eq:gselfconall}, split the outcome set into the genuine outcomes and $\bot$:
+	For \ref{eq:g-hat-self-consistency}, split the outcome set into the genuine outcomes and $\bot$:
 	\[
 		\E_x \sum_g \|(\widehat G_g^x \ot I - I \ot \widehat G_g^x)\ket{\psi}\|^2
 		\le \zeta + \zeta = 2\zeta
 	\]
-	by \ref{item:ld-pasting-self-consistency} and \ref{cor:g-bot-self-consistency}. For \ref{eq:gcomall}, the same decomposition yields four cases: polynomial--polynomial, $\bot$--$\bot$, polynomial--$\bot$, and $\bot$--polynomial. These contribute $\nu_{\mathrm{com}}$ and three copies of $\nu_2$, so
+	by \ref{item:ld-pasting-self-consistency} and \ref{cor:g-bot-self-consistency}. For \ref{eq:g-hat-commutativity}, the same decomposition yields four cases: polynomial--polynomial, $\bot$--$\bot$, polynomial--$\bot$, and $\bot$--polynomial. These contribute $\nu_{\mathrm{com}}$ and three copies of $\nu_2$, so
 	\[
 		\nu_{\mathrm{com}} + 3\nu_2
 		\le
@@ -873,7 +873,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{lemma}
 \begin{proof}
 	\leanok
-	Repeatedly move the leftmost factor across the remaining product, using \ref{eq:gselfconall} and \ref{eq:gcomall} at each step and summing the resulting errors with \ref{prop:triangle-inequality-for-approx_delta}. The paper's calculation gives
+	Repeatedly move the leftmost factor across the remaining product, using \ref{eq:g-hat-self-consistency} and \ref{eq:g-hat-commutativity} at each step and summing the resulting errors with \ref{prop:triangle-inequality-for-approx_delta}. The paper's calculation gives
 	\[
 		3k\bigl(4k\zeta + k\nu_3\bigr)
 		\le
@@ -1010,7 +1010,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \begin{proof}
 	\leanok
 	Summing out the coordinates to the right of $i$ gives
-	\begin{equation}\label{eq:delete-extraneous-coordinates}
+	\begin{equation}\label{eq:sum-out-right-coordinates}
 		\begin{aligned}
 			    & \E_u \E_{x_1,\dots,x_k} \sum_{g_1,\dots,g_k\,:\,g_i\ne\bot} \sum_{a\ne g_i(u)}
 			\bra{\psi} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot B_{[f(x_i)=a]}^u \ket{\psi} \\
@@ -1021,7 +1021,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\end{equation}
 	Write $\widehat G_{g_{<i}}^{x_{<i}} = \widehat G_{g_1}^{x_1}\cdots \widehat G_{g_{i-1}}^{x_{i-1}}$. Then
 	\begin{align}
-		\eqref{eq:delete-extraneous-coordinates}
+		\eqref{eq:sum-out-right-coordinates}
 		 & =
 		\E_u \E_{x_1,\dots,x_i} \sum_{g_1,\dots,g_i\,:\,g_i\ne\bot}
 		\bra{\psi}
@@ -1289,7 +1289,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\label{eq:insert-line-measurement-resolution}
 	\end{align}
 	We next insert an indicator recording consistency along the sampled line:
-	\begin{equation}\label{eq:add-in-indicator-for-f-and-g}
+	\begin{equation}\label{eq:insert-line-consistency-indicator}
 		\eqref{eq:insert-line-measurement-resolution}
 		\approx_{\frac{k^2}{q}+k\nu_5}
 		\E_u \E_{y_1,\dots,y_k} \sum_{\tau:\,|\tau|\ge d+1} \sum_f
@@ -1310,7 +1310,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\[
 		\bone[\forall i\in\tau,\ f(y_i)=g_i(u)] \le \bone[\mathsf{Consistent}_\tau(g,y,u)],
 	\]
-	so \ref{eq:add-in-indicator-for-f-and-g} is bounded by
+	so \ref{eq:insert-line-consistency-indicator} is bounded by
 	\begin{align}
 		    & \E_u \E_{y_1,\dots,y_k} \sum_{\tau:\,|\tau|\ge d+1}
 		\sum_{(g_1,\dots,g_k)\in \overline{\mathsf{Global}_\tau(y)}}
@@ -1546,7 +1546,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\ket{\psi}
 		}.
 	\end{multline}
-	The first square root is at most $1$ because $S_{\tau_{\ge \ell}}\le I$ and $\widehat H$ is a submeasurement, and the second is at most $2\zeta$ by \ref{eq:gselfconall}.
+	The first square root is at most $1$ because $S_{\tau_{\ge \ell}}\le I$ and $\widehat H$ is a submeasurement, and the second is at most $2\zeta$ by \ref{eq:g-hat-self-consistency}.
 
 	Next, commute the leftmost $\widehat G_{g_\ell}^{x_\ell}$ across the left half-sandwich:
 	\begin{align}
@@ -1640,11 +1640,11 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\widehat H_{g_{>\ell}}^{x_{>\ell}}
 		\ot \bigl(S_{\tau_{\ge \ell}}\widehat G_{g_\ell}^{x_\ell}\widehat G_{g_\ell}^{x_\ell}\bigr)
 		\ket{\psi}.
-		\label{eq:h-ot-mgg}
+		\label{eq:remaining-g-on-second-factor}
 	\end{align}
 	The omitted Cauchy--Schwarz bound reuses the first square root from \ref{eq:second-cauchy-schwarz-bound} and the second square root from \ref{eq:first-cauchy-schwarz-bound}. Since $\widehat G$ is projective,
 	\begin{align*}
-		\eqref{eq:h-ot-mgg}
+		\eqref{eq:remaining-g-on-second-factor}
 		 & =
 		\E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}} \sum_{(g_\ell,g_{>\ell})\in \mathsf O_{\tau_{\ge \ell}}}
 		\bra{\psi}
@@ -1710,7 +1710,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	Equivalently, $\E_{i\sim\mu}(1-\lambda_i)\le \kappa$, so Markov's inequality
 	shows that most of the spectral mass of $X$ lies on eigenvalues at least
 	$\theta$:
-	\begin{equation}\label{eq:in-other-words}
+	\begin{equation}\label{eq:spectral-mass-threshold}
 		\Pr_{i\sim\mu}[\lambda_i > \theta] \ge 1-\frac{\kappa}{1-\theta}.
 	\end{equation}
 	For a scalar $p \in [d/k,1]$, the quantity
@@ -1720,7 +1720,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	is the probability of observing at least $d+1$ successes in $k$
 	Bernoulli$(p)$ trials. Applying the scalar Chernoff bound
 	eigenvalue-by-eigenvalue therefore yields
-	\begin{equation}\label{eq:by-chernoff}
+	\begin{equation}\label{eq:bernoulli-tail-chernoff}
 		F(p) \ge 1-\exp\Bigl(-2\Bigl(p-\frac{d}{k}\Bigr)^2k\Bigr).
 	\end{equation}
 	Hence
@@ -1731,7 +1731,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		 & = \E_{i\sim\mu} F(\lambda_i)\nonumber                            \\
 		 & \ge \Pr_{i\sim\mu}[\lambda_i \ge \theta]\cdot F(\theta)\nonumber \\
 		 & \ge \left(1-\frac{\kappa}{1-\theta}\right)\cdot F(\theta)
-		\tag{by \ref{eq:in-other-words}}\nonumber                           \\
+		\tag{by \ref{eq:spectral-mass-threshold}}\nonumber                           \\
 		 & \ge \left(1-\frac{\kappa}{1-\theta}\right)\cdot
 		\left(1-\exp\Bigl(-2\Bigl(\theta-\frac{d}{k}\Bigr)^2k\Bigr)\right).
 		\label{eq:bernoulli-polynomial-spectral-lower-bound}
