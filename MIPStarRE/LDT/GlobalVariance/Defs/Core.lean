@@ -84,7 +84,7 @@ instance (params : Parameters) [FieldModel params.q] : Nonempty (Polynomial para
 /-! ## Uniform averages -/
 
 /-- Uniformly average a family of bounded operators into a `Unit`-valued submeasurement. -/
-private noncomputable def uniformAverageUnitSubMeas {α : Type*}
+noncomputable def averageUnitSubMeas {α : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]
     (f : α → MIPStarRE.Quantum.Op ι)
     (hpsd : ∀ a, 0 ≤ f a) (hle : ∀ a, f a ≤ 1) :
@@ -127,15 +127,6 @@ private noncomputable def uniformAverageUnitSubMeas {α : Type*}
           _ = 1 := by simp
       simpa [averageOperatorOverDistribution, uniformDistribution] using
         le_trans hsum (le_of_eq hconst) }
-
-/-- Public wrapper for the uniform `Unit`-valued average used by the aggregate
-families in the global-variance lemmas. -/
-noncomputable def averageUnitSubMeas {α : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    (f : α → MIPStarRE.Quantum.Op ι)
-    (hpsd : ∀ a, 0 ≤ f a) (hle : ∀ a, f a ≤ 1) :
-    SubMeas Unit ι :=
-  uniformAverageUnitSubMeas (ι := ι) f hpsd hle
 
 /-- The unique outcome of `averageUnitSubMeas` is the uniform operator average
 of the underlying family. -/
