@@ -14,6 +14,16 @@ Rows and recommendations below should therefore be read as the May 8 audit
 snapshot.  They are not an open instruction to re-delete or reintroduce that
 statement.
 
+**Status note (2026-05-25, spectral truncation).**  Row 18 below is also
+historical.  In the active Lean tree, `SpectralTruncationStatement` has direct
+construction theorems, including
+`spectralTruncationStatement_of_sourceAlmostProjective` and
+`spectralTruncationStatement_of_witness`, and the low-rank conversion
+`projectiveLowRankSum_of_spectralTruncationStatement` is checked by
+`AxiomAudit.lean`.  The former `SpectralTruncationInput`,
+`OrthonormalizationBridge.lean`, and `OrthonormalizationInputConstructors.lean`
+route is no longer the live interface.
+
 ## Purpose
 
 Re-runs the audit prescribed by `docs/anti_patterns.md` §A6 ("External `*Statement`
@@ -81,7 +91,7 @@ explicit tracking entry.
 | 15 | `RoundedProjMeasStatement` | `MakingMeasurementsProjective/Statements.lean:129` | `Projectivization.lean:409, 425, 441` | `Statements.lean:148, 162, 257`; `Orthonormalization.lean:137`; `OrthonormalizationBridge.lean:473` | #1361 | **G**, connected. |
 | 16 | `NaimarkStatement` | `MakingMeasurementsProjective/Statements.lean:48` | `NaimarkFull.lean:35, 89` (per-question only) | none | #1361 (deliberate paper-gap, no `\leanok`) | **T** — paper-gap noted in #1361: full tensor-product version not formalized; questionwise local dilations only. |
 | 17 | `AlmostProjMeasStatement` | `MakingMeasurementsProjective/Statements.lean:79` | `Projectivization.lean:339` | `Projectivization.lean:390, 421`; `Orthonormalization.lean:146, 255, 302, 533`; `SpectralTruncation/ProjectiveNonMeasurement.lean:723` | #1361 | **G**, heavily connected. |
-| 18 | `SpectralTruncationStatement` | `MakingMeasurementsProjective/Statements.lean:96` | none on this branch | `OrthonormalizationBridge.lean:446, 467, 470, 517, 539, 562`; `OrthonormalizationInputConstructors.lean:74, 160, 186, 217` | **#1032** | **T** — known external/internal residual; producer is the spectral-truncation lemma in #1032. Heavy consumer footprint (43 occurrences) — this is a *core* tracked smuggle. |
+| 18 | `SpectralTruncationStatement` | `MakingMeasurementsProjective/Statements.lean:96` | historical row: none on the May 8 branch; current tree has `spectralTruncationStatement_of_sourceAlmostProjective` and `spectralTruncationStatement_of_witness` | historical consumers: `OrthonormalizationBridge.lean` and `OrthonormalizationInputConstructors.lean`; current live consumers include locality-preserving repair and low-rank conversion | **#1032** | **G** in the current tree.  This row was **T** at the May 8 snapshot, but the direct construction theorem is now present and checked. |
 | 19 | `GCompleteSelfConsistencyStatement` | `Pasting/Statements.lean:194` | `Core/CompletePart.lean:312`; `Statements.lean:217, 300` | `CompletePart.lean:323`; `SwitcherooSetup/Infrastructure.lean:52`; `ContextWrappers.lean:199`; `SwitcherooCompletion/FourthTermChain.lean:60` | — | **G**, connected. |
 | 20 | `GBotSelfConsistencyStatement` | `Pasting/Statements.lean:212` | `CompletePart.lean:324`; `Statements.lean:302` | `GHatFacts.lean:120` | — | **G**. |
 | 21 | `CommutativitySwitcherooStatement` | `Pasting/Statements.lean:226` | `SwitcherooCompletion.lean:124` | `CommutingWithG/Complete.lean:209, 260` | — | **G**. |
@@ -134,9 +144,11 @@ lapsed.**
   (re-classified from E to G after PR #1378 review: it has its own producer
   `chernoffBernoulliMatrix`) and rows 26 / 36 (`LdSandwichLineOnePointStatement`,
   `SdpStatement`) verified 2026-05-08.
-- **T** (tracked smuggle, no producer yet): 2 — `NaimarkStatement`
-  (deliberate paper-gap noted in #1361) and `SpectralTruncationStatement`
-  (#1032).
+- **T** (tracked smuggle, no producer yet): 2 at the audit snapshot —
+  `NaimarkStatement` (deliberate paper-gap noted in #1361) and
+  `SpectralTruncationStatement` (#1032).  In the active tree,
+  `SpectralTruncationStatement` is produced directly by the spectral-truncation
+  construction theorems named in the status note above.
 - **E** (genuine external citation): 2 — `RazSafraSoundnessStatement` and
   `PolishchukSpielmanClassicalSoundnessStatement`.
 - **P** (paper-faithful packaging): 1 — `NormalizationConditionStatement`.
