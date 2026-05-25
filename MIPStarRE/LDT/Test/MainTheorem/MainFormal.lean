@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Test.MainTheorem.NativeTargets
-import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister
+import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Final
 import MIPStarRE.LDT.Test.StrategyBiProj
 
 /-!

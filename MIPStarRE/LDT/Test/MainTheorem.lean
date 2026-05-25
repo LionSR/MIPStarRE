@@ -29,7 +29,7 @@ The imported modules carry the split proof assembly:
 * `DiagonalCompletion` — diagonal consistency inputs for completing each side
 * `NativeTargets` — the final `ζ₄` native consistency targets
 * `MainFormal` — base, successor, and final branch assembly for `thm:main-formal`
-* `SourceRoleRegister` — two-space source-boundary role-register handoff
+* `SourceRoleRegister.Final` — two-space source-boundary role-register handoff
 
 ## References
 
