@@ -34,18 +34,15 @@ structure GlobalRewriteStatement (params : Parameters)
     ∃ decomp : GlobalVarianceDecomposition params A,
       globalVariance params A ψ = globalVarianceTraceForm params A ψ decomp
 
-private def ambientHilbertSpaceOf (ι : Type u) [Fintype ι] [DecidableEq ι] [Nonempty ι] :
-    FiniteHilbertSpace where
-  carrier := ι
-  instFintype := inferInstance
-  instDecidableEq := inferInstance
-  instNonempty := inferInstance
-
 /-- Reinterpret an abstract operator family and state as a concrete matrix realization. -/
 def abstractMatrixModel (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) [Nonempty ι] :
     MatrixOperatorFamilyRealization params where
-  space := ambientHilbertSpaceOf ι
+  space :=
+    { carrier := ι
+      instFintype := inferInstance
+      instDecidableEq := inferInstance
+      instNonempty := inferInstance }
   state :=
     { matrix := ψ.density
       positive := ψ.density_psd }
