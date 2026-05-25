@@ -1,4 +1,3 @@
-import Mathlib.Analysis.Convex.SpecificFunctions.Pow
 import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.Test.StrategyFailures
 import MIPStarRE.LDT.CommutativityPoints.Approximation
