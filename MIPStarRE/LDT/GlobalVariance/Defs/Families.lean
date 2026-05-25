@@ -281,34 +281,6 @@ noncomputable def generalizeBLineCollisionExpansion (params : Parameters)
             ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
             (G.outcome g)))
 
-private noncomputable def polynomialAverageUnitSubMeas (params : Parameters)
-    [FieldModel params.q]
-    (f : Polynomial params → MIPStarRE.Quantum.Op (ι × ι))
-    (hpos : ∀ g : Polynomial params, 0 ≤ f g)
-    (hle : ∀ g : Polynomial params, f g ≤ 1) :
-    SubMeas Unit (ι × ι) :=
-  averageUnitSubMeas (α := Polynomial params) f hpos hle
-
-/-- The unique outcome of the polynomial average helper is its uniform operator average. -/
-@[simp] lemma polynomialAverageUnitSubMeas_outcome (params : Parameters)
-    [FieldModel params.q]
-    (f : Polynomial params → MIPStarRE.Quantum.Op (ι × ι))
-    (hpos : ∀ g : Polynomial params, 0 ≤ f g)
-    (hle : ∀ g : Polynomial params, f g ≤ 1) :
-    (polynomialAverageUnitSubMeas (ι := ι) params f hpos hle).outcome () =
-      averageOperatorOverDistribution (uniformDistribution (Polynomial params)) f :=
-  rfl
-
-/-- The total of the polynomial average helper is its uniform operator average. -/
-@[simp] lemma polynomialAverageUnitSubMeas_total (params : Parameters)
-    [FieldModel params.q]
-    (f : Polynomial params → MIPStarRE.Quantum.Op (ι × ι))
-    (hpos : ∀ g : Polynomial params, 0 ≤ f g)
-    (hle : ∀ g : Polynomial params, f g ≤ 1) :
-    (polynomialAverageUnitSubMeas (ι := ι) params f hpos hle).total =
-      averageOperatorOverDistribution (uniformDistribution (Polynomial params)) f :=
-  rfl
-
 /-- Aggregated family for the left-hand side of `lem:generalize-b`
 on the bipartite space `d * d`. -/
 noncomputable def generalizeBLeftFamily (params : Parameters) [FieldModel params.q]
@@ -316,7 +288,7 @@ noncomputable def generalizeBLeftFamily (params : Parameters) [FieldModel params
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (AxisParallelLineQuestion params) Unit (ι × ι) :=
   fun qu =>
-    polynomialAverageUnitSubMeas params
+    averageUnitSubMeas (α := Polynomial params)
       (fun g => weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
       (fun g => weightedGeneralizeBLeftOperatorAtPolynomial_pos params strategy G g qu)
       (fun g => weightedGeneralizeBLeftOperatorAtPolynomial_le_one params strategy G g qu)
@@ -328,7 +300,7 @@ noncomputable def generalizeBRightFamily (params : Parameters) [FieldModel param
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (AxisParallelLineQuestion params) Unit (ι × ι) :=
   fun qu =>
-    polynomialAverageUnitSubMeas params
+    averageUnitSubMeas (α := Polynomial params)
       (fun g => weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)
       (fun g => weightedGeneralizeBRightOperatorAtPolynomial_pos params strategy G g qu)
       (fun g => weightedGeneralizeBRightOperatorAtPolynomial_le_one params strategy G g qu)
@@ -340,7 +312,7 @@ noncomputable def localVarianceLeftFamily (params : Parameters) [FieldModel para
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (PointPairQuestion params) Unit (ι × ι) :=
   fun uv =>
-    polynomialAverageUnitSubMeas params
+    averageUnitSubMeas (α := Polynomial params)
       (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.1)
       (fun g => weightedPointConditionedOperatorAtPolynomial_pos params strategy G g uv.1)
       (fun g => weightedPointConditionedOperatorAtPolynomial_le_one params strategy G g uv.1)
@@ -352,7 +324,7 @@ noncomputable def localVarianceRightFamily (params : Parameters) [FieldModel par
     (G : SubMeas (Polynomial params) ι) :
     IdxSubMeas (PointPairQuestion params) Unit (ι × ι) :=
   fun uv =>
-    polynomialAverageUnitSubMeas params
+    averageUnitSubMeas (α := Polynomial params)
       (fun g => weightedPointConditionedOperatorAtPolynomial params strategy G g uv.2)
       (fun g => weightedPointConditionedOperatorAtPolynomial_pos params strategy G g uv.2)
       (fun g => weightedPointConditionedOperatorAtPolynomial_le_one params strategy G g uv.2)
