@@ -359,18 +359,6 @@ lemma answerSuccessor_selfConsistencyRestrictedAverage_eq
     _ = strategy.selfConsistencyFailureProbability :=
         answerCarrier_selfConsistencyFailureProbability_eq params strategy
 
-private def answerPointAppendProdEquiv (params : Parameters) [FieldModel params.q]
-    (β : Type*) :
-    Fq params × (Point params × β) ≃ Point params.next × β where
-  toFun := fun xb => (appendPoint params xb.2.1 xb.1, xb.2.2)
-  invFun := fun ub => (pointHeight params ub.1, (truncatePoint params ub.1, ub.2))
-  left_inv := by
-    rintro ⟨x, u, b⟩
-    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
-  right_inv := by
-    rintro ⟨u, b⟩
-    exact Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv u) rfl
-
 private lemma answerSuccessorRestrictedDiagonalSampleError_eq
     (params : Parameters)
     [FieldModel params.q]
@@ -486,10 +474,9 @@ private lemma answerSuccessorDiagonalSliceIndexErrorAverage_eq_diagonalIndexErro
           g := by
             simpa using
               (MIPStarRE.LDT.avgOver_uniform_equiv
-                (e := answerPointAppendProdEquiv params (Fin (j.val + 1) → Fq params))
+                (e := pointAppendProdEquiv params (Fin (j.val + 1) → Fq params))
                 (f := fun xs : Fq params × RestrictedDiagonalSample params j =>
-                  g ((answerPointAppendProdEquiv params
-                    (Fin (j.val + 1) → Fq params)) xs)))
+                  g ((pointAppendProdEquiv params (Fin (j.val + 1) → Fq params)) xs)))
     _ = answerSuccessorDiagonalIndexError params strategy (embedCoord params j) := by
             rfl
 
