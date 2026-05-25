@@ -31,6 +31,9 @@ formulae should be punctuated as part of the sentences in which they occur.
 This is the most important rule. Every proof in the blueprint must faithfully describe what the Lean proof does:
 
 - **Reference the actual lemmas used.** If the Lean proof calls `LDT.selfImprovement`, the blueprint proof should say "By Lemma X.Y (self-improvement)..." and list it in `\uses`.
+- **Do not use `\cref` or `\Cref`.** The blueprint does not load `cleveref`.
+  Spell out the kind of object and use ordinary references, for example
+  `Lemma~\ref{lem:self-improvement}` or `Theorem~\ref{thm:main-formal}`.
 - **Describe the actual proof structure.** If Lean does induction on a parameter, say so. If Lean uses a specific decomposition, name it.
 - **Don't hand-wave where Lean is specific.** "Standard argument" is not acceptable if Lean uses three specific lemmas. Name them.
 - **Don't be more specific than Lean.** If Lean uses `simp` to close a goal, a one-line sketch is fine.
