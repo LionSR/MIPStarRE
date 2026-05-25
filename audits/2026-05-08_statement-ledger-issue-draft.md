@@ -55,7 +55,7 @@ Headline counts:
 | Verdict | Count |
 |---|---|
 | G — grounded (producer exists) | 33 |
-| T — tracked smuggle (open sub-issue) | 2 (`SpectralTruncationStatement` #1032; `NaimarkStatement` deliberate paper-gap #1361) |
+| T — tracked smuggle (open sub-issue) | 2 at the May 8 snapshot (`SpectralTruncationStatement` #1032; `NaimarkStatement` deliberate paper-gap #1361).  In the active tree, `SpectralTruncationStatement` has direct construction theorems. |
 | E — genuine external citation | 2 (`RazSafraSoundnessStatement`, `PolishchukSpielmanClassicalSoundnessStatement`) |
 | P — paper-faithful packaging | 1 (`NormalizationConditionStatement`) |
 | **D — dead** | **1 at the May 8 snapshot** (`MatrixAddInUTransferStatement`, now removed) |
@@ -94,9 +94,12 @@ entries; CI enforcement is straightforward.
       (`MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean:78`). Producer
       at `Bracketed.lean:520`; downstream consumer chain unclear.
 
-### Tracked-smuggle sub-issues (already open — link as sub-issues)
+### Tracked-smuggle sub-issues (historical snapshot)
 
-- [ ] #1032 — `SpectralTruncationStatement` producer (43 occurrences, core)
+- [x] #1032 — `SpectralTruncationStatement` producer.  The active tree has
+      `spectralTruncationStatement_of_sourceAlmostProjective` and
+      `spectralTruncationStatement_of_witness`; do not open a new producer
+      sub-issue for this unless the direct construction route is removed.
 - [ ] #1230 — abstract / matrix SDP statements (`SdpStatement*`,
       `MatrixSdpStatementWithSlackness*`, `AddInUStatement`)
 - [ ] #1359 — `OrthonormalizeAndCompleteStatement` extra-hypothesis chain
