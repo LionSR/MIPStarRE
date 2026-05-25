@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas
+import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas.TailStage
 
 /-!
 # Section 12 pasting: from-H-to-G adjacent-stage source scalars
