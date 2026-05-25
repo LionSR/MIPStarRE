@@ -93,7 +93,7 @@ in the main-induction and final-theorem assembly:
 | 663 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` |
 | 583 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` |
 | 515 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` |
-| 503 | `MIPStarRE/LDT/MainInductionStep/Theorems/AvgSliceErrors.lean` |
+| deleted | `MIPStarRE/LDT/MainInductionStep/Theorems/AvgSliceErrors.lean`; declarations live in `AvgSliceErrors/Core.lean` and `AvgSliceErrors/Successor.lean` |
 | 442 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` |
 
 ## Recommended Validation Ladder
