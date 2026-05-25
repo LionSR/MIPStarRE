@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
 
 /-!
 # Section 12 pasting: commute G half-sandwich setup (compatibility module)
@@ -10,7 +11,6 @@ The original file (`Setup.lean`, \>1800 lines) has been split into:
 - `Setup/SumBounds.lean` — sum-of-products `≤ 1` bounds and error envelope
 - `Setup/StepLemmas/Split.lean` — split-iff, reindexing, and the two-term base case
 - `Setup/StepLemmas/Move.lean` — step-commutation and move-chain lemmas
-- `Setup/StepLemmas.lean` — compatibility module for the two step-lemma modules
 
 ## References
 
