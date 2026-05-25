@@ -3,11 +3,21 @@
 This note records the dependency-graph repair for the public node
 `thm:self-improvement-in-induction-section`.
 
+## Current status
+
+The repair recorded in this note has been carried out.  The blueprint entry
+for `thm:self-improvement-in-induction-section` now has both the statement
+`\leanok` marker and the proof-level `\leanok` marker, and
+`MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection` is audited
+in `MIPStarRE/LDT/Test/AxiomAudit.lean` as standard-axiom clean.  The table
+below is retained as the historical diagnosis that justified the dependency
+graph update.
+
 ## Source comparison
 
 | Node | Public graph status | Paper source | Blueprint entry | Lean declaration | Classification | Repair |
 | --- | --- | --- | --- | --- | --- | --- |
-| `thm:self-improvement-in-induction-section` | Green statement, blue proof-ready background, but not proof-formalized | `references/ldt-paper/inductive_step.tex:249-286`, with the proved measurement-valued restatement in `references/ldt-paper/self_improvement.tex:631-671` | `blueprint/src/chapter/ch10_induction.tex` | `MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection` | Unlinked completed proof | Add proof-level `\leanok` to the theorem proof block. |
+| `thm:self-improvement-in-induction-section` | Historical snapshot: green statement, blue proof-ready background, but not proof-formalized | `references/ldt-paper/inductive_step.tex:249-286`, with the proved measurement-valued restatement in `references/ldt-paper/self_improvement.tex:631-671` | `blueprint/src/chapter/ch10_induction.tex` | `MIPStarRE.LDT.MainInductionStep.selfImprovementInInductionSection` | Proof link now present | Completed: proof-level `\leanok` has been added to the theorem proof block. |
 
 The induction-section statement in the original Section 6 text states the input
 as a submeasurement.  The proved restatement in Section 9, and the form used in
