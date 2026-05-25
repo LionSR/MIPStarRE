@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency
+import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.CompletionTransport
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
