@@ -1,10 +1,4 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.AlgebraicIdentity
-import MIPStarRE.LDT.GlobalVariance.Theorems.CollisionExpansion
-import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport
-import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransportSum
-import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
-import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
 
 /-!
 # GlobalVariance Theorems — Results imports
