@@ -56,7 +56,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` | 1,886 | 8.9 | 18.3 | none |
 | `Test/MainTheorem.lean` | 2,971 | 8.8 | 8.5 | none |
 | `Commutativity/Main/Auxiliary.lean` | 1,139 | 8.7 | 9.6 | none |
-| `GlobalVariance/Theorems/Results.lean` | 2,950 | 8.6 | 14.9 | none |
+| deleted; `GlobalVariance/Theorems/MainTheorems.lean` carries the final reductions | 2,950 | 8.6 | 14.9 | none |
 | `Pasting/Bernoulli/FromHToG/PaperBounds.lean` | 1,004 | 8.2 | 7.7 | 1× 1,000,000 |
 | `Test/StrategyRole.lean` | 1,101 | 14.7 | 28.8 | none |
 | `Commutativity/ScalarApproximation/PaperChainBasic.lean` | 901 | 7.9 | 9.6 | 1× 3,000,000 + 1× 800,000 |
@@ -106,7 +106,7 @@ Files sorted by heartbeat override magnitude:
 | `MainInductionStep/Theorems.lean` | 3,484 | 26.1s | 1M | 47 simp, 71 positivity, 6 field_simp |
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | 10.8s | — | 56 simp |
 | `Test/MainTheorem.lean` | 2,971 | 8.8s | — | 1 simp (mostly assembly) |
-| `GlobalVariance/Theorems/Results.lean` | 2,950 | 8.6s | — | 63 simp |
+| deleted; final reductions now live in `GlobalVariance/Theorems/MainTheorems.lean` | 2,950 | 8.6s | — | 63 simp |
 | `BridgeLemmas/LineInterpolation.lean` | 2,902 | 10.2s | — | 119 simp |
 | `CommuteGHalfSandwich/MoveChain.lean` | 2,409 | 9.9s | — | 74 simp |
 | `ScalarApproximation/ProcessedG.lean` | 2,035 | 15.2s | 5M | 27 simp, 30 calc |
@@ -131,7 +131,7 @@ These files import many submodules and are natural compile-time bottlenecks in a
 |------|-------|---------|-----------|
 | `Commutativity/Theorems.lean` | 24 | 18 | <1s |
 | `Pasting/Theorems.lean` | 19 | 13 | <1s |
-| `GlobalVariance/Theorems/Results.lean` | 2,950 | 10 | 8.6s |
+| deleted; final reductions now live in `GlobalVariance/Theorems/MainTheorems.lean` | 2,950 | 10 | 8.6s |
 | `Test/MainTheorem.lean` | 2,971 | 9 | 8.8s |
 | `MainInductionStep/Theorems.lean` | 3,484 | 9 | 26.1s |
 | `MIPStarRE/LDT.lean` (root re-export module) | 133 | 133 | 6.5s |
@@ -221,7 +221,7 @@ change trigger a large rebuild.
 | `MainInductionStep/Theorems.lean` | 3,484 | `SlicePrep`, `PastingBridge`, `FinalTelescope` |
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | `BaseSlice`, `SliceEvaluation`, `FullSlice` |
 | `Test/MainTheorem.lean` | 2,971 | Already mostly assembly — low priority |
-| `GlobalVariance/Theorems/Results.lean` | 2,950 | `VarianceBounds`, `CrossTerms`, `FinalAssembly` |
+| deleted; final reductions now live in `GlobalVariance/Theorems/MainTheorems.lean` | 2,950 | `VarianceBounds`, `CrossTerms`, `FinalAssembly` |
 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2,902 | `PointInterpolation`, `LineExtension`, `FullInterpolation` |
 
 ---

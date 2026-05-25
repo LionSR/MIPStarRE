@@ -32,8 +32,10 @@ order, are:
 
 1. `MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean` — high payoff, natural seams, moderate
    downstream surface.
-2. `MIPStarRE/LDT/GlobalVariance/Theorems/Results.lean` — strong seams and only one substantive
-   downstream theorem file, but proof-heavy.
+2. Completed since this snapshot: the former
+   `MIPStarRE/LDT/GlobalVariance/Theorems/Results.lean` long file has been
+   split, and its final reductions now live in
+   `MIPStarRE/LDT/GlobalVariance/Theorems/MainTheorems.lean`.
 3. `MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation.lean` — many public helper lemmas and a
    single substantive downstream user (`HBConsistency.lean`), but should wait until nearby Pasting
    PRs are quiet.
@@ -96,7 +98,7 @@ git diff --check
 | 2 | 3484 | `MIPStarRE/LDT/MainInductionStep/Theorems.lean` |
 | 3 | 3203 | `MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean` |
 | 4 | 2971 | `MIPStarRE/LDT/Test/MainTheorem.lean` |
-| 5 | 2950 | `MIPStarRE/LDT/GlobalVariance/Theorems/Results.lean` |
+| 5 | deleted | `MIPStarRE/LDT/GlobalVariance/Theorems/Results.lean`; final reductions now live in `MIPStarRE/LDT/GlobalVariance/Theorems/MainTheorems.lean` |
 | 6 | 2902 | `MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation.lean` |
 | 7 | 2409 | `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` |
 | 8 | 2035 | `MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean` |
@@ -162,7 +164,7 @@ including the long files in this report:
 
 - `MIPStarRE.LDT.Test.MainTheorem`
 - `MIPStarRE.LDT.MainInductionStep.Theorems`
-- `MIPStarRE.LDT.GlobalVariance.Theorems.Results`
+- `MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems`
 - `MIPStarRE.LDT.Commutativity.Transport.FullSlice`
 - `MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG`
 - `MIPStarRE.LDT.Pasting.BridgeLemmas`
@@ -205,7 +207,7 @@ motion.
 | 2 | `MainInductionStep/Theorems.lean` | 3484 | Section 6 statements plus Test failures, commutativity core, Pasting final, self-improvement results | `LDT.lean`, `MainInductionStep.lean`, `Test/MainTheorem.lean` | 17 public / 56 private | Sorry-free but active Section 6 area. Wait for #924. |
 | 3 | `Commutativity/Transport/FullSlice.lean` | 3203 | `Transport.Pullback`, `Scaffold.Products`, `EvaluatedSliceCommutation.Averages`, `PolynomialAgreement` | `LDT.lean`, `Commutativity/Main/Auxiliary.lean`, `Commutativity/Theorems.lean`; the former `Commutativity/Transport.lean` barrel has since been removed | 20 public / 51 private | Best high-payoff split candidate at the snapshot. |
 | 4 | `Test/MainTheorem.lean` | 2971 | Main induction, projectivization, preliminaries, Test cascade/strategy files | `LDT.lean`, `Test/AxiomAudit.lean` | 103 public / 4 private | In the snapshot, contained the only live `sorry` at line 2950. Defer. |
-| 5 | `GlobalVariance/Theorems/Results.lean` | 2950 | expansion results, Cauchy-Schwarz, completion transfer, GlobalVariance statements/averaging, Test failures | `LDT.lean`, `GlobalVariance/Theorems.lean`, `SelfImprovement/Theorems/Results.lean` | 42 public / 53 private | Good candidate after checking no GlobalVariance PR is active. |
+| 5 | deleted; final reductions now live in `GlobalVariance/Theorems/MainTheorems.lean` | 2950 | expansion results, Cauchy-Schwarz, completion transfer, GlobalVariance statements/averaging, Test failures | `LDT.lean`, `GlobalVariance/Theorems.lean`, `SelfImprovement/Theorems/Results.lean` | 42 public / 53 private | The former long file has been split; this compatibility re-export is now retired. |
 | 6 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2902 | `Pasting.BridgeLemmas.Common` | `Pasting/BridgeLemmas/HBConsistency.lean` | 64 public / 0 private | Good candidate; Pasting-nearby, so wait for Pasting PRs. |
 | 7 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` | 2409 | `CommuteGHalfSandwich.Setup` | `Pasting/BridgeLemmas/CommuteGHalfSandwich.lean` | 1 public / 61 private | Defer; private chain around one final theorem. |
 | 8 | `Commutativity/ScalarApproximation/ProcessedG.lean` | 2035 | scalar core/paper chain/residuals, evaluated-slice consequences, G-comm scalar | `LDT.lean`, `Commutativity/Main/Results.lean`, scalar barrel, `Commutativity/Theorems.lean` | 1 public / 23 private | Defer near scalar cleanup/follow-ups. |
@@ -233,7 +235,7 @@ Suggested seam plan:
 | `FullSlice/Commutation.lean` | lines 1951--3203: qSDDOp average expansion, scalar-to-tensor bridges, final `fullSliceCommutation_qSDDOp_avg_eq` | Final theorem block; import previous leaves. |
 | `FullSlice.lean` | imports the four leaves | Compatibility path for existing imports. |
 
-Validation for the future PR:
+Validation for the retirement PR:
 
 ```bash
 lake env lean MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean
@@ -242,17 +244,16 @@ lake env lean MIPStarRE/LDT/Commutativity/Theorems.lean
 git grep -n -w -e sorry -e axiom -e unsafe_axiom -e admit -- '*.lean'
 ```
 
-### P2: `GlobalVariance/Theorems/Results.lean`
+### P2: retired `GlobalVariance/Theorems/Results.lean`
 
-Why it is second:
+Status:
 
-- It is large, sorry-free, and has clean mathematical phases.
-- The only substantive downstream file in the direct-import scan is
-  `SelfImprovement/Theorems/Results.lean`; the other dependents are barrels.
-- It is not listed among the current active PR conflict hotspots, but should still be rechecked
-  before editing.
+- The former long file has been split into concrete leaves.
+- The compatibility re-export has now been retired.
+- The final local/global variance reductions are carried by
+  `GlobalVariance/Theorems/MainTheorems.lean`.
 
-Suggested seam plan:
+Historical seam plan:
 
 | Proposed module | Source range / declarations | Notes |
 |---|---|---|
@@ -261,12 +262,12 @@ Suggested seam plan:
 | `Results/EventConsistency.lean` | lines 1261--1995: adjoint swap, rerandomization averages, event self-consistency, axis-parallel point/line consistency | Semantically separate weighted-event block. |
 | `Results/TransportChain.lean` | lines 2009--2569: transport question equivalences and `localVarianceTransportChainBound` | Can be validated before moving final wrappers. |
 | `Results/Final.lean` | lines 2591--2950: `localVarianceOfPoints`, `globalVarianceOfPoints`, and matrix wrappers | Final public theorem block. |
-| `Results.lean` | imports the five leaves | Compatibility path for existing imports. |
+| `Results.lean` | imports the five leaves | Historical compatibility path, now retired. |
 
 Validation for the future PR:
 
 ```bash
-lake env lean MIPStarRE/LDT/GlobalVariance/Theorems/Results.lean
+lake env lean MIPStarRE/LDT/GlobalVariance/Theorems.lean
 lake env lean MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean
 git grep -n -w -e sorry -e axiom -e unsafe_axiom -e admit -- '*.lean'
 ```
@@ -416,8 +417,7 @@ Open focused follow-ups for the top candidates rather than using #907 as a singl
 
 1. Split `Commutativity/Transport/FullSlice.lean` into `Defs`, `Collision`, `SelfConsistency`, and
    `Commutation` leaves.
-2. Split `GlobalVariance/Theorems/Results.lean` into `GeneralizeB`, `Collision`,
-   `EventConsistency`, `TransportChain`, and `Final` leaves.
+2. No new split issue is needed for the retired `GlobalVariance/Theorems/Results.lean` path.
 3. Split `Pasting/BridgeLemmas/LineInterpolation.lean` after nearby Pasting PRs settle.
 
 Each follow-up should reference this audit, #907, and the active-PR constraints above.
