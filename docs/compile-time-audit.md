@@ -62,7 +62,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Commutativity/ScalarApproximation/PaperChainBasic.lean` | 901 | 7.9 | 9.6 | 1× 3,000,000 + 1× 800,000 |
 | `Commutativity/ScalarApproximation/PaperChainPhaseSix.lean` | 226 | 7.4 | 4.1 | 1× 10,000,000 |
 | `Commutativity/ScalarApproximation/PaperChainTail.lean` | 238 | 7.1 | 3.9 | 1× 10,000,000 |
-| deleted; `Pasting/Bernoulli/FromHToG/AdjacentStages/Chain.lean` now carries the chain | 1,533 | 7.8 | 8.5 | none |
+| deleted; `Pasting/Bernoulli/FromHToG/AdjacentStages/Chain/{HalfSandwich,FinalMove}.lean` now carries the chain | 1,533 | 7.8 | 8.5 | none |
 
 ---
 
@@ -113,7 +113,7 @@ Files sorted by heartbeat override magnitude:
 | `CommuteGHalfSandwich/Setup.lean` | 1,886 | 8.9s | — | 48 simp |
 | `SwitcherooCompletion.lean` | 1,673 | 23.1s | 1M | 28 simp |
 | `BridgeLemmas/OverAllOutcomes.lean` | 1,547 | 11.0s | — | 24 simp |
-| deleted; `FromHToG/AdjacentStages/Chain.lean` now carries the chain | 1,533 | 7.8s | — | 0 simp (mostly arithmetic) |
+| deleted; `FromHToG/AdjacentStages/Chain/{HalfSandwich,FinalMove}.lean` now carries the chain | 1,533 | 7.8s | — | 0 simp (mostly arithmetic) |
 | `Test/ErrorCascade.lean` | 1,482 | 16.1s | — | 3 simp |
 | `FromHToG/Core.lean` | 1,339 | 20.6s | 800K | 54 simp |
 | `Pasting/Core.lean` | 1,202 | 11.5s | — | 35 simp |

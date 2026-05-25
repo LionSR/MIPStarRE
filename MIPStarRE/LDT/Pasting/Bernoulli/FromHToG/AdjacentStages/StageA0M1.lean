@@ -8,8 +8,9 @@ with their shape rewrites and the supporting move-right and half-sandwich contex
 algebra lemmas.
 
 This file covers the definitions up to the first move-right step and the
-half-sandwich context algebra.  The downstream chain `M₁ → M₂ → M₃ → M₄` lives
-in `AdjacentStages.Chain`.
+half-sandwich context algebra.  The downstream chain `M₁ → M₂ → M₃ → M₄` is
+split between `AdjacentStages.Chain.HalfSandwich` and
+`AdjacentStages.Chain.FinalMove`.
 -/
 
 namespace MIPStarRE.LDT.Pasting

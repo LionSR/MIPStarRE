@@ -190,7 +190,7 @@ The heaviest files for `avgOver`/`uniformDistribution` are:
 | 332 | `MIPStarRE/LDT/MainInductionStep/Theorems.lean` |
 | 277 | `MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean` |
 | 230 | `MIPStarRE/LDT/GlobalVariance/Theorems/Results.lean` |
-| 212 | deleted; content lives under `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages/Chain.lean` |
+| 212 | deleted; content lives under `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages/Chain/` |
 | 151 | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/PaperBounds.lean` |
 | 149 | `MIPStarRE/LDT/Test/MainTheorem.lean` |
 | 139 | `MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation.lean` |
