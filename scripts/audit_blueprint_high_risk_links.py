@@ -84,13 +84,10 @@ def asserted_declarations(axiom_audit_path: Path) -> set[str]:
 def declaration_is_asserted(decl: str, asserted: set[str]) -> bool:
     """Return whether ``decl`` is explicitly audited.
 
-    Prefer fully-qualified matches, but also accept an exact short-name match
-    for declarations asserted inside an open namespace in ``AxiomAudit.lean``.
+    Prefer fully-qualified matches, but also accept exact suffix matches for
+    declarations asserted inside an open namespace in ``AxiomAudit.lean``.
     """
-    if decl in asserted:
-        return True
-    short = decl.rsplit(".", 1)[-1]
-    return short in asserted
+    return any(decl == candidate or decl.endswith(f".{candidate}") for candidate in asserted)
 
 
 def run_audit(
