@@ -84,8 +84,8 @@ largest files are:
 - `MIPStarRE/LDT/Test/MainTheorem.lean` -- 4072 lines.
 - `MIPStarRE/LDT/Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean` -- 3827
   lines.
-- `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` --
-  2409 lines.
+- split; `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain/`
+  carries the former 2409-line move chain.
 - `MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean` -- 2035
   lines.
 - `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` -- 1886

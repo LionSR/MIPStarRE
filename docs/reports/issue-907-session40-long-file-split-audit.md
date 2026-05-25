@@ -100,7 +100,7 @@ git diff --check
 | 4 | 2971 | `MIPStarRE/LDT/Test/MainTheorem.lean` |
 | 5 | deleted | `MIPStarRE/LDT/GlobalVariance/Theorems/Results.lean`; final reductions now live in `MIPStarRE/LDT/GlobalVariance/Theorems/MainTheorems.lean` |
 | 6 | 2902 | `MIPStarRE/LDT/Pasting/BridgeLemmas/LineInterpolation.lean` |
-| 7 | split | `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain/{Base,Lifting,Chain,BackChain,FlatChain,FlatChainStep,Core}.lean`; the former `MoveChain.lean` is now a compatibility wrapper |
+| 7 | split | `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain/{Base,Lifting,Chain,BackChain,FlatChain,FlatChainStep,Core}.lean`; the former `MoveChain.lean` wrapper has been removed |
 | 8 | 2035 | `MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean` |
 | 9 | 1886 | `MIPStarRE/LDT/Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` |
 | 10 | 1673 | `MIPStarRE/LDT/Pasting/SwitcherooCompletion.lean` |
@@ -209,7 +209,7 @@ motion.
 | 4 | `Test/MainTheorem.lean` | 2971 | Main induction, projectivization, preliminaries, Test cascade/strategy files | `LDT.lean`, `Test/AxiomAudit.lean` | 103 public / 4 private | In the snapshot, contained the only live `sorry` at line 2950. Defer. |
 | 5 | deleted; final reductions now live in `GlobalVariance/Theorems/MainTheorems.lean` | 2950 | expansion results, Cauchy-Schwarz, completion transfer, GlobalVariance statements/averaging, Test failures | `LDT.lean`, `GlobalVariance/Theorems.lean`, `SelfImprovement/Theorems/Results.lean` | 42 public / 53 private | The former long file has been split; this compatibility re-export is now retired. |
 | 6 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2902 | `Pasting.BridgeLemmas.Common` | `Pasting/BridgeLemmas/HBConsistency.lean` | 64 public / 0 private | Good candidate; Pasting-nearby, so wait for Pasting PRs. |
-| 7 | split; former `Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` is now a compatibility wrapper | 2409 | `CommuteGHalfSandwich.Setup` | `Pasting/BridgeLemmas/CommuteGHalfSandwich.lean` | 1 public / 61 private | The move chain now lives in the `MoveChain/` leaves. |
+| 7 | split; former `Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` wrapper has been removed | 2409 | `CommuteGHalfSandwich.Setup` | `Pasting/BridgeLemmas/CommuteGHalfSandwich.lean` | 1 public / 61 private | The move chain now lives in the `MoveChain/` leaves. |
 | 8 | `Commutativity/ScalarApproximation/ProcessedG.lean` | 2035 | scalar core/paper chain/residuals, evaluated-slice consequences, G-comm scalar | `LDT.lean`, `Commutativity/Main/Results.lean`, scalar barrel, `Commutativity/Theorems.lean` | 1 public / 23 private | Defer near scalar cleanup/follow-ups. |
 | 9 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` | 1886 | shared helpers core, bridge common | `Pasting/Bernoulli/FromHToG/Core.lean`, concrete `MoveChain/` leaves | 56 public / 0 private | Remaining setup work should be considered with the split move-chain leaves. |
 | 10 | `Pasting/SwitcherooCompletion.lean` | 1673 | `SwitcherooContraction`, `SwitcherooCompletion.SecondTerm` | `LDT.lean`, `SwitcherooCompletion/CompletePart.lean` | 4 public / 27 private | Already partly split; lower priority. |
@@ -348,10 +348,10 @@ split seams:
 
 `Setup.lean` (1886 LOC) and the former `MoveChain.lean` chain were considered
 together in this snapshot.  The move chain has since been split into leaves
-under `CommuteGHalfSandwich/MoveChain/`, leaving `MoveChain.lean` as a small
-compatibility wrapper.  Any remaining follow-up should therefore focus on
-`Setup.lean` and on the concrete `MoveChain/` leaves, not on the retired
-aggregate path.
+under `CommuteGHalfSandwich/MoveChain/`, and the temporary `MoveChain.lean`
+compatibility wrapper has now been removed.  Any remaining follow-up should
+therefore focus on `Setup.lean` and on the concrete `MoveChain/` leaves, not on
+the retired aggregate path.
 
 - `Setup` lines 34--251: basic tuple equivalences and split facts;
 - `Setup` lines 320--741: self-consistency, pair-product, and error-bound helpers;

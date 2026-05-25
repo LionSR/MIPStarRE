@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.MoveChain
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.MoveChain.Core
 
 /-!
 # Section 12 pasting: commute G half-sandwich
