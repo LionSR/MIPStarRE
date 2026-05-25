@@ -178,7 +178,7 @@ since been removed after the split.
 - `MIPStarRE/LDT/Commutativity/Transport/FullSlice/Machinery.lean` and
   `.../FullSlice/Bridges.lean`: this was the #981 target.  The concrete
   machinery and bridge leaves remain, while the unused `Machinery.lean` barrel
-  no longer exists.
+  and `Bridges.lean` wrapper no longer exist.
 - `MIPStarRE/LDT/MainInductionStep/Theorems.lean`: defer until #979 / #931 and
   downstream rebases settle.
 - `MIPStarRE/LDT/Test/MainTheorem.lean`: defer until #958 / #560 and the live

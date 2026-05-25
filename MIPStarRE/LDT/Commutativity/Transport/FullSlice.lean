@@ -1,10 +1,12 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges
+import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.Closeness
+import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessXEval
+import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.ZeroBounds
 
 /-!
 # Section 11 commutativity: full-slice transport
 
-Compatibility module re-exporting the full-slice transport sub-modules:
+Compatibility module re-exporting the full-slice transport submodules:
 
 - `Averages`: zero-family definition, scalar/tensor averages, data indices
 - `ZeroBounds`: zero-family SDDOpRel bounds
@@ -21,11 +23,11 @@ Architecture: The public API is scalar (e.g. `fullSliceABAAvg`,
 `Main/Auxiliary.lean`.  See `docs/decisions/713-scalar-tensor-decision.md`
 for the Option 3 (hybrid) decision record.
 
-Import direction: `Averages` is the shared base leaf for FullSlice-specific
+Import direction: `Averages` is the shared base leaf for full-slice-specific
 Fubini, symmetry, and data-reindexing helpers.  `ZeroBounds`, `Machinery.*`,
 and `Bridges.QSDD` depend on that base.  `Bridges.Closeness` depends on
-`Averages` plus the two machinery leaves.  FullSlice leaves should not import
-these compatibility modules.
+`Averages` plus the two machinery leaves.  Full-slice leaves should import the
+concrete bridge leaves rather than a separate bridge compatibility module.
 
 Ex-private definitions are tensor-form machinery per architecture decision
 #713; downstream code should use the scalar public API.

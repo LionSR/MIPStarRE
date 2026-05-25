@@ -12,7 +12,7 @@ Architecture: Implements the scalar↔tensor bridge chain (Option 3 hybrid).
 Public lemmas `fullSlice_scalar_marginalize_x` and
 `fullSlice_scalar_marginalize_y` are pure scalar inequalities; their proofs
 compose internal-use tensor-form bridges from
-`Transport/FullSlice/Bridges.lean` over tensor averages defined in
+`Transport/FullSlice/Bridges/` over tensor averages defined in
 `Transport/FullSlice/Averages.lean`, with `closenessOfIP` at cost `√ζ` each.
 
 See `docs/decisions/713-scalar-tensor-decision.md` for the full decision record.
