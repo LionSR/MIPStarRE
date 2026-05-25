@@ -373,7 +373,7 @@ noncomputable def xEvaluatedSliceBABAScalarAvg
           (leftTensor (ι₂ := ι) (B.outcome h * A.outcome a * B.outcome h * A.outcome a)))
 
 /-- Reindex mixed x-evaluated data `(u, x, y)` as `(appendPoint u x, y)`. -/
-def xEvaluatedQuestionPointNextEquiv
+private def xEvaluatedQuestionPointNextEquiv
     (params : Parameters) [FieldModel params.q] :
     Point params × FullSliceQuestion params ≃ Point params.next × Fq params where
   toFun := fun ux => (appendPoint params ux.1 ux.2.1, ux.2.2)
