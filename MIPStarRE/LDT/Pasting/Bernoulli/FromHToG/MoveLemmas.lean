@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas.Basic
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas.TailStage
 
 /-!
