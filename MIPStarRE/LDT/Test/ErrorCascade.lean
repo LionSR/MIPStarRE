@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Test.ErrorCascade.Definitions
-import MIPStarRE.LDT.Test.ErrorCascade.EnvelopeBounds
 import MIPStarRE.LDT.Test.ErrorCascade.CascadeBounds
 import MIPStarRE.LDT.Test.SurfaceVsPoint
 
