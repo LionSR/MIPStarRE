@@ -16,35 +16,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Split a nonempty point tuple into its head and tail. -/
-def fromHToGPointTupleConsEquiv (params : Parameters) (n : ℕ) :
-    PointTuple params (n + 1) ≃ Fq params × PointTuple params n where
-  toFun xs := (xs 0, pointTupleTail xs)
-  invFun p := Fin.cons p.1 p.2
-  left_inv xs := by
-    funext i
-    cases i using Fin.cases with
-    | zero => rfl
-    | succ j => rfl
-  right_inv p := by
-    cases p
-    rfl
-
-/-- Split a nonempty completed-outcome tuple into its head and tail. -/
-def fromHToGGHatTupleOutcomeConsEquiv
-    (params : Parameters) [FieldModel params.q] (n : ℕ) :
-    GHatTupleOutcome params (n + 1) ≃ GHatOutcome params × GHatTupleOutcome params n where
-  toFun gs := (gs 0, gHatTupleOutcomeTail gs)
-  invFun p := Fin.cons p.1 p.2
-  left_inv gs := by
-    funext i
-    cases i using Fin.cases with
-    | zero => rfl
-    | succ j => rfl
-  right_inv p := by
-    cases p
-    rfl
-
 /-- Head-tail Boolean type membership after consing an outcome tuple. -/
 lemma fromHToG_gHatTupleType_cons_eq
     (params : Parameters) [FieldModel params.q]
@@ -127,7 +98,7 @@ lemma fromHToG_cons_type_outcome_sum
               ((gHatSandwichFamily params family (n + 1) (Fin.cons x xs)).outcome
                 (Fin.cons p.1 p.2)) * rightTensor (ι₁ := ι) S)
           else 0 := by
-          exact Fintype.sum_equiv (fromHToGGHatTupleOutcomeConsEquiv params n)
+          exact Fintype.sum_equiv (gHatTupleOutcomeConsEquiv' params n)
             (fun gs' : GHatTupleOutcome params (n + 1) =>
               if gHatTupleType gs' = prependTypeBit b τ then
                 ev ψbi (leftTensor (ι₂ := ι)
@@ -266,15 +237,15 @@ lemma fromHToGTailStageMass_cons_eq_adjacentStageA0_branch
               gHatTupleType gs' = prependTypeBit b τ,
             ev ψbi (leftTensor (ι₂ := ι)
               ((gHatSandwichFamily params family (n + 1)
-                ((fromHToGPointTupleConsEquiv params n).symm q)).outcome gs') *
+                ((pointTupleConsEquiv params n).symm q)).outcome gs') *
                 rightTensor (ι₁ := ι) S)) := by
-            exact avgOver_uniform_equiv (fromHToGPointTupleConsEquiv params n) _
+            exact avgOver_uniform_equiv (pointTupleConsEquiv params n) _
     _ = avgOver (uniformDistribution (Fq params × PointTuple params n)) (fun q =>
           F q.1 q.2) := by
             refine avgOver_congr _ _ _ ?_
             intro q
             rcases q with ⟨x, xs⟩
-            simpa [F, S, fromHToGPointTupleConsEquiv] using
+            simpa [F, S, pointTupleConsEquiv] using
               (fromHToG_cons_type_outcome_sum params ψbi family b τ x xs S)
     _ = avgOver (uniformDistribution (Fq params)) (fun x =>
           avgOver (uniformDistribution (PointTuple params n)) (fun xs => F x xs)) := by
