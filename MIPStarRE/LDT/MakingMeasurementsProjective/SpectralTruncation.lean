@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.Conversion
 
 /-!
