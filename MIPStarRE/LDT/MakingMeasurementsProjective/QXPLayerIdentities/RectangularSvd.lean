@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 
 /-!
 # Section 5 — Rectangular SVD constructors for Q/X/XHat/P data
