@@ -4,10 +4,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.Basic.MeasurementLift
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
-import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.Completion
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.ErrorBounds
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 5 — Orthonormalization
