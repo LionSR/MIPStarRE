@@ -251,14 +251,14 @@ where
 
 We first record the natural construction obtained by sampling $d+1$ slices and interpolating. It motivates the eventual argument but is not the construction used in the formal theorem.
 
-\subsubsection{The First Construction}\label{sec:construction-numba-one}
+\subsubsection{The First Construction}\label{sec:first-construction}
 
 The first construction samples $d+1$ slice outcomes $g_1,\dots,g_{d+1}\in \polyfunc{m}{q}{d}$, interpolates them to a global polynomial $h \in \polyfunc{m+1}{q}{d}$, and then averages over distinct interpolation points. Its consistency is governed by the commutation of the slice measurements, but its completeness is subtler. The heuristic comparison is
 \[
 	\bra{\psi} H \ot I \ket{\psi} \approx \bra{\psi} G^{d+1} \ot I \ket{\psi}.
 \]
 Thus one would like to show
-\begin{equation}\label{eq:subtract-a-G}
+\begin{equation}\label{eq:first-construction-g-power-comparison}
 	\bra{\psi} G^{d+1} \ot I \ket{\psi}
 	\approx \bra{\psi} G \ot I \ket{\psi}.
 \end{equation}
@@ -269,12 +269,12 @@ The naive estimate would instead suggest
 which is too weak for the induction.
 
 The key input is that one can first show
-\begin{equation}\label{eq:step-one-of-grand-plan}
+\begin{equation}\label{eq:first-construction-power-increment}
 	\bra{\psi} G^{d+2} \ot I \ket{\psi}
 	\approx_\Delta \bra{\psi} G^{d+1} \ot I \ket{\psi},
 \end{equation}
 for a small error $\Delta = \poly(m)\cdot \poly(\eps,\delta,\gamma,\zeta,d/q)$. Writing the eigendecomposition $G=\sum_i \lambda_i \ket{v_i}\bra{v_i}$ and the induced spectral distribution $\mu(i)=\bra{\psi}(\ket{v_i}\bra{v_i}\ot I)\ket{\psi}$, this is equivalent to
-\begin{equation}\label{eq:equivalent-way-of-writing-grand-plan}
+\begin{equation}\label{eq:first-construction-spectral-defect}
 	\Delta
 	\ge \bra{\psi} G^{d+1} \ot I \ket{\psi} - \bra{\psi} G^{d+2} \ot I \ket{\psi}
 	= \E_{i\sim\mu}[\lambda_i^{d+1}(1-\lambda_i)].
@@ -317,7 +317,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \begin{corollary}[First-construction completeness comparison]\label{cor:first-construction-completeness-comparison}
 	\uses{cor:first-construction-spectral-comparison, lem:first-construction-scalar-inequality}
 	As in the paper, Lemma~\ref{lem:first-construction-scalar-inequality} now converts
-	\eqref{eq:equivalent-way-of-writing-grand-plan} into the estimate
+	\eqref{eq:first-construction-spectral-defect} into the estimate
 	\[
 		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
 		\le 2\cdot \E_{i\sim\mu}\Big[(\lambda_i^{d+1}(1-\lambda_i))^{1/(d+1)}\Big]
@@ -332,7 +332,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \end{corollary}
 
-\subsubsection{The Second Construction}\label{sec:construction-numba-two}
+\subsubsection{The Second Construction}\label{sec:second-construction}
 
 \begin{definition}[The incomplete part and the completed measurement]\label{def:G-hat}
 	\lean{MIPStarRE.LDT.Pasting.GHatOutcome, MIPStarRE.LDT.Pasting.gHatIdxMeas}
@@ -546,29 +546,29 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\label{eq:split-G-and-commute}
 	\end{align}
 	This is the Cauchy--Schwarz estimate coming from \ref{eq:M-commutes-with-G}. Next,
-	\begin{equation}\label{eq:move-G-for-great-justice}
+	\begin{equation}\label{eq:move-G-to-right-factor}
 		\eqref{eq:split-G-and-commute}
 		\approx_{\sqrt{\zeta}}
 		\E_{x,y} \sum_{o,g} \bra{\psi} G^x M_o^y G_g^x M_o^y \ot G_g^x \ket{\psi}.
 	\end{equation}
 	Here the error is bounded using \ref{item:ld-pasting-self-consistency}. Then
-	\begin{equation}\label{eq:move-G-for-even-greater-justice}
-		\eqref{eq:move-G-for-great-justice}
+	\begin{equation}\label{eq:move-G-back-to-left-factor}
+		\eqref{eq:move-G-to-right-factor}
 		\approx_{\sqrt{\zeta}}
 		\E_{x,y} \sum_{o,g} \bra{\psi} G_g^x G^x M_o^y G_g^x M_o^y \ot I \ket{\psi},
 	\end{equation}
 	again by strong self-consistency of $G_g^x$. Since $G$ is projective,
 	\begin{align}
-		\eqref{eq:move-G-for-even-greater-justice}
+		\eqref{eq:move-G-back-to-left-factor}
 		 & =
 		\E_{x,y} \sum_{o,g} \bra{\psi} G_g^x M_o^y G_g^x M_o^y \ot I \ket{\psi} \nonumber \\
 		 & \approx_{\sqrt{\chi}}
 		\E_{x,y} \sum_{o,g} \bra{\psi} M_o^y G_g^x G_g^x M_o^y \ot I \ket{\psi}.
-		\label{eq:commute-the-G-yet-again}
+		\label{eq:commuted-G-after-transfer}
 	\end{align}
 	Finally,
 	\begin{align*}
-		\eqref{eq:commute-the-G-yet-again}
+		\eqref{eq:commuted-G-after-transfer}
 		 & =
 		\E_{x,y} \sum_{o,g} \bra{\psi} M_o^y G_g^x M_o^y \ot I \ket{\psi}         \\
 		 & =
@@ -579,7 +579,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\bra{\psi} G \ot M \ket{\psi}.
 	\end{align*}
 	Therefore
-	\begin{equation}\label{eq:term-three-for-use-right-now}
+	\begin{equation}\label{eq:third-error-term-bound}
 		\E_{x,y} \sum_o \bra{\psi} G^x M_o^y G^x M_o^y \ot I \ket{\psi}
 		\approx_{2\sqrt{\zeta}+2\sqrt{\omega}+2\sqrt{\chi}}
 		\bra{\psi} G \ot M \ket{\psi}.
@@ -1032,10 +1032,10 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\bra{\psi}
 		\widehat G_{g_i}^{x_i}\widehat G_{g_{<i}}^{x_{<i}}\widehat G_{g_i}^{x_i}(\widehat G_{g_{<i}}^{x_{<i}})^\dagger
 		\ot (I-B_{[f(x_i)=g_i(u)]}^u)\ket{\psi}.
-		\label{eq:gonna-need-a-bigger-cauchy-schwarz}
+		\label{eq:half-sandwich-first-commutation}
 	\end{align}
 	The Cauchy--Schwarz argument uses
-	\begin{equation}\label{eq:add-in-the-bot}
+	\begin{equation}\label{eq:completed-outcome-commutator}
 		\E_u \E_{x_1,\dots,x_i} \sum_{g_1,\dots,g_i}
 		\bra{\psi}
 		\bigl((\widehat G_{g_{<i}}^{x_{<i}}\widehat G_{g_i}^{x_i} - \widehat G_{g_i}^{x_i}\widehat G_{g_{<i}}^{x_{<i}})
@@ -1043,15 +1043,15 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\ot I \ket{\psi},
 	\end{equation}
 	which is at most $\nu_4$ by Lemma~\ref{lem:commute-g-half-sandwich}. A second Cauchy--Schwarz step gives
-	\begin{equation}\label{eq:even-bigger-CS}
-		\eqref{eq:gonna-need-a-bigger-cauchy-schwarz}
+	\begin{equation}\label{eq:half-sandwich-second-commutation}
+		\eqref{eq:half-sandwich-first-commutation}
 		\approx_{\sqrt{\nu_4}}
 		\E_u \E_{x_1,\dots,x_i} \sum_{g_1,\dots,g_i\,:\,g_i\ne\bot}
 		\bra{\psi}
 		\widehat G_{g_i}^{x_i}\widehat G_{g_{<i}}^{x_{<i}}(\widehat G_{g_{<i}}^{x_{<i}})^\dagger \widehat G_{g_i}^{x_i}
 		\ot (I-B_{[f(x_i)=g_i(u)]}^u)\ket{\psi}.
 	\end{equation}
-	Summing over $g_1,\dots,g_{i-1}$ collapses the middle factor to $I$, so \ref{eq:even-bigger-CS} becomes
+	Summing over $g_1,\dots,g_{i-1}$ collapses the middle factor to $I$, so \ref{eq:half-sandwich-second-commutation} becomes
 	\[
 		\E_u \E_{x_1,\dots,x_i} \sum_{g_i\,:\,g_i\ne\bot}
 		\bra{\psi} \widehat G_{g_i}^{x_i} \ot (I-B_{[f(x_i)=g_i(u)]}^u)\ket{\psi}
@@ -1091,20 +1091,20 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		={} & \E_u \E_{x_1,\dots,x_k} \sum_h \sum_{w:|w|\ge d+1} \sum_{(g_1,\dots,g_k)=h_w}
 		\sum_{f\ne h|_u}
 		\bra{\psi} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot B_f^u \ket{\psi}.
-		\label{eq:keep-on-expandin}
+		\label{eq:h-b-consistency-expanded-sum}
 	\end{align}
 	If $|w|\ge d+1$ and $f \ne h|_u$, then some active coordinate $i$ must satisfy $g_i \ne \bot$ and $g_i(u)\ne f(x_i)$. Hence
 	\begin{align}
-		\eqref{eq:keep-on-expandin}
+		\eqref{eq:h-b-consistency-expanded-sum}
 		\le{} &
 		\E_u \E_{x_1,\dots,x_k} \sum_{g_1,\dots,g_k}
 		\sum_{\substack{f:\exists i,\ g_i\ne\bot, \\ g_i(u)\ne f(x_i)}}
 		\bra{\psi} \widehat H_{g_1,\dots,g_k}^{x_1,\dots,x_k} \ot B_f^u \ket{\psi}.
-		\label{eq:keep-on-contractin}
+		\label{eq:h-b-consistency-bad-coordinate-union}
 	\end{align}
 	Passing from independent tuples to distinct tuples costs at most $k^2/q$ by Lemma~\ref{prop:ld-dnoteq}. A union bound over the offending coordinate then gives
 	\[
-		\eqref{eq:keep-on-contractin}
+		\eqref{eq:h-b-consistency-bad-coordinate-union}
 		\le
 		\sum_{i=1}^k
 		\E_u \E_{y_1,\dots,y_k}
@@ -1286,11 +1286,11 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\E_u \E_{y_1,\dots,y_k} \sum_{\tau:\,|\tau|\ge d+1} \sum_f
 		\sum_{(g_1,\dots,g_k)\in \overline{\mathsf{Global}_\tau(y)}}
 		\bra{\psi} \widehat H_{g_1,\dots,g_k}^{y_1,\dots,y_k} \ot B_f^u \ket{\psi}.
-		\label{eq:B-appears-out-of-thin-air}
+		\label{eq:insert-line-measurement-resolution}
 	\end{align}
 	We next insert an indicator recording consistency along the sampled line:
 	\begin{equation}\label{eq:add-in-indicator-for-f-and-g}
-		\eqref{eq:B-appears-out-of-thin-air}
+		\eqref{eq:insert-line-measurement-resolution}
 		\approx_{\frac{k^2}{q}+k\nu_5}
 		\E_u \E_{y_1,\dots,y_k} \sum_{\tau:\,|\tau|\ge d+1} \sum_f
 		\sum_{(g_1,\dots,g_k)\in \overline{\mathsf{Global}_\tau(y)}}
@@ -1298,7 +1298,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\cdot \bone[\forall i\in\tau,\ f(y_i)=g_i(u)].
 	\end{equation}
 	The discarded part is
-	\begin{equation}\label{eq:about-to-swap-x-for-y}
+	\begin{equation}\label{eq:discarded-line-inconsistency-term}
 		\E_u \E_{y_1,\dots,y_k} \sum_{\tau:\,|\tau|\ge d+1} \sum_f
 		\sum_{(g_1,\dots,g_k)\in \overline{\mathsf{Global}_\tau(y)}}
 		\bra{\psi} \widehat H_{g_1,\dots,g_k}^{y_1,\dots,y_k} \ot B_f^u \ket{\psi}
@@ -1564,7 +1564,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\label{eq:commute-g-part-one}
 	\end{align}
 	The associated Cauchy--Schwarz estimate is
-	\begin{multline}\label{eq:call-this-later}
+	\begin{multline}\label{eq:adjoint-commutator-cauchy-schwarz}
 		\Bigl|
 		\E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}} \sum_{(g_\ell,g_{>\ell})\in \mathsf O_{\tau_{\ge \ell}}}
 		\bra{\psi}
@@ -1629,7 +1629,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\ket{\psi}
 		}.
 	\end{multline}
-	By \ref{eq:S-sandwich}, the first square root is at most $1$, and the second matches the first square root in \ref{eq:call-this-later}, hence is at most $\nu_4$.
+	By \ref{eq:S-sandwich}, the first square root is at most $1$, and the second matches the first square root in \ref{eq:adjoint-commutator-cauchy-schwarz}, hence is at most $\nu_4$.
 
 	Finally move the remaining $\widehat G_{g_\ell}^{x_\ell}$ to the second tensor factor:
 	\begin{align}
@@ -1734,9 +1734,9 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\tag{by \ref{eq:in-other-words}}\nonumber                           \\
 		 & \ge \left(1-\frac{\kappa}{1-\theta}\right)\cdot
 		\left(1-\exp\Bigl(-2\Bigl(\theta-\frac{d}{k}\Bigr)^2k\Bigr)\right).
-		\label{eq:almost-done-with-this-giant-proof}
+		\label{eq:bernoulli-polynomial-spectral-lower-bound}
 	\end{align}
-	Since $(1-b)(1-c)\ge 1-b-c$ for $b,c\ge 0$, \ref{eq:almost-done-with-this-giant-proof} implies
+	Since $(1-b)(1-c)\ge 1-b-c$ for $b,c\ge 0$, \ref{eq:bernoulli-polynomial-spectral-lower-bound} implies
 	\[
 		\bra{\psi} F(X) \ot I \ket{\psi}
 		\ge

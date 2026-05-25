@@ -1086,7 +1086,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 		\sigma = m^2\left(\nu+e^{-k/(80000m^2)}\right).
 	\]
 	Theorem~\ref{thm:main-induction} applied to the symmetrized strategy produces a measurement $G=\{G_g\} \in \polymeas{m}{q}{d}$ such that
-	\begin{equation}\label{eq:just-applied-induction}
+	\begin{equation}\label{eq:symmetrized-induction-point-consistency}
 		(A_{\mathrm{sym}})_a^u \ot I \simeq_\sigma I \ot G_{[g(u)=a]},
 		\qquad
 		G_{[g(u)=a]} \ot I \simeq_\sigma I \ot (A_{\mathrm{sym}})_a^u.
@@ -1164,7 +1164,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 		\zeta_3 = 6\zeta_1 + 6\zeta_2.
 	\]
 	Because both measurements are projective, Lemma~\ref{prop:simeq-to-approx} converts this to
-	\begin{equation}\label{eq:third-goal}
+	\begin{equation}\label{eq:completed-polynomial-consistency}
 		Q_g^{\mathrm A} \ot I \simeq_{\zeta_3/2} I \ot Q_g^{\mathrm B}.
 	\end{equation}
 	By data processing,
@@ -1177,11 +1177,11 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 		Q_g^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_g^{\mathrm B}.
 	\]
 	Data processing then gives
-	\begin{equation}\label{eq:ok-almost-there-ok}
+	\begin{equation}\label{eq:left-completed-point-with-original-polynomial}
 		Q_{[g(u)=a]}^{\mathrm A} \ot I \simeq_{\zeta_1} I \ot G_{[g(u)=a]}^{\mathrm B}.
 	\end{equation}
-	Applying Lemma~\ref{prop:simeq-triangle-inequality} to \ref{eq:cons-b}, \ref{eq:ok-almost-there-ok}, and \ref{eq:point-evaluation-data-processing} yields
-	\begin{equation}\label{eq:one-goal}
+	Applying Lemma~\ref{prop:simeq-triangle-inequality} to \ref{eq:cons-b}, \ref{eq:left-completed-point-with-original-polynomial}, and \ref{eq:point-evaluation-data-processing} yields
+	\begin{equation}\label{eq:final-left-point-consistency}
 		A_a^{\mathrm A,u} \ot I \simeq_{\zeta_4} I \ot Q_{[g(u)=a]}^{\mathrm B},
 	\end{equation}
 	where
@@ -1189,7 +1189,7 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 		\zeta_4 = 2\sigma + 2\sqrt{\zeta_1+\zeta_3/2}.
 	\]
 	The same argument with the roles reversed gives
-	\begin{equation}\label{eq:another-goal}
+	\begin{equation}\label{eq:final-right-point-consistency}
 		I \ot A_a^{\mathrm B,u} \simeq_{\zeta_4} Q_{[g(u)=a]}^{\mathrm A} \ot I.
 	\end{equation}
 
@@ -1232,5 +1232,5 @@ $G^{\mathrm A}\approx_{\zeta_2}Q^{\mathrm A}$ yields
 	\[
 		100000k^2m^4\left(\eps^{1/40000}+(d/q)^{1/40000}+e^{-k/(2560000m^2)}\right).
 	\]
-	Hence \ref{eq:one-goal}, \ref{eq:another-goal}, and \ref{eq:third-goal} give the three claimed conclusions, with $Q^{\mathrm A}$ and $Q^{\mathrm B}$ renamed as the theorem's $G^{\mathrm A}$ and $G^{\mathrm B}$.
+	Hence \ref{eq:final-left-point-consistency}, \ref{eq:final-right-point-consistency}, and \ref{eq:completed-polynomial-consistency} give the three claimed conclusions, with $Q^{\mathrm A}$ and $Q^{\mathrm B}$ renamed as the theorem's $G^{\mathrm A}$ and $G^{\mathrm B}$.
 \end{proof}
