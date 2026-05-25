@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
