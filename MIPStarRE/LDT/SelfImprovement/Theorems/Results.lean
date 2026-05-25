@@ -14,7 +14,8 @@ All original declarations remain available under the same namespace.
 - `SdpMatrixBridge` — comparison between the matrix-level slackness interface
   and the abstract SDP statement with slackness
 - `HelperCompleteness` — input-consistency lower bounds, SDP bridge, `sdp`, `addInU`
-- `AddInUDiagonalAndDefs` — diagonal add-in-u specialization, Q₀–Q₄ CS chain defs
+- `AddInUDiagonalAndDefs.{Selection,Residual,ScalarChain}` — diagonal add-in-u
+  specialization, off-diagonal residual estimates, and Q₀–Q₄ CS chain definitions
 - `AddInUPointConsistency` — off-diagonal add-in-u selection infrastructure for
   helper `A`-consistency
 - `AddInUStep12.{Raw,Selected}` — algebraic alignment and raw CS Step 1/2 bounds
