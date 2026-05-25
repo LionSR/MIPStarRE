@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.OperatorExpectations
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.Core
 
 /-!
