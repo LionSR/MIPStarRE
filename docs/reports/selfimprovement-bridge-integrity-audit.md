@@ -49,6 +49,16 @@ Status note, 2026-05-22 after the answer-valued successor repair: the Section 6
 small-error successor construction is now checked for the corrected large-`k`
 interface.
 
+Status note, 2026-05-25 after the SDP slackness repair: the Section 9
+complementary-slackness route is no longer a live proof obligation.  The
+declarations `SelfImprovement.sdp_statement_with_slackness`,
+`SelfImprovement.selfImprovementHelper`, `SelfImprovement.selfImprovement`, and
+`MainInductionStep.selfImprovementInInductionSection` are audited in
+`MIPStarRE/LDT/Test/AxiomAudit.lean` as using only the standard Lean kernel
+axioms.  Later references in this historical report to issue `#1230`, issue
+`#1385`, or SDP slackness as an open dependency should be read as describing
+the May 2026 audit snapshot, not the current proof frontier.
+
 Status note, 2026-05-23 after the source-boundary cleanup: the project has
 adopted the factor-\(400\) correction as a confirmed statement correction and
 has added the final-theorem nonzero sampling boundary \(0<k\).  Under these
@@ -210,7 +220,7 @@ paper-facing `selfImprovement`, `mainInduction`, or `mainFormal` statements:
 
 | Declaration | File | Status |
 |------------|------|--------|
-| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | Internal dependency of `selfImprovementHelper`; rests on `sdp_statement_with_slackness` |
+| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean` | Internal dependency of `selfImprovementHelper`; it calls the checked theorem `sdp_statement_with_slackness`, which is now standard-axiom clean. |
 
 The former full-conclusion residual-domination variants
 `selfImprovementWithSlacknessAndResidualDominationInput` and
@@ -218,10 +228,9 @@ The former full-conclusion residual-domination variants
 #1539.  The remaining slackness-carrying helper is not a theorem-level
 substitute for `selfImprovement`.
 
-These variants assume the SDP carries complementary slackness
-(`SdpStatementWithSlackness`).  They are useful proof content only insofar as
-the Section 9 SDP slackness theorem is eventually proved from the paper
-hypotheses.
+The retained companion helper uses the SDP statement with complementary
+slackness (`SdpStatementWithSlackness`).  It is useful proof content only
+insofar as it is derived from the checked Section 9 SDP slackness theorem.
 
 ### 2.2. Removed orphan helper-bridge modules
 

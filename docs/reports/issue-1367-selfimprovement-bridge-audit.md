@@ -81,6 +81,15 @@
 > two-space source-boundary theorem are proof-complete in Lean.  Later mentions
 > of source-range or final-theorem obligation declarations below refer to
 > retired interfaces, not to current theorem hypotheses.
+>
+> **Status note, 2026-05-25.**  The SDP slackness entries in this historical
+> report are also no longer live proof obligations.  The current declarations
+> `SelfImprovement.sdp_statement_with_slackness`,
+> `SelfImprovement.selfImprovementHelper`, `SelfImprovement.selfImprovement`,
+> and `MainInductionStep.selfImprovementInInductionSection` are audited in
+> `MIPStarRE/LDT/Test/AxiomAudit.lean` as standard-axiom clean.  Later table
+> rows that list issue `#1230`, issue `#1385`, or SDP slackness as a current
+> blocker record the May 2026 audit snapshot only.
 
 ---
 
@@ -111,10 +120,11 @@ the paper-facing theorem should instead keep the paper statement and discharge
 the missing analytic content through named obligation theorems or separately named
 conditional helpers.
 
-**This audit report confirms that #1367 can be closed** once #1374 and #1373 land (or this report is merged), because:
-- The remaining gaps are individually tracked by open issues (#1375, #1376, #1377, #1043, #1035, #1385)
-- The active PRs complete the immediate bridge architecture
-- No new undiscovered gaps exist
+**Historical closure criterion.**  At the time of this audit, #1367 could be
+closed once #1374 and #1373 landed, because the then-remaining gaps were tracked
+separately.  Current Lean has since discharged the Section 9 SDP slackness route
+and the corrected large-\(k\) Section 6 source route; the list below is an audit
+snapshot, not a live issue queue.
 
 ---
 
@@ -363,7 +373,7 @@ base-case completion obligation.
 
 | Component | What's proved right now | After #1373 | After #1374 | Issue tracking final gap |
 |-----------|------------------------|-------------|-------------|--------------------------|
-| `selfImprovementHelper` (SDP + addInU) | Conditional on `sdp` witness | No change | No change | #1385 (SDP slackness), #1230 |
+| `selfImprovementHelper` (SDP + addInU) | Historical snapshot: conditional on an `sdp` witness | No change | No change | Discharged; see the 2026-05-25 status note above |
 | `helperStrongSelfConsistency` (helper SSC) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `orthonormalization.spec` (spectral) | **PROVED** unconditionally | No change | No change | — |
 | `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleInductionWitness` wraps it | No change | #1032 (QXP construction) |
@@ -393,7 +403,7 @@ These were the obligation constructors for the two historical proposed
 
 | # | Gap | Tracked by |
 |---|-----|------------|
-| F | `SdpStatementWithSlackness` unconditional obligation (strong duality) | #1385, #1230 |
+| F | Historical `SdpStatementWithSlackness` unconditional obligation (strong duality) | Discharged; `sdp_statement_with_slackness` is standard-axiom clean |
 | G | `LeftLiftedProjectivizationRepairInput` unconditional obligation (QXP construction) | #1032 |
 | H | `OrthonormalizationRepairObligation` for the helper families | #1032 (via QXP) |
 
@@ -402,7 +412,7 @@ These were the obligation constructors for the two historical proposed
 ```
 #1032 (QXP repair) ──────────────────────────┐
                                                ├─→ #1043 (base completion)
-#1385/#1230 (SDP slackness) ───→               │
+historical #1385/#1230 (SDP slackness) ─→      │
                                     #1376 (per-slice obligations) ──→ mainFormal closure
 #1375 (genuine SymStrat) ────────→              │
                                                ├─→ #1374 hypotheses
@@ -413,7 +423,7 @@ These were the obligation constructors for the two historical proposed
 
 | Item | Status |
 |------|--------|
-| Remaining slackness-carrying helper route (`self_improvement_helper_with_slackness`) | Internal SelfImprovement dependency; tracked by #1230 and #1385 |
+| Remaining slackness-carrying helper route (`self_improvement_helper_with_slackness`) | Internal SelfImprovement dependency through the checked theorem `sdp_statement_with_slackness`; no longer a live #1230/#1385 obligation |
 | Former `MatrixAddInUTransferStatement` | Removed; no live Lean declaration remains |
 | `self_improvement_helper_with_slackness` variants | Internal SelfImprovement route; not a public substitute for `selfImprovement` |
 | Internal SelfImprovement sub-lemmas (HelperCompleteness, PointConsistency, etc.) | All proved (conditional) |
@@ -428,7 +438,7 @@ These were the obligation constructors for the two historical proposed
 
 | Declaration | File | Callers in MainTest | Verdict |
 |------------|------|---------------------|---------|
-| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean:119` | `selfImprovementHelper` | Internal route resting on SDP slackness (#1230, #1385) |
+| `self_improvement_helper_with_slackness` | `SelfImprovementTop/Core.lean` | `selfImprovementHelper` | Internal route through the checked SDP slackness theorem; no live #1230/#1385 obligation remains |
 | Former full-conclusion residual-domination variants | `ResidualDomination.lean` | None | Removed by PR #1539; no longer a live theorem-level route |
 | Matrix-to-helper SDP lemmas | `SdpMatrixHelperBridge.lean` | None | Removed orphan module; revive only as source-derived proof content if the SDP duality path is completed |
 | Former `MatrixAddInUTransferStatement` | `MatrixRealization.lean` | None | Removed; no live Lean declaration remains |
@@ -446,7 +456,8 @@ constructors from those obligations to larger input packages.
 
 ## 8. Issue Tracking Completeness
 
-The following open issues directly address the remaining gaps identified in this audit:
+The following issues were the tracking map for the remaining gaps identified in
+this audit snapshot:
 
 | Issue | Description | Covers Gap(s) | Status |
 |-------|-------------|---------------|--------|
@@ -456,10 +467,12 @@ The following open issues directly address the remaining gaps identified in this
 | #1035 | Prove recursive `mainFormal` for successor restricted slices | D | Open, blocked by #1377 |
 | #1043 | Construct base/successor completion data | E | Open, blocked by #1032 |
 | #1032 | QXP repair / spectral-truncation + locality-preserving repair lemmas | G, H | Open, core gap |
-| #1385 | `SdpStatementWithSlackness` obligation | F | Open, epic tracking |
+| #1385 | Historical `SdpStatementWithSlackness` obligation | F | Discharged by the checked `sdp_statement_with_slackness` route |
 | #1369 | Construct answer-valued successor inputs for MainFormal | A–D (umbrella) | Open |
 
-**Completeness check:** Every sub-gap identified in Section 6 has a corresponding open issue. No new gaps need new issues.
+**Historical completeness check:** Every sub-gap identified in Section 6 had a
+corresponding tracking issue at the time of the audit.  The SDP slackness
+sub-gap is no longer part of the current proof frontier.
 
 ---
 
@@ -525,7 +538,8 @@ hypotheses.
 
 9. **Prove #1043** — the base-case completion construction.
 
-10. **Prove #1385** (`SdpStatementWithSlackness`) — the strong-duality SDP bridge.
+10. **Historical #1385 item** (`SdpStatementWithSlackness`) — now discharged by
+    the checked strong-duality and slackness construction.
 
 ---
 
