@@ -72,7 +72,7 @@ barrel modules, are:
 | Lines | File |
 | ---: | --- |
 | 913 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction/Sigma.lean` |
-| 910 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` |
+| deleted | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean`; declarations live in `PastingAssembly/Successor.lean` |
 | 876 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities/LayerAlgebra.lean` |
 | 841 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization/Canonical.lean` |
 | 839 | `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean` |
@@ -89,7 +89,7 @@ in the main-induction and final-theorem assembly:
 
 | Lines | File |
 | ---: | --- |
-| 910 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` |
+| deleted | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean`; declarations live in `PastingAssembly/Successor.lean` |
 | 663 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` |
 | 583 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` |
 | 515 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` |
@@ -128,7 +128,7 @@ For edits to `MIPStarRE/LDT/Test/Defs.lean`:
 For edits to `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean`:
 
 1. Run `lake env lean MIPStarRE/LDT/Pasting/Bernoulli/Final.lean`.
-2. Run `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean`
+2. Run `lake env lean MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly/Successor.lean`
    when the exported pasting conclusion or error bound changes.
 3. Run `lake env lean MIPStarRE/LDT/Test/AxiomAudit.lean` when the proof status
    of a source-facing theorem changes.

@@ -31,7 +31,7 @@ Blueprint source: `blueprint/src/chapter/ch10_induction.tex`, nodes
 
 Lean source:
 `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` and
-`MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean`.
+`MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly/Successor.lean`.
 
 ## Source comparison
 

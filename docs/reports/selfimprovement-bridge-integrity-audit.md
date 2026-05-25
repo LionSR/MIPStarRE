@@ -299,7 +299,7 @@ the appropriate slice profile, not a Section 9 proof debt.
 
 ### 3.4. SelfImprovementData → AveragedPastingData: ✅ Complete
 
-`assembleAveragedPastingData` (in `PastingAssembly.lean:420`) converts the
+`assembleAveragedPastingData` (in `PastingAssembly/Successor.lean`) converts the
 per-slice `SelfImprovementData` fields into averaged inputs for the pasting
 theorem.
 
@@ -420,7 +420,7 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` | answer-valued carrier self-improvement construction |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionSuccessorNext_ofSmallErrorConstruction` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` | ordinary and answer-valued stage-data conversions |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` | `assembleAveragedPastingData` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly/Successor.lean` | `assembleAveragedPastingData` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | source-final statement and obligation, current same-space interface, and proved final transport |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister.lean` | role-register witness constructors routed through Section 6 `mainInduction` |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued restricted-slice weighted bounds and recursive-slice targets |

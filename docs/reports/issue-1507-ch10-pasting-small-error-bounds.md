@@ -1,7 +1,7 @@
 # Issue 1507: Small-Error Pasting Scalar Side Conditions
 
 This note records the proof batch in
-`MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean` which removes
+`MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly/Successor.lean` which removes
 three scalar proof inputs from the averaged pasting constructor used in the
 small-error branch of the main induction step.
 
