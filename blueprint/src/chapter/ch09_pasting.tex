@@ -281,7 +281,7 @@ for a small error $\Delta = \poly(m)\cdot \poly(\eps,\delta,\gamma,\zeta,d/q)$. 
 \end{equation}
 The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar inequality.
 
-\begin{lemma}[A scalar inequality for the first construction]\label{lem:first-construction-scalar-inequality}
+\begin{lemma}[A scalar inequality for the first construction]\label{lem:looks-easy-but-took-me-a-while}
 	\lean{MIPStarRE.LDT.Pasting.first_construction_scalar_inequality}
 	\leanok
 	For every real number $0 \le \lambda \le 1$,
@@ -295,28 +295,28 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{proof}
 
 \begin{corollary}[First-construction spectral comparison]\label{cor:first-construction-spectral-comparison}
-	\uses{def:ld-pasting-context, lem:first-construction-scalar-inequality}
+	\uses{def:ld-pasting-context, lem:looks-easy-but-took-me-a-while}
 	Suppose that the first-construction spectral distribution satisfies
 	\[
 		\Delta \ge
 		\E_{i\sim\mu}[\lambda_i^{d+1}(1-\lambda_i)].
 	\]
 	Then the scalar inequality from
-	Lemma~\ref{lem:first-construction-scalar-inequality} gives
+	Lemma~\ref{lem:looks-easy-but-took-me-a-while} gives
 	\[
 		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
 		\le 2\Delta^{1/(d+1)}.
 	\]
 \end{corollary}
 \begin{proof}
-	\uses{def:ld-pasting-context, lem:first-construction-scalar-inequality}
-	Apply Lemma~\ref{lem:first-construction-scalar-inequality} pointwise and then use
+	\uses{def:ld-pasting-context, lem:looks-easy-but-took-me-a-while}
+	Apply Lemma~\ref{lem:looks-easy-but-took-me-a-while} pointwise and then use
 	the concavity of \(a \mapsto a^{1/(d+1)}\).
 \end{proof}
 
 \begin{corollary}[First-construction completeness comparison]\label{cor:first-construction-completeness-comparison}
-	\uses{cor:first-construction-spectral-comparison, lem:first-construction-scalar-inequality}
-	As in the paper, Lemma~\ref{lem:first-construction-scalar-inequality} now converts
+	\uses{cor:first-construction-spectral-comparison, lem:looks-easy-but-took-me-a-while}
+	As in the paper, Lemma~\ref{lem:looks-easy-but-took-me-a-while} now converts
 	\eqref{eq:first-construction-spectral-defect} into the estimate
 	\[
 		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
