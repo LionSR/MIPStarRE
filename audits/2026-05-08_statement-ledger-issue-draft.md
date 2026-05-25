@@ -58,7 +58,7 @@ Headline counts:
 | T — tracked smuggle (open sub-issue) | 2 (`SpectralTruncationStatement` #1032; `NaimarkStatement` deliberate paper-gap #1361) |
 | E — genuine external citation | 2 (`RazSafraSoundnessStatement`, `PolishchukSpielmanClassicalSoundnessStatement`) |
 | P — paper-faithful packaging | 1 (`NormalizationConditionStatement`) |
-| **D — dead** | **1** (`MatrixAddInUTransferStatement`) |
+| **D — dead** | **1 at the May 8 snapshot** (`MatrixAddInUTransferStatement`, now removed) |
 | **Total** | **39** |
 
 ### Strengthened policy (2026-05-08)
@@ -79,9 +79,9 @@ entries; CI enforcement is straightforward.
 
 ### Cleanup
 
-- [ ] **Delete or justify `MatrixAddInUTransferStatement`**
-      (`MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean:148`) — zero
-      consumers, zero producers. (sub-issue: TBD)
+- [x] **Delete or justify `MatrixAddInUTransferStatement`**
+      (`MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean:148`) — this
+      dead statement is no longer present in the active Lean tree.
 
 ### Verify
 
@@ -141,9 +141,9 @@ A future CI step will enforce (1)–(5) automatically.
 1. Open this issue with the body above.
 2. Add the existing trackers (#1032, #1230, #1359, #1361, #1041, #1035, #1369,
    #1364) as native sub-issues using `mcp__github__sub_issue_write`.
-3. Create one new sub-issue:
-   *"Delete or justify `MatrixAddInUTransferStatement`"* (single,
-   bracket-free title; `@claude`-compatible).
+3. Do not create the former `MatrixAddInUTransferStatement` cleanup sub-issue
+   unless that name is reintroduced; the active Lean tree no longer contains
+   the declaration.
 4. Edit `docs/anti_patterns.md` §A6 to point at the new ledger number.
 5. (Optional, separate PR) Extend the #1244 count-badge script to enforce
    the `*Statement` allow-list.

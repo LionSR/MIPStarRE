@@ -1,5 +1,16 @@
 # Extended A6 re-audit — all suffixes, 2026-05-08
 
+**Status note, 2026-05-25.**  The ten dead declarations identified in this
+audit have been removed from the active Lean tree.  A current exact-name search
+over `MIPStarRE/` and `blueprint/src/` finds zero occurrences of
+`MatrixNaimarkWitness`, `MatrixAlmostProjectiveWitness`,
+`MatrixRoundedProjectiveWitness`, `MatrixSpectralTruncationWitness`,
+`MatrixSpectralTruncationMeasurementWitness`,
+`CommDataProcessedGEvaluatedSliceInput`, `GCommStabilityInput`,
+`GCommStabilityTwoInput`, `FullSliceCommutationEvaluatedInput`, and
+`MatrixAddInUTransferStatement`.  The inventory below is therefore a historical
+record of the May 8 snapshot, not an open deletion task.
+
 ## Purpose
 
 Companion to [`2026-05-08_statement-smuggle-reaudit.md`](./2026-05-08_statement-smuggle-reaudit.md).
@@ -19,7 +30,7 @@ these statements for other chapters/sections that are also problematic."*
 rg -n '^\s*(structure|def|abbrev)\s+\w*<SUFFIX>\b' MIPStarRE/LDT/
 ```
 
-For each declaration, count total occurrences across `MIPStarRE/`. A
+For each declaration, the audit counted total occurrences across `MIPStarRE/`. A
 declaration with **only 1 occurrence** is the definition itself with no
 consumer or producer anywhere — i.e., **dead scaffolding**.
 
@@ -47,7 +58,7 @@ Today's count is **102 across all suffixes**, almost exactly double, with
 
 ## Dead-scaffolding inventory
 
-Every entry below has **exactly 1 occurrence in `MIPStarRE/`** — the
+At the May 8 snapshot, every entry below had **exactly 1 occurrence in `MIPStarRE/`** — the
 declaration line and nothing else.
 
 ### `MakingMeasurementsProjective/Defs.lean` — 5 dead Witness structures
@@ -143,7 +154,8 @@ adds new structures rather than discharging or deleting the old layer.
 
 ## Recommendation
 
-**Single low-risk PR**: delete all 10 dead structures.
+**Completed.**  The recommended low-risk deletion PR has been carried out.  The
+following table records the original deletion target for audit provenance.
 
 | File | Lines to delete |
 |---|---|
@@ -151,7 +163,7 @@ adds new structures rather than discharging or deleting the old layer.
 | `MIPStarRE/LDT/Commutativity/Scaffold/Core.lean` | 4 abbrevs (`CommDataProcessedGEvaluatedSliceInput`, `GCommStabilityInput`, `GCommStabilityTwoInput`, `FullSliceCommutationEvaluatedInput`) at lines 102, 124, 143, 163 |
 | `MIPStarRE/LDT/SelfImprovement/MatrixRealization.lean` | 1 structure (`MatrixAddInUTransferStatement`) at line 148 |
 
-Each deletion is independently verifiable: `lake env lean
+At the time of the audit, each deletion was independently verifiable: `lake env lean
 <file>` after deletion should succeed, since nothing imports these
 declarations. If anyone later wants the matrix-realization track, a new
 PR can re-introduce one with a wired-up consumer.
@@ -169,7 +181,8 @@ for n in MatrixNaimarkWitness MatrixAlmostProjectiveWitness \
 done
 ```
 
-All ten should show `1`.
+At the audit snapshot all ten showed `1`.  In the active tree the same exact
+search should show `0`, since the declarations have been deleted.
 
 ## Verify-and-close checklist (companion task)
 
@@ -189,9 +202,9 @@ flagged for verification. Status now:
 
 ## Next steps
 
-1. **PR #1: delete the 10 dead structures.** Doc-only and trivially safe.
-   Bracket-free PR title; `@claude`-compatible branch.
-2. **PR #2: post the ledger issue** (drafted in
+1. The dead-structure deletion has been completed; do not reopen this item
+   unless one of the ten names is reintroduced in `MIPStarRE/`.
+2. **Post or refresh the ledger issue** (drafted in
    `2026-05-08_statement-ledger-issue-draft.md`) so future additions don't
    re-create this drift.
 3. **Then** the massive sub-issue round per the previous report's
