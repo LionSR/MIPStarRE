@@ -21,6 +21,21 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
+/-- Repackage a restriction height, a slice point, and an auxiliary index as an
+ambient successor point paired with the same auxiliary index.  This is the
+product-compatible form of `CommutativityPoints.pointNextEquiv` used by both
+ordinary and answer-valued diagonal restriction averages. -/
+def pointAppendProdEquiv (params : Parameters) [FieldModel params.q] (β : Type*) :
+    Fq params × (Point params × β) ≃ Point params.next × β where
+  toFun := fun xb => (appendPoint params xb.2.1 xb.1, xb.2.2)
+  invFun := fun ub => (pointHeight params ub.1, (truncatePoint params ub.1, ub.2))
+  left_inv := by
+    rintro ⟨x, u, b⟩
+    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
+  right_inv := by
+    rintro ⟨u, b⟩
+    exact Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv u) rfl
+
 /-- Averaging the self-consistency defect over all horizontal restrictions
 recovers the ambient self-consistency defect. -/
 lemma selfConsistencyRestrictedAverage_eq

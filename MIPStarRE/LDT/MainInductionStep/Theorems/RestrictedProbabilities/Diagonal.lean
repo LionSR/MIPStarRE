@@ -18,20 +18,6 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Equivalence repackaging a slice point `u : Point params`, a height `x : Fq params`
-and an auxiliary index `β` as an ambient point `Point params.next` paired with the same
-auxiliary index. This is the product-compatible form of `CommutativityPoints.pointNextEquiv`. -/
-private def pointAppendProdEquiv (params : Parameters) [FieldModel params.q] (β : Type*) :
-    Fq params × (Point params × β) ≃ Point params.next × β where
-  toFun := fun xb => (appendPoint params xb.2.1 xb.1, xb.2.2)
-  invFun := fun ub => (pointHeight params ub.1, (truncatePoint params ub.1, ub.2))
-  left_inv := by
-    rintro ⟨x, u, b⟩
-    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
-  right_inv := by
-    rintro ⟨u, b⟩
-    exact Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv u) rfl
-
 private lemma restrictedDiagonalSampleError_eq
     (params : Parameters)
     [FieldModel params.q]
