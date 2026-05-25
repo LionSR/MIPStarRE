@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
 import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement
 
