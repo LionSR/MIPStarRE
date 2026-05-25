@@ -8,7 +8,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Resi
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.ScalarChain
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Raw
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Selected
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 
 /-!
 # Add-in-u Step 3/4 factored Cauchy--Schwarz bounds

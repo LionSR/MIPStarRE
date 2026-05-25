@@ -13,7 +13,8 @@ All original declarations remain available under the same namespace.
 - `CommonHelpers` — shared internal helpers (formerly private)
 - `SdpMatrixBridge` — comparison between the matrix-level slackness interface
   and the abstract SDP statement with slackness
-- `HelperCompleteness` — input-consistency lower bounds, SDP bridge, `sdp`, `addInU`
+- `HelperCompleteness.{InputSdp,FiberBounds,Linearized,Bracketed}` —
+  input-consistency lower bounds, SDP bridge, `sdp`, `addInU`
 - `AddInUDiagonalAndDefs.{Selection,Residual,ScalarChain}` — diagonal add-in-u
   specialization, off-diagonal residual estimates, and Q₀–Q₄ CS chain definitions
 - `AddInUPointConsistency` — off-diagonal add-in-u selection infrastructure for
