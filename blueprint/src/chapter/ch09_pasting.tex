@@ -263,7 +263,7 @@ Thus one would like to show
 	\approx \bra{\psi} G \ot I \ket{\psi}.
 \end{equation}
 The naive estimate would instead suggest
-\begin{equation}\label{eq:dumbo-bound-for-idiots}
+\begin{equation}\label{eq:first-construction-naive-bound}
 	\bra{\psi} G^{d+1} \ot I \ket{\psi} \approx 1-(d+1)\kappa,
 \end{equation}
 which is too weak for the induction.
@@ -281,7 +281,7 @@ for a small error $\Delta = \poly(m)\cdot \poly(\eps,\delta,\gamma,\zeta,d/q)$. 
 \end{equation}
 The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar inequality.
 
-\begin{lemma}[A scalar inequality for the first construction]\label{lem:looks-easy-but-took-me-a-while}
+\begin{lemma}[A scalar inequality for the first construction]\label{lem:first-construction-scalar-inequality}
 	\lean{MIPStarRE.LDT.Pasting.first_construction_scalar_inequality}
 	\leanok
 	For every real number $0 \le \lambda \le 1$,
@@ -295,28 +295,28 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{proof}
 
 \begin{corollary}[First-construction spectral comparison]\label{cor:first-construction-spectral-comparison}
-	\uses{def:ld-pasting-context, lem:looks-easy-but-took-me-a-while}
+	\uses{def:ld-pasting-context, lem:first-construction-scalar-inequality}
 	Suppose that the first-construction spectral distribution satisfies
 	\[
 		\Delta \ge
 		\E_{i\sim\mu}[\lambda_i^{d+1}(1-\lambda_i)].
 	\]
 	Then the scalar inequality from
-	Lemma~\ref{lem:looks-easy-but-took-me-a-while} gives
+	Lemma~\ref{lem:first-construction-scalar-inequality} gives
 	\[
 		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
 		\le 2\Delta^{1/(d+1)}.
 	\]
 \end{corollary}
 \begin{proof}
-	\uses{def:ld-pasting-context, lem:looks-easy-but-took-me-a-while}
-	Apply Lemma~\ref{lem:looks-easy-but-took-me-a-while} pointwise and then use
+	\uses{def:ld-pasting-context, lem:first-construction-scalar-inequality}
+	Apply Lemma~\ref{lem:first-construction-scalar-inequality} pointwise and then use
 	the concavity of \(a \mapsto a^{1/(d+1)}\).
 \end{proof}
 
 \begin{corollary}[First-construction completeness comparison]\label{cor:first-construction-completeness-comparison}
-	\uses{cor:first-construction-spectral-comparison, lem:looks-easy-but-took-me-a-while}
-	As in the paper, Lemma~\ref{lem:looks-easy-but-took-me-a-while} now converts
+	\uses{cor:first-construction-spectral-comparison, lem:first-construction-scalar-inequality}
+	As in the paper, Lemma~\ref{lem:first-construction-scalar-inequality} now converts
 	\eqref{eq:equivalent-way-of-writing-grand-plan} into the estimate
 	\[
 		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
@@ -1421,9 +1421,9 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\E_{x_{>\ell}} \sum_{\tau:\,|\tau|\ge d+1} \sum_{g_{>\ell}\in \mathsf O_{\tau_{>\ell}}}
 		\bra{\psi} \widehat H_{g_{>\ell}}^{x_{>\ell}}
 		\ot \bigl(G^{|\tau_{\le \ell}|}(I-G)^{\ell-|\tau_{\le \ell}|}\bigr)\ket{\psi}.
-		\label{eq:i-think-this-is-what-i'm-supposed-to-prove}
+		\label{eq:bernoulli-tail-stage-reduction}
 	\end{align}
-	Iterating \ref{eq:i-think-this-is-what-i'm-supposed-to-prove} for $\ell=1,\dots,k$ produces the Bernoulli polynomial
+	Iterating \ref{eq:bernoulli-tail-stage-reduction} for $\ell=1,\dots,k$ produces the Bernoulli polynomial
 	\[
 		\sum_{r=d+1}^k \binom{k}{r} \bra{\psi} G^r(I-G)^{k-r} \ot I \ket{\psi},
 	\]
@@ -1438,21 +1438,21 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	estimate contributes $k$ copies of the $2\sqrt{\nu_4}$ term, and the
 	definition of $\nu_4$ already contains a factor $k^2$.
 
-	To prove \ref{eq:i-think-this-is-what-i'm-supposed-to-prove}, define for each $1\le \ell \le k+1$ and each tail type $\tau_{\ge \ell}$,
+	To prove \ref{eq:bernoulli-tail-stage-reduction}, define for each $1\le \ell \le k+1$ and each tail type $\tau_{\ge \ell}$,
 	\begin{equation}\label{eq:S-def}
 		S_{\tau_{\ge \ell}}
 		=
 		\sum_{\tau_{<\ell}\,:\,|\tau|\ge d+1}
 		G^{|\tau_{<\ell}|}(I-G)^{(\ell-1)-|\tau_{<\ell}|}.
 	\end{equation}
-	Then \ref{eq:i-think-this-is-what-i'm-supposed-to-prove} may be rewritten as
+	Then \ref{eq:bernoulli-tail-stage-reduction} may be rewritten as
 	\begin{align}
 		                                         & \E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}} \sum_{g_{\ge \ell}\in \mathsf O_{\tau_{\ge \ell}}}
 		\bra{\psi} \widehat H_{g_{\ge \ell}}^{x_{\ge \ell}} \ot S_{\tau_{\ge \ell}} \ket{\psi}\nonumber                                        \\
 		\approx_{2\sqrt{2\zeta}+2\sqrt{\nu_4}}{} &
 		\E_{x_{>\ell}} \sum_{\tau_{>\ell}} \sum_{g_{>\ell}\in \mathsf O_{\tau_{>\ell}}}
 		\bra{\psi} \widehat H_{g_{>\ell}}^{x_{>\ell}} \ot S_{\tau_{>\ell}} \ket{\psi}.
-		\label{eq:i-think-this-is-what-i'm-supposed-to-prove-2}
+		\label{eq:bernoulli-tail-stage-reduction-expanded}
 	\end{align}
 	\begin{remark}[Lean proof-stage notation]
 		In Lean, the type-restricted averaged submeasurement, the per-tail operator/mass, the aggregated stage quantity, and the final Bernoulli-tail scalar from this proof are recorded by the declarations above. Their indexing is shifted to the repository's 0-based convention: Lean stage $\ell$ is the paper's stage $\ell+1$.
@@ -1503,7 +1503,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\end{align}
 	because $S_{\tau_{\ge \ell}}$ commutes with $G$ and $(I-G)$ and is bounded by $I$.
 
-	We now prove \ref{eq:i-think-this-is-what-i'm-supposed-to-prove-2}. Writing $\widehat H$ as a sandwich of $\widehat G$ operators and moving the rightmost $\widehat G_{g_\ell}^{x_\ell}$ to the second tensor factor gives
+	We now prove \ref{eq:bernoulli-tail-stage-reduction-expanded}. Writing $\widehat H$ as a sandwich of $\widehat G$ operators and moving the rightmost $\widehat G_{g_\ell}^{x_\ell}$ to the second tensor factor gives
 	\begin{align}
 		                          & \E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}} \sum_{(g_\ell,g_{>\ell})\in \mathsf O_{\tau_{\ge \ell}}}
 		\bra{\psi} \widehat H_{g_{\ge \ell}}^{x_{\ge \ell}} \ot S_{\tau_{\ge \ell}}\ket{\psi}\nonumber                                \\
@@ -1519,10 +1519,10 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\bigl(\widehat G_{g_{\ge \ell}}^{x_{\ge \ell}}
 		(\widehat G_{g_{>\ell}}^{x_{>\ell}})^\dagger\bigr)
 		\ot \bigl(S_{\tau_{\ge \ell}}\widehat G_{g_\ell}^{x_\ell}\bigr)\ket{\psi}.
-		\label{eq:move-g-over-there}
+		\label{eq:move-rightmost-g-to-second-factor}
 	\end{align}
 	The corresponding Cauchy--Schwarz bound is
-	\begin{multline}\label{eq:call-again-later-part-tres}
+	\begin{multline}\label{eq:first-cauchy-schwarz-bound}
 		\Bigl|
 		\E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}} \sum_{(g_\ell,g_{>\ell})\in \mathsf O_{\tau_{\ge \ell}}}
 		\bra{\psi}
@@ -1550,7 +1550,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 
 	Next, commute the leftmost $\widehat G_{g_\ell}^{x_\ell}$ across the left half-sandwich:
 	\begin{align}
-		\eqref{eq:move-g-over-there}
+		\eqref{eq:move-rightmost-g-to-second-factor}
 		 & =
 		\E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}} \sum_{(g_\ell,g_{>\ell})\in \mathsf O_{\tau_{\ge \ell}}}
 		\bra{\psi}
@@ -1603,7 +1603,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\label{eq:commute-g-part-two}
 	\end{align}
 	This time the Cauchy--Schwarz step is
-	\begin{multline}\label{eq:call-again-later-part-dos}
+	\begin{multline}\label{eq:second-cauchy-schwarz-bound}
 		\Bigl|
 		\E_{x_{\ge \ell}} \sum_{\tau_{\ge \ell}} \sum_{(g_\ell,g_{>\ell})\in \mathsf O_{\tau_{\ge \ell}}}
 		\bra{\psi}
@@ -1642,7 +1642,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\ket{\psi}.
 		\label{eq:h-ot-mgg}
 	\end{align}
-	The omitted Cauchy--Schwarz bound reuses the first square root from \ref{eq:call-again-later-part-dos} and the second square root from \ref{eq:call-again-later-part-tres}. Since $\widehat G$ is projective,
+	The omitted Cauchy--Schwarz bound reuses the first square root from \ref{eq:second-cauchy-schwarz-bound} and the second square root from \ref{eq:first-cauchy-schwarz-bound}. Since $\widehat G$ is projective,
 	\begin{align*}
 		\eqref{eq:h-ot-mgg}
 		 & =
@@ -1667,7 +1667,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\ket{\psi}
 		\tag{by \ref{eq:S-recurrence}},
 	\end{align*}
-	which is exactly \ref{eq:i-think-this-is-what-i'm-supposed-to-prove-2}.
+	which is exactly \ref{eq:bernoulli-tail-stage-reduction-expanded}.
 \end{proof}
 
 \begin{lemma}[Context specializations for the pasted measurement]\label{lem:pasting-context-specializations}
