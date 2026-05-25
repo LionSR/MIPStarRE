@@ -5,8 +5,9 @@ import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.CompletionTransport
 
 Compatibility module for the projective-consistency part of the `mainFormal`
 assembly, covering the paper's `ζ₃ = 6ζ₁ + 6ζ₂` step
-(`\Cref{eq:third-goal}`).  The underlying declarations are split into two
-submodules:
+and the completed-polynomial consistency relation recorded in the blueprint as
+`eq:completed-polynomial-consistency`.  The underlying declarations are split
+into two submodules:
 
 * `ProjectiveConsistency.Evaluation` — data-processing lemmas converting
   polynomial-level projective consistency to pointwise consistency after

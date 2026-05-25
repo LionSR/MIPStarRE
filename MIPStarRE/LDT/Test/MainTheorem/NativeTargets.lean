@@ -54,13 +54,14 @@ end MainFormalProjectiveCompletionTransportWitness
 
 namespace MainFormalProjectiveCompletionTransportWitness
 
-/-- Convert the reconstructed line-156 projective approximation into the native
-`eq:third-goal` self-consistency estimate.
+/-- Convert the reconstructed line-156 projective approximation into the
+completed-polynomial self-consistency estimate.
 
 The only mathematical step performed here is the projective converse of
 `prop:simeq-to-approx`: for projective measurements, an `≈_{ζ₃}` relation gives
-`≃_{ζ₃/2}`, which is exactly paper `eq:third-goal`
-(`references/ldt-paper/inductive_step.tex:159-162`). -/
+`≃_{ζ₃/2}`, which is the paper's third final consistency relation
+(`references/ldt-paper/inductive_step.tex:159-162`) and the blueprint relation
+`eq:completed-polynomial-consistency`. -/
 theorem selfConsistency
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -111,13 +112,13 @@ theorem selfConsistency
 /-- Final packaging step for `thm:main-formal` once the projective-completion
 transport witness has been constructed.
 
-* `eq:one-goal` (lines 175--181):
+* `eq:final-left-point-consistency` (paper lines 175--181):
   $A^{\mathrm A,u}_a \otimes I \simeq_{\zeta_4}
     I \otimes Q^{\mathrm B}_{[g(u)=a]}$;
-* `eq:another-goal` (lines 182--185):
+* `eq:final-right-point-consistency` (paper lines 182--185):
   $I \otimes A^{\mathrm B,u}_a \simeq_{\zeta_4}
     Q^{\mathrm A}_{[g(u)=a]} \otimes I$;
-* `eq:third-goal` (lines 160--162):
+* `eq:completed-polynomial-consistency` (paper lines 160--162):
   $Q^{\mathrm A}_g \otimes I \simeq_{\zeta_3/2} I \otimes Q^{\mathrm B}_g$.
 
 This theorem performs only the Step 8 weakening from the paper cascade errors

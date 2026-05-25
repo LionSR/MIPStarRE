@@ -17,7 +17,7 @@ self-improvement, or concrete slice-strategy data as inputs, have been removed.
 
 * Paper: `references/ldt-paper/inductive_step.tex`,
   `x`-restricted strategy definition and
-  `\Cref{lem:restricted-probabilities}` (lines 363–412).
+  `lem:restricted-probabilities` (lines 363–412).
 * Blueprint: `blueprint/src/chapter/ch10_induction.tex`,
   `\label{def:restricted-strategy}`,
   `\label{lem:restricted-probabilities}`, and the unnumbered paragraph

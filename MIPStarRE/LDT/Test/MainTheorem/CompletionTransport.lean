@@ -19,9 +19,9 @@ consumed by the culminating `mainFormal` step.
 ## References
 
 * Paper: `references/ldt-paper/orthonormalization.tex`,
-  `\Cref{lem:orthonormalization-main-lemma}` at line 282; and
+  `lem:orthonormalization-main-lemma` at line 282; and
   `references/ldt-paper/preliminaries.tex`,
-  `\Cref{prop:completing-to-measurement}` at line 1101.
+  `prop:completing-to-measurement` at line 1101.
   These are applied in `references/ldt-paper/inductive_step.tex`
   (lines 135–143).
 * Blueprint: `blueprint/src/chapter/ch04_projective.tex`,
