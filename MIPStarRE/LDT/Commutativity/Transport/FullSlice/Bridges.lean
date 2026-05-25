@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessCore
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.Closeness
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessXEval
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
