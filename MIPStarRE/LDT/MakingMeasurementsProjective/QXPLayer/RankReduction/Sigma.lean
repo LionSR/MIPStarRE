@@ -100,7 +100,7 @@ end FiniteHilbertSpace
 
 /-- A finite-enumeration carrier is equivalent to the paper's literal sigma type
 `Σ a, Fin (m a)`. -/
-noncomputable def sigmaFinCarrierEquiv {Outcome : Type*} [Fintype Outcome]
+private noncomputable def sigmaFinCarrierEquiv {Outcome : Type*} [Fintype Outcome]
     (m : Outcome → ℕ) :
     (Σ a : Outcome, Fin (m a)) ≃ FiniteHilbertSpace.sigmaFinCarrier m := by
   classical
