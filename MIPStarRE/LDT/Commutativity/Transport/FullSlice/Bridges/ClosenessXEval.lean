@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization
+import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization.Y
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 
 /-!
