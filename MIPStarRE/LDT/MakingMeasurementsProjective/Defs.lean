@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Basic.QuantumState
 import MIPStarRE.LDT.Basic.SubMeasurementCore
 import MIPStarRE.Quantum.Measurement
 
