@@ -1,4 +1,3 @@
-import Mathlib.Algebra.Order.Chebyshev
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 
