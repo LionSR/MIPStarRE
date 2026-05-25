@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.MainInductionStep.Statements
 import MIPStarRE.LDT.MainInductionStep.Theorems
 
 /-!
