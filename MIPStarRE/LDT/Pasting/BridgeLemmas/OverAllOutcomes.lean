@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes.ErrorAndMass
-import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes.NonglobalDecomposition
 import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes.Final
 
 /-!
