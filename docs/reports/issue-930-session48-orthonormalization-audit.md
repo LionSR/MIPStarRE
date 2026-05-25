@@ -23,8 +23,9 @@ guidance.
 It is also superseded on the old bundled-input point by the 2026-05-13
 orthonormalization-input cleanup.  The former
 `MakingMeasurementsProjective.OrthonormalizationInput` record has been removed;
-the Section 5 paper-facing theorem keeps the sharp orthonormalization
-construction as a tracked proof gap rather than as an extra theorem hypothesis.
+at that May 13 snapshot, the Section 5 paper-facing theorem kept the sharp
+orthonormalization construction as a tracked proof gap rather than as an extra
+theorem hypothesis.
 The paragraphs below that describe `OrthonormalizationInput` as the current
 formalization boundary are therefore historical.
 
@@ -32,6 +33,17 @@ The same cleanup later removed the older `ProjectivizationRepairInput` and
 `LeftLiftedProjectivizationRepairInput` abbreviations and the conditional
 rounding lemmas that consumed them.  The current Section 5 repair route uses the
 proved theorem `leftLiftedProjectivizationRepair` directly.
+
+## 2026-05-25 update
+
+The 2026-05-13 proof-gap description is now historical.  Issue #1032 is closed
+as completed, and the declarations
+`MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationCompletionRoute`,
+`MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMainLemma`, and
+`MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalization` are audited in
+`MIPStarRE/LDT/Test/AxiomAudit.lean` as standard-axiom clean.  The remaining
+paragraphs below therefore record the May 1 and May 13 audit states, not the
+current proof frontier.
 
 ## Executive summary
 
@@ -106,13 +118,14 @@ exposed the then-current bridge boundary directly.  It took:
 It returned a rounded projective witness for the left-lifted measurement with
 error `orthonormalizationMainLemmaError zeta = 84 * zeta^(1/4)`
 (`Defs.lean:296-298`, `Orthonormalization.lean:400-449` in that snapshot).
-Those extra bridge hypotheses are historical.  The current repair direction is
-to prove the spectral and repair constructions internally, leaving a tracked
-`sorry` on the source-facing statement where the construction is not yet
-formalized.  The `zeta <= 1` bound was a helper-level non-vacuous-regime
-assumption used in the scalar comparison `12*sqrt(2*zeta) <= 84*zeta^(1/4)`;
-the paper handles larger values by a trivial branch, and the public
-submeasurement theorem has its own large-error branch.
+Those extra bridge hypotheses are historical.  The repair direction described
+there is now completed: the spectral and repair constructions have been
+internalized, and the source-facing orthonormalization route is standard-axiom
+clean.  The
+`zeta <= 1` bound was a helper-level non-vacuous-regime assumption used in the
+scalar comparison `12*sqrt(2*zeta) <= 84*zeta^(1/4)`; the paper handles larger
+values by a trivial branch, and the public submeasurement theorem has its own
+large-error branch.
 
 The local wrapper `orthonormalizationMainLemma_local` in the audited snapshot
 specialized this route to a measurement `A` whose strong self-consistency is

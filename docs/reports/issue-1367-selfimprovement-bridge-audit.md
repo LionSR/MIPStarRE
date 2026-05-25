@@ -29,8 +29,9 @@
 > historical.  The Section 9 theorem `selfImprovement` and the
 > induction-section theorem `selfImprovementInInductionSection` are checked
 > without `sorry` or `axiom`.  The former #1515 and #1503
-> self-improvement gaps have been discharged in the current Lean code.  The
-> remaining live proof obstruction on the `mainFormal` route is the Section 6
+> self-improvement gaps have been discharged in the current Lean code.  At that
+> 2026-05-20 snapshot, the remaining proof obstruction on the `mainFormal` route
+> was the Section 6
 > small-error successor construction
 > `mainInductionSuccessorNext_ofSmallErrorConstruction` (#1507), together with
 > the already documented source-interface restrictions for the same-space
@@ -47,9 +48,9 @@
 > `mainInductionSuccessorNext_ofSmallErrorConstruction`.  As of the 2026-05-20
 > blueprint split, `mainInduction` is linked from the corrected large-`k`
 > current-interface entry, while the printed paper theorem remains a separate
-> source-labelled statement.  The current repair direction is to keep the paper
-> theorem statements visible and to represent the remaining Section 6 analytic
-> derivation by the tracked `sorry` site until it is proved.
+> source-labelled statement.  At that snapshot, the repair direction was to keep
+> the paper theorem statements visible and to represent the remaining Section 6
+> analytic derivation by the tracked `sorry` site until it was proved.
 >
 > **Status note, 2026-05-22.**  The Section 6 corrected large-\(k\) successor
 > construction has since been proved.  Later table rows that describe the
@@ -90,6 +91,17 @@
 > `MIPStarRE/LDT/Test/AxiomAudit.lean` as standard-axiom clean.  Later table
 > rows that list issue `#1230`, issue `#1385`, or SDP slackness as a current
 > blocker record the May 2026 audit snapshot only.
+>
+> **Status note, 2026-05-25.**  The QXP-repair entries are likewise historical.
+> Issue `#1032` is closed as completed: the current Section 5 declarations
+> `MakingMeasurementsProjective.orthonormalizationCompletionRoute`,
+> `MakingMeasurementsProjective.orthonormalizationMainLemma`, and
+> `MakingMeasurementsProjective.orthonormalization` are audited in
+> `MIPStarRE/LDT/Test/AxiomAudit.lean` as standard-axiom clean.  Issue `#1043`
+> is also closed as completed.  The old answer-valued successor route issues
+> `#1375`, `#1376`, `#1035`, and `#1369` are closed as not planned, and issue
+> `#1377` is closed as completed; those rows describe an abandoned interface,
+> not a current obstruction to the final theorem.
 
 ---
 
@@ -219,8 +231,8 @@ Bridge constructors:
 **Current status:** the full input bundle and the old bridge module have been
 removed.  The spectral conversion is retained directly as
 `spectralTruncationStatement_of_sourceAlmostProjective`.  The locality-preserving
-QXP repair construction from Sections 5.8-5.10 remains tracked by #1032 and
-should be proved directly, not supplied as a theorem hypothesis.
+QXP repair construction from Sections 5.8-5.10 is now part of the checked
+orthonormalization route; issue #1032 is no longer a live proof obstruction.
 
 #### `finalFields` — historical conditional route
 
@@ -376,7 +388,7 @@ base-case completion obligation.
 | `selfImprovementHelper` (SDP + addInU) | Historical snapshot: conditional on an `sdp` witness | No change | No change | Discharged; see the 2026-05-25 status note above |
 | `helperStrongSelfConsistency` (helper SSC) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `orthonormalization.spec` (spectral) | **PROVED** unconditionally | No change | No change | — |
-| `orthonormalization.repair` (QXP repair) | Hypothesis | New: `of_roleInductionWitness` wraps it | No change | #1032 (QXP construction) |
+| `orthonormalization.repair` (QXP repair) | Historical snapshot: hypothesis | New: `of_roleInductionWitness` wraps it | No change | Discharged; see the 2026-05-25 QXP status note above |
 | `finalFields` (completeness etc.) | Conditional lemma proved | No change | No change | #1376 (per-slice obligation) |
 | `SliceObligations` wiring | **PROVED** (constructors exist) | No change | No change | #1375 (concrete SymStrat) |
 | `MainFormal` successor case | **Historical, as of 2026-05-08:** `sorry` at line 611 | No change | New: replaced by `hanswerSlice*` hypotheses | #1376 + #1377 + #1035 |
@@ -397,20 +409,20 @@ These were the obligation constructors for the two historical proposed
 | B | Historical `SelfImprovementObligations` per concrete slice | Per-slice helperSSC + orthonormalization + finalFields | #1376 | Replaced by checked Section 9 and induction-section self-improvement theorems |
 | C | Universe mismatch `AnswerMainInductionHypothesis` at `Role × ι` | Fix type-level application | #1377 | Blocks per-slice induction |
 | D | Recursive `mainFormal` for successor restricted slices | `MainFormalSuccessorAnswerRecursiveSlices` (= per-slice induction conclusion) | #1035 | Needs C fixed |
-| E | Historical bridge-style base/successor input | left/right repair witnesses + diagonal consistency | #1043 | Needs QXP repair (#1032) |
+| E | Historical bridge-style base/successor input | left/right repair witnesses + diagonal consistency | #1043 | Historical; issue #1043 is closed as completed |
 
 ### 6.2 Blockers for SelfImprovement internal closure
 
 | # | Gap | Tracked by |
 |---|-----|------------|
 | F | Historical `SdpStatementWithSlackness` unconditional obligation (strong duality) | Discharged; `sdp_statement_with_slackness` is standard-axiom clean |
-| G | `LeftLiftedProjectivizationRepairInput` unconditional obligation (QXP construction) | #1032 |
-| H | `OrthonormalizationRepairObligation` for the helper families | #1032 (via QXP) |
+| G | Historical `LeftLiftedProjectivizationRepairInput` unconditional obligation (QXP construction) | Discharged; issue #1032 is closed as completed |
+| H | Historical `OrthonormalizationRepairObligation` for the helper families | Discharged through the checked orthonormalization route |
 
 ### 6.3 Dependency relationships
 
 ```
-#1032 (QXP repair) ──────────────────────────┐
+historical #1032 (QXP repair) ───────────────┐
                                                ├─→ #1043 (base completion)
 historical #1385/#1230 (SDP slackness) ─→      │
                                     #1376 (per-slice obligations) ──→ mainFormal closure
@@ -461,14 +473,14 @@ this audit snapshot:
 
 | Issue | Description | Covers Gap(s) | Status |
 |-------|-------------|---------------|--------|
-| #1375 | Construct concrete `SymStrat` slice strategies from answer-valued restriction | A | Open, untouched |
+| #1375 | Construct concrete `SymStrat` slice strategies from answer-valued restriction | A | Closed as not planned after the answer-valued route was abandoned |
 | #1376 | Historical per-slice self-improvement obligation route for answer-valued restricted slices | B | Superseded by the checked Section 9 and induction-section construction route |
-| #1377 | `Role × ι` universe mismatch in `AnswerMainInductionHypothesis` | C | Open, diagnosed |
-| #1035 | Prove recursive `mainFormal` for successor restricted slices | D | Open, blocked by #1377 |
-| #1043 | Construct base/successor completion data | E | Open, blocked by #1032 |
-| #1032 | QXP repair / spectral-truncation + locality-preserving repair lemmas | G, H | Open, core gap |
+| #1377 | `Role × ι` universe mismatch in `AnswerMainInductionHypothesis` | C | Closed as completed |
+| #1035 | Prove recursive `mainFormal` for successor restricted slices | D | Closed as not planned after the proof route changed |
+| #1043 | Construct base/successor completion data | E | Closed as completed |
+| #1032 | QXP repair / spectral-truncation + locality-preserving repair lemmas | G, H | Closed as completed |
 | #1385 | Historical `SdpStatementWithSlackness` obligation | F | Discharged by the checked `sdp_statement_with_slackness` route |
-| #1369 | Construct answer-valued successor inputs for MainFormal | A–D (umbrella) | Open |
+| #1369 | Construct answer-valued successor inputs for MainFormal | A-D (umbrella) | Closed as not planned after the proof route changed |
 
 **Historical completeness check:** Every sub-gap identified in Section 6 had a
 corresponding tracking issue at the time of the audit.  The SDP slackness
@@ -496,7 +508,8 @@ paper theorems remain separate and source-faithful.  Construction lemmas should
 be introduced only when their assumptions are derived from the paper
 hypotheses.
 
-**Recommendation:** Close #1369 as superseded by the combination of #1374 + #1375 + #1376 + #1035.
+**Current status:** #1369 is closed as not planned.  The answer-valued
+successor route described here was superseded by the corrected Section 6 route.
 
 ---
 
@@ -504,41 +517,34 @@ hypotheses.
 
 ### 10.1 Immediate (this audit cycle)
 
+The immediate recommendations below are historical.  The conditional #1374
+hypothesis route was not adopted as the paper-facing final theorem interface.
+
 1. **Do not merge the historical #1374 hypothesis route.**  Its theorem-level
-   extra hypotheses have been replaced by paper-facing `sorry` sites.
+   extra hypotheses were replaced by source-facing theorem statements and
+   named construction theorems.
 
-2. **Close or retarget #1367** only after the tracking issue records that the
-   former obligation route has been removed.  The remaining live work on this
-   route is #1507, the final completion construction, and the documented
-   source-interface restrictions for the current same-space formal theorem.
-
-3. **Close or retarget #1363 and #1369** as historical bridge-route issues if
-   they no longer describe live Lean declarations.
-
-4. **Do not reintroduce `MatrixAddInUTransferStatement`** as a standalone
+2. **Do not reintroduce `MatrixAddInUTransferStatement`** as a standalone
    proof-debt structure.  If the add-in-\(u\) transfer is needed again, state it
    as a source-derived theorem with a paper citation and a proof obligation.
 
+3. **Read the issue rows below as an audit snapshot.**  The former #1507
+   successor construction, #1032 orthonormalization repair, #1043 completion
+   data, and #1385 SDP slackness items are no longer live obstructions in the
+   current Lean development.
+
 ### 10.2 Next proof cycle
 
-5. **Fix #1377** (universe mismatch) — prerequisite for #1035, likely a small type-level fix.
-
-6. **Answer-valued slice self-improvement interface** — discharged by the
+4. **Answer-valued slice self-improvement interface** — discharged by the
    carrier route `AnswerSelfImprovementData.ofAnswerCarrier`.  A low-degree
    support theorem would still be needed for the stronger ordinary-realization
    route, but it is not needed for the active successor reduction.
 
-7. **Continue the Section 6 successor construction** (#1507), including the
-   predecessor induction input.  The
-   former #1515 and #1503 self-improvement gaps should not be reopened as live
-   bridge obligations, and the former degree-zero family branch has been retired
-   by the recursive-slice reduction.
+5. **Historical answer-valued successor issues** — #1375, #1376, #1035, and
+   #1369 are closed as not planned, while #1377 is closed as completed.  They
+   belong to the abandoned bridge-route interface recorded by this audit.
 
-8. **Prove #1035** (recursive `mainFormal`) — the fixed-point that ties the induction together.
-
-9. **Prove #1043** — the base-case completion construction.
-
-10. **Historical #1385 item** (`SdpStatementWithSlackness`) — now discharged by
+6. **Historical #1385 item** (`SdpStatementWithSlackness`) — now discharged by
     the checked strong-duality and slackness construction.
 
 ---
