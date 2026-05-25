@@ -218,7 +218,7 @@ generic residual-domination implication.
 
    The former SDP slackness obligation has been discharged: the declaration
    `MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness` is audited by
-   `assert_sdp_slackness_axioms` in
+   `assert_standard_axioms` in
    `MIPStarRE/LDT/Test/AxiomAudit.lean` and prints only the standard Lean
    axioms.  Thus the remaining frontier is the helper-output-specific residual
    domination needed by issue `#1642`, not the former SDP slackness obligation.

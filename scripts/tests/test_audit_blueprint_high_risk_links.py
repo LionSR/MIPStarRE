@@ -49,6 +49,34 @@ assert_no_sorry_axiom MIPStarRE.LDT.RepairThing
         self.assertEqual(result.high_risk_entries, 1)
         self.assertEqual(result.findings, ())
 
+    def test_high_risk_link_passes_for_nested_assertion_in_namespace(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_minimal_tree(
+                root,
+                tex=r"""
+\begin{lemma}\label{lem:slackness}
+\lean{MIPStarRE.LDT.SelfImprovement.PairWithSlackness.toStatementWithSlackness}
+\leanok
+This is a test statement.
+\end{lemma}
+""",
+                axiom_audit="""
+namespace MIPStarRE.LDT.SelfImprovement
+
+assert_no_sorry_axiom PairWithSlackness.toStatementWithSlackness
+
+end MIPStarRE.LDT.SelfImprovement
+""",
+            )
+
+            result = run_audit(root)
+
+        self.assertTrue(result.ok)
+        self.assertEqual(result.scanned_entries, 1)
+        self.assertEqual(result.high_risk_entries, 1)
+        self.assertEqual(result.findings, ())
+
     def test_high_risk_link_fails_without_axiom_audit_assertion(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
