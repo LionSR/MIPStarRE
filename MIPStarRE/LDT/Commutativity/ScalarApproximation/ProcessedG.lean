@@ -1,8 +1,3 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChain
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.MainChain
 
 /-!
