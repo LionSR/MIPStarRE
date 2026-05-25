@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
-import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
 import MIPStarRE.LDT.GlobalVariance.Theorems.Results
 
 /-!

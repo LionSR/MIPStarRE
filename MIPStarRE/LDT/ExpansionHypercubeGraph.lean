@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems
 
 /-!

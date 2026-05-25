@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Core
 import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
 
 /-!
