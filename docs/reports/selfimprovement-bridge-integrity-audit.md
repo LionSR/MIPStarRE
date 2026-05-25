@@ -264,7 +264,7 @@ option-completed helper measurement.
 | Module | Used by |
 |--------|---------|
 | `SelfImprovement/Theorems/Results/HelperSSC` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
-| `SelfImprovement/Theorems/Results/BoundednessTransport` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
+| `SelfImprovement/Theorems/Results/BoundednessTransport/BoundednessGap.lean` | `SelfImprovementTop/Core.lean` (via `selfImprovement`) |
 | `SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `MainInductionStep/SelfImprovementAssembly/Core.lean` |
 | `Pasting/Core.lean` → `ldPasting` | `MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` through `ldPastingInInductionSection`, then the successor-stage assembly |
 
@@ -411,7 +411,7 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean` | `SelfImprovementHelperConclusion`, `SelfImprovementConclusion`, etc.; the former `SelfImprovementObligations` bundle has been removed |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean` | `selfImprovementHelper`, `selfImprovement`; the former `selfImprovementFromObligations` theorem has been removed |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC/` | Proof of `helperStrongSelfConsistency` (internal) |
-| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport.lean` | Proof of `finalFields` (internal) |
+| `MIPStarRE/LDT/SelfImprovement/Theorems/Results/BoundednessTransport/BoundednessGap.lean` | Proof of `finalFields` (internal) |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixHelperBridge.lean` | Removed orphan module; direct SDP-to-helper wrappers no longer exist |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/ResidualDomination.lean` | Removed compatibility module; top-level residual-domination variants no longer exist |
 | `MIPStarRE/LDT/SelfImprovement/Theorems/OrthonormalizationInputConstructors.lean` | Removed orphan module; unused obligation-package constructors no longer exist |
