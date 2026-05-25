@@ -4,7 +4,8 @@ import MIPStarRE.LDT.Test.StrategyFailures
 # Symmetrized-strategy self-consistency bridge
 
 Self-consistency comparison lemmas for the classical role-register
-symmetrization, extracted from `MIPStarRE.LDT.Test.StrategySymmetrized`.
+symmetrization.  These lemmas are part of the split strategy interface
+re-exported by `MIPStarRE.LDT.Test.Strategy`.
 -/
 
 namespace MIPStarRE.LDT
