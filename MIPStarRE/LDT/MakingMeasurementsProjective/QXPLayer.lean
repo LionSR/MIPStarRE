@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
 
 /-!
