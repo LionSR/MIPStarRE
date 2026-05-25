@@ -1,5 +1,6 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChain
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainReverse
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainTail
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
 import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
@@ -10,9 +11,9 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
 The core lemma `evaluatedSlice_scalar_chain_bound` that assembles the ten-step
 scalar approximation chain for `lem:comm-data-processed-g`.  This is the
 heavyweight proof corresponding to `references/ldt-paper/commutativity-G.tex`,
-lines 72–131.  Phases 1, 3, 4, 6–7, and 8–9 are delegated to
-`ScalarApproximation.PaperChain`; Phase 2 uses the reindexing infrastructure
-from `PhaseTwo`.
+lines 72–131.  Phases 1, 3, 4, 6–7, and 8–9 are supplied by the reverse and
+tail parts of the paper chain; Phase 2 uses the reindexing infrastructure from
+`PhaseTwo`.
 -/
 
 namespace MIPStarRE.LDT.Commutativity

@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic
-import MIPStarRE.LDT.Commutativity.GCommStability
+import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
 
 /-!
 # Phase-five endpoint for the evaluated-slice paper chain
