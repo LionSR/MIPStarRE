@@ -39,7 +39,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean` | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | **Largest file** (3,827 lines), 137 `simp` calls |
 | `Pasting/Bernoulli/FromHToG/Core.lean` | 1,339 | 20.6 | 24.3 | 1× 800,000 | 7 | 54 `simp`, rpow expansions |
 | `Pasting/CommutingWithG/Complete.lean` | 476 | 17.5 | 22.5 | 1× 1,000,000 | 1 | Sqrt/rpow chain |
-| `Test/ErrorCascade.lean` | 1,482 | 16.1 | 39.7 | none | 2 | High user/sys ratio |
+| split; `Test/ErrorCascade/{Definitions,EnvelopeBounds,CascadeBounds}.lean` carry the cascade | 1,482 | 16.1 | 39.7 | none | 2 | Former bottleneck now a 28-line compatibility wrapper |
 | `Commutativity/ScalarApproximation/ProcessedG.lean` | 2,035 | 15.2 | 23.4 | 1× 5,000,000 + 1× 210,000 | 5 | Largest heartbeat override proof (809 lines) |
 
 ### Files Taking 8–15 Seconds
@@ -52,7 +52,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | 10.8 | 24.6 | none |
 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2,902 | 10.2 | 24.1 | none |
 | `Commutativity/GCommStability/Scalar/RawSecond.lean` | 648 | 10.2 | 9.2 | 1× 1,200,000 |
-| `Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` | 2,409 | 9.9 | 17.7 | none |
+| split; `CommuteGHalfSandwich/MoveChain/{Base,Lifting,Chain,BackChain,FlatChain,FlatChainStep,Core}.lean` carries the chain | 2,409 | 9.9 | 17.7 | none |
 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` | 1,886 | 8.9 | 18.3 | none |
 | `Test/MainTheorem.lean` | 2,971 | 8.8 | 8.5 | none |
 | `Commutativity/Main/Auxiliary.lean` | 1,139 | 8.7 | 9.6 | none |
@@ -108,13 +108,13 @@ Files sorted by heartbeat override magnitude:
 | `Test/MainTheorem.lean` | 2,971 | 8.8s | — | 1 simp (mostly assembly) |
 | deleted; final reductions now live in `GlobalVariance/Theorems/MainTheorems.lean` | 2,950 | 8.6s | — | 63 simp |
 | `BridgeLemmas/LineInterpolation.lean` | 2,902 | 10.2s | — | 119 simp |
-| `CommuteGHalfSandwich/MoveChain.lean` | 2,409 | 9.9s | — | 74 simp |
+| split; `CommuteGHalfSandwich/MoveChain/{Base,Lifting,Chain,BackChain,FlatChain,FlatChainStep,Core}.lean` carries the chain | 2,409 | 9.9s | — | 74 simp |
 | `ScalarApproximation/ProcessedG.lean` | 2,035 | 15.2s | 5M | 27 simp, 30 calc |
 | `CommuteGHalfSandwich/Setup.lean` | 1,886 | 8.9s | — | 48 simp |
 | `SwitcherooCompletion.lean` | 1,673 | 23.1s | 1M | 28 simp |
 | `BridgeLemmas/OverAllOutcomes.lean` | 1,547 | 11.0s | — | 24 simp |
 | deleted; `FromHToG/AdjacentStages/Chain/{HalfSandwich,FinalMove}.lean` now carries the chain | 1,533 | 7.8s | — | 0 simp (mostly arithmetic) |
-| `Test/ErrorCascade.lean` | 1,482 | 16.1s | — | 3 simp |
+| split; `Test/ErrorCascade/{Definitions,EnvelopeBounds,CascadeBounds}.lean` carries the cascade | 1,482 | 16.1s | — | 3 simp |
 | `FromHToG/Core.lean` | 1,339 | 20.6s | 800K | 54 simp |
 | `Pasting/Core.lean` | 1,202 | 11.5s | — | 35 simp |
 | `Commutativity/Main/Auxiliary.lean` | 1,139 | 8.7s | — | 25 simp |
@@ -188,7 +188,7 @@ change trigger a large rebuild.
 7. **Reduce `simp` usage in large files**
    - `LdSandwichLineOnePoint.lean`: 137 `simp` calls
    - `LineInterpolation.lean`: 119 `simp` calls
-   - `MoveChain.lean`: 74 `simp` calls
+   - former `MoveChain.lean` chain, now split under `MoveChain/`: 74 `simp` calls
    - Use `simp only` with explicit lemma lists instead of unqualified `simp`.
    - Use `dsimp` where only definitional unfolding is needed.
    - **Expected benefit:** Modest (~5–10%) but reduces risk of `simp` slowdowns after Mathlib updates.
