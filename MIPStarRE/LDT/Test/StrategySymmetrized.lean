@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Test.StrategyFailures
-import MIPStarRE.LDT.Test.StrategySelfConsistency
 import MIPStarRE.LDT.Test.StrategyRoleAverage
 
 /-!
