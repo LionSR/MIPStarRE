@@ -962,10 +962,10 @@
   </div>
   <div class="proof_content">
   <p> For \(u,v \in \mathbb {F}_q^m\), </p>
-<div class="equation" id="eq:reader-probably-has-no-idea-whats-going-on-yet">
+<div class="equation" id="eq:edge-difference-action">
 <p>
   <div class="equation_content">
-    \begin{equation}  \begin{aligned}  ((\langle u \rvert -\langle v \rvert ) \otimes \langle \psi  \rvert ) \cdot A_{\mathrm{comb}} &  = ((\langle u \rvert -\langle v \rvert ) \otimes \langle \psi  \rvert ) \cdot \sum _{w \in \mathbb {F}_q^m} \lvert w \rangle  \otimes A^w \otimes I \\ &  = \langle \psi  \rvert  \cdot ((A^u-A^v)\otimes I). \end{aligned} \label{eq:reader-probably-has-no-idea-whats-going-on-yet} \end{equation}
+    \begin{equation}  \begin{aligned}  ((\langle u \rvert -\langle v \rvert ) \otimes \langle \psi  \rvert ) \cdot A_{\mathrm{comb}} &  = ((\langle u \rvert -\langle v \rvert ) \otimes \langle \psi  \rvert ) \cdot \sum _{w \in \mathbb {F}_q^m} \lvert w \rangle  \otimes A^w \otimes I \\ &  = \langle \psi  \rvert  \cdot ((A^u-A^v)\otimes I). \end{aligned} \label{eq:edge-difference-action} \end{equation}
   </div>
   <span class="equation_label">8</span>
 </p>
@@ -978,7 +978,7 @@
 <div class="displaymath" id="a0000000296">
   \[  A_{\mathrm{comb}}^\dagger (L \otimes \lvert \psi  \rangle \langle \psi  \rvert ) A_{\mathrm{comb}} = \frac12 \mathbb {E}_{(u,v)\sim C} ((A^u-A^v)\otimes I)\lvert \psi  \rangle \langle \psi  \rvert ((A^u-A^v)\otimes I)  \]
 </div>
-<p> by <a href="sec-expansion.html#eq:reader-probably-has-no-idea-whats-going-on-yet" class="eqref">8</a>. Taking the trace gives </p>
+<p> by <a href="sec-expansion.html#eq:edge-difference-action" class="eqref">8</a>. Taking the trace gives </p>
 <div class="displaymath" id="a0000000297">
   \[  \operatorname{Tr}(A_{\mathrm{comb}}^\dagger (L \otimes \lvert \psi  \rangle \langle \psi  \rvert ) A_{\mathrm{comb}}) = \frac12 \mathbb {E}_{(u,v)\sim C} \langle \psi  \rvert  (A^u-A^v)^2 \otimes I \lvert \psi  \rangle  = \mathbf{Var}_{\mathrm{local}}(A,\psi ).  \]
 </div>

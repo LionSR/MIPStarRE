@@ -881,10 +881,10 @@
 </p>
 </div>
 <p> The naive estimate would instead suggest </p>
-<div class="equation" id="eq:dumbo-bound-for-idiots">
+<div class="equation" id="eq:first-construction-naive-bound">
 <p>
   <div class="equation_content">
-    \begin{equation} \label{eq:dumbo-bound-for-idiots} \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle  \approx 1-(d+1)\kappa , \end{equation}
+    \begin{equation} \label{eq:first-construction-naive-bound} \langle \psi  \rvert  G^{d+1} \otimes I \lvert \psi  \rangle  \approx 1-(d+1)\kappa , \end{equation}
   </div>
   <span class="equation_label">9</span>
 </p>
@@ -909,7 +909,7 @@
 </p>
 </div>
 <p> The remaining comparison between \(G\) and \(G^{d+1}\) is then reduced to a scalar inequality. </p>
-<div class="lemma_thmwrapper theorem-style-plain" id="lem:looks-easy-but-took-me-a-while">
+<div class="lemma_thmwrapper theorem-style-plain" id="lem:first-construction-scalar-inequality">
   <div class="lemma_thmheading">
     <span class="lemma_thmcaption">
     Lemma
@@ -923,7 +923,7 @@
         </div>
     <div class="thm_header_hidden_extras">
 
-    <a class="icon proof" href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">#</a>
+    <a class="icon proof" href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">#</a>
     
     <a class="icon proof" href="sec-ld-pasting.html#a0000000466"><svg  class="icon icon-cogs "><use xlink:href="symbol-defs.svg#icon-cogs"></use></svg>
 </a>
@@ -1003,11 +1003,11 @@
           
           <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">Lemma 9.8</a></li>
+          <li><a href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">Lemma 9.8</a></li>
           
           <li><a href="sec-ld-pasting.html#def:ld-pasting-context">Definition 9.3</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">Lemma 9.8</a></li>
+          <li><a href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">Lemma 9.8</a></li>
           
         </ul>
     
@@ -1023,7 +1023,7 @@
 <div class="displaymath" id="a0000000469">
   \[  \Delta \ge \mathbb {E}_{i\sim \mu }[\lambda _i^{d+1}(1-\lambda _i)].  \]
 </div>
-<p> Then the scalar inequality from Lemma&#160;<a href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">9.8</a> gives </p>
+<p> Then the scalar inequality from Lemma&#160;<a href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">9.8</a> gives </p>
 <div class="displaymath" id="a0000000470">
   \[  \mathbb {E}_{i\sim \mu }[\lambda _i(1-\lambda _i^d)] \le 2\Delta ^{1/(d+1)}.  \]
 </div>
@@ -1038,7 +1038,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> Apply Lemma&#160;<a href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">9.8</a> pointwise and then use the concavity of \(a \mapsto a^{1/(d+1)}\). </p>
+  <p> Apply Lemma&#160;<a href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">9.8</a> pointwise and then use the concavity of \(a \mapsto a^{1/(d+1)}\). </p>
 
   </div>
 </div>
@@ -1071,7 +1071,7 @@
           
           <li><a href="sec-ld-pasting.html#cor:first-construction-spectral-comparison">Corollary 9.9</a></li>
           
-          <li><a href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">Lemma 9.8</a></li>
+          <li><a href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">Lemma 9.8</a></li>
           
         </ul>
     
@@ -1083,7 +1083,7 @@
         </div>
   </div>
   <div class="corollary_thmcontent">
-  <p>  As in the paper, Lemma&#160;<a href="sec-ld-pasting.html#lem:looks-easy-but-took-me-a-while">9.8</a> now converts <a href="sec-ld-pasting.html#eq:equivalent-way-of-writing-grand-plan" class="eqref">11</a> into the estimate </p>
+  <p>  As in the paper, Lemma&#160;<a href="sec-ld-pasting.html#lem:first-construction-scalar-inequality">9.8</a> now converts <a href="sec-ld-pasting.html#eq:equivalent-way-of-writing-grand-plan" class="eqref">11</a> into the estimate </p>
 <div class="displaymath" id="a0000000471">
   \[  \mathbb {E}_{i\sim \mu }[\lambda _i(1-\lambda _i^d)] \le 2\cdot \mathbb {E}_{i\sim \mu }\Big[(\lambda _i^{d+1}(1-\lambda _i))^{1/(d+1)}\Big] \le 2\cdot \Delta ^{1/(d+1)},  \]
 </div>
@@ -3954,9 +3954,9 @@
 </div>
 <p> Write \(\mathsf O_\tau = \mathsf{Outcomes}_\tau \). The main iterative step is that for each \(1\le \ell \le k\), </p>
 <div class="displaymath" id="a0000000569">
-  \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau :\, |\tau |\ge d+1} \sum _{g_{\ge \ell }\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes \bigl(G^{|\tau _{{\lt}\ell }|}(I-G)^{(\ell -1)-|\tau _{{\lt}\ell }|}\bigr)\lvert \psi  \rangle \nonumber \\ \approx _{2\sqrt{2\zeta }+2\sqrt{\nu _4}}{} &  \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau :\, |\tau |\ge d+1} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(G^{|\tau _{\le \ell }|}(I-G)^{\ell -|\tau _{\le \ell }|}\bigr)\lvert \psi  \rangle . \label{eq:i-think-this-is-what-i'm-supposed-to-prove} \end{align}
+  \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau :\, |\tau |\ge d+1} \sum _{g_{\ge \ell }\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes \bigl(G^{|\tau _{{\lt}\ell }|}(I-G)^{(\ell -1)-|\tau _{{\lt}\ell }|}\bigr)\lvert \psi  \rangle \nonumber \\ \approx _{2\sqrt{2\zeta }+2\sqrt{\nu _4}}{} &  \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau :\, |\tau |\ge d+1} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(G^{|\tau _{\le \ell }|}(I-G)^{\ell -|\tau _{\le \ell }|}\bigr)\lvert \psi  \rangle . \label{eq:bernoulli-tail-stage-reduction} \end{align}
 </div>
-<p> Iterating <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove">40</a> for \(\ell =1,\dots ,k\) produces the Bernoulli polynomial </p>
+<p> Iterating <a href="sec-ld-pasting.html#eq:bernoulli-tail-stage-reduction">40</a> for \(\ell =1,\dots ,k\) produces the Bernoulli polynomial </p>
 <div class="displaymath" id="a0000000570">
   \[  \sum _{r=d+1}^k \binom {k}{r} \langle \psi  \rvert  G^r(I-G)^{k-r} \otimes I \lvert \psi  \rangle ,  \]
 </div>
@@ -3965,7 +3965,7 @@
   \[  k(2\sqrt{2\zeta }+2\sqrt{\nu _4}) \le 46k^2m\left(\gamma ^{1/32}+\zeta ^{1/32}+(d/q)^{1/32}\right) = \nu _8.  \]
 </div>
 <p> This corrects the displayed arithmetic in the paper: the iterated adjacent estimate contributes \(k\) copies of the \(2\sqrt{\nu _4}\) term, and the definition of \(\nu _4\) already contains a factor \(k^2\). </p>
-<p>To prove <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove">40</a>, define for each \(1\le \ell \le k+1\) and each tail type \(\tau _{\ge \ell }\), </p>
+<p>To prove <a href="sec-ld-pasting.html#eq:bernoulli-tail-stage-reduction">40</a>, define for each \(1\le \ell \le k+1\) and each tail type \(\tau _{\ge \ell }\), </p>
 <div class="equation" id="eq:S-def">
 <p>
   <div class="equation_content">
@@ -3974,9 +3974,9 @@
   <span class="equation_label">41</span>
 </p>
 </div>
-<p> Then <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove">40</a> may be rewritten as </p>
+<p> Then <a href="sec-ld-pasting.html#eq:bernoulli-tail-stage-reduction">40</a> may be rewritten as </p>
 <div class="displaymath" id="a0000000572">
-  \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{g_{\ge \ell }\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes S_{\tau _{\ge \ell }} \lvert \psi  \rangle \nonumber \\ \approx _{2\sqrt{2\zeta }+2\sqrt{\nu _4}}{} &  \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau _{{\gt}\ell }} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes S_{\tau _{{\gt}\ell }} \lvert \psi  \rangle . \label{eq:i-think-this-is-what-i'm-supposed-to-prove-2} \end{align}
+  \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{g_{\ge \ell }\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes S_{\tau _{\ge \ell }} \lvert \psi  \rangle \nonumber \\ \approx _{2\sqrt{2\zeta }+2\sqrt{\nu _4}}{} &  \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau _{{\gt}\ell }} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes S_{\tau _{{\gt}\ell }} \lvert \psi  \rangle . \label{eq:bernoulli-tail-stage-reduction-expanded} \end{align}
 </div>
 <div class="remark_thmwrapper theorem-style-remark" id="a0000000573">
   <div class="remark_thmheading">
@@ -4023,18 +4023,18 @@
   \begin{align}  S_{\tau _{\ge \ell }} \cdot \Bigl(\mathbb {E}_{x_\ell } \sum _{g_\ell \in \mathsf O_{\tau _\ell }} \widehat G_{g_\ell }^{x_\ell }\Bigr) \cdot S_{\tau _{\ge \ell }} \le \mathbb {E}_{x_\ell } \sum _{g_\ell \in \mathsf O_{\tau _\ell }} \widehat G_{g_\ell }^{x_\ell }, \label{eq:S-sandwich} \end{align}
 </div>
 <p> because \(S_{\tau _{\ge \ell }}\) commutes with \(G\) and \((I-G)\) and is bounded by \(I\). </p>
-<p>We now prove <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove-2">42</a>. Writing \(\widehat H\) as a sandwich of \(\widehat G\) operators and moving the rightmost \(\widehat G_{g_\ell }^{x_\ell }\) to the second tensor factor gives </p>
+<p>We now prove <a href="sec-ld-pasting.html#eq:bernoulli-tail-stage-reduction-expanded">42</a>. Writing \(\widehat H\) as a sandwich of \(\widehat G\) operators and moving the rightmost \(\widehat G_{g_\ell }^{x_\ell }\) to the second tensor factor gives </p>
 <div class="displaymath" id="a0000000576">
-  \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes S_{\tau _{\ge \ell }}\lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} (\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \widehat G_{g_\ell }^{x_\ell }\bigr) \otimes S_{\tau _{\ge \ell }}\lvert \psi  \rangle \nonumber \\ \approx _{\sqrt{2\zeta }}{} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} (\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:move-g-over-there} \end{align}
+  \begin{align} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes S_{\tau _{\ge \ell }}\lvert \psi  \rangle \nonumber \\ ={} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} (\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \widehat G_{g_\ell }^{x_\ell }\bigr) \otimes S_{\tau _{\ge \ell }}\lvert \psi  \rangle \nonumber \\ \approx _{\sqrt{2\zeta }}{} &  \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} (\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:move-rightmost-g-to-second-factor} \end{align}
 </div>
 <p> The corresponding Cauchy–Schwarz bound is </p>
-<div class="displaymath" id="eq:call-again-later-part-tres">
-  \begin{multline} \label{eq:call-again-later-part-tres} \Bigl| \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  (\widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes S_{\tau _{\ge \ell }}) \bigl((\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \otimes I\bigr) (\widehat G_{g_\ell }^{x_\ell }\otimes I - I \otimes \widehat G_{g_\ell }^{x_\ell }) \lvert \psi  \rangle  \Bigr|\\ \le \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes (S_{\tau _{\ge \ell }})^2 \lvert \psi  \rangle  } \cdot \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  (\widehat G_{g_\ell }^{x_\ell }\otimes I - I \otimes \widehat G_{g_\ell }^{x_\ell }) (\widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes I) (\widehat G_{g_\ell }^{x_\ell }\otimes I - I \otimes \widehat G_{g_\ell }^{x_\ell }) \lvert \psi  \rangle  }. \end{multline}
+<div class="displaymath" id="eq:first-cauchy-schwarz-bound">
+  \begin{multline} \label{eq:first-cauchy-schwarz-bound} \Bigl| \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  (\widehat G_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes S_{\tau _{\ge \ell }}) \bigl((\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \otimes I\bigr) (\widehat G_{g_\ell }^{x_\ell }\otimes I - I \otimes \widehat G_{g_\ell }^{x_\ell }) \lvert \psi  \rangle  \Bigr|\\ \le \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{\ge \ell }}^{x_{\ge \ell }} \otimes (S_{\tau _{\ge \ell }})^2 \lvert \psi  \rangle  } \cdot \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  (\widehat G_{g_\ell }^{x_\ell }\otimes I - I \otimes \widehat G_{g_\ell }^{x_\ell }) (\widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes I) (\widehat G_{g_\ell }^{x_\ell }\otimes I - I \otimes \widehat G_{g_\ell }^{x_\ell }) \lvert \psi  \rangle  }. \end{multline}
 </div>
 <p> The first square root is at most \(1\) because \(S_{\tau _{\ge \ell }}\le I\) and \(\widehat H\) is a submeasurement, and the second is at most \(2\zeta \) by <a href="sec-ld-pasting.html#eq:gselfconall">23</a>. </p>
 <p>Next, commute the leftmost \(\widehat G_{g_\ell }^{x_\ell }\) across the left half-sandwich: </p>
 <div class="displaymath" id="a0000000577">
-  \begin{align}  \eqref{eq:move-g-over-there} &  = \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_\ell }^{x_\ell }\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle \nonumber \\ &  \approx _{\sqrt{\nu _4}} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}\widehat G_{g_\ell }^{x_\ell }(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:commute-g-part-one} \end{align}
+  \begin{align}  \eqref{eq:move-rightmost-g-to-second-factor} &  = \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_\ell }^{x_\ell }\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle \nonumber \\ &  \approx _{\sqrt{\nu _4}} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}\widehat G_{g_\ell }^{x_\ell }(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:commute-g-part-one} \end{align}
 </div>
 <p> The associated Cauchy–Schwarz estimate is </p>
 <div class="displaymath" id="eq:call-this-later">
@@ -4046,19 +4046,19 @@
   \begin{align}  \eqref{eq:commute-g-part-one} \approx _{\sqrt{\nu _4}} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }}(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger \widehat G_{g_\ell }^{x_\ell }\bigr) \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr)\lvert \psi  \rangle . \label{eq:commute-g-part-two} \end{align}
 </div>
 <p> This time the Cauchy–Schwarz step is </p>
-<div class="displaymath" id="eq:call-again-later-part-dos">
-  \begin{multline} \label{eq:call-again-later-part-dos} \Bigl| \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes (S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell })\bigr) \bigl([(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }] \otimes I\bigr) \lvert \psi  \rangle  \Bigr|\\ \le \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }S_{\tau _{\ge \ell }}\bigr) \lvert \psi  \rangle  } \cdot \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  [(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }]^\dagger [(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }] \otimes I \lvert \psi  \rangle  }. \end{multline}
+<div class="displaymath" id="eq:second-cauchy-schwarz-bound">
+  \begin{multline} \label{eq:second-cauchy-schwarz-bound} \Bigl| \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \bigl(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes (S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell })\bigr) \bigl([(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }] \otimes I\bigr) \lvert \psi  \rangle  \Bigr|\\ \le \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }S_{\tau _{\ge \ell }}\bigr) \lvert \psi  \rangle  } \cdot \sqrt{ \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  [(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }]^\dagger [(\widehat G_{g_{{\gt}\ell }}^{x_{{\gt}\ell }})^\dagger ,\widehat G_{g_\ell }^{x_\ell }] \otimes I \lvert \psi  \rangle  }. \end{multline}
 </div>
 <p> By <a href="sec-ld-pasting.html#eq:S-sandwich">46</a>, the first square root is at most \(1\), and the second matches the first square root in <a href="sec-ld-pasting.html#eq:call-this-later">51</a>, hence is at most \(\nu _4\). </p>
 <p>Finally move the remaining \(\widehat G_{g_\ell }^{x_\ell }\) to the second tensor factor: </p>
 <div class="displaymath" id="eq:h-ot-mgg">
   \begin{align}  \eqref{eq:commute-g-part-two} \approx _{\sqrt{2\zeta }} \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\widehat G_{g_\ell }^{x_\ell }\bigr) \lvert \psi  \rangle . \label{eq:h-ot-mgg} \end{align}
 </div>
-<p> The omitted Cauchy–Schwarz bound reuses the first square root from <a href="sec-ld-pasting.html#eq:call-again-later-part-dos">54</a> and the second square root from <a href="sec-ld-pasting.html#eq:call-again-later-part-tres">48</a>. Since \(\widehat G\) is projective, </p>
+<p> The omitted Cauchy–Schwarz bound reuses the first square root from <a href="sec-ld-pasting.html#eq:second-cauchy-schwarz-bound">54</a> and the second square root from <a href="sec-ld-pasting.html#eq:first-cauchy-schwarz-bound">48</a>. Since \(\widehat G\) is projective, </p>
 <div class="displaymath" id="a0000000578">
   \begin{align*}  \eqref{eq:h-ot-mgg} &  = \mathbb {E}_{x_{\ge \ell }} \sum _{\tau _{\ge \ell }} \sum _{(g_\ell ,g_{{\gt}\ell })\in \mathsf O_{\tau _{\ge \ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \bigl(S_{\tau _{\ge \ell }}\widehat G_{g_\ell }^{x_\ell }\bigr) \lvert \psi  \rangle  \\ &  = \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau _{{\gt}\ell }} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes \Bigl(\sum _{\tau _\ell } S_{\tau _{\ge \ell }} \Bigl(\mathbb {E}_{x_\ell }\sum _{g_\ell \in \mathsf O_{\tau _\ell }} \widehat G_{g_\ell }^{x_\ell }\Bigr)\Bigr) \lvert \psi  \rangle  \\ &  = \mathbb {E}_{x_{{\gt}\ell }} \sum _{\tau _{{\gt}\ell }} \sum _{g_{{\gt}\ell }\in \mathsf O_{\tau _{{\gt}\ell }}} \langle \psi  \rvert  \widehat H_{g_{{\gt}\ell }}^{x_{{\gt}\ell }} \otimes S_{\tau _{{\gt}\ell }} \lvert \psi  \rangle  \tag {by \ref{eq:S-recurrence}}, \end{align*}
 </div>
-<p> which is exactly <a href="sec-ld-pasting.html#eq:i-think-this-is-what-i'm-supposed-to-prove-2">42</a>. </p>
+<p> which is exactly <a href="sec-ld-pasting.html#eq:bernoulli-tail-stage-reduction-expanded">42</a>. </p>
 
   </div>
 </div>
