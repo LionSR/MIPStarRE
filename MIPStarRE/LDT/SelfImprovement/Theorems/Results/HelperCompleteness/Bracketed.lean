@@ -435,22 +435,6 @@ theorem helper_slackness_eq_of_helper_with_slackness
       T.toSubMeas.outcome h * Z :=
   (hhelper.complementarySlackness h).symm
 
-/-- Reconstruct the slackness-carrying SDP pair from the strengthened helper
-conclusion. -/
-theorem helper_sdp_optimal_pair_with_slackness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta : Error)
-    {T : Measurement (Polynomial params) ι}
-    {Hhat : SubMeas (Polynomial params) ι}
-    {Z : MIPStarRE.Quantum.Op ι}
-    (hhelper :
-      SelfImprovementHelperConclusionWithSlackness params strategy T Hhat Z eps delta) :
-    SdpOptimalPairWithSlackness params strategy T.toSubMeas Z :=
-  { toSdpOptimalPair := hhelper.toHelperConclusion.sdpWitness
-    complementarySlackness := hhelper.complementarySlackness }
-
 /-- The `Hhat`-versus-`Z` comparison from point self-consistency and a helper
 conclusion carrying SDP complementary slackness.
 

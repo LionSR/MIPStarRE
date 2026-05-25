@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Saturated
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality
+import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Separation
 
 /-!
 # Section 9 — Matrix realization

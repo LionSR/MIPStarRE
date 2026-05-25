@@ -816,26 +816,4 @@ theorem matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le
         params model T Z hcanonical)
       hOneLe)
 
-/-- Canonical complementary slackness and \(I \le Z\) saturate the extracted
-paper primal submeasurement. -/
-theorem matrixSdpPrimalTotalEqOne_extracted_of_canonicalComplementarySlackness_of_one_le
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
-    (Z : MatrixOperator model.space)
-    (hcanonical :
-      X * (matrixSdpCanonicalDualOperator params model Z -
-            matrixSdpCanonicalObjectiveOperator params model) =
-        0)
-    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
-    ∑ g : Polynomial params,
-        (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX).effect g =
-      1 :=
-  matrixSdpPrimalTotalEqOne_of_canonicalComplementarySlackness_of_one_le
-    params model (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) Z
-    (matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
-      params model X hX Z hcanonical)
-    hOneLe
-
 end MIPStarRE.LDT.SelfImprovement

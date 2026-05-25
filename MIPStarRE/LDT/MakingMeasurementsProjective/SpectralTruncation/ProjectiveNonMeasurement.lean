@@ -436,28 +436,6 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_two_mul
       simpa [RCLike.real_smul_eq_coe_smul (K := ℂ)] using hsmul_real
     exact le_trans hbase <| by simpa [ε] using hsmul
 
-/-- Construct the paper witness `lem:projective-non-measurement` from a source
-almost-projective defect already bounded by `ζ`.
-
-This is the same theorem as
-`projectiveNonMeasurement_of_sourceAlmostProjective_two_mul`, specialized to the
-stronger input hypothesis `hsource ≤ ζ`. -/
-theorem projectiveNonMeasurement_of_sourceAlmostProjective
-    {Outcome : Type uOutcome} [Fintype Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
-    (hζ : 0 < ζ) (hζ_small : ζ ≤ 1 / 4)
-    (hsource : ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ ζ) :
-    projectiveNonMeasurement ψ A ζ := by
-  have hsource_two :
-      ∑ a, ev ψ (A.outcome a - A.outcome a * A.outcome a) ≤ 2 * ζ := by
-    have hζ_nonneg : 0 ≤ ζ :=
-      le_trans (sourceAlmostProjective_nonneg ψ A) hsource
-    have hζ_le : ζ ≤ 2 * ζ := by nlinarith
-    exact hsource.trans hζ_le
-  exact projectiveNonMeasurement_of_sourceAlmostProjective_two_mul
-    ψ A ζ hζ hζ_small hsource_two
-
 /-- The exact endpoint `ζ = 0` of `lem:projective-non-measurement`.
 
 Here the source almost-projective defect vanishes exactly. We round each effect
@@ -760,38 +738,6 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_full
     exact hsource.trans hζ_le
   exact projectiveNonMeasurement_of_sourceAlmostProjective_two_mul_full
     ψ A ζ hψ hsource_two
-
-/-- A direct `projectiveNonMeasurement` construction from
-`AlmostProjMeasStatement`.
-
-Only the `sourceAlmostProjective` field carries mathematical content for this
-spectral step; the strong self-consistency and self-distance fields belong to
-the earlier almost-projective stage. -/
-theorem projectiveNonMeasurement_of_almostProjMeasStatement
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
-    (hζ : 0 < ζ) (hζ_small : ζ ≤ 1 / 4)
-    (halmost : AlmostProjMeasStatement ψ A ζ) :
-    projectiveNonMeasurement ψ A ζ :=
-  projectiveNonMeasurement_of_sourceAlmostProjective ψ A ζ hζ hζ_small
-    halmost.sourceAlmostProjective
-
-/-- Unconditional conversion from `AlmostProjMeasStatement` to the rounding
-projector witness.
-
-The normalized-state hypothesis is exactly the one already required by the
-`spectralTruncationStatement_of_sourceAlmostProjective` route. It is used only
-in the large-error branch. -/
-theorem projectiveNonMeasurement_of_almostProjMeasStatement_full
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
-    (hψ : ψ.IsNormalized)
-    (halmost : AlmostProjMeasStatement ψ A ζ) :
-    projectiveNonMeasurement ψ A ζ :=
-  projectiveNonMeasurement_of_sourceAlmostProjective_full ψ A ζ hψ
-    halmost.sourceAlmostProjective
 
 /-- Construct the spectral truncation statement from the source almost-projective
 estimate.
