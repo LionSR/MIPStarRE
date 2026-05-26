@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
 
 /-!
 # Section 12 pasting: scalar bounds for complementary Bernoulli branches

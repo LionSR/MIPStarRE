@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.Recurrence
+import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
+import MIPStarRE.LDT.Pasting.Bernoulli.MatrixChernoff
 import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
 import MIPStarRE.LDT.Pasting.Bernoulli.DegreeZero
 import MIPStarRE.LDT.Pasting.Defs.Tuples
