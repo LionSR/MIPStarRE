@@ -96,7 +96,14 @@ The paper states `ν₈ = 46 k m * (γ^(1/32)+ζ^(1/32)+(d/q)^(1/32))` in `refer
 ν₈' = 46 k^2 m * (γ^(1/32)+ζ^(1/32)+(d/q)^(1/32)).
 ```
 
-Lean uses this corrected value as `fromHToGError` (`MIPStarRE/LDT/Pasting/Statements.lean:113-124`) and proves the telescope through `fromHToGPaperTotalError` and `fromHToGPaperTotalError_le` (`MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core.lean:1111-1122`, `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG.lean:20-57`). The blueprint already records the correction at `blueprint/src/chapter/ch09_pasting.tex:1037-1100`. I added `docs/paper-gaps/issue-930-pasting-from-H-to-G-error.tex` so the paper-gap directory now has a standalone mathematical note for the correction.
+Lean uses this corrected value as `fromHToGError`
+(`MIPStarRE/LDT/Pasting/Statements.lean:113-124`) and proves the telescope
+through `fromHToGPaperTotalError` and `fromHToGPaperTotalError_le`
+(`MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core/FactBundles.lean:78-260`,
+`MIPStarRE/LDT/Pasting/Bernoulli/FromHToG.lean:20-58`). The blueprint already
+records the correction at `blueprint/src/chapter/ch09_pasting.tex:1037-1100`.
+I added `docs/paper-gaps/issue-930-pasting-from-H-to-G-error.tex` so the
+paper-gap directory now has a standalone mathematical note for the correction.
 
 This correction is harmless for the final pasting theorem because `ν₇` and the corrected `ν₈'` are both absorbed into the theorem's `ν = 100 k^2 m * (...)` in `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean:38-43` and `:344-350`.
 
