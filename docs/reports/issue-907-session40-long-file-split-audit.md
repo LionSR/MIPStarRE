@@ -107,7 +107,7 @@ git diff --check
 | 11 | 1547 | `MIPStarRE/LDT/Pasting/BridgeLemmas/OverAllOutcomes.lean` |
 | 12 | deleted | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages/Chain/` |
 | 13 | split | `MIPStarRE/LDT/Test/ErrorCascade/Definitions.lean`, `MIPStarRE/LDT/Test/ErrorCascade/EnvelopeBounds.lean`, and the leaves under `MIPStarRE/LDT/Test/ErrorCascade/CascadeBounds/`; the former `ErrorCascade.lean` wrapper has been removed |
-| 14 | 1339 | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core.lean` |
+| 14 | split | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core/`; the former `Core.lean` wrapper has been removed |
 | 15 | 1202 | `MIPStarRE/LDT/Pasting/Core.lean` |
 | 16 | 1132 | `MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean` |
 | 17 | 1101 | `MIPStarRE/LDT/Test/StrategyRole.lean` |
@@ -212,7 +212,7 @@ motion.
 | 6 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2902 | `Pasting.BridgeLemmas.Common` | `Pasting/BridgeLemmas/HBConsistency.lean` | 64 public / 0 private | Good candidate; Pasting-nearby, so wait for Pasting PRs. |
 | 7 | split; former `Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` wrapper has been removed | 2409 | `CommuteGHalfSandwich.Setup` | `Pasting/BridgeLemmas/CommuteGHalfSandwich.lean` | 1 public / 61 private | The move chain now lives in the `MoveChain/` leaves. |
 | 8 | `Commutativity/ScalarApproximation/ProcessedG.lean` | 2035 | scalar core/paper chain/residuals, evaluated-slice consequences, G-comm scalar | `LDT.lean`, `Commutativity/Main/Results.lean`, scalar barrel, `Commutativity/Theorems.lean` | 1 public / 23 private | Defer near scalar cleanup/follow-ups. |
-| 9 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` | 1886 | shared helpers core, bridge common | `Pasting/Bernoulli/FromHToG/Core.lean`, concrete `MoveChain/` leaves | 56 public / 0 private | Remaining setup work should be considered with the split move-chain leaves. |
+| 9 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` | 1886 | shared helpers core, bridge common | `Pasting/Bernoulli/FromHToG/Core/FactBundles.lean`, concrete `MoveChain/` leaves | 56 public / 0 private | Remaining setup work should be considered with the split move-chain leaves. |
 | 10 | `Pasting/SwitcherooCompletion.lean` | 1673 | `SwitcherooContraction`, `SwitcherooCompletion.SecondTerm` | `LDT.lean`, `SwitcherooCompletion/CompletePart.lean` | 4 public / 27 private | Already partly split; lower priority. |
 
 ## Prioritized split candidates

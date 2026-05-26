@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Basic.QuantumState
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core
+import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.FactBundles
 
 /-!
 # Section 12 pasting: from-H-to-G move lemmas
