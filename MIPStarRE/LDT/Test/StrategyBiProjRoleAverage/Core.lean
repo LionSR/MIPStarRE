@@ -16,21 +16,6 @@ open MIPStarRE.Quantum
 
 namespace ProjStrat
 
-theorem rolePairDirectSumCond_mul_eq_zero_of_ne {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (rL rR sL sR : Role)
-    (X Y : MIPStarRE.Quantum.Op
-      (LocalCarrierSum ιA ιB × LocalCarrierSum ιA ιB))
-    (h : (rL, rR) ≠ (sL, sR)) :
-    rolePairDirectSumCond rL rR X * rolePairDirectSumCond sL sR Y = 0 := by
-  unfold rolePairDirectSumCond
-  let e := roleRegisterPairLocalEquiv ιA ιB
-  change (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj rL rR) X) *
-      (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj sL sR) Y) = 0
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e]
-  rw [opTensor_mul, rolePairProj_mul_eq_zero_of_ne rL rR sL sR h]
-  simp [opTensor]
-
 theorem ev_roleRegisterSymmState_rolePairDirectSumCond_AA {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Nonempty ιA]
     [Fintype ιB] [DecidableEq ιB] [Nonempty ιB]

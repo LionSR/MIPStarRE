@@ -367,31 +367,35 @@ theorem normalizedTrace_rolePairDirectSumCond {ιA ιB : Type*}
   congr 1
   simp [opTensor_mul, rolePairProj, roleProj_mul_self]
 
+/-- Distinct role-pair sectors of the direct-sum role register are orthogonal. -/
+theorem rolePairDirectSumCond_mul_eq_zero_of_ne {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    (rL rR sL sR : Role)
+    (X Y : MIPStarRE.Quantum.Op
+      (LocalCarrierSum ιA ιB × LocalCarrierSum ιA ιB))
+    (h : (rL, rR) ≠ (sL, sR)) :
+    rolePairDirectSumCond rL rR X * rolePairDirectSumCond sL sR Y = 0 := by
+  unfold rolePairDirectSumCond
+  let e := roleRegisterPairLocalEquiv ιA ιB
+  change (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj rL rR) X) *
+      (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj sL sR) Y) = 0
+  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e]
+  rw [opTensor_mul, rolePairProj_mul_eq_zero_of_ne rL rR sL sR h]
+  simp [opTensor]
+
 @[simp] theorem rolePairDirectSumCond_AB_mul_BA {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (X Y : MIPStarRE.Quantum.Op
       (LocalCarrierSum ιA ιB × LocalCarrierSum ιA ιB)) :
     rolePairDirectSumCond Role.A Role.B X * rolePairDirectSumCond Role.B Role.A Y = 0 := by
-  unfold rolePairDirectSumCond
-  let e := roleRegisterPairLocalEquiv ιA ιB
-  change (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj Role.A Role.B) X) *
-      (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj Role.B Role.A) Y) = 0
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e]
-  rw [opTensor_mul, rolePairProj_AB_mul_BA]
-  simp [opTensor]
+  exact rolePairDirectSumCond_mul_eq_zero_of_ne Role.A Role.B Role.B Role.A X Y (by decide)
 
 @[simp] theorem rolePairDirectSumCond_BA_mul_AB {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (X Y : MIPStarRE.Quantum.Op
       (LocalCarrierSum ιA ιB × LocalCarrierSum ιA ιB)) :
     rolePairDirectSumCond Role.B Role.A X * rolePairDirectSumCond Role.A Role.B Y = 0 := by
-  unfold rolePairDirectSumCond
-  let e := roleRegisterPairLocalEquiv ιA ιB
-  change (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj Role.B Role.A) X) *
-      (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj Role.A Role.B) Y) = 0
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e]
-  rw [opTensor_mul, rolePairProj_BA_mul_AB]
-  simp [opTensor]
+  exact rolePairDirectSumCond_mul_eq_zero_of_ne Role.B Role.A Role.A Role.B X Y (by decide)
 
 @[simp] theorem swapDensity_rolePairDirectSumCond {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]

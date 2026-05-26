@@ -58,14 +58,12 @@ private lemma rolePairCond_mul_eq_zero_of_ne {ι : Type*} [Fintype ι] [Decidabl
 private lemma rolePairCond_AB_mul_BA {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.A Role.B X * rolePairCond Role.B Role.A Y = 0 := by
-  exact rolePairCond_mul_eq_zero Role.A Role.B Role.B Role.A X Y
-    MIPStarRE.LDT.rolePairProj_AB_mul_BA
+  exact rolePairCond_mul_eq_zero_of_ne Role.A Role.B Role.B Role.A X Y (by decide)
 
 private lemma rolePairCond_BA_mul_AB {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.B Role.A X * rolePairCond Role.A Role.B Y = 0 := by
-  exact rolePairCond_mul_eq_zero Role.B Role.A Role.A Role.B X Y
-    MIPStarRE.LDT.rolePairProj_BA_mul_AB
+  exact rolePairCond_mul_eq_zero_of_ne Role.B Role.A Role.A Role.B X Y (by decide)
 
 private lemma opTensor_roleCond {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) (X Y : MIPStarRE.Quantum.Op ι) :
