@@ -67,7 +67,7 @@ import MIPStarRE.LDT.Pasting.SwitcherooCompletion
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 import MIPStarRE.LDT.Pasting.GHatFacts
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.Final
-import MIPStarRE.LDT.Pasting.Bernoulli
+import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.Pasting.ContextWrappers
 import MIPStarRE.LDT.Preliminaries.Polynomials
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement

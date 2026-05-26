@@ -571,7 +571,7 @@ hypothesis route was not adopted as the paper-facing final theorem interface.
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` | `selfImprovementInInductionSection`, ordinary slice transport, and ordinary self-improvement data constructors |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` | Answer-valued slice transport and answer-valued self-improvement data constructors |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` | Stage-data constructors, including conversion from answer-valued to ordinary self-improvement data |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `answerMainInduction`, and the checked successor construction |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean` | `mainInduction`, `mainInductionBaseCase`, `answerMainInduction`, and the checked successor construction |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | Source-final statement and obligation, current same-space interface, and proved final transport |
 | `MIPStarRE/LDT/Test/MainTheorem/RoleRegister/Core.lean` | Role-register witness constructors routed through Section 6 `mainInduction` |
 | `MIPStarRE/LDT/Test/MainTheorem/AnswerValuedRestriction.lean` | Answer-valued restricted-slice weighted bounds and recursive-slice targets |

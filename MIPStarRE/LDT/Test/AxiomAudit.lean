@@ -1,7 +1,7 @@
 import Lean
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
+import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
 import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization

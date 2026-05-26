@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
+import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
 import MIPStarRE.LDT.Preliminaries.ComparisonProjective
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
 import MIPStarRE.LDT.Preliminaries.Triangles.SimEq

@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems
+import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
 
 /-!
 # Section 6 — Corrected source-boundary induction theorem
