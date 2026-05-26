@@ -25,7 +25,7 @@ The two stale `TODO(#199)` comments in `MIPStarRE/LDT/Pasting/GHatFacts.lean` ar
 Targeted checks in this worktree succeeded:
 
 ```text
-lake build MIPStarRE.LDT.Pasting.Theorems
+lake build MIPStarRE.LDT.Pasting.Bernoulli.Final
 lake env lean MIPStarRE/LDT/Pasting/GHatFacts.lean
 lake env lean MIPStarRE/LDT/Pasting/Bernoulli/FromHToG.lean
 lake env lean MIPStarRE/LDT/Pasting/Bernoulli/Final.lean

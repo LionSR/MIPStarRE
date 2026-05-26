@@ -82,7 +82,7 @@ barrel modules, are:
 | 802 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC/Assembly.lean` |
 | 795 | `MIPStarRE/LDT/Pasting/BridgeLemmas/LdSandwichLineOnePoint/Endpoint.lean` |
 | 787 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/AddInUStep12/Selected.lean` |
-| 783 | `MIPStarRE/LDT/Preliminaries/Triangles.lean` |
+| 783 | `MIPStarRE/LDT/Preliminaries/Triangles/Core.lean` |
 
 For `Pasting/Bernoulli/Final.lean`, the largest downstream files are concentrated
 in the main-induction and final-theorem assembly:

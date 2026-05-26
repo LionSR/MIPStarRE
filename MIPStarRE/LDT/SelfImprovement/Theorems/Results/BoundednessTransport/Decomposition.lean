@@ -2,7 +2,7 @@ import MIPStarRE.LDT.Basic.QuantumState
 import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.Preliminaries.Triangles
+import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUPointConsistency

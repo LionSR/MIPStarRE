@@ -626,9 +626,9 @@ Key Lean theorem names:
 **Lean mapping**
 
 - `MIPStarRE/LDT/Pasting/Defs.lean`
-- `MIPStarRE/LDT/Pasting/Theorems.lean`
 - `MIPStarRE/LDT/Pasting/Statements.lean`
-- `MIPStarRE/LDT/Pasting/Sandwich.lean`
+- `MIPStarRE/LDT/Pasting/Sandwich/PastedFamilies.lean`
+- `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean`
 
 Key Lean theorem names:
 

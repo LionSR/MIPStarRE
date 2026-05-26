@@ -117,8 +117,8 @@ git diff --check
 | 21 | 901 | `MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic.lean` |
 | 22 | deleted | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/MoveLemmas/{Basic,TailStage}.lean` |
 | 23 | 878 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.lean` |
-| 24 | 852 | `MIPStarRE/LDT/Pasting/SwitcherooContraction.lean` |
-| 25 | 829 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean` |
+| 24 | deleted | `MIPStarRE/LDT/Pasting/SwitcherooContraction.lean` |
+| 25 | deleted | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean` |
 | 26 | 731 | `MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean` |
 | 27 | 722 | `MIPStarRE/LDT/Test/StrategyBiProj.lean` |
 | 28 | 673 | `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean` |
@@ -181,8 +181,9 @@ preserving as compatibility modules:
 - `MIPStarRE/LDT/Commutativity/ScalarApproximation.lean` imported `Core`,
   `ProcessedG`, and `Pointwise`.  This unused barrel has since been removed;
   current code imports the needed leaves directly.
-- `MIPStarRE/LDT/Pasting/BridgeLemmas.lean` imports `CommuteGHalfSandwich`,
-  `LdSandwichLineOnePoint`, `HBConsistency`, `HAConsistency`, and `OverAllOutcomes`.
+- The former `MIPStarRE/LDT/Pasting/BridgeLemmas.lean` compatibility wrapper has
+  been removed; current consumers import the concrete bridge-lemma leaves
+  directly.
 
 ### Low-conflict split pattern
 

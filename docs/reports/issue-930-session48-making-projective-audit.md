@@ -24,7 +24,7 @@ I audited the already-formalized projectivization support slice against:
 - `references/ldt-paper/inductive_step.tex:130-185`;
 - `blueprint/src/chapter/ch04_projective.tex:1-1037`, with the relevant support nodes in `blueprint/src/chapter/ch03_preliminaries.tex` and `blueprint/src/chapter/ch10_induction.tex`.
 
-The audited Lean scope was `MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkOneMeas.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkFull.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/Projectivization.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/**`, `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean`, and the completion/self-consistency support in `MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/**`, `MIPStarRE/LDT/Preliminaries/Completion.lean`, and `MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean`.  The then-existing `QXPLayerData.lean` compatibility wrapper is now subsumed by `QXPLayer/`.
+The audited Lean scope was `MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkOneMeas.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkFull.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/Projectivization.lean`, `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/**`, `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities/**`, and the completion/self-consistency support in `MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/**`, `MIPStarRE/LDT/Preliminaries/Completion.lean`, and `MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean`.  The then-existing `QXPLayerData.lean` compatibility wrapper is now subsumed by `QXPLayer/`.
 
 This scope intentionally excludes `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean`, since a separate orthonormalization-only audit was active in session 48. It also avoided the then-live `Test/MainTheorem.lean` Step-6 witness residual (#834), the then-#931 self-improvement input producer work assigned to `jizhengfeng`, and draft PR #889, which was the Lean/Mathlib v4.29.1 upgrade.  Open PR inspection at the audit snapshot found only draft #889; open issue inspection then found #931 and #834 as the live proof-work owners relevant to this slice.
 
@@ -140,7 +140,7 @@ lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/TruncationComb
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.lean
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/QCompleteness.lean
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/AlmostProjective.lean
-lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean
+lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities/ProjectorApprox.lean
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean
 lake env lean MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/Core.lean
 lake env lean MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/Local.lean
@@ -148,7 +148,7 @@ lake env lean MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/Completion.le
 lake env lean MIPStarRE/LDT/Preliminaries/Completion.lean
 lake env lean MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean
 lake build MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
-lake build MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer
+lake build MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
 rg -n "\b(sorry|axiom|admit)\b" \
   MIPStarRE/LDT/MakingMeasurementsProjective \
   MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency \

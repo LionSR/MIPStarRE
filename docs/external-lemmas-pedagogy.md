@@ -299,9 +299,9 @@ heartbeat timeout is a Mathlib performance issue, not a gap.
 
 ## 8. Chebyshev sum inequality
 
-**Paper reference**: Used internally in `Preliminaries/Triangles.lean`.
+**Paper reference**: Used internally in `Preliminaries/Triangles/Core.lean`.
 
-**Lean file**: `MIPStarRE/LDT/Preliminaries/Triangles.lean`
+**Lean file**: `MIPStarRE/LDT/Preliminaries/Triangles/Core.lean`
 
 **What the paper assumes**: Standard Chebyshev rearrangement / sum
 inequality for monotone sequences.

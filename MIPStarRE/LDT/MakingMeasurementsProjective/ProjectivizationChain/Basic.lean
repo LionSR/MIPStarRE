@@ -4,7 +4,7 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorAp
 import MIPStarRE.LDT.Preliminaries.Completion
 import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
-import MIPStarRE.LDT.Preliminaries.Triangles
+import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 
 /-!
 # Section 5 — basic projectivization data
