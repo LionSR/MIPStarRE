@@ -317,8 +317,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{proof}
 
 \begin{corollary}[First-construction completeness comparison]\label{cor:first-construction-completeness-comparison}
-	\uses{cor:first-construction-spectral-comparison, lem:looks-easy-but-took-me-a-while}
-	As in the paper, Lemma~\ref{lem:looks-easy-but-took-me-a-while} now converts
+	\uses{cor:first-construction-spectral-comparison}
+	The spectral comparison above converts
 	\eqref{eq:first-construction-spectral-defect} into the estimate
 	\[
 		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
@@ -333,6 +333,12 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	For constant~$d$, this is exactly the heuristic completeness comparison for the
 	first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \end{corollary}
+\begin{proof}
+	\uses{cor:first-construction-spectral-comparison}
+	Apply Corollary~\ref{cor:first-construction-spectral-comparison} to the
+	spectral distribution of \(G\). The displayed operator expression is the same
+	quantity written in the eigenbasis of \(G\).
+\end{proof}
 
 \subsubsection{The Second Construction}\label{sec:second-construction}
 
