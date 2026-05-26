@@ -17,26 +17,6 @@ private lemma rolePairProj_mul_same (rL rR : Role) :
     rolePairProj rL rR * rolePairProj rL rR = rolePairProj rL rR := by
   simp [rolePairProj, opTensor_mul, roleProj_mul_self]
 
-private lemma rolePairProj_AB_mul_AA :
-    rolePairProj Role.A Role.B * rolePairProj Role.A Role.A = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_mul_self, roleProj_B_mul_A]
-  simp [opTensor]
-
-private lemma rolePairProj_BA_mul_AA :
-    rolePairProj Role.B Role.A * rolePairProj Role.A Role.A = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_B_mul_A, roleProj_mul_self]
-  simp [opTensor]
-
-private lemma rolePairProj_AB_mul_BB :
-    rolePairProj Role.A Role.B * rolePairProj Role.B Role.B = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_A_mul_B, roleProj_mul_self]
-  simp [opTensor]
-
-private lemma rolePairProj_BA_mul_BB :
-    rolePairProj Role.B Role.A * rolePairProj Role.B Role.B = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_mul_self, roleProj_A_mul_B]
-  simp [opTensor]
-
 private lemma rolePairCond_mul {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL₁ rR₁ rL₂ rR₂ : Role) (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond rL₁ rR₁ X * rolePairCond rL₂ rR₂ Y =
@@ -68,6 +48,13 @@ private lemma rolePairCond_mul_eq_zero {ι : Type*} [Fintype ι] [DecidableEq ι
   rw [rolePairCond_mul, hproj]
   simp [opTensor]
 
+private lemma rolePairCond_mul_eq_zero_of_ne {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (rL₁ rR₁ rL₂ rR₂ : Role) (X Y : MIPStarRE.Quantum.Op (ι × ι))
+    (h : (rL₁, rR₁) ≠ (rL₂, rR₂)) :
+    rolePairCond rL₁ rR₁ X * rolePairCond rL₂ rR₂ Y = 0 :=
+  rolePairCond_mul_eq_zero rL₁ rR₁ rL₂ rR₂ X Y
+    (rolePairProj_mul_eq_zero_of_ne rL₁ rR₁ rL₂ rR₂ h)
+
 private lemma rolePairCond_AB_mul_BA {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond Role.A Role.B X * rolePairCond Role.B Role.A Y = 0 := by
@@ -79,26 +66,6 @@ private lemma rolePairCond_BA_mul_AB {ι : Type*} [Fintype ι] [DecidableEq ι]
     rolePairCond Role.B Role.A X * rolePairCond Role.A Role.B Y = 0 := by
   exact rolePairCond_mul_eq_zero Role.B Role.A Role.A Role.B X Y
     MIPStarRE.LDT.rolePairProj_BA_mul_AB
-
-private lemma rolePairCond_AB_mul_AA {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    rolePairCond Role.A Role.B X * rolePairCond Role.A Role.A Y = 0 := by
-  exact rolePairCond_mul_eq_zero Role.A Role.B Role.A Role.A X Y rolePairProj_AB_mul_AA
-
-private lemma rolePairCond_BA_mul_AA {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    rolePairCond Role.B Role.A X * rolePairCond Role.A Role.A Y = 0 := by
-  exact rolePairCond_mul_eq_zero Role.B Role.A Role.A Role.A X Y rolePairProj_BA_mul_AA
-
-private lemma rolePairCond_AB_mul_BB {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    rolePairCond Role.A Role.B X * rolePairCond Role.B Role.B Y = 0 := by
-  exact rolePairCond_mul_eq_zero Role.A Role.B Role.B Role.B X Y rolePairProj_AB_mul_BB
-
-private lemma rolePairCond_BA_mul_BB {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    rolePairCond Role.B Role.A X * rolePairCond Role.B Role.B Y = 0 := by
-  exact rolePairCond_mul_eq_zero Role.B Role.A Role.B Role.B X Y rolePairProj_BA_mul_BB
 
 private lemma opTensor_roleCond {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) (X Y : MIPStarRE.Quantum.Op ι) :
@@ -321,8 +288,8 @@ lemma ev_classicalRoleSymmState_rolePair_AA {ι : Type*}
   unfold classicalRoleSymmState ev
   rw [add_mul, MIPStarRE.Quantum.normalizedTrace_add,
     smul_mul_assoc, smul_mul_assoc,
-    rolePairCond_AB_mul_AA,
-    rolePairCond_BA_mul_AA]
+    rolePairCond_mul_eq_zero_of_ne Role.A Role.B Role.A Role.A _ _ (by decide),
+    rolePairCond_mul_eq_zero_of_ne Role.B Role.A Role.A Role.A _ _ (by decide)]
   simp
 
 lemma ev_classicalRoleSymmState_rolePair_BB {ι : Type*}
@@ -332,8 +299,8 @@ lemma ev_classicalRoleSymmState_rolePair_BB {ι : Type*}
   unfold classicalRoleSymmState ev
   rw [add_mul, MIPStarRE.Quantum.normalizedTrace_add,
     smul_mul_assoc, smul_mul_assoc,
-    rolePairCond_AB_mul_BB,
-    rolePairCond_BA_mul_BB]
+    rolePairCond_mul_eq_zero_of_ne Role.A Role.B Role.B Role.B _ _ (by decide),
+    rolePairCond_mul_eq_zero_of_ne Role.B Role.A Role.B Role.B _ _ (by decide)]
   simp
 
 -- The `Role.A` block of the left tensor only sees the `Role.B` principal block

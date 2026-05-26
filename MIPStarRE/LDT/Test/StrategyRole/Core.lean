@@ -131,17 +131,23 @@ def roleRegisterPairLocalEquiv (ι : Type*) :
 noncomputable def rolePairProj (rL rR : Role) : MIPStarRE.Quantum.Op (Role × Role) :=
   opTensor (roleProj rL) (roleProj rR)
 
+/-- Distinct role-pair sectors have zero product. -/
+theorem rolePairProj_mul_eq_zero_of_ne (rL rR sL sR : Role)
+    (h : (rL, rR) ≠ (sL, sR)) :
+    rolePairProj rL rR * rolePairProj sL sR = 0 := by
+  rw [rolePairProj, rolePairProj, opTensor_mul]
+  cases rL <;> cases rR <;> cases sL <;> cases sR <;>
+    simp [opTensor] at h ⊢
+
 /-- Orthogonal role-pair sectors `AB` and `BA` have zero product. -/
 @[simp] theorem rolePairProj_AB_mul_BA :
     rolePairProj Role.A Role.B * rolePairProj Role.B Role.A = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_A_mul_B, roleProj_B_mul_A]
-  simp [opTensor]
+  exact rolePairProj_mul_eq_zero_of_ne Role.A Role.B Role.B Role.A (by decide)
 
 /-- Orthogonal role-pair sectors `BA` and `AB` have zero product. -/
 @[simp] theorem rolePairProj_BA_mul_AB :
     rolePairProj Role.B Role.A * rolePairProj Role.A Role.B = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul, roleProj_B_mul_A, roleProj_A_mul_B]
-  simp [opTensor]
+  exact rolePairProj_mul_eq_zero_of_ne Role.B Role.A Role.A Role.B (by decide)
 
 /-- Reindex a bipartite local-space operator into the `(Role × ι)` local spaces and
 restrict it to the selected role sector. -/

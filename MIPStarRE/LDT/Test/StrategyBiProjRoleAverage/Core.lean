@@ -16,13 +16,6 @@ open MIPStarRE.Quantum
 
 namespace ProjStrat
 
-private theorem rolePairProj_mul_eq_zero_of_ne (rL rR sL sR : Role)
-    (h : (rL, rR) ≠ (sL, sR)) :
-    rolePairProj rL rR * rolePairProj sL sR = 0 := by
-  rw [rolePairProj, rolePairProj, opTensor_mul]
-  cases rL <;> cases rR <;> cases sL <;> cases sR <;>
-    simp [opTensor] at h ⊢
-
 theorem rolePairDirectSumCond_mul_eq_zero_of_ne {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (rL rR sL sR : Role)
