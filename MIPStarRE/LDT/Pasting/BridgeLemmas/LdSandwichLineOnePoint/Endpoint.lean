@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint.EndpointEquivs
+import MIPStarRE.LDT.Pasting.Core.LdGbcon
 
 /-!
 # Section 12 pasting: line one-point bridge — endpoint lemmas
