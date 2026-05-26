@@ -1,5 +1,5 @@
 import Lean
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
+import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
 import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
@@ -12,8 +12,8 @@ import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 import MIPStarRE.LDT.Test.MainTheorem.MainFormal
-import MIPStarRE.LDT.Test.StrategyBiProj
-import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage
+import MIPStarRE.LDT.Test.StrategyBiProj.SameSpace
+import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
 import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
 
 /-!

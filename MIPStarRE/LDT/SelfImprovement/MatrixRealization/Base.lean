@@ -1,5 +1,5 @@
 import MIPStarRE.Quantum.FiniteMatrix
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
+import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
 import MIPStarRE.LDT.SelfImprovement.Defs
 
 /-!

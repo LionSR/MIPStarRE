@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization
+import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 

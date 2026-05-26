@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage
+import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
 
 /-!
 # Heterogeneous role-register measurement extraction
