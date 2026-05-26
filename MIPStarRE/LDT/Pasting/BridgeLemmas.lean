@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
+import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes.Final
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.Final
 
 /-!

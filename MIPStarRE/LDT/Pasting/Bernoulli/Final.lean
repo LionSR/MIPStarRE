@@ -8,7 +8,7 @@ import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
-import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes
+import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes.Final
 
 /-!
 # Section 12 pasting: final pasting theorems
