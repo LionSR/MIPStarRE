@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport
+import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.Point
+import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.PointLine
 import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransportSum
 import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
 
