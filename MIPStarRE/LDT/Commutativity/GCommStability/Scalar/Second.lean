@@ -34,31 +34,6 @@ noncomputable def gCommStabilityTwoR
         Prod.snd)
     (uniformDistribution_weight_sum_le_one (Point params.next))
 
-private lemma gCommStabilityTwoR_first_factor_le_one
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (x : Fq params) :
-    ∑ g : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι) ((gCommStabilityTwoR params family G x).outcome g)) ≤ 1 := by
-  calc
-    ∑ g : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι) ((gCommStabilityTwoR params family G x).outcome g))
-      = ev strategy.state
-          (leftTensor (ι₂ := ι) ((gCommStabilityTwoR params family G x).total)) := by
-            rw [← ev_sum strategy.state]
-            rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
-              (fun g : Polynomial params => (gCommStabilityTwoR params family G x).outcome g)]
-            rw [(gCommStabilityTwoR params family G x).sum_eq_total]
-    _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-          exact ev_mono strategy.state _ _ <|
-            leftTensor_le_one (ι₂ := ι) (gCommStabilityTwoR params family G x).total_le_one
-    _ = 1 := ev_one_of_isNormalized strategy.state hnorm
-
 /-- Named scalar defect for the boundedness half of the second paper stability claim.
 
 For fixed `x`, this is the post-transport mirror analogue of
@@ -105,7 +80,8 @@ private lemma gCommStabilityTwo_scalar_pointwise_bound
     scalar_pointwise_cauchy_schwarz_bound
       params strategy zeta family G hG hbound
       (gCommStabilityTwoR params family G x) x
-      (gCommStabilityTwoR_first_factor_le_one params strategy hnorm family G x)
+      (sum_ev_leftTensor_outcome_le_one strategy.state hnorm
+        (gCommStabilityTwoR params family G x))
 
 /-- Direct boundedness proof for the second paper scalar stability estimate.
 
