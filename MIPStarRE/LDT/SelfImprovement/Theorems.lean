@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
 # Section 9 — Theorems

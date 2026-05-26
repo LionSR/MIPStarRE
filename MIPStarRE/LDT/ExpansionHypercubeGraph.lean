@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems
+import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 
 /-!
 # LDT/ExpansionHypercubeGraph — imports

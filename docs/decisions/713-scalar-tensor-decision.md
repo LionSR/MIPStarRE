@@ -178,7 +178,7 @@ cubic endpoints are compared to a common `G ⊗ G` switch-sandwich center, costi
 - Paper: `references/ldt-paper/commutativity-G.tex`, lines 332–401
 - Paper-gap note: `docs/paper-gaps/issue-713-scalar-tensor-decision.tex`
 - Source: `MIPStarRE/LDT/Commutativity/Transport/FullSlice/Averages.lean`
-- Source: `MIPStarRE/LDT/Commutativity/Transport/FullSlice.lean` (barrel)
-- Source: `MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean`
+- Source: `MIPStarRE/LDT/Commutativity/Transport/FullSlice/Bridges/ClosenessXEval.lean`
+- Source: `MIPStarRE/LDT/Commutativity/Main/Auxiliary/ScalarMarginalization.lean`
 - Source: `MIPStarRE/LDT/Commutativity/Main/EvaluatedQuestions.lean`
 - Source: `MIPStarRE/LDT/Commutativity/Main/Results.lean` (`comMain`)

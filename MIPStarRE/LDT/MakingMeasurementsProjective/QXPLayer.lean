@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
 
 /-!
 # Section 5 — Q/X/XHat/P intermediate layer

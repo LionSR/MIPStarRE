@@ -414,8 +414,8 @@ re-export file (e.g., `Theorems.lean`) that imports all the leaves:
 
 ```lean
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results
+import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 ```
 
 The compatibility module file itself contains no new declarations — it is purely a
