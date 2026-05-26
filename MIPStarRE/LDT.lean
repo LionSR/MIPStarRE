@@ -60,9 +60,11 @@ import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
 import MIPStarRE.LDT.CommutativityPoints.AnswerTheorems
 import MIPStarRE.LDT.Commutativity.Defs
 import MIPStarRE.LDT.Commutativity.Theorems
-import MIPStarRE.LDT.Pasting.Defs
+import MIPStarRE.LDT.Pasting.Defs.Families
+import MIPStarRE.LDT.Pasting.Defs.Context
 import MIPStarRE.LDT.Pasting.Statements
-import MIPStarRE.LDT.Pasting.Core
+import MIPStarRE.LDT.Pasting.Core.LdGbcon
+import MIPStarRE.LDT.Pasting.Core.CompletePart
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 import MIPStarRE.LDT.Pasting.GHatFacts

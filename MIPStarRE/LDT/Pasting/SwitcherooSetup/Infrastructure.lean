@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.Core
+import MIPStarRE.LDT.Pasting.Core.CompletePart
 
 /-!
 # Section 12 pasting: switcheroo infrastructure

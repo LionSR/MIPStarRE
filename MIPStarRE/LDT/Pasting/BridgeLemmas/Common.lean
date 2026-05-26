@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Pasting.GHatFacts
-import MIPStarRE.LDT.Pasting.Core
+import MIPStarRE.LDT.Pasting.Core.CompletePart
 import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Basic.LowDegreePolynomial
 
