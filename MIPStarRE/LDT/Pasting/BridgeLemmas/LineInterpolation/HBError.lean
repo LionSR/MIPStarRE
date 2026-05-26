@@ -1,6 +1,6 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.BadMass
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.Averaging
-import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint
+import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint.Core
 import MIPStarRE.LDT.Pasting.Core.DDistinct
 
 /-!

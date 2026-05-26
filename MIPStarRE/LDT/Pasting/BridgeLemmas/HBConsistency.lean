@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint
+import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint.Core
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.HBError
 
 /-!
