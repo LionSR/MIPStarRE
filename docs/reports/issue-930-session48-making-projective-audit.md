@@ -141,13 +141,13 @@ lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/QCompleteness.lean
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/AlmostProjective.lean
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities/ProjectorApprox.lean
-lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean
+lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain/Output.lean
 lake env lean MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/Core.lean
 lake env lean MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/Local.lean
 lake env lean MIPStarRE/LDT/Preliminaries/BipartiteSelfConsistency/Completion.lean
 lake env lean MIPStarRE/LDT/Preliminaries/Completion.lean
 lake env lean MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean
-lake build MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
+lake build MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 lake build MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
 rg -n "\b(sorry|axiom|admit)\b" \
   MIPStarRE/LDT/MakingMeasurementsProjective \
