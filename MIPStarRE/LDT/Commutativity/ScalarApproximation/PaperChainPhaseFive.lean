@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Normalization
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.PointSwap
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexing
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
+import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
 
 /-!
 # Phase-five endpoint for the evaluated-slice paper chain

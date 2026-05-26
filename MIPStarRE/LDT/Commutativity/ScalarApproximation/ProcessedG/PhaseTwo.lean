@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Normaliza
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.PointSwap
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexing
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
+import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.First
 
 /-!
 # Phase 2 stability defect infrastructure
