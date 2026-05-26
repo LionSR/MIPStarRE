@@ -13,7 +13,7 @@ Scope: docs-only split plan for #907. No Lean files were edited.
 > `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
 > `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`, together with
 > `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
-> in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`, tracked by
+> in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`, tracked by
 > #1507.  The split recommendations below should therefore be read as
 > historical refactor planning, not as a current proof-frontier inventory.
 >

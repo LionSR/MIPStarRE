@@ -18,7 +18,7 @@ Branch: `gpt55/issue-834-mainformal-residual-session40`
 > `MIPStarRE.LDT.MainInductionStep.mainInduction`.  The only construction proof
 > hole on this same-space route is
 > `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
-> in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`, tracked by
+> in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`, tracked by
 > #1507.  The source-labelled blueprint entry `thm:main-formal` is now
 > represented by
 > `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named

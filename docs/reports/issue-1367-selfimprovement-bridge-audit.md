@@ -298,7 +298,7 @@ that realize the answer-valued slice interface.
 
 ### 3.4 Downstream assembly
 
-**File:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`
+**File:** `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`
 
 - Historical `mainInductionByRecursionOnM`: took `hselfObligation` as an
   internal proof-stage input, then assembled averaged pasting data.  The
