@@ -24,11 +24,11 @@ We then combine this with the global `R ≤ (1 + 2√ζ) I` estimate to obtain
 paper's `4√ζ` truncation error.
 
 These lemmas do **not** depend on the matrix/spectral scaffolding in
-`QXPLayer/Core.lean` or `QXPLayer/RankReduction.lean`; they are pure
+`QXPLayer/Core.lean` or `QXPLayer/RankReduction/LowRank.lean`; they are pure
 combinatorics over a chosen partition. The per-projector orthonormal range
 decomposition is available as `MIPStarRE.Quantum.IsProj.rangeONB`; the concrete
 `Large/Small` choice and truncated projectors are assembled in
-`QXPLayer/RankReduction.lean`.
+`QXPLayer/RankReduction/LowRank.lean`.
 
 ## References
 
