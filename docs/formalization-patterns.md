@@ -409,8 +409,8 @@ below.
 
 ## Pattern 4: Compatibility re-export pattern
 
-Each subdirectory with multiple internal proof leaves has a root-level
-re-export file (e.g., `Theorems.lean`) that imports all the leaves:
+Public subdirectories with several proof leaves may have a root-level
+re-export file (e.g., `Theorems.lean`) that imports the source-facing leaves:
 
 ```lean
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
@@ -418,8 +418,8 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 ```
 
-The compatibility module file itself contains no new declarations — it is purely a
-re-export convenience so downstream consumers can write
+The compatibility module file itself contains no new declarations. It is a
+public import convenience so downstream consumers can write
 `import MIPStarRE.LDT.SelfImprovement.Theorems` instead of importing
 each leaf individually.
 
@@ -427,11 +427,18 @@ The top-level re-export file is `MIPStarRE.lean`, which imports all
 subdirectories.  `MIPStarRE/LDT.lean` imports all LDT subdirectories.
 
 **When to add to a re-export file**: When a new proof leaf is added to a
-subdirectory's `Theorems/` subdirectory, add its import to the compatibility module.
+public theorem or definition subdirectory and the leaf is part of the intended
+section-level API, add its import to the public compatibility module.
 
 **When not to add**: If a leaf is only used by one other leaf (internal
-helper), don't add it to the compatibility module — let the consumer import it
+helper), don't add it to the compatibility module; let the consumer import it
 directly so its API surface doesn't leak.
+
+**When not to create another wrapper**: Do not add an intermediate module whose
+only purpose is to import a single leaf, or a wrapper that is itself imported
+only by a public compatibility module.  The public module should import the
+concrete leaf directly.  Such one-step wrappers make the import graph harder to
+read without recording any new mathematical boundary.
 
 ---
 
