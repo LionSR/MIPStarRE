@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
+import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
 
 namespace MIPStarRE.LDT.Pasting
 
