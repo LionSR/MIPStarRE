@@ -10,7 +10,8 @@ import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
-import MIPStarRE.LDT.Test.MainTheorem
+import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
+import MIPStarRE.LDT.Test.MainTheorem.MainFormal
 import MIPStarRE.LDT.Test.StrategyBiProj
 import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage
 import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization

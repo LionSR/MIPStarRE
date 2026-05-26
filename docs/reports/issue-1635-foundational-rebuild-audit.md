@@ -38,7 +38,7 @@ The following counts are the transitive local imports of representative targets.
 | --- | ---: | --- | --- | --- |
 | `MIPStarRE.LDT.Pasting.Bernoulli.Final` | 202 | yes | yes | no |
 | `MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems` | 330 | yes | yes | yes |
-| `MIPStarRE.LDT.Test.MainTheorem` | 367 | yes | yes | yes |
+| `MIPStarRE.LDT.Test.MainTheorem.MainFormal` | 367 | yes | yes | yes |
 | `MIPStarRE.LDT` | 385 | yes | yes | yes |
 
 This explains the observed cost of using a final pasting or final theorem route
@@ -110,7 +110,8 @@ For edits to `MIPStarRE/LDT/Basic/LowDegreePolynomial.lean`:
    For pasting work, prefer `lake env lean
    MIPStarRE/LDT/Pasting/Bernoulli/Final.lean` before considering a main
    induction or final theorem file.
-4. Reserve `lake build`, `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`,
+4. Reserve `lake build`,
+   `lake env lean MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean`,
    and `lake env lean
    MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` for changes
    that alter public theorem statements, imports, or shared structures.
@@ -122,8 +123,8 @@ For edits to `MIPStarRE/LDT/Test/Defs.lean`:
    `MIPStarRE/LDT/Test/StrategyCore.lean`,
    `MIPStarRE/LDT/Test/SchwartzZippelStep.lean`, or
    `MIPStarRE/LDT/Preliminaries/Defs.lean`.
-3. Run `MIPStarRE/LDT/Test/MainTheorem.lean` only when the edit changes the
-   statement-level interface used by the final theorem.
+3. Run `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` only when the edit
+   changes the statement-level interface used by the final theorem.
 
 For edits to `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean`:
 

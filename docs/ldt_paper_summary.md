@@ -260,7 +260,9 @@ Important Lean theorem names already scaffolded:
 **Lean mapping**
 
 - `MIPStarRE/LDT/MakingMeasurementsProjective/Defs.lean`
-- `MIPStarRE/LDT/MakingMeasurementsProjective/Theorems.lean`
+- `MIPStarRE/LDT/MakingMeasurementsProjective/NaimarkFull.lean`
+- `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean`
+- `MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean`
 
 Key Lean theorem names:
 

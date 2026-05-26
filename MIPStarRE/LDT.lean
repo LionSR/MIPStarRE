@@ -17,7 +17,8 @@ import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.Test.SurfaceVsPoint
 import MIPStarRE.LDT.Test.SymmetrizationBridge
 import MIPStarRE.LDT.Test.Unsymmetrization
-import MIPStarRE.LDT.Test.MainTheorem
+import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
+import MIPStarRE.LDT.Test.MainTheorem.MainFormal
 import MIPStarRE.LDT.Preliminaries.FiniteFields
 import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Preliminaries.ComparisonCore
@@ -38,10 +39,12 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
-import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation
-import MIPStarRE.LDT.MakingMeasurementsProjective.Theorems
+import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
+import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.Conversion
 import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 import MIPStarRE.LDT.MainInductionStep
 import MIPStarRE.LDT.ExpansionHypercubeGraph
 import MIPStarRE.LDT.GlobalVariance.Defs
