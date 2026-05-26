@@ -12,7 +12,7 @@ low-degree-test formalization.
 ## References
 
 - `references/ldt-paper/orthonormalization.tex`, lines 570--573.
-- `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.lean`.
+- `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction/LowRank.lean`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.L2Operator

@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
 
 /-!
 # Section 5 — Q/X/XHat/P q-completeness
