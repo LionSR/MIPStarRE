@@ -47,8 +47,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169R
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 import MIPStarRE.LDT.MainInductionStep
 import MIPStarRE.LDT.ExpansionHypercubeGraph
-import MIPStarRE.LDT.GlobalVariance.Defs
-import MIPStarRE.LDT.GlobalVariance.Theorems
+import MIPStarRE.LDT.GlobalVariance.Defs.Families
+import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.SelfImprovement.Defs
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization
 import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
