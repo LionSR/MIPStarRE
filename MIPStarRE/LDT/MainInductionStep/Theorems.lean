@@ -7,7 +7,8 @@ Compatibility module re-exporting all induction-step theorem leaf modules:
 
 - `SelfImprovementAssembly`: ordinary and answer-valued self-improvement assembly,
   including the Section 6 pasting theorem
-- `InductionParameterBounds`: parameter-bound helpers for `mainInductionError < 1`
+- `InductionParameterBounds.{Averaging,MainError,SelfImprovement}`:
+  parameter-bound helpers for `mainInductionError < 1`
 - `RestrictedProbabilities`: restricted failure probability bookkeeping
 - `StageDataConstructors`: constructors for the structured induction data and
   skeletal assembly

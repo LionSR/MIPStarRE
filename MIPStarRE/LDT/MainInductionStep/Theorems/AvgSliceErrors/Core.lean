@@ -1,5 +1,7 @@
 import Mathlib.Analysis.Convex.SpecificFunctions.Pow
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
+import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Averaging
+import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.MainError
+import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.SelfImprovement
 import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 
 /-!
