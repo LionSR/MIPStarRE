@@ -1,6 +1,6 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Core
 import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds
+import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.MainError
 
 /-!
 # Section 6 -- Answer-Valued Restricted Probability Statement
