@@ -14,6 +14,47 @@
 \begin{document}
 \maketitle
 
+\section{At a glance}
+
+\begin{itemize}
+\item \textbf{Difficulty.}  This is a local quantitative repair in the
+  projectivization part of the main-induction proof.  The mathematical
+  obstruction is not the existence of the completed measurement, but the size of
+  the error term after replacing an orthonormalized submeasurement by its
+  completion.
+\item \textbf{Estimated weight.}  The remaining formal work is small to medium:
+  the local comparison lemmas are checked, while later uses must continue to
+  thread the corrected error term rather than the printed line-169 error.
+\item \textbf{Mathlib/project split.}  Mathlib supplies the Hilbert-space
+  algebra, positivity, and Cauchy--Schwarz estimates.  The project supplies the
+  state-dependent distance relations, completion construction, and
+  projectivization-chain bookkeeping.
+\item \textbf{Key mathematical inputs.}  The checked inputs are
+  \path{prop:triangle-sub}, the easy approximation-to-match-mass comparison,
+  and monotonicity of diagonal match mass under canonical completion of a
+  projective submeasurement.
+\end{itemize}
+
+\section{Key theorem forms}
+
+The paper's printed line-169 replacement would preserve the error
+\(\zeta_1\).  The formalized substitution theorem instead gives the generic
+bound
+\[
+  Q^{\mathrm A}_g \otimes I
+  \simeq_{\zeta_1+\sqrt{\zeta_2}}
+  I \otimes G^{\mathrm B}_g.
+\]
+The checked local repair uses the pre-completion orthonormalization estimate
+and the monotonicity of canonical completion to obtain the sharper corrected
+bound
+\[
+  Q^{\mathrm A}_g \otimes I
+  \simeq_{\zeta_1+10\zeta_1^{1/8}}
+  I \otimes G^{\mathrm B}_g.
+\]
+This bound is the one recorded by the projectivization-chain repair lemmas.
+
 \section{The cited step}
 
 This note concerns the projectivization step in the proof of the main induction
@@ -150,7 +191,7 @@ generic pre-completion transport theorems are
 and
 \leanid{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationLine169Repair.rightConsistency\_of\_completion\_and\_sdd}
 in
-\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean}.
+\doclink{MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain/Line169Repair.lean}.
 Specializing the $\approx$-error to
 \leanid{MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationError}
 gives

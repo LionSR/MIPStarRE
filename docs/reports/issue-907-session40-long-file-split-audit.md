@@ -13,7 +13,7 @@ Scope: docs-only split plan for #907. No Lean files were edited.
 > `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
 > `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`, together with
 > `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
-> in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean`, tracked by
+> in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`, tracked by
 > #1507.  The split recommendations below should therefore be read as
 > historical refactor planning, not as a current proof-frontier inventory.
 >
@@ -107,7 +107,7 @@ git diff --check
 | 11 | 1547 | `MIPStarRE/LDT/Pasting/BridgeLemmas/OverAllOutcomes.lean` |
 | 12 | deleted | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/AdjacentStages/Chain/` |
 | 13 | split | `MIPStarRE/LDT/Test/ErrorCascade/Definitions.lean`, `MIPStarRE/LDT/Test/ErrorCascade/EnvelopeBounds.lean`, and the leaves under `MIPStarRE/LDT/Test/ErrorCascade/CascadeBounds/`; the former `ErrorCascade.lean` wrapper has been removed |
-| 14 | 1339 | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core.lean` |
+| 14 | split | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/Core/`; the former `Core.lean` wrapper has been removed |
 | 15 | 1202 | `MIPStarRE/LDT/Pasting/Core.lean` |
 | 16 | 1132 | `MIPStarRE/LDT/Commutativity/Main/Auxiliary.lean` |
 | 17 | 1101 | `MIPStarRE/LDT/Test/StrategyRole.lean` |
@@ -117,8 +117,8 @@ git diff --check
 | 21 | 901 | `MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic.lean` |
 | 22 | deleted | `MIPStarRE/LDT/Pasting/Bernoulli/FromHToG/MoveLemmas/{Basic,TailStage}.lean` |
 | 23 | 878 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.lean` |
-| 24 | 852 | `MIPStarRE/LDT/Pasting/SwitcherooContraction.lean` |
-| 25 | 829 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean` |
+| 24 | deleted | `MIPStarRE/LDT/Pasting/SwitcherooContraction.lean` |
+| 25 | deleted | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean` |
 | 26 | 731 | `MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean` |
 | 27 | 722 | `MIPStarRE/LDT/Test/StrategyBiProj.lean` |
 | 28 | 673 | `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean` |
@@ -181,8 +181,9 @@ preserving as compatibility modules:
 - `MIPStarRE/LDT/Commutativity/ScalarApproximation.lean` imported `Core`,
   `ProcessedG`, and `Pointwise`.  This unused barrel has since been removed;
   current code imports the needed leaves directly.
-- `MIPStarRE/LDT/Pasting/BridgeLemmas.lean` imports `CommuteGHalfSandwich`,
-  `LdSandwichLineOnePoint`, `HBConsistency`, `HAConsistency`, and `OverAllOutcomes`.
+- The former `MIPStarRE/LDT/Pasting/BridgeLemmas.lean` compatibility wrapper has
+  been removed; current consumers import the concrete bridge-lemma leaves
+  directly.
 
 ### Low-conflict split pattern
 
@@ -211,7 +212,7 @@ motion.
 | 6 | `Pasting/BridgeLemmas/LineInterpolation.lean` | 2902 | `Pasting.BridgeLemmas.Common` | `Pasting/BridgeLemmas/HBConsistency.lean` | 64 public / 0 private | Good candidate; Pasting-nearby, so wait for Pasting PRs. |
 | 7 | split; former `Pasting/BridgeLemmas/CommuteGHalfSandwich/MoveChain.lean` wrapper has been removed | 2409 | `CommuteGHalfSandwich.Setup` | `Pasting/BridgeLemmas/CommuteGHalfSandwich.lean` | 1 public / 61 private | The move chain now lives in the `MoveChain/` leaves. |
 | 8 | `Commutativity/ScalarApproximation/ProcessedG.lean` | 2035 | scalar core/paper chain/residuals, evaluated-slice consequences, G-comm scalar | `LDT.lean`, `Commutativity/Main/Results.lean`, scalar barrel, `Commutativity/Theorems.lean` | 1 public / 23 private | Defer near scalar cleanup/follow-ups. |
-| 9 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` | 1886 | shared helpers core, bridge common | `Pasting/Bernoulli/FromHToG/Core.lean`, concrete `MoveChain/` leaves | 56 public / 0 private | Remaining setup work should be considered with the split move-chain leaves. |
+| 9 | `Pasting/BridgeLemmas/CommuteGHalfSandwich/Setup.lean` | 1886 | shared helpers core, bridge common | `Pasting/Bernoulli/FromHToG/Core/FactBundles.lean`, concrete `MoveChain/` leaves | 56 public / 0 private | Remaining setup work should be considered with the split move-chain leaves. |
 | 10 | `Pasting/SwitcherooCompletion.lean` | 1673 | `SwitcherooContraction`, `SwitcherooCompletion.SecondTerm` | `LDT.lean`, `SwitcherooCompletion/CompletePart.lean` | 4 public / 27 private | Already partly split; lower priority. |
 
 ## Prioritized split candidates

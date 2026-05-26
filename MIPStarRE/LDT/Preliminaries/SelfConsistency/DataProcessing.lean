@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Preliminaries.CauchySchwarz
-import MIPStarRE.LDT.Preliminaries.Triangles
+import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.Completeness
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 

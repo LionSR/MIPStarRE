@@ -185,10 +185,10 @@ Validation was run after adding this report:
 ```text
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean
 lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/Projectivization.lean
-lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean
+lake env lean MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain/Output.lean
 lake env lean MIPStarRE/LDT/Preliminaries/Completion.lean
 lake env lean MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean
-rg -n "\b(sorry|axiom|admit)\b" MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean MIPStarRE/LDT/MakingMeasurementsProjective/Projectivization.lean MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain.lean MIPStarRE/LDT/Preliminaries/Completion.lean MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean || true
+rg -n "\b(sorry|axiom|admit)\b" MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean MIPStarRE/LDT/MakingMeasurementsProjective/Projectivization.lean MIPStarRE/LDT/MakingMeasurementsProjective/ProjectivizationChain/Output.lean MIPStarRE/LDT/Preliminaries/Completion.lean MIPStarRE/LDT/Preliminaries/CompletionTransfer.lean || true
 git diff --check
 ```
 

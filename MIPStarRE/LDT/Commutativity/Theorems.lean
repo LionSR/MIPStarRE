@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Commutativity.Main
+import MIPStarRE.LDT.Commutativity.Main.Results
 
 /-!
 # Section 11 commutativity theorems

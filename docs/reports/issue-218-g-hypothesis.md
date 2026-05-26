@@ -43,9 +43,9 @@ change is needed in `Commutativity/Theorems.lean` or `Commutativity/Defs.lean`.
 
 6. Downstream consumers use the packaged theorem conclusion rather than
    reintroducing an unconstrained theorem statement. For example,
-   `Pasting/Theorems.lean` takes
-   `hcom : Commutativity.ComMainConclusion params strategy family G gamma zeta`.
-   Source: `MIPStarRE/LDT/Pasting/Theorems.lean:702-711`.
+   `Pasting/Bernoulli/Final.lean` takes
+   `hcom : Commutativity.ComMainConclusion params strategy family gamma zeta`.
+   Source: `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean`.
 
 ## Close-Worthy Comment
 

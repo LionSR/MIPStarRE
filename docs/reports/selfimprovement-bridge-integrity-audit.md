@@ -419,7 +419,7 @@ which this audit is meant to prevent.
 | `MIPStarRE/LDT/Pasting/Core.lean` | `ldPasting` — consumed by `ldPastingInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` | `selfImprovementInInductionSection` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` | answer-valued carrier self-improvement construction |
-| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionSuccessorNext_ofSmallErrorConstruction` |
+| `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean` | `mainInduction`, `mainInductionBaseCase`, `mainInductionSuccessorNext_ofSmallErrorConstruction` |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` | ordinary and answer-valued stage-data conversions |
 | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly/Successor.lean` | `assembleAveragedPastingData` |
 | `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` | source-final statement and obligation, current same-space interface, and proved final transport |

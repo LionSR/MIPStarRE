@@ -53,8 +53,8 @@ Rows marked "skip now" overlap current ownership constraints or active proof wor
 | 903 | `MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean` | Defer: Basic files are active. |
 | 901 | `MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic.lean` | Medium candidate; check scalar-chain owners first. |
 | 874 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.lean` | Candidate; below urgent threshold. |
-| 857 | `MIPStarRE/LDT/Pasting/SwitcherooContraction.lean` | Candidate; old #488 row remains substantial. |
-| 829 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean` | Candidate; below urgent threshold. |
+| deleted | `MIPStarRE/LDT/Pasting/SwitcherooContraction.lean` | Retired as a compatibility wrapper; concrete leaves remain under `Pasting/SwitcherooContraction/`. |
+| deleted | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean` | Retired as a compatibility wrapper; concrete leaves remain under `MakingMeasurementsProjective/QXPLayerIdentities/`. |
 | 673 | `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean` | Candidate only if it grows further. |
 | 658 | `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs/Fourier.lean` | Already split; below urgent threshold. |
 | 609 | `MIPStarRE/LDT/Pasting/SwitcherooCompletion/Expansion.lean` | Already factored; below urgent threshold. |

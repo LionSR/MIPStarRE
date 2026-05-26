@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Commutativity.Main.Auxiliary
+import MIPStarRE.LDT.Commutativity.Main.Auxiliary.HEvalTransport
+import MIPStarRE.LDT.Commutativity.Main.Auxiliary.ScalarMarginalization
 
 /-!
 # Section 11 commutativity: evaluated-question transport

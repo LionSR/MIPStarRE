@@ -175,13 +175,13 @@ These files use `ConsRel` or `bipartiteConsError` in a way that matches the pape
 - `MIPStarRE/LDT/Preliminaries/DistanceBounds.lean`
 - `MIPStarRE/LDT/Preliminaries/ConsistencyBridges.lean`
   The bridge from `ConsRel` to `BipartiteSDDRel` is always via left-placement for the first family and right-placement for the second.
-- `MIPStarRE/LDT/Preliminaries/Triangles.lean`
+- `MIPStarRE/LDT/Preliminaries/Triangles/Core.lean`
   Both triangle lemmas keep the first family on the left and the second on the right; they rewrite through the placement bridge rather than silently swapping arguments.
-- `MIPStarRE/LDT/Preliminaries/SelfConsistency.lean`, lines 74-158
+- `MIPStarRE/LDT/Preliminaries/SelfConsistency/Core.lean`
   `otherTwoNotionsOfSelfConsistency` uses `ConsRel ψ 𝒟 A A` and rewrites it to left/right placements of the same family, which is consistent with the bipartite reading.
 - `MIPStarRE/LDT/Pasting/Statements.lean`, lines 282-299
   The statements for `h-b-consistency` and `h-a-consistency` put the pasted family in the first slot and the line/point family in the second slot, matching the paper's displayed formulas `H ⊗ I ≃ I ⊗ B` and `H ⊗ I ≃ I ⊗ A`.
-- `MIPStarRE/LDT/Pasting/Theorems.lean`, lines 944-959
+- `MIPStarRE/LDT/Pasting/BridgeLemmas/HAConsistency.lean`
   `hAConsistency` follows the same `H ⊗ I ≃ I ⊗ A` orientation as the paper.
 
 ### 4.2 No hidden swap inside the helper APIs

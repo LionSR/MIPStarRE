@@ -37,8 +37,8 @@ The following counts are the transitive local imports of representative targets.
 | Target module | Local imports | Contains `LowDegreePolynomial` | Contains `Test.Defs` | Contains `Pasting.Bernoulli.Final` |
 | --- | ---: | --- | --- | --- |
 | `MIPStarRE.LDT.Pasting.Bernoulli.Final` | 202 | yes | yes | no |
-| `MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems` | 330 | yes | yes | yes |
-| `MIPStarRE.LDT.Test.MainTheorem` | 367 | yes | yes | yes |
+| `MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor` | 330 | yes | yes | yes |
+| `MIPStarRE.LDT.Test.MainTheorem.MainFormal` | 367 | yes | yes | yes |
 | `MIPStarRE.LDT` | 385 | yes | yes | yes |
 
 This explains the observed cost of using a final pasting or final theorem route
@@ -82,7 +82,7 @@ barrel modules, are:
 | 802 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperSSC/Assembly.lean` |
 | 795 | `MIPStarRE/LDT/Pasting/BridgeLemmas/LdSandwichLineOnePoint/Endpoint.lean` |
 | 787 | `MIPStarRE/LDT/SelfImprovement/Theorems/Results/AddInUStep12/Selected.lean` |
-| 783 | `MIPStarRE/LDT/Preliminaries/Triangles.lean` |
+| 783 | `MIPStarRE/LDT/Preliminaries/Triangles/Core.lean` |
 
 For `Pasting/Bernoulli/Final.lean`, the largest downstream files are concentrated
 in the main-induction and final-theorem assembly:
@@ -91,7 +91,7 @@ in the main-induction and final-theorem assembly:
 | ---: | --- |
 | deleted | `MIPStarRE/LDT/MainInductionStep/Theorems/PastingAssembly.lean`; declarations live in `PastingAssembly/Successor.lean` |
 | 663 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/Core.lean` |
-| 583 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` |
+| 583 | `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean` |
 | 515 | `MIPStarRE/LDT/MainInductionStep/Theorems/StageDataConstructors.lean` |
 | deleted | `MIPStarRE/LDT/MainInductionStep/Theorems/AvgSliceErrors.lean`; declarations live in `AvgSliceErrors/Core.lean` and `AvgSliceErrors/Successor.lean` |
 | 442 | `MIPStarRE/LDT/MainInductionStep/Theorems/SelfImprovementAssembly/AnswerSlice.lean` |
@@ -110,9 +110,10 @@ For edits to `MIPStarRE/LDT/Basic/LowDegreePolynomial.lean`:
    For pasting work, prefer `lake env lean
    MIPStarRE/LDT/Pasting/Bernoulli/Final.lean` before considering a main
    induction or final theorem file.
-4. Reserve `lake build`, `lake env lean MIPStarRE/LDT/Test/MainTheorem.lean`,
+4. Reserve `lake build`,
+   `lake env lean MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean`,
    and `lake env lean
-   MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems.lean` for changes
+   MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean` for changes
    that alter public theorem statements, imports, or shared structures.
 
 For edits to `MIPStarRE/LDT/Test/Defs.lean`:
@@ -122,8 +123,8 @@ For edits to `MIPStarRE/LDT/Test/Defs.lean`:
    `MIPStarRE/LDT/Test/StrategyCore.lean`,
    `MIPStarRE/LDT/Test/SchwartzZippelStep.lean`, or
    `MIPStarRE/LDT/Preliminaries/Defs.lean`.
-3. Run `MIPStarRE/LDT/Test/MainTheorem.lean` only when the edit changes the
-   statement-level interface used by the final theorem.
+3. Run `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean` only when the edit
+   changes the statement-level interface used by the final theorem.
 
 For edits to `MIPStarRE/LDT/Pasting/Bernoulli/Final.lean`:
 

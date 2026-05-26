@@ -1,6 +1,6 @@
 import MIPStarRE.LDT.Pasting.Statements
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
-import MIPStarRE.LDT.Preliminaries.Triangles
+import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 
 /-!
 # Section 12 pasting: vertical-line consistency transfer

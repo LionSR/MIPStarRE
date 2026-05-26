@@ -37,8 +37,8 @@ proof work or externally owned Pasting files.
 | 903 | `MIPStarRE/LDT/Basic/SubMeasurementFamilies.lean` | Moderate; below urgent threshold. |
 | 901 | `MIPStarRE/LDT/Commutativity/ScalarApproximation/PaperChainBasic.lean` | Skip now: active #732 area. |
 | 874 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction.lean` | Moderate candidate. |
-| 857 | `MIPStarRE/LDT/Pasting/SwitcherooContraction.lean` | Defer near Pasting work. |
-| 829 | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean` | Moderate candidate. |
+| deleted | `MIPStarRE/LDT/Pasting/SwitcherooContraction.lean` | Retired as a compatibility wrapper; concrete leaves remain under `Pasting/SwitcherooContraction/`. |
+| deleted | `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayerIdentities.lean` | Retired as a compatibility wrapper; concrete leaves remain under `MakingMeasurementsProjective/QXPLayerIdentities/`. |
 | 673 | `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean` | Low priority. |
 | 658 | `MIPStarRE/LDT/ExpansionHypercubeGraph/Defs/Fourier.lean` | Low priority. |
 | 648 | `MIPStarRE/LDT/Commutativity/GCommStability/Scalar/RawSecond.lean` | Newly split; leave alone. |
