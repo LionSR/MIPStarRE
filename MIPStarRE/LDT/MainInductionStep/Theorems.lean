@@ -13,7 +13,8 @@ Compatibility module re-exporting all induction-step theorem leaf modules:
   skeletal assembly
 - `AvgSliceErrors`: averaged slice-error bounds
 - `PastingAssembly`: pasting assembly and `assembleAveragedPastingData`
-- `MainTheorems`: corrected large-`k` top-level induction theorems
+- `MainTheorems.Base` and `MainTheorems.Successor`: corrected large-`k`
+  top-level induction theorems
 - `SourceTheorems`: corrected source-boundary theorem and public restriction data
 
 ## References
