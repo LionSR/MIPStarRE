@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.ErrorBounds
+import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.SelfImprovement
 
 /-!
 # Section 6 — Pasting Assembly: Successor Assembly
