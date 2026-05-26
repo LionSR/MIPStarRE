@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Normalization
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.PointSwap
+import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexing
 import MIPStarRE.LDT.Commutativity.GCommStability.Scalar
 
 /-!
