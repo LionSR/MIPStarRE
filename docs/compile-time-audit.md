@@ -59,7 +59,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | deleted; `GlobalVariance/Theorems/MainTheorems.lean` carries the final reductions | 2,950 | 8.6 | 14.9 | none |
 | `Pasting/Bernoulli/FromHToG/PaperBounds.lean` | 1,004 | 8.2 | 7.7 | 1× 1,000,000 |
 | split; `Test/StrategyRole/{Core,Algebra,Symmetrization}.lean` carries role-register algebra | 1,101 | 14.7 | 28.8 | none |
-| `Commutativity/ScalarApproximation/PaperChainBasic.lean` | 901 | 7.9 | 9.6 | 1× 3,000,000 + 1× 800,000 |
+| split; `Commutativity/ScalarApproximation/PaperChainBasic/{Normalization,PointSwap,Reindexing}.lean` carries the helpers | 901 | 7.9 | 9.6 | 1× 3,000,000 + 1× 800,000 |
 | `Commutativity/ScalarApproximation/PaperChainPhaseSix.lean` | 226 | 7.4 | 4.1 | 1× 10,000,000 |
 | `Commutativity/ScalarApproximation/PaperChainTail.lean` | 238 | 7.1 | 3.9 | 1× 10,000,000 |
 | deleted; `Pasting/Bernoulli/FromHToG/AdjacentStages/Chain/{HalfSandwich,FinalMove}.lean` now carries the chain | 1,533 | 7.8 | 8.5 | none |
@@ -75,7 +75,7 @@ Files sorted by heartbeat override magnitude:
 | **10,000,000** | 50× | `PaperChainPhaseSix.lean` | 226 | Reverse insertion with `closenessOfIP` normalization |
 | **10,000,000** | 50× | `PaperChainTail.lean` | 238 | Adjoint tail comparison, second-coordinate normalization |
 | **5,000,000** | 25× | `ProcessedG.lean` | 2,035 | Full scalar-chain assembly (809-line proof) |
-| **3,000,000** | 15× | `PaperChainBasic.lean` | 901 | Right-register point-swap with placed-family congruence |
+| **3,000,000** | 15× | `PaperChainBasic/{Normalization,PointSwap,Reindexing}.lean` | 901 | Right-register point-swap with placed-family congruence |
 | **1,200,000** | 6× | `GCommStability/Scalar/RawSecond.lean` | 648 | Cauchy-Schwarz + finite averages |
 | **1,000,000** | 5× | `MainInductionStep/Theorems.lean` | 3,484 | Averaged slice-to-pasting telescope |
 | **1,000,000** | 5× | `SwitcherooCompletion.lean` | 1,673 | Sqrt/rpow bound `12√ζ + 4√ν ≤ ν₂` |
