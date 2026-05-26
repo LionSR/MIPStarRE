@@ -31,29 +31,6 @@ noncomputable def gCommStabilityR
         Prod.snd)
     (uniformDistribution_weight_sum_le_one (Point params.next))
 
-private lemma gCommStabilityR_first_factor_le_one
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι) (y : Fq params) :
-    ∑ g : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι) ((gCommStabilityR params family y).outcome g)) ≤ 1 := by
-  calc
-    ∑ g : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι) ((gCommStabilityR params family y).outcome g))
-      = ev strategy.state
-          (leftTensor (ι₂ := ι) ((gCommStabilityR params family y).total)) := by
-            rw [← ev_sum strategy.state]
-            rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ
-              (fun g : Polynomial params => (gCommStabilityR params family y).outcome g)]
-            rw [(gCommStabilityR params family y).sum_eq_total]
-    _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
-          exact ev_mono strategy.state _ _ <|
-            leftTensor_le_one (ι₂ := ι) (gCommStabilityR params family y).total_le_one
-    _ = 1 := ev_one_of_isNormalized strategy.state hnorm
-
 /-- Named scalar defect for the first paper stability claim.
 
 For fixed `y`, this is the collapsed scalar from `commutativity-G.tex`,
@@ -95,7 +72,8 @@ private lemma gCommStability_scalar_pointwise_bound
     scalar_pointwise_cauchy_schwarz_bound
       params strategy zeta family G hG hbound
       (gCommStabilityR params family y) y
-      (gCommStabilityR_first_factor_le_one params strategy hnorm family y)
+      (sum_ev_leftTensor_outcome_le_one strategy.state hnorm
+        (gCommStabilityR params family y))
 
 /-- Direct boundedness proof for the first paper scalar stability estimate.
 

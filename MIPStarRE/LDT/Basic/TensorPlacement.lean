@@ -146,6 +146,20 @@ theorem leftTensor_le_one
       (B := (1 : MIPStarRE.Quantum.Op ι₂)) hA
       (zero_le_one : (0 : MIPStarRE.Quantum.Op ι₂) ≤ 1))
 
+/-- The total left-register expectation of a submeasurement is at most one on
+a normalized bipartite state. -/
+theorem sum_ev_leftTensor_outcome_le_one {α : Type*} [Fintype α]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState (ι × ι)) (hnorm : ψ.IsNormalized) (A : SubMeas α ι) :
+    ∑ a : α, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) ≤ 1 := by
+  calc
+    ∑ a : α, ev ψ (leftTensor (ι₂ := ι) (A.outcome a))
+      = ev ψ (leftTensor (ι₂ := ι) A.total) := by
+          exact (ev_leftTensor_total_eq_sum_outcome ψ A).symm
+    _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
+          exact ev_mono ψ _ _ <| leftTensor_le_one (ι₂ := ι) A.total_le_one
+    _ = 1 := ev_one_of_isNormalized ψ hnorm
+
 /-- Right tensor placement preserves the operator bound `≤ 1`. -/
 theorem rightTensor_le_one
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
