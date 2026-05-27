@@ -545,22 +545,6 @@ theorem opTensor_sum_right_finset
   | @insert a s ha ih =>
       rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_right_local, ih]
 
-/-- Compatibility alias for pulling a finite sum out of the left factor of `opTensor`. -/
-theorem opTensor_sum_left_local
-    {α ι₁ ι₂ : Type*}
-    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
-    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B :=
-  opTensor_sum_left_finset s f B
-
-/-- Compatibility alias for pulling a finite sum out of the right factor of `opTensor`. -/
-theorem opTensor_sum_right_local
-    {α ι₁ ι₂ : Type*}
-    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (A : MIPStarRE.Quantum.Op ι₁) (s : Finset α) (f : α → MIPStarRE.Quantum.Op ι₂) :
-    opTensor A (∑ a ∈ s, f a) = ∑ a ∈ s, opTensor A (f a) :=
-  opTensor_sum_right_finset A s f
-
 /-- Pull an unindexed finite-type sum out of the left factor of `opTensor`. -/
 theorem opTensor_sum_left_univ
     {α ι₁ ι₂ : Type*} [Fintype α]

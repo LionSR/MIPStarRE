@@ -79,7 +79,7 @@ lemma nonglobal_gives_slice_mismatch_against_interpolant
   intro i hiSome
   exact congrArg Polynomial.poly (hcontra i hiSome)
 
-/-- Compatibility alias for the chosen `d+1` interpolation support inside `gHatTupleSupport`. -/
+/-- The chosen `d+1` interpolation support inside `gHatTupleSupport`. -/
 noncomputable def interpolationSupportSubset
     {params : Parameters} [FieldModel params.q]
     {k : ℕ} (gs : GHatTupleOutcome params k)
