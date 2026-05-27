@@ -81,41 +81,13 @@ instance interpolationEligible_decidablePred (params : Parameters) [FieldModel p
   unfold InterpolationEligible gHatTupleHammingWeight gHatTupleSupport
   infer_instance
 
-/-- Select the first `n` elements of a finite linearly ordered set by sorting it and
-truncating the resulting list. -/
-private def takeCardSubset {α : Type*} [DecidableEq α] [LinearOrder α]
-    (s : Finset α) (n : ℕ) : Finset α :=
-  (s.sort (· ≤ ·)).take n |>.toFinset
-
-/-- The sorted-take subset produced by `takeCardSubset` stays inside the original
-finset. -/
-private theorem takeCardSubset_subset {α : Type*} [DecidableEq α] [LinearOrder α]
-    (s : Finset α) (n : ℕ) :
-    takeCardSubset s n ⊆ s := by
-  intro a ha
-  have haTake : a ∈ (s.sort (· ≤ ·)).take n := by
-    simpa [takeCardSubset] using ha
-  exact (Finset.mem_sort (s := s) (r := (· ≤ ·))).mp (List.mem_of_mem_take haTake)
-
-/-- If `n` does not exceed the size of `s`, then `takeCardSubset s n` has exactly
-`n` elements. -/
-private theorem takeCardSubset_card {α : Type*} [DecidableEq α] [LinearOrder α]
-    (s : Finset α) {n : ℕ} (hn : n ≤ s.card) :
-    (takeCardSubset s n).card = n := by
-  have hNodup : ((s.sort (· ≤ ·)).take n).Nodup := by
-    exact List.Nodup.sublist (List.take_sublist n (s.sort (· ≤ ·)))
-      (Finset.sort_nodup s (· ≤ ·))
-  rw [takeCardSubset, List.toFinset_card_of_nodup hNodup, List.length_take,
-    Finset.length_sort]
-  exact Nat.min_eq_left hn
-
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:473-482`
 (interpolation step of the second construction, requiring `|w| \geq d+1`
 genuine outcomes).
 
-A canonical `d+1`-element interpolation support together with the proof fields
-that show it lies inside the genuine completed-slice support. The support is built
-by sorting the genuine support and taking its first `d+1` indices. -/
+A `d+1`-element interpolation support together with the proof fields that show it
+lies inside the genuine completed-slice support. The support is chosen from the
+finite-set existence theorem `Finset.exists_subset_card_eq`. -/
 structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q]
     {k : ℕ} (gs : GHatTupleOutcome params k) where
   support : Finset (Fin k)
@@ -126,18 +98,21 @@ structure InterpolationSupportWitness (params : Parameters) [FieldModel params.q
 (interpolation step of the second construction, requiring `|w| \geq d+1`
 genuine outcomes).
 
-Construct an explicit `d+1`-point interpolation support inside the genuine support of
-an interpolation-eligible tuple by taking the first `d+1` indices in sorted order. -/
-def interpolationSupportWitness {params : Parameters} {k : ℕ}
+Construct a `d+1`-point interpolation support inside the genuine support of an
+interpolation-eligible tuple.
+
+**Source:** This is the source-faithful finite-support selection required by the
+interpolation step cited above; the paper assumes such a support after the
+cardinality lower bound is known. -/
+noncomputable def interpolationSupportWitness {params : Parameters} {k : ℕ}
     [FieldModel params.q] (gs : GHatTupleOutcome params k)
     (hEligible : InterpolationEligible params gs) :
     InterpolationSupportWitness params gs :=
-  { support := takeCardSubset (gHatTupleSupport gs) (params.d + 1)
-    subset_support := by
-      simpa using (takeCardSubset_subset (gHatTupleSupport gs) (params.d + 1))
-    card_eq := by
-      apply takeCardSubset_card
-      simpa using (interpolationEligible_card_le hEligible) }
+  let hs := Finset.exists_subset_card_eq (s := gHatTupleSupport gs)
+    (n := params.d + 1) (by simpa using interpolationEligible_card_le hEligible)
+  { support := Classical.choose hs
+    subset_support := (Classical.choose_spec hs).1
+    card_eq := (Classical.choose_spec hs).2 }
 
 /-- Interpolate from a specified `d+1`-element index set to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
