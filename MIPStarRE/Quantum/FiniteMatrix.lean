@@ -101,15 +101,12 @@ local instance : NonnegSpectrumClass ℝ (Op d) :=
 noncomputable local instance : NonUnitalContinuousFunctionalCalculus ℝ (Op d) IsSelfAdjoint :=
   ContinuousFunctionalCalculus.toNonUnital (R := ℝ) (A := Op d) (p := IsSelfAdjoint)
 
-private lemma trace_star_mul_self_eq_sum_col_norm_sq (Y : Op d) :
-    Complex.re (Yᴴ * Y).trace = ∑ i : d, ‖toLp 2 (Y · i)‖ ^ 2 := by
-  simp [Matrix.trace, Matrix.conjTranspose_apply, Matrix.mul_apply,
-    PiLp.norm_sq_eq_of_L2 (fun _ : d => ℂ), ← Complex.normSq_eq_norm_sq,
-    Complex.normSq_apply]
-
 private lemma col_norm_sq_le_trace_star_mul_self (Y : Op d) (i : d) :
     ‖toLp 2 (Y · i)‖ ^ 2 ≤ Complex.re (Yᴴ * Y).trace := by
-  rw [trace_star_mul_self_eq_sum_col_norm_sq]
+  rw [show Complex.re (Yᴴ * Y).trace = ∑ k : d, ‖toLp 2 (Y · k)‖ ^ 2 by
+    simp [Matrix.trace, Matrix.conjTranspose_apply, Matrix.mul_apply,
+      PiLp.norm_sq_eq_of_L2 (fun _ : d => ℂ), ← Complex.normSq_eq_norm_sq,
+      Complex.normSq_apply]]
   exact Finset.single_le_sum (fun k _ => sq_nonneg (‖toLp 2 (Y · k)‖))
     (Finset.mem_univ i)
 
