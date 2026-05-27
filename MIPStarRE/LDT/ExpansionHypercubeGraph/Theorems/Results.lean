@@ -179,8 +179,9 @@ private lemma matrixTraceForm_localToGlobal (params : Parameters)
       matrixTensorOperator (((hypercubeSpectralGap params : ℂ) •
           orthogonalModeProjectorMatrix params)) model.state.matrix ≤
         matrixTensorOperator (matrixLaplacianOperator params) model.state.matrix := by
-    exact MIPStarRE.LDT.ExpansionHypercubeGraph.matrixTensorOperator_mono_left
-      (hypercubeSpectralGap_operator params) model.state.positive
+    simpa [matrixTensorOperator] using
+      MIPStarRE.Quantum.kronecker_mono_left
+        (hypercubeSpectralGap_operator params) model.state.positive
   have hwitness :
       ((hypercubeSpectralGap params : ℂ) • matrixGlobalVarianceTraceWitness params model) ≤
         matrixLocalVarianceTraceWitness params model := by
