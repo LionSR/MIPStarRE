@@ -37,46 +37,6 @@ private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Par
   simpa [pointConditionedOutcomeOperatorAtPolynomial] using
     Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u)
 
-private theorem generalizeBLeftOperatorAtPolynomial_pos (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    0 ≤ generalizeBLeftOperatorAtPolynomial params strategy g qu := by
-  simpa [generalizeBLeftOperatorAtPolynomial] using
-    (generalizeBLeftEventSubMeasAtPolynomial params strategy g qu).outcome_pos (some ())
-
-private theorem generalizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    generalizeBLeftOperatorAtPolynomial params strategy g qu ≤ 1 := by
-  simpa [generalizeBLeftOperatorAtPolynomial] using
-    SubMeas.outcome_le_one
-      (generalizeBLeftEventSubMeasAtPolynomial params strategy g qu)
-      (some ())
-
-private theorem generalizeBRightOperatorAtPolynomial_pos (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    0 ≤ generalizeBRightOperatorAtPolynomial params strategy g qu := by
-  simpa [generalizeBRightOperatorAtPolynomial] using
-    (generalizeBRightEventSubMeasAtPolynomial params strategy g qu).outcome_pos (some ())
-
-private theorem generalizeBRightOperatorAtPolynomial_le_one (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    generalizeBRightOperatorAtPolynomial params strategy g qu ≤ 1 := by
-  simpa [generalizeBRightOperatorAtPolynomial] using
-    SubMeas.outcome_le_one
-      (generalizeBRightEventSubMeasAtPolynomial params strategy g qu)
-      (some ())
-
 /-- `CFC.sqrt (G.outcome g) ≤ 1` when `G` is a submeasurement.
 Proved via the NNReal CFC spectrum API: `G.outcome g ≤ 1` means all
 spectral values satisfy `λ ≤ 1`, so `√λ ≤ 1` as well. -/
@@ -244,13 +204,23 @@ noncomputable def generalizeBLeftFamily (params : Parameters) [FieldModel params
         simpa [weightedGeneralizeBLeftOperatorAtPolynomial] using
           (weightedPolynomialOperator_pos (ι := ι) (params := params) (G := G) (g := g)
             (A := generalizeBLeftOperatorAtPolynomial params strategy g qu)
-            (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)))
+            (by
+              simpa [generalizeBLeftOperatorAtPolynomial] using
+                (generalizeBLeftEventSubMeasAtPolynomial
+                  params strategy g qu).outcome_pos (some ()))))
       (fun g => by
         simpa [weightedGeneralizeBLeftOperatorAtPolynomial] using
           (weightedPolynomialOperator_le_one (ι := ι) (params := params) (G := G) (g := g)
             (A := generalizeBLeftOperatorAtPolynomial params strategy g qu)
-            (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
-            (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu)))
+            (by
+              simpa [generalizeBLeftOperatorAtPolynomial] using
+                (generalizeBLeftEventSubMeasAtPolynomial
+                  params strategy g qu).outcome_pos (some ()))
+            (by
+              simpa [generalizeBLeftOperatorAtPolynomial] using
+                SubMeas.outcome_le_one
+                  (generalizeBLeftEventSubMeasAtPolynomial params strategy g qu)
+                  (some ()))))
 
 /-- Aggregated family for the right-hand side of `lem:generalize-b`
 on the bipartite space `d * d`. -/
@@ -265,13 +235,23 @@ noncomputable def generalizeBRightFamily (params : Parameters) [FieldModel param
         simpa [weightedGeneralizeBRightOperatorAtPolynomial] using
           (weightedPolynomialOperator_pos (ι := ι) (params := params) (G := G) (g := g)
             (A := generalizeBRightOperatorAtPolynomial params strategy g qu)
-            (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)))
+            (by
+              simpa [generalizeBRightOperatorAtPolynomial] using
+                (generalizeBRightEventSubMeasAtPolynomial
+                  params strategy g qu).outcome_pos (some ()))))
       (fun g => by
         simpa [weightedGeneralizeBRightOperatorAtPolynomial] using
           (weightedPolynomialOperator_le_one (ι := ι) (params := params) (G := G) (g := g)
             (A := generalizeBRightOperatorAtPolynomial params strategy g qu)
-            (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
-            (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu)))
+            (by
+              simpa [generalizeBRightOperatorAtPolynomial] using
+                (generalizeBRightEventSubMeasAtPolynomial
+                  params strategy g qu).outcome_pos (some ()))
+            (by
+              simpa [generalizeBRightOperatorAtPolynomial] using
+                SubMeas.outcome_le_one
+                  (generalizeBRightEventSubMeasAtPolynomial params strategy g qu)
+                  (some ()))))
 
 /-- Aggregated family for `A^u_[g(u)] ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
