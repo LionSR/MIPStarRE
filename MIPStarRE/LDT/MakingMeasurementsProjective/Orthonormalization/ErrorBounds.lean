@@ -17,38 +17,6 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 namespace Orthonormalization
 namespace ErrorBounds
 
-/-- The quarter-root factor `2^{1/4}` is below the paper-friendly rational bound
-`25/21`, which is exactly the slack needed to turn `84·(2ζ)^{1/4}` into
-`100·ζ^{1/4}`. -/
-private lemma quarterRootTwo_le_twentyFiveTwentyOne :
-    Real.rpow (2 : Error) (1 / (4 : Error)) ≤ 25 / 21 := by
-  let x : Error := Real.rpow (2 : Error) (1 / (4 : Error))
-  have hx_nonneg : 0 ≤ x := by
-    dsimp [x]
-    exact Real.rpow_nonneg (by norm_num) _
-  have hx4 : x ^ (4 : ℕ) = 2 := by
-    change (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : ℕ) = 2
-    calc
-      (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : ℕ)
-          = (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : Error) := by
-              symm
-              exact Real.rpow_natCast _ 4
-      _ = Real.rpow (2 : Error) ((1 / (4 : Error)) * 4) := by
-              simpa using
-                (Real.rpow_mul (x := (2 : Error)) (by positivity)
-                  (1 / (4 : Error)) 4).symm
-      _ = Real.rpow (2 : Error) 1 := by norm_num
-      _ = 2 := by norm_num [Real.rpow_natCast]
-  by_contra hx_gt
-  have hx_lt : (25 / 21 : Error) < x := lt_of_not_ge hx_gt
-  have hpow_lt : (25 / 21 : Error) ^ (4 : ℕ) < x ^ (4 : ℕ) := by
-    exact pow_lt_pow_left₀ hx_lt (by positivity) (by decide)
-  have hq : (2 : Error) < (25 / 21 : Error) ^ (4 : ℕ) := by
-    norm_num
-  have : (25 / 21 : Error) ^ (4 : ℕ) < 2 := by
-    simpa [hx4] using hpow_lt
-  linarith
-
 /-- Bookkeeping for the submeasurement version of the orthonormalization theorem:
 after completing `A` by a fresh outcome, the local measurement lemma returns the
 error `84·(2ζ)^{1/4}`, which is bounded by the paper's `100·ζ^{1/4}`. -/
@@ -59,10 +27,37 @@ lemma orthonormalizationMainLemmaError_two_mul_le_orthonormalizationError
   rw [Real.mul_rpow (by positivity) hζ]
   have hconst :
       84 * Real.rpow (2 : Error) (1 / (4 : Error)) ≤ 100 := by
+    have hquarter : Real.rpow (2 : Error) (1 / (4 : Error)) ≤ 25 / 21 := by
+      let x : Error := Real.rpow (2 : Error) (1 / (4 : Error))
+      have hx_nonneg : 0 ≤ x := by
+        dsimp [x]
+        exact Real.rpow_nonneg (by norm_num) _
+      have hx4 : x ^ (4 : ℕ) = 2 := by
+        change (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : ℕ) = 2
+        calc
+          (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : ℕ)
+              = (Real.rpow (2 : Error) (1 / (4 : Error))) ^ (4 : Error) := by
+                  symm
+                  exact Real.rpow_natCast _ 4
+          _ = Real.rpow (2 : Error) ((1 / (4 : Error)) * 4) := by
+                  simpa using
+                    (Real.rpow_mul (x := (2 : Error)) (by positivity)
+                      (1 / (4 : Error)) 4).symm
+          _ = Real.rpow (2 : Error) 1 := by norm_num
+          _ = 2 := by norm_num [Real.rpow_natCast]
+      by_contra hx_gt
+      have hx_lt : (25 / 21 : Error) < x := lt_of_not_ge hx_gt
+      have hpow_lt : (25 / 21 : Error) ^ (4 : ℕ) < x ^ (4 : ℕ) := by
+        exact pow_lt_pow_left₀ hx_lt (by positivity) (by decide)
+      have hq : (2 : Error) < (25 / 21 : Error) ^ (4 : ℕ) := by
+        norm_num
+      have : (25 / 21 : Error) ^ (4 : ℕ) < 2 := by
+        simpa [hx4] using hpow_lt
+      linarith
     calc
       84 * Real.rpow (2 : Error) (1 / (4 : Error))
         ≤ 84 * (25 / 21 : Error) := by
-            refine mul_le_mul_of_nonneg_left quarterRootTwo_le_twentyFiveTwentyOne ?_
+            refine mul_le_mul_of_nonneg_left hquarter ?_
             norm_num
       _ = 100 := by norm_num
   have hquart_nonneg : 0 ≤ Real.rpow ζ (1 / (4 : Error)) := Real.rpow_nonneg hζ _
