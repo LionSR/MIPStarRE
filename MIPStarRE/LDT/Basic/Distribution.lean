@@ -36,12 +36,6 @@ end Distribution
 abbrev ProbabilityDistribution (α : Type*) :=
   {𝒟 : Distribution α // 𝒟.IsProbability}
 
-/-- Total mass is nonnegative because each weight is nonnegative. -/
-theorem Distribution.totalWeight_nonneg {α : Type*} (𝒟 : Distribution α) :
-    0 ≤ 𝒟.totalWeight := by
-  unfold Distribution.totalWeight
-  exact Finset.sum_nonneg fun a _ => 𝒟.nonnegative a
-
 /-- On a finite ambient type, a summand that vanishes outside a distribution's
 explicit support has the same total sum over all ambient values as over that support.
 
@@ -335,11 +329,6 @@ theorem weight_sum_univ_eq_one {α : Type*} [Fintype α]
 theorem weight_sum_le_one {α : Type*} (𝒟 : ProbabilityDistribution α) :
     ∑ a ∈ (𝒟 : Distribution α).support, (𝒟 : Distribution α).weight a ≤ 1 :=
   le_of_eq 𝒟.weight_sum_eq_one
-
-/-- The total mass of a bundled probability distribution is nonnegative. -/
-theorem totalWeight_nonneg {α : Type*} (𝒟 : ProbabilityDistribution α) :
-    0 ≤ (𝒟 : Distribution α).totalWeight :=
-  (𝒟 : Distribution α).totalWeight_nonneg
 
 /-- Averaging a constant against a bundled probability distribution returns that constant. -/
 theorem avgOver_const {α : Type*} (𝒟 : ProbabilityDistribution α) (c : Error) :
