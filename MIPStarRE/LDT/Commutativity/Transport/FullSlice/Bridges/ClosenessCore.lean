@@ -5,8 +5,8 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 /-!
 # Core full-slice closeness-of-inner-product bridges
 
-Standalone `closenessOfIP` scalar↔tensor bridges extracted from
-`Closeness.lean` per #1127.  These two lemmas are the core
+Standalone `closenessOfIP` scalar↔tensor bridge extracted from
+`Closeness.lean` per #1127.  This lemma is the core
 tensor-form machinery that moves a trailing measurement outcome between
 the scalar quartic and a manifestly positive tensor register.
 
@@ -128,83 +128,6 @@ lemma fullSliceABAB_scalar_to_BABAtensor
             (fun xy => ∑ g : Polynomial params, ∑ h : Polynomial params,
               ev strategy.state (C xy g h * B xy g))| := by
             rw [hScalar, hTensor]
-    _ ≤ Real.sqrt zeta := hclose
-
-
-/-- First mixed bridge in paper lines 356--360: move the already x-evaluated
-outcome from the right tensor register back to the left register. -/
-lemma xEvaluatedSliceBABAtensor_to_BABAScalar
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (hself : family.StronglySelfConsistent strategy.state zeta) :
-    |xEvaluatedSliceBABAtensorAvg params strategy family -
-        xEvaluatedSliceBABAScalarAvg params strategy family| ≤ Real.sqrt zeta := by
-  let 𝒟 : Distribution (Point params × FullSliceQuestion params) :=
-    uniformDistribution (Point params × FullSliceQuestion params)
-  let X : Point params × FullSliceQuestion params → SubMeas (Fq params) ι :=
-    fun ux => evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
-  let Y : Point params × FullSliceQuestion params → SubMeas (Polynomial params) ι :=
-    fun ux => (family.meas ux.2.2).toSubMeas
-  let A : Point params × FullSliceQuestion params → Fq params →
-      MIPStarRE.Quantum.Op (ι × ι) :=
-    fun ux a => leftTensor (ι₂ := ι) ((X ux).outcome a)
-  let B : Point params × FullSliceQuestion params → Fq params →
-      MIPStarRE.Quantum.Op (ι × ι) :=
-    fun ux a => rightTensor (ι₁ := ι) ((X ux).outcome a)
-  let C : Point params × FullSliceQuestion params → Fq params → Polynomial params →
-      MIPStarRE.Quantum.Op (ι × ι) :=
-    fun ux a h => leftTensor (ι₂ := ι)
-      ((Y ux).outcome h * (X ux).outcome a * (Y ux).outcome h)
-  have h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1 := by
-    simpa [𝒟] using uniformDistribution_weight_sum_le_one
-      (Point params × FullSliceQuestion params)
-  have hAB : avgOver 𝒟 (fun ux => qSDDCore strategy.state (A ux) (B ux)) ≤ zeta := by
-    simpa [𝒟, A, B, X] using
-      xEvaluated_selfConsistency_fst_bound params strategy family zeta hself
-  have hC :
-      ∀ ux,
-        ∑ a : Fq params,
-            (∑ h : Polynomial params, C ux a h) *
-              (∑ h : Polynomial params, C ux a h)ᴴ ≤ 1 := by
-    intro ux
-    simpa [C, X, Y] using
-      leftTensor_normalizationCondition_sandwich_bound
-        (ι := ι) (P := X ux) (Q := family.meas ux.2.2)
-  have hclose :=
-    MIPStarRE.LDT.Preliminaries.closenessOfIP
-      strategy.state hnorm 𝒟 h𝒟 A B C zeta hAB hC
-  have hScalar :
-      avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
-        ev strategy.state (C ux a h * A ux a)) =
-        xEvaluatedSliceBABAScalarAvg params strategy family := by
-    unfold xEvaluatedSliceBABAScalarAvg
-    apply avgOver_congr
-    intro ux
-    refine Finset.sum_congr rfl ?_
-    intro a _
-    refine Finset.sum_congr rfl ?_
-    intro h _
-    simp [A, C, X, Y, leftTensor_mul_leftTensor, mul_assoc]
-  have hTensor :
-      avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
-        ev strategy.state (C ux a h * B ux a)) =
-        xEvaluatedSliceBABAtensorAvg params strategy family := by
-    rw [xEvaluatedSliceBABAtensorAvg_eq_xFullData params strategy family]
-  calc
-    |xEvaluatedSliceBABAtensorAvg params strategy family -
-        xEvaluatedSliceBABAScalarAvg params strategy family|
-      = |avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
-            ev strategy.state (C ux a h * B ux a)) -
-          avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
-            ev strategy.state (C ux a h * A ux a))| := by
-          rw [hTensor, hScalar]
-    _ = |avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
-            ev strategy.state (C ux a h * A ux a)) -
-          avgOver 𝒟 (fun ux => ∑ a : Fq params, ∑ h : Polynomial params,
-            ev strategy.state (C ux a h * B ux a))| := by
-          rw [abs_sub_comm]
     _ ≤ Real.sqrt zeta := hclose
 
 end MIPStarRE.LDT.Commutativity

@@ -358,20 +358,6 @@ noncomputable def xEvaluatedFullSliceABABtensorAvg
           (leftTensor (ι₂ := ι) (A.outcome ah.1 * B.outcome ah.2 * A.outcome ah.1) *
             rightTensor (ι₁ := ι) (B.outcome ah.2)))
 
-/-- X-evaluated, y-full scalar `BABA` average used between the two paper
-line-356--360 `closenessOfIP` bridges. -/
-noncomputable def xEvaluatedSliceBABAScalarAvg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=
-  avgOver (uniformDistribution (Point params × FullSliceQuestion params))
-    (fun ux =>
-      let A : SubMeas (Fq params) ι :=
-        evaluateAt params ux.1 ((family.meas ux.2.1).toSubMeas)
-      let B : SubMeas (Polynomial params) ι := (family.meas ux.2.2).toSubMeas
-      ∑ a : Fq params, ∑ h : Polynomial params,
-        ev strategy.state
-          (leftTensor (ι₂ := ι) (B.outcome h * A.outcome a * B.outcome h * A.outcome a)))
-
 /-- Reindex mixed x-evaluated data `(u, x, y)` as `(appendPoint u x, y)`. -/
 private def xEvaluatedQuestionPointNextEquiv
     (params : Parameters) [FieldModel params.q] :
