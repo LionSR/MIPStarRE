@@ -35,15 +35,6 @@ private lemma leftTensor_outcome_conjTranspose_self
       leftTensor (ι₂ := ιB) (A.outcome a) := by
   rw [leftTensor_conjTranspose, A.outcome_hermitian]
 
-/-- The conjugate transpose of `rightTensor` of a Hermitian outcome is itself. -/
-private lemma rightTensor_outcome_conjTranspose_self
-    {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (B : SubMeas Outcome ιB) (a : Outcome) :
-    (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ =
-      rightTensor (ι₁ := ιA) (B.outcome a) := by
-  rw [rightTensor_conjTranspose, B.outcome_hermitian]
-
 /-- `leftTensor (A_a) * (leftTensor (A_a))ᴴ = leftTensor (A_a * A_a)` for Hermitian outcomes. -/
 private lemma leftTensor_outcome_mul_conjTranspose_eq
     {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
@@ -64,8 +55,7 @@ private lemma rightTensor_outcome_conjTranspose_mul_eq
     (rightTensor (ι₁ := ιA) (B.outcome a))ᴴ *
         rightTensor (ι₁ := ιA) (B.outcome a) =
       rightTensor (ι₁ := ιA) (B.outcome a * B.outcome a) := by
-  rw [rightTensor_outcome_conjTranspose_self (ιA := ιA) B a,
-    rightTensor_mul_rightTensor]
+  rw [rightTensor_conjTranspose, B.outcome_hermitian, rightTensor_mul_rightTensor]
 
 /-- Cauchy–Schwarz bound for the sum `∑_a ⟨ψ | A_a ⊗ B_a | ψ⟩`, expressed in
 terms of the left/right diagonal masses. -/
