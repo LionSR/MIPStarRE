@@ -41,17 +41,6 @@ private noncomputable def diagonalLineAnswerMeasurement
     let ℓ : DiagonalLine params := { base := s.1, direction := v }
     rw [postprocess_total, (M ℓ).total_eq_one]
 
-@[simp] private lemma postprocess_symmetrizedIdxProjMeas_outcome
-    {Question α β : Type*} {ι : Type*}
-    [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
-    (MA MB : IdxProjMeas Question α ι) (q : Question) (f : α → β) (b : β) :
-    (postprocess ((symmetrizedIdxProjMeas MA MB q).toSubMeas) f).outcome b =
-      roleCond Role.A ((postprocess ((MA q).toSubMeas) f).outcome b) +
-        roleCond Role.B ((postprocess ((MB q).toSubMeas) f).outcome b) := by
-  classical
-  simp [symmetrizedIdxProjMeas, postprocess, roleCond_finset_sum,
-    Finset.sum_add_distrib]
-
 private lemma axisParallelLineAnswerFamily_classicalRoleSymm_eq_roleSymmetrized
     {params : Parameters} [FieldModel params.q]
     {ι : Type*} [Fintype ι] [DecidableEq ι]
