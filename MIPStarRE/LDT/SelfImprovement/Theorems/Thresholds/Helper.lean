@@ -58,23 +58,6 @@ theorem d_q_ratio_le_one_of_d_le_q
     ((params.d : Error) / (params.q : Error)) ≤ 1 :=
   (div_le_one params.q_cast_pos).mpr hd_le_q
 
-/-- For `m ≥ 1`, `√(24m) ≤ 5m`. -/
-private theorem sqrt_24m_le_5m (params : Parameters) :
-    Real.sqrt (24 * (params.m : Error)) ≤ 5 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
-  have h5m_nn : (0 : Error) ≤ 5 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h5m_nn).mpr ?_
-  nlinarith [hmpos, hm1]
-
-/-- For `m ≥ 1`, `√(24 m²) ≤ 5m`. -/
-private theorem sqrt_24m_sq_le_5m (params : Parameters) :
-    Real.sqrt (24 * ((params.m : Error) ^ (2 : ℕ))) ≤ 5 * (params.m : Error) := by
-  have hmpos : (0 : Error) ≤ (params.m : Error) := m_cast_nonneg params
-  have h5m_nn : (0 : Error) ≤ 5 * (params.m : Error) := by positivity
-  refine (Real.sqrt_le_left h5m_nn).mpr ?_
-  nlinarith [sq_nonneg ((params.m : Error)), hmpos]
-
 /-- For `m ≥ 1`, `√(100m) ≤ 10m`. -/
 theorem sqrt_100m_le_10m (params : Parameters) :
     Real.sqrt (100 * (params.m : Error)) ≤ 10 * (params.m : Error) := by
@@ -169,7 +152,11 @@ theorem sqrt_selfImprovementVarianceError_le
     Real.sqrt_mul hmpos _
   -- √(24m) ≤ 5m.
   have hsqrt24m_le : Real.sqrt (24 * (params.m : Error)) ≤ 5 * (params.m : Error) :=
-    sqrt_24m_le_5m params
+    by
+      have hm1 : (1 : Error) ≤ (params.m : Error) := one_le_m_cast params
+      have h5m_nn : (0 : Error) ≤ 5 * (params.m : Error) := by positivity
+      refine (Real.sqrt_le_left h5m_nn).mpr ?_
+      nlinarith [hmpos, hm1]
   -- √(24m) * √m = √(24 m²) ≤ 5m.
   have hsplit_24m_m :
       Real.sqrt (24 * (params.m : Error)) * Real.sqrt (params.m : Error) =
@@ -180,7 +167,9 @@ theorem sqrt_selfImprovementVarianceError_le
       Real.sqrt (24 * (params.m : Error)) * Real.sqrt (params.m : Error) ≤
         5 * (params.m : Error) := by
     rw [hsplit_24m_m]
-    exact sqrt_24m_sq_le_5m params
+    have h5m_nn : (0 : Error) ≤ 5 * (params.m : Error) := by positivity
+    refine (Real.sqrt_le_left h5m_nn).mpr ?_
+    nlinarith [sq_nonneg ((params.m : Error)), hmpos]
   have hsqrt24m_nn : (0 : Error) ≤ Real.sqrt (24 * (params.m : Error)) :=
     Real.sqrt_nonneg _
   calc
