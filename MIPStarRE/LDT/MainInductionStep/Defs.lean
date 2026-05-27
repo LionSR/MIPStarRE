@@ -259,12 +259,6 @@ private noncomputable def diagonalValueRepresentative (params : Parameters)
   degreeBounded := by
     simp
 
-@[simp] private theorem diagonalValueRepresentative_apply (params : Parameters)
-    [FieldModel params.q] (a t : Fq params) :
-    diagonalValueRepresentative params a t = a := by
-  simp [diagonalValueRepresentative, DiagonalLinePolynomial.toFun,
-    evalLinePolynomialModel]
-
 /-- Restrict a diagonal-line measurement to the slice at height `x`.
 
 This is not literally the paper's outcome reindexing
@@ -479,7 +473,7 @@ point. -/
   let evalSlice : DiagonalLinePolynomial params → Fq params := fun f => f zeroCoord
   simp only [restrictDiagonalMeasurement, ProjMeas.postprocess_toSubMeas,
     SubMeas.postprocess_comp]
-  simp [diagonalValueRepresentative_apply]
+  simp [diagonalValueRepresentative, DiagonalLinePolynomial.toFun, evalLinePolynomialModel]
   rfl
 
 /-- The intermediate `ν` from `thm:main-induction`. -/
