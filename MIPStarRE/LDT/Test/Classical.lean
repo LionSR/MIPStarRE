@@ -83,26 +83,17 @@ def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
   | .A => strategy.diagonalAnswerA ℓ zeroCoord = strategy.pointAnswerB u
   | .B => strategy.pointAnswerA u = strategy.diagonalAnswerB ℓ zeroCoord
 
-/-- Reindex the two-element role average along the equivalence `Role ≃ Bool`. -/
-private def roleEquivBool : Role ≃ Bool where
-  toFun
-    | .A => false
-    | .B => true
-  invFun
-    | false => .A
-    | true => .B
-  left_inv := by
-    intro r
-    cases r <;> rfl
-  right_inv := by
-    intro b
-    cases b <;> rfl
-
 /-- A uniform average over roles is the arithmetic mean of the two role values. -/
 private theorem avgOver_uniform_role (f : Role → Error) :
     avgOver (uniformDistribution Role) f = (f Role.A + f Role.B) / 2 := by
-  rw [avgOver_uniform_equiv roleEquivBool f]
-  simp [avgOver, uniformDistribution, roleEquivBool]
+  have hcard : Fintype.card Role = 2 := by decide
+  rw [show avgOver (uniformDistribution Role) f =
+      (1 / (Fintype.card Role : Error)) * ∑ r : Role, f r by
+        simp [avgOver, uniformDistribution, Finset.mul_sum]]
+  rw [hcard]
+  rw [Fintype.sum_eq_add Role.A Role.B (by decide) (by
+    intro r hr
+    cases r <;> simp at hr)]
   ring_nf
 
 /-- Average the indicator of a decidable predicate over a uniform sample space. -/
