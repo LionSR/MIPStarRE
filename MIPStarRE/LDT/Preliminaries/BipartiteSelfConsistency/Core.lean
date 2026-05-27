@@ -76,16 +76,6 @@ lemma qSDDCore_rightTensor_eq_leftTensor_of_permInv
     _ = ev ψ ((leftTensor (ι₂ := ι) D)ᴴ * leftTensor (ι₂ := ι) D) := by
           rw [leftTensor_conjTranspose, leftTensor_mul_leftTensor]
 
-/-- `sscError` is nonneg since it averages `max 0 (...)` terms. -/
-lemma sscError_nonneg {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome ι) :
-    0 ≤ sscError ψ 𝒟 A := by
-  unfold sscError
-  exact avgOver_nonneg 𝒟 _ fun a => by unfold qSSCDefect; exact le_max_left 0 _
-
 private lemma qSDD_liftLeft_liftRight_le_two_qBipartiteSSCDefect
     {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
