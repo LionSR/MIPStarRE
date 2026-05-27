@@ -236,12 +236,6 @@ theorem card_ne_zero (q : ℕ) [FieldModel q] :
     Fintype.card (FieldModel.K q) ≠ 0 :=
   Nat.ne_of_gt (card_pos q)
 
-/-- Positivity of a bundled field model's cardinality after casting to the repository's
-real-valued error scalar type. -/
-theorem card_cast_pos (q : ℕ) [FieldModel q] :
-    0 < (Fintype.card (FieldModel.K q) : Error) :=
-  Nat.cast_pos.mpr (card_pos q)
-
 end FieldModel
 
 /-- Build the honest field model from prime-power data. -/
@@ -301,12 +295,6 @@ theorem two_le_scalar_card (params : Parameters) [FieldModel params.q] :
 theorem scalar_card_pos (params : Parameters) [FieldModel params.q] :
     0 < Fintype.card (Scalar params) :=
   lt_of_lt_of_le Nat.zero_lt_two (two_le_scalar_card params)
-
-/-- Positivity of the scalar model's cardinality after casting to the repository's
-real-valued error scalar type. -/
-theorem scalar_card_cast_pos (params : Parameters) [FieldModel params.q] :
-    0 < (Fintype.card (Scalar params) : Error) :=
-  Nat.cast_pos.mpr (scalar_card_pos params)
 
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
