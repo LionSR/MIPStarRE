@@ -11,34 +11,6 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-! ## Uniform averaging infrastructure -/
 
-private lemma avgOver_uniform_swap
-    {Question α : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    (𝒟 : Distribution Question) (f : Question → α → Error) :
-    avgOver 𝒟 (fun q => avgOver (uniformDistribution α) (fun a => f q a)) =
-      avgOver (uniformDistribution α) (fun a => avgOver 𝒟 (fun q => f q a)) := by
-  unfold avgOver uniformDistribution
-  calc
-    ∑ q ∈ 𝒟.support, 𝒟.weight q * ∑ a : α, (1 / (Fintype.card α : Error)) * f q a
-      = ∑ q ∈ 𝒟.support, ∑ a : α,
-          (1 / (Fintype.card α : Error)) * (𝒟.weight q * f q a) := by
-          refine Finset.sum_congr rfl ?_
-          intro q _
-          rw [Finset.mul_sum]
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          ring
-    _ = ∑ a : α, ∑ q ∈ 𝒟.support,
-          (1 / (Fintype.card α : Error)) * (𝒟.weight q * f q a) := by
-          rw [Finset.sum_comm]
-    _ = ∑ a : α, (1 / (Fintype.card α : Error)) *
-          ∑ q ∈ 𝒟.support, 𝒟.weight q * f q a := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [← Finset.mul_sum]
-    _ = avgOver (uniformDistribution α) (fun a => avgOver 𝒟 (fun q => f q a)) := by
-          simp [avgOver, uniformDistribution]
-
 private lemma ev_uniformAverage_sq_le_avg
     {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
     (ψ : QuantumState ι)
@@ -253,7 +225,7 @@ lemma sddRel_unit_family_of_pointwise
                 (MA q) (MB q) (fun a => A q a) (fun a => B q a) (hMA q) (hMB q)
     _ = avgOver (uniformDistribution α)
           (fun a => avgOver 𝒟 (fun q => ev ψ (((A q a - B q a)ᴴ) * (A q a - B q a)))) := by
-            exact avgOver_uniform_swap 𝒟
+            exact avgOver_comm 𝒟 (uniformDistribution α)
               (fun q a => ev ψ (((A q a - B q a)ᴴ) * (A q a - B q a)))
     _ ≤ avgOver (uniformDistribution α) (fun _ => δ) := by
           apply avgOver_mono
