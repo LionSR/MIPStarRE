@@ -173,15 +173,11 @@ private theorem ff_dotProduct_single (i : Fin m) (a : F) (v : Fin m → F) :
     exact (hi (by simp)).elim
 
 omit [Fintype F] [DecidableEq F] in
-private theorem exists_nonzero_coordinate {v : Fin m → F} (hv : v ≠ 0) :
-    ∃ i, v i ≠ 0 := by
-  simpa [funext_iff] using hv
-
-omit [Fintype F] [DecidableEq F] in
 private theorem ffVecChar_ne_zero [Finite F] {v : Fin m → F} (hv : v ≠ 0) :
     ffVecChar (p := p) (F := F) v ≠ 0 := by
   rw [AddChar.ne_zero_iff]
-  rcases exists_nonzero_coordinate (F := F) hv with ⟨i, hi⟩
+  obtain ⟨i, hi⟩ : ∃ i, v i ≠ 0 := by
+    simpa [funext_iff] using hv
   obtain ⟨b, hb0⟩ :=
     ffTrace_nondegenerate (p := p) (F := F) (a := v i) hi
   have hb : ffTrace (p := p) (F := F) (b * v i) ≠ 0 := by
