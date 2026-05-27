@@ -83,19 +83,6 @@ def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
   | .A => strategy.diagonalAnswerA ℓ zeroCoord = strategy.pointAnswerB u
   | .B => strategy.pointAnswerA u = strategy.diagonalAnswerB ℓ zeroCoord
 
-/-- A uniform average over roles is the arithmetic mean of the two role values. -/
-private theorem avgOver_uniform_role (f : Role → Error) :
-    avgOver (uniformDistribution Role) f = (f Role.A + f Role.B) / 2 := by
-  have hcard : Fintype.card Role = 2 := by decide
-  rw [show avgOver (uniformDistribution Role) f =
-      (1 / (Fintype.card Role : Error)) * ∑ r : Role, f r by
-        simp [avgOver, uniformDistribution, Finset.mul_sum]]
-  rw [hcard]
-  rw [Fintype.sum_eq_add Role.A Role.B (by decide) (by
-    intro r hr
-    cases r <;> simp at hr)]
-  ring_nf
-
 /-- Average the indicator of a decidable predicate over a uniform sample space. -/
 private noncomputable def indicatorAcceptanceProbability {β : Type*}
     [Fintype β] [DecidableEq β] [Nonempty β]
@@ -131,8 +118,21 @@ private theorem roleTaggedAcceptanceProbability_eq_roleAverage {β : Type*}
   change avgOver (uniformDistribution (Role × β)) (fun rs => F rs.1 rs.2) = _
   rw [avgOver_uniform_prod]
   simpa [F] using
-    (avgOver_uniform_role (fun r =>
-      avgOver (uniformDistribution β) fun s => F r s))
+    (show avgOver (uniformDistribution Role)
+        (fun r => avgOver (uniformDistribution β) fun s => F r s) =
+      (avgOver (uniformDistribution β) (fun s => F Role.A s) +
+        avgOver (uniformDistribution β) (fun s => F Role.B s)) / 2 by
+        have hcard : Fintype.card Role = 2 := by decide
+        rw [show avgOver (uniformDistribution Role)
+            (fun r => avgOver (uniformDistribution β) fun s => F r s) =
+          (1 / (Fintype.card Role : Error)) *
+            ∑ r : Role, avgOver (uniformDistribution β) fun s => F r s by
+              simp [avgOver, uniformDistribution, Finset.mul_sum]]
+        rw [hcard]
+        rw [Fintype.sum_eq_add Role.A Role.B (by decide) (by
+          intro r hr
+          cases r <;> simp at hr)]
+        ring_nf)
 
 /-- Axis-parallel acceptance probability for the role choice where Alice gets the
 line and Bob gets the sampled base point. -/
