@@ -65,13 +65,6 @@ private theorem natDegree_lagrangeBasis_le_card_sub_one {K ρ : Type*} [Field K]
     _ = s.card - 1 := by
           simp [Finset.card_erase_of_mem hi]
 
-/-- An interpolation-eligible tuple has at least `d+1` genuine outcomes. -/
-private theorem interpolationEligible_card_le {params : Parameters} {k : ℕ}
-    [FieldModel params.q] {gs : GHatTupleOutcome params k}
-    (hEligible : InterpolationEligible params gs) :
-    params.d + 1 ≤ (gHatTupleSupport gs).card := by
-  simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible
-
 /-- `InterpolationEligible params` is decidable without invoking classical logic:
 it is the finite inequality `d + 1 ≤ |support(gs)|`, where the support is computed
 by filtering the finite index set. -/
@@ -109,7 +102,8 @@ noncomputable def interpolationSupportWitness {params : Parameters} {k : ℕ}
     (hEligible : InterpolationEligible params gs) :
     InterpolationSupportWitness params gs :=
   let hs := Finset.exists_subset_card_eq (s := gHatTupleSupport gs)
-    (n := params.d + 1) (by simpa using interpolationEligible_card_le hEligible)
+    (n := params.d + 1) (by
+      simpa [InterpolationEligible, gHatTupleHammingWeight] using hEligible)
   { support := Classical.choose hs
     subset_support := (Classical.choose_spec hs).1
     card_eq := (Classical.choose_spec hs).2 }
