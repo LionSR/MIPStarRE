@@ -388,42 +388,6 @@ lemma fullSlice_scalar_marginalize_x
       ≤ 2 * Real.sqrt zeta + 2 * Real.sqrt zeta := htri
     _ = 4 * Real.sqrt zeta := by ring
 
-/-- Proved package for the first `closenessOfIP` leg in the y-side
-second-term prefix.
-
-The earlier prefix steps from `commutativity-G.tex` lines 332--354 are proved in
-`fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg`: `eq:gcom4` costs `√ζ` and
-`eq:gcom4-diff` costs `md/q`.  The second line-360 `closenessOfIP` bridge from
-`xEvaluatedFullSliceABABAvg` to `xEvaluatedFullSliceABABtensorAvg` is now proved
-in `xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg`.
-
-Thus this package records the first paper line-359 bridge from the
-x-evaluated `BAB ⊗ A` tensor endpoint to the scalar endpoint in the display from
-`eq:evaluate-gcom-at-points` to `eq:don't-understand-the-numbering-system`. -/
-private structure FullSliceScalarMarginalizeYFirstCloseness
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (zeta : Error) where
-  first_closeness :
-    |xEvaluatedSliceBABAtensorAvg params strategy family -
-        xEvaluatedFullSliceABABAvg params strategy family| ≤
-      Real.sqrt zeta
-
-/-- First `closenessOfIP` witness for the `y` prefix.
-
-This packages the proved paper `commutativity-G.tex` line-359 bridge.  The
-earlier `eq:gcom4`/`eq:gcom4-diff` prefix, the line-360 scalar-to-tensor bridge,
-and the y-marginalization tail are proved separately and composed below. -/
-private noncomputable def fullSliceScalarMarginalizeYFirstCloseness
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)
-    (zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (hself : family.StronglySelfConsistent strategy.state zeta) :
-    FullSliceScalarMarginalizeYFirstCloseness params strategy family zeta := by
-  exact ⟨xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
-    params strategy family zeta hnorm hself⟩
-
 /-- Paper-faithful second-term transport bound.
 
 The proved x-prefix (`eq:gcom4` plus `eq:gcom4-diff`, paper lines 332--354)
@@ -443,7 +407,7 @@ lemma fullSlice_scalar_marginalize_y
         evaluatedSliceABABAvg params strategy family| ≤
       (2 * ((↑params.m : Error) * ↑params.d / ↑params.q) + 4 * Real.sqrt zeta) := by
   let yClose :=
-    fullSliceScalarMarginalizeYFirstCloseness
+    xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
       params strategy family zeta hnorm hself
   have hxPrefix :=
     fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg
@@ -454,7 +418,7 @@ lemma fullSlice_scalar_marginalize_y
   have hsecond :=
     xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg
       params strategy family zeta hnorm hself
-  have hclose := abs_sub_le_of_two_step yClose.first_closeness hsecond
+  have hclose := abs_sub_le_of_two_step yClose hsecond
   have hclose_bound :
       |xEvaluatedSliceBABAtensorAvg params strategy family -
           xEvaluatedFullSliceABABtensorAvg params strategy family| ≤
