@@ -100,22 +100,6 @@ private lemma overAllOutcomesError_add_fromHToGError_le_ldPastingNu
           simp [MainInductionStep.ldPastingInInductionNu, kE, mE, fullSum,
             epsTerm, deltaTerm, gammaTerm, zetaTerm, dqTerm, ratio]
 
-/-- Positivity of the paper's choice `θ = 1/(200m)`. -/
-private lemma ldPasting_theta_pos (params : Parameters) :
-    (0 : Error) < 1 / (200 * (params.m : Error)) := by
-  have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
-  positivity
-
-/-- The paper's choice `θ = 1/(200m)` is strictly below `1`. -/
-private lemma ldPasting_theta_lt_one (params : Parameters) :
-    (1 / (200 * (params.m : Error)) : Error) < 1 := by
-  have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
-  have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
-    exact_mod_cast (Nat.succ_le_of_lt params.hm)
-  have hden_pos : (0 : Error) < 200 * (params.m : Error) := by positivity
-  field_simp [hden_pos.ne']
-  nlinarith
-
 /-- Paper arithmetic: for `θ = 1/(200m)`,
 `1/(1-θ) ≤ 1 + 1/(100m)`. -/
 private lemma ldPasting_theta_inv_le (params : Parameters) :
@@ -201,10 +185,19 @@ private lemma fromHToGBernoulliTailMass_lower_bound
         (1 - kappa) := by
     refine ⟨?_⟩
     simpa [subMeasMass, X, G, SubMeas.liftLeft] using hcomplete.averageCompleteness.lowerBound
+  have htheta_pos : (0 : Error) < 1 / (200 * (params.m : Error)) := by
+    have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
+    positivity
+  have htheta_lt_one : (1 / (200 * (params.m : Error)) : Error) < 1 := by
+    have hm_pos : (0 : Error) < (params.m : Error) := by exact_mod_cast params.hm
+    have hm_ge_one : (1 : Error) ≤ (params.m : Error) := by
+      exact_mod_cast (Nat.succ_le_of_lt params.hm)
+    have hden_pos : (0 : Error) < 200 * (params.m : Error) := by positivity
+    field_simp [hden_pos.ne']
+    nlinarith
   have hchern := chernoffBernoulliMatrix strategy.state strategy.isNormalized
     (1 / (200 * (params.m : Error))) k params.d X kappa
-    (ldPasting_theta_pos params) (ldPasting_theta_lt_one params)
-    (ldPasting_chernoff_size params k hk) hXpsd hXle hbase
+    htheta_pos htheta_lt_one (ldPasting_chernoff_size params k hk) hXpsd hXle hbase
   have hmassLower := hchern.matrixTailBound.lowerBound
   have hmass_eq :
       subMeasMass strategy.state
