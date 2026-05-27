@@ -319,14 +319,6 @@ theorem sddError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     0 ≤ sddError ψ 𝒟 A B := by
   unfold sddError; exact avgOver_nonneg 𝒟 _ fun q => qSDD_nonneg ψ _ _
 
-/-- The averaged consistency error is nonneg. -/
-theorem consError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A B : IdxSubMeas Question Outcome ι) :
-    0 ≤ consError ψ 𝒟 A B := by
-  unfold consError; exact avgOver_nonneg 𝒟 _ fun q => qConsDefect_nonneg ψ _ _
-
 /-- The bipartite consistency defect is nonneg by definition (`max 0 _`). -/
 theorem qBipartiteConsDefect_nonneg {Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -448,13 +440,6 @@ theorem sscError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (A : IdxSubMeas Question Outcome ι) :
     0 ≤ sscError ψ 𝒟 A := by
   unfold sscError; exact avgOver_nonneg 𝒟 _ fun q => qSSCDefect_nonneg ψ _
-
-/-- The domination defect is nonneg by definition (`max 0 _`). -/
-theorem bndError_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A : SubMeas Outcome ι) (Z : MIPStarRE.Quantum.Op ι) :
-    0 ≤ bndError ψ A Z := by
-  unfold bndError; exact le_max_left 0 _
 
 /-! ### Postprocessing preserves totals -/
 
