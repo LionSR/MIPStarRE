@@ -17,14 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma switcheroo_ev_opTensor_swap
-    (ψbi : QuantumState (ι × ι))
-    (hfix : swapDensity ψbi.density = ψbi.density)
-    (X Y : MIPStarRE.Quantum.Op ι) :
-    ev ψbi (opTensor X Y) = ev ψbi (opTensor Y X) := by
-  rw [show opTensor Y X = swapDensity (opTensor X Y) by rw [swapDensity_opTensor]]
-  exact (ev_swapDensity_of_density_fixed ψbi hfix (opTensor X Y)).symm
-
 private lemma switcherooCompletePartCenter_eq_target
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
@@ -58,7 +50,7 @@ private lemma switcherooCompletePartCenter_eq_target
           apply avgOver_congr
           intro q
           simpa using
-            (switcheroo_ev_opTensor_swap ψbi hfix
+            (ev_opTensor_swap_of_density_fixed ψbi hfix
               (((M q.2).toSubMeas).total)
               ((completePartSubMeas params family q.1).total))
     _ = switcherooAggregateTarget params ψbi family M := by
