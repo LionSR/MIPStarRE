@@ -141,13 +141,6 @@ private lemma matrixLocalVariance_eq_closedForm (params : Parameters)
               ev (matrixModelState model) ((model.family v)ᴴ * model.family u) := by
             simp [diagSum, corrSum, w, diag, corr]
 
-private lemma normalizedTrace_re_smul_real {H : FiniteHilbertSpace}
-    (r : Error) (A : MatrixOperator H) :
-    Complex.re (MIPStarRE.Quantum.normalizedTrace (((r : ℂ) • A))) =
-      r * Complex.re (MIPStarRE.Quantum.normalizedTrace A) := by
-  rw [MIPStarRE.Quantum.normalizedTrace_smul]
-  simp [Complex.mul_re]
-
 private lemma globalWitness_smul (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) (c : ℂ) :
     (matrixCombinedColumnOperator params model)ᴴ *
@@ -197,8 +190,8 @@ private lemma matrixTraceForm_localToGlobal (params : Parameters)
         Complex.re (MIPStarRE.Quantum.normalizedTrace
           (matrixLocalVarianceTraceWitness params model)) := by
     have hmono := MIPStarRE.LDT.ExpansionHypercubeGraph.normalizedTrace_re_mono hwitness
-    rw [normalizedTrace_re_smul_real] at hmono
-    exact hmono
+    rw [MIPStarRE.Quantum.normalizedTrace_smul] at hmono
+    simpa [Complex.mul_re] using hmono
   have hm_nonneg : 0 ≤ (params.m : Error) := by positivity
   have hm_ne : (params.m : Error) ≠ 0 := by
     exact_mod_cast (Nat.ne_of_gt params.hm)
