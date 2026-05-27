@@ -115,27 +115,6 @@ theorem mainFormal_source_trivial_witness
   all_goals exact ⟨le_trans
     (bipartiteConsError_uniform_le_one strategy.state strategy.isNormalized _ _) herr⟩
 
-private theorem projStrat_eps_nonneg_of_passes
-    (params : Parameters)
-    [FieldModel params.q]
-    {ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA]
-    [Fintype ιB] [DecidableEq ιB]
-    {strategy : ProjStrat params ιA ιB}
-    {eps : Error}
-    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
-    0 ≤ eps := by
-  have haxis : 0 ≤ strategy.axisParallelRoleAverage :=
-    ProjStrat.axisParallelRoleAverage_nonneg strategy
-  have hpoint : 0 ≤ strategy.pointAgreementFailureProbability :=
-    ProjStrat.pointAgreementFailureProbability_nonneg strategy
-  have hdiag : 0 ≤ strategy.diagonalRoleAverage :=
-    ProjStrat.diagonalRoleAverage_nonneg strategy
-  have hfail : 0 ≤ strategy.lowIndividualDegreeFailureProbability := by
-    unfold ProjStrat.lowIndividualDegreeFailureProbability
-    nlinarith
-  exact hfail.trans hpass.soundnessHypothesis
-
 /-- Source role-register conclusion after the scalar branch has supplied
 `0 < k`.
 
@@ -173,7 +152,7 @@ theorem mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
             (constSubMeasFamily G_B.toSubMeas)
             (mainFormalError params k eps) := by
   classical
-  have hepsNN : 0 ≤ eps := projStrat_eps_nonneg_of_passes params hpass
+  have hepsNN : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes hpass
   let scalars : MainFormalCascadeScalars params eps k :=
     MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 hsmall
   let σsrc : Error :=
