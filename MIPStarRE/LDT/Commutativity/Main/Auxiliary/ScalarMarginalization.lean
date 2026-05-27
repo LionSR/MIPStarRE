@@ -45,17 +45,6 @@ private noncomputable def evaluatedPointProj
         intro a
         exact evaluatedPointFamily_outcome_proj params family u a }
 
-/-- The averaged slice operator `G = E_x Gˣ` is a valid switch-sandwich middle
-operator. -/
-private lemma averagedSubMeas_total_bounded01
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) :
-    MIPStarRE.LDT.Preliminaries.OpBounded01
-      ((IdxPolyFamily.averagedSubMeas family).total) := by
-  refine ⟨?_, ?_⟩
-  · exact (IdxPolyFamily.averagedSubMeas family).total_nonneg
-  · exact sub_nonneg.mpr (IdxPolyFamily.averagedSubMeas family).total_le_one
-
 /-- Triangle inequality with explicit bounds for an intermediate point. -/
 private lemma abs_sub_le_of_two_step
     {a b c e₁ e₂ : Error}
@@ -334,7 +323,9 @@ lemma fullSlice_scalar_marginalize_x
       4 * Real.sqrt zeta := by
   let G : MIPStarRE.Quantum.Op ι := (IdxPolyFamily.averagedSubMeas family).total
   have hG : MIPStarRE.LDT.Preliminaries.OpBounded01 G := by
-    simpa [G] using averagedSubMeas_total_bounded01 params family
+    refine ⟨?_, ?_⟩
+    · simpa [G] using (IdxPolyFamily.averagedSubMeas family).total_nonneg
+    · simpa [G] using sub_nonneg.mpr (IdxPolyFamily.averagedSubMeas family).total_le_one
   have hfullApprox :
       MIPStarRE.LDT.Preliminaries.BipartiteSDDRel strategy.state
         (uniformDistribution (Fq params))
