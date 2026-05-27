@@ -43,26 +43,23 @@ private inductive AvgCongrPeelKind where
   | plain
   | onSupport
 
-private def avgCongrSupportHypName
-    (name? : Option (TSyntax `ident)) : TacticM Name := do
-  let base :=
+private def avgCongrSupportPeel (name? : Option (TSyntax `ident)) : TacticM Unit := do
+  evalTactic (← `(tactic| refine MIPStarRE.LDT.avgOver_congr_on_support _ _ _ ?_))
+  let varName ← match name? with
+    | some name => pure name.getId
+    | none => mkFreshUserName `x
+  let supportBase :=
     match name? with
     | some name =>
         match name.getId.eraseMacroScopes with
         | .str _ s => Name.mkSimple ("h" ++ s)
         | _ => `hmem
     | none => `hmem
+  let mut supportName := supportBase
   for decl in ← getLCtx do
-    if !decl.isImplementationDetail && decl.userName == base then
-      return ← mkFreshUserName base
-  return base
-
-private def avgCongrSupportPeel (name? : Option (TSyntax `ident)) : TacticM Unit := do
-  evalTactic (← `(tactic| refine MIPStarRE.LDT.avgOver_congr_on_support _ _ _ ?_))
-  let varName ← match name? with
-    | some name => pure name.getId
-    | none => mkFreshUserName `x
-  let supportName ← avgCongrSupportHypName name?
+    if !decl.isImplementationDetail && decl.userName == supportBase then
+      supportName ← mkFreshUserName supportBase
+      break
   let goal ← getMainGoal
   let (_, goal) ← goal.introN 2 [varName, supportName]
   replaceMainGoal [goal]
