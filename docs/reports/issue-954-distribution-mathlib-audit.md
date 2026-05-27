@@ -122,9 +122,9 @@ noncomputable def uniformDistribution (α : Type*)
 
 This file already contains project-local finite-sum adapters such as
 `Distribution.sum_univ_eq_sum_support`,
-`Distribution.weight_sum_univ_eq_totalWeight`, `avgOver_eq_sum_univ`, and
-`averageOperatorOverDistribution_eq_sum_univ`.  Those are wrappers around
-Mathlib's `Finset` API, not replacements for Mathlib probability theory.
+`Distribution.weight_sum_univ_eq_totalWeight`, and `avgOver_eq_sum_univ`.
+Those are wrappers around Mathlib's `Finset` API, not replacements for
+Mathlib probability theory.
 
 ## Can `avgOver` be expressed as a Mathlib expectation?
 
