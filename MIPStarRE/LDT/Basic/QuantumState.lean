@@ -505,16 +505,6 @@ theorem opTensor_smul_right_error
   ext x y
   simp [opTensor, mul_comm, mul_left_comm]
 
-/-- Compatibility form of right-factor real scalar linearity with an explicit complex cast. -/
-theorem opTensor_smul_right_local
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (c : Error) (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
-    opTensor A ((c : ℂ) • B) = (c : ℂ) • opTensor A B := by
-  ext x y
-  change A x.1 y.1 * ((c : ℂ) * B x.2 y.2) =
-    (c : ℂ) * (A x.1 y.1 * B x.2 y.2)
-  ring
-
 /-- `opTensor` is additive in the left factor. -/
 theorem opTensor_add_left_local
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
