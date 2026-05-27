@@ -25,21 +25,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- On a swap-invariant bipartite state, left and right placements of the same
-operator have the same expectation. -/
-private lemma ev_leftTensor_eq_rightTensor_of_density_fixed
-    (ψ : QuantumState (ι × ι))
-    (hfix : swapDensity ψ.density = ψ.density)
-    (A : MIPStarRE.Quantum.Op ι) :
-    ev ψ (leftTensor (ι₂ := ι) A) = ev ψ (rightTensor (ι₁ := ι) A) := by
-  calc
-    ev ψ (leftTensor (ι₂ := ι) A) = ev ψ (opTensor A (1 : MIPStarRE.Quantum.Op ι)) := by
-      simp [leftTensor, opTensor]
-    _ = ev ψ (opTensor (1 : MIPStarRE.Quantum.Op ι) A) := by
-      exact ev_opTensor_swap_of_density_fixed ψ hfix A (1 : MIPStarRE.Quantum.Op ι)
-    _ = ev ψ (rightTensor (ι₁ := ι) A) := by
-      simp [rightTensor, opTensor]
-
 /-- Arithmetic helper for `cor:ld-pasting-N-completeness`: absorb the
 `overAllOutcomes` and `fromHToG` scalar losses into
 `ldPastingInInductionNu`.
@@ -239,7 +224,7 @@ private lemma fromHToGBernoulliTailMass_lower_bound
           ev strategy.state
             (rightTensor (ι₁ := ι)
               (bernoulliTailOperator k params.d family.averagedSubMeas.total)) :=
-      ev_leftTensor_eq_rightTensor_of_density_fixed strategy.state strategy.densityFixed _
+      strategy.permInvState.swap_ev _
     simp [fromHToGBernoulliTailMass, bernoulliTailFromFamily, subMeasMass,
       IdxSubMeas.liftRight, constSubMeasFamily, X, G, bernoulliTailOperator_leftTensor,
       hswap]
