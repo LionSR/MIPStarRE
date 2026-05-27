@@ -292,34 +292,6 @@ lemma ldSandwichLineOnePoint_core_of_axis_self
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
       family hi hi0 hcomm hmovedEndpoint'
 
-lemma ldSandwichLineOnePoint_core
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hzeta_le : zeta ≤ 1)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta)
-    (hcomm : ∀ j : ℕ, 2 ≤ j →
-      CommuteGHalfSandwichStatement params strategy.state family
-        gamma zeta j)
-    (k i : ℕ) (hi : i < k) :
-    ConsRel strategy.state
-      (uniformDistribution (SandwichedLineQuestion params k))
-      (ldSandwichLineOnePointLeftFamily params strategy family k i)
-      (ldSandwichLineOnePointRightFamily params strategy family k i)
-      (ldSandwichLineOnePointError params eps delta gamma zeta k) := by
-  have hgamma_nonneg : 0 ≤ gamma := by
-    have hdiag_nonneg : 0 ≤ strategy.diagonalFailureProbability := by
-      unfold SymStrat.diagonalFailureProbability
-      exact mul_nonneg (by positivity)
-        (Finset.sum_nonneg fun j _ => bipartiteConsError_nonneg strategy.state _ _ _)
-    exact le_trans hdiag_nonneg hgood.diagonalLineTest
-  exact ldSandwichLineOnePoint_core_of_axis_self params strategy eps delta gamma zeta
-    hgood.axisParallelTest hgood.selfConsistencyTest hgamma_nonneg hzeta_le family hcons
-    hcomm k i hi
-
 /-- Internal form of `lem:ld-sandwich-line-one-point` after applying
 `cor:G-hat-facts`.
 
