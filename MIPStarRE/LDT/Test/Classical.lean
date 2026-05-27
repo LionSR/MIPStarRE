@@ -20,28 +20,6 @@ namespace MIPStarRE.LDT
 
 namespace Test
 
-/-- A role-tagged sample for the axis-parallel branch of the classical low
-individual degree test.
-
-We reuse `AxisParallelTestSample` from `Test.Strategy`: it packages the sampled
-base point together with the chosen coordinate direction. The outer `Role`
-indicates which prover receives the line query. -/
-abbrev ClassicalAxisParallelSample (params : Parameters) :=
-  Role × AxisParallelTestSample params
-
-/-- The self-consistency branch sends the same point query to both provers. -/
-abbrev ClassicalSelfConsistencySample (params : Parameters) :=
-  Point params
-
-/-- A role-tagged sample for the `j`-restricted diagonal branch.
-
-The full diagonal branch first samples `j : Fin params.m` uniformly and then a
-restricted diagonal sample for that `j`; the outer `Role` indicates which prover
-receives the line query. -/
-abbrev ClassicalRestrictedDiagonalSample (params : Parameters)
-    (j : Fin params.m) :=
-  Role × RestrictedDiagonalSample params j
-
 /-- Deterministic classical answers for the two provers in the low individual
 degree test. -/
 structure TwoProverClassicalLIDStrategy (params : Parameters) [FieldModel params.q] where
@@ -64,7 +42,7 @@ namespace TwoProverClassicalLIDStrategy
 branch instance. -/
 def axisParallelAccepts {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params)
-    (rs : ClassicalAxisParallelSample params) : Prop :=
+    (rs : Role × AxisParallelTestSample params) : Prop :=
   let r := rs.1
   let s := rs.2
   let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
@@ -87,7 +65,7 @@ how that term relates to the role-register-symmetrized SSC defect used
 elsewhere in the repository. -/
 def selfConsistencyAccepts {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params)
-    (u : ClassicalSelfConsistencySample params) : Prop :=
+    (u : Point params) : Prop :=
   strategy.pointAnswerA u = strategy.pointAnswerB u
 
 /-- Whether the deterministic strategy is accepted on a sampled `j`-restricted
@@ -95,7 +73,7 @@ diagonal branch instance. -/
 def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params)
     (j : Fin params.m)
-    (rs : ClassicalRestrictedDiagonalSample params j) : Prop :=
+    (rs : Role × RestrictedDiagonalSample params j) : Prop :=
   let r := rs.1
   let s := rs.2
   let ℓ : DiagonalLine params :=
@@ -222,7 +200,7 @@ individual degree test. -/
 noncomputable def selfConsistencyAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=
-  indicatorAcceptanceProbability fun u : ClassicalSelfConsistencySample params =>
+  indicatorAcceptanceProbability fun u : Point params =>
     strategy.selfConsistencyAccepts u
 
 /-- Restricted-diagonal acceptance probability for the role choice where Alice
