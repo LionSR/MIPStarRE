@@ -214,8 +214,8 @@ The endpoint-reduction scaffolding is now restored in the monolith:
 - `sandwichedLineQuestionOneEquiv`
 - `ldSandwichLineOnePointRightEndpointMeasurement`
 - `ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas`
-- `ldSandwichLineOnePoint_endpoint_ldGbcon`
-- `ldSandwichLineOnePoint_oneQuestion_ldGbcon`
+- `ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self`
+- `ldSandwichLineOnePoint_oneQuestion_ldGbcon_of_axis_self`
 
 These are intended to keep the eventual `k = 1` / endpoint `ldGbcon` collapse out of the main
 one-point theorem body.
