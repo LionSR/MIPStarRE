@@ -415,23 +415,6 @@ theorem ev_cross_term_le {ι : Type*} [Fintype ι] [DecidableEq ι]
   rw [hexp] at h
   linarith [ev_conjTranspose_mul_comm ψ A B]
 
-/-- Double-sum identity: `∑ᵢ ∑ⱼ (f i + f j) / 2 = n * ∑ f`. -/
-private theorem double_sum_avg_eq {α : Type*} [Fintype α] (f : α → ℝ) :
-    ∑ i : α, ∑ j : α, (f i + f j) / 2 =
-      (Fintype.card α : ℝ) * ∑ a : α, f a := by
-  have inner : ∀ i, ∑ j : α, (f i + f j) / 2 =
-      (Fintype.card α : ℝ) * (f i / 2) + (∑ j : α, f j) / 2 := by
-    intro i
-    simp_rw [add_div, Finset.sum_add_distrib, Finset.sum_const,
-      Finset.card_univ, nsmul_eq_mul, Finset.sum_div]
-  simp_rw [inner]
-  rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
-    nsmul_eq_mul]
-  simp_rw [show ∀ x, (Fintype.card α : ℝ) * (f x / 2) =
-    (Fintype.card α : ℝ) / 2 * f x from fun _ => by ring]
-  rw [← Finset.mul_sum]
-  ring
-
 /-- Jensen inequality for the quadratic form: for a finite family of operators,
 `ev ψ ((∑ Xᵢ)ᴴ * (∑ Xᵢ)) ≤ n * ∑ ev ψ (XᵢᴴXᵢ)`. -/
 theorem ev_sum_conjTranspose_mul_sum_le {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -453,7 +436,22 @@ theorem ev_sum_conjTranspose_mul_sum_le {ι : Type*} [Fintype ι] [DecidableEq �
           Finset.sum_le_sum fun j _ => by
             linarith [ev_cross_term_le ψ (X i) (X j)]
     _ = (Fintype.card α : ℝ) * ∑ a, ev ψ ((X a)ᴴ * X a) :=
-        double_sum_avg_eq _
+        by
+          let f : α → ℝ := fun a => ev ψ ((X a)ᴴ * X a)
+          change ∑ i : α, ∑ j : α, (f i + f j) / 2 =
+            (Fintype.card α : ℝ) * ∑ a : α, f a
+          have inner : ∀ i, ∑ j : α, (f i + f j) / 2 =
+              (Fintype.card α : ℝ) * (f i / 2) + (∑ j : α, f j) / 2 := by
+            intro i
+            simp_rw [add_div, Finset.sum_add_distrib, Finset.sum_const,
+              Finset.card_univ, nsmul_eq_mul, Finset.sum_div]
+          simp_rw [inner]
+          rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ,
+            nsmul_eq_mul]
+          simp_rw [show ∀ x, (Fintype.card α : ℝ) * (f x / 2) =
+            (Fintype.card α : ℝ) / 2 * f x from fun _ => by ring]
+          rw [← Finset.mul_sum]
+          ring
 
 /-! ### Bipartite-tensor sandwich Cauchy–Schwarz
 
