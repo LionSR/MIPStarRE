@@ -70,13 +70,6 @@ lemma fromHToG_qSDDCore_symm
   change ev ψ ((-G a)ᴴ * (-G a)) = ev ψ ((G a)ᴴ * G a)
   simp
 
-/-- Tensor product is monotone in the right factor against a PSD left factor. -/
-lemma fromHToG_opTensor_mono_right_of_nonneg
-    {A B₁ B₂ : MIPStarRE.Quantum.Op ι} :
-    0 ≤ A → B₁ ≤ B₂ → opTensor A B₁ ≤ opTensor A B₂ := by
-  intro hA hB
-  exact MIPStarRE.LDT.opTensor_mono_right hA hB
-
 /-- If `A` is PSD and `B ≤ C`, then the corresponding bipartite scalar
 expectations with left/right tensor placement are monotone in the right factor. -/
 lemma fromHToG_ev_leftTensor_rightTensor_mono_right_of_nonneg_left
@@ -87,7 +80,7 @@ lemma fromHToG_ev_leftTensor_rightTensor_mono_right_of_nonneg_left
       ev ψbi (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) C) := by
   apply ev_mono ψbi _ _
   rw [leftTensor_mul_rightTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
-  exact fromHToG_opTensor_mono_right_of_nonneg hA hBC
+  exact MIPStarRE.LDT.opTensor_mono_right hA hBC
 
 /-- If `S` is a PSD contraction commuting with `B`, then `S * B * S ≤ B`.  This
 packages the paper's `eq:S-sandwich` domination step without using explicit

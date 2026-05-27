@@ -20,12 +20,6 @@ namespace GCommStability.Scalar
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-lemma opTensor_mono_right_of_nonneg
-    {A B₁ B₂ : MIPStarRE.Quantum.Op ι} :
-    0 ≤ A → B₁ ≤ B₂ → opTensor A B₁ ≤ opTensor A B₂ := by
-  intro hA hB
-  exact MIPStarRE.LDT.opTensor_mono_right hA hB
-
 lemma averagedSlicePointEvaluationOperator_nonneg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
@@ -269,7 +263,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
               exact ev_mono strategy.state _ _ <| by
                 rw [leftTensor_mul_rightTensor_eq_opTensor,
                   leftTensor_mul_rightTensor_eq_opTensor]
-                exact opTensor_mono_right_of_nonneg
+                exact MIPStarRE.LDT.opTensor_mono_right
                   (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
                   (averagedSlicePointEvaluationOperator_sq_le_self params strategy x g)
       _ ≤ ∑ g : Polynomial params,
@@ -281,7 +275,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
               exact ev_mono strategy.state _ _ <| by
                 rw [leftTensor_mul_rightTensor_eq_opTensor,
                   leftTensor_mul_rightTensor_eq_opTensor]
-                exact opTensor_mono_right_of_nonneg
+                exact MIPStarRE.LDT.opTensor_mono_right
                   (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
                   (hbound.averagedPoint_le_witness x g)
       _ = ev strategy.state

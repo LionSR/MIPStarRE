@@ -173,7 +173,7 @@ lemma fromHToGAdjacentStage_paperMoveChain
                     dsimp [sandTerm, sandLeft]
                     rw [leftTensor_mul_rightTensor_eq_opTensor]
                     simpa [sandTerm, sandLeft, T, leftTensor, opTensor] using
-                      fromHToG_opTensor_mono_right_of_nonneg (A := T * Tᴴ) hTT_pos hS_le
+                      MIPStarRE.LDT.opTensor_mono_right (A := T * Tᴴ) hTT_pos hS_le
             _ = leftTensor (ι₂ := ι)
                   (∑ gs : GHatTupleOutcome params n,
                     let T := gHatHalfProductOutcomeOperator params family n q.2 gs
@@ -405,7 +405,7 @@ lemma fromHToGAdjacentStage_paperMoveChain
             _ ≤ leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) U := by
                   rw [leftTensor_mul_rightTensor_eq_opTensor,
                     leftTensor_mul_rightTensor_eq_opTensor]
-                  exact fromHToG_opTensor_mono_right_of_nonneg hTpos hSU_le
+                  exact MIPStarRE.LDT.opTensor_mono_right hTpos hSU_le
         calc
           ∑ ogs : GHatOutcome params × GHatTupleOutcome params n,
               (∑ _u : Unit,
