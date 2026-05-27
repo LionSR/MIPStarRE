@@ -31,19 +31,6 @@ private noncomputable def scalarBernoulliLowerTail (k degree : ℕ) (p : Error) 
 noncomputable def bernoulliTailLowerAffine (theta c : Error) (p : Error) : Error :=
   (1 - c) - ((1 / (1 - theta)) * (1 - p))
 
-/-- The scalar Bernoulli tail polynomial is nonnegative on `[0,1]`. -/
-private lemma scalarBernoulliTail_nonneg
-    (k degree : ℕ) {p : Error} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
-    0 ≤ scalarBernoulliTail k degree p := by
-  unfold scalarBernoulliTail
-  refine Finset.sum_nonneg ?_
-  intro r hr
-  apply mul_nonneg
-  · exact_mod_cast Nat.zero_le (Nat.choose k r)
-  · apply mul_nonneg
-    · exact pow_nonneg hp0 _
-    · exact pow_nonneg (sub_nonneg.mpr hp1) _
-
 /-- Hoeffding's lemma for a centered Bernoulli random variable. -/
 private lemma bernoulli_centered_mgf_le {p t : Error}
     (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
@@ -514,7 +501,15 @@ theorem bernoulliTailLowerAffine_le_scalarBernoulliTail
         scalarBernoulliTail k degree p := by
   by_cases hpθ : p < theta
   · have htail_nonneg : 0 ≤ scalarBernoulliTail k degree p :=
-      scalarBernoulliTail_nonneg k degree hp0 hp1
+      by
+        unfold scalarBernoulliTail
+        refine Finset.sum_nonneg ?_
+        intro r hr
+        apply mul_nonneg
+        · exact_mod_cast Nat.zero_le (Nat.choose k r)
+        · apply mul_nonneg
+          · exact pow_nonneg hp0 _
+          · exact pow_nonneg (sub_nonneg.mpr hp1) _
     have hθden : 0 < 1 - theta := sub_pos.mpr hθ1
     have hfrac_ge_one : 1 ≤ (1 - p) / (1 - theta) := by
       rw [one_le_div₀ hθden]
