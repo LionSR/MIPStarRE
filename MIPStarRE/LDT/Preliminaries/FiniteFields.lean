@@ -110,11 +110,6 @@ private theorem ffChar_ne_zero [Finite F] : ffChar (p := p) (F := F) ≠ 0 := by
   intro h
   exact ha ((AddChar.IsPrimitive.zmod_char_eq_one_iff p (ZMod.isPrimitive_stdAddChar p) _).mp h)
 
-omit [Fintype F] [DecidableEq F] in
-private theorem ff_char_is_primitive [Finite F] : (ffChar (p := p) (F := F)).IsPrimitive := by
-  apply AddChar.IsPrimitive.of_ne_one
-  simpa using (ffChar_ne_zero (p := p) (F := F))
-
 /-- Paper label `prop:fourier-fact-scalar`.
 
 The Fourier orthogonality relation for the finite field `F`: the expectation
@@ -135,7 +130,10 @@ theorem fourier_fact_scalar (a : F) :
           simp [ψ, ha]
         simp [ha, hψ]
       · have hψ : ψ ≠ 0 := by
-          simpa [ψ] using (ff_char_is_primitive (p := p) (F := F) ha)
+          have hprimitive : (ffChar (p := p) (F := F)).IsPrimitive := by
+            exact AddChar.IsPrimitive.of_ne_one (by
+              simpa using (ffChar_ne_zero (p := p) (F := F)))
+          simpa [ψ] using hprimitive ha
         simp [ha, hψ]
 
 section Vector
