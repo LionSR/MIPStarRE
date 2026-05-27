@@ -550,19 +550,20 @@ remains the authoritative merge gate.  The responsibilities are:
 | Source-labelled Lean declaration headers do not change silently | `pre-push`: `check_source_statement_changes.py --base origin/main` for changed LDT Lean files | Paper-facing proof-debt audit and review prompts | Local blocking guard for issue #1578.  Intentional paper-realignment changes should carry a statement-integrity audit in the PR. |
 | Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `lean_action_ci.yml` | CI remains the full repository authority. |
 | Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, rebuild changed Lean modules, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning.  The local rebuild prevents stale `.olean` files from making an existing declaration look missing. |
-| Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner, so this workflow keeps one explicit `lake build` before the audit. |
+| Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner.  The workflow therefore keeps one explicit `lake build` before the audit, but only when `blueprint_axiom_audit_needed.py` sees Lean source, Lean-facing project metadata, the audit implementation, or blueprint `\lean{}` / `\leanok` / `\notready` / `\proves{}` marker changes. |
 | Whole-project Lean compilation | `pre-push` full mode: `lake build` | `lean_action_ci.yml` | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
 | Blueprint and audit helper unit tests still pass | `pre-commit`: `python3 -m unittest discover -s scripts/tests` when any `scripts/*.py` or `scripts/tests/**` file is staged | `blueprint-sync.yml` runs the helper unit-test discovery. | The pre-commit hook is the fast local gate; blueprint-sync is the CI backstop for test regressions. |
 | Blueprint LaTeX convention lint (no active `cleveref` / `\Cref`) | `pre-commit`: `check_blueprint_latex.py --root blueprint/src` when blueprint sources or the lint script change | No dedicated CI convention gate. `leanblueprint web/pdf` catches undefined macro errors while the blueprint preamble continues not to load `cleveref`; it is not a replacement for the convention scan if `cleveref` is later introduced. | The pre-commit hook is the active scan. Bypass it with `MIPSTARRE_SKIP_HOOKS=1` only to recover from a local tooling problem. |
 | Blueprint LaTeX/PDF/web build | `pre-push`: `leanblueprint web` for `blueprint/src/` changes; full mode reruns it only if the default smoke tier did not run | `lint-blueprint.yml` and `blueprint.yml` | Local warm smoke check measured about 8 seconds on 2026-05-14; CI remains the render authority. |
 
 This split keeps the proof-status audit separate from ordinary compilation.
-`blueprint-sync.yml` still builds the repository once because `#print axioms`
-requires compiled local imports on a cold runner.  It is not a second
-compilation authority; it exists to support the blueprint `\leanok` audit.
-Path filters prevent documentation-only audit prose from starting this heavy
-workflow unless the Lean source, blueprint Lean references, declaration
-manifest, toolchain, or the audit scripts themselves changed.
+`blueprint-sync.yml` still runs the surface synchronization check for every
+matching blueprint change, but it skips the full Lean build for metadata-only
+blueprint edits such as adding `\uses{...}` edges.  It builds the repository
+only when the diff may change the set of blueprint declarations whose proof
+status is claimed, because `#print axioms` requires compiled local imports on a
+cold runner.  It is not a second compilation authority; it exists to support the
+blueprint `\leanok` audit.
 
 ### Adding or Changing a Guard
 

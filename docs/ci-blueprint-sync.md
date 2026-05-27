@@ -1,12 +1,18 @@
 # Blueprint ↔ Lean sync check
 
 The [`blueprint-sync.yml`](../.github/workflows/blueprint-sync.yml) workflow
-defends against drift between the LaTeX blueprint and the Lean source tree at
-the **axiom** level: a `\leanok` tag is only honest if the Lean proof it
-points to is free of `sorryAx` in its transitive closure.
+defends against drift between the LaTeX blueprint and the Lean source tree.  It
+always runs the name-level surface check on matching pull requests.  It also
+defends the **axiom** level when the pull request can affect proof-status
+claims: a `\leanok` tag is only honest if the Lean proof it points to is free
+of `sorryAx` in its transitive closure.
 
 It runs on every pull request that touches `blueprint/**`, `MIPStarRE/**`,
-or the toolchain files, and on manual dispatch.
+the relevant blueprint-sync scripts, the workflow itself, or the Lean
+toolchain/project files, and on manual dispatch.  The expensive Lean build and
+proof-level axiom audit are skipped for blueprint metadata-only edits such as
+adding `\uses{...}` edges, because such edits do not change the set of Lean
+declarations whose proof status is claimed.
 
 > **Current mode: advisory.** The check runs with `continue-on-error: true`
 > so it does not block merging. Once the codebase reaches zero sorry sites,
@@ -51,20 +57,24 @@ observed `\leanok` placement (`[\leanok: statement-level]` or
 `[\leanok: proof-level]`) so reviewers can distinguish statement-sync work
 from proof-completion work at a glance.
 
-The axiom closure is obtained by `lake env lean`-ing a throwaway harness that
-runs `#print axioms Name` for each unique declaration. Lines are attributed
-to a declaration **by the quoted `'Name'` / `` `Name` `` subject first**
-(this is what Lean 4.28 emits with its plain-line format: `'Name' depends
-on axioms: […]` / `'Name' does not depend on any axioms`), and only fall
-back to a strict `<harness-path>:line:col:` location prefix (historical
-format). Arbitrary `file:line:col:` prefixes from imported modules are
-deliberately **not** trusted — a stray warning such as
-`./MIPStarRE/Foo.lean:4:0: warning: …` would otherwise misattribute lines
-to whichever declaration happens to sit on line 4 of the harness. ANSI
-colour escapes are stripped before parsing. Pattern matching
-(`Unknown identifier` / `Unknown constant`, `does not depend on any
-axioms`, `depends on axioms: […]`) is performed case-insensitively so
-both Lean 4.28's capital-U form and older lowercase forms are accepted.
+The workflow first uses `scripts/blueprint_axiom_audit_needed.py` to decide
+whether the axiom closure can have changed.  The heavy audit runs when the diff
+touches Lean source, Lean-facing project metadata, the axiom-audit
+implementation, the workflow, or a blueprint formalization marker
+(`\lean{...}`, `\leanok`, `\notready`, or `\proves{...}`).  When it runs, the
+axiom closure is obtained by `lake env lean`-ing a throwaway harness that runs
+`#print axioms Name` for each unique declaration. Lines are attributed to a
+declaration **by the quoted `'Name'` / `` `Name` `` subject first** (this is
+what Lean 4.28 emits with its plain-line format: `'Name' depends on axioms:
+[…]` / `'Name' does not depend on any axioms`), and only fall back to a strict
+`<harness-path>:line:col:` location prefix (historical format). Arbitrary
+`file:line:col:` prefixes from imported modules are deliberately **not**
+trusted — a stray warning such as `./MIPStarRE/Foo.lean:4:0: warning: …` would
+otherwise misattribute lines to whichever declaration happens to sit on line 4
+of the harness. ANSI colour escapes are stripped before parsing. Pattern
+matching (`Unknown identifier` / `Unknown constant`, `does not depend on any
+axioms`, `depends on axioms: […]`) is performed case-insensitively so both Lean
+4.28's capital-U form and older lowercase forms are accepted.
 
 **Two distinct global/local failure modes:**
 
@@ -136,6 +146,12 @@ For fast parse-only smoke tests before the Lean proof-level check:
 ```bash
 python scripts/check_blueprint_latex.py --root blueprint/src
 python scripts/blueprint_lean_sync.py --root . --ci
+```
+
+To check whether a pull request needs the proof-level axiom audit:
+
+```bash
+python scripts/blueprint_axiom_audit_needed.py --base-ref origin/main
 ```
 
 To verify the check actually fails on drift, temporarily replace the proof of

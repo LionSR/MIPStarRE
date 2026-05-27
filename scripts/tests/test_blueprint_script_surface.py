@@ -21,6 +21,10 @@ BLUEPRINT_SUPPORT_SCRIPTS = {
         "tests": {"scripts/tests/test_blueprint_leanok_axioms.py"},
         "workflows": {".github/workflows/blueprint-sync.yml"},
     },
+    "scripts/blueprint_axiom_audit_needed.py": {
+        "tests": {"scripts/tests/test_blueprint_axiom_audit_needed.py"},
+        "workflows": {".github/workflows/blueprint-sync.yml"},
+    },
     "scripts/audit_blueprint_high_risk_links.py": {
         "tests": {"scripts/tests/test_audit_blueprint_high_risk_links.py"},
         "workflows": set(),
@@ -50,6 +54,7 @@ BLUEPRINT_SUPPORT_SCRIPTS = {
 WORKFLOW_REQUIRED_PATHS = {
     ".github/workflows/blueprint-sync.yml": {
         "scripts/blueprint_lean_sync.py",
+        "scripts/blueprint_axiom_audit_needed.py",
         "scripts/blueprint_leanok_axioms.py",
         "scripts/tex_utils.py",
         "scripts/tests/**",

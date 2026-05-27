@@ -9,6 +9,7 @@ on:
       - 'lakefile.toml'
       - 'lake-manifest.json'
       - 'lean-toolchain'
+      - 'scripts/blueprint_axiom_audit_needed.py'
       - 'scripts/blueprint_lean_sync.py'
       - 'scripts/blueprint_leanok_axioms.py'
       - 'scripts/tex_utils.py'
@@ -28,6 +29,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@v6
         with:
@@ -42,11 +45,26 @@ jobs:
       - name: Check blueprint ↔ Lean surface sync
         run: python3 scripts/blueprint_lean_sync.py --root . --ci
 
+      - name: Decide whether the axiom audit is needed
+        id: axiom-audit-needed
+        env:
+          BASE_REF: origin/${{ github.base_ref || 'main' }}
+        run: python3 scripts/blueprint_axiom_audit_needed.py --base-ref "$BASE_REF" --github-output
+
       - name: Set up Lean toolchain and fetch Mathlib cache
+        if: >-
+          github.event_name == 'workflow_dispatch' ||
+          steps.axiom-audit-needed.outputs.needs_axiom_audit == 'true'
         uses: ./.github/actions/setup-lean
 
       - name: Build MIPStarRE
+        if: >-
+          github.event_name == 'workflow_dispatch' ||
+          steps.axiom-audit-needed.outputs.needs_axiom_audit == 'true'
         run: lake build
 
       - name: Check \leanok declarations are sorry-free
+        if: >-
+          github.event_name == 'workflow_dispatch' ||
+          steps.axiom-audit-needed.outputs.needs_axiom_audit == 'true'
         run: python3 scripts/blueprint_leanok_axioms.py --ci
