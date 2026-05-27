@@ -60,35 +60,6 @@ structure TwoProverClassicalLIDStrategy (params : Parameters) [FieldModel params
 
 namespace TwoProverClassicalLIDStrategy
 
-/-- The axis-parallel line carried by an `AxisParallelTestSample`. -/
-def axisParallelLineOfSample (params : Parameters)
-    (s : AxisParallelTestSample params) : AxisParallelLine params where
-  base := s.1
-  direction := s.2
-
-/-- The sampled point in the axis-parallel branch is the line's base point. -/
-def axisParallelPointOfSample (params : Parameters)
-    (s : AxisParallelTestSample params) : Point params :=
-  s.1
-
-/-- The full diagonal direction encoded by a restricted diagonal sample. -/
-def restrictedDiagonalDirectionOfSample {params : Parameters}
-    [FieldModel params.q] (j : Fin params.m)
-    (s : RestrictedDiagonalSample params j) : Point params :=
-  extendRestrictedDirection j s.2
-
-/-- The diagonal line carried by a restricted diagonal sample. -/
-def restrictedDiagonalLineOfSample {params : Parameters} [FieldModel params.q]
-    (j : Fin params.m) (s : RestrictedDiagonalSample params j) :
-    DiagonalLine params where
-  base := s.1
-  direction := restrictedDiagonalDirectionOfSample j s
-
-/-- The sampled point in the restricted diagonal branch is the line's base point. -/
-def restrictedDiagonalPointOfSample {params : Parameters}
-    (j : Fin params.m) (s : RestrictedDiagonalSample params j) : Point params :=
-  s.1
-
 /-- Whether the deterministic strategy is accepted on a sampled axis-parallel
 branch instance. -/
 def axisParallelAccepts {params : Parameters} [FieldModel params.q]
@@ -96,8 +67,8 @@ def axisParallelAccepts {params : Parameters} [FieldModel params.q]
     (rs : ClassicalAxisParallelSample params) : Prop :=
   let r := rs.1
   let s := rs.2
-  let ℓ := axisParallelLineOfSample params s
-  let u := axisParallelPointOfSample params s
+  let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+  let u : Point params := s.1
   match r with
   | .A => strategy.axisParallelAnswerA ℓ zeroCoord = strategy.pointAnswerB u
   | .B => strategy.pointAnswerA u = strategy.axisParallelAnswerB ℓ zeroCoord
@@ -127,8 +98,9 @@ def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
     (rs : ClassicalRestrictedDiagonalSample params j) : Prop :=
   let r := rs.1
   let s := rs.2
-  let ℓ := restrictedDiagonalLineOfSample j s
-  let u := restrictedDiagonalPointOfSample j s
+  let ℓ : DiagonalLine params :=
+    { base := s.1, direction := extendRestrictedDirection j s.2 }
+  let u : Point params := s.1
   match r with
   | .A => strategy.diagonalAnswerA ℓ zeroCoord = strategy.pointAnswerB u
   | .B => strategy.pointAnswerA u = strategy.diagonalAnswerB ℓ zeroCoord
