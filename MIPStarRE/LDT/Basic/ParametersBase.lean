@@ -285,12 +285,6 @@ abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
     Fintype.card (Scalar params) = params.q := by
   simp [Scalar]
 
-/-- The scalar model has at least two elements, because the paper's field size `q`
-is a positive prime power (`preliminaries.tex`, lines 17--19 and 89--93). -/
-theorem two_le_scalar_card (params : Parameters) [FieldModel params.q] :
-    2 ≤ Fintype.card (Scalar params) := by
-  simpa using params.two_le_q
-
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
   (FieldModel.equiv (q := params.q)).symm x
