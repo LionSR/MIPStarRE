@@ -73,16 +73,6 @@ private def avgCongrSupportPeel (name? : Option (TSyntax `ident)) : TacticM Unit
   let (_, goal) ← goal.introN 2 [varName, supportName]
   replaceMainGoal [goal]
 
-private def avgCongrCloseLeaf (fallback? : Option (TSyntax `tactic)) : TacticM Unit := do
-  match fallback? with
-  | some tac =>
-      evalTactic (← `(tactic| solve | $tac:tactic)) <|>
-        evalTactic (← `(tactic| rfl)) <|>
-        evalTactic (← `(tactic| solve | simp))
-  | none =>
-      evalTactic (← `(tactic| rfl)) <|>
-        evalTactic (← `(tactic| solve | simp))
-
 /-- Core recursion for `avg_congr` using a fixed peel theorem.
 
 When `requireClosed` is true, an unclosed leaf is treated as failure so the caller
@@ -117,7 +107,14 @@ private partial def evalAvgCongrCore
       else
         let saved ← saveState
         try
-          avgCongrCloseLeaf fallback?
+          match fallback? with
+          | some tac =>
+              evalTactic (← `(tactic| solve | $tac:tactic)) <|>
+                evalTactic (← `(tactic| rfl)) <|>
+                evalTactic (← `(tactic| solve | simp))
+          | none =>
+              evalTactic (← `(tactic| rfl)) <|>
+                evalTactic (← `(tactic| solve | simp))
         catch _ =>
           saved.restore
           if requireClosed || !mayStop then
