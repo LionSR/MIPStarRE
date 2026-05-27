@@ -409,6 +409,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{lemma}
 \begin{proof}
 	\leanok
+	\uses{prop:two-notions-of-self-consistency}
 	Because $G$ is projective, \ref{prop:two-notions-of-self-consistency} identifies the assumed strong self-consistency of the outcome-level family with
 	\begin{equation}\label{eq:ld-g-self-consistency}
 		\E_x \sum_g \bra{\psi} G_g^x \ot G_g^x \ket{\psi}
@@ -489,6 +490,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{lemma}
 \begin{proof}
 	\leanok
+	\uses{prop:switch-sandwich, lem:g-complete-self-consistency}
 	Let $M = \E_y \sum_o M_o^y$. The error to bound is
 	\begin{align}
 		    & \E_{x,y} \sum_o \|(G^xM_o^y - M_o^yG^x)\ot I \ket{\psi}\|^2 \nonumber \\
@@ -679,6 +681,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{corollary}
 \begin{proof}
 	\leanok
+	\uses{cor:g-bot-self-consistency, cor:commuting-with-G-complete,
+		cor:commuting-with-G-incomplete}
 	For \ref{eq:g-hat-self-consistency}, split the outcome set into the genuine outcomes and $\bot$:
 	\[
 		\E_x \sum_g \|(\widehat G_g^x \ot I - I \ot \widehat G_g^x)\ket{\psi}\|^2
@@ -865,6 +869,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 \end{lemma}
 \begin{proof}
 	\leanok
+	\uses{cor:G-hat-facts, lem:one-step-completed-sandwich-commutation,
+		prop:triangle-inequality-for-approx_delta}
 	Repeatedly move the leftmost factor across the remaining product, using \ref{eq:g-hat-self-consistency} and \ref{eq:g-hat-commutativity} at each step and summing the resulting errors with \ref{prop:triangle-inequality-for-approx_delta}. The paper's calculation gives
 	\[
 		3k\bigl(4k\zeta + k\nu_3\bigr)
