@@ -43,27 +43,6 @@ private inductive AvgCongrPeelKind where
   | plain
   | onSupport
 
-private def avgCongrSupportPeel (name? : Option (TSyntax `ident)) : TacticM Unit := do
-  evalTactic (← `(tactic| refine MIPStarRE.LDT.avgOver_congr_on_support _ _ _ ?_))
-  let varName ← match name? with
-    | some name => pure name.getId
-    | none => mkFreshUserName `x
-  let supportBase :=
-    match name? with
-    | some name =>
-        match name.getId.eraseMacroScopes with
-        | .str _ s => Name.mkSimple ("h" ++ s)
-        | _ => `hmem
-    | none => `hmem
-  let mut supportName := supportBase
-  for decl in ← getLCtx do
-    if !decl.isImplementationDetail && decl.userName == supportBase then
-      supportName ← mkFreshUserName supportBase
-      break
-  let goal ← getMainGoal
-  let (_, goal) ← goal.introN 2 [varName, supportName]
-  replaceMainGoal [goal]
-
 /-- Core recursion for `avg_congr` using a fixed peel theorem.
 
 When `requireClosed` is true, an unclosed leaf is treated as failure so the caller
@@ -83,7 +62,26 @@ private partial def evalAvgCongrCore
           match name? with
           | some name => evalTactic (← `(tactic| intro $name:ident))
           | none => evalTactic (← `(tactic| intro))
-      | .onSupport => avgCongrSupportPeel name?
+      | .onSupport =>
+          evalTactic (← `(tactic| refine MIPStarRE.LDT.avgOver_congr_on_support _ _ _ ?_))
+          let varName ← match name? with
+            | some name => pure name.getId
+            | none => mkFreshUserName `x
+          let supportBase :=
+            match name? with
+            | some name =>
+                match name.getId.eraseMacroScopes with
+                | .str _ s => Name.mkSimple ("h" ++ s)
+                | _ => `hmem
+            | none => `hmem
+          let mut supportName := supportBase
+          for decl in ← getLCtx do
+            if !decl.isImplementationDetail && decl.userName == supportBase then
+              supportName ← mkFreshUserName supportBase
+              break
+          let goal ← getMainGoal
+          let (_, goal) ← goal.introN 2 [varName, supportName]
+          replaceMainGoal [goal]
       return true
     catch _ =>
       saved.restore
