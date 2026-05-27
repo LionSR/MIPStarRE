@@ -58,8 +58,8 @@ consistency defect.
 
 The current public Lean file already contains the endpoint reduction helpers
 
-- `ldSandwichLineOnePoint_endpoint_ldGbcon`, and
-- `ldSandwichLineOnePoint_oneQuestion_ldGbcon`,
+- `ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self`, and
+- `ldSandwichLineOnePoint_oneQuestion_ldGbcon_of_axis_self`,
 
 which reduce the final one-point endpoint comparison to `ldGbcon`.
 
@@ -134,8 +134,8 @@ Target shape:
 Likely ingredients:
 
 - repeated measurement-completeness collapse for the prefix sandwich
-- `ldSandwichLineOnePoint_endpoint_ldGbcon`
-- `ldSandwichLineOnePoint_oneQuestion_ldGbcon`
+- `ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self`
+- `ldSandwichLineOnePoint_oneQuestion_ldGbcon_of_axis_self`
 - `ldGbcon`
 
 ## Suggested follow-up helper split for #705
