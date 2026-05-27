@@ -153,9 +153,9 @@ identifier cannot be renamed in the current PR, record the required migration
 in the issue, PR description, or an audit file under `audits/`.
 
 Do not add an empty pass-through abbreviation merely to introduce a second
-public name.  This is different from the documented compatibility wrappers
-allowed in the shared-helper procedure above: a wrapper must preserve a
-paper-facing or blueprint-facing term and must say why the alias exists.
+public name.  This is different from a documented public wrapper allowed in the
+shared-helper procedure above: a wrapper must preserve a paper-facing or
+blueprint-facing term and must say why the alias exists.
 
 ## Review Checklist
 

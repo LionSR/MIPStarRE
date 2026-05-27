@@ -52,7 +52,7 @@ namespace SameSpaceProjStrat
 Public alias for `SameSpaceProjStrat.classicalRoleSymmStrategy`, wrapping a
 `SameSpaceProjStrat params ι` as a symmetric strategy
 `SymStrat params (Role × ι)` via the Lean construction
-`classicalRoleSymmState` from `MIPStarRE.LDT.Test.StrategyRole`.  Each
+`classicalRoleSymmState` from `MIPStarRE.LDT.Test.StrategyRole.Core`.  Each
 player's local Hilbert space is extended by a two-dimensional role
 register, and the bipartite state is replaced by the block-diagonal
 density operator supported on the `A/B` and `B/A` role sectors: the

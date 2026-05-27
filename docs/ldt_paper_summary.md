@@ -431,7 +431,9 @@ Key Lean theorem names:
 **Lean mapping**
 
 - `MIPStarRE/LDT/SelfImprovement/Defs.lean`
-- `MIPStarRE/LDT/SelfImprovement/Theorems.lean`
+- `MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean`
+- `MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness/Bracketed.lean`
+- `MIPStarRE/LDT/SelfImprovement/Theorems/Results/SelfImprovementTop/Core.lean`
 
 Key Lean theorem names:
 
@@ -565,8 +567,9 @@ Key Lean theorem name:
 
 **Lean mapping**
 
-- `MIPStarRE/LDT/Commutativity/Defs.lean`
-- `MIPStarRE/LDT/Commutativity/Theorems.lean`
+- `MIPStarRE/LDT/Commutativity/Defs/Normalization.lean`
+- `MIPStarRE/LDT/Commutativity/ScalarApproximation/ProcessedG.lean`
+- `MIPStarRE/LDT/Commutativity/Main/Results.lean`
 
 Key Lean theorem names:
 
@@ -783,7 +786,8 @@ Key Lean theorem names:
 
 - `MIPStarRE/LDT/MainInductionStep/Defs.lean`
 - `MIPStarRE/LDT/MainInductionStep/Statements.lean`
-- `MIPStarRE/LDT/MainInductionStep/Theorems.lean`
+- `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`
+- `MIPStarRE/LDT/MainInductionStep/Theorems/SourceTheorems.lean`
 
 Key Lean theorem names:
 
