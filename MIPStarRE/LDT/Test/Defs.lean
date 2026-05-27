@@ -297,13 +297,6 @@ theorem qSDD_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
   unfold qSDD qSDDCore
   exact Finset.sum_nonneg fun a _ => ev_adjoint_self_nonneg ψ _
 
-/-- The strong self-consistency defect is nonneg by definition (`max 0 _`). -/
-theorem qSSCDefect_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A : SubMeas Outcome ι) :
-    0 ≤ qSSCDefect ψ A := by
-  unfold qSSCDefect; exact le_max_left 0 _
-
 /-- The averaged squared-distance error is nonneg. -/
 theorem sddError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -425,14 +418,6 @@ theorem bipartiteSSCError_nonneg {Question Outcome : Type*}
     0 ≤ bipartiteSSCError ψ 𝒟 A := by
   unfold bipartiteSSCError
   exact avgOver_nonneg 𝒟 _ fun q => qBipartiteSSCDefect_nonneg ψ _
-
-/-- The averaged self-consistency error is nonneg. -/
-theorem sscError_nonneg {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome ι) :
-    0 ≤ sscError ψ 𝒟 A := by
-  unfold sscError; exact avgOver_nonneg 𝒟 _ fun q => qSSCDefect_nonneg ψ _
 
 /-! ### Postprocessing preserves totals -/
 
