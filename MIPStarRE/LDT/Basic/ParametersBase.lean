@@ -97,10 +97,6 @@ real-valued error scalar type. -/
 theorem q_cast_pos (params : Parameters) : 0 < (params.q : Error) :=
   Nat.cast_pos.mpr params.hq
 
-/-- The real-valued field-size denominator is nonzero. -/
-theorem q_cast_ne_zero (params : Parameters) : (params.q : Error) ≠ 0 :=
-  ne_of_gt params.q_cast_pos
-
 end Parameters
 
 instance : Inhabited Parameters where
@@ -246,11 +242,6 @@ theorem card_cast_pos (q : ℕ) [FieldModel q] :
     0 < (Fintype.card (FieldModel.K q) : Error) :=
   Nat.cast_pos.mpr (card_pos q)
 
-/-- The real-valued cardinality denominator attached to a bundled field model is nonzero. -/
-theorem card_cast_ne_zero (q : ℕ) [FieldModel q] :
-    (Fintype.card (FieldModel.K q) : Error) ≠ 0 :=
-  ne_of_gt (card_cast_pos q)
-
 end FieldModel
 
 /-- Build the honest field model from prime-power data. -/
@@ -317,11 +308,6 @@ theorem scalar_card_cast_pos (params : Parameters) [FieldModel params.q] :
     0 < (Fintype.card (Scalar params) : Error) :=
   Nat.cast_pos.mpr (scalar_card_pos params)
 
-/-- The real-valued scalar-cardinality denominator is nonzero. -/
-theorem scalar_card_cast_ne_zero (params : Parameters) [FieldModel params.q] :
-    (Fintype.card (Scalar params) : Error) ≠ 0 :=
-  ne_of_gt (scalar_card_cast_pos params)
-
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
   (FieldModel.equiv (q := params.q)).symm x
@@ -338,16 +324,6 @@ def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params)
     (x : Scalar params) :
     decodeScalar (encodeScalar x) = x := by
   simp [encodeScalar, decodeScalar]
-
-/-- Decoding from the coded `Fin q` carrier into the chosen scalar field is injective. -/
-theorem decodeScalar_injective {params : Parameters} [FieldModel params.q] :
-    Function.Injective (decodeScalar (params := params)) :=
-  (FieldModel.equiv (q := params.q)).symm.injective
-
-/-- Encoding scalar-field elements back to the coded `Fin q` carrier is injective. -/
-theorem encodeScalar_injective {params : Parameters} [FieldModel params.q] :
-    Function.Injective (encodeScalar (params := params)) :=
-  (FieldModel.equiv (q := params.q)).injective
 
 /-- The zero coordinate. -/
 def zeroCoord {params : Parameters} [FieldModel params.q] : Fq params :=
