@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.StrategyBiProj
+import MIPStarRE.LDT.Test.StrategyBiProj.SameSpace
 import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
