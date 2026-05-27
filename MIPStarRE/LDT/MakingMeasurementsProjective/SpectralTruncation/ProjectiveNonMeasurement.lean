@@ -301,13 +301,6 @@ private lemma zeroProjectorFamily_sum_eq_total {Outcome : Type uOutcome}
       (zeroProjectorFamily (Outcome := Outcome) (ι := ι)).total := by
   simp [zeroProjectorFamily]
 
-private lemma truncationCutoff_zero_le_self (x : Error) (hx0 : 0 ≤ x) (hx1 : x ≤ 1) :
-    truncationCutoff 0 x ≤ x := by
-  by_cases h : 1 ≤ x
-  · have hx : x = 1 := le_antisymm hx1 h
-    simp [truncationCutoff, hx]
-  · simp [truncationCutoff, h, hx0]
-
 private lemma roundedProjectorFamily_total_le_one_zero {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
@@ -324,9 +317,12 @@ private lemma roundedProjectorFamily_total_le_one_zero {Outcome : Type uOutcome}
         (hf := continuousOn_outcome_spectrum A a (truncationCutoff 0))
         (hg := continuousOn_outcome_spectrum A a id)
       intro x hx
-      exact truncationCutoff_zero_le_self x
-        (outcome_spectrum_nonneg A a x hx)
-        (outcome_spectrum_le_one A a x hx)
+      have hx0 := outcome_spectrum_nonneg A a x hx
+      have hx1 := outcome_spectrum_le_one A a x hx
+      by_cases h : 1 ≤ x
+      · have hx_eq : x = 1 := le_antisymm hx1 h
+        simp [truncationCutoff, hx_eq]
+      · simp [truncationCutoff, h, hx0]
     calc
       (roundedProjectorFamily A 0).outcome a = cfc (truncationCutoff 0) (A.outcome a) := rfl
       _ ≤ cfc (R := ℝ) (id : Error → Error) (A.outcome a) := hmono
