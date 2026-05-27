@@ -52,7 +52,8 @@ import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 import MIPStarRE.LDT.GlobalVariance.Defs.Families
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.SelfImprovement.Defs
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization
+import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Saturated
+import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Separation
 import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 import MIPStarRE.LDT.CommutativityPoints.Defs

@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.Test.StrategyRole
+import MIPStarRE.LDT.Test.StrategyRole.Algebra
+import MIPStarRE.LDT.Test.StrategyRole.Symmetrization
 
 /-!
 # Symmetrized-strategy failure probabilities and test bounds
