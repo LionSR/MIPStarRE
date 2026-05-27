@@ -75,12 +75,6 @@ private def avgCongrSupportPeel (name? : Option (TSyntax `ident)) : TacticM Unit
   let (_, goal) ← goal.introN 2 [varName, supportName]
   replaceMainGoal [goal]
 
-private def avgCongrPeel
-    (kind : AvgCongrPeelKind) (name? : Option (TSyntax `ident)) : TacticM Unit := do
-  match kind with
-  | .plain => avgCongrPlainPeel name?
-  | .onSupport => avgCongrSupportPeel name?
-
 private def avgCongrCloseLeaf (fallback? : Option (TSyntax `tactic)) : TacticM Unit := do
   match fallback? with
   | some tac =>
@@ -104,7 +98,9 @@ private partial def evalAvgCongrCore
   let tryPeel (name? : Option (TSyntax `ident)) : TacticM Bool := do
     let saved ← saveState
     try
-      avgCongrPeel kind name?
+      match kind with
+      | .plain => avgCongrPlainPeel name?
+      | .onSupport => avgCongrSupportPeel name?
       return true
     catch _ =>
       saved.restore
