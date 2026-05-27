@@ -13,6 +13,18 @@ open scoped BigOperators
 
 /-! ### Finite answer spaces -/
 
+/-- The axis-line polynomial answer type uses classical equality on the bundled
+polynomial witness. -/
+noncomputable instance (params : Parameters) [FieldModel params.q] :
+    DecidableEq (AxisLinePolynomial params) :=
+  Classical.decEq _
+
+/-- The finite low-individual-degree polynomial answer type uses classical
+equality on the bundled polynomial witness. -/
+noncomputable instance (params : Parameters) [FieldModel params.q] :
+    DecidableEq (Polynomial params) :=
+  Classical.decEq _
+
 /-- Axis-line polynomial answers form a finite type via their bounded coefficient vectors. -/
 noncomputable instance (params : Parameters) [FieldModel params.q] :
     Fintype (AxisLinePolynomial params) := by

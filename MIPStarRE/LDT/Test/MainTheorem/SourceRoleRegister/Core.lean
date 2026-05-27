@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.Evaluation
 import MIPStarRE.LDT.Test.MainTheorem.UnsymmetrizedTargets
 import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final

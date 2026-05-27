@@ -61,18 +61,6 @@ noncomputable instance (params : Parameters) : Fintype (AxisParallelLine params)
         rfl }
   exact Fintype.ofEquiv (Point params × Fin params.m) e.symm
 
-/-- The finite low-individual-degree polynomial model uses classical equality on
-the bundled witness. -/
-noncomputable instance (params : Parameters) [FieldModel params.q] :
-    DecidableEq (Polynomial params) :=
-  Classical.decEq _
-
-/-- The axis-parallel line polynomial model uses classical equality on the bundled witness.
-Required by `MatrixSubmeasurement (DegreeBoundedLineAnswer params) ...`. -/
-noncomputable instance (params : Parameters) [FieldModel params.q] :
-    DecidableEq (AxisLinePolynomial params) :=
-  Classical.decEq _
-
 /-- A default low-degree polynomial witnessing nonemptiness of the finite
 polynomial answer type. -/
 instance (params : Parameters) [FieldModel params.q] : Nonempty (Polynomial params) := by
