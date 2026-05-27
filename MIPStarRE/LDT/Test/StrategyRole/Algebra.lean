@@ -154,20 +154,6 @@ theorem qBipartiteConsDefect_of_measurements {Outcome : Type*} {ιA ιB : Type*}
     simp [A.total_eq_one, B.total_eq_one, opTensor]]
   rw [max_eq_right (sub_nonneg.mpr hmatch_le)]
 
-private lemma opTensor_add_left {ι₁ ι₂ : Type*}
-    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (A B : MIPStarRE.Quantum.Op ι₁) (C : MIPStarRE.Quantum.Op ι₂) :
-    opTensor (A + B) C = opTensor A C + opTensor B C := by
-  ext i j
-  simp [opTensor, add_mul]
-
-private lemma opTensor_add_right {ι₁ ι₂ : Type*}
-    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (A : MIPStarRE.Quantum.Op ι₁) (B C : MIPStarRE.Quantum.Op ι₂) :
-    opTensor A (B + C) = opTensor A B + opTensor A C := by
-  ext i j
-  simp [opTensor, mul_add]
-
 private lemma normalizedTrace_error_smul {ι : Type*} [Fintype ι]
     (c : Error) (A : MIPStarRE.Quantum.Op ι) :
     MIPStarRE.Quantum.normalizedTrace (c • A) =
@@ -235,7 +221,7 @@ lemma opTensor_roleCond_sum {ι : Type*} [Fintype ι] [DecidableEq ι]
         rolePairCond Role.A Role.B (opTensor XA YB) +
           (rolePairCond Role.B Role.A (opTensor XB YA) +
             rolePairCond Role.B Role.B (opTensor XB YB)) := by
-  rw [opTensor_add_left, opTensor_add_right, opTensor_add_right]
+  rw [opTensor_add_left_local, opTensor_add_right_local, opTensor_add_right_local]
   rw [opTensor_roleCond, opTensor_roleCond, opTensor_roleCond, opTensor_roleCond]
 
 lemma ev_classicalRoleSymmState_rolePair_AB {ι : Type*}
