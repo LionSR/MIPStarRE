@@ -165,7 +165,6 @@ These are the key tools when a `SubMeas` is lifted to a bipartite space.
 
 - `def SubMeas.liftLeft (A : SubMeas α ι) : SubMeas α (ι × ι)`
 - `def IdxSubMeas.liftLeft (A : IdxSubMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι)`
-- `def IdxProjMeas.toIdxSubMeasLeft (A : IdxProjMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι)`
 - `def leftPlacedSubMeas (A : SubMeas α ιA) : SubMeas α (ιA × ιB)`
 - `def rightPlacedSubMeas (A : SubMeas α ιB) : SubMeas α (ιA × ιB)`
 

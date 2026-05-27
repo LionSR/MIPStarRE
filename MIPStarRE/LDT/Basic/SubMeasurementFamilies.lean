@@ -602,27 +602,6 @@ def IdxSubMeas.liftRight {Question Outcome : Type*} {ι : Type*}
     (A : IdxSubMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
   fun q => mkRightPlacedSubMeas (ιA := ι) (A q)
 
-/-- Lift an indexed projective measurement family to an indexed submeasurement family
-on the left tensor factor. -/
-def IdxProjMeas.toIdxSubMeasLeft {Question Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (A : IdxProjMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
-  (IdxProjMeas.toIdxSubMeas A).liftLeft
-
-/-- Lift an indexed projective measurement family to an indexed submeasurement family
-on the right tensor factor. -/
-def IdxProjMeas.toIdxSubMeasRight {Question Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (A : IdxProjMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
-  (IdxProjMeas.toIdxSubMeas A).liftRight
-
-/-- Lift an indexed projective submeasurement family to an indexed submeasurement family
-on the right tensor factor. -/
-def IdxProjSubMeas.toIdxSubMeasRight {Question Outcome : Type*} {ι : Type*}
-    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
-    (A : IdxProjSubMeas Question Outcome ι) : IdxSubMeas Question Outcome (ι × ι) :=
-  (IdxProjSubMeas.toIdxSubMeas A).liftRight
-
 /-! ### General bipartite placement -/
 
 /-- Place a submeasurement on the left tensor factor of `ιA × ιB`. -/
