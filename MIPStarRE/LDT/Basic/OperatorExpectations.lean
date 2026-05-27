@@ -49,17 +49,6 @@ theorem ev_real_smul {ι : Type*} [Fintype ι] [DecidableEq ι]
   rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
   simpa using ev_scale ψ c X
 
-/-- Trace cyclicity: `τ(ρ · XY) = τ(Y · ρX)`. -/
-theorem ev_trace_cyclic {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (X Y : MIPStarRE.Quantum.Op ι) :
-    ev ψ (X * Y) =
-      Complex.re (MIPStarRE.Quantum.normalizedTrace
-        (Y * (ψ.density * X))) := by
-  simp only [ev]
-  congr 1
-  rw [← Matrix.mul_assoc]
-  exact MIPStarRE.Quantum.normalizedTrace_mul_comm (ψ.density * X) Y
-
 /-! ### Self-difference and zero-matrix infrastructure -/
 
 /-- `ev` of the zero operator is zero. -/
@@ -75,15 +64,6 @@ theorem ev_opTensor
     ev ψ (opTensor A B) =
       ev ψ (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) := by
   rw [leftTensor_mul_rightTensor_eq_opTensor]
-
-/-- The tensor-product expectation rewrite used throughout the bipartite arguments. -/
-theorem ev_leftTensor_rightTensor
-    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (ψ : QuantumState (ι₁ × ι₂))
-    (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
-    ev ψ (leftTensor (ι₂ := ι₂) A * rightTensor (ι₁ := ι₁) B) =
-      ev ψ (opTensor A B) := by
-  simpa using (ev_opTensor ψ A B).symm
 
 /-- A normalized state has unit expectation on the identity operator. -/
 @[simp] theorem ev_one_of_isNormalized {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -578,47 +558,5 @@ theorem ev_opTensor_sandwich_abs_le_sqrt
           rw [sq]
           ring_nf
           rw [Real.sq_sqrt hX_nonneg, Real.sq_sqrt hY_nonneg]
-
-/-- Finset Cauchy–Schwarz for sums of bipartite-tensor sandwich expectations.
-
-Specialization of `ev_opTensor_sandwich_abs_le_sqrt` to a sum indexed by
-`Outcome`, followed by the real-valued Cauchy–Schwarz `sum_sqrt_mul_sqrt_le`.
-
-This is the direct sum-form analogue of `sum_ev_mul_le_sqrt`. It packages the
-operator Cauchy–Schwarz template needed by future raw add-in-`u` Step 3/4
-producers when the bilinear forms share the polynomial outcome index between
-numerator and denominator. -/
-theorem sum_ev_opTensor_sandwich_le_sqrt
-    {Outcome ι₁ ι₂ : Type*}
-    [Fintype Outcome] [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
-    (ψ : QuantumState (ι₁ × ι₂))
-    (X Y M : Outcome → MIPStarRE.Quantum.Op ι₁)
-    (T : Outcome → MIPStarRE.Quantum.Op ι₂)
-    (hM : ∀ a, 0 ≤ M a) (hT : ∀ a, 0 ≤ T a) :
-    |∑ a : Outcome, ev ψ (opTensor ((X a)ᴴ * M a * Y a) (T a))| ≤
-      Real.sqrt (∑ a : Outcome, ev ψ (opTensor ((X a)ᴴ * M a * X a) (T a))) *
-        Real.sqrt (∑ a : Outcome, ev ψ (opTensor ((Y a)ᴴ * M a * Y a) (T a))) := by
-  calc
-    |∑ a : Outcome, ev ψ (opTensor ((X a)ᴴ * M a * Y a) (T a))|
-        ≤ ∑ a : Outcome, |ev ψ (opTensor ((X a)ᴴ * M a * Y a) (T a))| :=
-              Finset.abs_sum_le_sum_abs _ _
-    _ ≤ ∑ a : Outcome,
-            Real.sqrt (ev ψ (opTensor ((X a)ᴴ * M a * X a) (T a))) *
-              Real.sqrt (ev ψ (opTensor ((Y a)ᴴ * M a * Y a) (T a))) := by
-              refine Finset.sum_le_sum ?_
-              intro a _
-              exact ev_opTensor_sandwich_abs_le_sqrt ψ (X a) (Y a) (M a) (T a)
-                (hM a) (hT a)
-    _ ≤ Real.sqrt (∑ a : Outcome, ev ψ (opTensor ((X a)ᴴ * M a * X a) (T a))) *
-          Real.sqrt (∑ a : Outcome, ev ψ (opTensor ((Y a)ᴴ * M a * Y a) (T a))) := by
-              exact
-                Real.sum_sqrt_mul_sqrt_le (s := Finset.univ)
-                  (f := fun a => ev ψ (opTensor ((X a)ᴴ * M a * X a) (T a)))
-                  (g := fun a => ev ψ (opTensor ((Y a)ᴴ * M a * Y a) (T a)))
-                  (fun a => ev_opTensor_sandwich_diag_nonneg ψ (X a) (M a) (T a)
-                    (hM a) (hT a))
-                  (fun a => ev_opTensor_sandwich_diag_nonneg ψ (Y a) (M a) (T a)
-                    (hM a) (hT a))
-
 
 end MIPStarRE.LDT
