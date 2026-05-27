@@ -82,7 +82,12 @@ The declarations
 
 - `MIPStarRE.LDT.MainInductionStep.AveragedPastingData.invokeLdPasting`;
 - `MIPStarRE.LDT.MainInductionStep.mainInductionFromStageData`;
-- `MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection`;
-- `MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSectionNontrivial`
+- `MIPStarRE.LDT.MainInductionStep.ldPastingInInductionSection`
 
 all report only `propext`, `Classical.choice`, and `Quot.sound`.
+
+Update on 2026-05-27: the Section 6 nontrivial-regime restatement
+`ldPastingInInductionSectionNontrivial` has been retired.  The nontrivial
+proof reduction remains in the Section 9 declaration
+`MIPStarRE.LDT.Pasting.ldPastingNontrivial`, which is used internally by the
+unrestricted theorem `MIPStarRE.LDT.Pasting.ldPasting`.

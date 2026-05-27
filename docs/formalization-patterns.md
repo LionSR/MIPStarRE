@@ -184,7 +184,6 @@ When such a declaration remains useful, its role should be one of the following:
 | `MainFormalDiagonalOrthonormalizationWitness` | Internal witness produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `LdPastingNontrivialContext` | Nontrivial-regime context for `ldPastingNontrivial`; do not present it as the unrestricted `thm:ld-pasting` context |
 | `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link from a Lean-only remark, while `Pasting.ldPasting` remains the unrestricted source-facing theorem |
-| `MainInductionStep.ldPastingInInductionSectionNontrivial` | Restricted nontrivial-regime restatement of the pasting theorem for Section 6; do not present it as the unrestricted source theorem |
 
 The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
 `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`, and
@@ -299,11 +298,9 @@ standard axiom and proof-debt audits.
   `k >= 400md` but does not state the nontrivial-regime inequalities as
   hypotheses.  The source-facing declaration `Pasting.ldPasting` keeps this
   unrestricted statement visible, including the direct degree-zero branch
-  formerly tracked by issue #1622.  The restricted declarations
-  `Pasting.ldPastingNontrivial` and
-  `MainInductionStep.ldPastingInInductionSectionNontrivial` still belong in
-  Lean-only remarks because they assume `gamma <= 1`, `zeta <= 1`, `d <= q`,
-  `0 < d`, and `1 <= k`.
+  formerly tracked by issue #1622.  The restricted declaration
+  `Pasting.ldPastingNontrivial` belongs in Lean-only remarks because it assumes
+  `gamma <= 1`, `zeta <= 1`, `d <= q`, `0 < d`, and `1 <= k`.
 
 ### The `\uses{}` convention
 
