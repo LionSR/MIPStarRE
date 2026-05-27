@@ -22,36 +22,27 @@ private lemma gHatTypeWeight_le {k : ℕ} (τ : GHatType k) :
     (s := (Finset.univ : Finset (Fin k)))
     (p := fun i : Fin k => τ i))
 
-private lemma finCons_eq_prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) :
-    ((Fin.cons b τ : GHatType (k + 1))) = prependTypeBit b τ := by
-  funext i
-  cases i using Fin.cases with
-  | zero => rfl
-  | succ j => rfl
-
 private lemma gHatTypeWeight_prepend_true {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight (prependTypeBit true τ) = gHatTypeWeight τ + 1 := by
-  rw [← finCons_eq_prependTypeBit true τ]
   unfold gHatTypeWeight
-  simpa [Fin.cons_zero, Fin.cons_succ, add_comm] using
+  simpa [prependTypeBit, Fin.cons_zero, Fin.cons_succ, add_comm] using
     (Fin.card_filter_univ_succ
       (n := k) (p := fun i : Fin (k + 1) => (Fin.cons true τ : GHatType (k + 1)) i = true))
 
 private lemma gHatTypeWeight_prepend_false {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight (prependTypeBit false τ) = gHatTypeWeight τ := by
-  rw [← finCons_eq_prependTypeBit false τ]
   unfold gHatTypeWeight
-  simpa [Fin.cons_zero, Fin.cons_succ] using
+  simpa [prependTypeBit, Fin.cons_zero, Fin.cons_succ] using
     (Fin.card_filter_univ_succ
       (n := k) (p := fun i : Fin (k + 1) => (Fin.cons false τ : GHatType (k + 1)) i = true))
 
 private lemma gHatTypeWeight_fin_cons_true {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight (Fin.cons true τ : GHatType (k + 1)) = gHatTypeWeight τ + 1 := by
-  simpa [finCons_eq_prependTypeBit] using gHatTypeWeight_prepend_true τ
+  simpa [prependTypeBit] using gHatTypeWeight_prepend_true τ
 
 private lemma gHatTypeWeight_fin_cons_false {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight (Fin.cons false τ : GHatType (k + 1)) = gHatTypeWeight τ := by
-  simpa [finCons_eq_prependTypeBit] using gHatTypeWeight_prepend_false τ
+  simpa [prependTypeBit] using gHatTypeWeight_prepend_false τ
 
 private lemma gHatTypeOperator_nonneg
     (G : MIPStarRE.Quantum.Op ι)
@@ -106,14 +97,14 @@ private lemma gHatTypeOperator_fin_cons_true
     (G : MIPStarRE.Quantum.Op ι)
     {k : ℕ} (τ : GHatType k) :
     gHatTypeOperator G (Fin.cons true τ : GHatType (k + 1)) = gHatTypeOperator G τ * G := by
-  simpa [finCons_eq_prependTypeBit] using gHatTypeOperator_prepend_true G τ
+  simpa [prependTypeBit] using gHatTypeOperator_prepend_true G τ
 
 private lemma gHatTypeOperator_fin_cons_false
     (G : MIPStarRE.Quantum.Op ι)
     {k : ℕ} (τ : GHatType k) :
     gHatTypeOperator G (Fin.cons false τ : GHatType (k + 1)) =
       gHatTypeOperator G τ * (1 - G) := by
-  simpa [finCons_eq_prependTypeBit] using gHatTypeOperator_prepend_false G τ
+  simpa [prependTypeBit] using gHatTypeOperator_prepend_false G τ
 
 /-- Each Boolean-type monomial commutes with the base operator `G`. -/
 lemma gHatTypeOperator_commute_base
@@ -209,7 +200,7 @@ private lemma full_gHatType_sum_eq_one
               gHatTypeOperator G (prependTypeBit true τprefix)) +
               ∑ τprefix : GHatType prefixLen,
                 gHatTypeOperator G (prependTypeBit false τprefix) := by
-                simp [finCons_eq_prependTypeBit]
+                simp [prependTypeBit]
         _ =
             (∑ τprefix : GHatType prefixLen, gHatTypeOperator G τprefix * G) +
               ∑ τprefix : GHatType prefixLen,
