@@ -150,7 +150,7 @@ change trigger a large rebuild.
 1. **Keep the `LdSandwichLineOnePoint` split focused on proof-bearing leaves**
    - The former 3,827-line wrapper has been split into leaf modules under
      `Pasting/BridgeLemmas/LdSandwichLineOnePoint/`.
-   - Future compile-time work should optimize the leaves, not the compatibility
+   - Future compile-time work should optimize the leaves, not the public
      re-export file.
    - **Expected benefit:** smaller per-file iteration targets and better
      parallel compilation.
