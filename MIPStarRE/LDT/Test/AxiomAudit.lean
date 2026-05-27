@@ -253,11 +253,6 @@ private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
       m!"'{declName}' depends on axioms {axioms.toList}, expected exactly " ++
         m!"{expected.toList}"
 
-private def assertDoesNotUseSorryAxiom (declName : Name) : CommandElabM Unit := do
-  let axioms := (← Lean.collectAxioms declName).qsort Name.lt
-  if axioms.contains ``sorryAx then
-    throwError m!"'{declName}' unexpectedly depends on `sorryAx`; axioms: {axioms.toList}"
-
 private def resolveDeclIdent (id : TSyntax `ident) : CommandElabM Name := do
   liftCoreM <| Lean.Elab.realizeGlobalConstNoOverloadWithInfo id
 
@@ -265,7 +260,10 @@ elab "assert_standard_axioms " id:ident : command => do
   assertUsesExactlyAxioms (← resolveDeclIdent id) expectedStandardAxioms
 
 elab "assert_no_sorry_axiom " id:ident : command => do
-  assertDoesNotUseSorryAxiom (← resolveDeclIdent id)
+  let declName ← resolveDeclIdent id
+  let axioms := (← Lean.collectAxioms declName).qsort Name.lt
+  if axioms.contains ``sorryAx then
+    throwError m!"'{declName}' unexpectedly depends on `sorryAx`; axioms: {axioms.toList}"
 
 assert_standard_axioms MIPStarRE.LDT.Test.razSafra
 assert_no_sorry_axiom MIPStarRE.LDT.Test.RazSafraSoundnessStatement
