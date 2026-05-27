@@ -26,15 +26,6 @@ open MIPStarRE.LDT
 
 /-! ### Orthonormalization helper lemmas -/
 
-/-- The conjugate transpose of `leftTensor` of a Hermitian outcome is itself. -/
-private lemma leftTensor_outcome_conjTranspose_self
-    {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (A : SubMeas Outcome ιA) (a : Outcome) :
-    (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
-      leftTensor (ι₂ := ιB) (A.outcome a) := by
-  rw [leftTensor_conjTranspose, A.outcome_hermitian]
-
 /-- `leftTensor (A_a) * (leftTensor (A_a))ᴴ = leftTensor (A_a * A_a)` for Hermitian outcomes. -/
 private lemma leftTensor_outcome_mul_conjTranspose_eq
     {Outcome : Type*} {ιA ιB : Type*} [Fintype Outcome]
@@ -43,8 +34,7 @@ private lemma leftTensor_outcome_mul_conjTranspose_eq
     leftTensor (ι₂ := ιB) (A.outcome a) *
         (leftTensor (ι₂ := ιB) (A.outcome a))ᴴ =
       leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a) := by
-  rw [leftTensor_outcome_conjTranspose_self (ιB := ιB) A a,
-    leftTensor_mul_leftTensor]
+  rw [leftTensor_conjTranspose, A.outcome_hermitian, leftTensor_mul_leftTensor]
 
 /-- The right-tensor analogue of
 `leftTensor_outcome_mul_conjTranspose_eq`. -/
@@ -92,8 +82,7 @@ private lemma sum_ev_leftTensor_outcome_sq_nonneg
           ev ψ (leftTensor (ι₂ := ιB) (A.outcome a * A.outcome a)) := by
   refine Finset.sum_nonneg fun a _ => ?_
   have h := ev_adjoint_self_nonneg ψ (leftTensor (ι₂ := ιB) (A.outcome a))
-  rwa [leftTensor_outcome_conjTranspose_self (ιB := ιB) A a,
-    leftTensor_mul_leftTensor] at h
+  rwa [leftTensor_conjTranspose, A.outcome_hermitian, leftTensor_mul_leftTensor] at h
 
 /-- The `diagB` sum (in terms of `rightTensor (B_a * B_a)`) is nonnegative. -/
 private lemma sum_ev_rightTensor_outcome_sq_nonneg
