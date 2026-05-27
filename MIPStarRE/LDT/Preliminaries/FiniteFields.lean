@@ -162,17 +162,6 @@ omit [Fintype F] [DecidableEq F] in
   rfl
 
 omit [Fintype F] [DecidableEq F] in
-private theorem ff_dotProduct_single (i : Fin m) (a : F) (v : Fin m → F) :
-    ffDotProduct (Pi.single i a) v = a * v i := by
-  unfold ffDotProduct
-  rw [Finset.sum_eq_single i]
-  · simp
-  · intro j _ hji
-    simp [hji]
-  · intro hi
-    exact (hi (by simp)).elim
-
-omit [Fintype F] [DecidableEq F] in
 private theorem ffVecChar_ne_zero [Finite F] {v : Fin m → F} (hv : v ≠ 0) :
     ffVecChar (p := p) (F := F) v ≠ 0 := by
   rw [AddChar.ne_zero_iff]
@@ -183,7 +172,15 @@ private theorem ffVecChar_ne_zero [Finite F] {v : Fin m → F} (hv : v ≠ 0) :
   have hb : ffTrace (p := p) (F := F) (b * v i) ≠ 0 := by
     simpa [mul_comm] using hb0
   refine ⟨Pi.single i b, ?_⟩
-  rw [ffVecChar_apply, ff_dotProduct_single, ffChar_apply]
+  have hdot : ffDotProduct (Pi.single i b) v = b * v i := by
+    unfold ffDotProduct
+    rw [Finset.sum_eq_single i]
+    · simp
+    · intro j _ hji
+      simp [hji]
+    · intro hi
+      exact (hi (by simp)).elim
+  rw [ffVecChar_apply, hdot, ffChar_apply]
   intro h
   exact hb ((AddChar.IsPrimitive.zmod_char_eq_one_iff p (ZMod.isPrimitive_stdAddChar p) _).mp h)
 
