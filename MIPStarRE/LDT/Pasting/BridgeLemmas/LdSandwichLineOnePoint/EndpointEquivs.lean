@@ -29,19 +29,6 @@ noncomputable def postprocessMeasurement
   total_eq_one := by
     simpa [postprocess_total] using B.total_eq_one
 
-/-- A one-slice sandwiched-line question is equivalent to a point-height pair. -/
-noncomputable def sandwichedLineQuestionOneEquiv
-    (params : Parameters) [FieldModel params.q] :
-    SandwichedLineQuestion params 1 ≃ Point params × Fq params where
-  toFun q := (q.1, (pointTupleOneEquiv params) q.2)
-  invFun ux := (ux.1, (pointTupleOneEquiv params).symm ux.2)
-  left_inv := by
-    rintro ⟨u, xs⟩
-    simp
-  right_inv := by
-    rintro ⟨u, x⟩
-    simp
-
 /-- Split a sandwiched-line question at one selected slice coordinate. -/
 noncomputable def sandwichedLineQuestionSplitAtEquiv
     (params : Parameters) [FieldModel params.q]
