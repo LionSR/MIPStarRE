@@ -29,60 +29,6 @@ def toGeneralProjStrat {params : Parameters} [FieldModel params.q]
     (strategy : SameSpaceProjStrat params ι) : ProjStrat params ι ι :=
   strategy.toProjStrat
 
-@[simp] theorem toGeneralProjStrat_eq_toProjStrat {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toGeneralProjStrat = strategy.toProjStrat :=
-  rfl
-
-@[simp] theorem toProjStrat_state {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toProjStrat.state = strategy.state :=
-  rfl
-
-@[simp] theorem toProjStrat_isNormalized {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toProjStrat.isNormalized = strategy.isNormalized :=
-  rfl
-
-@[simp] theorem toProjStrat_pointMeasurementA {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toProjStrat.pointMeasurementA = strategy.pointMeasurementA :=
-  rfl
-
-@[simp] theorem toProjStrat_axisParallelMeasurementA {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toProjStrat.axisParallelMeasurementA = strategy.axisParallelMeasurementA :=
-  rfl
-
-@[simp] theorem toProjStrat_diagonalMeasurementA {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toProjStrat.diagonalMeasurementA = strategy.diagonalMeasurementA :=
-  rfl
-
-@[simp] theorem toProjStrat_pointMeasurementB {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toProjStrat.pointMeasurementB = strategy.pointMeasurementB :=
-  rfl
-
-@[simp] theorem toProjStrat_axisParallelMeasurementB {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toProjStrat.axisParallelMeasurementB = strategy.axisParallelMeasurementB :=
-  rfl
-
-@[simp] theorem toProjStrat_diagonalMeasurementB {params : Parameters}
-    [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι) :
-    strategy.toProjStrat.diagonalMeasurementB = strategy.diagonalMeasurementB :=
-  rfl
-
 end SameSpaceProjStrat
 
 
