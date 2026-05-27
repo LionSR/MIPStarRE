@@ -296,29 +296,9 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	Compare $1-\lambda^d$ with $(1-\lambda)(1+\lambda+\cdots+\lambda^{d-1})$ and use that $d^{1/(d+1)} \le 2$.
 \end{proof}
 
-\begin{corollary}[First-construction spectral comparison]\label{cor:first-construction-spectral-comparison}
-	\uses{def:ld-pasting-context, lem:looks-easy-but-took-me-a-while}
-	Suppose that the first-construction spectral distribution satisfies
-	\[
-		\Delta \ge
-		\E_{i\sim\mu}[\lambda_i^{d+1}(1-\lambda_i)].
-	\]
-	Then the scalar inequality from
-	Lemma~\ref{lem:looks-easy-but-took-me-a-while} gives
-	\[
-		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
-		\le 2\Delta^{1/(d+1)}.
-	\]
-\end{corollary}
-\begin{proof}
-	\uses{def:ld-pasting-context, lem:looks-easy-but-took-me-a-while}
-	Apply Lemma~\ref{lem:looks-easy-but-took-me-a-while} pointwise and then use
-	the concavity of \(a \mapsto a^{1/(d+1)}\).
-\end{proof}
-
 \begin{corollary}[First-construction completeness comparison]\label{cor:first-construction-completeness-comparison}
-	\uses{cor:first-construction-spectral-comparison}
-	The spectral comparison above converts
+	\uses{def:ld-pasting-context, lem:looks-easy-but-took-me-a-while}
+	Lemma~\ref{lem:looks-easy-but-took-me-a-while} converts
 	\eqref{eq:first-construction-spectral-defect} into the estimate
 	\[
 		\E_{i\sim\mu}[\lambda_i(1-\lambda_i^d)]
@@ -334,9 +314,10 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	first construction recorded in `references/ldt-paper/ld-pasting.tex`.
 \end{corollary}
 \begin{proof}
-	\uses{cor:first-construction-spectral-comparison}
-	Apply Corollary~\ref{cor:first-construction-spectral-comparison} to the
-	spectral distribution of \(G\). The displayed operator expression is the same
+	\uses{def:ld-pasting-context, lem:looks-easy-but-took-me-a-while}
+	Apply Lemma~\ref{lem:looks-easy-but-took-me-a-while} pointwise to the
+	spectral distribution of \(G\), and then use the concavity of
+	\(a \mapsto a^{1/(d+1)}\). The displayed operator expression is the same
 	quantity written in the eigenbasis of \(G\).
 \end{proof}
 
