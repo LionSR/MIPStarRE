@@ -142,56 +142,6 @@ private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Pa
       (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
       (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u))
 
-private theorem weightedGeneralizeBLeftOperatorAtPolynomial_pos (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    0 ≤ weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu := by
-  simpa [weightedGeneralizeBLeftOperatorAtPolynomial] using
-    (weightedPolynomialOperator_pos (ι := ι) (params := params) (G := G) (g := g)
-      (A := generalizeBLeftOperatorAtPolynomial params strategy g qu)
-      (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu))
-
-private theorem weightedGeneralizeBLeftOperatorAtPolynomial_le_one (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  simpa [weightedGeneralizeBLeftOperatorAtPolynomial] using
-    (weightedPolynomialOperator_le_one (ι := ι) (params := params) (G := G) (g := g)
-      (A := generalizeBLeftOperatorAtPolynomial params strategy g qu)
-      (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
-      (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu))
-
-private theorem weightedGeneralizeBRightOperatorAtPolynomial_pos (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    0 ≤ weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu := by
-  simpa [weightedGeneralizeBRightOperatorAtPolynomial] using
-    (weightedPolynomialOperator_pos (ι := ι) (params := params) (G := G) (g := g)
-      (A := generalizeBRightOperatorAtPolynomial params strategy g qu)
-      (generalizeBRightOperatorAtPolynomial_pos params strategy g qu))
-
-private theorem weightedGeneralizeBRightOperatorAtPolynomial_le_one (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu ≤ 1 := by
-  simpa [weightedGeneralizeBRightOperatorAtPolynomial] using
-    (weightedPolynomialOperator_le_one (ι := ι) (params := params) (G := G) (g := g)
-      (A := generalizeBRightOperatorAtPolynomial params strategy g qu)
-      (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
-      (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu))
-
 /-- The squared norm expression controlled by `lem:generalize-b` for a fixed `g`.
 Uses bipartite state `ψbi` on `d * d`. -/
 noncomputable def generalizeBDeviationAtPolynomial (params : Parameters) [FieldModel params.q]
@@ -290,8 +240,17 @@ noncomputable def generalizeBLeftFamily (params : Parameters) [FieldModel params
   fun qu =>
     averageUnitSubMeas (α := Polynomial params)
       (fun g => weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu)
-      (fun g => weightedGeneralizeBLeftOperatorAtPolynomial_pos params strategy G g qu)
-      (fun g => weightedGeneralizeBLeftOperatorAtPolynomial_le_one params strategy G g qu)
+      (fun g => by
+        simpa [weightedGeneralizeBLeftOperatorAtPolynomial] using
+          (weightedPolynomialOperator_pos (ι := ι) (params := params) (G := G) (g := g)
+            (A := generalizeBLeftOperatorAtPolynomial params strategy g qu)
+            (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)))
+      (fun g => by
+        simpa [weightedGeneralizeBLeftOperatorAtPolynomial] using
+          (weightedPolynomialOperator_le_one (ι := ι) (params := params) (G := G) (g := g)
+            (A := generalizeBLeftOperatorAtPolynomial params strategy g qu)
+            (generalizeBLeftOperatorAtPolynomial_pos params strategy g qu)
+            (generalizeBLeftOperatorAtPolynomial_le_one params strategy g qu)))
 
 /-- Aggregated family for the right-hand side of `lem:generalize-b`
 on the bipartite space `d * d`. -/
@@ -302,8 +261,17 @@ noncomputable def generalizeBRightFamily (params : Parameters) [FieldModel param
   fun qu =>
     averageUnitSubMeas (α := Polynomial params)
       (fun g => weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu)
-      (fun g => weightedGeneralizeBRightOperatorAtPolynomial_pos params strategy G g qu)
-      (fun g => weightedGeneralizeBRightOperatorAtPolynomial_le_one params strategy G g qu)
+      (fun g => by
+        simpa [weightedGeneralizeBRightOperatorAtPolynomial] using
+          (weightedPolynomialOperator_pos (ι := ι) (params := params) (G := G) (g := g)
+            (A := generalizeBRightOperatorAtPolynomial params strategy g qu)
+            (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)))
+      (fun g => by
+        simpa [weightedGeneralizeBRightOperatorAtPolynomial] using
+          (weightedPolynomialOperator_le_one (ι := ι) (params := params) (G := G) (g := g)
+            (A := generalizeBRightOperatorAtPolynomial params strategy g qu)
+            (generalizeBRightOperatorAtPolynomial_pos params strategy g qu)
+            (generalizeBRightOperatorAtPolynomial_le_one params strategy g qu)))
 
 /-- Aggregated family for `A^u_[g(u)] ⊗ (G_g)^{1/2}`
 on the bipartite space `d * d`. -/
