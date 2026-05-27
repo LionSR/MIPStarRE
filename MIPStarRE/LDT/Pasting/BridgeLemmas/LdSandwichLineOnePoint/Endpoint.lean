@@ -107,25 +107,6 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self
       Function.comp] using hproc
   convert hprod' using 2
 
-lemma ldSandwichLineOnePoint_endpoint_ldGbcon
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta) :
-    ConsRel strategy.state
-      (uniformDistribution (Point params × Fq params))
-      (fun ux => postprocess (evaluateAt params ux.1 ((family.meas ux.2).toSubMeas)) some)
-      (fun ux =>
-        postprocess
-          (ldSandwichLineOnePointRightEndpointMeasurement params strategy ux).toSubMeas
-          some)
-        (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  exact ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self
-    params strategy eps delta zeta hgood.axisParallelTest hgood.selfConsistencyTest family hcons
-
 -- The proof compares the one-question equivalence with the endpoint
 -- formulation; the chain of rewriting identities records the two equivalent
 -- presentations of the same postprocessed submeasurement.
@@ -163,25 +144,6 @@ lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon_of_axis_self
           Order.lt_one_iff, ↓reduceDIte, Fin.zero_eta,
           ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas]
         exact (postprocess_postprocess _ _ _).symm
-
-lemma ldSandwichLineOnePoint_oneQuestion_ldGbcon
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (family : IdxPolyFamily params ι)
-    (hcons : family.ConsistentWithPoints strategy zeta) :
-    ConsRel strategy.state
-      (uniformDistribution (SandwichedLineQuestion params 1))
-      (fun q =>
-        postprocess
-          (evaluateAt params q.1 ((family.meas ((pointTupleOneEquiv params) q.2)).toSubMeas))
-          some)
-      (ldSandwichLineOnePointRightFamily params strategy family 1 0)
-      (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  exact ldSandwichLineOnePoint_oneQuestion_ldGbcon_of_axis_self
-    params strategy eps delta zeta hgood.axisParallelTest hgood.selfConsistencyTest family hcons
 
 -- The proof lifts the endpoint consistency relation through the split
 -- sandwiched-line equivalence; the chain of rewriting identities unfolds this
