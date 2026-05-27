@@ -168,13 +168,6 @@ private lemma qBipartiteMatchMass_postprocess_eq_add_localCollision
   · simp [hEq]
   · by_cases hf : f aa.1 = f aa.2 <;> simp [hEq, hf]
 
-private lemma max_sub_le_max_sub_add_of_nonneg (x c : Error) (hc : 0 ≤ c) :
-    max 0 x ≤ max 0 (x - c) + c := by
-  apply max_le
-  · exact add_nonneg (le_max_left 0 (x - c)) hc
-  · have hx : x - c ≤ max 0 (x - c) := le_max_right 0 (x - c)
-    linarith
-
 private lemma qBipartiteConsDefect_le_postprocess_add_localCollision
     {α β ιA ιB : Type*} [Fintype α] [Fintype β]
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -193,10 +186,16 @@ private lemma qBipartiteConsDefect_le_postprocess_add_localCollision
   change max 0 (ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B) ≤
     max 0 (ev ψ (opTensor A.total B.total) -
       (qBipartiteMatchMass ψ A B + c)) + c
-  convert
-    (max_sub_le_max_sub_add_of_nonneg
-      (ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B) c hc) using 1
-  ring_nf
+  apply max_le
+  · exact add_nonneg (le_max_left 0 _) hc
+  · have hle :
+        ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B - c ≤
+          max 0 (ev ψ (opTensor A.total B.total) -
+            (qBipartiteMatchMass ψ A B + c)) := by
+      convert le_max_right 0
+        (ev ψ (opTensor A.total B.total) - (qBipartiteMatchMass ψ A B + c)) using 1
+      ring
+    linarith
 
 private lemma avg_localCollisionMass_eval_eq_polynomialCollisionMass
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
