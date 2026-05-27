@@ -245,11 +245,6 @@ theorem realTracePairingCLM_tracePairingMatrixOfRealCLM
     _ = ψ X := by
           rw [← Matrix.matrix_eq_sum_single X]
 
-private lemma trace_real_smul {d : Type*} [Fintype d]
-    (r : ℝ) (A : Op d) :
-    Matrix.trace (r • A) = r • Matrix.trace A := by
-  simp [Matrix.trace, Finset.mul_sum]
-
 /-- Hermitian part of a matrix for the real trace pairing. -/
 noncomputable def tracePairingHermitianPart {d : Type*} [Fintype d] [DecidableEq d]
     (Z : Op d) : Op d :=
@@ -282,8 +277,11 @@ theorem realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
   have hZX : Complex.re (Matrix.trace (Zᴴ * X)) =
       Complex.re (Matrix.trace (Z * X)) :=
     trace_conjTranspose_mul_re_eq_of_isHermitian Z hX
-  rw [tracePairingHermitianPart, smul_mul_assoc, Matrix.add_mul, trace_real_smul,
-    Matrix.trace_add, Complex.smul_re, Complex.add_re]
+  rw [tracePairingHermitianPart, smul_mul_assoc, Matrix.add_mul]
+  rw [show Matrix.trace ((1 / 2 : ℝ) • (Z * X + Zᴴ * X)) =
+      (1 / 2 : ℝ) • Matrix.trace (Z * X + Zᴴ * X) by
+        simp [Matrix.trace, Finset.mul_sum]]
+  rw [Matrix.trace_add, Complex.smul_re, Complex.add_re]
   rw [hZX]
   ring
 
