@@ -36,14 +36,6 @@ private lemma gHatTypeWeight_prepend_false {k : ℕ} (τ : GHatType k) :
     (Fin.card_filter_univ_succ
       (n := k) (p := fun i : Fin (k + 1) => (Fin.cons false τ : GHatType (k + 1)) i = true))
 
-private lemma gHatTypeWeight_fin_cons_true {k : ℕ} (τ : GHatType k) :
-    gHatTypeWeight (Fin.cons true τ : GHatType (k + 1)) = gHatTypeWeight τ + 1 := by
-  simpa [prependTypeBit] using gHatTypeWeight_prepend_true τ
-
-private lemma gHatTypeWeight_fin_cons_false {k : ℕ} (τ : GHatType k) :
-    gHatTypeWeight (Fin.cons false τ : GHatType (k + 1)) = gHatTypeWeight τ := by
-  simpa [prependTypeBit] using gHatTypeWeight_prepend_false τ
-
 private lemma gHatTypeOperator_nonneg
     (G : MIPStarRE.Quantum.Op ι)
     (hGpsd : 0 ≤ G)
@@ -92,19 +84,6 @@ private lemma gHatTypeOperator_prepend_false
   unfold gHatTypeOperator
   rw [gHatTypeWeight_prepend_false, hsub, pow_succ]
   simp [mul_assoc]
-
-private lemma gHatTypeOperator_fin_cons_true
-    (G : MIPStarRE.Quantum.Op ι)
-    {k : ℕ} (τ : GHatType k) :
-    gHatTypeOperator G (Fin.cons true τ : GHatType (k + 1)) = gHatTypeOperator G τ * G := by
-  simpa [prependTypeBit] using gHatTypeOperator_prepend_true G τ
-
-private lemma gHatTypeOperator_fin_cons_false
-    (G : MIPStarRE.Quantum.Op ι)
-    {k : ℕ} (τ : GHatType k) :
-    gHatTypeOperator G (Fin.cons false τ : GHatType (k + 1)) =
-      gHatTypeOperator G τ * (1 - G) := by
-  simpa [prependTypeBit] using gHatTypeOperator_prepend_false G τ
 
 /-- Each Boolean-type monomial commutes with the base operator `G`. -/
 lemma gHatTypeOperator_commute_base
@@ -320,7 +299,11 @@ theorem truncatedTypeSumRecurrence
                   (d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) + gHatTypeWeight τtail) ↔
                     (d + 1 ≤ gHatTypeWeight τprefix +
                       gHatTypeWeight (prependTypeBit true τtail)) := by
-                rw [gHatTypeWeight_fin_cons_true, gHatTypeWeight_prepend_true]
+                have hprefix :
+                    gHatTypeWeight (Fin.cons true τprefix : GHatType (prefixLen + 1)) =
+                      gHatTypeWeight τprefix + 1 := by
+                  simpa [prependTypeBit] using gHatTypeWeight_prepend_true τprefix
+                rw [hprefix, gHatTypeWeight_prepend_true]
                 omega
               by_cases h : d + 1 ≤ gHatTypeWeight τprefix +
                   gHatTypeWeight (prependTypeBit true τtail)
@@ -328,7 +311,8 @@ theorem truncatedTypeSumRecurrence
                     d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
                       gHatTypeWeight τtail :=
                   hcond.mpr h
-                simpa [h, h'] using gHatTypeOperator_fin_cons_true G τprefix
+                rw [if_pos h', if_pos h]
+                simpa [prependTypeBit] using gHatTypeOperator_prepend_true G τprefix
               · have h' :
                     ¬ d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
                       gHatTypeWeight τtail := by
@@ -359,14 +343,19 @@ theorem truncatedTypeSumRecurrence
                   (d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) + gHatTypeWeight τtail) ↔
                     (d + 1 ≤ gHatTypeWeight τprefix +
                       gHatTypeWeight (prependTypeBit false τtail)) := by
-                simp [gHatTypeWeight_fin_cons_false, gHatTypeWeight_prepend_false]
+                have hprefix :
+                    gHatTypeWeight (Fin.cons false τprefix : GHatType (prefixLen + 1)) =
+                      gHatTypeWeight τprefix := by
+                  simpa [prependTypeBit] using gHatTypeWeight_prepend_false τprefix
+                simp [hprefix, gHatTypeWeight_prepend_false]
               by_cases h : d + 1 ≤ gHatTypeWeight τprefix +
                   gHatTypeWeight (prependTypeBit false τtail)
               · have h' :
                     d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +
                       gHatTypeWeight τtail :=
                   hcond.mpr h
-                simpa [h, h'] using gHatTypeOperator_fin_cons_false G τprefix
+                rw [if_pos h', if_pos h]
+                simpa [prependTypeBit] using gHatTypeOperator_prepend_false G τprefix
               · have h' :
                     ¬ d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +
                       gHatTypeWeight τtail := by
