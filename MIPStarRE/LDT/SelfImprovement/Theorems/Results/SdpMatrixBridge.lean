@@ -1,4 +1,5 @@
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization
+import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Saturated
+import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Separation
 import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
