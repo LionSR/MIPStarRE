@@ -43,12 +43,6 @@ private inductive AvgCongrPeelKind where
   | plain
   | onSupport
 
-private def avgCongrPlainPeel (name? : Option (TSyntax `ident)) : TacticM Unit := do
-  evalTactic (← `(tactic| refine MIPStarRE.LDT.avgOver_congr _ _ _ ?_))
-  match name? with
-  | some name => evalTactic (← `(tactic| intro $name:ident))
-  | none => evalTactic (← `(tactic| intro))
-
 private def avgCongrSupportHypName
     (name? : Option (TSyntax `ident)) : TacticM Name := do
   let base :=
@@ -87,7 +81,11 @@ private partial def evalAvgCongrCore
     let saved ← saveState
     try
       match kind with
-      | .plain => avgCongrPlainPeel name?
+      | .plain =>
+          evalTactic (← `(tactic| refine MIPStarRE.LDT.avgOver_congr _ _ _ ?_))
+          match name? with
+          | some name => evalTactic (← `(tactic| intro $name:ident))
+          | none => evalTactic (← `(tactic| intro))
       | .onSupport => avgCongrSupportPeel name?
       return true
     catch _ =>
