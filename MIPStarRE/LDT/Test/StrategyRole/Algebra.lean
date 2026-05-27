@@ -13,10 +13,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 /-! ### Role-pair projection algebra -/
 
-private lemma rolePairProj_mul_same (rL rR : Role) :
-    rolePairProj rL rR * rolePairProj rL rR = rolePairProj rL rR := by
-  simp [rolePairProj, opTensor_mul, roleProj_mul_self]
-
 private lemma rolePairCond_mul {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL₁ rR₁ rL₂ rR₂ : Role) (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond rL₁ rR₁ X * rolePairCond rL₂ rR₂ Y =
@@ -38,7 +34,9 @@ private lemma rolePairCond_mul {ι : Type*} [Fintype ι] [DecidableEq ι]
 private lemma rolePairCond_mul_same {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
     rolePairCond rL rR X * rolePairCond rL rR Y = rolePairCond rL rR (X * Y) := by
-  simpa [rolePairCond, rolePairProj_mul_same] using
+  have hproj : rolePairProj rL rR * rolePairProj rL rR = rolePairProj rL rR := by
+    simp [rolePairProj, opTensor_mul, roleProj_mul_self]
+  simpa [rolePairCond, hproj] using
     rolePairCond_mul rL rR rL rR X Y
 
 private lemma rolePairCond_mul_eq_zero {ι : Type*} [Fintype ι] [DecidableEq ι]
