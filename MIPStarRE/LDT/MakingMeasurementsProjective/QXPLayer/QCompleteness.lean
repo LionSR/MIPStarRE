@@ -35,31 +35,6 @@ lemma spectralTruncationError_le_zetaQuarterRoot (ζ : Error)
   exact Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 (by positivity)
     (by norm_num : (1 : Error) / 2 ≥ 1 / 4)
 
-private lemma sqrt_roundingToProjectiveError_eq (ζ : Error)
-    (hζ : 0 ≤ ζ) :
-    Real.sqrt (roundingToProjectiveError ζ) =
-      Real.sqrt (12 : Error) * zetaQuarterRoot ζ := by
-  -- `sqrt (12 * √ζ) = sqrt 12 * ζ^(1/4)`.
-  have hsqrt_rpow :
-      Real.sqrt (ζ ^ (1 / (2 : Error))) = zetaQuarterRoot ζ := by
-    rw [Real.sqrt_eq_rpow, zetaQuarterRoot, ← Real.rpow_mul hζ]
-    congr 1
-    ring
-  dsimp [roundingToProjectiveError, spectralTruncationError]
-  rw [Real.sqrt_mul (by positivity), hsqrt_rpow]
-
-private lemma sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot (ζ : Error)
-    (hζ : 0 ≤ ζ) :
-    Real.sqrt (roundingToProjectiveError ζ) ≤ 4 * zetaQuarterRoot ζ := by
-  -- Coefficient estimate: `sqrt 12 ≤ 4`.
-  rw [sqrt_roundingToProjectiveError_eq ζ hζ]
-  have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := zetaQuarterRoot_nonneg hζ
-  have hsqrt : Real.sqrt (12 : Error) ≤ 4 := by
-    have hsq : (Real.sqrt (12 : Error)) ^ 2 ≤ (4 : Error) ^ 2 := by norm_num
-    nlinarith [Real.sq_sqrt (show 0 ≤ (12 : Error) by positivity), hsq]
-  refine mul_le_mul_of_nonneg_right ?_ hzqr_nonneg
-  exact hsqrt
-
 /-- **Completeness of `Q`** (`lem:Q-completeness`).
 
 If `Q_a` is the rank-reduced family from `lem:projective-low-rank-sum`, then
@@ -279,7 +254,23 @@ lemma qCompleteness {Outcome : Type*}
         (by norm_num : (1 : Error) ≥ 1 / 4))
   have hround_term :
       2 * Real.sqrt (roundingToProjectiveError ζ) ≤ 8 * zetaQuarterRoot ζ := by
-    have hsqrt_bound := sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot ζ hζ
+    have hsqrt_rpow :
+        Real.sqrt (ζ ^ (1 / (2 : Error))) = zetaQuarterRoot ζ := by
+      rw [Real.sqrt_eq_rpow, zetaQuarterRoot, ← Real.rpow_mul hζ]
+      congr 1
+      ring
+    have hsqrt_eq :
+        Real.sqrt (roundingToProjectiveError ζ) =
+          Real.sqrt (12 : Error) * zetaQuarterRoot ζ := by
+      dsimp [roundingToProjectiveError, spectralTruncationError]
+      rw [Real.sqrt_mul (by positivity), hsqrt_rpow]
+    have hzqr_nonneg : 0 ≤ zetaQuarterRoot ζ := zetaQuarterRoot_nonneg hζ
+    have hsqrt : Real.sqrt (12 : Error) ≤ 4 := by
+      have hsq : (Real.sqrt (12 : Error)) ^ 2 ≤ (4 : Error) ^ 2 := by norm_num
+      nlinarith [Real.sq_sqrt (show 0 ≤ (12 : Error) by positivity), hsq]
+    have hsqrt_bound : Real.sqrt (roundingToProjectiveError ζ) ≤ 4 * zetaQuarterRoot ζ := by
+      rw [hsqrt_eq]
+      exact mul_le_mul_of_nonneg_right hsqrt hzqr_nonneg
     nlinarith
   calc
     ev ψ (QTotal data) = qMass := rfl
