@@ -21,13 +21,6 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma selfImprovementCoeff_ge_one
-    (params : Parameters) :
-    (1 : Error) ≤ 3000 * (params.next.m : Error) := by
-  have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
-    exact_mod_cast params.next.hm
-  nlinarith
-
 private lemma le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
     (params : Parameters) {eps delta gamma x : Error}
     (hzeta_le : selfImprovementInInductionError params.next eps delta gamma ≤ 1)
@@ -35,7 +28,10 @@ private lemma le_one_of_selfImprovementInInductionError_le_one_of_scaled_bound
       3000 * (params.next.m : Error) * Real.rpow x (1 / (32 : Error)) ≤
         selfImprovementInInductionError params.next eps delta gamma) :
     x ≤ 1 := by
-  have hcoef_ge_one := selfImprovementCoeff_ge_one params
+  have hcoef_ge_one : (1 : Error) ≤ 3000 * (params.next.m : Error) := by
+    have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
+      exact_mod_cast params.next.hm
+    nlinarith
   have hroot_le_one : Real.rpow x (1 / (32 : Error)) ≤ 1 := by
     by_contra hroot
     have hroot_gt : 1 < Real.rpow x (1 / (32 : Error)) := lt_of_not_ge hroot
