@@ -134,15 +134,6 @@ private theorem roleTaggedAcceptanceProbability_eq_roleAverage {β : Type*}
     (avgOver_uniform_role (fun r =>
       avgOver (uniformDistribution β) fun s => F r s))
 
-/-- Pull a common scalar through a finite sum of arithmetic means. -/
-private theorem smul_sum_half_split {α : Type*} [Fintype α]
-    (m : Error) (A B : α → Error) :
-    m * ∑ x, (A x + B x) / 2 =
-      ((m * ∑ x, A x) + (m * ∑ x, B x)) / 2 := by
-  simp_rw [div_eq_mul_inv, add_mul]
-  rw [Finset.sum_add_distrib, ← Finset.sum_mul, ← Finset.sum_mul, mul_add]
-  ring
-
 /-- Axis-parallel acceptance probability for the role choice where Alice gets the
 line and Bob gets the sampled base point. -/
 noncomputable def axisParallelLineLeftPointRightAcceptanceProbability
@@ -282,9 +273,9 @@ theorem diagonalAcceptanceProbability_eq_roleAverage {params : Parameters}
     diagonalLineLeftPointRightAcceptanceProbability
     diagonalPointLeftLineRightAcceptanceProbability
   simp_rw [restrictedDiagonalAcceptanceProbability_eq_roleAverage]
-  exact smul_sum_half_split (1 / (params.m : Error))
-    (fun j => strategy.restrictedDiagonalLineLeftPointRightAcceptanceProbability j)
-    (fun j => strategy.restrictedDiagonalPointLeftLineRightAcceptanceProbability j)
+  simp_rw [div_eq_mul_inv, add_mul]
+  rw [Finset.sum_add_distrib, ← Finset.sum_mul, ← Finset.sum_mul, mul_add]
+  ring
 
 /-- Acceptance probability of the full classical low individual degree test,
 averaging the three branches with equal probability. -/
