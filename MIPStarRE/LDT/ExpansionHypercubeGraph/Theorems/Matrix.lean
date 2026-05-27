@@ -20,13 +20,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma matrixSquaredDifferenceExpectation_eq_ev {params : Parameters}
-    (model : MatrixOperatorFamilyRealization params)
-    (X Y : MatrixOperator model.space) :
-    matrixSquaredDifferenceExpectation model.state X Y =
-      ev (matrixModelState model) (((X - Y)ᴴ) * (X - Y)) := by
-  rfl
-
 /-- The matrix correlation term is symmetric under swapping the two points. -/
 lemma corr_symm (params : Parameters) (model : MatrixOperatorFamilyRealization params)
     (u v : Point params) :
@@ -43,7 +36,8 @@ lemma sqdiff_eq_corr (params : Parameters) (model : MatrixOperatorFamilyRealizat
         ev (matrixModelState model) ((model.family v)ᴴ * model.family v) -
         ev (matrixModelState model) ((model.family u)ᴴ * model.family v) -
         ev (matrixModelState model) ((model.family v)ᴴ * model.family u) := by
-  rw [matrixSquaredDifferenceExpectation_eq_ev]
+  change ev (matrixModelState model)
+      (((model.family u - model.family v)ᴴ) * (model.family u - model.family v)) = _
   have hexpand :
       (((model.family u - model.family v)ᴴ) * (model.family u - model.family v)) =
         (model.family u)ᴴ * model.family u + (model.family v)ᴴ * model.family v -
