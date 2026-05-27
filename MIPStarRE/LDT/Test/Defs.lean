@@ -297,13 +297,6 @@ theorem qSDD_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
   unfold qSDD qSDDCore
   exact Finset.sum_nonneg fun a _ => ev_adjoint_self_nonneg ψ _
 
-/-- The consistency defect is nonneg by definition (`max 0 _`). -/
-theorem qConsDefect_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A B : SubMeas Outcome ι) :
-    0 ≤ qConsDefect ψ A B := by
-  unfold qConsDefect; exact le_max_left 0 _
-
 /-- The strong self-consistency defect is nonneg by definition (`max 0 _`). -/
 theorem qSSCDefect_nonneg {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
