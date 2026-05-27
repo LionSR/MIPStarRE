@@ -20,27 +20,6 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-private lemma avgOver_gap_le_sqrt_of_pointwise
-    {Question : Type*}
-    (𝒟 : Distribution Question)
-    (h𝒟 : ∑ q ∈ 𝒟.support, 𝒟.weight q ≤ 1)
-    (lhs rhs sdd : Question → Error)
-    (hpointwise : ∀ q, |lhs q - rhs q| ≤ Real.sqrt (sdd q))
-    (hsdd_nonneg : ∀ q, 0 ≤ sdd q) :
-    |avgOver 𝒟 lhs - avgOver 𝒟 rhs| ≤ Real.sqrt (avgOver 𝒟 sdd) := by
-  calc
-    |avgOver 𝒟 lhs - avgOver 𝒟 rhs|
-      = |avgOver 𝒟 (fun q => lhs q - rhs q)| := by
-          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
-    _ ≤ Real.sqrt (avgOver 𝒟 sdd) := by
-          exact
-            avgOver_abs_le_sqrt_of_pointwise 𝒟
-              (fun q => lhs q - rhs q)
-              sdd
-              hpointwise
-              hsdd_nonneg
-              h𝒟
-
 lemma sum_ev_mul_le_sqrt
     {Outcome : Type*} {ι : Type*}
     [Fintype Outcome] [Fintype ι] [DecidableEq ι]
@@ -159,16 +138,19 @@ theorem easyApproxFromApproxDelta
   calc
     |avgOver 𝒟 (fun q => ∑ a : Outcome, ev ψ ((A q).outcome a * (C q).outcome a)) -
         avgOver 𝒟 (fun q => ∑ a : Outcome, ev ψ ((B q).outcome a * (C q).outcome a))|
-      ≤ Real.sqrt (avgOver 𝒟 (fun q => qSDD ψ (A q) (B q))) := by
-          exact
-            avgOver_gap_le_sqrt_of_pointwise
-              𝒟
-              h𝒟
-              (fun q => ∑ a : Outcome, ev ψ ((A q).outcome a * (C q).outcome a))
-              (fun q => ∑ a : Outcome, ev ψ ((B q).outcome a * (C q).outcome a))
-              (fun q => qSDD ψ (A q) (B q))
-              (fun q => question_easyApproxFromApproxDelta ψ hψ (A q) (B q) (C q))
-              (fun q => qSDD_nonneg ψ (A q) (B q))
+      = |avgOver 𝒟 (fun q =>
+          (∑ a : Outcome, ev ψ ((A q).outcome a * (C q).outcome a)) -
+            ∑ a : Outcome, ev ψ ((B q).outcome a * (C q).outcome a))| := by
+          simp [avgOver, Finset.sum_sub_distrib, mul_sub]
+    _ ≤ Real.sqrt (avgOver 𝒟 (fun q => qSDD ψ (A q) (B q))) := by
+          exact avgOver_abs_le_sqrt_of_pointwise 𝒟
+            (fun q =>
+              (∑ a : Outcome, ev ψ ((A q).outcome a * (C q).outcome a)) -
+                ∑ a : Outcome, ev ψ ((B q).outcome a * (C q).outcome a))
+            (fun q => qSDD ψ (A q) (B q))
+            (fun q => question_easyApproxFromApproxDelta ψ hψ (A q) (B q) (C q))
+            (fun q => qSDD_nonneg ψ (A q) (B q))
+            h𝒟
     _ ≤ Real.sqrt δ := by
           exact Real.sqrt_le_sqrt hAB.squaredDistanceBound
 
