@@ -299,19 +299,15 @@ lemma qCompleteness {Outcome : Type*}
             exact Real.rpow_nonneg hζ _
           linarith
 
-private lemma nnreal_smul_matrix_eq_complex {ι : Type*}
-    (Q : MIPStarRE.Quantum.Op ι) (c : NNReal) :
-    (c : ℂ) • Q = c • Q := by
-  ext i j
-  change (c : ℂ) * Q i j = (c : ℂ) * Q i j
-  rfl
-
 private lemma nnreal_algebraMap_matrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (c : NNReal) :
     (algebraMap NNReal (MIPStarRE.Quantum.Op ι)) c =
       (c : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
   rw [Algebra.algebraMap_eq_smul_one]
-  exact (nnreal_smul_matrix_eq_complex (1 : MIPStarRE.Quantum.Op ι) c).symm
+  ext i j
+  change (c : ℂ) * (1 : MIPStarRE.Quantum.Op ι) i j =
+    (c : ℂ) * (1 : MIPStarRE.Quantum.Op ι) i j
+  rfl
 
 private lemma one_sub_spectralTruncationError_smul_le_sqrt
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -346,7 +342,7 @@ private lemma one_sub_spectralTruncationError_smul_le_sqrt
       exact NNReal.coe_mk (1 - ε) (by linarith)
     simpa using congrArg (fun r : Error => (r : ℂ)) hc_real
   rw [← hc_cast]
-  rw [nnreal_smul_matrix_eq_complex Q c]
+  change c • Q ≤ CFC.sqrt Q
   rw [CFC.sqrt_eq_cfc]
   rw [← cfc_const_mul_id (R := NNReal) c Q (ha := hQ_nonneg)]
   rw [cfc_nnreal_le_iff _ _ _ (SpectrumRestricts.nnreal_of_nonneg hQ_nonneg)
