@@ -6,7 +6,7 @@ import MIPStarRE.Quantum.Measurement
 /-!
 # Quantum infrastructure
 
-This root module re-exports the finite-dimensional Hilbert-space, matrix,
-projector, and measurement infrastructure used by the low individual degree
-test formalization.
+This root module provides the finite-dimensional Hilbert-space, matrix, projector,
+and measurement infrastructure used by the low individual degree test
+formalization.
 -/

@@ -80,8 +80,8 @@ import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 /-!
 # Low individual degree test
 
-This root module re-exports the Lean development for the low individual degree
-test, including the test definition, preliminary analytic estimates, the
+This root module provides the Lean development for the low individual degree test,
+including the test definition, preliminary analytic estimates, the
 projectivization theorem, the main-induction interface, global variance,
 self-improvement, commutativity, and pasting.
 -/
