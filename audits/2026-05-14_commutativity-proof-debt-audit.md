@@ -67,12 +67,13 @@ The following remaining vocabulary is below the source theorem boundary.
 | Former phase-67 first-reverse residual declarations | `ScalarApproximation/Phase67Residual.lean` | Historical analytic endpoint for an older BAB-side reverse-insertion route | Deleted after import checks; not a hypothesis of `commDataProcessedG`, whose scalar chain uses the paper line-99--104 route through `evaluatedSlice_phaseSixSeven_reverse_bound` |
 | Former `evaluatedSlicePhaseFiveStabilityDefect` declarations | `ScalarApproximation/ProcessedG/PhaseFive.lean` | Older phase-five local scaffold | Deleted after import checks; the final paper-chain assembly uses `PaperChainPhaseFive.lean` |
 | `fullSliceABAB_scalar_to_BABAtensor` and related full-slice closeness lemmas | `Transport/FullSlice/Bridges/*` | Proved `closenessOfIP` scalar-to-tensor estimates | Internal construction lemmas, not theorem hypotheses; the unused x-evaluated `BABA` scalar intermediate was deleted after import checks |
-| `FullSliceScalarMarginalizeYFirstCloseness` | `Main/Auxiliary/ScalarMarginalization.lean` | Private local structure bundling a proved line-359 estimate | Harmless local proof organization |
+| Former one-field line-359 closeness wrapper | `Main/Auxiliary/ScalarMarginalization.lean` | Private local structure bundling a proved line-359 estimate | Deleted after import checks; the scalar marginalization proof now calls the proved line-359 estimate directly |
 
 These objects should not be promoted to assumptions of a source-labelled
-theorem.  The phase-67 residual scaffold and the older phase-five stability
-defect scaffold have been deleted after import checks; the remaining rows may
-be reconsidered in later cleanup after their import dependencies are checked.
+theorem.  The phase-67 residual scaffold, the older phase-five stability defect
+scaffold, and the one-field scalar-marginalization wrapper have been deleted
+after import checks; the remaining rows may be reconsidered in later cleanup
+after their import dependencies are checked.
 
 ## Statement Integrity Audit
 
