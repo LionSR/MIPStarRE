@@ -74,15 +74,6 @@ theorem totalDegree_le_mul_of_degreeOf_le {m d : ℕ} {K : Type*} [CommSemiring 
     _ = m * d := by
       simp [Fintype.card_fin]
 
-private theorem agreementEvent_eq_zeroEvent_sub {m : ℕ} {K : Type*} [Field K] [Fintype K]
-    [DecidableEq K] (g h : MvPolynomial (Fin m) K) :
-    {x ∈ (Finset.univ : Finset (Fin m → K)) |
-        MvPolynomial.eval x g = MvPolynomial.eval x h} =
-      {x ∈ (Finset.univ : Finset (Fin m → K)) |
-        MvPolynomial.eval x (g - h) = 0} := by
-  ext x
-  simp [MvPolynomial.eval_sub, sub_eq_zero]
-
 /-- If two polynomials on `K^m` have total degree at most `d`, then the uniform
 agreement probability is at most `d / |K|`. -/
 theorem schwartzZippel_totalDegree {m d : ℕ} {K : Type*} [Field K] [Fintype K]
@@ -93,7 +84,12 @@ theorem schwartzZippel_totalDegree {m d : ℕ} {K : Type*} [Field K] [Fintype K]
   have hsub_deg : (g - h).totalDegree ≤ d :=
     (MvPolynomial.totalDegree_sub g h).trans (max_le hg hh)
   unfold polynomialAgreementProbability
-  rw [agreementEvent_eq_zeroEvent_sub g h]
+  rw [show {x ∈ (Finset.univ : Finset (Fin m → K)) |
+        MvPolynomial.eval x g = MvPolynomial.eval x h} =
+      {x ∈ (Finset.univ : Finset (Fin m → K)) |
+        MvPolynomial.eval x (g - h) = 0} by
+        ext x
+        simp [MvPolynomial.eval_sub, sub_eq_zero]]
   calc
     #{x ∈ (Finset.univ : Finset (Fin m → K)) |
         MvPolynomial.eval x (g - h) = 0} /
