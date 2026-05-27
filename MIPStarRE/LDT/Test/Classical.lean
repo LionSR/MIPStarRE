@@ -51,23 +51,6 @@ def axisParallelAccepts {params : Parameters} [FieldModel params.q]
   | .A => strategy.axisParallelAnswerA ℓ zeroCoord = strategy.pointAnswerB u
   | .B => strategy.pointAnswerA u = strategy.axisParallelAnswerB ℓ zeroCoord
 
-/-- Whether the deterministic strategy is accepted on the paper's
-self-consistency branch.
-
-This is the actual verifier check from `references/ldt-paper/test_definition.tex`:
-both provers receive the same point question and must return the same field
-value. On the projective side,
-`SameSpaceProjStrat.lowIndividualDegreeFailureProbability` uses the
-matching cross-prover point-agreement term
-`SameSpaceProjStrat.pointAgreementFailureProbability`, and
-`SameSpaceProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement` explains
-how that term relates to the role-register-symmetrized SSC defect used
-elsewhere in the repository. -/
-def selfConsistencyAccepts {params : Parameters} [FieldModel params.q]
-    (strategy : TwoProverClassicalLIDStrategy params)
-    (u : Point params) : Prop :=
-  strategy.pointAnswerA u = strategy.pointAnswerB u
-
 /-- Whether the deterministic strategy is accepted on a sampled `j`-restricted
 diagonal branch instance. -/
 def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
@@ -183,7 +166,7 @@ noncomputable def selfConsistencyAcceptanceProbability {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) : Error :=
   indicatorAcceptanceProbability fun u : Point params =>
-    strategy.selfConsistencyAccepts u
+    strategy.pointAnswerA u = strategy.pointAnswerB u
 
 /-- Restricted-diagonal acceptance probability for the role choice where Alice
 gets the diagonal line and Bob gets the sampled base point. -/
