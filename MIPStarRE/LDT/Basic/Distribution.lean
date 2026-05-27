@@ -291,15 +291,6 @@ theorem averageOperatorOverDistribution_eq_sum_univ {α : Type*}
     (Distribution.sum_univ_eq_sum_support 𝒟 (fun a => 𝒟.weight a • A a)
       (fun a ha => by simp [𝒟.outsideSupport a ha])).symm
 
-/-- The weighted operator average of the zero-valued family is zero.
-This is a thin wrapper around `Finset.sum` simplification for
-`averageOperatorOverDistribution`. -/
-theorem averageOperatorOverDistribution_zero {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : Distribution α) :
-    averageOperatorOverDistribution 𝒟 (fun _ : α => (0 : MIPStarRE.Quantum.Op ι)) = 0 := by
-  simp [averageOperatorOverDistribution]
-
 /-- If two operator-valued families agree pointwise, their averages agree. -/
 theorem averageOperatorOverDistribution_congr {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -307,17 +298,6 @@ theorem averageOperatorOverDistribution_congr {α : Type*}
     (h : ∀ a, A a = B a) :
     averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
   exact Finset.sum_congr rfl fun a _ => by rw [h a]
-
-/-- Operator averages only depend on the family values on the explicit support.
-This support-restricted form is useful when the support carries an invariant not
-available for all ambient values. -/
-theorem averageOperatorOverDistribution_congr_on_support {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : Distribution α) (A B : α → MIPStarRE.Quantum.Op ι)
-    (h : ∀ a, a ∈ 𝒟.support → A a = B a) :
-    averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
-  simp only [averageOperatorOverDistribution]
-  exact Finset.sum_congr rfl fun a ha => by rw [h a ha]
 
 namespace Distribution.IsProbability
 
@@ -333,42 +313,6 @@ theorem avgOver_le_of_forall_le_on_support {α : Type*} {𝒟 : Distribution α}
     avgOver 𝒟 f ≤ avgOver 𝒟 (fun _ : α => δ) :=
       avgOver_mono_on_support 𝒟 f (fun _ : α => δ) hf
     _ = δ := avgOver_const_of_isProbability 𝒟 h𝒟 δ
-
-/-- A supportwise lower bound also bounds the average of a probability distribution
-from below. -/
-theorem le_avgOver_of_forall_le_on_support {α : Type*} {𝒟 : Distribution α}
-    (h𝒟 : 𝒟.IsProbability) (f : α → Error) (δ : Error)
-    (hf : ∀ a, a ∈ 𝒟.support → δ ≤ f a) :
-    δ ≤ avgOver 𝒟 f := by
-  calc
-    δ = avgOver 𝒟 (fun _ : α => δ) :=
-      (avgOver_const_of_isProbability 𝒟 h𝒟 δ).symm
-    _ ≤ avgOver 𝒟 f :=
-      avgOver_mono_on_support 𝒟 (fun _ : α => δ) f hf
-
-/-- If a scalar function is bounded in absolute value on the explicit support of a
-probability distribution, then its weighted average has the same absolute-value
-bound. -/
-theorem abs_avgOver_le_of_forall_abs_le_on_support {α : Type*} {𝒟 : Distribution α}
-    (h𝒟 : 𝒟.IsProbability) (f : α → Error) (δ : Error)
-    (hf : ∀ a, a ∈ 𝒟.support → |f a| ≤ δ) :
-    |avgOver 𝒟 f| ≤ δ := by
-  calc
-    |avgOver 𝒟 f|
-        = |∑ a ∈ 𝒟.support, 𝒟.weight a * f a| := by
-          simp only [avgOver]
-    _ ≤ ∑ a ∈ 𝒟.support, |𝒟.weight a * f a| :=
-        Finset.abs_sum_le_sum_abs (fun a => 𝒟.weight a * f a) 𝒟.support
-    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * |f a| := by
-        refine Finset.sum_congr rfl ?_
-        intro a _
-        rw [abs_mul, abs_of_nonneg (𝒟.nonnegative a)]
-    _ ≤ ∑ a ∈ 𝒟.support, 𝒟.weight a * δ :=
-        Finset.sum_le_sum fun a ha =>
-          mul_le_mul_of_nonneg_left (hf a ha) (𝒟.nonnegative a)
-    _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * δ := by
-        rw [← Finset.sum_mul]
-    _ = δ := by rw [h𝒟.weight_sum_eq_one, one_mul]
 
 end Distribution.IsProbability
 
@@ -569,33 +513,5 @@ theorem avgOver_uniform_snd {α β : Type*}
             (avgOver_uniform_equiv (e := Equiv.prodComm α β)
               (f := fun ab : α × β => f ab.2))
     _ = avgOver (uniformDistribution β) f := avgOver_uniform_fst f
-
-/-- A pointwise upper bound depending only on the first coordinate bounds the product average. -/
-theorem avgOver_uniform_prod_le_fst {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α × β → Error) (g : α → Error)
-    (h : ∀ ab, f ab ≤ g ab.1) :
-    avgOver (uniformDistribution (α × β)) f ≤
-      avgOver (uniformDistribution α) g := by
-  calc
-    avgOver (uniformDistribution (α × β)) f
-      ≤ avgOver (uniformDistribution (α × β)) (fun ab => g ab.1) := by
-          exact avgOver_mono _ _ _ h
-    _ = avgOver (uniformDistribution α) g := avgOver_uniform_fst g
-
-/-- A pointwise upper bound depending only on the second coordinate bounds the product average. -/
-theorem avgOver_uniform_prod_le_snd {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α × β → Error) (g : β → Error)
-    (h : ∀ ab, f ab ≤ g ab.2) :
-    avgOver (uniformDistribution (α × β)) f ≤
-      avgOver (uniformDistribution β) g := by
-  calc
-    avgOver (uniformDistribution (α × β)) f
-      ≤ avgOver (uniformDistribution (α × β)) (fun ab => g ab.2) := by
-          exact avgOver_mono _ _ _ h
-    _ = avgOver (uniformDistribution β) g := avgOver_uniform_snd g
 
 end MIPStarRE.LDT
