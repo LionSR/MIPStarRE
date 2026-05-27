@@ -242,22 +242,17 @@ while still acting as regression tests.
 
 open Lean Elab Command
 
-private def expectedStandardAxioms : Array Name :=
-  #[``propext, ``Classical.choice, ``Quot.sound].qsort Name.lt
-
-private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
-    CommandElabM Unit := do
-  let axioms := (← Lean.collectAxioms declName).qsort Name.lt
-  unless axioms == expected do
-    throwError
-      m!"'{declName}' depends on axioms {axioms.toList}, expected exactly " ++
-        m!"{expected.toList}"
-
 private def resolveDeclIdent (id : TSyntax `ident) : CommandElabM Name := do
   liftCoreM <| Lean.Elab.realizeGlobalConstNoOverloadWithInfo id
 
 elab "assert_standard_axioms " id:ident : command => do
-  assertUsesExactlyAxioms (← resolveDeclIdent id) expectedStandardAxioms
+  let declName ← resolveDeclIdent id
+  let axioms := (← Lean.collectAxioms declName).qsort Name.lt
+  let expected := #[``propext, ``Classical.choice, ``Quot.sound].qsort Name.lt
+  unless axioms == expected do
+    throwError
+      m!"'{declName}' depends on axioms {axioms.toList}, expected exactly " ++
+        m!"{expected.toList}"
 
 elab "assert_no_sorry_axiom " id:ident : command => do
   let declName ← resolveDeclIdent id

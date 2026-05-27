@@ -469,7 +469,21 @@ noncomputable def roleRegisterSymmState {ιA ιB : Type*}
         roleRegisterDensityScale ιA ιB •
           rolePairDirectSumCond Role.A Role.B
             (localPairABBlock ψ.density) := by
-            simp [roleRegisterSymmState]
+            let s : Error := roleRegisterDensityScale ιA ιB
+            let A := rolePairDirectSumCond Role.A Role.B (localPairABBlock ψ.density)
+            let B := rolePairDirectSumCond Role.B Role.A
+              (localPairBABlock (heterogeneousSwapDensity ψ.density))
+            change swapDensity (s • A + s • B) = s • B + s • A
+            rw [swapDensity_add]
+            have hAB : swapDensity (s • A) = s • B := by
+              change swapDensity ((s : ℂ) • A) = (s : ℂ) • B
+              rw [swapDensity_smul]
+              simp [A, B]
+            have hBA : swapDensity (s • B) = s • A := by
+              change swapDensity ((s : ℂ) • B) = (s : ℂ) • A
+              rw [swapDensity_smul]
+              simp [A, B]
+            rw [hAB, hBA]
     _ = (roleRegisterSymmState ψ).density := by
           simp [roleRegisterSymmState, add_comm]
 
