@@ -25,14 +25,6 @@ lemma spectralTruncationError_le_half (ζ : Error)
     exact hquarter ▸ Real.sqrt_le_sqrt hζq
   simpa [spectralTruncationError, Real.sqrt_eq_rpow] using hsqrt
 
-private lemma zeta_le_zetaQuarterRoot (ζ : Error)
-    (hζ : 0 ≤ ζ) (hζq : ζ ≤ 1 / (4 : Error)) :
-    ζ ≤ zetaQuarterRoot ζ := by
-  have hζ1 : ζ ≤ 1 := by linarith
-  dsimp [zetaQuarterRoot]
-  simpa [Real.rpow_one] using
-    (Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 (by positivity) (by norm_num : (1 : Error) ≥ 1 / 4))
-
 /-- Under the small-error hypothesis `ζ ≤ 1/4`, the spectral truncation error
 is bounded by the fourth-root error scale used in the `Q/X/XHat/P` layer. -/
 lemma spectralTruncationError_le_zetaQuarterRoot (ζ : Error)
@@ -280,7 +272,11 @@ lemma qCompleteness {Outcome : Type*}
   have hzeta_term :
       2 * ζ ≤ 2 * zetaQuarterRoot ζ := by
     gcongr
-    exact zeta_le_zetaQuarterRoot ζ hζ hζ_small
+    have hζ1 : ζ ≤ 1 := by linarith
+    dsimp [zetaQuarterRoot]
+    simpa [Real.rpow_one] using
+      (Real.rpow_le_rpow_of_exponent_ge' hζ hζ1 (by positivity)
+        (by norm_num : (1 : Error) ≥ 1 / 4))
   have hround_term :
       2 * Real.sqrt (roundingToProjectiveError ζ) ≤ 8 * zetaQuarterRoot ζ := by
     have hsqrt_bound := sqrt_roundingToProjectiveError_le_four_zetaQuarterRoot ζ hζ
