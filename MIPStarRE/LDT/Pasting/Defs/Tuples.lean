@@ -93,9 +93,8 @@ def gHatTypeWeight {k : ℕ} (τ : GHatType k) : ℕ :=
   (Finset.univ.filter fun i => τ i).card
 
 /-- Prepend one type bit to a tail type. -/
-def prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) : GHatType (k + 1)
-  | ⟨0, _⟩ => b
-  | ⟨n + 1, hn⟩ => τ ⟨n, Nat.lt_of_succ_lt_succ hn⟩
+def prependTypeBit {k : ℕ} (b : Bool) (τ : GHatType k) : GHatType (k + 1) :=
+  Fin.cons b τ
 
 /-- The operator monomial associated with a type `τ`. -/
 noncomputable def gHatTypeOperator (G : MIPStarRE.Quantum.Op ι) {k : ℕ}
