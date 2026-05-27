@@ -77,12 +77,7 @@ jobs:
         working-directory: blueprint
         run: |
           leanblueprint pdf
-          pdf_status=$?
 
-          if [ "$pdf_status" -ne 0 ]; then
-            echo "::error::leanblueprint pdf failed — check for undefined macros or LaTeX errors above"
-            exit "$pdf_status"
-          fi
           if [ ! -s print/print.pdf ]; then
             echo "::error::leanblueprint pdf produced no output"
             exit 1
