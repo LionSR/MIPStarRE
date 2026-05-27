@@ -121,24 +121,14 @@ private lemma sum_reorder_four {α β γ δ : Type*}
           intro a ha
           rw [Finset.sum_comm]
 
-private lemma sum_sum_mul_right {α β γ : Type*}
-    [Fintype α] [Fintype β] [Semiring γ] (f : α → β → γ) (c : γ) :
-    (∑ a, ∑ b, f a b) * c = ∑ a, ∑ b, f a b * c := by
-  calc
-    (∑ a, ∑ b, f a b) * c = ∑ a, (∑ b, f a b) * c := by
-      simpa using
-        (Finset.sum_mul (s := (Finset.univ : Finset α)) (f := fun a => ∑ b, f a b) (a := c))
-    _ = ∑ a, ∑ b, f a b * c := by
-      refine Finset.sum_congr rfl ?_
-      intro a ha
-      simpa using
-        (Finset.sum_mul (s := (Finset.univ : Finset β)) (f := fun b => f a b) (a := c))
-
 /-- Factor a common scalar out of a doubly indexed finite sum. -/
 lemma sum_sum_mul_left {α β γ : Type*}
     [Fintype α] [Fintype β] [CommSemiring γ] (c : γ) (f : α → β → γ) :
     ∑ a, ∑ b, c * f a b = c * ∑ a, ∑ b, f a b := by
-  simpa [mul_comm] using (sum_sum_mul_right (f := f) (c := c)).symm
+  rw [Finset.mul_sum]
+  refine Finset.sum_congr rfl ?_
+  intro a ha
+  rw [Finset.mul_sum]
 
 /-- Distribute a doubly indexed sum across pointwise addition. -/
 lemma sum_sum_add {α β γ : Type*}
@@ -227,10 +217,7 @@ lemma normalizedTrace_combined_tensor_eq (params : Parameters)
   unfold MIPStarRE.Quantum.normalizedTrace matrixExpectation
   rw [trace_combined_tensor_eq]
   simp_rw [div_eq_mul_inv]
-  simpa [mul_assoc] using
-    (sum_sum_mul_right
-      (f := fun u v => P u v * (model.state.matrix * ((model.family v)ᴴ * model.family u)).trace)
-      (c := (Fintype.card model.space.carrier : ℂ)⁻¹))
+  simp [MIPStarRE.Quantum.normalizedTrace, Finset.sum_mul, div_eq_mul_inv, mul_assoc]
 
 /-- Closed form of `globalVarianceTraceForm` as the average squared norm of the
 orthogonal residual family carried by the decomposition. -/
