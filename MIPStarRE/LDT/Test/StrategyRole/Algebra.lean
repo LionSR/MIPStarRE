@@ -152,12 +152,6 @@ theorem qBipartiteConsDefect_of_measurements {Outcome : Type*} {ιA ιB : Type*}
     simp [A.total_eq_one, B.total_eq_one, opTensor]]
   rw [max_eq_right (sub_nonneg.mpr hmatch_le)]
 
-private lemma normalizedTrace_error_smul {ι : Type*} [Fintype ι]
-    (c : Error) (A : MIPStarRE.Quantum.Op ι) :
-    MIPStarRE.Quantum.normalizedTrace (c • A) =
-      (c : ℂ) * MIPStarRE.Quantum.normalizedTrace A := by
-  simpa using MIPStarRE.Quantum.normalizedTrace_smul (c : ℂ) A
-
 -- Formal version of the role-register calculation in
 -- `references/ldt-paper/inductive_step.tex`, lines 45--66, together with the
 -- cross-term-vanishing observation at line 105.  The symmetrized state is
@@ -298,7 +292,8 @@ private lemma ev_classicalRoleSymmState_opTensor_roleCond_A_ignore {ι : Type*}
   rw [add_mul, add_mul, MIPStarRE.Quantum.normalizedTrace_add,
     MIPStarRE.Quantum.normalizedTrace_add, smul_mul_assoc, smul_mul_assoc,
     smul_mul_assoc, smul_mul_assoc]
-  simp_rw [normalizedTrace_error_smul]
+  simp_rw [RCLike.real_smul_eq_coe_smul (K := ℂ),
+    MIPStarRE.Quantum.normalizedTrace_smul]
   conv_lhs =>
     rw [normalizedTrace_rolePairCond_mul_left_roleCond_same Role.A Role.B,
       normalizedTrace_rolePairCond_mul_left_roleCond_ne (by decide : Role.B ≠ Role.A)]
@@ -328,7 +323,8 @@ private lemma ev_classicalRoleSymmState_opTensor_roleCond_B_ignore {ι : Type*}
   rw [add_mul, add_mul, MIPStarRE.Quantum.normalizedTrace_add,
     MIPStarRE.Quantum.normalizedTrace_add, smul_mul_assoc, smul_mul_assoc,
     smul_mul_assoc, smul_mul_assoc]
-  simp_rw [normalizedTrace_error_smul]
+  simp_rw [RCLike.real_smul_eq_coe_smul (K := ℂ),
+    MIPStarRE.Quantum.normalizedTrace_smul]
   conv_lhs =>
     rw [normalizedTrace_rolePairCond_mul_left_roleCond_ne (by decide : Role.A ≠ Role.B),
       normalizedTrace_rolePairCond_mul_left_roleCond_same Role.B Role.A]
