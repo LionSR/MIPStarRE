@@ -84,17 +84,6 @@ private theorem sharedDiagonalLineQuestionOfPointPair_of_line
         ring_nf
         simp
 
-private theorem sharedDiagonalLineQuestionOfPointPair_injective
-    (params : Parameters)
-    [FieldModel params.q] :
-    Function.Injective (sharedDiagonalLineQuestionOfPointPair params) := by
-  intro s₁ s₂ hs
-  have hs' := congrArg
-    (fun q => (sampledPointPairFromSharedDiagonalQuestion params q, q.2.1)) hs
-  rcases Prod.mk.inj (by
-    simpa [sharedDiagonalLineQuestionOfPointPair_sampledPointPair] using hs') with ⟨hpair, ht⟩
-  exact Prod.ext hpair ht
-
 private lemma avgOver_pointPairSharedDiagonalLine_eq_uniform_seed
     (params : Parameters)
     [FieldModel params.q]
@@ -104,7 +93,11 @@ private lemma avgOver_pointPairSharedDiagonalLine_eq_uniform_seed
         (fun s => f (sharedDiagonalLineQuestionOfPointPair params s)) := by
   let e : PointPairQuestion params × Fq params → PointPairDiagonalLineQuestion params :=
     sharedDiagonalLineQuestionOfPointPair params
-  have hinj : Function.Injective e := sharedDiagonalLineQuestionOfPointPair_injective params
+  have hinj : Function.Injective e := by
+    refine Function.LeftInverse.injective
+      (g := fun q => (sampledPointPairFromSharedDiagonalQuestion params q, q.2.1)) ?_
+    intro s
+    exact Prod.ext (sharedDiagonalLineQuestionOfPointPair_sampledPointPair params s) rfl
   unfold avgOver pointPairSharedDiagonalLineDistribution uniformDistribution
   rw [Finset.sum_image]
   · apply Finset.sum_congr rfl
