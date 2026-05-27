@@ -49,17 +49,15 @@ private def avgCongrPlainPeel (name? : Option (TSyntax `ident)) : TacticM Unit :
   | some name => evalTactic (← `(tactic| intro $name:ident))
   | none => evalTactic (← `(tactic| intro))
 
-private def avgCongrSupportHypBaseName (name? : Option (TSyntax `ident)) : Name :=
-  match name? with
-  | some name =>
-      match name.getId.eraseMacroScopes with
-      | .str _ s => Name.mkSimple ("h" ++ s)
-      | _ => `hmem
-  | none => `hmem
-
 private def avgCongrSupportHypName
     (name? : Option (TSyntax `ident)) : TacticM Name := do
-  let base := avgCongrSupportHypBaseName name?
+  let base :=
+    match name? with
+    | some name =>
+        match name.getId.eraseMacroScopes with
+        | .str _ s => Name.mkSimple ("h" ++ s)
+        | _ => `hmem
+    | none => `hmem
   for decl in ← getLCtx do
     if !decl.isImplementationDetail && decl.userName == base then
       return ← mkFreshUserName base
