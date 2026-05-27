@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 
 /-!
@@ -39,15 +40,6 @@ private lemma switcherooAggregateRight_completePart_outcome
     completePartTotalProductRight, multiplyByTotalOnRight,
     multiplyByTotalOnLeft, OpFamily.leftPlacedOpFamily]
 
-private lemma qSDDOp_congr_unit_outcome
-    (ψbi : QuantumState (ι × ι))
-    (A B A' B' : OpFamily Unit (ι × ι))
-    (hA : A.outcome () = A'.outcome ())
-    (hB : B.outcome () = B'.outcome ()) :
-    qSDDOp ψbi A B = qSDDOp ψbi A' B' := by
-  unfold qSDDOp qSDDCore
-  simp [hA, hB]
-
 /-- When the left/right aggregate families are re-expressed using the
 completed one-outcome form, the aggregate commutation bound translates to the
 complete-part total-product commutation bound. -/
@@ -66,29 +58,20 @@ lemma completePartAggregateCommutation_as_total
       (completePartTotalProductLeft params family)
       (completePartTotalProductRight params family)
       gamma := by
-  rcases hcomm with ⟨hcomm⟩
-  constructor
-  unfold sddErrorOp at *
-  calc
-    avgOver (uniformDistribution (SlicePairQuestion params))
-        (fun q =>
-          qSDDOp ψbi
-            (completePartTotalProductLeft params family q)
-            (completePartTotalProductRight params family q))
-      = avgOver (uniformDistribution (SlicePairQuestion params))
-          (fun q =>
-            qSDDOp ψbi
-              (switcherooAggregateLeft params family (completePartProjFamily params family) q)
-              (switcherooAggregateRight params family
-                (completePartProjFamily params family) q)) := by
-                apply avgOver_congr
-                intro q
-                symm
-                exact qSDDOp_congr_unit_outcome ψbi
-                  _ _ _ _
-                  (switcherooAggregateLeft_completePart_outcome params family q)
-                  (switcherooAggregateRight_completePart_outcome params family q)
-    _ ≤ gamma := hcomm
+  exact CommutativityPoints.sddOpRel_congr_outcome ψbi
+    (uniformDistribution (SlicePairQuestion params))
+    (switcherooAggregateLeft params family (completePartProjFamily params family))
+    (switcherooAggregateRight params family (completePartProjFamily params family))
+    (completePartTotalProductLeft params family)
+    (completePartTotalProductRight params family)
+    gamma
+    (fun q a => by
+      cases a
+      exact switcherooAggregateLeft_completePart_outcome params family q)
+    (fun q a => by
+      cases a
+      exact switcherooAggregateRight_completePart_outcome params family q)
+    hcomm
 
 /-- Variant of the first switcheroo scalar bound using the intermediate
 `eighthSum`; shared with `CommutingWithG/Complete`. -/
