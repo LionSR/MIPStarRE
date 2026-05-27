@@ -16,30 +16,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Expand the left aggregate family after replacing the slice family by its
-completed one-outcome form. -/
-private lemma switcherooAggregateLeft_completePart_outcome
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    (q : SlicePairQuestion params) :
-    (switcherooAggregateLeft params family (completePartProjFamily params family) q).outcome () =
-      (completePartTotalProductLeft params family q).outcome () := by
-  simp [switcherooAggregateLeft, completePartProjFamily,
-    completePartTotalProductLeft, multiplyByTotalOnRight,
-    multiplyByTotalOnLeft, OpFamily.leftPlacedOpFamily]
-
-/-- Expand the right aggregate family after replacing the slice family by its
-completed one-outcome form. -/
-private lemma switcherooAggregateRight_completePart_outcome
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι)
-    (q : SlicePairQuestion params) :
-    (switcherooAggregateRight params family (completePartProjFamily params family) q).outcome () =
-      (completePartTotalProductRight params family q).outcome () := by
-  simp [switcherooAggregateRight, completePartProjFamily,
-    completePartTotalProductRight, multiplyByTotalOnRight,
-    multiplyByTotalOnLeft, OpFamily.leftPlacedOpFamily]
-
 /-- When the left/right aggregate families are re-expressed using the
 completed one-outcome form, the aggregate commutation bound translates to the
 complete-part total-product commutation bound. -/
@@ -67,10 +43,14 @@ lemma completePartAggregateCommutation_as_total
     gamma
     (fun q a => by
       cases a
-      exact switcherooAggregateLeft_completePart_outcome params family q)
+      simp [switcherooAggregateLeft, completePartProjFamily,
+        completePartTotalProductLeft, multiplyByTotalOnRight,
+        multiplyByTotalOnLeft, OpFamily.leftPlacedOpFamily])
     (fun q a => by
       cases a
-      exact switcherooAggregateRight_completePart_outcome params family q)
+      simp [switcherooAggregateRight, completePartProjFamily,
+        completePartTotalProductRight, multiplyByTotalOnRight,
+        multiplyByTotalOnLeft, OpFamily.leftPlacedOpFamily])
     hcomm
 
 /-- Variant of the first switcheroo scalar bound using the intermediate
