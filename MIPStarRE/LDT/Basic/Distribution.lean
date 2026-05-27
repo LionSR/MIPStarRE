@@ -52,14 +52,6 @@ theorem Distribution.sum_univ_eq_sum_support {α β : Type*} [Fintype α]
     (Finset.sum_subset (Finset.subset_univ 𝒟.support)
       (fun a _ ha => hf a ha)).symm
 
-/-- On a finite ambient type, summing weights over all ambient values gives the same
-mass as summing over the stored support. -/
-theorem Distribution.weight_sum_univ_eq_totalWeight {α : Type*} [Fintype α]
-    (𝒟 : Distribution α) :
-    (∑ a : α, 𝒟.weight a) = 𝒟.totalWeight := by
-  simpa [Distribution.totalWeight] using
-    Distribution.sum_univ_eq_sum_support 𝒟 𝒟.weight 𝒟.outsideSupport
-
 namespace Distribution.IsProbability
 
 /-- Unpack the equality form of the probability invariant. -/
@@ -76,8 +68,9 @@ statements that follow the paper's notation `𝔼_{x ∼ 𝒟}` over the questio
 than over a stored support finset. -/
 theorem weight_sum_univ_eq_one {α : Type*} [Fintype α]
     {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) :
-    (∑ a : α, 𝒟.weight a) = 1 :=
-  (Distribution.weight_sum_univ_eq_totalWeight 𝒟).trans h𝒟
+    (∑ a : α, 𝒟.weight a) = 1 := by
+  rw [Distribution.sum_univ_eq_sum_support 𝒟 𝒟.weight 𝒟.outsideSupport]
+  exact h𝒟.weight_sum_eq_one
 
 /-- A probability distribution has total weight at most `1`. -/
 theorem weight_sum_le_one {α : Type*}
@@ -121,18 +114,6 @@ noncomputable def totalVariationDistance {α : Type*} [DecidableEq α]
 
 Proofs use Mathlib's `Finset.sum` API: `Finset.sum_le_sum`, `Finset.sum_add_distrib`,
 `Finset.mul_sum`, and `Finset.sum_congr`. -/
-
-/-- On a finite ambient type, `avgOver` can be read as a weighted sum over all ambient
-values because `Distribution.weight` is zero outside the stored support.
-
-This is a thin adapter from the repository-local `Distribution.sum_univ_eq_sum_support`
-lemma to the `avgOver` API; it is not a replacement for Mathlib probability theory. -/
-theorem avgOver_eq_sum_univ {α : Type*} [Fintype α]
-    (𝒟 : Distribution α) (f : α → Error) :
-    avgOver 𝒟 f = ∑ a : α, 𝒟.weight a * f a := by
-  simpa [avgOver] using
-    (Distribution.sum_univ_eq_sum_support 𝒟 (fun a => 𝒟.weight a * f a)
-      (fun a ha => by simp [𝒟.outsideSupport a ha])).symm
 
 /-- Averaging the zero function gives zero. -/
 theorem avgOver_zero {α : Type*} (𝒟 : Distribution α) :

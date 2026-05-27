@@ -120,11 +120,9 @@ noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α := ...
 ```
 
-This file already contains project-local finite-sum adapters such as
-`Distribution.sum_univ_eq_sum_support`,
-`Distribution.weight_sum_univ_eq_totalWeight`, and `avgOver_eq_sum_univ`.
-Those are wrappers around Mathlib's `Finset` API, not replacements for
-Mathlib probability theory.
+This file already contains the project-local finite-sum adapter
+`Distribution.sum_univ_eq_sum_support`.  It is a wrapper around Mathlib's
+`Finset` API, not a replacement for Mathlib probability theory.
 
 ## Can `avgOver` be expressed as a Mathlib expectation?
 
@@ -153,8 +151,8 @@ The proof would use:
   `∑ a, (p a).toReal • f a`;
 - `ENNReal.toReal_ofReal (𝒟.nonnegative a)` to return from `ℝ≥0∞` weights to
   `Error = ℝ` weights;
-- `avgOver_eq_sum_univ` / `Distribution.sum_univ_eq_sum_support` to move
-  between the explicit support and the ambient finite type.
+- `Distribution.sum_univ_eq_sum_support` to move between the explicit support
+  and the ambient finite type.
 
 For non-probability weights, `avgOver` is not an expectation.  It is a finite
 weighted sum.  It can still be represented by a finite measure, but then the
