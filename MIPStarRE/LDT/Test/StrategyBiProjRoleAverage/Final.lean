@@ -98,6 +98,34 @@ theorem diagonalRoleAverage_nonneg
     linarith
   · norm_num
 
+/-- The full low-individual-degree failure probability of a two-space projective
+strategy is nonnegative. -/
+theorem lowIndividualDegreeFailureProbability_nonneg
+    {params : Parameters} [FieldModel params.q]
+    {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
+    {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
+    (strategy : ProjStrat params ιA ιB) :
+    0 ≤ strategy.lowIndividualDegreeFailureProbability := by
+  have haxis : 0 ≤ strategy.axisParallelRoleAverage :=
+    axisParallelRoleAverage_nonneg strategy
+  have hpoint : 0 ≤ strategy.pointAgreementFailureProbability :=
+    pointAgreementFailureProbability_nonneg strategy
+  have hdiag : 0 ≤ strategy.diagonalRoleAverage :=
+    diagonalRoleAverage_nonneg strategy
+  unfold ProjStrat.lowIndividualDegreeFailureProbability
+  nlinarith
+
+/-- Any passing two-space projective strategy has a nonnegative error
+parameter. -/
+theorem eps_nonneg_of_passes
+    {params : Parameters} [FieldModel params.q]
+    {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
+    {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
+    {strategy : ProjStrat params ιA ιB} {eps : Error}
+    (hpass : strategy.PassesLowIndividualDegreeTest eps) :
+    0 ≤ eps :=
+  (lowIndividualDegreeFailureProbability_nonneg strategy).trans hpass.soundnessHypothesis
+
 /-- The heterogeneous role-register symmetrization of a two-space projective
 strategy is `(3ε, 3ε, 3ε)`-good whenever the original strategy passes the full
 low individual degree test with error `ε`. -/
