@@ -162,11 +162,6 @@ private lemma rolePairCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
   MIPStarRE.Quantum.reindex_nonneg (roleRegisterPairLocalEquiv ι)
     (opTensor_nonneg (rolePairProj_nonneg rL rR) hX)
 
-@[simp] private lemma swapDensity_real_smul {ι : Type*} (c : Error)
-    (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity (c • X) = c • swapDensity X := by
-  simpa using (swapDensity_smul (c := (c : ℂ)) X)
-
 @[simp] private lemma swapDensity_leftTensor {ι : Type*} [Fintype ι] [DecidableEq ι]
     (M : MIPStarRE.Quantum.Op ι) :
     swapDensity (leftTensor (ι₂ := ι) M) = rightTensor (ι₁ := ι) M := by
@@ -188,15 +183,6 @@ private lemma swapDensity_nonneg {ι : Type*} [Finite ι]
     0 ≤ swapDensity X := by
   simpa [swapDensity_eq_reindex] using
     MIPStarRE.Quantum.reindex_nonneg (Equiv.prodComm ι ι) hX
-
-@[simp] private lemma swapDensity_rolePairCond {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (rL rR : Role) (X : MIPStarRE.Quantum.Op (ι × ι)) :
-    swapDensity (rolePairCond rL rR X) = rolePairCond rR rL (swapDensity X) := by
-  ext x y
-  rcases x with ⟨⟨sL, iL⟩, ⟨sR, iR⟩⟩
-  rcases y with ⟨⟨tL, jL⟩, ⟨tR, jR⟩⟩
-  cases rL <;> cases rR <;> cases sL <;> cases sR <;> cases tL <;> cases tR <;>
-    simp [swapDensity, rolePairCond, rolePairProj, roleProj, opTensor, roleRegisterPairLocalEquiv]
 
 /-- Classical role-register symmetrization of a bipartite state.
 
@@ -222,15 +208,25 @@ noncomputable def classicalRoleSymmState {ι : Type*} [Fintype ι] [DecidableEq 
 @[simp] theorem classicalRoleSymmState_density_fixed {ι : Type*}
     [Fintype ι] [DecidableEq ι] (ψ : QuantumState (ι × ι)) :
     swapDensity (classicalRoleSymmState ψ).density = (classicalRoleSymmState ψ).density := by
+  have hrolePair (rL rR : Role) (X : MIPStarRE.Quantum.Op (ι × ι)) :
+      swapDensity (rolePairCond rL rR X) = rolePairCond rR rL (swapDensity X) := by
+    ext x y
+    rcases x with ⟨⟨sL, iL⟩, ⟨sR, iR⟩⟩
+    rcases y with ⟨⟨tL, jL⟩, ⟨tR, jR⟩⟩
+    cases rL <;> cases rR <;> cases sL <;> cases sR <;> cases tL <;> cases tR <;>
+      simp [swapDensity, rolePairCond, rolePairProj, roleProj, opTensor, roleRegisterPairLocalEquiv]
   calc
     swapDensity (classicalRoleSymmState ψ).density
       = (2 : Error) • swapDensity (rolePairCond Role.A Role.B ψ.density) +
           (2 : Error) • swapDensity
             (rolePairCond Role.B Role.A (swapDensity ψ.density)) := by
-              simp [classicalRoleSymmState]
+              ext x y
+              rcases x with ⟨iL, iR⟩
+              rcases y with ⟨jL, jR⟩
+              simp [classicalRoleSymmState, swapDensity]
     _ = (2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density) +
           (2 : Error) • rolePairCond Role.A Role.B (swapDensity (swapDensity ψ.density)) := by
-              simp
+              simp [hrolePair]
     _ = (2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density) +
           (2 : Error) • rolePairCond Role.A Role.B ψ.density := by
               simp
