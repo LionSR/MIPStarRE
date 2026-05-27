@@ -193,25 +193,6 @@ noncomputable def tracePairingMatrixOfRealCLM {d : Type*} [Fintype d] [Decidable
     (ψ (Matrix.single j i (1 : ℂ)) : ℂ) -
       (ψ (Matrix.single j i Complex.I) : ℂ) * Complex.I
 
-private lemma realTracePairingCLM_tracePairingMatrixOfRealCLM_single
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (ψ : StrongDual ℝ (Op d)) (i j : d) (z : ℂ) :
-    realTracePairingCLM (tracePairingMatrixOfRealCLM ψ) (Matrix.single i j z) =
-      ψ (Matrix.single i j z) := by
-  rw [realTracePairingCLM_single]
-  rw [show Matrix.single i j z =
-      z.re • Matrix.single i j (1 : ℂ) + z.im • Matrix.single i j Complex.I by
-        ext a b
-        by_cases hai : a = i
-        · subst a
-          by_cases hbj : b = j
-          · subst b
-            simp [Complex.re_add_im]
-          · simp [Matrix.single, Ne.symm hbj]
-        · simp [Matrix.single, Ne.symm hai]]
-  simp [tracePairingMatrixOfRealCLM, Complex.mul_re]
-  ring
-
 /-- Every continuous real-linear functional on finite complex matrices is a real trace pairing. -/
 theorem realTracePairingCLM_tracePairingMatrixOfRealCLM
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -232,7 +213,20 @@ theorem realTracePairingCLM_tracePairingMatrixOfRealCLM
           intro i _
           apply Finset.sum_congr rfl
           intro j _
-          exact realTracePairingCLM_tracePairingMatrixOfRealCLM_single ψ i j (X i j)
+          rw [realTracePairingCLM_single]
+          rw [show Matrix.single i j (X i j) =
+              (X i j).re • Matrix.single i j (1 : ℂ) +
+                (X i j).im • Matrix.single i j Complex.I by
+                ext a b
+                by_cases hai : a = i
+                · subst a
+                  by_cases hbj : b = j
+                  · subst b
+                    simp [Complex.re_add_im]
+                  · simp [Matrix.single, Ne.symm hbj]
+                · simp [Matrix.single, Ne.symm hai]]
+          simp [tracePairingMatrixOfRealCLM, Complex.mul_re]
+          ring
     _ = ψ (∑ i, ∑ j, Matrix.single i j (X i j)) := by
           simp
     _ = ψ X := by
