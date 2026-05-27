@@ -239,18 +239,6 @@ noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
   let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
   Au * (T.outcome h) * Au
 
-private theorem filteredPolynomialOutcomeSum_le_one (params : Parameters)
-    [FieldModel params.q]
-    (T : SubMeas (Polynomial params) ι) (u : Point params) (a : Fq params) :
-    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 := by
-  calc
-    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a), T.outcome h
-      ≤ ∑ h : Polynomial params, T.outcome h :=
-        Finset.sum_le_sum_of_subset_of_nonneg
-          (Finset.filter_subset _ _) (fun h _ _ => T.outcome_pos h)
-    _ = T.total := T.sum_eq_total
-    _ ≤ 1 := T.total_le_one
-
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
 noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     [FieldModel params.q]
@@ -303,7 +291,14 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
               intro a _
               have hfilt_le_one : ∑ h ∈ Finset.univ.filter
                   (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 :=
-                filteredPolynomialOutcomeSum_le_one (ι := ι) (params := params) T u a
+                calc
+                  ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                      T.outcome h
+                    ≤ ∑ h : Polynomial params, T.outcome h :=
+                      Finset.sum_le_sum_of_subset_of_nonneg
+                        (Finset.filter_subset _ _) (fun h _ _ => T.outcome_pos h)
+                  _ = T.total := T.sum_eq_total
+                  _ ≤ 1 := T.total_le_one
               simpa [Au.proj a] using
                 sandwich_mono
                   (M := Au.toSubMeas.outcome a)
