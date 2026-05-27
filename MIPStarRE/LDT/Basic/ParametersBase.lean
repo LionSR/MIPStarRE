@@ -291,11 +291,6 @@ theorem two_le_scalar_card (params : Parameters) [FieldModel params.q] :
     2 ≤ Fintype.card (Scalar params) := by
   simpa using params.two_le_q
 
-/-- The scalar model has positive finite cardinality. -/
-theorem scalar_card_pos (params : Parameters) [FieldModel params.q] :
-    0 < Fintype.card (Scalar params) :=
-  lt_of_lt_of_le Nat.zero_lt_two (two_le_scalar_card params)
-
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
   (FieldModel.equiv (q := params.q)).symm x
