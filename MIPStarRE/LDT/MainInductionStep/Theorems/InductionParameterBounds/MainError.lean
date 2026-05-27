@@ -93,22 +93,6 @@ lemma mainInductionNu_lt_one_of_mainInductionError_lt_one
     exact lt_of_le_of_lt hnu_le hsmall
   · linarith
 
-private lemma mainInductionCoeff_ge_one
-    (params : Parameters) {k : ℕ}
-    (hk0 : k ≠ 0) :
-    (1 : Error) ≤
-      1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
-  have hk_one : (1 : Error) ≤ (k : Error) := by
-    have hk_nat_one : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
-    exact_mod_cast hk_nat_one
-  have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
-    exact_mod_cast params.next.hm
-  have hk_sq_ge_one : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
-    nlinarith [hk_one]
-  have hm_sq_ge_one : (1 : Error) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
-    nlinarith [hm_one]
-  nlinarith
-
 private lemma le_one_of_mainInductionError_lt_one_of_scaled_bound
     (params : Parameters) {k : ℕ} {eps delta gamma x : Error}
     (hsmall : mainInductionError params.next k eps delta gamma < 1)
@@ -119,7 +103,19 @@ private lemma le_one_of_mainInductionError_lt_one_of_scaled_bound
     x ≤ 1 := by
   have hk0 :=
     k_ne_zero_of_mainInductionError_lt_one params.next k eps delta gamma hsmall
-  have hcoef_ge_one := mainInductionCoeff_ge_one params hk0
+  have hcoef_ge_one :
+      (1 : Error) ≤
+        1000 * ((k : Error) ^ (2 : ℕ)) * ((params.next.m : Error) ^ (2 : ℕ)) := by
+    have hk_one : (1 : Error) ≤ (k : Error) := by
+      have hk_nat_one : 1 ≤ k := Nat.succ_le_of_lt (Nat.pos_of_ne_zero hk0)
+      exact_mod_cast hk_nat_one
+    have hm_one : (1 : Error) ≤ (params.next.m : Error) := by
+      exact_mod_cast params.next.hm
+    have hk_sq_ge_one : (1 : Error) ≤ ((k : Error) ^ (2 : ℕ)) := by
+      nlinarith [hk_one]
+    have hm_sq_ge_one : (1 : Error) ≤ ((params.next.m : Error) ^ (2 : ℕ)) := by
+      nlinarith [hm_one]
+    nlinarith
   have hnu_lt :=
     mainInductionNu_lt_one_of_mainInductionError_lt_one
       params.next k eps delta gamma hsmall
