@@ -49,7 +49,8 @@ unconditional theorem exposed to later Lean code.
   branch, the endpoint branch, and the trivial large-error branch into the
   standalone projective-non-measurement witness consumed by the
   orthonormalization construction.\footnote{The relevant declarations are
-  \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective},
+  \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_two\_mul},
+  \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_two\_mul\_full},
   \leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full}, and
   \leanid{spectralTruncationStatement\_of\_sourceAlmostProjective} in
   \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean}.}
@@ -168,14 +169,15 @@ The endpoint is therefore valid, but it requires a separate spectral argument.
 \section{Relation with the formal development}
 
 The current \Lean{} declarations make this distinction explicit.\footnote{The
-constructive small-error branch is formalized by
-\leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective} and
-\leanid{projectiveNonMeasurement\_of\_almostProjMeasStatement} in
+constructive small-error branch with the paper's $2\zeta$ source-defect bound is
+formalized by
+\leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_two\_mul} in
 \doclink{MIPStarRE/LDT/MakingMeasurementsProjective/SpectralTruncation/ProjectiveNonMeasurement.lean}.
-The unconditional spectral-truncation producer
-\leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full} combines
-that branch with the exact $\zeta = 0$ endpoint and the trivial large-error
-case, and
+The unconditional spectral-truncation producers
+\leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_two\_mul\_full}
+and
+\leanid{projectiveNonMeasurement\_of\_sourceAlmostProjective\_full} combine that
+branch with the exact $\zeta = 0$ endpoint and the trivial large-error case, and
 \leanid{spectralTruncationStatement\_of\_sourceAlmostProjective} records the
 result directly as the spectral-truncation statement used by the later
 Section~5 construction.}
