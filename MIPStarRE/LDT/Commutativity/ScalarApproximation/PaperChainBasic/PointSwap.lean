@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
 import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
 import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
+import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 
 /-!
 # Point-swap bound for the evaluated-slice paper chain
@@ -18,51 +19,6 @@ open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
-private lemma qSDDOp_rightPlaced_eq_leftPlaced
-    {Outcome : Type*} [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (hperm : PermInvState ψ)
-    (A B : OpFamily Outcome ι) :
-    qSDDOp ψ
-      (OpFamily.rightPlacedOpFamily (ιA := ι) A)
-      (OpFamily.rightPlacedOpFamily (ιA := ι) B) =
-    qSDDOp ψ
-      (OpFamily.leftPlacedOpFamily (ιB := ι) A)
-      (OpFamily.leftPlacedOpFamily (ιB := ι) B) := by
-  unfold qSDDOp qSDDCore
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  let D : MIPStarRE.Quantum.Op ι := A.outcome a - B.outcome a
-  have hright_diff :
-      (OpFamily.rightPlacedOpFamily (ιA := ι) A).outcome a -
-        (OpFamily.rightPlacedOpFamily (ιA := ι) B).outcome a =
-      rightTensor (ι₁ := ι) D := by
-    simpa [OpFamily.rightPlacedOpFamily, rightTensor, opTensor, D] using
-      (MIPStarRE.Quantum.kronecker_sub_right
-        (A := (1 : MIPStarRE.Quantum.Op ι))
-        (B₁ := A.outcome a) (B₂ := B.outcome a))
-  have hleft_diff :
-      (OpFamily.leftPlacedOpFamily (ιB := ι) A).outcome a -
-        (OpFamily.leftPlacedOpFamily (ιB := ι) B).outcome a =
-      leftTensor (ι₂ := ι) D := by
-    simpa [OpFamily.leftPlacedOpFamily, D] using
-      leftTensor_sub (ι₁ := ι) (ι₂ := ι) (A.outcome a) (B.outcome a)
-  rw [hright_diff, hleft_diff]
-  calc
-    ev ψ ((rightTensor (ι₁ := ι) D)ᴴ * rightTensor (ι₁ := ι) D)
-        = ev ψ (rightTensor (ι₁ := ι) (Dᴴ * D)) := by
-          rw [show (rightTensor (ι₁ := ι) D)ᴴ = rightTensor (ι₁ := ι) Dᴴ by
-            simpa [rightTensor, opTensor] using
-              (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) (1 : MIPStarRE.Quantum.Op ι) D)]
-          rw [rightTensor_mul_rightTensor]
-    _ = ev ψ (leftTensor (ι₂ := ι) (Dᴴ * D)) := by
-          rw [← hperm.swap_ev (Dᴴ * D)]
-    _ = ev ψ ((leftTensor (ι₂ := ι) D)ᴴ * leftTensor (ι₂ := ι) D) := by
-          rw [show (leftTensor (ι₂ := ι) D)ᴴ = leftTensor (ι₂ := ι) Dᴴ by
-            simpa [leftTensor, opTensor] using
-              (conjTranspose_opTensor (ι₁ := ι) (ι₂ := ι) D (1 : MIPStarRE.Quantum.Op ι))]
-          rw [leftTensor_mul_leftTensor]
 
 lemma evaluatedSlice_phaseFour_pointSwap_right_bound_of_commutativityPoints
     (params : Parameters) [FieldModel params.q]
@@ -140,13 +96,18 @@ lemma evaluatedSlice_phaseFour_pointSwap_right_bound_of_commutativityPoints
             simpa [qSDDOp, Lrev, Lord, Rrev, Rord, evaluatedSlicePointMeas,
               OpFamily.leftPlacedOpFamily, OpFamily.rightPlacedOpFamily,
               reversedProductOpFamily, orderedProductOpFamily, Parameters.next] using
-              (qSDDOp_rightPlaced_eq_leftPlaced (ι := ι) strategy.state strategy.permInvState
-                (reversedProductOpFamily
+              (MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv
+                (ι := ι) (ψ := strategy.state) strategy.permInvState
+                (fun ab =>
+                  (reversedProductOpFamily
+                    ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
+                    ((strategy.pointMeasurement q.2).toSubMeas :
+                      SubMeas (Fq params.next) ι)).outcome ab)
+                (fun ab =>
+                  (orderedProductOpFamily
                   ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
-                  ((strategy.pointMeasurement q.2).toSubMeas : SubMeas (Fq params.next) ι))
-                (orderedProductOpFamily
-                  ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
-                  ((strategy.pointMeasurement q.2).toSubMeas : SubMeas (Fq params.next) ι)))
+                    ((strategy.pointMeasurement q.2).toSubMeas :
+                      SubMeas (Fq params.next) ι)).outcome ab))
       _ ≤ commutativityPointsError params.next gamma := by
             simpa [sddErrorOp] using h
   have hC' :
