@@ -104,18 +104,6 @@ private lemma q_mass_le_total_bound {Outcome : Type*}
             ev_scale ψ (1 + 2 * spectralTruncationError ζ)
               (1 : MIPStarRE.Quantum.Op ι)
 
-private lemma sqrt_four_spectralTruncationError (ζ : Error) (hζ : 0 ≤ ζ) :
-    Real.sqrt (4 * spectralTruncationError ζ) =
-      2 * zetaQuarterRoot ζ := by
-  have hsqrt_rpow :
-      Real.sqrt (ζ ^ (1 / (2 : Error))) = zetaQuarterRoot ζ := by
-    rw [Real.sqrt_eq_rpow, zetaQuarterRoot, ← Real.rpow_mul hζ]
-    congr 1
-    ring
-  dsimp [spectralTruncationError]
-  rw [Real.sqrt_mul (by positivity : 0 ≤ (4 : Error)), hsqrt_rpow]
-  norm_num
-
 private lemma xHat_cross_sum_eq_sqrt {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -316,7 +304,13 @@ private lemma q_p_cross_close {Outcome : Type*}
           exact mul_le_mul hsqrt_first hsqrt_second
             (Real.sqrt_nonneg _) (Real.sqrt_nonneg _)
     _ = 2 * zetaQuarterRoot ζ := by
-          rw [sqrt_four_spectralTruncationError ζ hζ]
+          have hsqrt_rpow :
+              Real.sqrt (ζ ^ (1 / (2 : Error))) = zetaQuarterRoot ζ := by
+            rw [Real.sqrt_eq_rpow, zetaQuarterRoot, ← Real.rpow_mul hζ]
+            congr 1
+            ring
+          dsimp [spectralTruncationError]
+          rw [Real.sqrt_mul (by positivity : 0 ≤ (4 : Error)), hsqrt_rpow]
           ring
 
 /-- **`P` is close to `Q`** (`lem:P-Q-approx`).
