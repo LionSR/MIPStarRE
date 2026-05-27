@@ -36,10 +36,10 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Test/StrategyRoleAverage.lean` | 422 | 31.6 | 47.2 | 2× 1,000,000 | 1 | Massive `calc` blocks with `ev_add`, `abel_nf` expansions |
 | `MainInductionStep/Theorems.lean` | 3,484 | 26.1 | 71.4 | 1× 1,000,000 | 9 | 71 `positivity` calls, 6 `field_simp`, re-export file |
 | `Pasting/SwitcherooCompletion.lean` | 1,673 | 23.1 | 34.8 | 1× 1,000,000 | 2 | Heavy sqrt/rpow chain |
-| split; `Pasting/BridgeLemmas/LdSandwichLineOnePoint/` carries the line-one-point bridge | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | Former compatibility wrapper is now 16 lines |
-| split; `Pasting/Bernoulli/FromHToG/Core/` carries the core recurrence lemmas | 1,339 | 20.6 | 24.3 | 1× 800,000 | 7 | Former compatibility wrapper removed |
+| split; `Pasting/BridgeLemmas/LdSandwichLineOnePoint/` carries the line-one-point bridge | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | Former root wrapper no longer carries the proof |
+| split; `Pasting/Bernoulli/FromHToG/Core/` carries the core recurrence lemmas | 1,339 | 20.6 | 24.3 | 1× 800,000 | 7 | Former root wrapper removed |
 | `Pasting/CommutingWithG/Complete.lean` | 476 | 17.5 | 22.5 | 1× 1,000,000 | 1 | Sqrt/rpow chain |
-| split; `Test/ErrorCascade/Definitions.lean`, `Test/ErrorCascade/EnvelopeBounds.lean`, and `Test/ErrorCascade/CascadeBounds/` carry the cascade | 1,482 | 16.1 | 39.7 | none | 2 | Former compatibility wrapper removed |
+| split; `Test/ErrorCascade/Definitions.lean`, `Test/ErrorCascade/EnvelopeBounds.lean`, and `Test/ErrorCascade/CascadeBounds/` carry the cascade | 1,482 | 16.1 | 39.7 | none | 2 | Former root wrapper removed |
 | `Commutativity/ScalarApproximation/ProcessedG.lean` | 2,035 | 15.2 | 23.4 | 1× 5,000,000 + 1× 210,000 | 5 | Largest heartbeat override proof (809 lines) |
 
 ### Files Taking 8–15 Seconds
@@ -136,8 +136,8 @@ These files import many submodules and are natural compile-time bottlenecks in a
 | `MainInductionStep/Theorems.lean` | 3,484 | 9 | 26.1s |
 | `MIPStarRE/LDT.lean` (root re-export module) | 133 | 133 | 6.5s |
 
-**Note:** The compatibility module files at 25 line/18 imports are fast
-individually (they just re-export), but the 133-import root re-export file
+**Note:** The small public re-export modules are fast individually, but the
+133-import root re-export file
 forces all modules to stay in the compilation graph, making any downstream
 change trigger a large rebuild.
 
@@ -232,9 +232,9 @@ change trigger a large rebuild.
 ## Quick Wins Implemented
 
 - Several files named in the original audit have since been split into
-  proof-bearing leaf modules plus short compatibility re-exports.  This report
-  now points optimization work at those leaves rather than at the re-export
-  wrappers.
+  proof-bearing leaf modules and, where needed, short public re-export modules.
+  This report now points optimization work at those leaves rather than at the
+  re-export modules.
 
 ---
 

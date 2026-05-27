@@ -26,7 +26,8 @@ The formerly monolithic file has been split into focused leaf modules:
   (`evaluatedSlicePhaseTwoStabilityDefect`, finite reindexing, subtraction algebra)
 - `ProcessedG.MainChain`: The main `evaluatedSlice_scalar_chain_bound` assembly
 
-This file remains as a compatibility module exporting `commDataProcessedG`.
+This file is the public assembly point for `commDataProcessedG`, the
+paper-facing scalar approximation theorem.
 -/
 
 namespace MIPStarRE.LDT.Commutativity

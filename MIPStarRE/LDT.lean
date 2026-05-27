@@ -76,3 +76,12 @@ import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.Pasting.ContextWrappers
 import MIPStarRE.LDT.Preliminaries.Polynomials
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
+
+/-!
+# Low individual degree test
+
+This root module re-exports the Lean development for the low individual degree
+test, including the test definition, preliminary analytic estimates, the
+projectivization theorem, the main-induction interface, global variance,
+self-improvement, commutativity, and pasting.
+-/

@@ -4,7 +4,9 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Telescope
 /-!
 # Section 12 pasting: from-H-to-G theorem
 
-Compatibility module exposing the public `fromHToG` theorem.
+Public assembly of `lem:from-H-to-G`, deriving the paper-facing theorem from
+the `G`-hat facts, the half-sandwich commutation theorem, and the telescoping
+Bernoulli-stage comparison.
 -/
 
 namespace MIPStarRE.LDT.Pasting

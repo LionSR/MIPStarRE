@@ -14,7 +14,7 @@ proof-gap protocol in `docs/paper-gaps/proof-gap-protocol.tex`.
 1. [Source-faithful statements and internal proof obligations](#pattern-1-source-faithful-statements-and-internal-proof-obligations)
 2. [Blueprint–Lean synchronization](#pattern-2-blueprintlean-synchronization)
 3. [Split-module architecture](#pattern-3-split-module-architecture)
-4. [Compatibility re-export pattern](#pattern-4-compatibility-re-export-pattern)
+4. [Public re-export pattern](#pattern-4-public-re-export-pattern)
 5. [Temporary obligation-structure pattern](#pattern-5-temporary-obligation-structure-pattern)
 6. [Paper-gap documentation pattern](#pattern-6-paper-gap-documentation-pattern)
 
@@ -366,7 +366,7 @@ Each subdirectory follows a consistent internal layout:
 SubModule/
 ├── Defs.lean        # New structures, type abbreviations, error-term definitions
 ├── Statements.lean   # Statement-level types (hypothesis bundles, conclusion shapes)
-├── Theorems.lean     # Compatibility re-export
+├── Theorems.lean     # Public re-export, when the section has one
 └── Theorems/
     ├── Core.lean     # Main proof of the chapter's theorem
     ├── ...           # Supporting proof leaves
@@ -375,8 +375,8 @@ SubModule/
 
 Some larger chapters (like `Pasting/` and `SelfImprovement/`) have more
 internal subdivisions (e.g., `Pasting/Bernoulli/`, `Pasting/Sandwich/`,
-`SelfImprovement/Theorems/Results/`).  The outer `Theorems.lean`
-compatibility module imports all the proof leaves.
+`SelfImprovement/Theorems/Results/`).  When an outer `Theorems.lean` module is
+present, it imports the public proof leaves.
 
 ### Why split instead of monolithic files?
 
@@ -402,41 +402,41 @@ the paper line number, workflow step, or implementation phase.
 
 ### Re-export files
 
-See [Pattern 4: Compatibility re-export pattern](#pattern-4-compatibility-re-export-pattern)
+See [Pattern 4: Public re-export pattern](#pattern-4-public-re-export-pattern)
 below.
 
 ---
 
-## Pattern 4: Compatibility re-export pattern
+## Pattern 4: Public re-export pattern
 
 Public subdirectories with several proof leaves may have a root-level
-re-export file (e.g., `Theorems.lean`) that imports the source-facing leaves:
+re-export file that imports the source-facing leaves.  For example, the
+top-level LDT module imports the public section APIs:
 
 ```lean
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
+import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
+import MIPStarRE.LDT.Pasting.Bernoulli.Final
 ```
 
-The compatibility module file itself contains no new declarations. It is a
-public import convenience so downstream consumers can write
-`import MIPStarRE.LDT.SelfImprovement.Theorems` instead of importing
-each leaf individually.
+The re-export module itself contains no new mathematical declarations. It is a
+public import convenience.  When no such public module exists, downstream code
+should import the specific leaf module whose declarations it uses.
 
 The top-level re-export file is `MIPStarRE.lean`, which imports all
 subdirectories.  `MIPStarRE/LDT.lean` imports all LDT subdirectories.
 
 **When to add to a re-export file**: When a new proof leaf is added to a
 public theorem or definition subdirectory and the leaf is part of the intended
-section-level API, add its import to the public compatibility module.
+section-level API, add its import to the relevant public module.
 
 **When not to add**: If a leaf is only used by one other leaf (internal
-helper), don't add it to the compatibility module; let the consumer import it
-directly so its API surface doesn't leak.
+helper), do not add it to a public re-export module; let the consumer import it
+directly so its API surface does not leak.
 
 **When not to create another wrapper**: Do not add an intermediate module whose
 only purpose is to import a single leaf, or a wrapper that is itself imported
-only by a public compatibility module.  The public module should import the
+only by a public re-export module.  The public module should import the
 concrete leaf directly.  Such one-step wrappers make the import graph harder to
 read without recording any new mathematical boundary.
 
