@@ -409,7 +409,7 @@ private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
             exact ev_mono strategy.state _ _ <| by
               rw [leftTensor_mul_rightTensor_eq_opTensor,
                 leftTensor_mul_rightTensor_eq_opTensor]
-              exact opTensor_mono_right_of_nonneg hleft_pos hWsq_le
+              exact MIPStarRE.LDT.opTensor_mono_right hleft_pos hWsq_le
       _ = yDiag vy gb := by
             simp [yDiag, B, Gg, T]
   have ht : ∀ vy gb, |t vy gb| ≤ Real.sqrt (xDiag vy gb) * Real.sqrt (yDiag vy gb) := by
