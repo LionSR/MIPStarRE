@@ -253,16 +253,6 @@ theorem tracePairingHermitianPart_isHermitian
     (tracePairingHermitianPart Z).IsHermitian := by
   exact (Matrix.isHermitian_add_transpose_self Z).smul (IsSelfAdjoint.all _)
 
-private lemma trace_conjTranspose_mul_re_eq_of_isHermitian
-    {d : Type*} [Fintype d]
-    (Z : Op d) {X : Op d} (hX : X.IsHermitian) :
-    Complex.re (Matrix.trace (Zᴴ * X)) = Complex.re (Matrix.trace (Z * X)) := by
-  have hstar : star (Matrix.trace (Z * X)) = Matrix.trace (Zᴴ * X) := by
-    rw [← Matrix.trace_conjTranspose]
-    rw [Matrix.conjTranspose_mul, hX.eq]
-    rw [Matrix.trace_mul_comm]
-  simpa [Complex.star_def, Complex.conj_re] using congrArg Complex.re hstar.symm
-
 /-- On Hermitian inputs, the Hermitian part has the same real trace pairing. -/
 theorem realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -272,7 +262,12 @@ theorem realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
   rw [realTracePairingCLM_apply, realTracePairingCLM_apply]
   have hZX : Complex.re (Matrix.trace (Zᴴ * X)) =
       Complex.re (Matrix.trace (Z * X)) :=
-    trace_conjTranspose_mul_re_eq_of_isHermitian Z hX
+    by
+      have hstar : star (Matrix.trace (Z * X)) = Matrix.trace (Zᴴ * X) := by
+        rw [← Matrix.trace_conjTranspose]
+        rw [Matrix.conjTranspose_mul, hX.eq]
+        rw [Matrix.trace_mul_comm]
+      simpa [Complex.star_def, Complex.conj_re] using congrArg Complex.re hstar.symm
   rw [tracePairingHermitianPart, smul_mul_assoc, Matrix.add_mul]
   rw [show Matrix.trace ((1 / 2 : ℝ) • (Z * X + Zᴴ * X)) =
       (1 / 2 : ℝ) • Matrix.trace (Z * X + Zᴴ * X) by
