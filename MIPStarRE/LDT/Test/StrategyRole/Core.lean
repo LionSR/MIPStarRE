@@ -55,11 +55,6 @@ lemma roleProj_nonneg (r : Role) : 0 ≤ roleProj r := by
       (fun x => roleProj Role.B i x * roleProj Role.A x j) = 0
   cases i <;> cases j <;> simp [roleProj]
 
-@[simp] private lemma roleProj_sum_eq_one :
-    roleProj Role.A + roleProj Role.B = (1 : MIPStarRE.Quantum.Op Role) := by
-  ext i j
-  cases i <;> cases j <;> simp [roleProj]
-
 /-- Tensor an operator with the role projector selecting the `r` block. -/
 noncomputable def roleCond {ι : Type*} [Fintype ι] [DecidableEq ι]
     (r : Role) (X : MIPStarRE.Quantum.Op ι) :
