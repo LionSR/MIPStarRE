@@ -691,23 +691,4 @@ def IdxSubMeas.placeRight {Question Outcome : Type*}
     IdxSubMeas Question Outcome (ιA × ιB) :=
   fun q => mkRightPlacedSubMeas (ιA := ιA) (A q)
 
-/-- `placeLeft` is `liftLeft` when both indices are the same. -/
-theorem IdxSubMeas.placeLeft_eq_liftLeft {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (A : IdxSubMeas Question Outcome ι) :
-    IdxSubMeas.placeLeft (ιB := ι) A = IdxSubMeas.liftLeft A := by
-  funext q
-  rfl
-
-/-- `placeRight` is `liftRight` when both indices are the same. -/
-theorem IdxSubMeas.placeRight_eq_liftRight {Question Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (A : IdxSubMeas Question Outcome ι) :
-    IdxSubMeas.placeRight (ιA := ι) A = IdxSubMeas.liftRight A := by
-  funext q
-  rfl
-
-
 end MIPStarRE.LDT
