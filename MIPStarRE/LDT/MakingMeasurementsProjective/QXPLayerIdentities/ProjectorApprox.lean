@@ -87,23 +87,6 @@ private lemma pa_square_mass_le_one {Outcome : Type*}
             rw [pa_hermitian data a, pa_idempotent data a]
     _ ≤ 1 := pa_mass_le_one data ψ hψ
 
-private lemma q_mass_le_total_bound {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState ι) (A : Measurement Outcome ι) (ζ : Error)
-    (data : QLayerData Outcome ι)
-    (hψ : ψ.IsNormalized)
-    (hRank : RankReductionWitness ψ A ζ data) :
-    ev ψ (QTotal data) ≤ 1 + 2 * spectralTruncationError ζ := by
-  calc
-    ev ψ (QTotal data)
-        ≤ ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
-            (1 : MIPStarRE.Quantum.Op ι)) := ev_mono ψ _ _ hRank.total_le
-    _ = 1 + 2 * spectralTruncationError ζ := by
-          simpa [ev_one_of_isNormalized ψ hψ] using
-            ev_scale ψ (1 + 2 * spectralTruncationError ζ)
-              (1 : MIPStarRE.Quantum.Op ι)
-
 private lemma xHat_cross_sum_eq_sqrt {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -345,8 +328,15 @@ lemma pQApprox {Outcome : Type*}
     have hleft := (abs_le.mp hcross_close).1
     nlinarith
   have hq_mass : ev ψ (QTotal data.qLayer) ≤
-      1 + 2 * spectralTruncationError ζ :=
-    q_mass_le_total_bound ψ A ζ data.qLayer hψ hRank
+      1 + 2 * spectralTruncationError ζ := by
+    calc
+      ev ψ (QTotal data.qLayer)
+          ≤ ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
+              (1 : MIPStarRE.Quantum.Op ι)) := ev_mono ψ _ _ hRank.total_le
+      _ = 1 + 2 * spectralTruncationError ζ := by
+            simpa [ev_one_of_isNormalized ψ hψ] using
+              ev_scale ψ (1 + 2 * spectralTruncationError ζ)
+                (1 : MIPStarRE.Quantum.Op ι)
   have hp_mass : (∑ a : Outcome, ev ψ (Pa data a)) ≤ 1 :=
     pa_mass_le_one data ψ hψ
   have hcross_symm :
