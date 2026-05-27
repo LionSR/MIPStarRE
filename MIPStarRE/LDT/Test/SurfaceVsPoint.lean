@@ -69,15 +69,10 @@ end Surface
 abbrev SurfacePolynomialModel (params : Parameters) [FieldModel params.q] :=
   MvPolynomial (Fin 2) (Scalar params)
 
-/-- Decode a coded surface parameter into the chosen field model. -/
-def decodeSurfaceParameter {params : Parameters} [FieldModel params.q]
-    (t : SurfaceParameter params) : Fin 2 → Scalar params :=
-  fun i => decodeScalar (t i)
-
 /-- Evaluate a bivariate surface polynomial answer on coded surface parameters. -/
 noncomputable def evalSurfacePolynomialModel (params : Parameters) [FieldModel params.q]
     (p : SurfacePolynomialModel params) (t : SurfaceParameter params) : Fq params :=
-  encodeScalar (MvPolynomial.eval (decodeSurfaceParameter t) p)
+  encodeScalar (MvPolynomial.eval (fun i => decodeScalar (t i)) p)
 
 /-- Surface answers in the classical Raz--Safra test are genuine bivariate
 polynomials whose total degree is at most `d`. -/
