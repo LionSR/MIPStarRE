@@ -184,12 +184,6 @@ private theorem exists_nonzero_coordinate {v : Fin m → F} (hv : v ≠ 0) :
   simpa [funext_iff] using hv
 
 omit [Fintype F] [DecidableEq F] in
-@[simp] private theorem ffVecChar_zero :
-    ffVecChar (p := p) (F := F) (0 : Fin m → F) = 0 := by
-  ext u
-  simp [ffVecChar, ffDotProduct]
-
-omit [Fintype F] [DecidableEq F] in
 private theorem ffVecChar_ne_zero [Finite F] {v : Fin m → F} (hv : v ≠ 0) :
     ffVecChar (p := p) (F := F) v ≠ 0 := by
   rw [AddChar.ne_zero_iff]
@@ -217,7 +211,12 @@ theorem fourier_fact_vector (v : Fin m → F) :
       AddChar.expect_eq_ite _
     _ = if v = 0 then (1 : ℂ) else 0 := by
       by_cases hv : v = 0
-      · simp [hv]
+      · have hzero :
+            ffVecChar (p := p) (F := F) v = 0 := by
+          subst v
+          ext u
+          simp [ffVecChar, ffDotProduct]
+        rw [if_pos hzero, if_pos hv]
       · have hvc : ffVecChar (p := p) (F := F) v ≠ 0 :=
           ffVecChar_ne_zero (p := p) (F := F) hv
         simp [hv, hvc]
