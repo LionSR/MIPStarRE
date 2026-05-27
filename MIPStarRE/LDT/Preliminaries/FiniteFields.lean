@@ -115,11 +115,6 @@ private theorem ff_char_is_primitive [Finite F] : (ffChar (p := p) (F := F)).IsP
   apply AddChar.IsPrimitive.of_ne_one
   simpa using (ffChar_ne_zero (p := p) (F := F))
 
-omit [Fintype F] [DecidableEq F] in
-private theorem ff_char_mulShift_ne_zero [Finite F] {a : F} (ha : a ≠ 0) :
-    (ffChar (p := p) (F := F)).mulShift a ≠ 0 := by
-  simpa using (ff_char_is_primitive (p := p) (F := F) ha)
-
 /-- Paper label `prop:fourier-fact-scalar`.
 
 The Fourier orthogonality relation for the finite field `F`: the expectation
@@ -139,7 +134,8 @@ theorem fourier_fact_scalar (a : F) :
           ext x
           simp [ψ, ha]
         simp [ha, hψ]
-      · have hψ : ψ ≠ 0 := ff_char_mulShift_ne_zero (p := p) (F := F) ha
+      · have hψ : ψ ≠ 0 := by
+          simpa [ψ] using (ff_char_is_primitive (p := p) (F := F) ha)
         simp [ha, hψ]
 
 section Vector
