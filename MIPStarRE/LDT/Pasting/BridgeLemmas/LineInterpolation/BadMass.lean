@@ -169,7 +169,9 @@ noncomputable def singleOutcomeRightSubMeas
   sum_eq_total := by simp
   total_le_one := le_trans (B.outcome_le_total a0) B.total_le_one
 
-lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true_local
+/-- If the right-hand Boolean submeasurement has only the `true` outcome, the
+consistency defect is exactly the left `false` mass against its total operator. -/
+lemma qBipartiteConsDefect_eq_false_mass_of_bool_right_true
     (ψ : QuantumState (ι × ι))
     (A B : SubMeas Bool ι)
     (hfalse : B.outcome false = 0)
@@ -229,7 +231,7 @@ lemma qBipartiteConsDefect_postprocess_eq_singleOutcome
         ev ψ
           (opTensor ((postprocess A (fun a => decide (a = a0))).outcome false)
             (B.outcome a0)) := by
-  refine qBipartiteConsDefect_eq_false_mass_of_bool_right_true_local ψ
+  refine qBipartiteConsDefect_eq_false_mass_of_bool_right_true ψ
     (postprocess A (fun a => decide (a = a0))) (singleOutcomeRightSubMeas B a0) ?_ ?_
   · rfl
   · rfl
