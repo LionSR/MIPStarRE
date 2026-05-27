@@ -253,9 +253,6 @@ private def assertUsesExactlyAxioms (declName : Name) (expected : Array Name) :
       m!"'{declName}' depends on axioms {axioms.toList}, expected exactly " ++
         m!"{expected.toList}"
 
-private def assertUsesOnlyStandardAxioms (declName : Name) : CommandElabM Unit := do
-  assertUsesExactlyAxioms declName expectedStandardAxioms
-
 private def assertDoesNotUseSorryAxiom (declName : Name) : CommandElabM Unit := do
   let axioms := (← Lean.collectAxioms declName).qsort Name.lt
   if axioms.contains ``sorryAx then
@@ -265,7 +262,7 @@ private def resolveDeclIdent (id : TSyntax `ident) : CommandElabM Name := do
   liftCoreM <| Lean.Elab.realizeGlobalConstNoOverloadWithInfo id
 
 elab "assert_standard_axioms " id:ident : command => do
-  assertUsesOnlyStandardAxioms (← resolveDeclIdent id)
+  assertUsesExactlyAxioms (← resolveDeclIdent id) expectedStandardAxioms
 
 elab "assert_no_sorry_axiom " id:ident : command => do
   assertDoesNotUseSorryAxiom (← resolveDeclIdent id)
