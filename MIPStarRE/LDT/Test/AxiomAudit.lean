@@ -119,12 +119,6 @@ theorem under the corrected nonzero sampling hypothesis.  The zero-sampling
 boundary tracked by #422 is now removed from the source theorem statement by the
 explicit hypothesis `0 < k`.
 
-The same-space corrected-range subcase of the final source conclusion is
-recorded separately as `Test.mainFormal_sourceConclusion_ofSameSpaceLargeK`.
-It is audited with the current `mainFormal` route: it proves the paper
-conclusion for the forgetful image of a `SameSpaceProjStrat`, under
-`400md ≤ k` and `0 < k`, and is standard-axiom clean.
-
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
 by `GlobalVariance.localVarianceTransportChainBound`, so the paper-facing theorem
@@ -450,7 +444,6 @@ assert_no_sorry_axiom MIPStarRE.LDT.SelfImprovement.AddInUFullStatement
 assert_no_sorry_axiom
   MIPStarRE.LDT.SelfImprovement.addInUFullStatement_of_isGood
 assert_standard_axioms MIPStarRE.LDT.Test.mainFormal
-assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofSameSpaceLargeK
 assert_standard_axioms
   MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency
 assert_standard_axioms
