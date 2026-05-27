@@ -74,10 +74,6 @@ noncomputable def postprocess [DecidableEq α] [DecidableEq β]
           = ∑ a, M.effect a := Finset.sum_fiberwise Finset.univ f M.effect
       _ ≤ 1 := M.sum_le_one
 
-theorem total_eq_sum (M : Submeasurement α d) :
-    M.total = ∑ a, M.effect a :=
-  rfl
-
 /-- Restatement of `sum_le_one` in terms of the named total operator. -/
 theorem total_le_one (M : Submeasurement α d) :
     M.total ≤ 1 := by
