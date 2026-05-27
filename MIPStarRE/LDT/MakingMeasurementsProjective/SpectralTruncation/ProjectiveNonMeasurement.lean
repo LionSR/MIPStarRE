@@ -28,7 +28,7 @@ private noncomputable def truncationCutoff (δ : Error) : Error → Error :=
   fun x => if 1 - δ ≤ x then 1 else 0
 
 private lemma truncationCutoff_le_inv_one_sub_mul
-    (δ x : Error) (hδ : 0 < δ) (hδhalf : δ ≤ 1 / 2) (hx0 : 0 ≤ x) (_hx1 : x ≤ 1) :
+    (δ x : Error) (hδ : 0 < δ) (hδhalf : δ ≤ 1 / 2) (hx0 : 0 ≤ x) :
     truncationCutoff δ x ≤ (1 / (1 - δ)) * x := by
   by_cases h : 1 - δ ≤ x
   · have hden : 0 < 1 - δ := by linarith
@@ -121,7 +121,6 @@ private lemma roundedProjectorFamily_outcome_le_scale {Outcome : Type uOutcome}
     intro x hx
     exact truncationCutoff_le_inv_one_sub_mul δ x hδ hδhalf
       (outcome_spectrum_nonneg A a x hx)
-      (outcome_spectrum_le_one A a x hx)
   calc
     (roundedProjectorFamily A δ).outcome a = cfc (truncationCutoff δ) (A.outcome a) := rfl
     _ ≤ cfc (fun x => (1 / (1 - δ)) * x) (A.outcome a) := hmono
