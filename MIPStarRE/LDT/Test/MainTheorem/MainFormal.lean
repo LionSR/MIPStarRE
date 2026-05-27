@@ -20,10 +20,6 @@ module contains:
   prove the corrected two-space source theorem, including the nonzero sampling
   condition.
 
-* `mainFormal_sourceConclusion_ofSameSpaceLargeK` — proves the source-shaped
-  conclusion in the same-space corrected-range subcase by calling the current
-  `mainFormal` interface.
-
 * `mainFormal` — the checked same-space formal interface toward the final
   theorem, taking a same-space projective strategy that passes the LID test with
   probability `≥ 1 − ε`, together with the explicit boundary conditions `0 < k`
@@ -498,46 +494,6 @@ theorem mainFormal
       ⟨projectiveCompletionWitness⟩
     exact mainFormal_ofProjectiveCompletionTransportWitness (hpass := hpass)
       projectiveCompletionWitness
-
-/--
-Same-space, corrected-range subcase of the source-shaped conclusion of
-`thm:main-formal`.
-
-This theorem records the portion of the printed two-space source theorem that is
-already obtained from the current checked interface: after forgetting a
-`SameSpaceProjStrat` to its underlying two-space `ProjStrat`, the three final
-consistency conclusions follow under the corrected hypotheses
-`400 * m * d ≤ k` and `0 < k`.
-
-It is not a substitute for the two-space source theorem.  This theorem is
-standard-axiom clean because it only calls the checked current same-space
-interface. -/
-theorem mainFormal_sourceConclusion_ofSameSpaceLargeK
-    (params : Parameters)
-    [FieldModel.{0} params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (strategy : SameSpaceProjStrat params ι)
-    (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
-    (k : ℕ)
-    (hk : 400 * params.m * params.d ≤ k)
-    (hk0 : 0 < k) :
-    ∃ G_A : ProjMeas (Polynomial params) ι,
-      ∃ G_B : ProjMeas (Polynomial params) ι,
-        ConsRel strategy.toProjStrat.state (uniformDistribution (Point params))
-            (IdxProjMeas.toIdxSubMeas strategy.toProjStrat.pointMeasurementA)
-            (polynomialEvaluationFamily params G_B.toSubMeas)
-            (mainFormalError params k eps) ∧
-          ConsRel strategy.toProjStrat.state (uniformDistribution (Point params))
-            (polynomialEvaluationFamily params G_A.toSubMeas)
-            (IdxProjMeas.toIdxSubMeas strategy.toProjStrat.pointMeasurementB)
-            (mainFormalError params k eps) ∧
-          ConsRel strategy.toProjStrat.state (uniformDistribution Unit)
-            (constSubMeasFamily G_A.toSubMeas)
-            (constSubMeasFamily G_B.toSubMeas)
-            (mainFormalError params k eps) := by
-  simpa using
-    mainFormal params strategy eps hpass k hk (hk0 := hk0)
 
 end Test
 
