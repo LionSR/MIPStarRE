@@ -196,26 +196,22 @@ noncomputable def tracePairingMatrixOfRealCLM {d : Type*} [Fintype d] [Decidable
     (ψ (Matrix.single j i (1 : ℂ)) : ℂ) -
       (ψ (Matrix.single j i Complex.I) : ℂ) * Complex.I
 
-omit [Fintype d] in
-private lemma single_eq_re_smul_add_im_smul [DecidableEq d] (i j : d) (z : ℂ) :
-    Matrix.single i j z =
-      z.re • Matrix.single i j (1 : ℂ) + z.im • Matrix.single i j Complex.I := by
-  ext a b
-  by_cases hai : a = i
-  · subst a
-    by_cases hbj : b = j
-    · subst b
-      simp [Complex.re_add_im]
-    · simp [Matrix.single, Ne.symm hbj]
-  · simp [Matrix.single, Ne.symm hai]
-
 private lemma realTracePairingCLM_tracePairingMatrixOfRealCLM_single
     {d : Type*} [Fintype d] [DecidableEq d]
     (ψ : StrongDual ℝ (Op d)) (i j : d) (z : ℂ) :
     realTracePairingCLM (tracePairingMatrixOfRealCLM ψ) (Matrix.single i j z) =
       ψ (Matrix.single i j z) := by
   rw [realTracePairingCLM_single]
-  rw [single_eq_re_smul_add_im_smul i j z]
+  rw [show Matrix.single i j z =
+      z.re • Matrix.single i j (1 : ℂ) + z.im • Matrix.single i j Complex.I by
+        ext a b
+        by_cases hai : a = i
+        · subst a
+          by_cases hbj : b = j
+          · subst b
+            simp [Complex.re_add_im]
+          · simp [Matrix.single, Ne.symm hbj]
+        · simp [Matrix.single, Ne.symm hai]]
   simp [tracePairingMatrixOfRealCLM, Complex.mul_re]
   ring
 
