@@ -271,20 +271,6 @@ theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
     _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by rw [← Finset.sum_mul]
     _ = c := by rw [h𝒟.weight_sum_eq_one, one_mul]
 
-/-- On a finite ambient type, operator averages may be unfolded as weighted sums over
-all ambient values, with the outside-support weights contributing zero.
-
-This is the `Quantum.Op` specialization of the project-local explicit-support adapter
-`Distribution.sum_univ_eq_sum_support`; it is not a replacement for Mathlib probability
-theory. -/
-theorem averageOperatorOverDistribution_eq_sum_univ {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι] [Fintype α]
-    (𝒟 : Distribution α) (A : α → MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution 𝒟 A = ∑ a : α, 𝒟.weight a • A a := by
-  simpa [averageOperatorOverDistribution] using
-    (Distribution.sum_univ_eq_sum_support 𝒟 (fun a => 𝒟.weight a • A a)
-      (fun a ha => by simp [𝒟.outsideSupport a ha])).symm
-
 /-- If two operator-valued families agree pointwise, their averages agree. -/
 theorem averageOperatorOverDistribution_congr {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
