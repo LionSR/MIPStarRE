@@ -73,20 +73,6 @@ private lemma pa_mass_le_one {Outcome : Type*}
     _ ≤ ev ψ (1 : MIPStarRE.Quantum.Op ι) := ev_mono ψ _ _ P.total_le_one
     _ = 1 := ev_one_of_isNormalized ψ hψ
 
-private lemma pa_square_mass_le_one {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) (ψ : QuantumState ι)
-    (hψ : ψ.IsNormalized) :
-    (∑ a : Outcome, ev ψ ((Pa data a)ᴴ * Pa data a)) ≤ 1 := by
-  calc
-    (∑ a : Outcome, ev ψ ((Pa data a)ᴴ * Pa data a))
-        = ∑ a : Outcome, ev ψ (Pa data a) := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            rw [pa_hermitian data a, pa_idempotent data a]
-    _ ≤ 1 := pa_mass_le_one data ψ hψ
-
 private lemma xHat_cross_sum_eq_sqrt {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -217,7 +203,13 @@ private lemma q_p_cross_close {Outcome : Type*}
               ev_scale ψ (4 * spectralTruncationError ζ)
                 (1 : MIPStarRE.Quantum.Op ι)
   have hsecond_le : (∑ a : Outcome, second a) ≤ 1 := by
-    simpa [second] using pa_square_mass_le_one data ψ hψ
+    calc
+      (∑ a : Outcome, second a)
+          = ∑ a : Outcome, ev ψ (Pa data a) := by
+              refine Finset.sum_congr rfl ?_
+              intro a _
+              simp [second, pa_hermitian data a, pa_idempotent data a]
+      _ ≤ 1 := pa_mass_le_one data ψ hψ
   have hhat_ev :
       (∑ a : Outcome, ev ψ ((Xa data a)ᴴ * data.xHat * Pa data a)) =
         ev ψ (CFC.sqrt (QTotal data.qLayer)) := by
