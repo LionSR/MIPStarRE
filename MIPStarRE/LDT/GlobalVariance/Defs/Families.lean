@@ -29,14 +29,6 @@ private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parame
   simpa [pointConditionedOutcomeOperatorAtPolynomial] using
     (strategy.pointMeasurement u).outcome_pos (g u)
 
-private theorem pointConditionedOutcomeOperatorAtPolynomial_le_one (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params) (u : Point params) :
-    pointConditionedOutcomeOperatorAtPolynomial params strategy g u ≤ 1 := by
-  simpa [pointConditionedOutcomeOperatorAtPolynomial] using
-    Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u)
-
 /-- `CFC.sqrt (G.outcome g) ≤ 1` when `G` is a submeasurement.
 Proved via the NNReal CFC spectrum API: `G.outcome g ≤ 1` means all
 spectral values satisfy `λ ≤ 1`, so `√λ ≤ 1` as well. -/
@@ -96,11 +88,14 @@ private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Pa
     (G : SubMeas (Polynomial params) ι)
     (g : Polynomial params) (u : Point params) :
     weightedPointConditionedOperatorAtPolynomial params strategy G g u ≤ 1 := by
+  have hA_le_one :
+      pointConditionedOutcomeOperatorAtPolynomial params strategy g u ≤ 1 := by
+    simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+      Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u)
   simpa [weightedPointConditionedOperatorAtPolynomial] using
     (weightedPolynomialOperator_le_one (ι := ι) (params := params) (G := G) (g := g)
       (A := pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
-      (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u)
-      (pointConditionedOutcomeOperatorAtPolynomial_le_one params strategy g u))
+      (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u) hA_le_one)
 
 /-- The squared norm expression controlled by `lem:generalize-b` for a fixed `g`.
 Uses bipartite state `ψbi` on `d * d`. -/
