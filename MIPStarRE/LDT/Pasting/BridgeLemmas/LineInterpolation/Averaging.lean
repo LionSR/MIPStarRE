@@ -21,35 +21,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-lemma opTensor_smul_left
-    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (c : Error)
-    (A : MIPStarRE.Quantum.Op ιA)
-    (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor ((c : ℂ) • A) B = (c : ℂ) • opTensor A B := by
-  ext x y
-  simp only [Complex.coe_smul, Matrix.smul_apply, smul_eq_mul]
-  calc
-    (c • A) x.1 y.1 * B x.2 y.2 =
-        (c • (A x.1 y.1)) * B x.2 y.2 := by rfl
-    _ = ((c : ℂ) * A x.1 y.1) * B x.2 y.2 := by
-      rw [RCLike.real_smul_eq_coe_smul (K := ℂ)]
-      rw [smul_eq_mul]
-      rfl
-    _ = (c : ℂ) * (A x.1 y.1 * B x.2 y.2) := by ring
-
-lemma opTensor_sum_left
-    {α ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (s : Finset α)
-    (f : α → MIPStarRE.Quantum.Op ιA)
-    (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor (∑ a ∈ s, f a) B = ∑ a ∈ s, opTensor (f a) B := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => simp [opTensor]
-  | @insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, opTensor_add_left_local, ih]
-
 lemma opTensor_averageOperatorOverDistribution_left
     {Question ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -60,17 +31,10 @@ lemma opTensor_averageOperatorOverDistribution_left
       averageOperatorOverDistribution 𝒟 (fun q => opTensor (A q) B) := by
   classical
   unfold averageOperatorOverDistribution
-  rw [opTensor_sum_left]
+  rw [opTensor_sum_left_finset]
   refine Finset.sum_congr rfl ?_
   intro q _
-  simpa using opTensor_smul_left (c := 𝒟.weight q) (A := A q) (B := B)
-
-lemma avgOver_sub
-    {α : Type*}
-    (𝒟 : Distribution α)
-    (f g : α → Error) :
-    avgOver 𝒟 (fun a => f a - g a) = avgOver 𝒟 f - avgOver 𝒟 g := by
-  exact MIPStarRE.LDT.avgOver_sub 𝒟 f g
+  simpa using opTensor_smul_left_error (c := 𝒟.weight q) (A := A q) (B := B)
 
 lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
     (params : Parameters) [FieldModel params.q]

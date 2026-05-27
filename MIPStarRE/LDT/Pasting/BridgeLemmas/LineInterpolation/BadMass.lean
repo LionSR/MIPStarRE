@@ -290,7 +290,7 @@ lemma qBipartiteConsDefect_eq_sum_singleOutcome
       ev ψ (opTensor A.total B.toSubMeas.total) =
         ∑ a0 : Outcome, ev ψ (opTensor A.total (B.outcome a0)) := by
     rw [← B.sum_eq_total]
-    rw [opTensor_sum_right_local, ev_finset_sum]
+    rw [opTensor_sum_right_finset, ev_finset_sum]
   have hdecomp :
       ev ψ (opTensor A.total B.toSubMeas.total) - qBipartiteMatchMass ψ A B.toSubMeas =
         ∑ a0 : Outcome,
@@ -540,7 +540,7 @@ lemma hBConsistencyCoordMass_le_linePointDefect
                       by_cases hf : f (xs i) = a
                       · simp [hf]
                       · simp [hf, opTensor, ev]
-              rw [hgroup, ← ev_finset_sum, ← opTensor_sum_right_local]
+              rw [hgroup, ← ev_finset_sum, ← opTensor_sum_right_finset]
               rw [ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum]
   have hdefect_expand :
       qBipartiteConsDefect strategy.state A Bm.toSubMeas =
@@ -626,7 +626,7 @@ lemma hBConsistencyBadMass_le_linePointDefectSum
             rw [Finset.sum_comm]
             refine Finset.sum_congr rfl ?_
             intro f _
-            rw [opTensor_sum_left_local, ev_finset_sum]
+            rw [opTensor_sum_left_finset, ev_finset_sum]
     _ ≤ ∑ i : Fin k,
           qBipartiteConsDefect strategy.state
             ((ldSandwichLineOnePointLeftFamily params strategy family k i.1) (u, xs))
@@ -701,7 +701,7 @@ lemma hBConsistencyBadMass_le_one
           ev strategy.state (opTensor T (
               (verticalLineMeasurementFamily params strategy u).outcome f)) := hsum_le
     _ = ev strategy.state (opTensor T (verticalLineMeasurementFamily params strategy u).total) := by
-          rw [← ev_finset_sum, ← opTensor_sum_right_local]
+          rw [← ev_finset_sum, ← opTensor_sum_right_finset]
           rw [(verticalLineMeasurementFamily params strategy u).sum_eq_total]
     _ = ev strategy.state (opTensor T (1 : MIPStarRE.Quantum.Op ι)) := by rw [htotal_eq_one]
     _ ≤ 1 := by

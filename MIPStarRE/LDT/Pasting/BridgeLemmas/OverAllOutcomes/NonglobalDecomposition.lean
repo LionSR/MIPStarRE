@@ -279,7 +279,7 @@ private lemma nonglobal_mass_eq_inserted_vertical_measurement
     _ = ev strategy.state (opTensor T (∑ f : AxisLinePolynomial params.next, B.outcome f)) := by
             rw [B.sum_eq_total]
     _ = ev strategy.state (∑ f : AxisLinePolynomial params.next, opTensor T (B.outcome f)) := by
-            rw [opTensor_sum_right_local]
+            rw [opTensor_sum_right_finset]
     _ = overAllOutcomesNonglobalInsertedMassLocal params strategy family u xs := by
             rw [ev_finset_sum]
             simp [overAllOutcomesNonglobalInsertedMassLocal, A, B, T]
@@ -399,7 +399,7 @@ private lemma lineConsistentLocal_le_indicatorLocal
           dsimp [A, B]
           exact Finset.sum_le_sum fun f _ => hterm f
     _ = ev strategy.state (opTensor T (∑ f : AxisLinePolynomial params.next, B.outcome f)) := by
-          rw [← ev_finset_sum, ← opTensor_sum_right_local]
+          rw [← ev_finset_sum, ← opTensor_sum_right_finset]
     _ = ev strategy.state (opTensor T B.total) := by rw [B.sum_eq_total]
     _ = ev strategy.state (opTensor T (1 : MIPStarRE.Quantum.Op ι)) := by rw [hBtotal]
     _ = overAllOutcomesLineConsistentIndicatorLocal params strategy family u xs := by
