@@ -92,7 +92,8 @@ But that does **not** mean the chapter is nearly trivial to finish. The remainin
 ### 2.1 Sandwich / consistency side
 
 1. `commuteGHalfSandwich_core`
-2. `ldSandwichLineOnePoint_core`
+2. the core line-one-point theorem, now represented by
+   `ldSandwichLineOnePoint_core_of_axis_self`
 3. `hBConsistency_core`
 
 ### 2.2 Completeness side
@@ -175,7 +176,7 @@ The remaining blockers are unusually well documented in the code itself.
 
 `BridgeLemmas.lean:3553-3558` says the `k \ge 3` branch still needs the recursive flat-chain endpoint assembly and error summation. In other words, most local infrastructure exists, but the final global chaining step is still missing.
 
-### 4.2 `ldSandwichLineOnePoint_core`
+### 4.2 Core line-one-point theorem
 
 `BridgeLemmas.lean:3615-3619` says the proof reduces to the single-slice comparison `eq:ld-gbcon`, and that this still needs the relevant `ConsRel` swap/transport API.
 

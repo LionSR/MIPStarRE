@@ -35,17 +35,18 @@ Lean:
 
 This PR is now intentionally **docs-only**.
 
-I explored a local refactor that tried to replace the monolithic
-`ldSandwichLineOnePoint_core` `sorry` by a more paper-faithful scalar helper, but
-that Lean scaffold was backed out from this branch after review. So the current
-branch does **not** modify
-`MIPStarRE/LDT/Pasting/BridgeLemmas/LdSandwichLineOnePoint.lean`.
+I explored a local refactor that tried to replace the then-monolithic core
+line-one-point `sorry` by a more paper-faithful scalar helper, but that Lean
+scaffold was backed out from this branch after review.  The current Lean code
+has since split this route; the surviving internal core theorem is
+`ldSandwichLineOnePoint_core_of_axis_self`.
 
 As of the rebased head:
 
-- the branch version of `LdSandwichLineOnePoint.lean` matches `origin/main`;
-- the file still has exactly one `sorry`, namely the pre-existing hole in
-  `ldSandwichLineOnePoint_core`;
+- the branch version of `LdSandwichLineOnePoint.lean` matched `origin/main`;
+- at the time, the file still had exactly one `sorry`, namely the pre-existing
+  hole in the theorem now represented by
+  `ldSandwichLineOnePoint_core_of_axis_self`;
 - there are no new `axiom`s and no duplicate local measurement-packaging
   helpers in the branch.
 
@@ -63,8 +64,8 @@ The current public Lean file already contains the endpoint reduction helpers
 
 which reduce the final one-point endpoint comparison to `ldGbcon`.
 
-What is still missing is the middle part of the paper proof inside
-`ldSandwichLineOnePoint_core`: delete the coordinates to the right of `i`, do
+What was still missing at the time was the middle part of the paper proof inside
+the core line-one-point theorem: delete the coordinates to the right of `i`, do
 both Cauchy--Schwarz transports across `commuteGHalfSandwich`, collapse the
 remaining prefix factor, and then feed the result into the existing endpoint
 lemmas above.
@@ -76,8 +77,8 @@ If a future proof refactor needs the right one-point family packaged as a
 
 ## Remaining obligation: paper-faithful dependency map
 
-The remaining proof of `ldSandwichLineOnePoint_core` appears to break into the
-following four substeps.
+The remaining proof of the core line-one-point theorem appeared to break into
+the following four substeps.
 
 ### A. Delete coordinates to the right of `i`
 
