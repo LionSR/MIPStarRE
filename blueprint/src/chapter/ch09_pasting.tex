@@ -49,7 +49,8 @@
 		      \]
 	\end{enumerate}
 \end{theorem}
-\begin{proof}\leanok
+\begin{proof}
+	\leanok
 	\uses{lem:ld-pasting-sub-measurement}
 	The argument below is the paper proof, and the unrestricted Lean theorem now
 	formalizes it directly.
@@ -102,9 +103,7 @@ The bound is trivial when at least one of $\eps$, $\delta$, $\gamma$, $\zeta$, o
 	\lean{MIPStarRE.LDT.Pasting.LdPastingNontrivialContext}
 	\leanok
 	\uses{def:good-strategy, def:polymeasurements, def:simeq,
-		def:approx_delta, item:ld-pasting-completeness,
-		item:ld-pasting-consistency, item:ld-pasting-self-consistency,
-		item:ld-pasting-boundedness}
+		def:approx_delta}
 	The Lean context linked here is the nontrivial-regime context used after the
 	reduction explained above.  It consists of the data and hypotheses from the
 	pasting theorem at the beginning of this chapter: an $(\eps,\delta,\gamma)$-good symmetric strategy
@@ -176,7 +175,8 @@ where
 		G^x_{[g(u)=a]} \ot I \simeq_{\nu_1} I \ot B^u_{[f(x)=a]}.
 	\]
 \end{lemma}
-\begin{proof}\leanok
+\begin{proof}
+	\leanok
 	This is exactly \ref{eq:ld-gbcon}, with \ref{eq:ld-nu1-def}.
 \end{proof}
 
@@ -1370,7 +1370,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		\sum_{\tau_\ell \in \{0,1\}} S_{\tau_{\ge \ell}} G^{\tau_\ell}(I-G)^{1-\tau_\ell}.
 	\]
 \end{lemma}
-\begin{proof}\leanok
+\begin{proof}
+	\leanok
 	Every summand is a polynomial in the commuting positive operators $G$ and $I-G$, so $S_{\tau_{\ge \ell}}$ is Hermitian and positive semidefinite. Summing over all prefixes gives
 	\[
 		S_{\tau_{\ge \ell}} \le (G+(I-G))^{\ell-1}=I.
@@ -1710,7 +1711,8 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 		1 - \frac{\kappa}{1-\theta} - e^{-\theta^2 k/2}.
 	\]
 \end{lemma}
-\begin{proof}\leanok
+\begin{proof}
+	\leanok
 	Let $\rho$ be the reduced state of $\ket{\psi}$ on one prover's subsystem, and write the eigendecomposition $X = \sum_i \lambda_i \ket{v_i}\bra{v_i}$. This defines a probability distribution $\mu(i)=\bra{v_i}\rho\ket{v_i}$, with
 	\[
 		\E_{i\sim\mu} \lambda_i = \Tr(X\rho) = \bra{\psi} X \ot I \ket{\psi} \ge 1-\kappa.

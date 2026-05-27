@@ -44,7 +44,8 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 		\label{eq:local-variance-of-points-equation}
 	\end{equation}
 \end{lemma}
-\begin{proof}\leanok
+\begin{proof}
+	\leanok
 	\uses{prop:simeq-to-approx, prop:cab-approx-delta, lem:generalize-b, lem:good-strategy-characterization, prop:triangle-inequality-for-approx_delta}
 	Fix $g$ and keep the weight $(G_g)^{1/2}$ on the second tensor factor throughout. On the vector $(I\ot (G_g)^{1/2})\ket{\psi}$ one has the six-step chain
 	\[
@@ -99,7 +100,8 @@ Throughout this chapter, $(\psi,A,B,L)$ is an $(\eps,\delta,\gamma)$-good symmet
 		\label{eq:global-variance-of-points-equation}
 	\end{equation}
 \end{lemma}
-\begin{proof}\leanok
+\begin{proof}
+	\leanok
 	\lean{MIPStarRE.LDT.GlobalVariance.globalVarianceDeviation_sum_le_m_mul_localVarianceDeviation_sum, MIPStarRE.LDT.GlobalVariance.globalVarianceDeviation_sum_le_of_localVarianceDeviation_sum_le}
 	\uses{def:local-and-variance, lem:local-to-global, lem:local-variance-of-points, lem:equivalent-local-variance}
 	We want to bound
