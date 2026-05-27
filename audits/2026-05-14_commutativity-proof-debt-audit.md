@@ -66,7 +66,7 @@ The following remaining vocabulary is below the source theorem boundary.
 | --- | --- | --- | --- |
 | Former phase-67 first-reverse residual declarations | `ScalarApproximation/Phase67Residual.lean` | Historical analytic endpoint for an older BAB-side reverse-insertion route | Deleted after import checks; not a hypothesis of `commDataProcessedG`, whose scalar chain uses the paper line-99--104 route through `evaluatedSlice_phaseSixSeven_reverse_bound` |
 | Former `evaluatedSlicePhaseFiveStabilityDefect` declarations | `ScalarApproximation/ProcessedG/PhaseFive.lean` | Older phase-five local scaffold | Deleted after import checks; the final paper-chain assembly uses `PaperChainPhaseFive.lean` |
-| `fullSliceABAB_scalar_to_BABAtensor`, `xEvaluatedSliceBABAtensor_to_BABAScalar`, and related full-slice closeness lemmas | `Transport/FullSlice/Bridges/*` | Proved `closenessOfIP` scalar-to-tensor estimates | Internal construction lemmas, not theorem hypotheses |
+| `fullSliceABAB_scalar_to_BABAtensor` and related full-slice closeness lemmas | `Transport/FullSlice/Bridges/*` | Proved `closenessOfIP` scalar-to-tensor estimates | Internal construction lemmas, not theorem hypotheses; the unused x-evaluated `BABA` scalar intermediate was deleted after import checks |
 | `FullSliceScalarMarginalizeYFirstCloseness` | `Main/Auxiliary/ScalarMarginalization.lean` | Private local structure bundling a proved line-359 estimate | Harmless local proof organization |
 
 These objects should not be promoted to assumptions of a source-labelled
