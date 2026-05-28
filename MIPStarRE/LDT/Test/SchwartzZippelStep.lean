@@ -85,31 +85,6 @@ private lemma qBipartiteMatchMass_postprocess_eq_pair_sum
               simp [h, hzero]
 
 open Classical in
-private lemma qBipartiteMatchMass_eq_pair_diag
-    {α ιA ιB : Type*} [Fintype α]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB) :
-    qBipartiteMatchMass ψ A B =
-      ∑ aa : α × α,
-        if aa.1 = aa.2 then
-          ev ψ (opTensor (A.outcome aa.1) (B.outcome aa.2))
-        else 0 := by
-  classical
-  unfold qBipartiteMatchMass
-  symm
-  rw [Fintype.sum_prod_type]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  rw [Finset.sum_eq_single a]
-  · simp
-  · intro b _ hb
-    have hb' : ¬ a = b := by
-      intro hEq
-      exact hb hEq.symm
-    simp [hb']
-  · simp
-
-open Classical in
 private noncomputable def localCollisionMass
     {α β ιA ιB : Type*} [Fintype α]
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -127,8 +102,27 @@ private lemma qBipartiteMatchMass_postprocess_eq_add_localCollision
     qBipartiteMatchMass ψ (postprocess A f) (postprocess B f) =
       qBipartiteMatchMass ψ A B + localCollisionMass ψ A B f := by
   classical
+  have hdiag :
+      qBipartiteMatchMass ψ A B =
+        ∑ aa : α × α,
+          if aa.1 = aa.2 then
+            ev ψ (opTensor (A.outcome aa.1) (B.outcome aa.2))
+          else 0 := by
+    unfold qBipartiteMatchMass
+    symm
+    rw [Fintype.sum_prod_type]
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    rw [Finset.sum_eq_single a]
+    · simp
+    · intro b _ hb
+      have hb' : ¬ a = b := by
+        intro hEq
+        exact hb hEq.symm
+      simp [hb']
+    · simp
   rw [qBipartiteMatchMass_postprocess_eq_pair_sum]
-  rw [qBipartiteMatchMass_eq_pair_diag]
+  rw [hdiag]
   unfold localCollisionMass
   rw [← Finset.sum_add_distrib]
   refine Finset.sum_congr rfl ?_
