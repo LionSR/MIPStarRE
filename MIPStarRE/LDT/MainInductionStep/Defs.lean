@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Basic.LinePolynomials
 import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
