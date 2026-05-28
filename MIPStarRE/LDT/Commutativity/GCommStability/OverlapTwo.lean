@@ -205,51 +205,6 @@ private lemma gCommStabilityTwo_pointwise_bound
             rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).total)) := by
           simpa using gCommStabilityTwo_pointwise_sum_bound params strategy family G hG q
 
-/-- The second stability family has raw defect at most `zeta / 2`. -/
-private lemma gCommStabilityTwo_raw_le_half
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hself : family.StronglySelfConsistent strategy.state zeta) :
-    sddErrorOp strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityTwoLeft params strategy family G)
-      (commDataProcessedGStabilityTwoRight params strategy family G) ≤
-    zeta / 2 := by
-  exact
-    gCommStability_raw_le_half_of params strategy zeta family G hG hself
-      (commDataProcessedGStabilityTwoLeft params strategy family G)
-      (commDataProcessedGStabilityTwoRight params strategy family G)
-      Prod.fst
-      (gCommOverlap_avgOver_fst params strategy G)
-      (gCommStabilityTwo_pointwise_bound params strategy family G hG)
-
-/-- The second stability family has raw defect at most `1`. -/
-private lemma gCommStabilityTwo_raw_le_one
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (_zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas) :
-    sddErrorOp strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityTwoLeft params strategy family G)
-      (commDataProcessedGStabilityTwoRight params strategy family G) ≤
-    1 := by
-  exact
-    gCommStability_raw_le_one_of params strategy hnorm G
-      (commDataProcessedGStabilityTwoLeft params strategy family G)
-      (commDataProcessedGStabilityTwoRight params strategy family G)
-      Prod.fst
-      (gCommStabilityTwo_pointwise_bound params strategy family G hG)
-
 /-- Overlap-only version of the second stability estimate.
 
 This removes the trailing `G^x` in the current SDD package via slice SSC overlap.
@@ -279,9 +234,18 @@ theorem gCommStabilityTwo_overlap
         (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)))
       hself.sliceSelfConsistency.squaredDistanceBound
   have hstrong_half :=
-    gCommStabilityTwo_raw_le_half params strategy zeta family G hG hself
+    gCommStability_raw_le_half_of params strategy zeta family G hG hself
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      Prod.fst
+      (gCommOverlap_avgOver_fst params strategy G)
+      (gCommStabilityTwo_pointwise_bound params strategy family G hG)
   have hstrong_one :=
-    gCommStabilityTwo_raw_le_one params strategy zeta hnorm family G hG
+    gCommStability_raw_le_one_of params strategy hnorm G
+      (commDataProcessedGStabilityTwoLeft params strategy family G)
+      (commDataProcessedGStabilityTwoRight params strategy family G)
+      Prod.fst
+      (gCommStabilityTwo_pointwise_bound params strategy family G hG)
   -- The SSC argument gives the stronger `sqrt zeta` bound directly.
   -- We then relax it by monotonicity to match the paper's displayed error term.
   have hstrong :
