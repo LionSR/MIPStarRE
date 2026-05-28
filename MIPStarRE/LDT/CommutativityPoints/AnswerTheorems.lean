@@ -311,26 +311,6 @@ private lemma answerSampledDiagonalLineApproximation_ignore_second
           simpa [answerSampledPointMeasurement, answerSampledDiagonalLineEvaluation,
             sampledPointFromDiagonalQuestion] using happrox
 
-private lemma answerDiagonalLineProduct_outcome_swap
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params ι) :
-    ∀ q ab,
-      (answerDiagonalLineProductOrdered params strategy q).outcome ab =
-        (answerDiagonalLineProductReversed params strategy q).outcome ab := by
-  intro q ⟨a, b⟩
-  simp only [answerDiagonalLineProductOrdered,
-    answerDiagonalLineProductReversed,
-    OpFamily.rightPlacedOpFamily,
-    reversedProductOpFamily,
-    orderedProductOpFamily,
-    answerSampledDiagonalLineEvaluation]
-  congr 1
-  exact (strategy.diagonalMeasurement
-    q.1).postprocess_outcome_commute
-    (fun f => f q.2.2)
-    (fun f => f q.2.1) b a
-
 /-- **Lean-only:** A local tensor-placement comparison in the answer-valued
 point-commutativity chain.
 
@@ -720,9 +700,14 @@ private lemma answerOrderedDropFromLineComparison
     (IdxSubMeas.toIdxOpFamily (answerPointDiagonalLineMixedProductRight params strategy))
     (pointDiagonalLineApproxError params gamma)
     (by
-      intro q ab
+      intro q ⟨a, b⟩
       symm
-      exact answerDiagonalLineProduct_outcome_swap params strategy q ab)
+      simp only [answerDiagonalLineProductOrdered, answerDiagonalLineProductReversed,
+        OpFamily.rightPlacedOpFamily, reversedProductOpFamily, orderedProductOpFamily,
+        answerSampledDiagonalLineEvaluation]
+      congr 1
+      exact (strategy.diagonalMeasurement q.1).postprocess_outcome_commute
+        (fun f => f q.2.2) (fun f => f q.2.1) b a)
     (by intro q ab; rfl)
     hrev
 
