@@ -46,22 +46,6 @@ private lemma oneThirtySecondErrorSum_nonneg
       (Real.rpow_nonneg hzeta_nonneg _))
     (Real.rpow_nonneg hratio_nonneg _)
 
-/-- The `hBConsistency` error term is one summand of the over-all-outcomes error. -/
-private lemma hBConsistencyError_le_overAllOutcomesError
-    (params : Parameters) [FieldModel params.q]
-    (eps delta gamma zeta : Error) (k : ℕ)
-    (heps_nonneg : 0 ≤ eps)
-    (hdelta_nonneg : 0 ≤ delta)
-    (hgamma_nonneg : 0 ≤ gamma)
-    (hzeta_nonneg : 0 ≤ zeta) :
-    hBConsistencyError params eps delta gamma zeta k ≤
-      overAllOutcomesError params eps delta gamma zeta k := by
-  have hsum_nonneg := oneThirtySecondErrorSum_nonneg params eps delta gamma zeta
-    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
-  simp only [hBConsistencyError, overAllOutcomesError]
-  gcongr
-  norm_num
-
 /-- Evaluate a weighted sum placed on Alice's tensor factor term by term. -/
 private lemma ev_leftTensor_weighted_sum
     {Question : Type*}
@@ -415,9 +399,12 @@ lemma dnoteq_term_le_overAllOutcomesError
       ((k : Error) ^ (2 : ℕ)) / (params.q : Error) ≤
         hBConsistencyError params eps delta gamma zeta k := by
     linarith
-  exact le_trans hdnoteq_le_hB
-    (hBConsistencyError_le_overAllOutcomesError params eps delta gamma zeta k
-      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg)
+  exact le_trans hdnoteq_le_hB <| by
+    have hsum_nonneg := oneThirtySecondErrorSum_nonneg params eps delta gamma zeta
+      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+    simp only [hBConsistencyError, overAllOutcomesError]
+    gcongr
+    norm_num
 
 /-- The paper's `md/q` Schwartz–Zippel term and the final distinctness swap fit
 inside the two-coefficient slack between `ν₆` and `ν₇`.
