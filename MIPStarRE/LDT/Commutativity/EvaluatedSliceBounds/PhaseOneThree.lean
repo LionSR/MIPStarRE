@@ -70,33 +70,6 @@ private lemma leftTensor_normalizationConditionSquare_le_one
             simpa [normalizationConditionSquareOperator] using
               (normalizationConditionSquareFamily P Q).total_le_one
 
-/-- Phase-1 `closenessOfIP` side condition for inserting Bob's measurement.
-
-This packages the `lem:normalization-condition` bound for
-`C_{b,a} = G^x_a G^y_b G^x_a`, lifted to the left tensor factor. -/
-private lemma evaluatedSlice_phaseOne_hC
-    (params : Parameters) [FieldModel params.q]
-    (family : IdxPolyFamily params ι) :
-    ∀ q : EvaluatedSliceQuestion params,
-      ∑ b : Fq params,
-          (∑ a : Fq params,
-              leftTensor (ι₂ := ι)
-                (((evaluatedSliceFirstFactor params family q).outcome a) *
-                  ((evaluatedSliceSecondFactor params family q).outcome b) *
-                  ((evaluatedSliceFirstFactor params family q).outcome a))) *
-            (∑ a : Fq params,
-              leftTensor (ι₂ := ι)
-                 (((evaluatedSliceFirstFactor params family q).outcome a) *
-                  ((evaluatedSliceSecondFactor params family q).outcome b) *
-                  ((evaluatedSliceFirstFactor params family q).outcome a)))ᴴ ≤ 1 := by
-  intro q
-  simpa [evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
-    evaluatedSliceFirstProj] using
-    leftTensor_normalizationConditionSquare_le_one
-      (ι := ι)
-      (P := evaluatedSliceSecondFactor params family q)
-      (Q := evaluatedSliceFirstProj params family q)
-
 /-- View the `params.next` point measurement with the outcome type rewritten as
 `Fq params`. -/
 noncomputable def evaluatedSlicePointMeas
@@ -173,7 +146,12 @@ lemma evaluatedSlice_phaseOne_insert_bound
   have hC :
       ∀ q, ∑ b : Fq params, (∑ a : Fq params, C q b a) * (∑ a : Fq params, C q b a)ᴴ ≤ 1 := by
     intro q
-    simpa [C] using evaluatedSlice_phaseOne_hC params family q
+    simpa [C, evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
+      evaluatedSliceFirstProj] using
+      leftTensor_normalizationConditionSquare_le_one
+        (ι := ι)
+        (P := evaluatedSliceSecondFactor params family q)
+        (Q := evaluatedSliceFirstProj params family q)
   have hzeta_nonneg : 0 ≤ zeta := by
     have hsdd_nonneg :
         0 ≤ sddError strategy.state
