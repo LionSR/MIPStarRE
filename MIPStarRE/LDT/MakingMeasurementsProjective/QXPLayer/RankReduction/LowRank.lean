@@ -441,32 +441,6 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
     · simpa [Qa, data] using hrankQ
     · simpa [data] using hAuxDim
 
-/-- **Degenerate empty-outcome branch** for `lem:projective-low-rank-sum`.
-
-In `references/ldt-paper/orthonormalization.tex`, lines 540-658, the rank-
-reduction argument starts from an honest measurement `A = {A_a}` on a nontrivial
-ambient space. If `Outcome` were empty, then `∑ a, A_a = 0` while
-`A.total_eq_one` forces the same sum to be `1`, so this branch is impossible.
-We isolate that contradiction here so `projectiveLowRankSum` can focus on the
-spectral construction in the nonempty case. -/
-private lemma rankReduction_emptyOutcome
-    {Outcome : Type uOutcome} {ι : Type uι}
-    [Fintype ι] [DecidableEq ι] [Nonempty ι]
-    [Fintype Outcome] [IsEmpty Outcome]
-    (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error) :
-    ∃ data : QLayerData Outcome ι,
-      RankReductionWitness ψ A ζ data := by
-  exfalso
-  obtain ⟨i⟩ := (inferInstance : Nonempty ι)
-  have htotal_zero : A.toSubMeas.total = 0 := by
-    simpa using A.toSubMeas.sum_eq_total.symm
-  have hzero_one : (0 : MIPStarRE.Quantum.Op ι) = 1 := by
-    rw [← htotal_zero, A.total_eq_one]
-  have hentry : (0 : ℂ) = 1 := by
-    simpa using congrFun (congrFun hzero_one i) i
-  norm_num at hentry
-
 /-- Internal rank-reduction constructor from an already rounded projective family.
 
 Construct the paper's rank-reduced family `Q_a`, together with the auxiliary
@@ -517,7 +491,15 @@ lemma projectiveLowRankSum_of_roundingWitness {Outcome : Type uOutcome}
     exact projectiveLowRankSum_truncate ψ hψ A ζ hζ hζ_le q hrounded
       source_almost_projective
   · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
-    exact rankReduction_emptyOutcome (ψ := ψ) (A := A) (ζ := ζ)
+    exfalso
+    obtain ⟨i⟩ := (inferInstance : Nonempty ι)
+    have htotal_zero : A.toSubMeas.total = 0 := by
+      simpa using A.toSubMeas.sum_eq_total.symm
+    have hzero_one : (0 : MIPStarRE.Quantum.Op ι) = 1 := by
+      rw [← htotal_zero, A.total_eq_one]
+    have hentry : (0 : ℂ) = 1 := by
+      simpa using congrFun (congrFun hzero_one i) i
+    norm_num at hentry
 
 
 end
