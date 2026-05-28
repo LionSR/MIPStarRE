@@ -106,19 +106,6 @@ private noncomputable def axisDirectionError
       (axisParallelPointAnswerFamily strategy (u, i))
       (axisParallelLineAnswerFamily strategy (u, i))
 
-private lemma axisDirectionError_nonneg
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (i : Fin params.next.m) :
-    0 ≤ axisDirectionError params strategy i := by
-  unfold axisDirectionError
-  refine avgOver_nonneg (uniformDistribution (Point params.next)) _ ?_
-  intro u
-  exact qBipartiteConsDefect_nonneg strategy.state
-    (axisParallelPointAnswerFamily strategy (u, i))
-    (axisParallelLineAnswerFamily strategy (u, i))
-
 private lemma sliceAxisDirectionErrorAverage_eq_axisDirectionError
     (params : Parameters)
     [FieldModel params.q]
@@ -295,7 +282,14 @@ lemma weighted_axisParallel_bound
           (axisDirectionError params strategy) :=
         weighted_embedded_average_le_full_average params
           (f := axisDirectionError params strategy)
-          (hf := axisDirectionError_nonneg params strategy)
+          (hf := by
+            intro i
+            unfold axisDirectionError
+            refine avgOver_nonneg (uniformDistribution (Point params.next)) _ ?_
+            intro u
+            exact qBipartiteConsDefect_nonneg strategy.state
+              (axisParallelPointAnswerFamily strategy (u, i))
+              (axisParallelLineAnswerFamily strategy (u, i)))
     _ = strategy.axisParallelFailureProbability :=
         axisFailure_eq_average_directionError params strategy
     _ ≤ eps := hgood.axisParallelTest
