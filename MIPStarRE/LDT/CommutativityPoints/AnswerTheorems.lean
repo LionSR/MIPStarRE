@@ -138,34 +138,6 @@ private noncomputable def answerPointDiagonalLineMixedProductRight
     let Lu := answerSampledDiagonalLineEvaluation params strategy (ℓ, tu)
     postprocess (tensorProductSubMeas Av Lu) Prod.swap
 
-private lemma answerPointMeasurementProductAlongSharedLine_outcome
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params ι)
-    (q : PointPairDiagonalLineQuestion params)
-    (a b : Fq params) :
-    (answerPointMeasurementProductAlongSharedLine params strategy q).outcome (a, b) =
-      leftTensor
-        ((strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome a *
-          (strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b) := by
-  simp [answerPointMeasurementProductAlongSharedLine, answerPointMeasurementProductLeft,
-    orderedProductOpFamily, sampledPointPairFromSharedDiagonalQuestion,
-    OpFamily.leftPlacedOpFamily]
-
-private lemma answerPointMeasurementProductAlongSharedLineReversed_outcome
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params ι)
-    (q : PointPairDiagonalLineQuestion params)
-    (a b : Fq params) :
-    (answerPointMeasurementProductAlongSharedLineReversed params strategy q).outcome (a, b) =
-      leftTensor
-        ((strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b *
-          (strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome a) := by
-  simp [answerPointMeasurementProductAlongSharedLineReversed, answerPointMeasurementProductRight,
-    reversedProductOpFamily, sampledPointPairFromSharedDiagonalQuestion,
-    OpFamily.leftPlacedOpFamily]
-
 private lemma answerPointDiagonalLineMixedProductLeft_outcome
     (params : Parameters)
     [FieldModel params.q]
@@ -210,32 +182,6 @@ private lemma answerPointDiagonalLineMixedProductRight_outcome
     simp [and_comm]
   rw [hfilter]
   simp
-
-private lemma answerDiagonalLineProductOrdered_outcome
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params ι)
-    (q : PointPairDiagonalLineQuestion params)
-    (a b : Fq params) :
-    (answerDiagonalLineProductOrdered params strategy q).outcome (a, b) =
-      rightTensor
-        ((answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).outcome b *
-          (answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a) := by
-  simp [answerDiagonalLineProductOrdered, answerSampledDiagonalLineEvaluation,
-    OpFamily.rightPlacedOpFamily, reversedProductOpFamily]
-
-private lemma answerDiagonalLineProductReversed_outcome
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params ι)
-    (q : PointPairDiagonalLineQuestion params)
-    (a b : Fq params) :
-    (answerDiagonalLineProductReversed params strategy q).outcome (a, b) =
-      rightTensor
-        ((answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a *
-          (answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).outcome b) := by
-  simp [answerDiagonalLineProductReversed, answerSampledDiagonalLineEvaluation,
-    OpFamily.rightPlacedOpFamily, orderedProductOpFamily]
 
 private lemma answerSampledDiagonalLineApproximation_ignore_first
     (params : Parameters)
@@ -478,7 +424,9 @@ private lemma answerOrderedLiftToMixedLine
                       a b
         _ = (answerPointMeasurementProductAlongSharedLine params strategy q).outcome (a, b) := by
               symm
-              exact answerPointMeasurementProductAlongSharedLine_outcome params strategy q a b)
+              simp [answerPointMeasurementProductAlongSharedLine, answerPointMeasurementProductLeft,
+                orderedProductOpFamily, sampledPointPairFromSharedDiagonalQuestion,
+                OpFamily.leftPlacedOpFamily])
     (by
       intro q ab
       rcases ab with ⟨a, b⟩
@@ -626,7 +574,8 @@ private lemma answerOrderedLiftToLineProduct
                       b a
         _ = (answerDiagonalLineProductOrdered params strategy q).outcome (a, b) := by
               symm
-              exact answerDiagonalLineProductOrdered_outcome params strategy q a b)
+              simp [answerDiagonalLineProductOrdered, answerSampledDiagonalLineEvaluation,
+                OpFamily.rightPlacedOpFamily, reversedProductOpFamily])
     hcab
 
 /-- **Lean-only:** A local tensor-placement comparison from the ordered
@@ -741,7 +690,8 @@ private lemma answerOrderedDropFromLineComparison
                         a b
           _ = (answerDiagonalLineProductReversed params strategy q).outcome (a, b) := by
                 symm
-                exact answerDiagonalLineProductReversed_outcome params strategy q a b)
+                simp [answerDiagonalLineProductReversed, answerSampledDiagonalLineEvaluation,
+                  OpFamily.rightPlacedOpFamily, orderedProductOpFamily])
       (by
         intro q ab
         rcases ab with ⟨a, b⟩
@@ -888,8 +838,9 @@ private lemma answerReversedDropToPointsComparison
         _ = (answerPointMeasurementProductAlongSharedLineReversed params strategy q).outcome
               (a, b) := by
               symm
-              exact answerPointMeasurementProductAlongSharedLineReversed_outcome
-                params strategy q a b)
+              simp [answerPointMeasurementProductAlongSharedLineReversed,
+                answerPointMeasurementProductRight, reversedProductOpFamily,
+                sampledPointPairFromSharedDiagonalQuestion, OpFamily.leftPlacedOpFamily])
     hcab
 
 /-- Answer-valued form of `thm:commutativity-points`.
