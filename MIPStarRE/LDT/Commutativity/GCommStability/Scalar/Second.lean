@@ -62,27 +62,6 @@ noncomputable def gCommStabilityTwoScalarDefect
         rightTensor (ι₁ := ι)
           (IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g))
 
-private lemma gCommStabilityTwo_scalar_pointwise_bound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
-    ∀ x : Fq params,
-      |gCommStabilityTwoScalarDefect params strategy family G x| ≤
-        Real.sqrt (hbound.storedResidual G x) := by
-  intro x
-  simpa [gCommStabilityTwoScalarDefect] using
-    scalar_pointwise_cauchy_schwarz_bound
-      params strategy zeta family G hG hbound
-      (gCommStabilityTwoR params family G x) x
-      (sum_ev_leftTensor_outcome_le_one strategy.state hnorm
-        (gCommStabilityTwoR params family G x))
-
 /-- Direct boundedness proof for the second paper scalar stability estimate.
 
 This is the `Z^x` boundedness half of
@@ -120,8 +99,13 @@ theorem gCommStabilityTwo_scalar
               (uniformDistribution (Fq params))
               (gCommStabilityTwoScalarDefect params strategy family G)
               (fun x => hbound.storedResidual G x)
-              (gCommStabilityTwo_scalar_pointwise_bound
-                params strategy zeta hnorm family G hG hbound)
+              (fun x => by
+                simpa [gCommStabilityTwoScalarDefect] using
+                  scalar_pointwise_cauchy_schwarz_bound
+                    params strategy zeta family G hG hbound
+                    (gCommStabilityTwoR params family G x) x
+                    (sum_ev_leftTensor_outcome_le_one strategy.state hnorm
+                      (gCommStabilityTwoR params family G x)))
               (storedResidual_nonneg
                 params strategy family G zeta hbound)
               h𝒟
