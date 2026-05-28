@@ -469,48 +469,6 @@ private lemma addInU_selected_cs_chain_self_energy_factor_le_one_at
       _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
   exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
 
-/-- Selected self-energy factor `≤ 1` for the `Q₂ → Q₃` factored
-Cauchy--Schwarz bound. -/
-private lemma addInU_selected_cs_chain_step3_self_energy_factor_le_one
-    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (M : IdxSubMeas (Point params) Outcome ι)
-    (T : SubMeas (Polynomial params) ι)
-    (S : AddInUSelection params Outcome) :
-    avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
-      ∑ ah : Outcome × Polynomial params,
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Av := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.2
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Av * Moh * Av) (T.outcome ah.2))
-        else 0) ≤ 1 := by
-  classical
-  simpa using
-    addInU_selected_cs_chain_self_energy_factor_le_one_at
-      params strategy M T S (fun uv : Point params × Point params => uv.2)
-
-/-- Selected self-energy factor `≤ 1` for the `Q₃ → Q₄` factored
-Cauchy--Schwarz bound. -/
-private lemma addInU_selected_cs_chain_step4_self_energy_factor_le_one
-    {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (M : IdxSubMeas (Point params) Outcome ι)
-    (T : SubMeas (Polynomial params) ι)
-    (S : AddInUSelection params Outcome) :
-    avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
-      ∑ ah : Outcome × Polynomial params,
-        if ah ∈ addInUSelectionPairs params S uv.1 then
-          let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy ah.2 uv.1
-          let Moh := (M uv.1).outcome ah.1
-          ev strategy.state (opTensor (Au * Moh * Au) (T.outcome ah.2))
-        else 0) ≤ 1 := by
-  classical
-  simpa using
-    addInU_selected_cs_chain_self_energy_factor_le_one_at
-      params strategy M T S (fun uv : Point params × Point params => uv.1)
-
 /-- The selected Step 3/4 variance factor is bounded by the summed
 global-variance deviation.
 
@@ -683,7 +641,10 @@ lemma addInU_selected_cs_chain_step3_abs_le_sqrt_globalVarianceDeviation_sum
     (addInU_selected_cs_chain_step3_factored_cs params strategy M T S)
     (addInU_selected_cs_chain_step34_variance_factor_le_globalVarianceDeviation_sum
       params strategy M T S)
-    (addInU_selected_cs_chain_step3_self_energy_factor_le_one params strategy M T S)
+    (by
+      simpa using
+        addInU_selected_cs_chain_self_energy_factor_le_one_at
+          params strategy M T S (fun uv : Point params × Point params => uv.2))
 
 /-- Raw selected `Q₃ → Q₄` global-variance Cauchy--Schwarz bound after the
 selected self-energy and variance factors have been estimated. -/
@@ -703,7 +664,10 @@ lemma addInU_selected_cs_chain_step4_abs_le_sqrt_globalVarianceDeviation_sum
   classical
   exact addInU_le_sqrt_of_factor_bounds_left
     (addInU_selected_cs_chain_step4_factored_cs params strategy M T S)
-    (addInU_selected_cs_chain_step4_self_energy_factor_le_one params strategy M T S)
+    (by
+      simpa using
+        addInU_selected_cs_chain_self_energy_factor_le_one_at
+          params strategy M T S (fun uv : Point params × Point params => uv.1))
     (addInU_selected_cs_chain_step34_variance_factor_le_globalVarianceDeviation_sum
       params strategy M T S)
 
