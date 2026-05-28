@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Test.ErrorCascade.Definitions
 import MIPStarRE.LDT.Test.ErrorCascade.EnvelopeBounds
 
 /-!
