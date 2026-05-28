@@ -131,39 +131,6 @@ private lemma diagonalSliceIndexErrorAverage_eq_diagonalIndexError
     _ = diagonalIndexError params strategy (embedCoord params j) := by
             rfl
 
-private lemma diagonalFailure_eq_average_indexError
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι) :
-    avgOver (uniformDistribution (Fin params.next.m))
-      (diagonalIndexError params strategy) =
-      strategy.diagonalFailureProbability := by
-  unfold diagonalIndexError SymStrat.diagonalFailureProbability
-  calc
-    avgOver (uniformDistribution (Fin params.next.m))
-        (fun j =>
-          bipartiteConsError strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params.next j))
-            (diagonalPointAnswerFamily strategy j)
-            (diagonalLineAnswerFamily strategy j))
-      = ∑ j : Fin params.next.m,
-          (1 / (params.next.m : Error)) *
-            bipartiteConsError strategy.state
-              (uniformDistribution (RestrictedDiagonalSample params.next j))
-              (diagonalPointAnswerFamily strategy j)
-              (diagonalLineAnswerFamily strategy j) := by
-                simp [avgOver, uniformDistribution, Fintype.card_fin]
-    _ = (1 / (params.next.m : Error)) *
-          ∑ j : Fin params.next.m,
-            bipartiteConsError strategy.state
-              (uniformDistribution (RestrictedDiagonalSample params.next j))
-              (diagonalPointAnswerFamily strategy j)
-              (diagonalLineAnswerFamily strategy j) := by
-                symm
-                rw [Finset.mul_sum]
-    _ = strategy.diagonalFailureProbability := by
-          rfl
-
 private lemma averageRestrictedDiagonalFailure_eq_embeddedDiagonalIndices
     (params : Parameters)
     [FieldModel params.q]
@@ -261,8 +228,32 @@ lemma weighted_diagonal_bound
               (uniformDistribution (RestrictedDiagonalSample params.next j))
               (diagonalPointAnswerFamily strategy j)
               (diagonalLineAnswerFamily strategy j))
-    _ = strategy.diagonalFailureProbability :=
-        diagonalFailure_eq_average_indexError params strategy
+    _ = strategy.diagonalFailureProbability := by
+        unfold diagonalIndexError SymStrat.diagonalFailureProbability
+        calc
+          avgOver (uniformDistribution (Fin params.next.m))
+              (fun j =>
+                bipartiteConsError strategy.state
+                  (uniformDistribution (RestrictedDiagonalSample params.next j))
+                  (diagonalPointAnswerFamily strategy j)
+                  (diagonalLineAnswerFamily strategy j))
+            = ∑ j : Fin params.next.m,
+                (1 / (params.next.m : Error)) *
+                  bipartiteConsError strategy.state
+                    (uniformDistribution (RestrictedDiagonalSample params.next j))
+                    (diagonalPointAnswerFamily strategy j)
+                    (diagonalLineAnswerFamily strategy j) := by
+                      simp [avgOver, uniformDistribution, Fintype.card_fin]
+          _ = (1 / (params.next.m : Error)) *
+                ∑ j : Fin params.next.m,
+                  bipartiteConsError strategy.state
+                    (uniformDistribution (RestrictedDiagonalSample params.next j))
+                    (diagonalPointAnswerFamily strategy j)
+                    (diagonalLineAnswerFamily strategy j) := by
+                      symm
+                      rw [Finset.mul_sum]
+          _ = strategy.diagonalFailureProbability := by
+                rfl
     _ ≤ gamma := hgood.diagonalLineTest
 
 end MIPStarRE.LDT.MainInductionStep
