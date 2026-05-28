@@ -295,26 +295,6 @@ private lemma consSubMeas_sandwichControl
                         simp [IdxSubMeas.liftLeft, rightTensor, leftTensor]
     _ ≤ γ := hcons
 
-private lemma consSubMeas_combinedControl
-    {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
-    (A : IdxSubMeas Question Outcome ι)
-    (B : IdxMeas Question Outcome ι) (γ : Error) :
-    SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
-      (diagonalSandwichFamily A B) γ →
-    SDDRel ψ 𝒟
-      (diagonalSandwichFamily A B)
-      (totalSandwichFamily A B) γ →
-    SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A)
-      (totalSandwichFamily A B) (4 * γ) := by
-  intro hAD hDT
-  have h := stateDependentDistanceRel_triangle ψ 𝒟 (IdxSubMeas.liftLeft A)
-    (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ
-    hAD hDT
-  exact stateDependentDistanceRel_mono ψ 𝒟 (IdxSubMeas.liftLeft A) (totalSandwichFamily A B)
-    (2 * (γ + γ)) (4 * γ) (by linarith) h
-
 /-- `prop:cons-sub-meas`. -/
 theorem consSubMeas {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -332,8 +312,13 @@ theorem consSubMeas {Question Outcome : Type*}
   exact {
     diagonalControl := hdc
     sandwichControl := hsc
-    combinedControl :=
-      consSubMeas_combinedControl ψ 𝒟 A B γ hdc hsc
+    combinedControl := by
+      have h :=
+        stateDependentDistanceRel_triangle ψ 𝒟 (IdxSubMeas.liftLeft A)
+          (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hdc hsc
+      exact
+        stateDependentDistanceRel_mono ψ 𝒟 (IdxSubMeas.liftLeft A)
+          (totalSandwichFamily A B) (2 * (γ + γ)) (4 * γ) (by linarith) h
   }
 
 
