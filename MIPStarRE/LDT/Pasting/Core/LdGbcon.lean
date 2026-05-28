@@ -44,33 +44,6 @@ private noncomputable def ldGbconVerticalLineMeasurement
       simpa [verticalLineMeasurementFamily, ℓ, postprocess_total] using
         (strategy.axisParallelMeasurement ℓ).total_eq_one }
 
-private lemma ldGbcon_rebased_vertical_line
-    (params : Parameters) [FieldModel params.q]
-    (u : Point params.next) :
-    AxisParallelLine.rebaseAt
-        ({ base := appendPoint params (truncatePoint params u) zeroCoord
-          , direction := lastCoord params } : AxisParallelLine params.next)
-        (pointHeight params u) =
-      { base := u, direction := lastCoord params } := by
-  let ℓ : AxisParallelLine params.next :=
-    { base := appendPoint params (truncatePoint params u) zeroCoord
-    , direction := lastCoord params }
-  have happend : appendPoint params (truncatePoint params u) (pointHeight params u) = u := by
-    exact (pointNextEquiv params).left_inv u
-  have hbase : ℓ.pointAt (pointHeight params u) = u := by
-    calc
-      ℓ.pointAt (pointHeight params u)
-        = appendPoint params (truncatePoint params u) (pointHeight params u) := by
-            simpa [ℓ] using
-              verticalLine_pointAt_appendPoint params
-                (truncatePoint params u) (pointHeight params u)
-      _ = u := happend
-  simpa [AxisParallelLine.rebaseAt, ℓ] using
-    congrArg
-      (fun base : Point params.next =>
-        ({ base := base, direction := lastCoord params } : AxisParallelLine params.next))
-      hbase
-
 private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
@@ -83,13 +56,31 @@ private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
     let ℓ : AxisParallelLine params.next :=
       { base := appendPoint params (truncatePoint params u) zeroCoord
       , direction := lastCoord params }
+    have hrebased :
+        AxisParallelLine.rebaseAt ℓ (pointHeight params u) =
+          { base := u, direction := lastCoord params } := by
+      have happend : appendPoint params (truncatePoint params u) (pointHeight params u) = u := by
+        exact (pointNextEquiv params).left_inv u
+      have hbase : ℓ.pointAt (pointHeight params u) = u := by
+        calc
+          ℓ.pointAt (pointHeight params u)
+            = appendPoint params (truncatePoint params u) (pointHeight params u) := by
+                simpa [ℓ] using
+                  verticalLine_pointAt_appendPoint params
+                    (truncatePoint params u) (pointHeight params u)
+          _ = u := happend
+      simpa [AxisParallelLine.rebaseAt, ℓ] using
+        congrArg
+          (fun base : Point params.next =>
+            ({ base := base, direction := lastCoord params } : AxisParallelLine params.next))
+          hbase
     calc
       (ldGbconAxisLineMeasurement params strategy u).toSubMeas.outcome a
         = (postprocess
             ((strategy.axisParallelMeasurement
               (AxisParallelLine.rebaseAt ℓ (pointHeight params u))).toSubMeas)
             (· zeroCoord)).outcome a := by
-              simp [ldGbconAxisLineMeasurement, ldGbcon_rebased_vertical_line, ℓ]
+              simp [ldGbconAxisLineMeasurement, hrebased, ℓ]
               rfl
       _ = (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas)
             (fun f => f (pointHeight params u))).outcome a := by
