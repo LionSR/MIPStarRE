@@ -18,19 +18,6 @@ universe uOutcome uι
 
 noncomputable section
 
-/-- Rectangular sandwiching is monotone in the middle operator. -/
-private lemma rectangular_sandwich_mono {α β : Type*}
-    [Fintype α] [Finite β]
-    (M : Matrix α β ℂ) {P Q : MIPStarRE.Quantum.Op α} (hPQ : P ≤ Q) :
-    Mᴴ * P * M ≤ Mᴴ * Q * M := by
-  letI : Fintype β := Fintype.ofFinite β
-  apply sub_nonneg.mp
-  have hpsd : 0 ≤ Mᴴ * (Q - P) * M := by
-    exact
-      (Matrix.PosSemidef.conjTranspose_mul_mul_same
-        (Matrix.nonneg_iff_posSemidef.mp (sub_nonneg.mpr hPQ)) M).nonneg
-  simpa [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_assoc] using hpsd
-
 private lemma pa_nonneg {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -172,8 +159,17 @@ private lemma q_p_cross_close {Outcome : Type*}
             (Xa data a)ᴴ *
               ((data.x * data.xᴴ - 1) * (data.x * data.xᴴ - 1)) *
               Xa data a := by
-        exact rectangular_sandwich_mono (M := Xa data a)
-          (by simpa [D] using squaredDifference data)
+        apply sub_nonneg.mp
+        have hpsd :
+            0 ≤ (Xa data a)ᴴ *
+              (((data.x * data.xᴴ - 1) * (data.x * data.xᴴ - 1)) - D * Dᴴ) *
+              Xa data a := by
+          exact
+            (Matrix.PosSemidef.conjTranspose_mul_mul_same
+              (Matrix.nonneg_iff_posSemidef.mp <|
+                sub_nonneg.mpr (by simpa [D] using squaredDifference data))
+              (Xa data a)).nonneg
+        simpa [Matrix.mul_sub, Matrix.sub_mul, Matrix.mul_assoc] using hpsd
       calc
         first a ≤ ev ψ ((Xa data a)ᴴ *
               ((data.x * data.xᴴ - 1) * (data.x * data.xᴴ - 1)) *
