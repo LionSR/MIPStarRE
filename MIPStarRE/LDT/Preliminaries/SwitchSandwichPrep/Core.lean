@@ -187,13 +187,6 @@ lemma projSubMeas_total_proj
     A.total * A.total = A.total := by
   simpa using ProjSubMeas.total_proj A
 
-/-- Any `OpBounded01` operator is bounded above by the identity. -/
-private lemma opBounded01_le_one
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    {B : MIPStarRE.Quantum.Op ι} (hB : OpBounded01 B) :
-    B ≤ 1 :=
-  sub_nonneg.mp hB.boundedByIdentity
-
 /-- Any `OpBounded01` operator is Hermitian. -/
 lemma opBounded01_hermitian
     {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -206,9 +199,10 @@ lemma opBounded01_sq_le_one
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     {B : MIPStarRE.Quantum.Op ι} (hB : OpBounded01 B) :
     B * B ≤ 1 := by
+  have hB_le_one : B ≤ 1 := sub_nonneg.mp hB.boundedByIdentity
   exact le_trans
-    (MIPStarRE.Quantum.sq_le_self hB.nonnegative (opBounded01_le_one hB))
-    (opBounded01_le_one hB)
+    (MIPStarRE.Quantum.sq_le_self hB.nonnegative hB_le_one)
+    hB_le_one
 
 /-- Left tensoring preserves the `0 ≤ B ≤ 1` bounds. -/
 lemma leftTensor_opBounded01
@@ -217,6 +211,7 @@ lemma leftTensor_opBounded01
     OpBounded01 (leftTensor (ι₂ := ι₂) B) := by
   constructor
   · exact leftTensor_nonneg (ι₂ := ι₂) hB.nonnegative
-  · exact sub_nonneg.mpr (leftTensor_le_one (ι₂ := ι₂) (opBounded01_le_one hB))
+  · exact sub_nonneg.mpr
+      (leftTensor_le_one (ι₂ := ι₂) (sub_nonneg.mp hB.boundedByIdentity))
 
 end MIPStarRE.LDT.Preliminaries
