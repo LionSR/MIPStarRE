@@ -121,20 +121,15 @@ private theorem normalizationConditionSandwichedTotalSum_le_one
           rw [Q.sum_eq_total]
     _ ≤ 1 := Q.total_le_one
 
-private theorem normalizationConditionSandwichedTotalOperator_nonneg
-    {OutcomeA OutcomeB : Type*} [Fintype OutcomeA] [Fintype OutcomeB]
-    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) (a : OutcomeA) :
-    0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
-  simpa [normalizationConditionSandwichedTotalOperator] using
-    SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
-
 private theorem normalizationConditionSandwichedTotalOperator_hermitian
     {OutcomeA OutcomeB : Type*} [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) (a : OutcomeA) :
     (normalizationConditionSandwichedTotalOperator P Q a)ᴴ =
       normalizationConditionSandwichedTotalOperator P Q a :=
   (Matrix.nonneg_iff_posSemidef.mp
-    (normalizationConditionSandwichedTotalOperator_nonneg P Q a)).isHermitian.eq
+    (by
+      simpa [normalizationConditionSandwichedTotalOperator] using
+        SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a))).isHermitian.eq
 
 private theorem normCondSandwichedTotal_sq_le
     {OutcomeA OutcomeB : Type*} [Fintype OutcomeA] [Fintype OutcomeB]
@@ -145,8 +140,11 @@ private theorem normCondSandwichedTotal_sq_le
   have hRle : normalizationConditionSandwichedTotalOperator P Q a ≤ 1 := by
     simpa [normalizationConditionSandwichedTotalOperator] using
       (normalizationConditionSandwichedTotalFamily P Q a).total_le_one
+  have hR_nonneg : 0 ≤ normalizationConditionSandwichedTotalOperator P Q a := by
+    simpa [normalizationConditionSandwichedTotalOperator] using
+      SubMeas.total_nonneg (normalizationConditionSandwichedTotalFamily P Q a)
   exact sq_le_self
-    (normalizationConditionSandwichedTotalOperator_nonneg P Q a)
+    hR_nonneg
     hRle
 
 /-- The family `a ↦ (∑_b C_{a,b})(∑_b C_{a,b})^†`. -/
