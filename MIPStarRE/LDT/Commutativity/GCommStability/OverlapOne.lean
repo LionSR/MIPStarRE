@@ -234,51 +234,6 @@ lemma sddOpRel_of_sqrt_bound_from_half_one
       nlinarith [Real.sq_sqrt hz_nonneg]
     exact le_trans hone hbig
 
-/-- The first stability family has raw defect at most `zeta / 2`. -/
-private lemma gCommStability_raw_le_half
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (zeta : Error)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hself : family.StronglySelfConsistent strategy.state zeta) :
-    sddErrorOp strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityOneLeft params strategy family G)
-      (commDataProcessedGStabilityOneRight params strategy family G) ≤
-    zeta / 2 := by
-  exact
-    gCommStability_raw_le_half_of params strategy zeta family G hG hself
-      (commDataProcessedGStabilityOneLeft params strategy family G)
-      (commDataProcessedGStabilityOneRight params strategy family G)
-      Prod.snd
-      (gCommOverlap_avgOver_snd params strategy G)
-      (gCommStability_pointwise_bound params strategy family G hG)
-
-/-- The first stability family has raw defect at most `1`. -/
-private lemma gCommStability_raw_le_one
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (_zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas) :
-    sddErrorOp strategy.state
-      (uniformDistribution (EvaluatedSliceQuestion params))
-      (commDataProcessedGStabilityOneLeft params strategy family G)
-      (commDataProcessedGStabilityOneRight params strategy family G) ≤
-    1 := by
-  exact
-    gCommStability_raw_le_one_of params strategy hnorm G
-      (commDataProcessedGStabilityOneLeft params strategy family G)
-      (commDataProcessedGStabilityOneRight params strategy family G)
-      Prod.snd
-      (gCommStability_pointwise_bound params strategy family G hG)
-
 /-- Overlap-only version of the first stability estimate.
 
 This is not the paper's boundedness-driven scalar proof of
@@ -308,9 +263,18 @@ theorem gCommStability_overlap
         (IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas family.meas)))
       hself.sliceSelfConsistency.squaredDistanceBound
   have hraw_le_half :=
-    gCommStability_raw_le_half params strategy zeta family G hG hself
+    gCommStability_raw_le_half_of params strategy zeta family G hG hself
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      Prod.snd
+      (gCommOverlap_avgOver_snd params strategy G)
+      (gCommStability_pointwise_bound params strategy family G hG)
   have hraw_le_one :=
-    gCommStability_raw_le_one params strategy zeta hnorm family G hG
+    gCommStability_raw_le_one_of params strategy hnorm G
+      (commDataProcessedGStabilityOneLeft params strategy family G)
+      (commDataProcessedGStabilityOneRight params strategy family G)
+      Prod.snd
+      (gCommStability_pointwise_bound params strategy family G hG)
   exact
     sddOpRel_of_sqrt_bound_from_half_one
       strategy.state
