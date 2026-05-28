@@ -389,18 +389,6 @@ private noncomputable def answerSuccessorDiagonalIndexError
     (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
     (AnswerSymStrat.diagonalLineAnswerFamily strategy j)
 
-private lemma answerSuccessorDiagonalIndexError_nonneg
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params.next ι)
-    (j : Fin params.next.m) :
-    0 ≤ answerSuccessorDiagonalIndexError params strategy j := by
-  unfold answerSuccessorDiagonalIndexError
-  exact bipartiteConsError_nonneg strategy.state
-    (uniformDistribution (RestrictedDiagonalSample params.next j))
-    (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
-    (AnswerSymStrat.diagonalLineAnswerFamily strategy j)
-
 private lemma answerSuccessorDiagonalSliceIndexErrorAverage_eq_diagonalIndexError
     (params : Parameters)
     [FieldModel params.q]
@@ -574,7 +562,13 @@ lemma answerSuccessor_weighted_diagonal_bound
           (answerSuccessorDiagonalIndexError params strategy) :=
         weighted_embedded_average_le_full_average params
           (f := answerSuccessorDiagonalIndexError params strategy)
-          (hf := answerSuccessorDiagonalIndexError_nonneg params strategy)
+          (hf := by
+            intro j
+            unfold answerSuccessorDiagonalIndexError
+            exact bipartiteConsError_nonneg strategy.state
+              (uniformDistribution (RestrictedDiagonalSample params.next j))
+              (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
+              (AnswerSymStrat.diagonalLineAnswerFamily strategy j))
     _ = strategy.diagonalFailureProbability :=
         answerSuccessorDiagonalFailure_eq_average_indexError params strategy
     _ ≤ gamma := hgood.diagonalLineTest
