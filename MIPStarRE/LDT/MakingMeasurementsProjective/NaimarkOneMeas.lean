@@ -162,20 +162,6 @@ private lemma partialIsometry_to_unitary
           simpa [LinearMap.comp_apply] using hx
     _ = Matrix.toEuclideanLin V x := rfl
 
-private lemma exists_unitary_extension_oneMeasNaimarkColumn
-    {α : Type*} [Fintype α] [DecidableEq α]
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (M : MIPStarRE.Quantum.Submeasurement α d) :
-    ∃ U : Matrix.unitaryGroup (d × Option α) ℂ,
-      (U : MIPStarRE.Quantum.Op (d × Option α)) *
-          oneMeasNaimarkInputProj (α := α) (d := d) =
-        oneMeasNaimarkColumn M := by
-  exact partialIsometry_to_unitary
-    (oneMeasNaimarkColumn M) (oneMeasNaimarkInputProj (α := α) (d := d))
-    oneMeasNaimarkInputProj_isProj
-    (oneMeasNaimarkColumn_mul_inputProj M)
-    (oneMeasNaimarkColumn_isometry M)
-
 private lemma normalizedTrace_oneMeasLiftedDensity_mul_auxProj
     {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
@@ -264,7 +250,12 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
   Extend the isometry column `V` to a unitary `U` on the whole enlarged space.
   The dilated projectors are then `U† (I ⊗ |oa⟩⟨oa|) U`.
   -/
-  obtain ⟨U, hU⟩ := exists_unitary_extension_oneMeasNaimarkColumn M
+  obtain ⟨U, hU⟩ :=
+    partialIsometry_to_unitary
+      (oneMeasNaimarkColumn M) (oneMeasNaimarkInputProj (α := α) (d := d))
+      oneMeasNaimarkInputProj_isProj
+      (oneMeasNaimarkColumn_mul_inputProj M)
+      (oneMeasNaimarkColumn_isometry M)
   let Umat : MIPStarRE.Quantum.Op (d × Option α) := U
   refine ⟨{
     source := M
