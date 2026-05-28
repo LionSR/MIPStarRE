@@ -132,24 +132,6 @@ private noncomputable def localCollisionMass
     (if aa.1 = aa.2 then 0 else if f aa.1 = f aa.2 then (1 : Error) else 0) *
       ev ψ (opTensor (A.outcome aa.1) (B.outcome aa.2))
 
-private lemma localCollisionMass_nonneg
-    {α β ιA ιB : Type*} [Fintype α]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB)
-    (f : α → β) :
-    0 ≤ localCollisionMass ψ A B f := by
-  classical
-  unfold localCollisionMass
-  refine Finset.sum_nonneg ?_
-  intro aa _
-  apply mul_nonneg
-  · by_cases hEq : aa.1 = aa.2
-    · simp [hEq]
-    · by_cases hf : f aa.1 = f aa.2
-      · simp [hEq, hf]
-      · simp [hEq, hf]
-  · exact ev_nonneg_of_psd ψ _ (opTensor_nonneg (A.outcome_pos aa.1) (B.outcome_pos aa.2))
-
 private lemma qBipartiteMatchMass_postprocess_eq_add_localCollision
     {α β ιA ιB : Type*} [Fintype α] [Fintype β]
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -178,7 +160,18 @@ private lemma qBipartiteConsDefect_le_postprocess_add_localCollision
         localCollisionMass ψ A B f := by
   classical
   let c := localCollisionMass ψ A B f
-  have hc : 0 ≤ c := localCollisionMass_nonneg ψ A B f
+  have hc : 0 ≤ c := by
+    dsimp [c, localCollisionMass]
+    refine Finset.sum_nonneg ?_
+    intro aa _
+    apply mul_nonneg
+    · by_cases hEq : aa.1 = aa.2
+      · simp [hEq]
+      · by_cases hf : f aa.1 = f aa.2
+        · simp [hEq, hf]
+        · simp [hEq, hf]
+    · exact ev_nonneg_of_psd ψ _
+        (opTensor_nonneg (A.outcome_pos aa.1) (B.outcome_pos aa.2))
   have hmatch := qBipartiteMatchMass_postprocess_eq_add_localCollision ψ A B f
   unfold qBipartiteConsDefect
   simp only [postprocess_total]
