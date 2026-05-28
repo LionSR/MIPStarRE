@@ -43,25 +43,6 @@ private noncomputable def axisParallelLineAnswerMeasurement
     exact (strategy.axisParallelMeasurement
       { base := s.1, direction := s.2 }).total_eq_one)
 
-private lemma axisParallelAnswerConsistency_measurement
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma) :
-    ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (IdxMeas.toIdxSubMeas (axisParallelPointAnswerMeasurement params strategy))
-      (IdxMeas.toIdxSubMeas (axisParallelLineAnswerMeasurement params strategy))
-      eps := by
-  have haxis :
-      ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
-        (axisParallelPointAnswerFamily strategy)
-        (axisParallelLineAnswerFamily strategy) eps := by
-    refine ⟨?_⟩
-    simpa [SymStrat.axisParallelFailureProbability] using
-      hgood.axisParallelTest
-  simpa [axisParallelPointAnswerMeasurement, axisParallelLineAnswerMeasurement,
-    IdxMeas.toIdxSubMeas] using haxis
-
 /-- The lifted line-answer family outcome at value `a = g(s.1)` reduces to the
 left-tensor of the `lem:generalize-b` left operator at the incident question
 `(ℓ, s.1)` with `ℓ = {base := s.1, direction := s.2}`.
@@ -149,7 +130,16 @@ lemma axisParallelBaseEventApproximation_weighted_sample_sum
   have hcons :
       ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
         (IdxMeas.toIdxSubMeas pointMeas) (IdxMeas.toIdxSubMeas lineMeas) eps :=
-    axisParallelAnswerConsistency_measurement params strategy eps delta gamma hgood
+    by
+      have haxis :
+          ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+            (axisParallelPointAnswerFamily strategy)
+            (axisParallelLineAnswerFamily strategy) eps := by
+        refine ⟨?_⟩
+        simpa [SymStrat.axisParallelFailureProbability] using
+          hgood.axisParallelTest
+      simpa [pointMeas, lineMeas, axisParallelPointAnswerMeasurement,
+        axisParallelLineAnswerMeasurement, IdxMeas.toIdxSubMeas] using haxis
   have hcons_swapped :
       ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
         (IdxMeas.toIdxSubMeas lineMeas) (IdxMeas.toIdxSubMeas pointMeas) eps :=
