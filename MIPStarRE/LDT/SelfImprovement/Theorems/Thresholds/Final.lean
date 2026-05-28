@@ -166,16 +166,6 @@ private theorem sqrt_selfImprovementHelperError_le_ten_m_powerSum_quarter
                   convert mul_le_mul_of_nonneg_left hsqrt_sum h10m_nn using 2
                   ring_nf
 
-private theorem rpow_quarter_eq_sqrt_sqrt {x : Error} (hx : 0 ≤ x) :
-    Real.rpow x (1 / (4 : Error)) = Real.sqrt (Real.sqrt x) := by
-  rw [Real.sqrt_eq_rpow, Real.sqrt_eq_rpow]
-  calc
-    Real.rpow x (1 / (4 : Error)) = Real.rpow x ((1 / (2 : Error)) * (1 / 2)) := by
-      congr 1
-      ring
-    _ = Real.rpow (Real.rpow x (1 / (2 : Error))) (1 / (2 : Error)) := by
-      exact Real.rpow_mul hx (1 / (2 : Error)) (1 / (2 : Error))
-
 /-- The orthogonalization threshold written as an iterated square root of the
 helper threshold.
 
@@ -187,7 +177,19 @@ theorem selfImprovementOrthogonalizationError_eq
     selfImprovementOrthogonalizationError params eps delta =
       100 * Real.sqrt (Real.sqrt (selfImprovementHelperError params eps delta)) := by
   unfold selfImprovementOrthogonalizationError orthonormalizationError
-  rw [rpow_quarter_eq_sqrt_sqrt (selfImprovementHelperError_nonneg params eps delta)]
+  rw [Real.sqrt_eq_rpow, Real.sqrt_eq_rpow]
+  congr 1
+  calc
+    Real.rpow (selfImprovementHelperError params eps delta) (1 / (4 : Error)) =
+        Real.rpow (selfImprovementHelperError params eps delta)
+          ((1 / (2 : Error)) * (1 / 2)) := by
+      congr 1
+      ring
+    _ = Real.rpow
+          (Real.rpow (selfImprovementHelperError params eps delta) (1 / (2 : Error)))
+          (1 / (2 : Error)) := by
+      exact Real.rpow_mul (selfImprovementHelperError_nonneg params eps delta)
+        (1 / (2 : Error)) (1 / (2 : Error))
 
 private theorem selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum_eighth
     (params : Parameters) [FieldModel params.q]
