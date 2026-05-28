@@ -28,41 +28,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The remaining `thm:com-main` lift from evaluated commutation back to
-full-slice commutation.
-
-This is the paper's two-step Schwartz-Zippel marginalization argument:
-first compare `G^x_g` with `G^x_[g(u)=a]`, then compare `G^y_h` with
-`G^y_[h(v)=b]`, while using slice strong self-consistency to move between the
-full and evaluated placements and finally absorb the scalar bookkeeping into
-`comMainError`. -/
-private lemma fullSliceCommutation_of_evaluated
-    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (gamma zeta : Error)
-    (hnorm : strategy.state.IsNormalized)
-    (hgamma_nonneg : 0 ≤ gamma) (hzeta_nonneg : 0 ≤ zeta)
-    (_hself : family.StronglySelfConsistent strategy.state zeta)
-    (hEval :
-      SDDOpRel strategy.state
-        (uniformDistribution (EvaluatedSliceQuestion params))
-        (evaluatedFromFullSliceProductLeft params strategy family)
-        (evaluatedFromFullSliceProductRight params strategy family)
-        (commDataProcessedGError params gamma zeta)) :
-    SDDOpRel strategy.state
-      (uniformDistribution (FullSliceQuestion params))
-      (fullSliceProductLeft params strategy family)
-      (fullSliceProductRight params strategy family)
-      (comMainError params gamma zeta) := by
-  exact
-    sddOpRel_of_pullback_fullSliceQuestion params strategy.state
-      (fullSliceProductLeft params strategy family)
-      (fullSliceProductRight params strategy family)
-      (comMainError params gamma zeta)
-      (fullSliceCommutation_of_evaluated_on_evaluated_questions
-        params strategy family gamma zeta
-        hnorm hgamma_nonneg hzeta_nonneg _hself hEval)
-
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex`
 (`\label{thm:com-main}`).
 
@@ -103,10 +68,13 @@ theorem comMain_of_commutativityPoints
     le_trans (sddError_nonneg _ _ _ _)
       hself.sliceSelfConsistency.squaredDistanceBound
   exact
-    fullSliceCommutation_of_evaluated
-      params strategy family gamma zeta
-      hnorm hgamma_nonneg hzeta_nonneg
-      hself hSpecialized
+    sddOpRel_of_pullback_fullSliceQuestion params strategy.state
+      (fullSliceProductLeft params strategy family)
+      (fullSliceProductRight params strategy family)
+      (comMainError params gamma zeta)
+      (fullSliceCommutation_of_evaluated_on_evaluated_questions
+        params strategy family gamma zeta
+        hnorm hgamma_nonneg hzeta_nonneg hself hSpecialized)
 
 /-- Paper origin: `references/ldt-paper/commutativity-G.tex`
 (`\label{thm:com-main}`).
