@@ -256,43 +256,6 @@ structure AnswerSuccessorRestrictedProbabilitiesStatement (params : Parameters)
         averageAnswerSuccessorRestrictedDiagonalError params profile ≤
           sliceConditioningLoss params * gamma
 
-private lemma answerCarrier_axisParallelFailureProbability_eq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params.next ι) :
-    (answerSelfImprovementCarrier params.next strategy).axisParallelFailureProbability =
-      strategy.axisParallelFailureProbability := by
-  rfl
-
-private lemma answerCarrier_selfConsistencyFailureProbability_eq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params.next ι) :
-    (answerSelfImprovementCarrier params.next strategy).selfConsistencyFailureProbability =
-      strategy.selfConsistencyFailureProbability := by
-  rfl
-
-private lemma answerSuccessorRestricted_axisParallelFailureProbability_eq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params.next ι)
-    (x : Fq params) :
-    (xRestrictedAnswerSymStratOfAnswer params strategy x).axisParallelFailureProbability =
-      (xRestrictedAnswerSymStrat params
-        (answerSelfImprovementCarrier params.next strategy) x).axisParallelFailureProbability := by
-  rfl
-
-private lemma answerSuccessorRestricted_selfConsistencyFailureProbability_eq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params.next ι)
-    (x : Fq params) :
-    (xRestrictedAnswerSymStratOfAnswer params strategy x).selfConsistencyFailureProbability =
-      AnswerSymStrat.selfConsistencyFailureProbability
-        (xRestrictedAnswerSymStrat params
-          (answerSelfImprovementCarrier params.next strategy) x) := by
-  rfl
-
 /-- The weighted average of the answer-valued successor restricted
 axis-parallel slice errors is bounded by the ambient answer-valued
 axis-parallel test error. -/
@@ -310,9 +273,9 @@ lemma answerSuccessor_weighted_axisParallel_bound
   have hcarrier_good :
       carrier.IsGood eps delta carrier.diagonalFailureProbability := by
     refine ⟨?_, ?_, le_rfl⟩
-    · simpa [carrier, answerCarrier_axisParallelFailureProbability_eq] using
+    · simpa [carrier] using
         hgood.axisParallelTest
-    · simpa [carrier, answerCarrier_selfConsistencyFailureProbability_eq] using
+    · simpa [carrier] using
         hgood.selfConsistencyTest
   calc
     avgOver (uniformDistribution (Fq params))
@@ -323,7 +286,7 @@ lemma answerSuccessor_weighted_axisParallel_bound
             (xRestrictedAnswerSymStrat params carrier x).axisParallelFailureProbability) := by
             refine avgOver_congr _ _ _ ?_
             intro x
-            rw [answerSuccessorRestricted_axisParallelFailureProbability_eq]
+            rfl
     _ ≤ eps :=
         answer_weighted_axisParallel_bound params carrier eps delta
           carrier.diagonalFailureProbability hcarrier_good
@@ -348,7 +311,7 @@ lemma answerSuccessor_selfConsistencyRestrictedAverage_eq
             (xRestrictedAnswerSymStrat params carrier x).selfConsistencyFailureProbability) := by
             refine avgOver_congr _ _ _ ?_
             intro x
-            rw [answerSuccessorRestricted_selfConsistencyFailureProbability_eq]
+            rfl
     _ = avgOver (uniformDistribution (Fq params))
           (fun x => (xRestrictedStrategy params carrier x).selfConsistencyFailureProbability) := by
             refine avgOver_congr _ _ _ ?_
@@ -356,8 +319,8 @@ lemma answerSuccessor_selfConsistencyRestrictedAverage_eq
             rw [answerRestricted_selfConsistencyFailureProbability_eq]
     _ = carrier.selfConsistencyFailureProbability :=
         selfConsistencyRestrictedAverage_eq params carrier
-    _ = strategy.selfConsistencyFailureProbability :=
-        answerCarrier_selfConsistencyFailureProbability_eq params strategy
+    _ = strategy.selfConsistencyFailureProbability := by
+        rfl
 
 private lemma answerSuccessorRestrictedDiagonalSampleError_eq
     (params : Parameters)
