@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.Basic.AxisParallelLine
 import MIPStarRE.LDT.Basic.DiagonalLine
 
 /-!
