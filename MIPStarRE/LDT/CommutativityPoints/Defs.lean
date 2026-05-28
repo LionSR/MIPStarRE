@@ -1,5 +1,3 @@
-import MIPStarRE.LDT.Basic.OpFamily
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.GlobalVariance.Defs.Core
 import MIPStarRE.LDT.Test.StrategyCore
 

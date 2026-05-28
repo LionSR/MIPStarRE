@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.CommutativityPoints.Defs
 import MIPStarRE.LDT.Preliminaries.ComparisonCore
-import MIPStarRE.LDT.Preliminaries.Defs
 import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
