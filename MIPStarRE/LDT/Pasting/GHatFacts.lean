@@ -16,24 +16,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- A sum over `Option α × Option β` of a four-way match pattern decomposes into
-the four quadrant contributions. This isolates the `Option × Option` combinatorics
-from the algebraic content of the `\widehat G` quadrant expansion. -/
-private lemma sum_option_pair_match
-    {α β M : Type*} [Fintype α] [Fintype β] [AddCommMonoid M]
-    (fss : α × β → M) (fsn : α → M) (fns : β → M) (fnn : M) :
-    (∑ ab : Option α × Option β,
-        (match ab.1, ab.2 with
-          | some a, some b => fss (a, b)
-          | some a, none => fsn a
-          | none, some b => fns b
-          | none, none => fnn)) =
-      (∑ p : α × β, fss p) + (∑ a : α, fsn a) + (∑ b : β, fns b) + fnn := by
-  rw [Fintype.sum_prod_type, Fintype.sum_option]
-  simp_rw [Fintype.sum_option]
-  rw [Finset.sum_add_distrib, ← Fintype.sum_prod_type']
-  abel
-
 /-- The pointwise `\widehat G` pair product splits into the complete-complete,
 complete-incomplete, incomplete-complete, and incomplete-incomplete quadrants. -/
 private lemma gHatPairProduct_qSDDOp_decompose
@@ -189,22 +171,10 @@ private lemma gHatPairProduct_qSDDOp_decompose
                     (totalLeft () - totalRight ())) := by
                 simp
               rw [htotal]
-              convert
-                (sum_option_pair_match
-                  (fss := fun p =>
-                    ev ψbi ((completeLeft p - completeRight p)ᴴ *
-                      (completeLeft p - completeRight p)))
-                  (fsn := fun g =>
-                    ev ψbi ((incompleteLeft g - incompleteRight g)ᴴ *
-                      (incompleteLeft g - incompleteRight g)))
-                  (fns := fun h =>
-                    ev ψbi ((swappedLeft h - swappedRight h)ᴴ *
-                      (swappedLeft h - swappedRight h)))
-                  (fnn := ev ψbi ((totalLeft () - totalRight ())ᴴ *
-                    (totalLeft () - totalRight ())))) using 1
-              · apply Finset.sum_congr rfl
-                rintro ⟨og, oh⟩ _hmem
-                cases og <;> cases oh <;> rfl
+              rw [Fintype.sum_prod_type, Fintype.sum_option]
+              simp_rw [Fintype.sum_option]
+              rw [Finset.sum_add_distrib, ← Fintype.sum_prod_type']
+              abel
     _ =
         qSDDOp ψbi
             (OpFamily.leftPlacedOpFamily (ιB := ι) <|
