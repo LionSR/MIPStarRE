@@ -232,7 +232,8 @@ noncomputable def gHatRotatedHalfProductTotalOperator (params : Parameters) [Fie
       gHatHalfProductTotalOperator params family k (pointTupleTail xs) *
         ((gHatIdxMeas params family (xs 0)).toSubMeas).total
 
-private def gHatTupleOutcomeConsEquiv (params : Parameters) [FieldModel params.q] (k : ℕ) :
+/-- Splitting a nonempty completed-outcome tuple into its first outcome and tail. -/
+def gHatTupleOutcomeConsEquiv' (params : Parameters) [FieldModel params.q] (k : ℕ) :
     GHatTupleOutcome params (k + 1) ≃ GHatOutcome params × GHatTupleOutcome params k where
   toFun gs := (gs 0, gHatTupleOutcomeTail gs)
   invFun p := Fin.cons p.1 p.2
@@ -272,7 +273,7 @@ lemma gHatHalfProduct_sum_eq_total (params : Parameters) [FieldModel params.q]
             ∑ p : GHatOutcome params × GHatTupleOutcome params k,
               gHatHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2) := by
         symm
-        exact (Fintype.sum_equiv (gHatTupleOutcomeConsEquiv params k)
+        exact (Fintype.sum_equiv (gHatTupleOutcomeConsEquiv' params k)
           (fun gs => gHatHalfProductOutcomeOperator params family (k + 1) xs gs)
           (fun p =>
             gHatHalfProductOutcomeOperator params family (k + 1) xs (Fin.cons p.1 p.2))
