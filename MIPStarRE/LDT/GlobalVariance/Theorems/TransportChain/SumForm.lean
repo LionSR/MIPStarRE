@@ -1,4 +1,6 @@
 import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.Core
+import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransportSum
+import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
 
 namespace MIPStarRE.LDT.GlobalVariance
 
