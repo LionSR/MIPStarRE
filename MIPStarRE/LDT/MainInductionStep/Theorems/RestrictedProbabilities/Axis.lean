@@ -18,40 +18,6 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma restrictAxisParallelMeasurement_postprocess_zero
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (x : Fq params)
-    (ℓ : AxisParallelLine params) :
-    postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas) (· zeroCoord) =
-    postprocess
-        ((strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
-        (fun f : AxisLinePolynomial params.next => f zeroCoord) := by
-  have htransport :
-      (restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas =
-        SubMeas.transport (axisLinePolynomialEquiv params x).symm
-          ((strategy.axisParallelMeasurement
-            (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas) := by
-    refine SubMeas.ext ?_ ?_
-    · intro f
-      rfl
-    · simpa [SubMeas.transport,
-        (strategy.axisParallelMeasurement
-          (AxisParallelLine.appendAtHeight params ℓ x)).total_eq_one] using
-        (restrictAxisParallelMeasurement params strategy x ℓ).total_eq_one
-  rw [htransport]
-  rw [SubMeas.postprocess_transport]
-  have hreadout :
-      (fun a : AxisLinePolynomial params.next =>
-          ((axisLinePolynomialEquiv params x).symm a) zeroCoord) =
-        (fun f : AxisLinePolynomial params.next => f zeroCoord) := by
-    funext a
-    cases a
-    rfl
-  rw [hreadout]
-  rfl
-
 private lemma restrictedAxisSampleError_eq
     (params : Parameters)
     [FieldModel params.q]
@@ -67,6 +33,36 @@ private lemma restrictedAxisSampleError_eq
     qBipartiteConsDefect strategy.state
       (axisParallelPointAnswerFamily strategy (appendPoint params u x, embedCoord params i))
       (axisParallelLineAnswerFamily strategy (appendPoint params u x, embedCoord params i)) := by
+  let ℓ : AxisParallelLine params := { base := u, direction := i }
+  have hpost :
+      postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas) (· zeroCoord) =
+      postprocess
+          ((strategy.axisParallelMeasurement
+            (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
+          (fun f : AxisLinePolynomial params.next => f zeroCoord) := by
+    have htransport :
+        (restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas =
+          SubMeas.transport (axisLinePolynomialEquiv params x).symm
+            ((strategy.axisParallelMeasurement
+              (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas) := by
+      refine SubMeas.ext ?_ ?_
+      · intro f
+        rfl
+      · simpa [SubMeas.transport,
+          (strategy.axisParallelMeasurement
+            (AxisParallelLine.appendAtHeight params ℓ x)).total_eq_one] using
+          (restrictAxisParallelMeasurement params strategy x ℓ).total_eq_one
+    rw [htransport]
+    rw [SubMeas.postprocess_transport]
+    have hreadout :
+        (fun a : AxisLinePolynomial params.next =>
+            ((axisLinePolynomialEquiv params x).symm a) zeroCoord) =
+          (fun f : AxisLinePolynomial params.next => f zeroCoord) := by
+      funext a
+      cases a
+      rfl
+    rw [hreadout]
+    rfl
   simp [RestrictedSymStrat.axisParallelPointAnswerFamily,
     RestrictedSymStrat.axisParallelLineAnswerFamily, axisParallelPointAnswerFamily,
     axisParallelLineAnswerFamily, xRestrictedStrategy]
@@ -75,8 +71,7 @@ private lemma restrictedAxisSampleError_eq
       (fun B =>
         qBipartiteConsDefect strategy.state
           ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas) B)
-      (restrictAxisParallelMeasurement_postprocess_zero params strategy x
-        { base := u, direction := i })
+      hpost
 
 /-- Per-direction axis-parallel consistency defect of the restricted `x`-slice
 strategy at embedded direction `i`, averaged over the slice point space
