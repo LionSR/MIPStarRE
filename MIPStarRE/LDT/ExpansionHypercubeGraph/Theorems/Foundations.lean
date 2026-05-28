@@ -92,16 +92,6 @@ lemma globalVarianceTraceForm_eq_zero_of_isEmpty (hι : ¬ Nonempty ι)
 
 /-! ## Finite-sum helper lemmas -/
 
-private lemma sum_mul_sum_expand {α β γ : Type*}
-    [Fintype α] [Fintype β] [Fintype γ]
-    (f : α → β → γ → ℂ) (g : α → β → ℂ) :
-    ∑ a, ∑ b, (∑ c, f a b c) * g a b = ∑ a, ∑ b, ∑ c, f a b c * g a b := by
-  refine Finset.sum_congr rfl ?_
-  intro a ha
-  refine Finset.sum_congr rfl ?_
-  intro b hb
-  rw [← Finset.sum_mul]
-
 private lemma sum_reorder_four {α β γ δ : Type*}
     [Fintype α] [Fintype β] [Fintype γ] [Fintype δ]
     (h : α → β → γ → δ → ℂ) :
@@ -191,7 +181,7 @@ private lemma trace_combined_tensor_eq (params : Parameters)
   let g : (Point params × model.space.carrier) → model.space.carrier → ℂ :=
     fun x i => model.family x.1 i x.2
   change ∑ a, ∑ b, (∑ c, f a b c) * g a b = _
-  rw [sum_mul_sum_expand]
+  simp_rw [Finset.sum_mul]
   simp_rw [f, g, Fintype.sum_prod_type, Finset.mul_sum]
   conv =>
     rhs
