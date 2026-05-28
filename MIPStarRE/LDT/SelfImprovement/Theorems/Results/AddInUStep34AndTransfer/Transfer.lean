@@ -380,16 +380,6 @@ lemma selfConsistencyDiagonalAddInU_of_simplifiedTransfer
   rw [hRHS_eq]
   exact htransfer
 
-private lemma sum_sum_sub_diagonal_eq_off_diagonal
-    {α β : Type*} [Fintype α] [DecidableEq α] [AddCommGroup β] (F : α → α → β) :
-    (∑ x : α, ∑ y : α, F x y) - (∑ x : α, F x x) =
-      ∑ x : α, ∑ y ∈ (Finset.univ : Finset α).erase x, F x y := by
-  classical
-  rw [← Finset.sum_sub_distrib]
-  exact Finset.sum_congr rfl fun x _ =>
-    (Finset.sum_erase_eq_sub (s := Finset.univ) (a := x)
-      (f := fun y => F x y) (Finset.mem_univ x)).symm
-
 /-- Exact residual-side expansion for the helper strong self-consistency proof.
 
 For the averaged helper `Hhat = E_u H^u` produced from the primal measurement
@@ -518,10 +508,13 @@ theorem helper_mass_sub_release_eq_polynomial_off_diagonal
                 (T.toSubMeas.outcome h)) := by
     rw [Finset.sum_comm]
   rw [hswap]
-  exact sum_sum_sub_diagonal_eq_off_diagonal (fun h h' =>
-    ev strategy.state
-      (opTensor
-        ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
-        (T.toSubMeas.outcome h)))
+  rw [← Finset.sum_sub_distrib]
+  exact Finset.sum_congr rfl fun h _ =>
+    (Finset.sum_erase_eq_sub (s := Finset.univ) (a := h)
+      (f := fun h' =>
+        ev strategy.state
+          (opTensor
+            ((sandwichedPolynomialSubMeasAt params strategy T.toSubMeas u).outcome h')
+            (T.toSubMeas.outcome h))) (Finset.mem_univ h)).symm
 
 end MIPStarRE.LDT.SelfImprovement
