@@ -46,19 +46,6 @@ def pointTupleConsEquiv (params : Parameters) (k : ℕ) :
     cases p
     rfl
 
-def gHatTupleOutcomeConsEquiv' (params : Parameters) [FieldModel params.q] (k : ℕ) :
-    GHatTupleOutcome params (k + 1) ≃ GHatOutcome params × GHatTupleOutcome params k where
-  toFun gs := (gs 0, gHatTupleOutcomeTail gs)
-  invFun p := Fin.cons p.1 p.2
-  left_inv gs := by
-    funext i
-    cases i using Fin.cases with
-    | zero => rfl
-    | succ j => rfl
-  right_inv p := by
-    cases p
-    rfl
-
 noncomputable def gHatReverseHalfProductOutcomeOperator
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
