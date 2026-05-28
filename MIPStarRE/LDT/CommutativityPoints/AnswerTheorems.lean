@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
-import MIPStarRE.LDT.CommutativityPoints.Approximation
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
 /-!
 # Section 10 commutativity points: answer-valued diagonal measurements
