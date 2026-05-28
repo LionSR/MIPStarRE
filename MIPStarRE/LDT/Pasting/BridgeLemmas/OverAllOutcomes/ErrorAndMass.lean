@@ -342,20 +342,6 @@ lemma overAllOutcomes_pasted_sub_expansion_le_dnoteq
   rw [overAllOutcomesExpansionMass_eq_avg_uniform_eligible]
   linarith
 
-/-- Nonnegativity of the displayed one-point sandwich error term. -/
-private lemma ldSandwichLineOnePointError_nonneg
-    (params : Parameters) [FieldModel params.q]
-    (eps delta gamma zeta : Error) (k : ℕ)
-    (heps_nonneg : 0 ≤ eps)
-    (hdelta_nonneg : 0 ≤ delta)
-    (hgamma_nonneg : 0 ≤ gamma)
-    (hzeta_nonneg : 0 ≤ zeta) :
-    0 ≤ ldSandwichLineOnePointError params eps delta gamma zeta k := by
-  have hsum_nonneg := oneThirtySecondErrorSum_nonneg params eps delta gamma zeta
-    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
-  unfold ldSandwichLineOnePointError
-  exact mul_nonneg (by positivity) hsum_nonneg
-
 /-- The distinctness loss is already absorbed by the displayed
 `lem:over-all-outcomes` error term. -/
 lemma dnoteq_term_le_overAllOutcomesError
@@ -370,18 +356,18 @@ lemma dnoteq_term_le_overAllOutcomesError
       overAllOutcomesError params eps delta gamma zeta k := by
   have hhb := hBConsistency_error_bound params eps delta gamma zeta k hd
     heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
+  have hsum_nonneg := oneThirtySecondErrorSum_nonneg params eps delta gamma zeta
+    heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
   have hld_nonneg :
       0 ≤ (k : Error) * ldSandwichLineOnePointError params eps delta gamma zeta k :=
-    mul_nonneg (by positivity)
-      (ldSandwichLineOnePointError_nonneg params eps delta gamma zeta k
-        heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg)
+    mul_nonneg (by positivity) (by
+      unfold ldSandwichLineOnePointError
+      exact mul_nonneg (by positivity) hsum_nonneg)
   have hdnoteq_le_hB :
       ((k : Error) ^ (2 : ℕ)) / (params.q : Error) ≤
         hBConsistencyError params eps delta gamma zeta k := by
     linarith
   exact le_trans hdnoteq_le_hB <| by
-    have hsum_nonneg := oneThirtySecondErrorSum_nonneg params eps delta gamma zeta
-      heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg
     simp only [hBConsistencyError, overAllOutcomesError]
     gcongr
     norm_num
