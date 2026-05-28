@@ -18,24 +18,6 @@ open scoped MatrixOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-private lemma restrictAxisParallelMeasurement_toSubMeas_eq_transport
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (x : Fq params)
-    (ℓ : AxisParallelLine params) :
-    (restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas =
-      SubMeas.transport (axisLinePolynomialEquiv params x).symm
-        ((strategy.axisParallelMeasurement
-          (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas) := by
-  refine SubMeas.ext ?_ ?_
-  · intro f
-    rfl
-  · simpa [SubMeas.transport,
-      (strategy.axisParallelMeasurement
-        (AxisParallelLine.appendAtHeight params ℓ x)).total_eq_one] using
-      (restrictAxisParallelMeasurement params strategy x ℓ).total_eq_one
-
 private lemma restrictAxisParallelMeasurement_postprocess_zero
     (params : Parameters)
     [FieldModel params.q]
@@ -43,10 +25,22 @@ private lemma restrictAxisParallelMeasurement_postprocess_zero
     (x : Fq params)
     (ℓ : AxisParallelLine params) :
     postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas) (· zeroCoord) =
-      postprocess
+    postprocess
         ((strategy.axisParallelMeasurement (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
         (fun f : AxisLinePolynomial params.next => f zeroCoord) := by
-  rw [restrictAxisParallelMeasurement_toSubMeas_eq_transport params strategy x ℓ]
+  have htransport :
+      (restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas =
+        SubMeas.transport (axisLinePolynomialEquiv params x).symm
+          ((strategy.axisParallelMeasurement
+            (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas) := by
+    refine SubMeas.ext ?_ ?_
+    · intro f
+      rfl
+    · simpa [SubMeas.transport,
+        (strategy.axisParallelMeasurement
+          (AxisParallelLine.appendAtHeight params ℓ x)).total_eq_one] using
+        (restrictAxisParallelMeasurement params strategy x ℓ).total_eq_one
+  rw [htransport]
   rw [SubMeas.postprocess_transport]
   have hreadout :
       (fun a : AxisLinePolynomial params.next =>
