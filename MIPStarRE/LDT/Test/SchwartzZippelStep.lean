@@ -19,28 +19,6 @@ namespace MIPStarRE.LDT
 namespace Test
 
 open Classical in
-private lemma postprocess_match_summand_expand
-    {α β ιA ιB : Type*} [Fintype α] [Fintype β]
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB)) (A : SubMeas α ιA) (B : SubMeas α ιB)
-    (f : α → β) (b : β) :
-    ev ψ (opTensor ((postprocess A f).outcome b) ((postprocess B f).outcome b)) =
-      ∑ aa : α × α,
-        if f aa.1 = b ∧ f aa.2 = b then
-          ev ψ (opTensor (A.outcome aa.1) (B.outcome aa.2))
-        else 0 := by
-  classical
-  simp only [postprocess, Finset.sum_filter, opTensor_sum_left_univ, opTensor_sum_right_univ,
-    ev_sum]
-  rw [Fintype.sum_prod_type]
-  rw [Finset.sum_comm]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  refine Finset.sum_congr rfl ?_
-  intro x _
-  by_cases ha : f a = b <;> by_cases hx : f x = b <;> simp [ha, hx, opTensor, ev_zero]
-
-open Classical in
 private lemma qBipartiteMatchMass_postprocess_eq_pair_sum
     {α β ιA ιB : Type*} [Fintype α] [Fintype β]
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -61,7 +39,16 @@ private lemma qBipartiteMatchMass_postprocess_eq_pair_sum
           else 0 := by
             refine Finset.sum_congr rfl ?_
             intro b _
-            exact postprocess_match_summand_expand ψ A B f b
+            simp only [postprocess, Finset.sum_filter, opTensor_sum_left_univ,
+              opTensor_sum_right_univ, ev_sum]
+            rw [Fintype.sum_prod_type]
+            rw [Finset.sum_comm]
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            refine Finset.sum_congr rfl ?_
+            intro x _
+            by_cases ha : f a = b <;> by_cases hx : f x = b <;>
+              simp [ha, hx, opTensor, ev_zero]
     _ = ∑ aa : α × α, ∑ b : β,
           if f aa.1 = b ∧ f aa.2 = b then
             ev ψ (opTensor (A.outcome aa.1) (B.outcome aa.2))
