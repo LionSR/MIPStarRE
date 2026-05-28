@@ -279,28 +279,6 @@ private lemma roundedProjectorFamily_closeness {Outcome : Type uOutcome}
             exact mul_le_mul_of_nonneg_left hsource hδinv_nonneg
   simpa [sddErrorOp, avgOver, uniformDistribution, constOpFamily] using hq
 
-private noncomputable def zeroProjectorFamily {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι] :
-    OpFamily Outcome ι where
-  outcome := fun _ => 0
-  total := 0
-
-private lemma zeroProjectorFamily_projective {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι] (a : Outcome) :
-    MIPStarRE.Quantum.IsProj ((zeroProjectorFamily (Outcome := Outcome) (ι := ι)).outcome a) := by
-  refine ⟨Matrix.isHermitian_zero, ?_⟩
-  change (0 : MIPStarRE.Quantum.Op ι) * 0 = 0
-  simp
-
-private lemma zeroProjectorFamily_sum_eq_total {Outcome : Type uOutcome}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι] :
-    ∑ a : Outcome, (zeroProjectorFamily (Outcome := Outcome) (ι := ι)).outcome a =
-      (zeroProjectorFamily (Outcome := Outcome) (ι := ι)).total := by
-  simp [zeroProjectorFamily]
-
 private lemma roundedProjectorFamily_total_le_one_zero {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
@@ -643,15 +621,18 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_large
     (hψ : ψ.IsNormalized) (hlarge : 1 / 4 < ζ) :
     projectiveNonMeasurement ψ A ζ := by
   classical
-  refine ⟨zeroProjectorFamily (Outcome := Outcome) (ι := ι), ?_⟩
-  refine ⟨?_, ?_, zeroProjectorFamily_sum_eq_total (Outcome := Outcome) (ι := ι), ?_⟩
+  let Z : OpFamily Outcome ι := (zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas
+  refine ⟨Z, ?_⟩
+  refine ⟨?_, ?_, ?_, ?_⟩
   · intro a
-    exact zeroProjectorFamily_projective (Outcome := Outcome) (ι := ι) a
+    refine ⟨?_, ?_⟩
+    · simp [Z, zeroProjSubMeas, SubMeas.toOpFamily]
+    · simp [Z, zeroProjSubMeas, SubMeas.toOpFamily]
   · constructor
     have hq1 :
         qSDDOp ψ (A.toSubMeas : OpFamily Outcome ι)
-            (zeroProjectorFamily (Outcome := Outcome) (ι := ι)) ≤ 1 := by
-      unfold qSDDOp qSDDCore zeroProjectorFamily
+            Z ≤ 1 := by
+      unfold qSDDOp qSDDCore Z
       calc
         ∑ a : Outcome,
             ev ψ (((A.toSubMeas.outcome a - 0)ᴴ) * (A.toSubMeas.outcome a - 0))
@@ -671,16 +652,17 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_large
       nlinarith
     have hq :
         qSDDOp ψ (A.toSubMeas : OpFamily Outcome ι)
-            (zeroProjectorFamily (Outcome := Outcome) (ι := ι)) ≤
+            Z ≤
           2 * spectralTruncationError ζ :=
       le_trans hq1 hbound
-    simpa [sddErrorOp, avgOver, uniformDistribution, constOpFamily,
-      zeroProjectorFamily] using hq
+    simpa [sddErrorOp, avgOver, uniformDistribution, constOpFamily, Z] using hq
+  · simpa [Z] using
+      (zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.sum_eq_total
   · have hζ_nonneg : 0 ≤ ζ := le_trans (by positivity : 0 ≤ (1 / 4 : Error)) hlarge.le
     have hcoeff_nonneg : 0 ≤ (1 + 2 * spectralTruncationError ζ : Error) := by
       have hs_nonneg : 0 ≤ spectralTruncationError ζ := spectralTruncationError_nonneg hζ_nonneg
       positivity
-    simpa [zeroProjectorFamily, RCLike.real_smul_eq_coe_smul (K := ℂ)] using
+    simpa [Z, zeroProjSubMeas, RCLike.real_smul_eq_coe_smul (K := ℂ)] using
       (smul_nonneg hcoeff_nonneg
         (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι)))
 
