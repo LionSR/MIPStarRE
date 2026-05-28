@@ -517,22 +517,6 @@ private lemma helper_moveOverV_C_contraction
     _ ≤ ∑ a : Fq params, K a := Finset.sum_le_sum (fun a _ => hsq_le a)
     _ ≤ 1 := hK_sum_le_one
 
-private lemma ev_opTensor_left_mul_comm_of_hermitian
-    (ψ : QuantumState (ι × ι))
-    (A H T : MIPStarRE.Quantum.Op ι)
-    (hA : Aᴴ = A) (hH : Hᴴ = H) (hT : Tᴴ = T) :
-    ev ψ (opTensor (A * H) T) = ev ψ (opTensor (H * A) T) := by
-  rw [← ev_conjTranspose ψ]
-  rw [conjTranspose_opTensor, Matrix.conjTranspose_mul, hA, hH, hT]
-
-private lemma ev_opTensor_right_mul_comm_of_hermitian
-    (ψ : QuantumState (ι × ι))
-    (H T A : MIPStarRE.Quantum.Op ι)
-    (hH : Hᴴ = H) (hT : Tᴴ = T) (hA : Aᴴ = A) :
-    ev ψ (opTensor H (A * T)) = ev ψ (opTensor H (T * A)) := by
-  rw [← ev_conjTranspose ψ]
-  rw [conjTranspose_opTensor, Matrix.conjTranspose_mul, hH, hT, hA]
-
 /-- Paper `eq:move-over-v`: the cloned `delete-an-A` quantity can be moved to
 the right tensor factor at cost `√(2δ)` from point self-consistency. -/
 theorem helperDeleteAClonedQuantity_abs_sub_moveOverVQuantity_le_sqrt_two_delta
@@ -688,14 +672,14 @@ theorem helperDeleteAClonedQuantity_abs_sub_moveOverVQuantity_le_sqrt_two_delta
         ev strategy.state (leftTensor (ι₂ := ι) Av * opTensor Hh' (T.outcome hh.1)) =
           ev strategy.state (opTensor (Hh' * Av) (T.outcome hh.1)) := by
       rw [leftTensor_mul_opTensor]
-      simpa using ev_opTensor_left_mul_comm_of_hermitian strategy.state Av Hh'
-        (T.outcome hh.1) hAv hH hT
+      rw [← ev_conjTranspose strategy.state]
+      rw [conjTranspose_opTensor, Matrix.conjTranspose_mul, hAv, hH, hT]
     have hright :
         ev strategy.state (rightTensor (ι₁ := ι) Av * opTensor Hh' (T.outcome hh.1)) =
           ev strategy.state (opTensor Hh' (T.outcome hh.1 * Av)) := by
       rw [rightTensor_mul_opTensor]
-      simpa using ev_opTensor_right_mul_comm_of_hermitian strategy.state Hh'
-        (T.outcome hh.1) Av hH hT hAv
+      rw [← ev_conjTranspose strategy.state]
+      rw [conjTranspose_opTensor, Matrix.conjTranspose_mul, hH, hT, hAv]
     rw [hleft, hright]
   have hmatch :
       avgOver (uniformDistribution (Point params × Point params)) (fun uv =>
