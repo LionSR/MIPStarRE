@@ -60,17 +60,16 @@ noncomputable def orthogonalModeProjectorMatrix (params : Parameters) :
     MatrixOperator (pointHilbertSpace params) :=
   1 - constantModeProjectorMatrix params
 
-private lemma dotProductZMod_comm (params : Parameters) (u α : Point params) :
-    dotProductZMod params u α = dotProductZMod params α u := by
-  unfold dotProductZMod
-  refine Finset.sum_congr rfl ?_
-  intro i _; ring
-
 private lemma fourierBasisState_apply_comm (params : Parameters) (α u : Point params) :
     fourierBasisState params α u = fourierBasisState params u α := by
   unfold fourierBasisState
+  have hdot : dotProductZMod params u α = dotProductZMod params α u := by
+    unfold dotProductZMod
+    refine Finset.sum_congr rfl ?_
+    intro i _
+    ring
   rw [addCharFq_dotProduct_eq_stdAddChar_dotProductZMod,
-    addCharFq_dotProduct_eq_stdAddChar_dotProductZMod, dotProductZMod_comm]
+    addCharFq_dotProduct_eq_stdAddChar_dotProductZMod, hdot]
 
 private lemma fourierBasisState_inner_product_dual (params : Parameters) (u v : Point params) :
     ∑ α : Point params,
@@ -582,18 +581,6 @@ lemma laplacianSpectralGap (params : Parameters) :
   gap_eq := by
     simp [hypercubeSpectralGap, hypercubeVertexCount]
 
-private lemma frequencyWeight_eq_zero_iff (params : Parameters) {α : Point params} :
-    (frequencyWeight params α = 0) ↔ α = 0 := by
-  refine ⟨fun hweight => by_contra fun hα =>
-    (frequencyWeight_pos_of_ne_zero params hα).ne' hweight, ?_⟩
-  intro hα
-  simpa [hα] using frequencyWeight_zero params
-
-private lemma laplacianEigenvalue_nonneg (params : Parameters) (α : Point params) :
-    0 ≤ laplacianEigenvalue params α := by
-  simp only [laplacianEigenvalue]
-  positivity
-
 private lemma laplacianEigenvalue_eq_zero_iff (params : Parameters) {α : Point params} :
     (laplacianEigenvalue params α = 0) ↔ α = 0 := by
   constructor
@@ -612,7 +599,8 @@ private lemma laplacianEigenvalue_eq_zero_iff (params : Parameters) {α : Point 
       simpa [laplacianEigenvalue, hden_ne] using hmul
     have hweight : frequencyWeight params α = 0 := by
       exact_mod_cast hweight_cast
-    exact (frequencyWeight_eq_zero_iff params).mp hweight
+    by_contra hα
+    exact (frequencyWeight_pos_of_ne_zero params hα).ne' hweight
   · intro halpha
     simp [halpha, laplacianEigenvalue, frequencyWeight_zero]
 
@@ -732,7 +720,8 @@ lemma laplacianSpectralGapOrdered_of_fourier_eigenvalue_order (params : Paramete
       ∀ i : Fin (hypercubeVertexCount params), 0 ≤ lambda i := by
     intro i
     rw [hlambda i]
-    exact laplacianEigenvalue_nonneg params (enum i)
+    simp only [laplacianEigenvalue]
+    positivity
   have hzero : ∃ i : Fin (hypercubeVertexCount params), lambda i = 0 := by
     refine ⟨enum.symm (0 : Point params), ?_⟩
     rw [hlambda]
