@@ -164,19 +164,6 @@ private lemma avgOver_subMeasMass_restrict_liftLeft_eq_sum_coeff
           intro a _
           rw [avgOver_mul_const]
 
-/-- Sum of the per-outcome Alice-side masses of a submeasurement.
-
-Wrapper around the generic `ev_leftTensor_total_eq_sum_outcome`: by definition
-`subMeasMass ψ A.liftLeft = ev ψ A.liftLeft.total = ev ψ (leftTensor A.total)`,
-and the generic lemma expands the right-hand side as `∑ a, ev ψ (leftTensor (A.outcome a))`. -/
-private lemma subMeasMass_liftLeft_eq_sum_outcome
-    {Outcome : Type*} [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (A : SubMeas Outcome ι) :
-    subMeasMass ψ A.liftLeft =
-      ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ι) (A.outcome a)) :=
-  ev_leftTensor_total_eq_sum_outcome ψ A
-
 /-- Fixed-distinct-tuple form of the line-consistent Schwartz--Zippel bound. -/
 private lemma lineConsistentIndicatorLocal_avg_le_mdq
     (params : Parameters) [FieldModel params.q]
@@ -230,7 +217,10 @@ private lemma lineConsistentIndicatorLocal_avg_le_mdq
           ev strategy.state (leftTensor (ι₂ := ι) (A.outcome gs)) := by
           rw [Finset.mul_sum]
     _ = δ * subMeasMass strategy.state A.liftLeft := by
-          rw [subMeasMass_liftLeft_eq_sum_outcome]
+          change δ * ∑ gs : GHatTupleOutcome params k,
+              ev strategy.state (leftTensor (ι₂ := ι) (A.outcome gs)) =
+            δ * ev strategy.state (leftTensor (ι₂ := ι) A.total)
+          rw [ev_leftTensor_total_eq_sum_outcome strategy.state A]
     _ ≤ δ * 1 := by
           exact mul_le_mul_of_nonneg_left
             (eligibleMass_le_one params strategy family xs) hδ_nonneg
