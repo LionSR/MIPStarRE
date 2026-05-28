@@ -193,19 +193,6 @@ private lemma generalizeBLeftOperator_eq_right_add_collision
         simp [hp, hq]
       · by_cases hp : x (axisParallelLineQuestionParameter (ℓ, u)) = g u <;> simp [hp, hq]
 
-private lemma generalizeBLeft_sub_right_eq_collision
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params)
-    (hline : pointOnLine (params := params) qu) :
-    generalizeBLeftOperatorAtPolynomial params strategy g qu -
-        generalizeBRightOperatorAtPolynomial params strategy g qu =
-      generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
-  rw [generalizeBLeftOperator_eq_right_add_collision params strategy g qu hline]
-  abel
-
 private lemma generalizeBLineDifference_sq_eq_collision
     (params : Parameters)
     [FieldModel params.q]
@@ -218,7 +205,13 @@ private lemma generalizeBLineDifference_sq_eq_collision
         (generalizeBLeftOperatorAtPolynomial params strategy g qu -
           generalizeBRightOperatorAtPolynomial params strategy g qu) =
       generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
-  rw [generalizeBLeft_sub_right_eq_collision params strategy g qu hline]
+  have hsub :
+      generalizeBLeftOperatorAtPolynomial params strategy g qu -
+          generalizeBRightOperatorAtPolynomial params strategy g qu =
+        generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
+    rw [generalizeBLeftOperator_eq_right_add_collision params strategy g qu hline]
+    abel
+  rw [hsub]
   change ((generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
       (some ()))ᴴ *
       (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
