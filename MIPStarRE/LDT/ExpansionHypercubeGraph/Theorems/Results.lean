@@ -141,29 +141,6 @@ private lemma matrixLocalVariance_eq_closedForm (params : Parameters)
               ev (matrixModelState model) ((model.family v)ᴴ * model.family u) := by
             simp [diagSum, corrSum, w, diag, corr]
 
-private lemma globalWitness_smul (params : Parameters)
-    (model : MatrixOperatorFamilyRealization params) (c : ℂ) :
-    (matrixCombinedColumnOperator params model)ᴴ *
-        (matrixTensorOperator (c • orthogonalModeProjectorMatrix params) model.state.matrix *
-          matrixCombinedColumnOperator params model) =
-      c • matrixGlobalVarianceTraceWitness params model := by
-  calc
-    (matrixCombinedColumnOperator params model)ᴴ *
-        (matrixTensorOperator (c • orthogonalModeProjectorMatrix params) model.state.matrix *
-          matrixCombinedColumnOperator params model)
-      = (matrixCombinedColumnOperator params model)ᴴ *
-          (((c • matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix) *
-            matrixCombinedColumnOperator params model)) := by
-              simp [matrixTensorOperator, Matrix.smul_kronecker]
-              rfl
-    _ = c •
-          ((matrixCombinedColumnOperator params model)ᴴ *
-            (matrixTensorOperator (orthogonalModeProjectorMatrix params) model.state.matrix *
-              matrixCombinedColumnOperator params model)) := by
-              simp
-    _ = c • matrixGlobalVarianceTraceWitness params model := by
-          simp [matrixGlobalVarianceTraceWitness]
-
 private lemma matrixTraceForm_localToGlobal (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
     matrixGlobalVarianceTraceForm params model ≤
@@ -181,8 +158,37 @@ private lemma matrixTraceForm_localToGlobal (params : Parameters)
     have hraw :=
       MIPStarRE.LDT.ExpansionHypercubeGraph.conjTranspose_mul_mul_mono
         (matrixCombinedColumnOperator params model) htensor
-    rw [globalWitness_smul] at hraw
-    simpa [matrixLocalVarianceTraceWitness] using hraw
+    let c : ℂ := hypercubeSpectralGap params
+    have hscale :
+        (matrixCombinedColumnOperator params model)ᴴ *
+            (matrixTensorOperator (c • orthogonalModeProjectorMatrix params) model.state.matrix *
+              matrixCombinedColumnOperator params model) =
+          c • matrixGlobalVarianceTraceWitness params model := by
+      calc
+        (matrixCombinedColumnOperator params model)ᴴ *
+            (matrixTensorOperator (c • orthogonalModeProjectorMatrix params) model.state.matrix *
+              matrixCombinedColumnOperator params model)
+          = (matrixCombinedColumnOperator params model)ᴴ *
+              (((c • matrixTensorOperator (orthogonalModeProjectorMatrix params)
+                  model.state.matrix) *
+                matrixCombinedColumnOperator params model)) := by
+                  simp [matrixTensorOperator, Matrix.smul_kronecker]
+                  rfl
+        _ = c •
+              ((matrixCombinedColumnOperator params model)ᴴ *
+                (matrixTensorOperator (orthogonalModeProjectorMatrix params)
+                  model.state.matrix *
+                  matrixCombinedColumnOperator params model)) := by
+                  simp
+        _ = c • matrixGlobalVarianceTraceWitness params model := by
+                  simp [matrixGlobalVarianceTraceWitness]
+    change
+      (matrixCombinedColumnOperator params model)ᴴ *
+          (matrixTensorOperator (c • orthogonalModeProjectorMatrix params) model.state.matrix *
+            matrixCombinedColumnOperator params model) ≤
+        matrixLocalVarianceTraceWitness params model at hraw
+    rw [hscale] at hraw
+    simpa [c] using hraw
   have htrace :
       hypercubeSpectralGap params *
           Complex.re (MIPStarRE.Quantum.normalizedTrace
