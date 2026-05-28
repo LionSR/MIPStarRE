@@ -65,26 +65,6 @@ private lemma ev_leftTensor_weighted_sum
     simp [leftTensor, mul_assoc]]
   rw [ev_scale]
 
-/-- Global interpolation eligibility has no more mass than raw interpolation eligibility. -/
-private lemma globalEligibleMass_le_eligibleMass
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) {k : ℕ} (xs : PointTuple params k) :
-    subMeasMass strategy.state
-        ((restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
-          (IsGloballyConsistent params xs)).liftLeft) ≤
-      subMeasMass strategy.state
-        ((interpolationEligibleSandwichFamily params family k xs).liftLeft) := by
-  unfold subMeasMass SubMeas.liftLeft
-  exact ev_mono strategy.state _ _ <|
-    (by
-      simpa [leftTensor] using
-        (opTensor_mono_left (ι₂ := ι) (B := (1 : MIPStarRE.Quantum.Op ι))
-          (restrictSubMeas_total_le_total
-            (interpolationEligibleSandwichFamily params family k xs)
-            (IsGloballyConsistent params xs))
-          (show 0 ≤ (1 : MIPStarRE.Quantum.Op ι) by simp)))
-
 /-- If `k < d+1`, the interpolation-eligible sandwich total vanishes. -/
 private lemma interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
     (params : Parameters) [FieldModel params.q]
@@ -334,19 +314,6 @@ lemma overAllOutcomes_reverse_mass_bound_of_not_d_add_one_le
     exact mul_nonneg (by positivity) hsum_nonneg
   linarith
 
-/-- The pasted mass is bounded by distinct eligible interpolation mass. -/
-private lemma overAllOutcomesPastedMass_le_avg_distinct_eligible
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) (k : ℕ) :
-    overAllOutcomesPastedMass params strategy family k ≤
-      avgOver (distinctTupleDistribution params k) (fun xs =>
-        subMeasMass strategy.state
-          ((interpolationEligibleSandwichFamily params family k xs).liftLeft)) := by
-  rw [overAllOutcomesPastedMass_eq_avg_distinct_global]
-  exact avgOver_mono _ _ _ fun xs =>
-    globalEligibleMass_le_eligibleMass params strategy family xs
-
 /-- The pasted-minus-expansion mass loss is bounded by the distinctness error. -/
 lemma overAllOutcomes_pasted_sub_expansion_le_dnoteq
     (params : Parameters) [FieldModel params.q]
@@ -355,8 +322,21 @@ lemma overAllOutcomes_pasted_sub_expansion_le_dnoteq
     overAllOutcomesPastedMass params strategy family k -
         overAllOutcomesExpansionMass params strategy family k ≤
       ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
-  have hdist := overAllOutcomesPastedMass_le_avg_distinct_eligible
-    params strategy family k
+  have hdist :
+      overAllOutcomesPastedMass params strategy family k ≤
+        avgOver (distinctTupleDistribution params k) (fun xs =>
+          subMeasMass strategy.state
+            ((interpolationEligibleSandwichFamily params family k xs).liftLeft)) := by
+    rw [overAllOutcomesPastedMass_eq_avg_distinct_global]
+    exact avgOver_mono _ _ _ fun xs => by
+      unfold subMeasMass SubMeas.liftLeft
+      exact ev_mono strategy.state _ _ <| by
+        simpa [leftTensor] using
+          (opTensor_mono_left (ι₂ := ι) (B := (1 : MIPStarRE.Quantum.Op ι))
+            (restrictSubMeas_total_le_total
+              (interpolationEligibleSandwichFamily params family k xs)
+              (IsGloballyConsistent params xs))
+            (show 0 ≤ (1 : MIPStarRE.Quantum.Op ι) by simp))
   have hswap := avgOver_distinct_eligibleMass_le_uniform_add_dnoteq
     params strategy family k
   rw [overAllOutcomesExpansionMass_eq_avg_uniform_eligible]
