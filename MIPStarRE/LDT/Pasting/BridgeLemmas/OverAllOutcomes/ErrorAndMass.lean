@@ -127,38 +127,6 @@ private lemma interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
   unfold interpolationEligibleSandwichFamily restrictSubMeas
   simp [hempty]
 
-/-- With no eligible tuple, the all-outcomes local mass is zero. -/
-private lemma eligibleMass_eq_zero_of_not_d_add_one_le
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) {k : ℕ}
-    (hnot : ¬ params.d + 1 ≤ k) (xs : PointTuple params k) :
-    subMeasMass strategy.state
-      ((interpolationEligibleSandwichFamily params family k xs).liftLeft) = 0 := by
-  have htotal := interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
-    params family hnot xs
-  simp [subMeasMass, SubMeas.liftLeft, htotal, leftTensor, ev]
-
-/-- With no eligible tuple, the pasted/global local mass is zero. -/
-private lemma globalEligibleMass_eq_zero_of_not_d_add_one_le
-    (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι) {k : ℕ}
-    (hnot : ¬ params.d + 1 ≤ k) (xs : PointTuple params k) :
-    subMeasMass strategy.state
-        ((restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
-          (IsGloballyConsistent params xs)).liftLeft) = 0 := by
-  have heligible_total := interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
-    params family hnot xs
-  have htotal : (restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
-      (IsGloballyConsistent params xs)).total = 0 := by
-    have hle := restrictSubMeas_total_le_total
-      (interpolationEligibleSandwichFamily params family k xs)
-      (IsGloballyConsistent params xs)
-    rw [heligible_total] at hle
-    exact le_antisymm hle (SubMeas.total_nonneg _)
-  simp [subMeasMass, SubMeas.liftLeft, htotal, leftTensor, ev]
-
 /-- Eligible interpolation mass is nonnegative for every point tuple. -/
 private lemma eligibleMass_nonneg
     (params : Parameters) [FieldModel params.q]
@@ -351,7 +319,11 @@ lemma overAllOutcomes_reverse_mass_bound_of_not_d_add_one_le
             ((interpolationEligibleSandwichFamily params family k xs).liftLeft))
         = avgOver (uniformDistribution (PointTuple params k)) (fun _ => 0) := by
             exact avgOver_congr _ _ _ fun xs =>
-              eligibleMass_eq_zero_of_not_d_add_one_le params strategy family hnot xs
+              by
+                have htotal :=
+                  interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
+                    params family hnot xs
+                simp [subMeasMass, SubMeas.liftLeft, htotal, leftTensor, ev]
       _ = 0 := avgOver_zero _
   have hDzero : avgOver (distinctTupleDistribution params k) (fun xs =>
       subMeasMass strategy.state
@@ -364,7 +336,19 @@ lemma overAllOutcomes_reverse_mass_bound_of_not_d_add_one_le
               (IsGloballyConsistent params xs)).liftLeft))
         = avgOver (distinctTupleDistribution params k) (fun _ => 0) := by
             exact avgOver_congr _ _ _ fun xs =>
-              globalEligibleMass_eq_zero_of_not_d_add_one_le params strategy family hnot xs
+              by
+                have heligible_total :=
+                  interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
+                    params family hnot xs
+                have htotal :
+                    (restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
+                      (IsGloballyConsistent params xs)).total = 0 := by
+                  have hle := restrictSubMeas_total_le_total
+                    (interpolationEligibleSandwichFamily params family k xs)
+                    (IsGloballyConsistent params xs)
+                  rw [heligible_total] at hle
+                  exact le_antisymm hle (SubMeas.total_nonneg _)
+                simp [subMeasMass, SubMeas.liftLeft, htotal, leftTensor, ev]
       _ = 0 := avgOver_zero _
   rw [overAllOutcomesExpansionMass_eq_avg_uniform_eligible,
     overAllOutcomesPastedMass_eq_avg_distinct_global, hUzero, hDzero]
