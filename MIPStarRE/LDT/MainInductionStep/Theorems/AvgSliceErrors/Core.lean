@@ -38,16 +38,6 @@ private lemma avgOver_uniform_fq_nonneg
     0 ≤ avgOver (uniformDistribution (Fq params)) f :=
   avgOver_nonneg (uniformDistribution (Fq params)) f hf
 
-private lemma restrictedAxisParallelProb_nonneg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : RestrictedSymStrat params ι) :
-    0 ≤ strategy.axisParallelFailureProbability := by
-  unfold RestrictedSymStrat.axisParallelFailureProbability
-  exact bipartiteConsError_nonneg strategy.state
-    (uniformDistribution (AxisParallelTestSample params))
-    (RestrictedSymStrat.axisParallelPointAnswerFamily strategy)
-    (RestrictedSymStrat.axisParallelLineAnswerFamily strategy)
-
 private lemma restricted_axis_nonneg
     (params : Parameters)
     [FieldModel params.q]
@@ -55,19 +45,15 @@ private lemma restricted_axis_nonneg
     (profile : RestrictedFailureProfile params strategy) :
     ∀ x, 0 ≤ profile.axisParallel x := by
   intro x
+  let restricted := xRestrictedStrategy params strategy x
   exact le_trans
-    (restrictedAxisParallelProb_nonneg params
-      (xRestrictedStrategy params strategy x))
+    (by
+      unfold RestrictedSymStrat.axisParallelFailureProbability
+      exact bipartiteConsError_nonneg restricted.state
+        (uniformDistribution (AxisParallelTestSample params))
+        (RestrictedSymStrat.axisParallelPointAnswerFamily restricted)
+        (RestrictedSymStrat.axisParallelLineAnswerFamily restricted))
     (profile.restrictedGood x).axisParallelTest
-
-private lemma restrictedSelfConsistencyProb_nonneg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : RestrictedSymStrat params ι) :
-    0 ≤ strategy.selfConsistencyFailureProbability := by
-  unfold RestrictedSymStrat.selfConsistencyFailureProbability
-  exact bipartiteSSCError_nonneg strategy.state
-    (uniformDistribution (Point params))
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
 
 private lemma restricted_self_nonneg
     (params : Parameters)
@@ -76,24 +62,14 @@ private lemma restricted_self_nonneg
     (profile : RestrictedFailureProfile params strategy) :
     ∀ x, 0 ≤ profile.selfConsistency x := by
   intro x
+  let restricted := xRestrictedStrategy params strategy x
   exact le_trans
-    (restrictedSelfConsistencyProb_nonneg params
-      (xRestrictedStrategy params strategy x))
+    (by
+      unfold RestrictedSymStrat.selfConsistencyFailureProbability
+      exact bipartiteSSCError_nonneg restricted.state
+        (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas restricted.pointMeasurement))
     (profile.restrictedGood x).selfConsistencyTest
-
-private lemma restrictedDiagonalProb_nonneg
-    (params : Parameters) [FieldModel params.q]
-    (strategy : RestrictedSymStrat params ι) :
-    0 ≤ strategy.diagonalFailureProbability := by
-  unfold RestrictedSymStrat.diagonalFailureProbability
-  refine mul_nonneg ?_ ?_
-  · positivity
-  · refine Finset.sum_nonneg ?_
-    intro j _
-    exact bipartiteConsError_nonneg strategy.state
-      (uniformDistribution (RestrictedDiagonalSample params j))
-      (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily strategy j)
-      (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily strategy j)
 
 private lemma restricted_diag_nonneg
     (params : Parameters)
@@ -102,9 +78,18 @@ private lemma restricted_diag_nonneg
     (profile : RestrictedFailureProfile params strategy) :
     ∀ x, 0 ≤ profile.diagonal x := by
   intro x
+  let restricted := xRestrictedStrategy params strategy x
   exact le_trans
-    (restrictedDiagonalProb_nonneg params
-      (xRestrictedStrategy params strategy x))
+    (by
+      unfold RestrictedSymStrat.diagonalFailureProbability
+      refine mul_nonneg ?_ ?_
+      · positivity
+      · refine Finset.sum_nonneg ?_
+        intro j _
+        exact bipartiteConsError_nonneg restricted.state
+          (uniformDistribution (RestrictedDiagonalSample params j))
+          (RestrictedSymStrat.restrictedDiagonalPointAnswerFamily restricted j)
+          (RestrictedSymStrat.restrictedDiagonalLineAnswerFamily restricted j))
     (profile.restrictedGood x).diagonalLineTest
 
 private lemma answerSuccessor_restricted_axis_nonneg
