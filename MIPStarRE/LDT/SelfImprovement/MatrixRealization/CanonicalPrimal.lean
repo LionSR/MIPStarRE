@@ -165,22 +165,6 @@ theorem matrixSdpCanonicalBlockDiagonal_trace_mul (params : Parameters)
   simp only [Matrix.reindexAlgEquiv_apply]
   rw [Matrix.trace_reindex, Matrix.trace_blockDiagonal_mul]
 
-private lemma sum_prod_if_fst_eq_mul_right {β α R : Type*} [Fintype β] [DecidableEq β]
-    [Fintype α] [NonUnitalNonAssocSemiring R] (b : β)
-    (F G : β × α → R) :
-    (∑ x : β × α, (if b = x.1 then F x else 0) * G x) =
-      ∑ a : α, F (b, a) * G (b, a) := by
-  classical
-  rw [Fintype.sum_prod_type]
-  calc
-    ∑ x : β, ∑ y : α, (if b = x then F (x, y) else 0) * G (x, y)
-        = ∑ x : β, (if b = x then ∑ y : α, F (x, y) * G (x, y) else 0) := by
-          refine Finset.sum_congr rfl ?_
-          intro x _
-          by_cases hx : b = x <;> simp [hx]
-    _ = ∑ y : α, F (b, y) * G (b, y) := by
-          simp
-
 /-- The trace pairing of a canonical block-diagonal operator with an arbitrary
 canonical matrix depends only on the diagonal blocks of the latter.
 
@@ -212,7 +196,21 @@ theorem matrixSdpCanonicalBlockDiagonal_trace_mul_left (params : Parameters)
         (if b = y.1 then B b i y.2 else 0) * X y (b, i)) =
     ∑ b : MatrixSdpCanonicalBlockIndex params, ∑ i : model.space.carrier,
       ∑ j : model.space.carrier, B b i j * X (b, j) (b, i)
-  simp_rw [sum_prod_if_fst_eq_mul_right]
+  refine Finset.sum_congr rfl ?_
+  intro b _
+  refine Finset.sum_congr rfl ?_
+  intro i _
+  rw [Fintype.sum_prod_type]
+  calc
+    ∑ x : MatrixSdpCanonicalBlockIndex params,
+        ∑ y : model.space.carrier, (if b = x then B b i y else 0) * X (x, y) (b, i)
+        = ∑ x : MatrixSdpCanonicalBlockIndex params,
+          (if b = x then ∑ y : model.space.carrier, B b i y * X (x, y) (b, i) else 0) := by
+            refine Finset.sum_congr rfl ?_
+            intro x _
+            by_cases hx : b = x <;> simp [hx]
+    _ = ∑ j : model.space.carrier, B b i j * X (b, j) (b, i) := by
+          simp
 
 /-- The diagonal block of a product with a canonical block-diagonal operator on
 the right depends only on the corresponding diagonal block of the left factor. -/
