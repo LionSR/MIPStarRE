@@ -37,16 +37,6 @@ noncomputable def overAllOutcomesDistinctNonglobalMass
       ((restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
         (fun gs => ¬ IsGloballyConsistent params xs gs)).liftLeft))
 
-/-- A submeasurement total splits into a restriction to `p` and its complement. -/
-private lemma restrictSubMeas_total_add_not
-    {α : Type*} [Fintype α] (A : SubMeas α ι)
-    (p : α → Prop) [DecidablePred p] :
-    (restrictSubMeas A p).total + (restrictSubMeas A (fun a => ¬ p a)).total =
-      A.total := by
-  unfold restrictSubMeas
-  rw [Finset.sum_filter_add_sum_filter_not]
-  exact A.sum_eq_total
-
 /-- Scalar mass splits into globally consistent and nonglobal parts. -/
 private lemma subMeasMass_restrict_add_not
     {α : Type*} [Fintype α] (ψ : QuantumState (ι × ι))
@@ -54,7 +44,12 @@ private lemma subMeasMass_restrict_add_not
     subMeasMass ψ A.liftLeft =
       subMeasMass ψ ((restrictSubMeas A p).liftLeft) +
         subMeasMass ψ ((restrictSubMeas A (fun a => ¬ p a)).liftLeft) := by
-  have htotal := restrictSubMeas_total_add_not A p
+  have htotal :
+      (restrictSubMeas A p).total + (restrictSubMeas A (fun a => ¬ p a)).total =
+        A.total := by
+    unfold restrictSubMeas
+    rw [Finset.sum_filter_add_sum_filter_not]
+    exact A.sum_eq_total
   unfold subMeasMass SubMeas.liftLeft
   calc
     ev ψ (leftTensor (ι₂ := ι) A.total)
