@@ -60,19 +60,6 @@ lemma orthonormalizationMainLemma {Outcome : Type*}
           hAlmost.sourceAlmostProjective
   exact ⟨P, hP⟩
 
-/-- Pointwise collapse for a complete measurement `A`: the bipartite
-self-consistency defect equals the bipartite consistency defect of `A` with
-itself. Both reduce to `max 0 (ev ψ 1 − ∑ a, ev ψ (A_a ⊗ A_a))`, since
-`A.total = 1` forces `leftTensor A.total = opTensor A.total A.total`. -/
-private lemma qBipartiteSSCDefect_eq_qBipartiteConsDefect_of_measurement
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (ψ : QuantumState (ι × ι)) (A : Measurement Outcome ι) :
-    qBipartiteSSCDefect ψ A.toSubMeas =
-      qBipartiteConsDefect ψ A.toSubMeas A.toSubMeas := by
-  simp [qBipartiteSSCDefect, qBipartiteConsDefect, qBipartiteMatchMass,
-    A.total_eq_one, leftTensor, opTensor]
-
 /-- For a complete measurement, bipartite SSC is exactly bipartite
 consistency of `A` with itself. -/
 private lemma bipartiteSSCRel_self_of_measurement {Outcome : Type*}
@@ -96,8 +83,10 @@ private lemma bipartiteSSCRel_self_of_measurement {Outcome : Type*}
           (constSubMeasFamily A.toSubMeas) (constSubMeasFamily A.toSubMeas) := by
     unfold bipartiteSSCError bipartiteConsError
     refine congrArg (avgOver _) ?_
-    funext _
-    exact qBipartiteSSCDefect_eq_qBipartiteConsDefect_of_measurement ψ A
+    funext x
+    cases x
+    simp [constSubMeasFamily, qBipartiteSSCDefect, qBipartiteConsDefect,
+      qBipartiteMatchMass, A.total_eq_one, leftTensor, opTensor]
   exact heq ▸ hssc
 
 /-- A rounded-projective witness for `leftLiftedMeasurement A` coming from a
