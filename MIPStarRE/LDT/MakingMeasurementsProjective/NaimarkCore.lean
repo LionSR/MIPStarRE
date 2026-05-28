@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 5 — Naimark core
