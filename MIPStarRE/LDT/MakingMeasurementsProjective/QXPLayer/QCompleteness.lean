@@ -286,16 +286,6 @@ lemma qCompleteness {Outcome : Type*}
             exact Real.rpow_nonneg hζ _
           linarith
 
-private lemma nnreal_algebraMap_matrix {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (c : NNReal) :
-    (algebraMap NNReal (MIPStarRE.Quantum.Op ι)) c =
-      (c : ℂ) • (1 : MIPStarRE.Quantum.Op ι) := by
-  rw [Algebra.algebraMap_eq_smul_one]
-  ext i j
-  change (c : ℂ) * (1 : MIPStarRE.Quantum.Op ι) i j =
-    (c : ℂ) * (1 : MIPStarRE.Quantum.Op ι) i j
-  rfl
-
 private lemma one_sub_spectralTruncationError_smul_le_sqrt
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (Q : MIPStarRE.Quantum.Op ι) (ζ : Error)
@@ -313,7 +303,7 @@ private lemma one_sub_spectralTruncationError_smul_le_sqrt
   let b : NNReal := ⟨1 + 2 * ε, by positivity⟩
   have hspec_le : ∀ x, x ∈ spectrum NNReal Q → x ≤ b := by
     have hle : Q ≤ (algebraMap NNReal (MIPStarRE.Quantum.Op ι)) b := by
-      rw [nnreal_algebraMap_matrix b]
+      rw [Algebra.algebraMap_eq_smul_one]
       have hb_real : (b : Error) = 1 + 2 * ε := by
         exact NNReal.coe_mk (1 + 2 * ε) (by positivity)
       change Q ≤ (((b : Error) : ℂ) • (1 : MIPStarRE.Quantum.Op ι))
