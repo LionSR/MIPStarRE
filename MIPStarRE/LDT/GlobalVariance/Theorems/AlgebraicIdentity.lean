@@ -144,36 +144,6 @@ private lemma weightedGeneralizeBOperator_sq
   rw [polynomialWeightSqrtOperator_conjTranspose,
     polynomialWeightSqrtOperator_mul_self]
 
-private lemma generalizeBCollisionOperatorAtPolynomial_proj
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    generalizeBCollisionOperatorAtPolynomial params strategy g qu *
-        generalizeBCollisionOperatorAtPolynomial params strategy g qu =
-      generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
-  change (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
-      (some ()) *
-    (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
-      (some ()) =
-    (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome (some ())
-  exact (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).proj (some ())
-
-private lemma generalizeBCollisionOperatorAtPolynomial_conjTranspose
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    (generalizeBCollisionOperatorAtPolynomial params strategy g qu)ᴴ =
-      generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
-  change ((generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
-      (some ()))ᴴ =
-    (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome (some ())
-  exact (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome_hermitian
-    (some ())
-
 private lemma generalizeB_right_event_implies_left_event
     (params : Parameters)
     [FieldModel params.q]
@@ -249,8 +219,14 @@ private lemma generalizeBLineDifference_sq_eq_collision
           generalizeBRightOperatorAtPolynomial params strategy g qu) =
       generalizeBCollisionOperatorAtPolynomial params strategy g qu := by
   rw [generalizeBLeft_sub_right_eq_collision params strategy g qu hline]
-  rw [generalizeBCollisionOperatorAtPolynomial_conjTranspose,
-    generalizeBCollisionOperatorAtPolynomial_proj]
+  change ((generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
+      (some ()))ᴴ *
+      (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome
+        (some ()) =
+    (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome (some ())
+  rw [(generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).outcome_hermitian
+    (some ())]
+  exact (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).proj (some ())
 
 private lemma generalizeBWeightedLineDifference_sq_eq_collision
     (params : Parameters)
