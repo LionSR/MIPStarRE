@@ -46,16 +46,6 @@ private lemma rolePairCond_mul_eq_zero_of_ne {ι : Type*} [Fintype ι] [Decidabl
   rw [rolePairCond_mul, rolePairProj_mul_eq_zero_of_ne rL₁ rR₁ rL₂ rR₂ h]
   simp [opTensor]
 
-private lemma rolePairCond_AB_mul_BA {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    rolePairCond Role.A Role.B X * rolePairCond Role.B Role.A Y = 0 := by
-  exact rolePairCond_mul_eq_zero_of_ne Role.A Role.B Role.B Role.A X Y (by decide)
-
-private lemma rolePairCond_BA_mul_AB {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (X Y : MIPStarRE.Quantum.Op (ι × ι)) :
-    rolePairCond Role.B Role.A X * rolePairCond Role.A Role.B Y = 0 := by
-  exact rolePairCond_mul_eq_zero_of_ne Role.B Role.A Role.A Role.B X Y (by decide)
-
 private lemma opTensor_roleCond {ι : Type*} [Fintype ι] [DecidableEq ι]
     (rL rR : Role) (X Y : MIPStarRE.Quantum.Op ι) :
     opTensor (roleCond rL X) (roleCond rR Y) =
@@ -216,7 +206,8 @@ lemma ev_classicalRoleSymmState_rolePair_AB {ι : Type*}
       (1 / 2 : Error) * ev ψ Z := by
   unfold classicalRoleSymmState ev
   rw [add_mul, MIPStarRE.Quantum.normalizedTrace_add, smul_mul_assoc,
-    smul_mul_assoc, rolePairCond_mul_same, rolePairCond_BA_mul_AB,
+    smul_mul_assoc, rolePairCond_mul_same,
+    rolePairCond_mul_eq_zero_of_ne Role.B Role.A Role.A Role.B _ _ (by decide),
     Complex.add_re]
   calc
     (MIPStarRE.Quantum.normalizedTrace
@@ -236,7 +227,9 @@ lemma ev_classicalRoleSymmState_rolePair_BA {ι : Type*}
       (1 / 2 : Error) * ev (swapQuantumState ψ) Z := by
   unfold classicalRoleSymmState ev swapQuantumState
   rw [add_mul, MIPStarRE.Quantum.normalizedTrace_add, smul_mul_assoc,
-    smul_mul_assoc, rolePairCond_AB_mul_BA, rolePairCond_mul_same,
+    smul_mul_assoc,
+    rolePairCond_mul_eq_zero_of_ne Role.A Role.B Role.B Role.A _ _ (by decide),
+    rolePairCond_mul_same,
     Complex.add_re]
   calc
     (MIPStarRE.Quantum.normalizedTrace ((2 : Error) • 0)).re +
@@ -290,7 +283,8 @@ private lemma ev_classicalRoleSymmState_opTensor_roleCond_A_ignore {ι : Type*}
   conv_lhs =>
     rw [normalizedTrace_rolePairCond_mul_left_roleCond_same Role.A Role.B,
       normalizedTrace_rolePairCond_mul_left_roleCond_ne (by decide : Role.B ≠ Role.A)]
-  rw [opTensor_roleCond, rolePairCond_BA_mul_AB]
+  rw [opTensor_roleCond,
+    rolePairCond_mul_eq_zero_of_ne Role.B Role.A Role.A Role.B _ _ (by decide)]
   simp [MIPStarRE.Quantum.normalizedTrace_zero]
 
 lemma ev_classicalRoleSymmState_opTensor_roleCond_A {ι : Type*}
@@ -321,7 +315,8 @@ private lemma ev_classicalRoleSymmState_opTensor_roleCond_B_ignore {ι : Type*}
   conv_lhs =>
     rw [normalizedTrace_rolePairCond_mul_left_roleCond_ne (by decide : Role.A ≠ Role.B),
       normalizedTrace_rolePairCond_mul_left_roleCond_same Role.B Role.A]
-  rw [opTensor_roleCond, rolePairCond_AB_mul_BA]
+  rw [opTensor_roleCond,
+    rolePairCond_mul_eq_zero_of_ne Role.A Role.B Role.B Role.A _ _ (by decide)]
   simp [MIPStarRE.Quantum.normalizedTrace_zero]
 
 lemma ev_classicalRoleSymmState_opTensor_roleCond_B {ι : Type*}
