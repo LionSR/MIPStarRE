@@ -214,13 +214,6 @@ theorem sqrt_selfImprovementVarianceError_le
           (Real.sqrt eps + Real.sqrt delta +
             Real.sqrt ((params.d : Error) / (params.q : Error))) := by ring
 
-private theorem sum_sqrt_eq_sum_rpow_half
-    (eps delta dq : Error) :
-    Real.sqrt eps + Real.sqrt delta + Real.sqrt dq =
-      Real.rpow eps (1 / (2 : Error)) + Real.rpow delta (1 / (2 : Error)) +
-        Real.rpow dq (1 / (2 : Error)) := by
-  simp [Real.sqrt_eq_rpow, Real.rpow_eq_pow]
-
 /-- Expansion of the helper-stage self-improvement error into the square-root
 sum used in the paper.
 
@@ -234,8 +227,7 @@ theorem selfImprovementHelperError_eq
       100 * (params.m : Error) *
         (Real.sqrt eps + Real.sqrt delta +
           Real.sqrt ((params.d : Error) / (params.q : Error))) := by
-  rw [selfImprovementHelperError,
-    sum_sqrt_eq_sum_rpow_half eps delta ((params.d : Error) / (params.q : Error))]
+  simp [selfImprovementHelperError, Real.sqrt_eq_rpow, Real.rpow_eq_pow]
 
 /-- The helper-stage threshold is nonnegative.
 
