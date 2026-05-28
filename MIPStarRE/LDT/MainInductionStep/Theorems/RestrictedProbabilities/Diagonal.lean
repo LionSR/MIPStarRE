@@ -90,18 +90,6 @@ private noncomputable def diagonalIndexError
     (diagonalPointAnswerFamily strategy j)
     (diagonalLineAnswerFamily strategy j)
 
-private lemma diagonalIndexError_nonneg
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (j : Fin params.next.m) :
-    0 ≤ diagonalIndexError params strategy j := by
-  unfold diagonalIndexError
-  exact bipartiteConsError_nonneg strategy.state
-    (uniformDistribution (RestrictedDiagonalSample params.next j))
-    (diagonalPointAnswerFamily strategy j)
-    (diagonalLineAnswerFamily strategy j)
-
 private lemma diagonalSliceIndexErrorAverage_eq_diagonalIndexError
     (params : Parameters)
     [FieldModel params.q]
@@ -266,7 +254,13 @@ lemma weighted_diagonal_bound
           (diagonalIndexError params strategy) :=
         weighted_embedded_average_le_full_average params
           (f := diagonalIndexError params strategy)
-          (hf := diagonalIndexError_nonneg params strategy)
+          (hf := by
+            intro j
+            unfold diagonalIndexError
+            exact bipartiteConsError_nonneg strategy.state
+              (uniformDistribution (RestrictedDiagonalSample params.next j))
+              (diagonalPointAnswerFamily strategy j)
+              (diagonalLineAnswerFamily strategy j))
     _ = strategy.diagonalFailureProbability :=
         diagonalFailure_eq_average_indexError params strategy
     _ ≤ gamma := hgood.diagonalLineTest
