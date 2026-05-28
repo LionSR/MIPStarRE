@@ -1,4 +1,3 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.Point
 import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.PointLine
 
 namespace MIPStarRE.LDT.GlobalVariance
