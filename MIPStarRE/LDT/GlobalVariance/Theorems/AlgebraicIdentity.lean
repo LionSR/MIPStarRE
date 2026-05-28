@@ -122,28 +122,6 @@ lemma weightedPointConditionedOperator_sq
   rw [polynomialWeightSqrtOperator_conjTranspose,
     polynomialWeightSqrtOperator_mul_self]
 
-private lemma weightedGeneralizeBOperator_sq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι) (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-        weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
-    Dᴴ * D =
-      opTensor
-        (((generalizeBLeftOperatorAtPolynomial params strategy g qu -
-          generalizeBRightOperatorAtPolynomial params strategy g qu)ᴴ) *
-            (generalizeBLeftOperatorAtPolynomial params strategy g qu -
-              generalizeBRightOperatorAtPolynomial params strategy g qu))
-        (G.outcome g) := by
-  dsimp only
-  simp only [weightedGeneralizeBLeftOperatorAtPolynomial,
-    weightedGeneralizeBRightOperatorAtPolynomial, opTensor_sub_left]
-  rw [conjTranspose_opTensor, opTensor_mul]
-  rw [polynomialWeightSqrtOperator_conjTranspose,
-    polynomialWeightSqrtOperator_mul_self]
-
 private lemma generalizeB_right_event_implies_left_event
     (params : Parameters)
     [FieldModel params.q]
@@ -233,7 +211,11 @@ private lemma generalizeBWeightedLineDifference_sq_eq_collision
     Dᴴ * D =
       opTensor (generalizeBCollisionOperatorAtPolynomial params strategy g qu) (G.outcome g) := by
   dsimp only
-  rw [weightedGeneralizeBOperator_sq]
+  simp only [weightedGeneralizeBLeftOperatorAtPolynomial,
+    weightedGeneralizeBRightOperatorAtPolynomial, opTensor_sub_left]
+  rw [conjTranspose_opTensor, opTensor_mul]
+  rw [polynomialWeightSqrtOperator_conjTranspose,
+    polynomialWeightSqrtOperator_mul_self]
   rw [generalizeBLineDifference_sq_eq_collision params strategy g qu hline]
 
 /-- Projective expansion for the pointwise `lem:generalize-b` deviation.
