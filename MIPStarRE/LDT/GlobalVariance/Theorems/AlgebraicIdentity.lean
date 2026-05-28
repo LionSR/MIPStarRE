@@ -317,34 +317,6 @@ private lemma weightedPolynomialState_ev_leftTensor
     _ = MIPStarRE.Quantum.normalizedTrace (strategy.state.density * opTensor X (G.outcome g)) := by
         rw [htarget]
 
-private lemma pointConditioned_leftTensor_sq
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) (g : Polynomial params)
-    (u v : Point params) :
-    let D := leftTensor (ι₂ := ι)
-          (pointConditionedOutcomeOperatorAtPolynomial params strategy g u) -
-        leftTensor (ι₂ := ι)
-          (pointConditionedOutcomeOperatorAtPolynomial params strategy g v)
-    Dᴴ * D =
-      leftTensor (ι₂ := ι)
-        (((pointConditionedOutcomeOperatorAtPolynomial params strategy g u -
-          pointConditionedOutcomeOperatorAtPolynomial params strategy g v)ᴴ) *
-            (pointConditionedOutcomeOperatorAtPolynomial params strategy g u -
-              pointConditionedOutcomeOperatorAtPolynomial params strategy g v)) := by
-  dsimp only
-  rw [leftTensor_sub]
-  have hct :
-      (leftTensor (ι₂ := ι)
-        (pointConditionedOutcomeOperatorAtPolynomial params strategy g u -
-          pointConditionedOutcomeOperatorAtPolynomial params strategy g v))ᴴ =
-        leftTensor (ι₂ := ι)
-          ((pointConditionedOutcomeOperatorAtPolynomial params strategy g u -
-            pointConditionedOutcomeOperatorAtPolynomial params strategy g v)ᴴ) :=
-    leftTensor_conjTranspose _
-  rw [hct]
-  rw [leftTensor_mul_leftTensor]
-
 private lemma weightedNormDeviation_eq_pointConditionedDifferenceAvg
     (params : Parameters)
     [FieldModel params.q]
@@ -375,7 +347,9 @@ private lemma weightedNormDeviation_eq_pointConditionedDifferenceAvg
   rw [weightedPointConditionedOperator_sq]
   unfold pointDifferenceSquaredOperator
   rw [← weightedPolynomialState_ev_leftTensor]
-  rw [pointConditioned_leftTensor_sq]
+  rw [leftTensor_sub]
+  rw [leftTensor_conjTranspose]
+  rw [leftTensor_mul_leftTensor]
 
 /-- The edgewise weighted squared-difference expression is exactly twice the
 local variance of the point-conditioned family on the weighted state. This is
