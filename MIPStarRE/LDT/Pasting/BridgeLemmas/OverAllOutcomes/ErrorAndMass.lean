@@ -101,18 +101,6 @@ private lemma globalEligibleMass_le_eligibleMass
             (IsGloballyConsistent params xs))
           (show 0 ≤ (1 : MIPStarRE.Quantum.Op ι) by simp)))
 
-/-- If `k < d+1`, no completed-slice tuple can be interpolation-eligible. -/
-private lemma not_interpolationEligible_of_not_d_add_one_le
-    (params : Parameters) [FieldModel params.q]
-    {k : ℕ} (hnot : ¬ params.d + 1 ≤ k)
-    (gs : GHatTupleOutcome params k) :
-    ¬ InterpolationEligible params gs := by
-  intro hEligible
-  have hweight_le : gHatTupleHammingWeight gs ≤ k := by
-    unfold gHatTupleHammingWeight gHatTupleSupport
-    simpa [Fintype.card_fin] using Finset.card_le_univ (gHatTupleSupport gs)
-  exact hnot (le_trans hEligible hweight_le)
-
 /-- If `k < d+1`, the interpolation-eligible sandwich total vanishes. -/
 private lemma interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
     (params : Parameters) [FieldModel params.q]
@@ -123,7 +111,10 @@ private lemma interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
       Finset (GHatTupleOutcome params k)) = ∅ := by
     rw [Finset.filter_eq_empty_iff]
     intro gs _ helig
-    exact not_interpolationEligible_of_not_d_add_one_le params hnot gs helig
+    have hweight_le : gHatTupleHammingWeight gs ≤ k := by
+      unfold gHatTupleHammingWeight gHatTupleSupport
+      simpa [Fintype.card_fin] using Finset.card_le_univ (gHatTupleSupport gs)
+    exact hnot (le_trans helig hweight_le)
   unfold interpolationEligibleSandwichFamily restrictSubMeas
   simp [hempty]
 
