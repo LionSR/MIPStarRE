@@ -431,39 +431,6 @@ private lemma answerSuccessorDiagonalSliceIndexErrorAverage_eq_diagonalIndexErro
     _ = answerSuccessorDiagonalIndexError params strategy (embedCoord params j) := by
             rfl
 
-private lemma answerSuccessorDiagonalFailure_eq_average_indexError
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : AnswerSymStrat params.next ι) :
-    avgOver (uniformDistribution (Fin params.next.m))
-      (answerSuccessorDiagonalIndexError params strategy) =
-      strategy.diagonalFailureProbability := by
-  unfold answerSuccessorDiagonalIndexError AnswerSymStrat.diagonalFailureProbability
-  calc
-    avgOver (uniformDistribution (Fin params.next.m))
-        (fun j =>
-          bipartiteConsError strategy.state
-            (uniformDistribution (RestrictedDiagonalSample params.next j))
-            (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
-            (AnswerSymStrat.diagonalLineAnswerFamily strategy j))
-      = ∑ j : Fin params.next.m,
-          (1 / (params.next.m : Error)) *
-            bipartiteConsError strategy.state
-              (uniformDistribution (RestrictedDiagonalSample params.next j))
-              (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
-              (AnswerSymStrat.diagonalLineAnswerFamily strategy j) := by
-                simp [avgOver, uniformDistribution, Fintype.card_fin]
-    _ = (1 / (params.next.m : Error)) *
-          ∑ j : Fin params.next.m,
-            bipartiteConsError strategy.state
-              (uniformDistribution (RestrictedDiagonalSample params.next j))
-              (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
-              (AnswerSymStrat.diagonalLineAnswerFamily strategy j) := by
-                symm
-                rw [Finset.mul_sum]
-    _ = strategy.diagonalFailureProbability := by
-          rfl
-
 private lemma answerSuccessorAverageRestrictedDiagonalFailure_eq_embeddedDiagonalIndices
     (params : Parameters)
     [FieldModel params.q]
@@ -569,8 +536,32 @@ lemma answerSuccessor_weighted_diagonal_bound
               (uniformDistribution (RestrictedDiagonalSample params.next j))
               (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
               (AnswerSymStrat.diagonalLineAnswerFamily strategy j))
-    _ = strategy.diagonalFailureProbability :=
-        answerSuccessorDiagonalFailure_eq_average_indexError params strategy
+    _ = strategy.diagonalFailureProbability := by
+        unfold answerSuccessorDiagonalIndexError AnswerSymStrat.diagonalFailureProbability
+        calc
+          avgOver (uniformDistribution (Fin params.next.m))
+              (fun j =>
+                bipartiteConsError strategy.state
+                  (uniformDistribution (RestrictedDiagonalSample params.next j))
+                  (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
+                  (AnswerSymStrat.diagonalLineAnswerFamily strategy j))
+            = ∑ j : Fin params.next.m,
+                (1 / (params.next.m : Error)) *
+                  bipartiteConsError strategy.state
+                    (uniformDistribution (RestrictedDiagonalSample params.next j))
+                    (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
+                    (AnswerSymStrat.diagonalLineAnswerFamily strategy j) := by
+                      simp [avgOver, uniformDistribution, Fintype.card_fin]
+          _ = (1 / (params.next.m : Error)) *
+                ∑ j : Fin params.next.m,
+                  bipartiteConsError strategy.state
+                    (uniformDistribution (RestrictedDiagonalSample params.next j))
+                    (AnswerSymStrat.diagonalPointAnswerFamily strategy j)
+                    (AnswerSymStrat.diagonalLineAnswerFamily strategy j) := by
+                      symm
+                      rw [Finset.mul_sum]
+          _ = strategy.diagonalFailureProbability := by
+                rfl
     _ ≤ gamma := hgood.diagonalLineTest
 
 /-- Assemble the weighted answer-valued successor restricted-probability bounds
