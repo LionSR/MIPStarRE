@@ -132,45 +132,6 @@ private lemma sliceAxisDirectionErrorAverage_eq_axisDirectionError
     _ = axisDirectionError params strategy (embedCoord params i) := by
           rfl
 
-private lemma axisFailure_eq_average_directionError
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι) :
-    avgOver (uniformDistribution (Fin params.next.m))
-      (axisDirectionError params strategy) =
-      strategy.axisParallelFailureProbability := by
-  let err : Fin params.next.m × Point params.next → Error := fun iu =>
-    qBipartiteConsDefect strategy.state
-      (axisParallelPointAnswerFamily strategy (iu.2, iu.1))
-      (axisParallelLineAnswerFamily strategy (iu.2, iu.1))
-  have hprod :
-      avgOver (uniformDistribution (Fin params.next.m))
-          (fun i => avgOver (uniformDistribution (Point params.next))
-            (fun u => err (i, u))) =
-        avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := by
-    simpa using
-      (avgOver_uniform_prod (α := Fin params.next.m) (β := Point params.next)
-        (f := fun i u => err (i, u))).symm
-  have hswap :
-      avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err =
-        avgOver (uniformDistribution (Point params.next × Fin params.next.m))
-          (fun ui => err (ui.2, ui.1)) := by
-    simpa using
-      (MIPStarRE.LDT.avgOver_uniform_equiv
-        (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
-        (f := err))
-  calc
-    avgOver (uniformDistribution (Fin params.next.m)) (axisDirectionError params strategy)
-      = avgOver (uniformDistribution (Fin params.next.m))
-          (fun i => avgOver (uniformDistribution (Point params.next))
-            (fun u => err (i, u))) := by
-              avg_congr
-    _ = avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := hprod
-    _ = avgOver (uniformDistribution (Point params.next × Fin params.next.m))
-          (fun ui => err (ui.2, ui.1)) := hswap
-    _ = strategy.axisParallelFailureProbability := by
-          rfl
-
 private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
     (params : Parameters)
     [FieldModel params.q]
@@ -290,8 +251,38 @@ lemma weighted_axisParallel_bound
             exact qBipartiteConsDefect_nonneg strategy.state
               (axisParallelPointAnswerFamily strategy (u, i))
               (axisParallelLineAnswerFamily strategy (u, i)))
-    _ = strategy.axisParallelFailureProbability :=
-        axisFailure_eq_average_directionError params strategy
+    _ = strategy.axisParallelFailureProbability := by
+        let err : Fin params.next.m × Point params.next → Error := fun iu =>
+          qBipartiteConsDefect strategy.state
+            (axisParallelPointAnswerFamily strategy (iu.2, iu.1))
+            (axisParallelLineAnswerFamily strategy (iu.2, iu.1))
+        have hprod :
+            avgOver (uniformDistribution (Fin params.next.m))
+                (fun i => avgOver (uniformDistribution (Point params.next))
+                  (fun u => err (i, u))) =
+              avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := by
+          simpa using
+            (avgOver_uniform_prod (α := Fin params.next.m) (β := Point params.next)
+              (f := fun i u => err (i, u))).symm
+        have hswap :
+            avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err =
+              avgOver (uniformDistribution (Point params.next × Fin params.next.m))
+                (fun ui => err (ui.2, ui.1)) := by
+          simpa using
+            (MIPStarRE.LDT.avgOver_uniform_equiv
+              (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
+              (f := err))
+        calc
+          avgOver (uniformDistribution (Fin params.next.m)) (axisDirectionError params strategy)
+            = avgOver (uniformDistribution (Fin params.next.m))
+                (fun i => avgOver (uniformDistribution (Point params.next))
+                  (fun u => err (i, u))) := by
+                    avg_congr
+          _ = avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := hprod
+          _ = avgOver (uniformDistribution (Point params.next × Fin params.next.m))
+                (fun ui => err (ui.2, ui.1)) := hswap
+          _ = strategy.axisParallelFailureProbability := by
+                rfl
     _ ≤ eps := hgood.axisParallelTest
 
 end MIPStarRE.LDT.MainInductionStep
