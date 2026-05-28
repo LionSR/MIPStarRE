@@ -52,28 +52,6 @@ private lemma gCommOverlap_avgOver_point
             (f := fun x => gCommOverlapTerm params strategy G x)
 
 /-- Averaging the overlap term over evaluated-slice questions through the
-second point coordinate marginalizes to the uniform `x : F_q` average. -/
-private lemma gCommOverlap_avgOver_snd
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (G : Fq params → SubMeas (Polynomial params) ι) :
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-      (fun q => gCommOverlapTerm params strategy G (pointHeight params q.2)) =
-    avgOver (uniformDistribution (Fq params))
-      (fun x => gCommOverlapTerm params strategy G x) := by
-  calc
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q => gCommOverlapTerm params strategy G (pointHeight params q.2))
-      = avgOver (uniformDistribution (Point params.next))
-          (fun w => gCommOverlapTerm params strategy G (pointHeight params w)) := by
-            exact avgOver_uniform_snd
-              (f := fun w => gCommOverlapTerm params strategy G (pointHeight params w))
-    _ = avgOver (uniformDistribution (Fq params))
-          (fun x => gCommOverlapTerm params strategy G x) :=
-          gCommOverlap_avgOver_point params strategy G
-
-/-- Averaging the overlap term over evaluated-slice questions through the
 first point coordinate marginalizes to the uniform `x : F_q` average. -/
 lemma gCommOverlap_avgOver_fst
     (params : Parameters)
@@ -267,7 +245,17 @@ theorem gCommStability_overlap
       (commDataProcessedGStabilityOneLeft params strategy family G)
       (commDataProcessedGStabilityOneRight params strategy family G)
       Prod.snd
-      (gCommOverlap_avgOver_snd params strategy G)
+      (by
+        calc
+          avgOver (uniformDistribution (EvaluatedSliceQuestion params))
+              (fun q => gCommOverlapTerm params strategy G (pointHeight params q.2))
+            = avgOver (uniformDistribution (Point params.next))
+                (fun w => gCommOverlapTerm params strategy G (pointHeight params w)) := by
+                  exact avgOver_uniform_snd
+                    (f := fun w => gCommOverlapTerm params strategy G (pointHeight params w))
+          _ = avgOver (uniformDistribution (Fq params))
+                (fun x => gCommOverlapTerm params strategy G x) :=
+                gCommOverlap_avgOver_point params strategy G)
       (gCommStability_pointwise_bound params strategy family G hG)
   have hraw_le_one :=
     gCommStability_raw_le_one_of params strategy hnorm G
