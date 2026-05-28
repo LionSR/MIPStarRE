@@ -250,31 +250,6 @@ private lemma hAConsistency_submeas_core_of_axis_self
     (constructedPastedSubMeas params family k) eps delta gamma zeta
     haxis hself_good hgamma_nonneg hzeta_nonneg k hk_pos hHB.lineConsistency
 
-/-- Specialization of `hAConsistency_submeas_from_lineConsistency` to the
-constructed pasted submeasurement. -/
-private lemma hAConsistency_submeas_core
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (eps delta gamma zeta : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (hgamma_nonneg : 0 ≤ gamma)
-    (hzeta_nonneg : 0 ≤ zeta)
-    (k : ℕ)
-    (hk_pos : 1 ≤ k)
-    (hHB : HBConsistencyStatement params strategy family
-        eps delta gamma zeta k) :
-    ConsRel strategy.state (uniformDistribution (Point params.next))
-        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-        (polynomialEvaluationFamily params.next
-          (constructedPastedSubMeas params family k))
-        (MainInductionStep.ldPastingInInductionNu params k
-          eps delta gamma zeta) := by
-  exact hAConsistency_submeas_core_of_axis_self params strategy family
-    eps delta gamma zeta hgood.axisParallelTest hgood.selfConsistencyTest
-    hgamma_nonneg hzeta_nonneg k hk_pos hHB
-
 /-- Internal form of `cor:h-a-consistency` from the one-point sandwich estimates.
 
 This theorem separates the genuinely earlier pasting input from the diagonal
@@ -435,8 +410,9 @@ theorem hAConsistency_submeas
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         family.evaluatedAtNextPoint)
       hcons.pointConsistency.offDiagonalBound
-  exact hAConsistency_submeas_core params strategy family
-    eps delta gamma zeta hgood hgamma_nonneg hzeta_nonneg k hk_pos hHB
+  exact hAConsistency_submeas_core_of_axis_self params strategy family
+    eps delta gamma zeta hgood.axisParallelTest hgood.selfConsistencyTest
+    hgamma_nonneg hzeta_nonneg k hk_pos hHB
 
 /-- Complete a polynomial submeasurement after its point consistency and mass
 lower bound have been proved.
