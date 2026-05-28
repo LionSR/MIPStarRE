@@ -361,7 +361,21 @@ private lemma xHat_mixed_adjoint {Outcome : Type*}
         (Matrix.nonneg_iff_posSemidef.mp
           (CFC.sqrt_nonneg (QTotal data.qLayer))).isHermitian.eq
 
-private lemma xxHat_isHermitian {Outcome : Type*}
+/-- The adjoint mixed product `Xhat† X` equals the positive square root of
+`Q`.
+
+This is the adjoint form of the stored identity `X† Xhat = sqrt Q`.  It is
+used to identify the operator `Y = X Xhat†` in the proof of
+`lem:squared-difference`. -/
+lemma xHat_adjoint_mul_x_eq_sqrt {Outcome : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    [Fintype Outcome]
+    (data : QXPLayerData Outcome ι) :
+    data.xHatᴴ * data.x = CFC.sqrt (QTotal data.qLayer) :=
+  xHat_mixed_adjoint data
+
+/-- The operator `X Xhat†` is Hermitian in a QXP layer. -/
+lemma x_mul_xHat_adjoint_isHermitian {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) :
@@ -383,7 +397,8 @@ private lemma xxHat_isHermitian {Outcome : Type*}
     _ = data.x * data.xHatᴴ := by
       simp [data.xHat_coisometry]
 
-private lemma xxHat_sq {Outcome : Type*}
+/-- The square of `X Xhat†` is `X X†` in a QXP layer. -/
+lemma x_mul_xHat_adjoint_sq {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) :
@@ -397,7 +412,8 @@ private lemma xxHat_sq {Outcome : Type*}
     _ = data.x * data.xᴴ := by
           simp [Matrix.mul_assoc, data.xHat_coisometry]
 
-private lemma xxHat_nonneg {Outcome : Type*}
+/-- The operator `X Xhat†` is positive semidefinite in a QXP layer. -/
+lemma x_mul_xHat_adjoint_nonneg {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) :
@@ -416,43 +432,6 @@ private lemma xxHat_nonneg {Outcome : Type*}
       simp [Matrix.mul_assoc]
     _ = data.x * data.xHatᴴ := by
       simp [data.xHat_coisometry]
-
-/-- The adjoint mixed product `Xhat† X` equals the positive square root of
-`Q`.
-
-This is the adjoint form of the stored identity `X† Xhat = sqrt Q`.  It is
-used to identify the operator `Y = X Xhat†` in the proof of
-`lem:squared-difference`. -/
-lemma xHat_adjoint_mul_x_eq_sqrt {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    data.xHatᴴ * data.x = CFC.sqrt (QTotal data.qLayer) :=
-  xHat_mixed_adjoint data
-
-/-- The operator `X Xhat†` is Hermitian in a QXP layer. -/
-lemma x_mul_xHat_adjoint_isHermitian {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    (data.x * data.xHatᴴ)ᴴ = data.x * data.xHatᴴ :=
-  xxHat_isHermitian data
-
-/-- The square of `X Xhat†` is `X X†` in a QXP layer. -/
-lemma x_mul_xHat_adjoint_sq {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    (data.x * data.xHatᴴ) * (data.x * data.xHatᴴ) = data.x * data.xᴴ :=
-  xxHat_sq data
-
-/-- The operator `X Xhat†` is positive semidefinite in a QXP layer. -/
-lemma x_mul_xHat_adjoint_nonneg {Outcome : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    [Fintype Outcome]
-    (data : QXPLayerData Outcome ι) :
-    0 ≤ data.x * data.xHatᴴ :=
-  xxHat_nonneg data
 
 /-- Spectral form of the paper's identity
 `X * Xhat† = U * Σ * U†` in `lem:X-times-X-hat`.
