@@ -21,14 +21,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 variable (params : Parameters) [FieldModel params.q]
 
-private theorem pointConditionedOutcomeOperatorAtPolynomial_pos (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (g : Polynomial params) (u : Point params) :
-    0 ≤ pointConditionedOutcomeOperatorAtPolynomial params strategy g u := by
-  simpa [pointConditionedOutcomeOperatorAtPolynomial] using
-    (strategy.pointMeasurement u).outcome_pos (g u)
-
 /-- `CFC.sqrt (G.outcome g) ≤ 1` when `G` is a submeasurement.
 Proved via the NNReal CFC spectrum API: `G.outcome g ≤ 1` means all
 spectral values satisfy `λ ≤ 1`, so `√λ ≤ 1` as well. -/
@@ -80,7 +72,9 @@ private theorem weightedPointConditionedOperatorAtPolynomial_pos (params : Param
   simpa [weightedPointConditionedOperatorAtPolynomial] using
     (weightedPolynomialOperator_pos (ι := ι) (params := params) (G := G) (g := g)
       (A := pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
-      (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u))
+      (by
+        simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+          (strategy.pointMeasurement u).outcome_pos (g u)))
 
 private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Parameters)
     [FieldModel params.q]
@@ -95,7 +89,10 @@ private theorem weightedPointConditionedOperatorAtPolynomial_le_one (params : Pa
   simpa [weightedPointConditionedOperatorAtPolynomial] using
     (weightedPolynomialOperator_le_one (ι := ι) (params := params) (G := G) (g := g)
       (A := pointConditionedOutcomeOperatorAtPolynomial params strategy g u)
-      (pointConditionedOutcomeOperatorAtPolynomial_pos params strategy g u) hA_le_one)
+      (by
+        simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+          (strategy.pointMeasurement u).outcome_pos (g u))
+      hA_le_one)
 
 /-- The squared norm expression controlled by `lem:generalize-b` for a fixed `g`.
 Uses bipartite state `ψbi` on `d * d`. -/
