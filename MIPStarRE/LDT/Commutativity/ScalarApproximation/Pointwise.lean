@@ -310,32 +310,6 @@ lemma gCommStability_pointwise_sum_bound_core
           rw [show (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) by simp]
           rw [hcollapse]
 
-/-- Summing the stability-one comparison family leaves only the overlap term
-for `G^y`. -/
-private lemma gCommStability_pointwise_sum_bound
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params.next ι)
-    (family : IdxPolyFamily params ι)
-    (G : Fq params → SubMeas (Polynomial params) ι)
-    (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (q : EvaluatedSliceQuestion params) :
-    (∑ ah : StabilityOneOutcome params,
-        ev strategy.state
-          ((leftTensor (ι₂ := ι)
-              ((1 - (G (pointHeight params q.2)).total) *
-                (evaluatedPointFamily params family q.1).outcome ah.1 *
-                (1 - (G (pointHeight params q.2)).total))) *
-            rightTensor (ι₁ := ι) ((G (pointHeight params q.2)).outcome ah.2))) ≤
-      gCommOverlapTerm params strategy G (pointHeight params q.2) := by
-  let y := pointHeight params q.2
-  let A : SubMeas (Fq params) ι := evaluatedPointFamily params family q.1
-  have hGy_sq : (G y).total * (G y).total = (G y).total := by
-    simpa [hG y] using
-      MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas y)
-  simpa [y, A, gCommOverlapTerm] using
-    gCommStability_pointwise_sum_bound_core strategy.state A (G y) hGy_sq
-
 /-- A single stability-one summand is controlled by replacing the inner
 evaluated slice sandwich with the corresponding evaluated point outcome. -/
 private lemma gCommStability_pointwise_summand_bound
@@ -455,8 +429,11 @@ lemma gCommStability_pointwise_bound
           exact gCommStability_pointwise_summand_bound params strategy family G q ah
     _ ≤ ev strategy.state
           (leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T) := by
+          have hGy_sq : (G y).total * (G y).total = (G y).total := by
+            simpa [hG y] using
+              MIPStarRE.LDT.Preliminaries.projSubMeas_total_proj (family.meas y)
           simpa [y, T, A] using
-            gCommStability_pointwise_sum_bound params strategy family G hG q
+            gCommStability_pointwise_sum_bound_core strategy.state A (G y) hGy_sq
 
 /-- The overlap term at `x` is bounded by the bipartite SSC defect of `G x`. -/
 lemma gCommStability_ssc_point
