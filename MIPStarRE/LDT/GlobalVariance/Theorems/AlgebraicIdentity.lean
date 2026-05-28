@@ -199,25 +199,6 @@ private lemma generalizeBLineDifference_sq_eq_collision
     (some ())]
   exact (generalizeBCollisionEventProjMeasAtPolynomial params strategy g qu).proj (some ())
 
-private lemma generalizeBWeightedLineDifference_sq_eq_collision
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι) (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params)
-    (hline : pointOnLine (params := params) qu) :
-    let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-        weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu
-    Dᴴ * D =
-      opTensor (generalizeBCollisionOperatorAtPolynomial params strategy g qu) (G.outcome g) := by
-  dsimp only
-  simp only [weightedGeneralizeBLeftOperatorAtPolynomial,
-    weightedGeneralizeBRightOperatorAtPolynomial, opTensor_sub_left]
-  rw [conjTranspose_opTensor, opTensor_mul]
-  rw [polynomialWeightSqrtOperator_conjTranspose,
-    polynomialWeightSqrtOperator_mul_self]
-  rw [generalizeBLineDifference_sq_eq_collision params strategy g qu hline]
-
 /-- Projective expansion for the pointwise `lem:generalize-b` deviation.
 
 For incident line questions, the right event `f = g|_ℓ` is a subevent of the
@@ -239,7 +220,12 @@ lemma generalizeBDeviationAtPolynomial_eq_collisionResidual
   have hline : pointOnLine (params := params) qu := by
     simpa [axisParallelLineQuestionDistribution] using hqu
   dsimp only
-  rw [generalizeBWeightedLineDifference_sq_eq_collision params strategy G g qu hline]
+  simp only [weightedGeneralizeBLeftOperatorAtPolynomial,
+    weightedGeneralizeBRightOperatorAtPolynomial, opTensor_sub_left]
+  rw [conjTranspose_opTensor, opTensor_mul]
+  rw [polynomialWeightSqrtOperator_conjTranspose,
+    polynomialWeightSqrtOperator_mul_self]
+  rw [generalizeBLineDifference_sq_eq_collision params strategy g qu hline]
 
 /-- Move a left-register observable from the polynomial-weighted state
 `(I ⊗ √G_g) ρ (I ⊗ √G_g)ᴴ` back to the original bipartite state. -/
