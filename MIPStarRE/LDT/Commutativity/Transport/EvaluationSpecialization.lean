@@ -60,44 +60,6 @@ private lemma postprocess_leftPlacedOpFamily_product_outcome
     · intros; rfl
   · exact hg_factor S T A.outcome B.outcome
 
-private lemma postprocess_leftPlacedOpFamily_orderedProduct_outcome
-    {α₁ α₂ β₁ β₂ : Type*}
-    [Fintype α₁] [Fintype α₂] [Fintype β₁] [Fintype β₂]
-    (A : SubMeas α₁ ι) (B : SubMeas α₂ ι)
-    (f₁ : α₁ → β₁) (f₂ : α₂ → β₂) (b₁ : β₁) (b₂ : β₂) :
-    (OpFamily.postprocess
-      (OpFamily.leftPlacedOpFamily (ιB := ι)
-        (orderedProductOpFamily A B))
-      (fun ab => (f₁ ab.1, f₂ ab.2))).outcome (b₁, b₂) =
-    (OpFamily.leftPlacedOpFamily (ιB := ι)
-      (orderedProductOpFamily
-        (postprocess A f₁)
-        (postprocess B f₂))).outcome (b₁, b₂) := by
-  unfold orderedProductOpFamily
-  exact postprocess_leftPlacedOpFamily_product_outcome
-    A B f₁ f₂ b₁ b₂ (· * ·) fun S T fA fB => by
-    rw [Finset.sum_product]; simp_rw [← Finset.mul_sum]
-    rw [← Finset.sum_mul]
-
-private lemma postprocess_leftPlacedOpFamily_reversedProduct_outcome
-    {α₁ α₂ β₁ β₂ : Type*}
-    [Fintype α₁] [Fintype α₂] [Fintype β₁] [Fintype β₂]
-    (A : SubMeas α₁ ι) (B : SubMeas α₂ ι)
-    (f₁ : α₁ → β₁) (f₂ : α₂ → β₂) (b₁ : β₁) (b₂ : β₂) :
-    (OpFamily.postprocess
-      (OpFamily.leftPlacedOpFamily (ιB := ι)
-        (reversedProductOpFamily A B))
-      (fun ab => (f₁ ab.1, f₂ ab.2))).outcome (b₁, b₂) =
-    (OpFamily.leftPlacedOpFamily (ιB := ι)
-      (reversedProductOpFamily
-        (postprocess A f₁)
-        (postprocess B f₂))).outcome (b₁, b₂) := by
-  unfold reversedProductOpFamily
-  exact postprocess_leftPlacedOpFamily_product_outcome
-    A B f₁ f₂ b₁ b₂ (fun x y => y * x) fun S T fA fB => by
-    rw [Finset.sum_product]; simp_rw [← Finset.sum_mul]
-    rw [← Finset.mul_sum]
-
 /-- The evaluated-from-full-slice ordered product equals the
 evaluated-slice ordered product at each question-outcome pair. -/
 private lemma evaluatedFromFullSliceProductLeft_outcome_eq
@@ -114,14 +76,18 @@ private lemma evaluatedFromFullSliceProductLeft_outcome_eq
     fullSliceProductLeft leftOrderedProductOpFamily
     evaluateFullSliceOutcomeAtQuestion
     fullSliceQuestionOfEvaluatedSlice
+    orderedProductOpFamily
   exact
-    postprocess_leftPlacedOpFamily_orderedProduct_outcome
+    postprocess_leftPlacedOpFamily_product_outcome
       (fullSliceFirstFactor params family
         (pointHeight params q.1, pointHeight params q.2))
       (fullSliceSecondFactor params family
         (pointHeight params q.1, pointHeight params q.2))
       (fun g => g (truncatePoint params q.1))
-      (fun h => h (truncatePoint params q.2)) a b
+      (fun h => h (truncatePoint params q.2)) a b (· * ·) fun S T fA fB => by
+      rw [Finset.sum_product]
+      simp_rw [← Finset.mul_sum]
+      rw [← Finset.sum_mul]
 
 /-- The evaluated-from-full-slice reversed product equals the
 evaluated-slice reversed product at each question-outcome pair. -/
@@ -139,14 +105,18 @@ private lemma evaluatedFromFullSliceProductRight_outcome_eq
     evaluatedSliceProductRight fullSliceProductRight
     evaluateFullSliceOutcomeAtQuestion
     fullSliceQuestionOfEvaluatedSlice
+    reversedProductOpFamily
   exact
-    postprocess_leftPlacedOpFamily_reversedProduct_outcome
+    postprocess_leftPlacedOpFamily_product_outcome
       (fullSliceFirstFactor params family
         (pointHeight params q.1, pointHeight params q.2))
       (fullSliceSecondFactor params family
         (pointHeight params q.1, pointHeight params q.2))
       (fun g => g (truncatePoint params q.1))
-      (fun h => h (truncatePoint params q.2)) a b
+      (fun h => h (truncatePoint params q.2)) a b (fun x y => y * x) fun S T fA fB => by
+      rw [Finset.sum_product]
+      simp_rw [← Finset.sum_mul]
+      rw [← Finset.mul_sum]
 
 /-- The evaluated-from-full-slice SDD error equals the evaluated-slice
 SDD error, because the postprocessed product equals the product of
