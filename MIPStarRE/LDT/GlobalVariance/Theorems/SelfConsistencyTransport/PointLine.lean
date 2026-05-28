@@ -86,25 +86,6 @@ private noncomputable def axisParallelBaseLineEventMeasurement
       rw [postprocess_total]
       exact (strategy.axisParallelMeasurement { base := s.1, direction := s.2 }).total_eq_one)
 
-/-- Measurement-form bridge from `axisParallelBaseEventConsistency` for use with
-`prop:simeq-to-approx`. -/
-private lemma axisParallelBaseEventConsistency_measurement
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (g : Polynomial params) :
-    ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
-      (IdxMeas.toIdxSubMeas
-        (axisParallelBasePointEventMeasurement params strategy g))
-      (IdxMeas.toIdxSubMeas
-        (axisParallelBaseLineEventMeasurement params strategy g))
-      eps := by
-  simpa [axisParallelBasePointEventMeasurement,
-    axisParallelBaseLineEventMeasurement] using
-    axisParallelBaseEventConsistency params strategy eps delta gamma hgood g
-
 /-- The symmetric `2ε` approximation interface for the point-line event.
 
 This is the orientation used in `expansion.tex`, lines 306--307 and 309--310:
@@ -130,8 +111,12 @@ lemma axisParallelBaseEventApproximation_swapped
       (2 * eps) := by
   let pointMeas := axisParallelBasePointEventMeasurement params strategy g
   let lineMeas := axisParallelBaseLineEventMeasurement params strategy g
-  have hcons := axisParallelBaseEventConsistency_measurement
-    params strategy eps delta gamma hgood g
+  have hcons :
+      ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+        (IdxMeas.toIdxSubMeas pointMeas) (IdxMeas.toIdxSubMeas lineMeas) eps := by
+    simpa [pointMeas, lineMeas, axisParallelBasePointEventMeasurement,
+      axisParallelBaseLineEventMeasurement] using
+      axisParallelBaseEventConsistency params strategy eps delta gamma hgood g
   have hcons_swapped :
       ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
         (IdxMeas.toIdxSubMeas lineMeas)
