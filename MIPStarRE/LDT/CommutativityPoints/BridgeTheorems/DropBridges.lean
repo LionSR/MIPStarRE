@@ -19,25 +19,6 @@ open MIPStarRE.LDT.GlobalVariance (PointPairQuestion)
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 open scoped Matrix MatrixOrder ComplexOrder BigOperators
-private lemma diagonalLineProduct_outcome_swap
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    ∀ q ab,
-      (diagonalLineProductOrdered params strategy q).outcome ab =
-        (diagonalLineProductReversed params strategy q).outcome ab := by
-  intro q ⟨a, b⟩
-  simp only [diagonalLineProductOrdered,
-    diagonalLineProductReversed,
-    OpFamily.rightPlacedOpFamily,
-    reversedProductOpFamily,
-    orderedProductOpFamily,
-    sampledDiagonalLineEvaluation]
-  congr 1
-  exact (strategy.diagonalMeasurement
-    q.1).postprocess_outcome_commute
-    (fun f => f q.2.2)
-    (fun f => f q.2.1) b a
 
 private lemma reversedDropFromLineComparison
     (params : Parameters)
@@ -177,9 +158,14 @@ private lemma orderedDropFromLineComparison
     (IdxSubMeas.toIdxOpFamily (pointDiagonalLineMixedProductRight params strategy))
     (pointDiagonalLineApproxError params gamma)
     (by
-      intro q ab
+      intro q ⟨a, b⟩
       symm
-      exact diagonalLineProduct_outcome_swap params strategy q ab)
+      simp only [diagonalLineProductOrdered, diagonalLineProductReversed,
+        OpFamily.rightPlacedOpFamily, reversedProductOpFamily, orderedProductOpFamily,
+        sampledDiagonalLineEvaluation]
+      congr 1
+      exact (strategy.diagonalMeasurement q.1).postprocess_outcome_commute
+        (fun f => f q.2.2) (fun f => f q.2.1) b a)
     (by intro q ab; rfl)
     (reversedDropFromLineComparison params strategy eps delta gamma hgood)
 
