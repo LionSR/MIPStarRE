@@ -122,21 +122,6 @@ lemma weightedPointConditionedOperator_sq
   rw [polynomialWeightSqrtOperator_conjTranspose,
     polynomialWeightSqrtOperator_mul_self]
 
-private lemma weightedGeneralizeBOperator_sub
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι) (g : Polynomial params)
-    (qu : AxisParallelLineQuestion params) :
-    weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
-        weightedGeneralizeBRightOperatorAtPolynomial params strategy G g qu =
-      opTensor
-        (generalizeBLeftOperatorAtPolynomial params strategy g qu -
-          generalizeBRightOperatorAtPolynomial params strategy g qu)
-        (polynomialWeightSqrtOperator params G g) := by
-  simp [weightedGeneralizeBLeftOperatorAtPolynomial,
-    weightedGeneralizeBRightOperatorAtPolynomial, opTensor_sub_left]
-
 private lemma weightedGeneralizeBOperator_sq
     (params : Parameters)
     [FieldModel params.q]
@@ -153,7 +138,8 @@ private lemma weightedGeneralizeBOperator_sq
               generalizeBRightOperatorAtPolynomial params strategy g qu))
         (G.outcome g) := by
   dsimp only
-  rw [weightedGeneralizeBOperator_sub]
+  simp only [weightedGeneralizeBLeftOperatorAtPolynomial,
+    weightedGeneralizeBRightOperatorAtPolynomial, opTensor_sub_left]
   rw [conjTranspose_opTensor, opTensor_mul]
   rw [polynomialWeightSqrtOperator_conjTranspose,
     polynomialWeightSqrtOperator_mul_self]
@@ -449,21 +435,6 @@ lemma globalVarianceDeviationAtPolynomial_eq_two_pointConditionedGlobalVarianceA
   exact weightedNormDeviation_eq_pointConditionedDifferenceAvg params strategy G g
     (independentPointPair params)
 
-private lemma pointConditionedLocalVarianceAtPolynomial_nonneg
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
-    0 ≤ pointConditionedLocalVarianceAtPolynomial params strategy G g := by
-  unfold pointConditionedLocalVarianceAtPolynomial localVariance
-  exact mul_nonneg (by norm_num)
-    (avgOver_nonneg (rerandomizeCoord params) _ fun uv =>
-      ev_adjoint_self_nonneg (weightedPolynomialState params strategy G g)
-        (leftTensor (ι₂ := ι)
-          (pointConditionedOutcomeOperatorAtPolynomial params strategy g uv.1) -
-        leftTensor (ι₂ := ι)
-          (pointConditionedOutcomeOperatorAtPolynomial params strategy g uv.2)))
-
 /-- A bound on the edgewise weighted norm expression implies the corresponding
 bound on the local variance. The factor `1/2` in `localVariance` only strengthens
 the estimate. -/
@@ -477,7 +448,15 @@ lemma pointConditionedLocalVarianceAtPolynomial_le_of_deviation
   have heq :=
     localVarianceDeviationAtPolynomial_eq_two_pointConditionedLocalVarianceAtPolynomial
       params strategy G g
-  have hnonneg := pointConditionedLocalVarianceAtPolynomial_nonneg params strategy G g
+  have hnonneg : 0 ≤ pointConditionedLocalVarianceAtPolynomial params strategy G g := by
+    unfold pointConditionedLocalVarianceAtPolynomial localVariance
+    exact mul_nonneg (by norm_num)
+      (avgOver_nonneg (rerandomizeCoord params) _ fun uv =>
+        ev_adjoint_self_nonneg (weightedPolynomialState params strategy G g)
+          (leftTensor (ι₂ := ι)
+            (pointConditionedOutcomeOperatorAtPolynomial params strategy g uv.1) -
+          leftTensor (ι₂ := ι)
+            (pointConditionedOutcomeOperatorAtPolynomial params strategy g uv.2)))
   calc
     pointConditionedLocalVarianceAtPolynomial params strategy G g
         ≤ localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
