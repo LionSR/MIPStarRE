@@ -126,24 +126,6 @@ theorem oneNaimarkAuxState_isNormalized (Outcome : Type u)
     (oneNaimarkAuxState Outcome).IsNormalized := by
   exact PureState.toQuantumState_isNormalized (oneNaimarkAuxPureState Outcome)
 
-/-- A finite double sum against a single matrix unit picks out the selected
-matrix coordinate. -/
-private lemma sum_if_pair_eq {d : Type u} [Fintype d] [DecidableEq d]
-    (F : d → d → ℂ) (i j : d) :
-    (∑ x : d, ∑ y : d, if j = x ∧ i = y then F y x else 0) = F i j := by
-  classical
-  rw [Finset.sum_eq_single j]
-  · rw [Finset.sum_eq_single i]
-    · simp
-    · intro y _ hyi
-      simp [show i ≠ y by exact fun h => hyi h.symm]
-    · intro hi
-      simp at hi
-  · intro x _ hxj
-    simp [show j ≠ x by exact fun h => hxj h.symm]
-  · intro hj
-    simp at hj
-
 /-- The one-measurement preservation identity identifies the `⊥,⊥`
 compression block of the dilated projector with the original effect. -/
 theorem OneMeasNaimarkData.compression_none_none
@@ -163,9 +145,24 @@ theorem OneMeasNaimarkData.compression_none_none
   have hOutcome : (Fintype.card (Option Outcome) : ℂ) ≠ 0 := by
     exact_mod_cast Fintype.card_ne_zero
   field_simp [hd, hOutcome] at h
-  rw [sum_if_pair_eq (fun y x => data.source.effect a y x) i j] at h
+  have hsum_if_pair_eq :
+      ∀ F : d → d → ℂ,
+        (∑ x : d, ∑ y : d, if j = x ∧ i = y then F y x else 0) = F i j := by
+    intro F
+    rw [Finset.sum_eq_single j]
+    · rw [Finset.sum_eq_single i]
+      · simp
+      · intro y _ hyi
+        simp [show i ≠ y by exact fun h => hyi h.symm]
+      · intro hi
+        simp at hi
+    · intro x _ hxj
+      simp [show j ≠ x by exact fun h => hxj h.symm]
+    · intro hj
+      simp at hj
+  rw [hsum_if_pair_eq (fun y x => data.source.effect a y x)] at h
   rw [← Finset.mul_sum] at h
-  rw [sum_if_pair_eq (fun y x => data.liftedEffect (some a) (y, none) (x, none)) i j] at h
+  rw [hsum_if_pair_eq (fun y x => data.liftedEffect (some a) (y, none) (x, none))] at h
   have hc : (↑(Fintype.card Outcome) + 1 : ℂ) ≠ 0 := by
     positivity
   exact mul_left_cancel₀ hc (by
