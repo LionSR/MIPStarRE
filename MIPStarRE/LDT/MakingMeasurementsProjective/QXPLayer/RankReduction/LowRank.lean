@@ -194,25 +194,6 @@ private lemma projectiveLowRankSum_truncationOverlap_eq_ev_sum {Outcome : Type u
     _ = ev ψ (∑ a, R.outcome a) := by
           rw [ev_sum]
 
-/-- Evaluate the scalar total bound from the rounding witness on a normalized
-state, rewriting the truncation error as `√ζ`. -/
-private lemma projectiveLowRankSum_eval_totalBound {ι : Type uι}
-    [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι) (hψ : ψ.IsNormalized) (ζ : Error) :
-    ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
-      (1 : MIPStarRE.Quantum.Op ι)) =
-      1 + 2 * Real.sqrt ζ := by
-  calc
-    ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
-        (1 : MIPStarRE.Quantum.Op ι))
-        = (1 + 2 * spectralTruncationError ζ) *
-            ev ψ (1 : MIPStarRE.Quantum.Op ι) :=
-          ev_scale ψ (1 + 2 * spectralTruncationError ζ)
-            (1 : MIPStarRE.Quantum.Op ι)
-    _ = 1 + 2 * Real.sqrt ζ := by
-          rw [ev_one_of_isNormalized ψ hψ, spectralTruncationError_eq_sqrt ζ]
-          ring
-
 /-- The squared-distance defect between the rounded family `R` and its truncated
 subprojector family is exactly the discarded rank-one overlap mass. -/
 private lemma projectiveLowRankSum_qSDD_truncation_eq_compl_overlap
@@ -363,8 +344,21 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
         _ ≤ ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ) : ℂ) •
             (1 : MIPStarRE.Quantum.Op ι)) := hev_le
         _ = 1 + 2 * Real.sqrt ζ := by
-              simpa using projectiveLowRankSum_eval_totalBound
-                (ψ := ψ) (hψ := hψ) (ζ := ζ)
+              have h :
+                  ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
+                    (1 : MIPStarRE.Quantum.Op ι)) =
+                    1 + 2 * Real.sqrt ζ := by
+                calc
+                  ev ψ ((((1 : Error) + 2 * spectralTruncationError ζ : Error) : ℂ) •
+                      (1 : MIPStarRE.Quantum.Op ι))
+                      = (1 + 2 * spectralTruncationError ζ) *
+                          ev ψ (1 : MIPStarRE.Quantum.Op ι) :=
+                        ev_scale ψ (1 + 2 * spectralTruncationError ζ)
+                          (1 : MIPStarRE.Quantum.Op ι)
+                  _ = 1 + 2 * Real.sqrt ζ := by
+                        rw [ev_one_of_isNormalized ψ hψ, spectralTruncationError_eq_sqrt ζ]
+                        ring
+              simpa using h
     have hsmall : (∑ x ∈ (Largeᶜ : Finset Idx), overlap x) ≤ 4 * Real.sqrt ζ :=
       Truncation.sum_small_le_four_sqrt (α := Idx) Large
         (hL_card := hLarge_card) (hcard_gt := hcard_gt) (hr_bound := hr_bound)
