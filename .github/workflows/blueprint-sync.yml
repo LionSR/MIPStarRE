@@ -14,7 +14,6 @@ on:
       - 'scripts/blueprint_leanok_axioms.py'
       - 'scripts/tex_utils.py'
       - 'scripts/tests/**'
-      - '.github/actions/setup-lean/**'
       - '.github/workflows/blueprint-sync.yml'
   workflow_dispatch:
 
@@ -55,7 +54,7 @@ jobs:
         if: >-
           github.event_name == 'workflow_dispatch' ||
           steps.axiom-audit-needed.outputs.needs_axiom_audit == 'true'
-        uses: ./.github/actions/setup-lean
+        uses: texra-ai/lean-env-action@6a03d2aa517a2ee67f71be460210310b3d48d70e
 
       - name: Build MIPStarRE
         if: >-
