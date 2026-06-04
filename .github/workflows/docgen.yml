@@ -75,13 +75,13 @@ jobs:
           build: true
 
       - name: Install TeX and graphviz
-        uses: ./.github/actions/setup-blueprint-system-deps
+        uses: texra-ai/lean-env-action/blueprint-system-deps@main
         with:
           cache-suffix: pdf-v1
           extra-packages: texlive-xetex texlive-science latexmk
 
       - name: Install leanblueprint
-        uses: ./.github/actions/setup-leanblueprint
+        uses: texra-ai/lean-env-action/leanblueprint@main
 
       - name: Build blueprint
         working-directory: blueprint

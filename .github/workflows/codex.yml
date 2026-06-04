@@ -74,7 +74,7 @@ jobs:
           git config --global user.name "chatgpt-codex-connector[bot]"
 
       - name: Set up Lean toolchain and cache
-        uses: ./.github/actions/setup-lean
+        uses: texra-ai/lean-env-action@main
         with:
           install-blueprint: 'true'
 

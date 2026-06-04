@@ -9,7 +9,6 @@ on:
       - 'lakefile.*'
       - 'lean-toolchain'
       - 'lake-manifest.json'
-      - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
       - 'scripts/tex_utils.py'
@@ -21,7 +20,6 @@ on:
       - 'lakefile.*'
       - 'lean-toolchain'
       - 'lake-manifest.json'
-      - '.github/actions/setup-lean/**'
       - '.github/workflows/lint-blueprint.yml'
       - 'blueprint/src/**'
       - 'scripts/tex_utils.py'
@@ -118,7 +116,7 @@ jobs:
       - name: Set up Lean toolchain
         continue-on-error: true
         id: lean-setup
-        uses: ./.github/actions/setup-lean
+        uses: texra-ai/lean-env-action@main
 
       - name: Generate lean_decls from blueprint .tex files
         if: steps.lean-setup.outcome == 'success'
