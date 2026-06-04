@@ -61,8 +61,9 @@ jobs:
 
       - name: Set up Lean toolchain and cache
         uses: texra-ai/lean-env-action@main
-        with:
-          install-blueprint: 'true'
+
+      - name: Install leanblueprint
+        uses: texra-ai/lean-env-action/leanblueprint@main
 
       - name: Run Claude Code
         id: claude
