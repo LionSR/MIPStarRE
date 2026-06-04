@@ -116,7 +116,7 @@ jobs:
       - name: Set up Lean toolchain
         continue-on-error: true
         id: lean-setup
-        uses: texra-ai/lean-env-action@main
+        uses: texra-ai/lean-env-action@6a03d2aa517a2ee67f71be460210310b3d48d70e
 
       - name: Generate lean_decls from blueprint .tex files
         if: steps.lean-setup.outcome == 'success'

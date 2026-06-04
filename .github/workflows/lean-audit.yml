@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 1
 
       - name: Set up Lean toolchain and cache
-        uses: texra-ai/lean-env-action@main
+        uses: texra-ai/lean-env-action@6a03d2aa517a2ee67f71be460210310b3d48d70e
 
       - name: Run Lean Audit
         uses: ./.github/actions/claude-code-with-provider
