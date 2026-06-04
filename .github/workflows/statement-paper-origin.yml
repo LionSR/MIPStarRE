@@ -47,6 +47,7 @@ jobs:
       - name: Surface violations in step summary
         if: always()
         run: |
+          # shellcheck disable=SC2016  # literal backticks are intentional markdown for the step summary
           {
             echo "### Statement-like paper-origin guard"
             echo
