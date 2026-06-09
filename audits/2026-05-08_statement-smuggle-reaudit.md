@@ -112,7 +112,7 @@ explicit tracking entry.
 | 36 | `SdpStatement` | `SelfImprovement/Theorems/Statements.lean:78` | `Results/HelperCompleteness/Bracketed.lean:520` (`sdp` lemma) | downstream of #1230 helper-completeness chain | #1230 | **G**, connected (verified 2026-05-08). |
 | 37 | `SdpStatementWithSlackness` | `SelfImprovement/Theorems/Statements.lean:89` | `SdpMatrixBridge.lean:335, 358, 402` | downstream of #1230 | #1230 | **G**, connected. |
 | 38 | `PolishchukSpielmanClassicalSoundnessStatement` | `Test/MainTheorem/ClassicalAndBase.lean:112` | external citation | `ClassicalAndBase.lean:149` (consumed by classical-soundness theorem) | A6 §"Acceptable" | **E** — Polishchuk–Spielman external paper. Not to be formalized. Audit-clean. |
-| 39 | `RazSafraSoundnessStatement` | `Test/MainTheorem/ClassicalAndBase.lean:94` | external citation | `ClassicalAndBase.lean:130` (consumed by `razSafra`) | A6 §"Acceptable" | **E** — Raz–Safra external paper. Not to be formalized. Audit-clean. |
+| 39 | retired surface-versus-point external interface | `Test/MainTheorem/ClassicalAndBase.lean:94` at the audited snapshot | external citation | consumed by the retired surface-versus-point wrapper at the audited snapshot | A6 §"Acceptable" | **D** — retired from the active Lean tree; the current low individual degree formalization route does not use this external result. |
 
 ## Summary by chapter
 
@@ -125,19 +125,18 @@ explicit tracking entry.
 | MakingMeasurementsProjective | 5 | 3 G + 2 T (Naimark, SpectralTruncation = #1032) |
 | Pasting | 13 | 13 G |
 | **SelfImprovement** | **6** | 5 G + **1 D** (`MatrixAddInUTransferStatement`) |
-| Test/MainTheorem | 2 | 2 E |
-| **Total** | **39** | **33 G + 2 T + 2 E + 1 P + 1 D** |
+| Test/MainTheorem | 2 | 1 E + 1 D |
+| **Total** | **39** | **33 G + 2 T + 1 E + 1 P + 2 D** |
 
 ## Overall verdict (under A6)
 
 **Under the existing A6 discipline, the pattern is sound; the bookkeeping has
 lapsed.**
 
-- **38 of 39** Statements are either grounded (producer exists), tracked
+- **37 of 39** Statements are either grounded (producer exists), tracked
   (open issue documents the missing producer), or genuine external citations.
-- **1 of 39** was dead scaffolding at the audit snapshot:
-  `MatrixAddInUTransferStatement`, with zero producers and zero consumers.  It
-  has since been deleted from the active Lean tree.
+- **2 of 39** are now retired from the active tree: `MatrixAddInUTransferStatement`
+  and the former surface-versus-point external interface.
 
 **Verdict counts** (sum to 39):
 - **G** (grounded): 33 — including row 30 `ChernoffBernoulliMatrixStatement`
@@ -149,11 +148,12 @@ lapsed.**
   `SpectralTruncationStatement` (#1032).  In the active tree,
   `SpectralTruncationStatement` is produced directly by the spectral-truncation
   construction theorems named in the status note above.
-- **E** (genuine external citation): 2 — `RazSafraSoundnessStatement` and
+- **E** (genuine external citation): 1 —
   `PolishchukSpielmanClassicalSoundnessStatement`.
 - **P** (paper-faithful packaging): 1 — `NormalizationConditionStatement`.
-- **D** (dead): 1 at the audit snapshot — `MatrixAddInUTransferStatement`,
-  now removed.
+- **D** (dead or retired): 2 — `MatrixAddInUTransferStatement` and the former
+  surface-versus-point external interface, both now removed from the active
+  Lean tree.
 
 ## Strengthened policy (per maintainer 2026-05-08): "earn your place"
 

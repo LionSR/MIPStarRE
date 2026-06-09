@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
-r"""Decide whether blueprint sync needs the heavy Lean axiom audit.
+r"""Decide whether a blueprint-facing diff needs the heavy Lean axiom audit.
 
-The blueprint sync workflow has two logically separate duties:
+There are two logically separate blueprint checks:
 
 * the fast surface check that ``\lean{...}`` references match Lean declarations;
 * the expensive proof-status check that builds Lean and audits proof-level
   ``\leanok`` declarations for ``sorryAx``.
 
-The second duty is only needed when Lean source, Lean-facing project metadata,
-or the blueprint formalization markers change.  A proof-dependency edit such as
-adding ``\uses{...}`` does not change the set of declarations whose axiom
+This helper classifies when the second check is mathematically relevant.  The
+pull-request surface-sync workflow uses the result for reporting; the full
+``scripts/blueprint_leanok_axioms.py --ci`` audit is run locally or in a Lean
+environment with enough disk for toolchain setup.  A proof-dependency edit such
+as adding ``\uses{...}`` does not change the set of declarations whose axiom
 closure is claimed by the blueprint, so it does not need a full Lean build.
 """
 

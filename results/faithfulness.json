@@ -1,0 +1,58 @@
+[
+  {
+    "decl": "scripts/Checkdecls.lean (checkdecls executable)",
+    "term": "unsafe def main : IO UInt32 (V2-unsafe)",
+    "claim": "the lone HIGH static finding (unsafe) is NOT a soundness vector for the headline",
+    "finding": "The deterministic static scan emits one HIGH finding, V2-unsafe at scripts/Checkdecls.lean:39, and on that basis its mechanical floor verdict is UNSOUND-VECTOR. This is a FALSE POSITIVE for the headline. scripts/Checkdecls.lean is the standalone `checkdecls` build-tooling executable (a separate lean_exe target, srcDir=scripts, supportInterpreter=true); `unsafe def main : IO UInt32` is the ordinary interpreter-backed CLI entry point. It is NOT imported by the MIPStarRE math library and is categorically incapable of backing a kernel-checked proof. The decisive kernel `#print axioms` audit confirms the headline theorems' closures contain only {propext, Classical.choice, Quot.sound} with no trace of it. Verdict overridden by the kernel audit per the skill's 'you are the detector' / 'escalate only when in the headline's closure' guidance.",
+    "severity": "INFO",
+    "evidence": "scripts/Checkdecls.lean:39 unsafe def main; lakefile.toml:20 [[lean_exe]] checkdecls srcDir=scripts; grep shows no import of Checkdecls in MIPStarRE/; #print axioms mainFormal = [propext, Classical.choice, Quot.sound]"
+  },
+  {
+    "decl": "MIPStarRE.LDT.Basic.constSubMeasFamily (used in mainFormal self-consistency conclusion)",
+    "term": "def constSubMeasFamily A := fun _ => A (V4-alias-weak)",
+    "claim": "the constSubMeasFamily alias does NOT trivialize the self-consistency conclusion",
+    "finding": "The static scan flags V4-alias-weak (MEDIUM) on `def constSubMeasFamily (A : SubMeas a i) : IdxSubMeas Unit a i := fun _ => A`. Investigated: this is a legitimate constant one-question family constructor, not a content-dropping alias. In mainFormal's third conclusion `ConsRel psi (uniformDistribution Unit) (constSubMeasFamily G_A.toSubMeas) (constSubMeasFamily G_B.toSubMeas) nu`, it reduces (single Unit question) to `qBipartiteConsDefect psi G_A.toSubMeas G_B.toSubMeas <= nu` — exactly the paper's self-consistency relation G^A_g (x) I ~=_nu I (x) G^B_g, with the polynomial-measurement content G_A, G_B fully preserved. The Unit distribution faithfully expresses a single (un-averaged) consistency relation via the same ConsRel machinery. Benign; not a trivialization.",
+    "severity": "INFO",
+    "evidence": "SubMeasurementFamilies.lean:451 def constSubMeasFamily ... := fun _ => A; MainFormal.lean:459-462 third conclusion; Test/Defs.lean:212 ConsRel"
+  },
+  {
+    "decl": "MIPStarRE.LDT.Test.mainFormal",
+    "term": "kernel axiom closure (soundness)",
+    "claim": "the proof is real: kernel-accepted with only the standard axioms",
+    "finding": "POSITIVE / no defect. Independent `#print axioms` (run directly via `lake env lean`) and the repo's own collectAxioms-based `assert_standard_axioms` (AxiomAudit.lean built clean, exit 0) both show that the headline theorem `mainFormal` depends on EXACTLY {propext, Classical.choice, Quot.sound}. No `sorryAx`, no custom axiom, no `native_decide`/`ofReduceBool`, no `unsafe`, no `debug.skipKernelTC`. The whole induction engine (`mainInduction`, `answerMainInduction`, `selfImprovement`, pasting) is likewise axiom-clean. The textual 'sorry' hits in the repo are prose inside audit docstrings, not proof terms.",
+    "severity": "INFO",
+    "evidence": "lake env lean #print axioms -> [propext, Classical.choice, Quot.sound]; AxiomAudit.lean elab assert_standard_axioms uses Lean.collectAxioms + throwError; `lake build MIPStarRE.LDT.Test.AxiomAudit` succeeds"
+  },
+  {
+    "decl": "MIPStarRE.LDT.Test.mainFormal",
+    "term": "mainFormalError vs paper's nu",
+    "claim": "the Lean error bound faithfully reproduces the paper's nu",
+    "finding": "POSITIVE / no weakening. mainFormalError = 100000*k^2*m^4*(eps^(1/40000)+(d/q)^(1/40000)+exp(-k/(2560000*m^2))) is character-identical to the paper's nu (test_definition.tex:178). The loose-looking shape (huge k^2 m^4 prefactor, brutal 1/40000-th roots; the bound exceeds 1 for essentially all non-asymptotic parameters and is meaningful only as eps->0 with q>>d) is the PAPER's own bound, which the paper explicitly defends ('choosing k=poly(m) should be more than sufficient'). It is NOT a Lean degradation, so it is not a weakening of the conclusion's quantitative content.",
+    "severity": "INFO",
+    "evidence": "MIPStarRE/LDT/Test/MainTheorem/ScalarBounds/Definitions.lean:27 vs references/ldt-paper/test_definition.tex:178"
+  },
+  {
+    "decl": "MIPStarRE.LDT.Test.mainFormal",
+    "term": "hypothesis k >= 400*m*d (paper prints k >= m*d)",
+    "claim": "the Lean strengthens the paper's printed hypothesis on k",
+    "finding": "FAITHFULNESS DELTA, documented + justified. The Lean requires k>=400md where the paper prints k>=md, narrowing applicability on the interval [md,400md). This is a confirmed correction of a genuine gap in the PAPER's own proof: the pasting theorem used in the successor step needs k>=400md, which k>=(m+1)d does not imply (e.g. m=1,k=2d). The project proves the discarded interval is NOT vacuous and explicitly refuses to close it via the trivial branch ('it should not be replaced by a hidden assumption on the paper-facing theorem'), instead correcting the statement and documenting it. Not concealment; the Lean proves a slightly narrower, corrected theorem than the literal printed one.",
+    "severity": "LOW",
+    "evidence": "MainFormal.lean:310 hk : 400*params.m*params.d <= k; test_definition.tex:183 'Let k >= md'; docs/paper-gaps/issue-906-main-formal-k-bound.tex (Section 'Non-vacuity of the discarded printed interval')"
+  },
+  {
+    "decl": "MIPStarRE.LDT.Test.mainFormal",
+    "term": "added hypothesis 0 < k",
+    "claim": "the Lean adds a positivity hypothesis the paper lacks",
+    "finding": "FAITHFULNESS DELTA, documented + justified. The Lean adds 0<k, absent from the printed statement. Justified: at d=0,k=0 the printed k>=md is satisfiable while the printed nu collapses to exactly 0 (mainFormalError_zero_k), forcing EXACT consistency that a test-passing strategy need not satisfy. issue-422 gives an explicit counterexample (m=1,d=0,k=0,eps=1: a non-constant point measurement passes vacuously but cannot equal any constant degree-0 polynomial measurement at two points). So the paper's literal statement is FALSE at that boundary and the Lean's 0<k corrects it. A statement-level correction, not a weakening that hollows the theorem.",
+    "severity": "LOW",
+    "evidence": "MainFormal.lean:311 hk0 : 0 < k; MainTheorem/ScalarBounds/Definitions.lean:39 mainFormalError_zero_k : mainFormalError params 0 eps = 0; docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex"
+  },
+  {
+    "decl": "MIPStarRE.LDT.Test.mainFormal",
+    "term": "hypothesis predicate PassesLowIndividualDegreeTest and conclusion predicate ConsRel",
+    "claim": "the hypothesis and conclusion predicates are genuine (not trivially/aliased-defined)",
+    "finding": "POSITIVE / no triviality. PassesLowIndividualDegreeTest := lowIndividualDegreeFailureProbability <= eps, where the failure probability is the average of three real test branches (axis-parallel, point-agreement/self-consistency, diagonal), each a genuine bipartiteConsError; not `True`. ConsRel ... delta := bipartiteConsError <= delta, the paper's Def 4.8 off-diagonal consistency defect E_{x~D} sum_{a!=b} <psi| A^x_a (x) B^x_b |psi>; not trivially 0. Parameters carries m>=1 and q a prime power >=2. The only trivial branch (mainFormalError>=1) is the paper's saturated-error regime, legitimately closed because bipartiteConsError<=1 for normalized states; it does not use the test-pass hypothesis, which is correct there.",
+    "severity": "INFO",
+    "evidence": "StrategyFailures.lean:371 + 354; Test/Defs.lean:212 ConsRel/offDiagonalBound; ParametersBase.lean:36; MainFormal.lean:83 mainFormal_trivial_witness via bipartiteConsError_uniform_le_one"
+  }
+]

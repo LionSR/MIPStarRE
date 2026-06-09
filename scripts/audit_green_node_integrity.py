@@ -72,11 +72,11 @@ ALLOWED_SOURCE_WARNINGS = {
     ),
     (
         "prop:main-formal-source-reduction",
-        "MIPStarRE.LDT.Test.mainFormal_sourceConclusion",
+        "MIPStarRE.LDT.Test.mainFormalConclusion",
     ),
     (
         "prop:main-formal-source-small-error",
-        "MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion",
+        "MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion",
     ),
 }
 

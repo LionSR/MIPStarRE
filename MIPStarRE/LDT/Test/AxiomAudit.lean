@@ -2,17 +2,16 @@ import Lean
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
-import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
 import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
+import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
-import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 import MIPStarRE.LDT.Test.MainTheorem.MainFormal
-import MIPStarRE.LDT.Test.StrategyBiProj.SameSpace
 import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
 import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
 
@@ -66,19 +65,18 @@ good-strategy hypotheses by using the selected Cauchy--Schwarz chain and the
 global-variance estimate.  The reduced `addInU` lemma remains only a downstream
 specialization.
 
-The audit for `Test.mainFormal` records that the current same-space, corrected
-large-`k` interface has no connection, residual, repair, data, or obligation hypotheses,
-and its proof is assembled from named construction targets.  The same-space
-restriction is documented in
-`docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex`; the
-large-`k` and `k > 0` scalar-cascade boundary is documented in
-`docs/paper-gaps/issue-906-main-formal-k-bound.tex`.  After the
-projective-completion refactor, the active `mainFormal` cascade routes through
-`MainInductionStep.mainInduction` via `strategySymmetrization_mainInduction`.
-The base case is proved by `mainInductionBaseCase`, while the arbitrary
-non-base branch merely decomposes the parameters and invokes the native
-successor-step theorem `mainInductionSuccessorNext`, whose nontrivial branch
-is the named construction theorem
+The audit for `Test.mainFormal` records that the current two-space, corrected
+large-`k` interface has no connection, residual, repair, data, or obligation
+hypotheses.  The large-`k` and `k > 0` scalar-cascade boundary is documented in
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and
+`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`.  Its proof routes
+through the heterogeneous role-register symmetrization and the checked theorem
+`MainInductionStep.mainInduction`.
+
+The base case of the induction theorem is proved by `mainInductionBaseCase`,
+while the arbitrary non-base branch merely decomposes the parameters and invokes
+the native successor-step theorem `mainInductionSuccessorNext`, whose nontrivial
+branch is the named construction theorem
 `mainInductionSuccessorNext_ofSmallErrorConstruction`.  That ordinary successor
 theorem now has no direct `sorry`; it calls the internal simultaneous
 answer-valued induction theorem `MainInductionStep.answerMainInduction`.  The
@@ -106,18 +104,10 @@ ordinary large-error branch.  The answer-valued successor slice theorem
 local recursive application to every restricted slice once the predecessor
 answer-valued induction hypothesis is in scope.  Thus the former transitive
 `sorryAx` dependency has been removed from the current `mainFormal` path.  The
-source-boundary declarations audited below are now standard-axiom clean under the
-corrected large-`k` and nonzero sampling hypotheses.
-
-The corrected source statement `MainInductionStep.mainInduction_sourceStatement`
-is audited with standard kernel axioms only.  The paper prints the weaker
-hypothesis `k ≥ md`, but the project records the missing factor `400` as a
-confirmed theorem-level correction rather than as proof debt.
-The final theorem source-boundary declaration proves the saturated-error branch,
-while its small-error branch calls the checked role-register scalar-boundary
-theorem under the corrected nonzero sampling hypothesis.  The zero-sampling
-boundary tracked by #422 is now removed from the source theorem statement by the
-explicit hypothesis `0 < k`.
+final theorem proves the saturated-error branch, while its small-error branch
+calls the checked role-register scalar-boundary theorem under the corrected
+nonzero sampling hypothesis.  The zero-sampling boundary tracked by #422 is
+removed from the source theorem statement by the explicit hypothesis `0 < k`.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -154,10 +144,8 @@ of `MainInductionStep.answerMainInduction`.  The checked reduction
 reduces the successor branch to the answer-valued pasting theorem
 `MainInductionStep.answerLdPastingInInductionSectionOfSmallError`, which is now
 standard-axiom clean.
-The transitive audit also records the exact downstream Section 6 and Section 3
-handoff: `mainInductionSuccessor`, `mainInduction`,
-`strategySymmetrization_mainInduction`, and
-`MainFormalRoleInductionWitness.ofMainInduction` are standard-axiom clean.
+The transitive audit also records the exact downstream Section 6 handoff:
+`mainInductionSuccessor` and `mainInduction` are standard-axiom clean.
 
 The answer-carrier reductions
 `MainInductionStep.mainInductionSuccessorNext_ofAnswerCarrier`,
@@ -260,8 +248,6 @@ elab "assert_no_sorry_axiom " id:ident : command => do
   if axioms.contains ``sorryAx then
     throwError m!"'{declName}' unexpectedly depends on `sorryAx`; axioms: {axioms.toList}"
 
-assert_standard_axioms MIPStarRE.LDT.Test.razSafra
-assert_no_sorry_axiom MIPStarRE.LDT.Test.RazSafraSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.PolishchukSpielmanClassicalSoundnessStatement
 assert_standard_axioms MIPStarRE.LDT.Test.classicalTestSoundness
 assert_no_sorry_axiom
@@ -273,8 +259,6 @@ assert_standard_axioms
   MIPStarRE.LDT.MakingMeasurementsProjective.OneMeasNaimarkData.twoSidedCorrelationPreservation
 assert_standard_axioms
   MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation
-assert_standard_axioms
-  MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement
 assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.roleRegisterSymmStrategy_sourceMainInduction
 assert_standard_axioms
@@ -326,10 +310,10 @@ assert_standard_axioms
 assert_standard_axioms
   MIPStarRE.LDT.ProjStrat.sourceRoleRegisterFinalPointConsistency
 assert_standard_axioms
-  MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary
-assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion
-assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceConclusion
-assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_sourceStatement
+  MIPStarRE.LDT.Test.mainFormalConclusion_ofRoleRegisterScalarBoundary
+assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion
+assert_standard_axioms MIPStarRE.LDT.Test.mainFormalConclusion
+assert_standard_axioms MIPStarRE.LDT.Test.mainFormal
 
 /-! Chapter 2 interfaces used by the final-theorem route.  These are
 foundational definitions and elementary API statements; the regression check is
@@ -339,10 +323,6 @@ assert_no_sorry_axiom MIPStarRE.LDT.Role.other
 assert_no_sorry_axiom MIPStarRE.LDT.ProjStrat
 assert_no_sorry_axiom MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability
 assert_no_sorry_axiom MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest
-assert_no_sorry_axiom MIPStarRE.LDT.SameSpaceProjStrat
-assert_no_sorry_axiom MIPStarRE.LDT.SameSpaceProjStrat.lowIndividualDegreeFailureProbability
-assert_no_sorry_axiom MIPStarRE.LDT.SameSpaceProjStrat.PassesLowIndividualDegreeTest
-assert_no_sorry_axiom MIPStarRE.LDT.SameSpaceProjStrat.toGeneralProjStrat
 assert_no_sorry_axiom MIPStarRE.LDT.SymStrat
 assert_no_sorry_axiom MIPStarRE.LDT.SymStrat.IsGood
 assert_no_sorry_axiom MIPStarRE.LDT.answer_diagonalFailureProbability_nonneg
@@ -406,7 +386,7 @@ assert_no_sorry_axiom
 assert_no_sorry_axiom MIPStarRE.LDT.lastDirectionLine
 assert_no_sorry_axiom MIPStarRE.LDT.lastDirectionMeasurementFamily
 assert_no_sorry_axiom MIPStarRE.LDT.RestrictedDiagonalSample
-assert_no_sorry_axiom MIPStarRE.LDT.Test.mainFormal_source_trivial_witness
+assert_no_sorry_axiom MIPStarRE.LDT.Test.mainFormal_trivial_witness
 assert_no_sorry_axiom
   MIPStarRE.LDT.MainInductionStep.RestrictedSymStrat.diagonalFailureProbability
 
@@ -433,11 +413,6 @@ end MIPStarRE.LDT.MakingMeasurementsProjective
 assert_no_sorry_axiom MIPStarRE.LDT.SelfImprovement.AddInUFullStatement
 assert_no_sorry_axiom
   MIPStarRE.LDT.SelfImprovement.addInUFullStatement_of_isGood
-assert_standard_axioms MIPStarRE.LDT.Test.mainFormal
-assert_standard_axioms
-  MIPStarRE.LDT.Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency
-assert_standard_axioms
-  MIPStarRE.LDT.Test.MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency
 -- Issue #1230 has been repaired for the public self-improvement theorem.
 assert_standard_axioms MIPStarRE.LDT.SelfImprovement.selfImprovement
 assert_standard_axioms MIPStarRE.LDT.GlobalVariance.globalVarianceOfPoints
@@ -596,23 +571,6 @@ assert_no_sorry_axiom MIPStarRE.LDT.MainInductionStep.mainInductionFromStageData
 assert_no_sorry_axiom
   MIPStarRE.LDT.MainInductionStep.mainInductionFromAnswerStageDataOfSmallError
 assert_standard_axioms MIPStarRE.LDT.MainInductionStep.mainInduction
-assert_standard_axioms
-  MIPStarRE.LDT.Test.strategySymmetrization_mainInduction
-assert_standard_axioms
-  MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInductionWitness
-assert_standard_axioms
-  MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofBaseCase
-assert_standard_axioms
-  MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.toRoleMeasurementWitness
-assert_standard_axioms
-  MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.roleWitness
-assert_standard_axioms MIPStarRE.LDT.Test.mainFormalBaseRoleInductionWitness
-assert_standard_axioms
-  MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction
-assert_standard_axioms
-  MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness
-assert_standard_axioms
-  MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness
 assert_standard_axioms MIPStarRE.LDT.Pasting.ldPastingDegreeZeroBranch
 assert_no_sorry_axiom MIPStarRE.LDT.Pasting.pointVerticalLineSdd_of_axis_self
 assert_no_sorry_axiom MIPStarRE.LDT.Pasting.ldGbcon_of_axis_self

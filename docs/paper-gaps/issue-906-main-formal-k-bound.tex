@@ -138,16 +138,16 @@ construction is used only when the final error parameter is already at least
 \(1\), in which case the consistency conclusion is saturated.
 \footnote{After the 2026-05-22 statement correction, the source-labelled
 blueprint theorem for main induction links to the corrected Lean statement
-\leanid{MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement}.  The
+\leanid{MIPStarRE.LDT.MainInductionStep.mainInduction}.  The
 main formal source theorem links to
-\leanid{MIPStarRE.LDT.Test.mainFormal_sourceStatement}.  The final source
+\leanid{MIPStarRE.LDT.Test.mainFormal}.  The final source
 theorem routes through the named source-boundary reduction
-\leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion}; its
+\leanid{MIPStarRE.LDT.Test.mainFormalConclusion}; its
 saturated-error branch is proved, and its non-vacuous branch is
-\leanid{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion}.  The
+\leanid{MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion}.  The
 small-error branch is reduced to the checked role-register scalar absorption
 theorem under the corrected nonzero sampling hypothesis
-\leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary}.
+\leanid{MIPStarRE.LDT.Test.mainFormalConclusion_ofRoleRegisterScalarBoundary}.
 The scalar lemma \leanid{MIPStarRE.LDT.Test.mainFormalError_zero_k} records
 that the displayed final-theorem error is exactly zero at \(k=0\).
 The Lean theorem \leanid{MIPStarRE.LDT.Test.mainFormal} assumes
@@ -185,7 +185,7 @@ takes the second option: the theorem statement is corrected to the large-\(k\)
 range.
 
 The same phenomenon occurs in the final theorem.  The source-boundary reduction
-\leanid{MIPStarRE.LDT.Test.mainFormal_sourceConclusion} proves the branch
+\leanid{MIPStarRE.LDT.Test.mainFormalConclusion} proves the branch
 \(\nu\ge 1\) by the trivial two-space consistency bound, but the source theorem
 also has a complementary branch in which
 \[

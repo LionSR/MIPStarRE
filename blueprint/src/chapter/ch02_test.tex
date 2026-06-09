@@ -11,7 +11,7 @@
 \end{definition}
 
 \begin{definition}[Low individual degree test]\label{def:low-individual-degree-test}
-	\lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest, MIPStarRE.LDT.SameSpaceProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.SameSpaceProjStrat.PassesLowIndividualDegreeTest}
+	\lean{MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability, MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest}
 	\leanok
 	\uses{def:roles}
 	Fix integers $m,d \ge 0$ and a prime power $q$. The $(m,q,d)$ low individual degree test has three equally likely subtests.
@@ -49,13 +49,8 @@
 \end{definition}
 
 \begin{definition}[General projective strategy]\label{def:projective-strategy}
-	\lean{MIPStarRE.LDT.ProjStrat, MIPStarRE.LDT.SameSpaceProjStrat, MIPStarRE.LDT.SameSpaceProjStrat.toGeneralProjStrat}
+	\lean{MIPStarRE.LDT.ProjStrat}
 	\leanok
-	% Lean separates the paper-faithful two-space container `ProjStrat ιA ιB`
-	% from the same-space, swap-symmetric surrogate `SameSpaceProjStrat ι` used by
-	% the current role-register symmetrization pipeline. Remaining follow-up work:
-	% build the heterogeneous direct-sum role symmetrization replacing the same-space
-	% `Role × ι` target in the Step 1 bridge.
 	A general projective strategy for the $(m,q,d)$ low individual degree test consists of a bipartite state $\ket{\psi} \in \mathcal H_{\mathrm A} \ot \mathcal H_{\mathrm B}$ together with point, axis-parallel line, and diagonal-line projective measurements for each prover separately. We write these measurements as $A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A}$ on the first prover and $A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B}$ on the second.
 \end{definition}
 
@@ -181,7 +176,7 @@
 \section{Formal soundness target}
 
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
-	\lean{MIPStarRE.LDT.Test.mainFormal_sourceStatement}
+	\lean{MIPStarRE.LDT.Test.mainFormal}
 	\leanok
 	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
 	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A},
@@ -211,7 +206,7 @@
 	\leanok
 	\uses{prop:main-formal-source-reduction, prop:main-formal-source-small-error}
 	The saturated-error branch is formalized by
-	\texttt{mainFormal\_source\_trivial\_witness}.  The remaining branch is the
+	\texttt{mainFormal\_trivial\_witness}.  The remaining branch is the
 	small-error source-boundary proposition
 	Proposition~\ref{prop:main-formal-source-small-error}.  The
 	factor \(400\) and the nonzero sampling condition are the corrected source
@@ -221,7 +216,7 @@
 \end{proof}
 
 \begin{proposition}[Source-boundary reduction for the final theorem]\label{prop:main-formal-source-reduction}
-	\lean{MIPStarRE.LDT.Test.mainFormal_sourceConclusion}
+	\lean{MIPStarRE.LDT.Test.mainFormalConclusion}
 	\leanok
 	This proposition records the saturated-error reduction for the corrected
 	two-space theorem
@@ -239,7 +234,7 @@
 \end{proof}
 
 \begin{proposition}[Small-error source-boundary conclusion for the final theorem]\label{prop:main-formal-source-small-error}
-	\lean{MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion}
+	\lean{MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion}
 	\leanok
 	This is the non-vacuous branch of the corrected two-space theorem.
 	It proves the conclusions of Theorem~\ref{thm:main-formal} under
@@ -256,17 +251,15 @@
 \end{proof}
 
 \begin{proposition}[Two-space role-register reduction for the source theorem]\label{prop:main-formal-source-two-space-role-register}
-	\lean{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary}
+	\lean{MIPStarRE.LDT.Test.mainFormalConclusion_ofRoleRegisterScalarBoundary}
 	\leanok
 	\uses{lem:heterogeneous-role-register-unsymmetrization}
 	The printed final theorem starts from a projective strategy on two possibly
-	different local Hilbert spaces.  The current checked formal interface
-	Theorem~\ref{thm:main-formal-current-interface} is stated for the same-space
-	interface.  The source proof uses the role-register symmetrization and then
-	unsymmetrizes the polynomial measurement.  Lean now formalizes this reduction
-	for the general two-space source strategy rather than assuming it as an
-	interface restriction.  The trace-level factor-two unsymmetrization estimate
-	for arbitrary heterogeneous role-register measurements is formalized in
+	different local Hilbert spaces.  The source proof uses the role-register
+	symmetrization and then unsymmetrizes the polynomial measurement.  Lean
+	formalizes this reduction for the general two-space source strategy.  The
+	trace-level factor-two unsymmetrization estimate for arbitrary heterogeneous
+	role-register measurements is formalized in
 	Lemma~\ref{lem:heterogeneous-role-register-unsymmetrization}.  The
 	heterogeneous role-register symmetrization may be fed into the source-shaped
 	main-induction theorem under the corrected large-\(k\) hypothesis
@@ -296,16 +289,16 @@
 \end{proposition}
 \begin{proof}
 	\proves{prop:main-formal-source-two-space-role-register}
-	\lean{MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary}
+	\lean{MIPStarRE.LDT.Test.mainFormalConclusion_ofRoleRegisterScalarBoundary}
 	\leanok
 	\uses{lem:heterogeneous-role-register-symmetrization, lem:heterogeneous-role-register-unsymmetrization}
-	\uses{thm:main-induction, thm:main-formal-current-interface}
+	\uses{thm:main-induction}
 	The proof is the linked heterogeneous role-register chain, ending in
-	\texttt{mainFormal\_sourceConclusion\_ofRoleRegisterScalarBoundary}.  It
+	\texttt{mainFormalConclusion\_ofRoleRegisterScalarBoundary}.  It
 	combines the source-shaped main-induction theorem, the heterogeneous
-	unsymmetrization estimates, projectivization on both local Hilbert spaces, the
-	completion and line-169 consistency steps, and the final scalar absorption
-	under the nonzero sampling boundary.
+	unsymmetrization estimates, the step making measurements projective on both
+	local Hilbert spaces, the completion and line-169 consistency steps, and the
+	final scalar absorption under the nonzero sampling boundary.
 \end{proof}
 
 \begin{remark}[Final-theorem zero-sampling boundary]\label{rem:main-formal-source-k-range-boundary}
@@ -321,66 +314,17 @@
 	\texttt{docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex}.
 \end{remark}
 
-\begin{theorem}[Current same-space formal interface]\label{thm:main-formal-current-interface}
-	\lean{MIPStarRE.LDT.Test.mainFormal}
-	\leanok
-	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
-	This is the currently linked Lean interface toward Theorem~\ref{thm:main-formal}.
-	It is not the printed theorem.  Compared with the paper statement, it uses the
-	documented large-\(k\) correction \(k\ge 400md\) and the scalar boundary
-	\(k>0\), and it is represented in Lean by the same-space strategy container
-	used by the present role-register symmetrization construction.  The corrected
-	two-space source theorem is recorded above; the literal printed interface
-	still differs by the large-\(k\) and nonzero-sampling corrections.
-	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A},
-	A^{\mathrm B}, B^{\mathrm B}, L^{\mathrm B})$ be a projective strategy in the
-	current same-space formal container that passes the $(m,q,d)$ low individual
-	degree test with probability at least \(1-\eps\). Let \(k>0\) with
-	\(k \ge 400\,md\), and define \(\nu\) by the same displayed expression as in
-	Theorem~\ref{thm:main-formal}.  Then the three consistency conclusions of
-	Theorem~\ref{thm:main-formal} hold for this restricted formal interface.
-\end{theorem}
-\begin{proof}
-	\leanok
-	\uses{thm:main-induction}
-	The proof follows the role-register route through the corrected large-\(k\)
-	induction interface.  This same-space corrected-range interface is now
-	proof-complete; it is still not the printed two-space source theorem.
-\end{proof}
-
-\begin{remark}[Internal witness form of the final transport]\label{rem:main-formal-final-transport}
-	The witness theorem is a Lean-only formally verified final-transport result: once the
-	Section~6 role witness and the post-role projective-completion witness have
-	been constructed from the hypotheses of Theorem~\ref{thm:main-formal}, it
-	derives the three consistency conclusions of the theorem.  It is not a
-	replacement statement for Theorem~\ref{thm:main-formal}, and it supplies no
-	additional hypothesis to the paper theorem.
-\end{remark}
-
 \begin{remark}[$k$-bound boundary for the public theorem]\label{rem:main-formal-k-boundary}
 	The paper statement uses the weaker hypothesis $k \ge md$, but the proof
 	invokes the Section~6 pasting theorem with side condition $k \ge 400\,md$.
-	This side condition is not implied by $k \ge md$. The current Lean interface,
-	Theorem~\ref{thm:main-formal-current-interface}, therefore records the
-	stronger large-$k$ assumption required by the pasting step, together with the
-	scalar-cascade boundary \(k>0\), rather than hiding the side-condition gap. The helper
+	This side condition is not implied by $k \ge md$.  The Lean theorem
+	therefore records the stronger large-$k$ assumption required by the pasting
+	step, together with the scalar-cascade boundary \(k>0\), rather than hiding
+	the side-condition gap.  The helper
 	\texttt{mainFormal\_trivial\_witness} remains only for already-saturated
 	branches where $\nu \ge 1$ makes the three $\simeq_\nu$ conclusions vacuous;
 	it is not a replacement for the zero-sampling boundary \(k=0\) when \(md=0\).
 	The source-boundary reduction proposition proves the saturated-error branch
 	and delegates the non-vacuous branch to the checked small-error proposition;
 	neither declaration is an extra hypothesis of Theorem~\ref{thm:main-formal}.
-\end{remark}
-
-\begin{remark}[Formal-interface boundary for the public theorem]\label{rem:main-formal-interface-boundary}
-	The printed theorem starts from a general projective strategy on possibly
-	different prover spaces.  The Lean declaration linked in
-	Theorem~\ref{thm:main-formal-current-interface} is the same-space interface
-	documented in
-	\texttt{docs/paper-gaps/issue-930-main-formal-interface-restrictions.tex}.
-	The source theorem, Theorem~\ref{thm:main-formal}, is linked to the
-	source-shaped Lean statement and is proof-complete under the corrected
-	boundary assumptions \(k\ge 400md\) and \(k>0\).  The current same-space
-	corrected-range interface remains a Lean-only intermediate theorem; it is
-	also proof-complete, but it is not the printed two-space source theorem.
 \end{remark}

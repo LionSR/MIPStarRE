@@ -1,0 +1,30 @@
+{
+  "ran": true,
+  "error": null,
+  "targets": {
+    "MIPStarRE.LDT.Test.mainFormal": {
+      "axioms": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "standard": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "sorry": [],
+      "compiler_trust": [],
+      "custom": [],
+      "clean": true
+    }
+  },
+  "unresolved": [],
+  "any_sorry": false,
+  "any_custom": false,
+  "any_compiler_trust": false,
+  "raw_output_tail": "'MIPStarRE.LDT.Test.mainFormal' depends on axioms: [propext, Classical.choice, Quot.sound]\n\n",
+  "targets_requested": [
+    "MIPStarRE.LDT.Test.mainFormal"
+  ]
+}

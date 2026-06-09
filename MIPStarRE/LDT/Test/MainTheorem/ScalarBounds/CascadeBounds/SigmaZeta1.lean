@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.ErrorCascade.EnvelopeBounds
+import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.EnvelopeBounds
 
 /-!
 # Error cascade — bounds for `σ` and `ζ₁`
@@ -6,7 +6,7 @@ import MIPStarRE.LDT.Test.ErrorCascade.EnvelopeBounds
 This module proves the tight and absorbing bounds for the first two cascade
 variables, `σ` and `ζ₁`.  The later variables `ζ₂`, `ζ₃`, and `ζ₄`, together
 with the top-level consolidator `errorCascade_le_mainFormalError`, are in the
-subsequent leaves of `Test.ErrorCascade.CascadeBounds`.
+subsequent leaves of `Test.MainTheorem.ScalarBounds.CascadeBounds`.
 
 The first cascade steps have three components:
 

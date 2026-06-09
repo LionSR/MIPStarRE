@@ -11,7 +11,7 @@ Scope: docs-only split plan for #907. No Lean files were edited.
 > holes were the
 > source-boundary obligations
 > `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
-> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`, together with
+> `MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion`, together with
 > `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
 > in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`, tracked by
 > #1507.  The split recommendations below should therefore be read as

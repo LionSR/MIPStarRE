@@ -16,10 +16,10 @@
 > `MIPStarRE.LDT.MainInductionStep.mainInductionSuccessorNext_ofSmallErrorConstruction`
 > tracked by #1507.  The source-labelled `thm:main-formal` and
 > `thm:main-induction` statements also have named source-boundary obligations,
-> respectively `mainFormal_sourceConclusion` and
+> respectively `mainFormalConclusion` and
 > `mainInduction_sourceRangeObligation`.
 > The final-theorem wrapper proves the saturated-error branch and leaves
-> `mainFormal_sourceSmallErrorConclusion` as the remaining direct final
+> `mainFormal_smallErrorConclusion` as the remaining direct final
 > source-boundary proof hole.
 >
 > **Status note, 2026-05-22.**  The corrected large-`k` Section 6 successor
@@ -47,7 +47,7 @@ The role-level orthonormalization input that used to feed `mainFormal` has been
 removed.  The final theorem no longer asks for the former role-level
 orthonormalization input record, nor for explicit left/right repair-input
 fields at the role residual.  Instead,
-`MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency`
+`retired diagonal orthonormalization witness route.nonempty_ofDiagonalConsistency`
 derives the pre-completion projective submeasurements directly from the
 line-130 cross consistency using
 `MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair`.

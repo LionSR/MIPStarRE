@@ -12,7 +12,7 @@ Date: 2026-05-07
 > cleanup also removed
 > `MainFormalCascadeRolePackageResidualProjectiveCompletionResidual`; the active
 > construction target is now
-> `MainFormalProjectiveCompletionTransportWitness`.
+> `retired final-transport witness route`.
 >
 > **Status note, 2026-05-15.**  The exact line-169 match-mass branch has been
 > removed from the active `mainFormal` path.  The post-role diagonal completion
@@ -22,7 +22,7 @@ Date: 2026-05-07
 >
 > **Status note, 2026-05-15.**  The Step 3 factor-two unsymmetrization record
 > has been renamed from `UnsymmetrizationBridgePackage` to
-> `UnsymmetrizationConsistency`.  This is not a change of mathematical content:
+> `retired same-carrier unsymmetrization consistency route`.  This is not a change of mathematical content:
 > the record is a proved consistency statement derived from the role-register
 > estimate, not an additional bridge hypothesis.
 >
@@ -30,18 +30,18 @@ Date: 2026-05-07
 > of the final-theorem repair.  The current source statement
 > `thm:main-formal` is no longer linked to a conditional Lean theorem; the
 > same-space Lean interface is recorded separately as
-> `thm:main-formal-current-interface`.  The same-space theorem
+> the retired Lean-only main-formal interface node.  The same-space theorem
 > `MIPStarRE.LDT.Test.mainFormal` has no bridge, residual, package, or
 > obligation hypotheses.  At this date its remaining `sorryAx` dependency was
 > transitive through `MIPStarRE.LDT.MainInductionStep.mainInduction`; the
 > later 2026-05-22 update below records that the corrected large-\(k\)
 > successor construction has since been proved.
 > The source-labelled blueprint entry `thm:main-formal` is now recorded as
-> `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
-> wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` for the printed
+> `MIPStarRE.LDT.Test.mainFormal`, which calls the named
+> wrapper `MIPStarRE.LDT.Test.mainFormalConclusion` for the printed
 > two-space, `k >= md` statement.  This wrapper proves the saturated-error
 > branch and leaves
-> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` as the direct
+> `MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion` as the direct
 > final-theorem source-boundary proof hole.
 > The former `MainFormalRolePackageBranchResidual`,
 > `successorSelfImprovementObligations`,
@@ -63,7 +63,7 @@ Date: 2026-05-07
 > historical: the corrected large-\(k\) Section 6 successor branch has since
 > been proved, and the live final-theorem frontier has the two pieces listed in
 > the next status note.  The saturated branch is already proved by
-> `mainFormal_source_trivial_witness`, and the small-error branch is not
+> `mainFormal_trivial_witness`, and the small-error branch is not
 > vacuous: the \(md\le k<400md\) interval can still have
 > `mainFormalError params k eps < 1`.
 >
@@ -73,14 +73,14 @@ Date: 2026-05-07
 > `prop:main-formal-source-two-space-role-register` and
 > `prop:main-formal-source-k-range-boundary`.  The direct Lean proof holes are
 > `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`
-> and `Test.mainFormal_sourceSmallErrorConclusion`.
+> and `Test.mainFormal_smallErrorConclusion`.
 >
 > **Status note, 2026-05-23.**  That final-theorem frontier is now historical.
 > The factor \(400\) in the large-\(k\) hypothesis is treated as a confirmed
 > correction to the printed statement, and the final theorem explicitly assumes
 > the nonzero-sampling boundary \(0<k\).  Under these corrected source
 > hypotheses, the two-space source-boundary route is checked; the older
-> `mainInduction_sourceRange*` and `mainFormal_source*Obligation` names below
+> former source-range and main-formal obligation names below
 > refer to retired wrappers rather than live proof holes.
 >
 > **Update, 2026-05-21.**  The first state and measurement pieces of the
@@ -121,7 +121,7 @@ Date: 2026-05-07
 > applies the source-shaped main-induction theorem to the heterogeneous
 > role-register symmetrization under the paper hypothesis \(k\ge md\).  This
 > handoff inherits the source-range `sorryAx` from
-> `MainInductionStep.mainInduction_sourceStatement`; it is not a completed
+> `MainInductionStep.mainInduction`; it is not a completed
 > final-theorem proof.  Lean also records
 > `MIPStarRE.LDT.ProjStrat.sourceRoleRegisterUnsymmetrizedPointConsistency`,
 > which combines this handoff with the factor-two trace-compression theorem and
@@ -200,9 +200,9 @@ pasting data, residual packages, or arbitrary implication hypotheses.
 It is now proved in the corrected large-\(k\) interface.
 
 The older conditional direct `sorry` in `MainFormal.lean` has been removed.  The
-later source-boundary wrapper `mainFormal_sourceSmallErrorConclusion` is now
+later source-boundary wrapper `mainFormal_smallErrorConclusion` is now
 checked under the corrected hypotheses `k >= 400md` and `0 < k`.  The wrapper
-`mainFormal_sourceConclusion` proves the saturated-error branch by a two-space
+`mainFormalConclusion` proves the saturated-error branch by a two-space
 trivial measurement construction.
 The historical goal displayed below records the earlier state of this report.
 
@@ -213,7 +213,7 @@ Paper assumptions for `thm:main-formal`: a general projective strategy
 test, passing probability at least `1 - eps`, and an integer `k >= md`.
 
 Lean assumptions in `MIPStarRE.LDT.Test.mainFormal`: a same-space projective
-strategy `strategy : SameSpaceProjStrat params ι`, the pass hypothesis
+strategy `strategy : the retired same-carrier strategy interface params ι`, the pass hypothesis
 `strategy.PassesLowIndividualDegreeTest eps`, an integer `k`, the corrected
 large-`k` bound `400 * params.m * params.d <= k`, and the scalar boundary
 `0 < k`.
@@ -229,10 +229,10 @@ eps`.
 
 Verdict: the source theorem `thm:main-formal` is recorded in its corrected form
 in the blueprint and is linked to the Lean statement
-`MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
-source-boundary construction `MIPStarRE.LDT.Test.mainFormal_sourceConclusion`.
+`MIPStarRE.LDT.Test.mainFormal`, which calls the named
+source-boundary construction `MIPStarRE.LDT.Test.mainFormalConclusion`.
 This wrapper proves the saturated-error branch and calls
-`MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` in the non-vacuous
+`MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion` in the non-vacuous
 small-error branch.
 The Lean theorem `mainFormal` is a separate current interface with
 faithful boundary hypotheses for the present formal container and the
@@ -251,15 +251,15 @@ Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual
 
 This intermediate structure has since been removed.  The corresponding active
 internal target is now a direct construction of
-`MainFormalProjectiveCompletionTransportWitness` from the role-register witness
+`retired final-transport witness route` from the role-register witness
 and the post-role diagonal completion theorem.
 
 **The removed structure had two fields**:
 
 | Field | Type | Paper Reference |
 |-------|------|-----------------|
-| `roleInductionWitness` | `MainFormalRoleInductionWitness params strategy eps hpass k` | Section 6 witness |
-| `postRoleDiagonalCompletion` | `MainFormalDiagonalCompletionWitness params strategy eps k scalars (roleInductionWitness.roleWitness scalars)` | Post-role line-130 completion |
+| `roleInductionWitness` | `retired role-induction witness route params strategy eps hpass k` | Section 6 witness |
+| `postRoleDiagonalCompletion` | `retired diagonal completion witness route params strategy eps k scalars (roleInductionWitness.roleWitness scalars)` | Post-role line-130 completion |
 
 ## 2. Historical context at the removed `MainFormal.lean` sorry site
 
@@ -273,7 +273,7 @@ and the post-role diagonal completion theorem.
 - `hk : 400 * params.m * params.d ≤ k` — large-k hypothesis
 
 ### Available hypotheses
-- `scalars : MainFormalCascadeScalars params eps k` — constructed from
+- `scalars : MainFormalScalarBounds params eps k` — constructed from
   `hepsNN`, `hk0`, `herr`.
 - The theorem statement had no bridge-style hypothesis.  The role-register
   witness, line-130 orthonormalization witness, and completion data were
@@ -302,11 +302,11 @@ corrected large-\(k\) interface.
 
 ## 3. Field analysis
 
-### Field 1: `roleInductionWitness : MainFormalRoleInductionWitness`
+### Field 1: `roleInductionWitness : retired role-induction witness route`
 
 This is a Section 6 witness:
 ```lean
-structure MainFormalRoleInductionWitness ... where
+structure retired role-induction witness route ... where
   roleMeasurement : Measurement (Polynomial params) (Role × ι)
   section6Consistency :
     ConsRel (strategy.strategySymmetrization).state
@@ -316,8 +316,8 @@ structure MainFormalRoleInductionWitness ... where
       (MainInductionStep.mainInductionError params k (3 * eps) (3 * eps) (3 * eps))
 ```
 
-**Existing construction theorem for base case:** `MainFormalRoleInductionWitness.ofBaseCase` (RoleRegister/Core.lean:187-196)
-- Calls `strategySymmetrization_mainInductionBaseCase` — already checked ✅
+**Existing construction theorem for base case:** `retired role-induction witness route.ofBaseCase` (RoleRegister/Core.lean:187-196)
+- Calls `roleRegisterSymmStrategy_sourceMainInductionBaseCase` — already checked ✅
 
 The historical successor constructors in `RoleRegister.lean` have been removed
 from the active final-theorem route.  Their names recorded the missing
@@ -330,26 +330,26 @@ for the corrected large-\(k\) interface.
 `mainFormal` gap.  Under the corrected final-theorem statement, the two-space
 source-boundary assembly and the \(k\)-range correction are checked.
 
-### Field 2: `postRoleDiagonalCompletion : MainFormalDiagonalCompletionWitness`
+### Field 2: `postRoleDiagonalCompletion : retired diagonal completion witness route`
 
 This structure contains the line-130 orthonormalization witness plus completion data:
 ```lean
-structure MainFormalDiagonalCompletionWitness ... where
-  orthWitness : MainFormalDiagonalOrthonormalizationWitness ...
+structure retired diagonal completion witness route ... where
+  orthWitness : retired diagonal orthonormalization witness route ...
   a_A a_B : Polynomial params
   leftCompletedCloseness : SDDRel ...
   rightCompletedCloseness : SDDRel ...
 ```
 The match-mass preservation proofs now live in
-`MainFormalDiagonalOrthonormalizationWitness`, together with the
+`retired diagonal orthonormalization witness route`, together with the
 projective submeasurements they concern.
 
 **Existing construction theorems**:
 
 | Constructor | Required inputs | Status |
 |------------|----------------|--------|
-| `MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness` | `roleInductionWitness` only | Source-shaped internal construction target; delegates the completion step to `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` |
-| `MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Constructs the completion witness directly from the checked completion-closeness argument |
+| `retired final-transport witness route.nonempty_ofRoleWitness` | `roleInductionWitness` only | Source-shaped internal construction target; delegates the completion step to `retired diagonal completion witness route.nonempty_ofDiagonalConsistency` |
+| `retired diagonal completion witness route.nonempty_ofDiagonalConsistency` | line-130 orthonormalization witness + cross consistency | Constructs the completion witness directly from the checked completion-closeness argument |
 | `mainFormalProjectiveCompletionTransportWitnessOfCompleteAtOutcomeStatements` | role witness + line-130 cross consistency + orthonormalize-and-complete statements | Uses the checked repaired line-169 transport with its explicit loss |
 
 **Current route:** Once Field 1 (`roleInductionWitness`) is produced, the proof
@@ -358,7 +358,7 @@ the completion witness directly from the checked completion argument, and then
 uses the repaired line-169 transport in the final projective completion step.
 
 The line-130 consistency data supplies the orthonormalization witness via
-`MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency`.
+`retired diagonal orthonormalization witness route.nonempty_ofDiagonalConsistency`.
 
 The completion theorem now fixes the distinguished completion outcome to the
 zero polynomial and derives the completion-closeness fields from the checked
@@ -381,7 +381,7 @@ inputs.
 This was the historical simple route.  It is rejected for the paper-facing
 theorem because it relies on additional non-paper inputs.
 
-**What's needed:** Only Field 1 (`MainFormalRoleInductionWitness` for successor case).
+**What's needed:** Only Field 1 (`retired role-induction witness route` for successor case).
 
 ### Historical Route B: Keep the native-targets cascade
 
@@ -392,7 +392,7 @@ Nonempty (MainFormalCascadeRolePackageResidualProjectiveCompletionResidual ...)
 
 This required both Field 1 and Field 2.  The current cleanup eliminates this
 intermediate record and constructs the active
-`MainFormalProjectiveCompletionTransportWitness` directly.
+`retired final-transport witness route` directly.
 
 **Comparison:** Route A was simpler and more faithful to the base-case
 structure.  Route B required more construction and preserved downstream code

@@ -11,8 +11,8 @@ obligation formerly tracked by #1622 has been discharged.
 
 **Status note (2026-05-23).**  The 2026-05-18 live-obligation classification is
 now historical.  The current `MIPStarRE/LDT/Test/AxiomAudit.lean` records
-standard-axiom checks for `mainFormal`, `mainFormal_sourceStatement`,
-`mainInduction`, `mainInduction_sourceStatement`, `selfImprovement`,
+standard-axiom checks for `mainFormal`, `mainFormal`,
+`mainInduction`, `mainInduction`, `selfImprovement`,
 `selfImprovementInInductionSection`, `ldPasting`,
 `sdp_statement_with_slackness`, and the displayed SDP slackness measurement.
 Thus the inventory below should be read as a snapshot of former `sorryAx`

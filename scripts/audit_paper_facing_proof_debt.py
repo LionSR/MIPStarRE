@@ -191,11 +191,6 @@ FAITHFUL_BOUNDARY_TOKENS = {
 # external theorem itself is formalized, but they should not be counted with
 # internal proof obligations such as witnesses, data packages, or wrappers.
 EXTERNAL_CITATION_TOKENS = {
-    "RazSafraSoundnessStatement": (
-        "external Raz--Safra theorem quoted in "
-        "references/ldt-paper/introduction.tex:43-65; the blueprint entry is "
-        "not marked as formalized"
-    ),
     "PolishchukSpielmanClassicalSoundnessStatement": (
         "external Polishchuk--Spielman theorem quoted in "
         "references/ldt-paper/introduction.tex:69-92; the blueprint entry is "
@@ -251,26 +246,6 @@ SOURCE_CONTEXT_TOKENS = {
         "local data-processing comparison in the final fields of the "
         "self-improvement proof; see references/ldt-paper/"
         "self_improvement.tex:635-671"
-    ),
-    "MainFormalDiagonalOrthonormalizationWitness": (
-        "internal Step 6 witness for the orthonormalization stage of the "
-        "final theorem proof; see references/ldt-paper/"
-        "inductive_step.tex:130-149"
-    ),
-    "MainFormalProjectiveCompletionTransportWitness": (
-        "internal Step 6 witness carrying the completed projective "
-        "measurements and final transport estimates; see "
-        "references/ldt-paper/inductive_step.tex:130-185"
-    ),
-    "MainFormalRoleInductionWitness": (
-        "internal final-theorem witness supplied by the symmetric induction "
-        "route; see references/ldt-paper/inductive_step.tex:7-18 and "
-        "test_definition.tex:180-202"
-    ),
-    "MainFormalRoleMeasurementWitness": (
-        "internal role-register measurement witness in the two-space to "
-        "same-space final theorem reduction; see references/ldt-paper/"
-        "test_definition.tex:180-202 and inductive_step.tex:130-185"
     ),
     "MatrixSdpStatementWithSlacknessAndDominance": (
         "Lean-only matrix SDP dominance interface used below the "
@@ -374,18 +349,6 @@ SOURCE_CONTEXT_CONDITIONAL_DECL_NAMES = {
         "proof; see references/ldt-paper/orthonormalization.tex:282-538 and "
         "the informational blueprint entry "
         "rem:lean-right-register-completion-helpers"
-    ),
-    "MIPStarRE.LDT.Test.MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness": (
-        "Lean-only construction of the final projective-completion transport "
-        "witness from an already constructed role witness; see "
-        "references/ldt-paper/inductive_step.tex:130-185 and the "
-        "informational blueprint entry rem:main-formal-step6-constructions"
-    ),
-    "MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness": (
-        "Lean-only final transport theorem from an already constructed "
-        "projective-completion witness; see references/ldt-paper/"
-        "test_definition.tex:180-202 and inductive_step.tex:130-185, and "
-        "the informational blueprint entry rem:main-formal-step6-constructions"
     ),
 }
 

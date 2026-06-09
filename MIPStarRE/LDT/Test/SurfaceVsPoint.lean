@@ -4,8 +4,8 @@ import MIPStarRE.LDT.Test.Classical
 # Surface-versus-point classical infrastructure
 
 Geometric surface questions, bivariate polynomial answers, and deterministic
-classical acceptance probabilities for the overview-level Raz--Safra
-surface-versus-point low-degree test.
+classical acceptance probabilities for the surface-versus-point low-degree
+test.
 
 ## References
 
@@ -74,8 +74,8 @@ noncomputable def evalSurfacePolynomialModel (params : Parameters) [FieldModel p
     (p : SurfacePolynomialModel params) (t : SurfaceParameter params) : Fq params :=
   encodeScalar (MvPolynomial.eval (fun i => decodeScalar (t i)) p)
 
-/-- Surface answers in the classical Raz--Safra test are genuine bivariate
-polynomials whose total degree is at most `d`. -/
+/-- Surface answers in the classical surface-versus-point test are genuine
+bivariate polynomials whose total degree is at most `d`. -/
 structure SurfacePolynomial (params : Parameters) [FieldModel params.q] where
   poly : SurfacePolynomialModel params
   totalDegreeBounded : poly.totalDegree ≤ params.d
@@ -129,9 +129,7 @@ modeled by ordinary bivariate polynomials in the chosen coordinates.
 Because the 2-dimensionality constraint depends only on the surface frame, the
 parameter `t` remains uniform conditional on `S`, and the induced queried-point
 marginal is still uniform on `Point params`. When `params.m < 2`, no genuine
-2-dimensional surfaces exist, so this support is empty; the surrounding
-Raz--Safra wrapper remains an explicit quoted-theorem interface in that edge
-case rather than a direct formalization of the classical result. -/
+2-dimensional surfaces exist, so this support is empty. -/
 noncomputable def surfaceVsPointDistribution (params : Parameters) [FieldModel params.q] :
     Distribution (SurfaceVsPointSample params) :=
   let support := surfaceVsPointSupport params

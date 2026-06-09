@@ -43,6 +43,37 @@ noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [Decidabl
     IdxSubMeas (Point params) (Fq params) ι :=
   fun u => evaluateAt params u G
 
+/-- View a global polynomial measurement as a point-indexed answer measurement family.
+
+The submeasurement-valued `polynomialEvaluationFamily` is the form used by most
+consistency statements.  The heterogeneous triangle step in the final theorem
+uses complete measurements, so this version keeps the same postprocessing while
+retaining the total-mass proof. -/
+noncomputable def polynomialEvaluationMeasurementFamily
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q]
+    (G : Measurement (Polynomial params) ι) :
+    IdxMeas (Point params) (Fq params) ι :=
+  fun u =>
+    { toSubMeas := evaluateAt params u G.toSubMeas
+      total_eq_one := by
+        simpa [evaluateAt, postprocess] using G.total_eq_one }
+
+namespace Test
+
+/-- Namespace-compatible form of `polynomialEvaluationMeasurementFamily`.
+
+This name is used by the two-space final-theorem route, where the surrounding
+theorems live in the `Test` namespace. -/
+noncomputable abbrev polynomialEvaluationMeasurementFamily
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (params : Parameters) [FieldModel params.q]
+    (G : Measurement (Polynomial params) ι) :
+    IdxMeas (Point params) (Fq params) ι :=
+  MIPStarRE.LDT.polynomialEvaluationMeasurementFamily params G
+
+end Test
+
 /-- Evaluate an indexed slice family at a point `(u, x)` in `F_q^{m+1}`. -/
 noncomputable def evaluateFiberFamilyAtNextPoint {ι : Type*} [Fintype ι] [DecidableEq ι]
     (params : Parameters) [FieldModel params.q]

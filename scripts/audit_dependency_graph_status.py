@@ -10,8 +10,6 @@ meaning for the LDT theorem boundary:
 * retired successor-boundary nodes must not appear;
 * source-boundary nodes that have since been proved must be displayed as
   proof-complete;
-* corrected Lean-only current-interface nodes that are now proved must be
-  proof-filled;
 * the now-proved Naimark tensor-product theorem must be proof-filled locally.
 
 The check is intentionally narrow.  It is a consistency guard for the generated
@@ -51,7 +49,6 @@ PROOF_FILLED_LABELS = {
     "prop:main-induction-successor-small-error-construction",
     "prop:main-induction-successor-predecessor-induction",
     "thm:main-formal",
-    "thm:main-formal-current-interface",
     "thm:main-induction",
     "thm:naimark",
 }

@@ -345,15 +345,6 @@ test accepts with high probability only strategies that are close to
 passing.  It is a key building block in the paper's argument chain
 but is treated as a black box.
 
-### Raz–Safra classical test
-
-**Paper**: Raz–Safra, "A sub-constant error-probability low-degree test,
-and a sub-constant error-probability PCP characterization of NP" (STOC 1997).
-
-**Lean declaration**: `MIPStarRE.LDT.Test.RazSafraSoundnessStatement`
-
-Analogous to Polishchuk–Spielman but for the surface-vs-point test.
-
 ### Matrix Chernoff bound
 
 **Lean declaration**: `chernoffBernoulliMatrix` (internal, in

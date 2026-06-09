@@ -59,7 +59,7 @@
 > holes were the printed source-range obligation
 > `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`
 > and the final two-space source-boundary obligation
-> `Test.mainFormal_sourceSmallErrorConclusion`.
+> `Test.mainFormal_smallErrorConclusion`.
 >
 > The same day, the orthonormalization-input cleanup removed the former
 > `SelfImprovement.HelperStrongSelfConsistencyInput`,
@@ -336,10 +336,10 @@ The older branch-residual route used the following proved wiring functions:
   `PerSliceInductionData` and the corresponding obligations to produce the
   branch residual
 - `roleWitnessResidual_ofAnswerSuccessorObligations` (line 602): wraps into
-  `Nonempty (MainFormalRoleInductionWitness)`
+  `Nonempty (retired role-induction witness route)`
 
 These functions have since been removed.  The current role-register route uses
-`MainFormalRoleInductionWitness.ofMainInduction`, so the missing successor
+`retired role-induction witness route.ofMainInduction`, so the missing successor
 construction is the `sorry` in the corrected large-`k` Section 6 interface
 `MainInductionStep.mainInduction`, not a separate obligation API in Section 3.
 

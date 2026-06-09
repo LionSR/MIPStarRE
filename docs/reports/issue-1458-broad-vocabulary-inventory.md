@@ -158,13 +158,11 @@ forms after supplying the one-point line estimates:
 
 ## Chapter 1 External Theorems
 
-The scan also sees `RazSafraSoundnessStatement` and
-`PolishchukSpielmanClassicalSoundnessStatement`.  These are quoted external
-theorem interfaces from
-`references/ldt-paper/introduction.tex:43-65` and
+The scan also sees `PolishchukSpielmanClassicalSoundnessStatement`.  This is a
+quoted external theorem interface from
 `references/ldt-paper/introduction.tex:69-92`.  The corresponding blueprint
-entries are deliberately not marked as formalized.  They are not internal
-bridge hypotheses.  A future formalization should replace the explicit external
+entry is deliberately not marked as formalized.  It is not an internal bridge
+hypothesis.  A future formalization should replace the explicit external
 hypothesis by a source-facing theorem or by a justified imported result.
 
 ## Unresolved Tokens

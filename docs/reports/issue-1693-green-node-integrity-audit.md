@@ -81,9 +81,6 @@ definitions or remarks rather than as source theorem formalizations.  These
 should remain visible in the graph, but they should not be counted as closed
 paper theorems.
 
-- `prop:lean-raz-safra-interface`: conditional Lean interface for the quoted
-  Raz--Safra theorem.  The source theorem `thm:raz-safra` is not marked
-  `\leanok`.
 - `prop:lean-classical-test-soundness-interface`: conditional Lean interface for
   the quoted Polishchuk--Spielman theorem.  The source theorem
   `thm:classical-test-soundness` is not marked `\leanok`.

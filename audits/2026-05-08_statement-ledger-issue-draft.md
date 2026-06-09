@@ -56,9 +56,9 @@ Headline counts:
 |---|---|
 | G — grounded (producer exists) | 33 |
 | T — tracked smuggle (open sub-issue) | 2 at the May 8 snapshot (`SpectralTruncationStatement` #1032; `NaimarkStatement` deliberate paper-gap #1361).  In the active tree, `SpectralTruncationStatement` has direct construction theorems. |
-| E — genuine external citation | 2 (`RazSafraSoundnessStatement`, `PolishchukSpielmanClassicalSoundnessStatement`) |
+| E — genuine external citation | 1 (`PolishchukSpielmanClassicalSoundnessStatement`) |
 | P — paper-faithful packaging | 1 (`NormalizationConditionStatement`) |
-| **D — dead** | **1 at the May 8 snapshot** (`MatrixAddInUTransferStatement`, now removed) |
+| **D — dead or retired** | **2** (`MatrixAddInUTransferStatement` and the former surface-versus-point external interface, now removed) |
 | **Total** | **39** |
 
 ### Strengthened policy (2026-05-08)

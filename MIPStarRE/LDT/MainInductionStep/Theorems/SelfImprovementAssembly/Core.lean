@@ -36,8 +36,8 @@ variable {ι : Type uι} [Fintype ι] [DecidableEq ι]
 
 This helper is the final `error ≤ mainInductionError` cleanup step only; the
 actual Section 6 construction is carried by `mainInductionBaseCase`,
-`mainInduction`, and the corrected source-facing theorem in
-`SourceTheorems.lean`. -/
+`mainInduction`, and their predecessor, self-improvement, and pasting
+construction lemmas. -/
 theorem mainInductionOfWitness
     (params : Parameters)
     [FieldModel params.q]

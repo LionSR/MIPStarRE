@@ -484,11 +484,10 @@ noncomputable def diagonalRoleAverage
 /-- Trace-based failure surrogate for the full low-individual-degree test for a
 paper-faithful two-space projective strategy.
 
-This is the heterogeneous analogue of
-`SameSpaceProjStrat.lowIndividualDegreeFailureProbability`: axis-parallel consistency,
-point agreement, and diagonal consistency are averaged
-with weights `1 / 3`, while the line branches are themselves averaged over the
-two role choices. -/
+This is the paper-faithful two-space failure surrogate: axis-parallel
+consistency, point agreement, and diagonal consistency are averaged with weights
+`1 / 3`, while the line branches are themselves averaged over the two role
+choices. -/
 noncomputable def lowIndividualDegreeFailureProbability
     (strategy : ProjStrat params ιA ιB) : Error :=
   (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +

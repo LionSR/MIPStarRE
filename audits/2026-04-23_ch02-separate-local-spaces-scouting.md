@@ -263,7 +263,7 @@ structure BiProjStrat (params : Parameters) [FieldModel params.q]
 
 Then keep the current same-space `ProjStrat` as the symmetrizable special case,
 for example by leaving it unchanged for now or later renaming it to something
-like `SameSpaceProjStrat`.
+like `the retired same-carrier strategy interface`.
 
 ## What the follow-up refactor would need
 

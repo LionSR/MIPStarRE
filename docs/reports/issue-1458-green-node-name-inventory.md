@@ -69,7 +69,6 @@ PY
 
 | Node | Triggering names | Verdict |
 | --- | --- | --- |
-| `prop:lean-raz-safra-interface` | `RazSafraSoundnessStatement` | Explicit external Raz--Safra hypothesis.  The source theorem `thm:raz-safra` is not claimed as formalized. |
 | `prop:lean-classical-test-soundness-interface` | `PolishchukSpielmanClassicalSoundnessStatement` | Explicit external Polishchuk--Spielman hypothesis.  The source theorem `thm:classical-test-soundness` is not claimed as formalized. |
 | `prop:simeq-data-processing` and `prop:self-consistency-implies-data-processing` | `simeqDataProcessing`, `selfConsistencyImpliesDataProcessing` | Standard use of the mathematical term data processing.  These are source-facing preliminary lemmas proved from their displayed hypotheses; the word `Data` is not construction-data vocabulary here. |
 | `thm:naimark` | `NaimarkTensorProductCorrelationStatement` | Source-facing Naimark tensor-product correlation statement in the projective-submeasurement form produced by the one-measurement construction.  It is linked to the proved theorem `naimarkTensorProductCorrelation`; the statement wrapper records the displayed mathematical assertion, not an extra hypothesis. |
@@ -94,9 +93,9 @@ PY
 | `lem:weighted-restricted-probability-bounds` | `RestrictedProbabilitiesStatement.ofWeightedBounds` | Internal weighted-probability statement constructor used in the induction assembly. |
 | `rem:self-improvement-slice-transport` | `SelfImprovementData.*`, `AnswerSelfImprovementData.*`, `selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion` | Lean-only self-improvement output interface.  It is now an informational remark rather than a green definition node, and it does not prove `thm:main-induction`.  The broad transport route has been removed as a theorem-level obstruction; the retained `SliceStrategyTransport` records are narrow Lean-only interfaces, while the active successor route uses the checked answer-carrier construction and then forgets to ordinary self-improvement data. |
 | `def:successor-pasting-data` | `AveragedPastingData.*`, `mainInductionFromAnswerStageDataOfSmallError` | Lean-only successor assembly interface.  The node is green because the conditional assembly is checked, not because the source successor theorem has been discharged. |
-| `prop:main-formal-source-reduction` | `mainFormal_sourceConclusion` | Statement-level final-theorem source-boundary theorem.  It proves the saturated-error branch and delegates the small-error branch to the checked scalar-boundary theorem; it is not an added paper hypothesis. |
-| `prop:main-formal-source-small-error` | `mainFormal_sourceSmallErrorConclusion` | Statement-level non-vacuous final-theorem source-boundary theorem under the corrected large-\(k\) and nonzero sampling hypotheses. |
-| `rem:main-formal-step6-constructions` | `MainFormal*Witness`, `mainFormalBaseRoleInductionWitness`, `mainFormal_ofProjectiveCompletionTransportWitness` | Lean-only final-transport route depending on a Section 6 role witness.  This is now an ordinary remark rather than a green definition node. |
+| `prop:main-formal-source-reduction` | `mainFormalConclusion` | Statement-level final-theorem source-boundary theorem.  It proves the saturated-error branch and delegates the small-error branch to the checked scalar-boundary theorem; it is not an added paper hypothesis. |
+| `prop:main-formal-source-small-error` | `mainFormal_smallErrorConclusion` | Statement-level non-vacuous final-theorem source-boundary theorem under the corrected large-\(k\) and nonzero sampling hypotheses. |
+| `rem:main-formal-step6-constructions` | `MainFormal*Witness`, `mainFormalBaseRoleInductionWitness`, `retired final-transport helper` | Lean-only final-transport route depending on a Section 6 role witness.  This is now an ordinary remark rather than a green definition node. |
 | `def:main-formal-error-cascade` | `CascadeHypotheses` | Faithful finite-regime hypothesis package for the scalar error calculation. |
 
 ## Verdict
