@@ -66,13 +66,13 @@ auxiliary warning links:
 - blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-obligations: MIPStarRE.LDT.MakingMeasurementsProjective.orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
 - blueprint/src/chapter/ch10_induction.tex:def:main-formal-error-cascade: MIPStarRE.LDT.Test.CascadeHypotheses
 allowed source-like unfaithful markers:
-- blueprint/src/chapter/ch02_test.tex:thm:main-formal: MIPStarRE.LDT.Test.mainFormal_sourceStatement
-- blueprint/src/chapter/ch02_test.tex:thm:main-formal-current-interface: MIPStarRE.LDT.Test.mainFormal
-- blueprint/src/chapter/ch10_induction.tex:thm:main-induction: MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement
+- blueprint/src/chapter/ch02_test.tex:thm:main-formal: MIPStarRE.LDT.Test.mainFormal
+- blueprint/src/chapter/ch02_test.tex:retired Lean-only main-formal interface node: MIPStarRE.LDT.Test.mainFormal
+- blueprint/src/chapter/ch10_induction.tex:thm:main-induction: MIPStarRE.LDT.MainInductionStep.mainInduction
 - blueprint/src/chapter/ch10_induction.tex:thm:main-induction-current-interface: MIPStarRE.LDT.MainInductionStep.mainInduction
 auxiliary unfaithful markers:
-- blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-successor-targets: MIPStarRE.LDT.Test.strategySymmetrization_mainInduction
-- blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-successor-targets: MIPStarRE.LDT.Test.MainFormalRoleInductionWitness.ofMainInduction
+- blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-successor-targets: MIPStarRE.LDT.Test.roleRegisterSymmStrategy_sourceMainInduction
+- blueprint/src/chapter/ch10_induction.tex:def:main-formal-step6-successor-targets: MIPStarRE.LDT.Test.retired role-induction witness route.ofMainInduction
 OK: no unexpected warning links or unfaithful markers in green source-like blueprint nodes.
 ```
 
@@ -205,15 +205,15 @@ In the current tree this section is historical: the fresh audit reports no
 source-like unfaithful markers.
 
 - `thm:main-formal` links to
-  `MIPStarRE.LDT.Test.mainFormal_sourceStatement`.  In the current tree this is
+  `MIPStarRE.LDT.Test.mainFormal`.  In the current tree this is
   the corrected two-space source statement with the documented \(k\ge400md\)
   and \(0<k\) boundary corrections, and it is proof-complete.
-- `thm:main-formal-current-interface` links to
+- the retired Lean-only main-formal interface node links to
   `MIPStarRE.LDT.Test.mainFormal`.  This is the same-space, corrected
   large-\(k\) interface.  It has no additional construction hypothesis, and the
   corrected Section 6 successor construction is now checked.
 - `thm:main-induction` links to
-  `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement`.  Its
+  `MIPStarRE.LDT.MainInductionStep.mainInduction`.  Its
   current statement records the confirmed \(k\ge400md\) correction.  The former
   source-range obligation below \(400md\) has been retired.
 - `thm:main-induction-current-interface` links to

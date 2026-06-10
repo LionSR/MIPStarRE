@@ -93,6 +93,10 @@ noncomputable def cascadeZeta4 (σ ζ₁ ζ₃ : Error) : Error :=
 
 /-- Repaired line-169 error obtained by the checked local pre-completion route.
 
+**Source:** This is source-faithful scalar bookkeeping for the repaired
+line-169 route documented in `docs/paper-gaps/issue-1099-sharper-local-fix.tex`
+and used in `references/ldt-paper/inductive_step.tex:167-173`.
+
 Paper line 169 is printed with the exact error `ζ₁`; the checked local repair
 instead yields `ζ₁ + 10·ζ₁^(1/8)`.  The additional term comes from
 `sqrt (orthonormalizationError ζ₁) = sqrt (100·ζ₁^(1/4)) = 10·ζ₁^(1/8)` in
@@ -108,6 +112,11 @@ noncomputable def cascadeLine169RepairError (ζ₁ : Error) : Error :=
 /-- Repaired final point-consistency scalar obtained by substituting the checked
 line-169 repair error into the last Step 8 transport triangle.
 
+**Source:** This is source-faithful scalar bookkeeping for the repaired
+line-169 route documented in `docs/paper-gaps/issue-1099-sharper-local-fix.tex`
+and absorbed by the error cascade from
+`references/ldt-paper/inductive_step.tex:186-234`.
+
 The paper's `ζ₄` at `references/ldt-paper/inductive_step.tex:181` is
 `2σ + 2·√(ζ₁ + ζ₃/2)`.  This repaired variant replaces `ζ₁` by the internal
 checked line-169 repair error above, so it is likewise an internal scalar that
@@ -120,6 +129,11 @@ noncomputable def cascadeZeta4Repaired (σ ζ₁ ζ₃ : Error) : Error :=
 (`\label{eq:G-self-consistency}` through
 `\label{eq:final-right-point-consistency}`, error cascade ζ₁–ζ₄); blueprint
 `\label{def:main-formal-error-cascade}`.
+
+**Source:** This is a faithful encoding of the standing scalar regime used in
+the paper's error cascade, with the corrected large-\(k\) and nonzero-sampling
+boundaries documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`
+and `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`.
 
 Standing numeric regime used throughout the cascade bounds: parameters
 satisfy the unit scale, and `ε, d/q ∈ [0, 1]`. -/

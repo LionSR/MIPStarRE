@@ -10,7 +10,7 @@ Branch: `gpt55/issue-834-mainformal-residual-session40`
 > `Test/MainTheorem.lean` monolith and its role-package/completion residual.
 > The current code has split the final-theorem route, removed the residual
 > structures named below, and records the same-space Lean interface separately
-> as `thm:main-formal-current-interface`.  The source statement
+> as the retired Lean-only main-formal interface node.  The source statement
 > `thm:main-formal` is no longer linked to a conditional Lean theorem.  The
 > current same-space theorem `MIPStarRE.LDT.Test.mainFormal` has no bridge,
 > residual, package, or obligation hypotheses; its only remaining `sorryAx`
@@ -21,10 +21,10 @@ Branch: `gpt55/issue-834-mainformal-residual-session40`
 > in `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`, tracked by
 > #1507.  The source-labelled blueprint entry `thm:main-formal` is now
 > represented by
-> `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, which calls the named
-> wrapper `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` for the printed
+> `MIPStarRE.LDT.Test.mainFormal`, which calls the named
+> wrapper `MIPStarRE.LDT.Test.mainFormalConclusion` for the printed
 > two-space statement.  At that snapshot, the wrapper proved the saturated-error
-> branch and left `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` as
+> branch and left `MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion` as
 > the direct non-vacuous source-boundary proof hole.  All references below to the live
 > `MainTheorem.lean` residual, #834,
 > #924, #931, #950, or #958 describe the April 30 audit snapshot, not the
@@ -85,8 +85,8 @@ the issue-#906 statement fix: the public hypothesis was
 The non-vacuous branch built scalar data and then stopped at the residual:
 
 ```lean
-let scalars : MainFormalCascadeScalars params eps k :=
-  MainFormalCascadeScalars.ofNontrivialMainFormal hepsNN hk0 herr
+let scalars : MainFormalScalarBounds params eps k :=
+  MainFormalScalarBounds.ofNontrivialMainFormal hepsNN hk0 herr
 have roleWitnessResidualLeftCompletionLine169Residual :
     MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual
       (params := params) (strategy := strategy) (eps := eps)
@@ -107,7 +107,7 @@ two fields:
 
 ```lean
 structure MainFormalCascadeRolePackageResidualLeftCompletionLine169Residual ... where
-  roleInductionWitness : MainFormalRoleInductionWitness params strategy eps hpass k
+  roleInductionWitness : retired role-induction witness route params strategy eps hpass k
   postRoleResidual :
     MainFormalPostRolePackageLeftCompletionLine169Residual params strategy eps k scalars
       (roleInductionWitness.roleWitness scalars)
@@ -144,11 +144,11 @@ Existing downstream conversions are already checked:
   consistency links from `line169MatchMassMonotonicity`.
 - `MainFormalCascadeRolePackagedCompletionLine169Residual.toCompletionLine169Residual`
   (`MainTheorem.lean:2395-2414`) expands the role-measurement record through
-  `UnsymmetrizationConsistency.ofSymConsistency`.
-- `MainFormalProjectiveCompletionTransportWitness.selfConsistency`
+  `retired same-carrier unsymmetrization consistency route.ofSymConsistency`.
+- `retired final-transport witness route.selfConsistency`
   reconstructs line 156 and converts it to the native `ζ₃/2` self-consistency
   target.
-- `MainFormalProjectiveCompletionTransportWitness.toMainFormal` only
+- `retired final-transport witness route.toMainFormal` only
   weakens the native `ζ₄` and `ζ₃/2` estimates to `mainFormalError`.
 
 Thus the proof work in that tree was upstream data construction, not downstream
@@ -177,13 +177,13 @@ The historical residual corresponded to the proof of `thm:main-formal` in
 
 | Paper lines | Paper step | Current Lean status |
 | --- | --- | --- |
-| 107-108 | `eq:cons-a` / `eq:cons-b`, the factor-two unsymmetrization estimates. | No longer residual fields; reconstructed from the concrete role-measurement record by `UnsymmetrizationConsistency.ofSymConsistency`. |
+| 107-108 | `eq:cons-a` / `eq:cons-b`, the factor-two unsymmetrization estimates. | No longer residual fields; reconstructed from the concrete role-measurement record by `retired same-carrier unsymmetrization consistency route.ofSymConsistency`. |
 | 130-133 | `eq:G-self-consistency`, polynomial $G^{\mathrm A}$ / $G^{\mathrm B}$ consistency at `ζ₁`. | Reconstructed from Step 5 wrappers and role-measurement data before line 156. |
 | 146-147 | `eq:G-with-Q-A`, completion closeness from $G$ to $Q$ at `ζ₂`. | Still part of `postRoleResidual`: Alice in left-register form, Bob in the left-register form returned by orthonormalize-and-complete. The #869 conversion to Bob's right-register paper form is already checked. |
 | 160-166 | `eq:third-goal` and data processing to evaluated $Q$ consistency. | Downstream conversions are checked once the residual fields are supplied. |
 | 167-173 | `prop:triangle-sub` line-169 transport to $Q^{\mathrm A}_g \otimes I \simeq_{ζ₁} I\otimes G^{\mathrm B}_g`, then data processing. | The paper's printed `ζ₁` cannot be obtained from generic `triangleSub` plus completion closeness without an extra `sqrt ζ₂`; the current tree therefore uses the repaired pre-completion line-169 route instead of an exact match-mass invariant. |
 | 175-185 | Final two `ζ₄` point goals `eq:one-goal` and `eq:another-goal`. | Already formalized by the residual conversions and triangle wrapper. |
-| 186-234 | Error cascade into the theorem's `ν`. | Already formalized by `MainFormalCascadeScalars` and `MainFormalProjectiveCompletionTransportWitness.toMainFormal`. |
+| 186-234 | Error cascade into the theorem's `ν`. | Already formalized by `MainFormalScalarBounds` and `retired final-transport witness route.toMainFormal`. |
 
 The exact line-169 constraint is the reason this report does not recommend a quick
 `triangleSub` proof: that route is mathematically weaker than the paper's displayed
@@ -237,10 +237,10 @@ of the residual:
 
 - #424 was still open, but the factor-two unsymmetrization estimates were no
   longer explicit residual fields; the current route obtains them from
-  `MainFormalRoleMeasurementWitness.toUnsymmetrizationConsistency`.
+  `retired role-measurement witness route.toretired same-carrier unsymmetrization consistency route`.
 - #427 was still open, but the scalar cascade bounds and final weakening were
-  already checked in `MainFormalCascadeScalars` and
-  `MainFormalProjectiveCompletionTransportWitness.toMainFormal`; the local TODO
+  already checked in `MainFormalScalarBounds` and
+  `retired final-transport witness route.toMainFormal`; the local TODO
   marker `TODO(#427)` is stale as a description of the remaining proof term.
 
 A future PR that edited `MainTheorem.lean` was expected to refresh these TODO
@@ -261,7 +261,7 @@ then-live `mainFormal` boundary to a `Nonempty` Step 6 witness residual.  It
 explicitly remained blocked on #931.
 
 Issue #931 was open and asked for closed self-improvement inputs for Section 6.
-In that tree, `MainFormalRoleInductionWitness` could be produced from the
+In that tree, `retired role-induction witness route` could be produced from the
 checked base handoff or a syntactic successor boundary, but the general
 successor-boundary construction still needed the Section 6
 self-improvement/recursion inputs that #931 tracked.  Therefore the first field

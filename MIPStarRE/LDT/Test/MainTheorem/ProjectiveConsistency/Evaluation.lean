@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Preliminaries.ComparisonProjective
-import MIPStarRE.LDT.Test.MainTheorem.UnsymmetrizedTargets
+import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
 # Projective consistency evaluation

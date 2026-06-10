@@ -160,7 +160,7 @@ successor proof is proof-complete.
 `thm:main-induction`: source theorem.
 
 Classification: corrected source statement, linked to
-`MainInductionStep.mainInduction_sourceStatement`.  The printed hypothesis
+`MainInductionStep.mainInduction`.  The printed hypothesis
 `k >= md` has been replaced by the documented correction `k >= 400md`; no
 source-range obligation remains in the active route.
 

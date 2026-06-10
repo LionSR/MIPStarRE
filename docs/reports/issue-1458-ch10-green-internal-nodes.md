@@ -128,8 +128,8 @@ Blueprint node:
 
 Linked Lean declarations include the diagonal orthonormalization and completion
 witness constructors, `mainFormalBaseRoleInductionWitness`,
-`MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness`, and
-`mainFormal_ofProjectiveCompletionTransportWitness`.
+`retired final-transport witness route.nonempty_ofRoleWitness`, and
+`retired final-transport helper`.
 
 Verdict: proved internal final-transport route, dependent on the Section 6
 role witness.

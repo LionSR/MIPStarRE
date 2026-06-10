@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.ErrorCascade.CascadeBounds.SigmaZeta1
+import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.SigmaZeta1
 
 /-!
 # Error cascade — bounds for `ζ₂` and `ζ₃`

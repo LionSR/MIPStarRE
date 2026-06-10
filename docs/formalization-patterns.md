@@ -77,14 +77,14 @@ are being actively removed.
    fact not yet formalized, state it as a separate proof obligation.  A
    temporary `sorry` in this declaration is preferable to adding the obligation as
    a hypothesis on the paper theorem.
-4. **Do not introduce conditional helpers by default.**  A helper such as
-   `mainFormal_ofProjectiveCompletionTransportWitness` is a quarantine device, not a
-   normal formalization pattern.  It may remain temporarily only when it
-   preserves substantial proof content that cannot yet be connected to the paper
-   hypotheses, has a tracked discharge or deletion target, and has no
-   source-labelled blueprint `\leanok`.  If the helper would merely package
-   missing work as an extra hypothesis, restore the theorem with the paper
-   statement and leave a tracked `sorry` instead.
+4. **Do not introduce conditional helpers by default.**  A helper whose name
+   ends in `_ofObligations` is a quarantine device, not a normal formalization
+   pattern.  It may remain temporarily only when it preserves substantial proof
+   content that cannot yet be connected to the paper hypotheses, has a tracked
+   discharge or deletion target, and has no source-labelled blueprint
+   `\leanok`.  If the helper would merely package missing work as an extra
+   hypothesis, restore the theorem with the paper statement and leave a tracked
+   `sorry` instead.
 5. **Audit the final statement.**  Every PR touching a source-labelled theorem
    should compare paper assumptions and Lean assumptions, paper conclusion and
    Lean conclusion, and report whether the Lean statement is exact, has only
@@ -167,24 +167,21 @@ and leave the missing proof as a tracked `sorry`.
    theorem: a projective strategy passing the low individual degree test, the
    stated parameter bounds, and the faithful formalization of the ambient
    domains.  Bridge, residual, repair, and proof-obligation inputs must be
-   produced inside its proof rather than added to its statement.  Reusable proof
-   content may remain in a plainly conditional helper, such as
-   `mainFormal_ofProjectiveCompletionTransportWitness`, whose statement displays the
-   witness it assumes.
+   produced inside its proof rather than added to its statement.
 
 ### Existing bridge-like declarations
 
 Several older declarations still name proof obligations explicitly.  They are
 transitional proof debt, not a pattern to extend to paper theorem statements.
-When such a declaration remains useful, its role should be one of the following:
+When such a declaration remains useful, its role should be made explicit and
+kept away from source-labelled blueprint entries.
 
 | Declaration | Status to maintain |
 |-------------|--------------------|
-| `mainFormal_ofProjectiveCompletionTransportWitness` | Conditional final-transport theorem; keep as reusable proof content, but do not present it as the paper theorem |
-| `MainFormalDiagonalOrthonormalizationWitness` | Internal witness produced from line-130 cross consistency; do not replace it by an orthonormalization-input hypothesis on `mainFormal` |
 | `LdPastingNontrivialContext` | Nontrivial-regime context for `ldPastingNontrivial`; do not present it as the unrestricted `thm:ld-pasting` context |
 | `Pasting.ldPastingNontrivial` | Restricted nontrivial-regime form of `thm:ld-pasting`; link from a Lean-only remark, while `Pasting.ldPasting` remains the unrestricted source-facing theorem |
 
+The former same-carrier `mainFormal` transport-witness route has been retired.
 The former `SelfImprovement.HelperStrongSelfConsistencyInput`,
 `SelfImprovement.OrthonormalizationInput`, `SelfImprovement.FinalFieldsInput`, and
 `MakingMeasurementsProjective.OrthonormalizationInput` bundles have been removed.
@@ -219,11 +216,11 @@ the target of a source-labelled blueprint `\leanok`.
 
 The former direct tracked proof obligations in `MainFormal.lean` and the
 Section 6 successor route have been discharged under the corrected source
-statements.  The theorem `MIPStarRE.LDT.Test.mainFormal_sourceStatement` is now
-the corrected two-space source theorem; `MIPStarRE.LDT.Test.mainFormal` remains
-as the same-space auxiliary interface.  Neither theorem carries bridge,
-residual, repair, package, producer, generic hypotheses, or proof-obligation
-inputs in its public statement.
+statements.  The theorem `MIPStarRE.LDT.Test.mainFormal` is the corrected
+two-space source theorem.  The earlier same-carrier auxiliary interface has
+been retired; the headline theorem carries no bridge, residual, repair,
+package, producer, generic hypothesis, or proof-obligation input in its public
+statement.
 
 ### Distinction from anti-patterns
 
@@ -412,7 +409,7 @@ top-level LDT module imports the public section APIs:
 
 ```lean
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
-import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
+import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
 import MIPStarRE.LDT.Pasting.Bernoulli.Final
 ```
 

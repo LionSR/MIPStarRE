@@ -86,7 +86,7 @@ compiles independently, and the MainInductionStep module wires them together
 through the checked successor construction.  The former gap described in the
 audit snapshot is no longer represented as an extra hypothesis on a
 source-labelled blueprint theorem.  The proved final-transport theorem
-`mainFormal_ofProjectiveCompletionTransportWitness` is retained as useful proof
+`retired final-transport helper` is retained as useful proof
 content, but no public theorem supplies completion data as an additional
 hypothesis.
 
@@ -332,7 +332,7 @@ as the confirmed \(k\ge400md\) statement correction:
 | SelfImprovement | ~50 theorems/lemmas | 2 paper theorem statements (`selfImprovementHelper`, `selfImprovement`) | Section 9 route is checked and axiom-clean |
 | SelfImprovement sub-lemmas (slackness, matrix bridge) | ~15 proved lemmas | Used internally by `selfImprovement` where needed; some historical adapters have been removed | No public substitute for the source theorem |
 | MainInductionStep | `selfImprovementInInductionSection`, self-improvement output constructors, `ldPastingInInductionSection`, checked successor assembly lemmas | Internal assembly remains in `MainTheorems.lean`; the broad slice-transport obstruction has been removed, while the narrow `SliceStrategyTransport` constructors remain as Lean-only transport interfaces | Corrected large-\(k\) successor route is proved; the printed range has been superseded by the confirmed \(k\ge400md\) correction |
-| MainTheorem | `mainFormal`, `mainFormal_ofProjectiveCompletionTransportWitness` | Corrected two-space source theorem plus proved final transport from a constructed completion witness | Proof-complete under the documented \(k\ge400md\) and \(0<k\) boundary corrections |
+| MainTheorem | `mainFormal`, `retired final-transport helper` | Corrected two-space source theorem plus proved final transport from a constructed completion witness | Proof-complete under the documented \(k\ge400md\) and \(0<k\) boundary corrections |
 
 ---
 

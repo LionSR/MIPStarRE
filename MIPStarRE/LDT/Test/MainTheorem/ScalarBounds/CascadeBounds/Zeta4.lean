@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.ErrorCascade.CascadeBounds.Zeta2Zeta3
+import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Zeta2Zeta3
 
 /-!
 # Error cascade — bound for `ζ₄`
@@ -190,7 +190,12 @@ theorem zeta4_bound {params : Parameters} {k : ℕ} {eps : Error}
           mainFormalEnvelope params k eps := by ring
 
 /-- The repaired `ζ₄` obtained by substituting the checked local line-169 repair
-into the final point-transport triangle is also absorbed by `mainFormalError`. -/
+into the final point-transport triangle is also absorbed by `mainFormalError`.
+
+**Source:** This is source-faithful scalar bookkeeping for the repaired
+line-169 route documented in `docs/paper-gaps/issue-1099-sharper-local-fix.tex`
+and the final absorption estimate from
+`references/ldt-paper/inductive_step.tex:186-234`. -/
 theorem zeta4Repaired_bound {params : Parameters} {k : ℕ} {eps : Error}
     (h : CascadeHypotheses params k eps) {ν σ ζ₁ ζ₂ ζ₃ : Error} (hνNN : 0 ≤ ν)
     (hν : ν ≤ 10000 * ((k : Error) ^ (2 : ℕ)) * ((params.m : Error) ^ (2 : ℕ)) *

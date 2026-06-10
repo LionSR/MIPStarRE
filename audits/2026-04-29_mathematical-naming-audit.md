@@ -113,9 +113,9 @@ is ready.
 - `MainInductionStep.mainInductionPublicRestrictionData`
 - `MakingMeasurementsProjective.SpectralTruncationStatement`
 - `MakingMeasurementsProjective.ProjectivizationMatchMassMonotonicity`
-- `Test.MainFormalRoleMeasurementWitness`
-- `Test.MainFormalRoleInductionWitness`
-- `Test.UnsymmetrizationConsistency`
+- `Test.retired role-measurement witness route`
+- `Test.retired role-induction witness route`
+- `Test.retired same-carrier unsymmetrization consistency route`
 
 The following names from the original audit have since been retired from the
 Lean tree and should be treated as historical, not as live migration targets:

@@ -82,18 +82,18 @@ theorem covered the case `d = 0`.
 declarations and checks the assembled small-error construction and its public
 successor wrappers as standard-axiom clean.  It also checks
 that the final Section 3 role-register transport theorem
-`MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness` does not
+`retired final-transport witness route.nonempty_ofRoleWitness` does not
 itself import this frontier; the dependency enters `mainFormal` only through the
 role-induction witness supplied by Section 6.
 The base-case role witness
-`MainFormalRoleInductionWitness.ofBaseCase`, the conversions
-`MainFormalRoleInductionWitness.toRoleMeasurementWitness` and
-`MainFormalRoleInductionWitness.roleWitness`, the base specialization
+`retired role-induction witness route.ofBaseCase`, the conversions
+`retired role-induction witness route.toRoleMeasurementWitness` and
+`retired role-induction witness route.roleWitness`, the base specialization
 `mainFormalBaseRoleInductionWitness`, and the final transport theorem
-`mainFormal_ofProjectiveCompletionTransportWitness` are also checked as
+`retired final-transport helper` are also checked as
 standard-axiom declarations.  Thus the final-theorem witness layer does not
 hide an additional proof frontier.  The successor-dependent constructor
-`MainFormalRoleInductionWitness.ofMainInduction` is standard-axiom clean for
+`retired role-induction witness route.ofMainInduction` is standard-axiom clean for
 the current same-space corrected-range interface.
 The same audit checks the answer-valued restriction, per-slice induction,
 self-improvement transport, and small-error stage assembly constructors used by
@@ -180,7 +180,7 @@ heterogeneous evaluation data-processing lemmas in
 `MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.Evaluation`.  The
 scalar absorption from these explicit pre-absorption errors to
 `mainFormalError` is now checked by
-`MIPStarRE.LDT.Test.mainFormal_sourceConclusion_ofRoleRegisterScalarBoundary`,
+`MIPStarRE.LDT.Test.mainFormalConclusion_ofRoleRegisterScalarBoundary`,
 under the corrected scalar-cascade boundary `0 < k`.  The scalar lemma
 `MIPStarRE.LDT.Test.mainFormalError_zero_k` records why the excluded
 zero-sampling corner is a statement-level boundary: at `k = 0` the displayed
@@ -211,9 +211,9 @@ theorems as proof-complete.
 
 | Blueprint node | Lean declaration | Status |
 |---|---|---|
-| `thm:main-induction` | `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement` | Statement and proof are marked `\leanok`.  This is the corrected large-`k` statement with `k ≥ 400md`; the printed `k ≥ md` bound is treated as a confirmed source statement gap. |
-| `thm:main-formal` | `MIPStarRE.LDT.Test.mainFormal_sourceStatement` | Statement and proof are marked `\leanok`.  This is the corrected two-space statement with `k ≥ 400md` and `0 < k`; the source-boundary reduction proves the saturated-error branch and the small-error branch calls the checked role-register scalar-boundary theorem. |
-| `thm:main-formal-current-interface` | `MIPStarRE.LDT.Test.mainFormal` | Statement and proof are marked `\leanok`.  This is the same-space corrected-range interface, not the printed two-space source theorem. |
+| `thm:main-induction` | `MIPStarRE.LDT.MainInductionStep.mainInduction` | Statement and proof are marked `\leanok`.  This is the corrected large-`k` statement with `k ≥ 400md`; the printed `k ≥ md` bound is treated as a confirmed source statement gap. |
+| `thm:main-formal` | `MIPStarRE.LDT.Test.mainFormal` | Statement and proof are marked `\leanok`.  This is the corrected two-space statement with `k ≥ 400md` and `0 < k`; the source-boundary reduction proves the saturated-error branch and the small-error branch calls the checked role-register scalar-boundary theorem. |
+| the retired Lean-only main-formal interface node | `MIPStarRE.LDT.Test.mainFormal` | Statement and proof are marked `\leanok`.  This is the same-space corrected-range interface, not the printed two-space source theorem. |
 
 The corrected source-labelled theorems `thm:main-induction` and
 `thm:main-formal` are proof-complete.
@@ -258,8 +258,8 @@ follows.
 
 | Class | Status |
 |---|---|
-| Corrected source-boundary theorem/proposition links `MIPStarRE.LDT.Test.mainFormal_sourceStatement`, `MIPStarRE.LDT.Test.mainFormal_sourceConclusion`, and `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion` | These are proof-marked in the blueprint after the zero-sampling boundary was corrected by the explicit hypothesis `0 < k`.  They are not hidden hypotheses on paper theorems. |
-| Source-shaped proved statements with high-risk words, such as `NaimarkTensorProductCorrelationStatement`, `RazSafraSoundnessStatement`, `PolishchukSpielmanClassicalSoundnessStatement`, `SdpStatementWithSlackness`, and `AddInUFullStatement` | These are explicitly audited in `AxiomAudit.lean`.  Their high-risk words record the Lean statement interface or the SDP slackness conclusion, not an added bridge assumption. |
+| Corrected source-boundary theorem/proposition links `MIPStarRE.LDT.Test.mainFormal`, `MIPStarRE.LDT.Test.mainFormalConclusion`, and `MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion` | These are proof-marked in the blueprint after the zero-sampling boundary was corrected by the explicit hypothesis `0 < k`.  They are not hidden hypotheses on paper theorems. |
+| Source-shaped proved statements with high-risk words, such as `NaimarkTensorProductCorrelationStatement`, `PolishchukSpielmanClassicalSoundnessStatement`, `SdpStatementWithSlackness`, and `AddInUFullStatement` | These are explicitly audited in `AxiomAudit.lean`.  Their high-risk words record the Lean statement interface or the SDP slackness conclusion, not an added bridge assumption. |
 | Proved construction and transport lemmas with high-risk words, such as the projectivization `Repair` declarations, SDP `Witness` and `Dominance` declarations, and `SliceBoundednessInput` accessors | These are Lean-only construction or bookkeeping interfaces.  They may be linked from auxiliary blueprint entries, but they are not advertised as replacements for the source-labelled theorems unless the surrounding blueprint text states the corresponding restriction or construction role. |
 
 This cross-check does not replace the statement-by-statement comparison against
@@ -309,8 +309,8 @@ interfaces, not as additional hypotheses of a source theorem.
 The four formerly conditional-looking informational links are
 `ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements`,
 `selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion`,
-`MainFormalProjectiveCompletionTransportWitness.nonempty_ofRoleWitness`, and
-`mainFormal_ofProjectiveCompletionTransportWitness`.  The audit now classifies
+`retired final-transport witness route.nonempty_ofRoleWitness`, and
+`retired final-transport helper`.  The audit now classifies
 these exact names as Lean-only source-construction contexts only in
 informational blueprint entries.  If any of them is linked from a theorem-like
 entry, it remains a conditional declaration-name finding.

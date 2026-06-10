@@ -7,11 +7,8 @@ Deterministic classical strategy data and acceptance probabilities for the
 paper's two-prover classical low individual degree test from
 `references/ldt-paper/test_definition.tex`.
 
-The relation between this paper-faithful classical test model and the
-repository's current quantum/projective surrogate
-`SameSpaceProjStrat.lowIndividualDegreeFailureProbability` is made explicit through the
-role-average lemmas below together with
-`SameSpaceProjStrat.lowIndividualDegreeFailureProbability`.
+The role-average lemmas below make explicit the same branch decomposition used
+by the paper-faithful two-space projective strategy container `ProjStrat`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -270,13 +267,9 @@ noncomputable def lowIndividualDegreeAcceptanceProbability {params : Parameters}
       strategy.diagonalAcceptanceProbability) / 3
 
 /-- The full classical test acceptance probability is the acceptance-side
-analogue of the branch average inside
-`SameSpaceProjStrat.lowIndividualDegreeFailureProbability`:
+analogue of the branch average used for two-space projective strategies:
 both formulas average the same axis-parallel and diagonal role choices and use
-the same cross-prover point-agreement self-consistency branch. Together with
-`SameSpaceProjStrat.classicalRoleSymmStrategy_selfConsistency_eq_pointAgreement`, this
-also explains how the comparison interfaces with the symmetric-strategy SSC
-defect used elsewhere in the repository. -/
+the same cross-prover point-agreement self-consistency branch. -/
 theorem lowIndividualDegreeAcceptanceProbability_eq_branchAverage
     {params : Parameters} [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) :
@@ -304,13 +297,10 @@ theorem lowIndividualDegreeAcceptanceProbability_eq_branchAverage
 /-- Passing the paper's deterministic two-prover classical low individual degree
 test with error `eps`, stated in acceptance-probability form.
 
-This name is deliberately distinct from `SameSpaceProjStrat.PassesLowIndividualDegreeTest`
+This name is deliberately distinct from `ProjStrat.PassesLowIndividualDegreeTest`
 so this paper-faithful classical predicate does not collide by dot notation with
-the repository's quantum/projective surrogate predicate. The precise branch
-comparison is exposed concretely by
-`lowIndividualDegreeAcceptanceProbability_eq_branchAverage` on the classical side
-and `SameSpaceProjStrat.lowIndividualDegreeFailureProbability` on the
-same-space projective surrogate side. -/
+the projective strategy predicate.  The precise branch comparison is exposed
+concretely by `lowIndividualDegreeAcceptanceProbability_eq_branchAverage`. -/
 structure ClassicallyPassesLowIndividualDegreeTest {params : Parameters}
     [FieldModel params.q]
     (strategy : TwoProverClassicalLIDStrategy params) (eps : Error) : Prop where
@@ -319,6 +309,78 @@ structure ClassicallyPassesLowIndividualDegreeTest {params : Parameters}
     1 - eps ≤ strategy.lowIndividualDegreeAcceptanceProbability
 
 end TwoProverClassicalLIDStrategy
+
+/-- Paper origin: `references/ldt-paper/introduction.tex`
+(`\label{thm:classical-test-soundness}`).
+
+Overview-level soundness conclusion: a low individual degree polynomial agrees
+with the point-answer function except on `slack` average mass, with explicit
+bound `slackBound`. -/
+def PointAnswerSoundnessConclusion (params : Parameters) [FieldModel params.q]
+    (a : Point params → Fq params) (slackBound slack : Error) : Prop :=
+  0 ≤ slack ∧
+    slack ≤ slackBound ∧
+      ∃ g : Polynomial params,
+        avgOver (uniformDistribution (Point params))
+            (fun u => if g u = a u then (1 : Error) else 0) ≥
+          1 - slack
+
+/-- Pass condition for the paper's deterministic two-prover classical low
+individual degree test.
+
+This records only the paper-faithful classical test-passing data:
+* a deterministic classical strategy for the two-prover low individual degree
+  test from `references/ldt-paper/test_definition.tex`,
+* a proof that Alice's point-answer function is the ambient `a`, and
+* a proof that the strategy passes that classical test with acceptance
+  probability at least `1 - eps`.
+
+The quoted Polishchuk--Spielman soundness implication is kept separate in
+`PolishchukSpielmanClassicalSoundnessStatement` so downstream theorems state
+the external dependency explicitly, without making it ambient proof power. -/
+def TwoProverClassicalLIDPassCondition (params : Parameters)
+    [FieldModel params.q]
+    (a : Point params → Fq params) (eps : Error) : Prop :=
+  ∃ strategy : TwoProverClassicalLIDStrategy params,
+    strategy.pointAnswerA = a ∧
+      strategy.ClassicallyPassesLowIndividualDegreeTest eps
+
+/-- Paper origin: external citation, Polishchuk--Spielman (`\cite{PS94}`),
+restated as `\label{thm:classical-test-soundness}` in
+`references/ldt-paper/introduction.tex:69-92`.
+
+Hypothesis-style interface for the classical low-individual-degree soundness
+result of Polishchuk and Spielman.
+
+This issue-#408 `Prop`-valued interface replaces the earlier ambient axiom with
+an explicit hypothesis at each call site. The external witness carries its own
+slack bound parameter `slackBound`, so downstream users must supply the specific
+error dependence they want to quote rather than inheriting any repository-chosen
+placeholder formula for the schematic Chapter 1
+`poly(m) * (poly(eps) + poly(d/q))` bound. -/
+def PolishchukSpielmanClassicalSoundnessStatement (params : Parameters)
+    [FieldModel params.q]
+    (a : Point params → Fq params) (eps slackBound : Error) : Prop :=
+  TwoProverClassicalLIDPassCondition params a eps →
+    ∃ slack : Error,
+      PointAnswerSoundnessConclusion params a slackBound slack
+
+/-- `thm:classical-test-soundness`.
+
+Quoted classical overview theorem: from paper-faithful classical LID
+test-passing data together with an explicit witness of the Polishchuk--Spielman
+soundness statement at a chosen slack bound `slackBound`, conclude that prover
+A's point-answer function is close to a low-degree polynomial with that same
+bound.  Any concrete overview-style rate must therefore be supplied by
+instantiating `slackBound` and the external hypothesis `hPS`. -/
+theorem classicalTestSoundness
+    (params : Parameters) [FieldModel params.q]
+    (a : Point params → Fq params) (eps slackBound : Error)
+    (hpass : TwoProverClassicalLIDPassCondition params a eps)
+    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps slackBound) :
+    ∃ slack : Error,
+      PointAnswerSoundnessConclusion params a slackBound slack := by
+  exact hPS hpass
 
 end Test
 

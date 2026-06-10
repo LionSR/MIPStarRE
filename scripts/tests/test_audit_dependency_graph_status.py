@@ -35,7 +35,6 @@ GOOD_DOT = r'''
 "thm:naimark" [color=green, fillcolor="#1CAC78", label=naimark, shape=ellipse, style=filled];
 "thm:main-formal" [color=green, fillcolor="#1CAC78", label="main-formal", shape=ellipse, style=filled];
 "thm:main-induction" [color=green, fillcolor="#1CAC78", label="main-induction", shape=ellipse, style=filled];
-"thm:main-formal-current-interface" [color=green, fillcolor="#1CAC78", label="main-formal-current-interface", shape=ellipse, style=filled];
 "prop:main-formal-source-reduction" [color=green, fillcolor="#1CAC78", label="main-formal-source-reduction", shape=ellipse, style=filled];
 "prop:main-formal-source-small-error" [color=green, fillcolor="#1CAC78", label="main-formal-source-small-error", shape=ellipse, style=filled];
     "prop:main-formal-source-two-space-role-register" [color=green, fillcolor="#1CAC78", label="main-formal-source-two-space-role-register", shape=ellipse, style=filled];

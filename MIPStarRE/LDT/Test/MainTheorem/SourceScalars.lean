@@ -1,11 +1,11 @@
 import MIPStarRE.LDT.MainInductionStep.Defs
-import MIPStarRE.LDT.Test.ErrorCascade.CascadeBounds.Final
+import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Final
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 
 /-!
-# Main-formal error scalars
+# Main-formal scalar bounds
 
-Section 3 error cascade for the `mainFormal` assembly.  This module defines
+Scalar estimates for the two-space `mainFormal` theorem.  This module defines
 the five scalars that appear in the paper's error calculation:
 
 * `σ` — the symmetrized induction consistency error
@@ -14,7 +14,7 @@ the five scalars that appear in the paper's error calculation:
 * `ζ₃` — the projective self-consistency error
 * `ζ₄` — the final point-consistency error
 
-The core structure `MainFormalCascadeScalars` (Prop) bundles the three
+The core structure `MainFormalScalarBounds` (Prop) bundles the three
 hypotheses needed to invoke the checked Step 8 bound
 `errorCascade_le_mainFormalError`:
 
@@ -28,7 +28,7 @@ hypotheses needed to invoke the checked Step 8 bound
 The cascade comparisons `ζ₁ ≤ …`, `ζ₃ ≤ 2·mainFormalError`, etc. are then
 derived in the private theorem `cascadeBounds` via
 `errorCascade_le_mainFormalError`, which calls the already-formalized
-error-cascade estimates from `LDT.Test.ErrorCascade`.  The module also
+scalar cascade estimates from `LDT.Test.MainTheorem.ScalarBounds`.  The module also
 provides the vacuous-branch analysis (`mainFormalError_ge_one_of_*`) and
 the coarsening lemma that absorbs `orthonormalizeAndCompleteError` into
 `ζ₂` (`orthonormalizeAndCompleteError_zeta1_le_zeta2`).
@@ -64,7 +64,7 @@ main-induction error at `(3ε, 3ε, 3ε)`.
 
 This is the exact scalar handoff between paper lines 75--81 and the cascade
 notation used from line 133 onward. -/
-theorem mainFormalCascadeSigma_eq_mainInductionError (params : Parameters)
+theorem mainFormalScalarSigma_eq_mainInductionError (params : Parameters)
     (k : ℕ) (eps : Error) :
     cascadeSigma params k (mainFormalInductionNu params k eps) =
       MainInductionStep.mainInductionError params k (3 * eps) (3 * eps) (3 * eps) :=
@@ -206,6 +206,11 @@ theorem mainFormalError_ge_one_of_q_lt_d
 /-- In the non-vacuous branch of `mainFormal`, the standing scalar hypotheses of
 Step 8 follow from the theorem's basic positivity data.
 
+**Source:** This is source-faithful scalar bookkeeping for
+`references/ldt-paper/inductive_step.tex:186-234`, under the corrected
+boundaries documented in `docs/paper-gaps/issue-906-main-formal-k-bound.tex`
+and `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`.
+
 If either `ε > 1` or `d > q`, the final error `mainFormalError` is already at
 least `1`, so `mainFormal_trivial_witness` handles the theorem. Hence under
 `¬ 1 ≤ mainFormalError params k eps` we may safely enter the paper's cascade
@@ -235,7 +240,7 @@ formalized Step 8 bound `errorCascade_le_mainFormalError` on the
 main-induction `ν` produced after symmetrization (paper lines 68--75). The
 corrected source route derives these scalar side conditions in the non-vacuous
 branch and otherwise uses the saturated-error witness. -/
-structure MainFormalCascadeScalars (params : Parameters) (eps : Error) (k : ℕ) : Prop where
+structure MainFormalScalarBounds (params : Parameters) (eps : Error) (k : ℕ) : Prop where
   /-- Standing scalar regime for the paper's cascade estimates. -/
   cascadeHypotheses : CascadeHypotheses params k eps
   /-- Nonnegativity of the main-induction `ν` at `(3ε, 3ε, 3ε)`. -/
@@ -247,14 +252,18 @@ structure MainFormalCascadeScalars (params : Parameters) (eps : Error) (k : ℕ)
         (Real.rpow eps (1 / (1024 : Error)) +
           Real.rpow ((params.d : Error) / (params.q : Error)) (1 / (1024 : Error)))
 
-namespace MainFormalCascadeScalars
+namespace MainFormalScalarBounds
 
 /-- Build the scalar data once the standing cascade hypotheses hold; the
 main-induction `ν` nonnegativity and paper line 71--73 coarsening are discharged
-by the checked scalar lemmas above. -/
+by the checked scalar lemmas above.
+
+**Source:** This is a source-faithful constructor for the scalar regime in
+`references/ldt-paper/inductive_step.tex:68-75` and
+`references/ldt-paper/inductive_step.tex:186-234`. -/
 theorem ofCascadeHypotheses {params : Parameters} {eps : Error} {k : ℕ}
     (h : CascadeHypotheses params k eps) :
-    MainFormalCascadeScalars params eps k where
+    MainFormalScalarBounds params eps k where
   cascadeHypotheses := h
   inductionNu_nonneg := mainFormalInductionNu_nonneg h
   inductionNu_bound := mainFormalInductionNu_bound h
@@ -267,50 +276,55 @@ remaining scalar positivity hypotheses. -/
 theorem ofNontrivialMainFormal {params : Parameters} {eps : Error} {k : ℕ}
     (hepsNN : 0 ≤ eps) (hk0 : 0 < k)
     (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
-    MainFormalCascadeScalars params eps k :=
+    MainFormalScalarBounds params eps k :=
   ofCascadeHypotheses (cascadeHypotheses_of_not_mainFormalError_ge_one hepsNN hk0 hsmall)
 
 /-- The paper's `σ`, built from the symmetrized main-induction `ν`. -/
 noncomputable def sigma {params : Parameters} {eps : Error} {k : ℕ}
-    (_scalars : MainFormalCascadeScalars params eps k) : Error :=
+    (_scalars : MainFormalScalarBounds params eps k) : Error :=
   cascadeSigma params k (mainFormalInductionNu params k eps)
 
 /-- The paper's `ζ₁ = 2σ + 2√(3ε + 2σ) + md/q`. -/
 noncomputable def zeta1 {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) : Error :=
+    (scalars : MainFormalScalarBounds params eps k) : Error :=
   cascadeZeta1 params eps scalars.sigma
 
 /-- The formal Step 6 scalar
 `ζ₂ = 200ζ₁^(1/4) + 42ζ₁^(1/8)`, widening the paper's printed coefficient
 `40` to absorb the extra completion term. -/
 noncomputable def zeta2 {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) : Error :=
+    (scalars : MainFormalScalarBounds params eps k) : Error :=
   cascadeZeta2 scalars.zeta1
 
 /-- The paper's self-consistency scalar `ζ₃ = 6ζ₁ + 6ζ₂`. -/
 noncomputable def zeta3 {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) : Error :=
+    (scalars : MainFormalScalarBounds params eps k) : Error :=
   cascadeZeta3 scalars.zeta1 scalars.zeta2
 
 /-- The paper's point-consistency scalar `ζ₄ = 2σ + 2√(ζ₁ + ζ₃/2)`. -/
 noncomputable def zeta4 {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) : Error :=
+    (scalars : MainFormalScalarBounds params eps k) : Error :=
   cascadeZeta4 scalars.sigma scalars.zeta1 scalars.zeta3
 
 /-- The repaired line-169 error `ζ₁ + 10·ζ₁^(1/8)` coming from the checked local
 pre-completion transport. -/
 noncomputable def line169Error {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) : Error :=
+    (scalars : MainFormalScalarBounds params eps k) : Error :=
   cascadeLine169RepairError scalars.zeta1
 
 /-- The repaired point-consistency scalar obtained by substituting the checked
-line-169 repair error into the final point-transport triangle. -/
+line-169 repair error into the final point-transport triangle.
+
+**Source:** This is source-faithful scalar bookkeeping for the repaired
+line-169 route documented in `docs/paper-gaps/issue-1099-sharper-local-fix.tex`
+and absorbed by the paper's final cascade estimate in
+`references/ldt-paper/inductive_step.tex:186-234`. -/
 noncomputable def zeta4Repaired {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) : Error :=
+    (scalars : MainFormalScalarBounds params eps k) : Error :=
   cascadeZeta4Repaired scalars.sigma scalars.zeta1 scalars.zeta3
 
 private theorem cascadeBounds {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) :
+    (scalars : MainFormalScalarBounds params eps k) :
     scalars.sigma ≤ mainFormalError params k eps ∧
       scalars.zeta1 ≤ mainFormalError params k eps ∧
       scalars.zeta2 ≤ mainFormalError params k eps ∧
@@ -326,14 +340,14 @@ private theorem cascadeBounds {params : Parameters} {eps : Error} {k : ℕ}
 
 /-- Nonnegativity of the native cascade `σ`. -/
 theorem sigma_nonneg {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) :
+    (scalars : MainFormalScalarBounds params eps k) :
     0 ≤ scalars.sigma := by
   unfold sigma cascadeSigma
   positivity [scalars.inductionNu_nonneg]
 
 /-- Nonnegativity of the native cascade `ζ₁`. -/
 theorem zeta1_nonneg {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) :
+    (scalars : MainFormalScalarBounds params eps k) :
     0 ≤ scalars.zeta1 := by
   have hσ : 0 ≤ scalars.sigma := sigma_nonneg scalars
   have hdq : 0 ≤ (params.d : Error) / (params.q : Error) :=
@@ -343,14 +357,14 @@ theorem zeta1_nonneg {params : Parameters} {eps : Error} {k : ℕ}
 
 /-- Step 8 absorption for the native `ζ₁` target. -/
 theorem zeta1_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) :
+    (scalars : MainFormalScalarBounds params eps k) :
     scalars.zeta1 ≤ mainFormalError params k eps :=
   (cascadeBounds scalars).2.1
 
 /-- In the non-vacuous branch, the cascade scalar `ζ₁` lies in the unit interval. -/
 theorem zeta1_le_one_of_not_mainFormalError_ge_one
     {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k)
+    (scalars : MainFormalScalarBounds params eps k)
     (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
     scalars.zeta1 ≤ 1 := by
   exact le_of_lt <|
@@ -360,7 +374,7 @@ theorem zeta1_le_one_of_not_mainFormalError_ge_one
 error in the non-vacuous branch. -/
 theorem orthonormalizeAndCompleteError_zeta1_le_zeta2
     {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k)
+    (scalars : MainFormalScalarBounds params eps k)
     (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
     MakingMeasurementsProjective.orthonormalizeAndCompleteError scalars.zeta1 ≤
       scalars.zeta2 := by
@@ -371,9 +385,14 @@ theorem orthonormalizeAndCompleteError_zeta1_le_zeta2
     MakingMeasurementsProjective.orthonormalizeAndCompleteError_le_absorbedZeta2
       (ζ := scalars.zeta1) hζ0 hζ1
 
-/-- Step 8 absorption for the repaired `ζ₄` point-consistency targets. -/
+/-- Step 8 absorption for the repaired `ζ₄` point-consistency targets.
+
+**Source:** This is source-faithful scalar bookkeeping for the repaired
+line-169 route documented in `docs/paper-gaps/issue-1099-sharper-local-fix.tex`
+and the final absorption estimate from
+`references/ldt-paper/inductive_step.tex:186-234`. -/
 theorem zeta4Repaired_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) :
+    (scalars : MainFormalScalarBounds params eps k) :
     scalars.zeta4Repaired ≤ mainFormalError params k eps := by
   have hσEq : scalars.sigma = cascadeSigma params k (mainFormalInductionNu params k eps) := rfl
   have hζ₁Eq : scalars.zeta1 = cascadeZeta1 params eps scalars.sigma := rfl
@@ -386,12 +405,12 @@ theorem zeta4Repaired_le_mainFormalError {params : Parameters} {eps : Error} {k 
 
 /-- Step 8 absorption for the native `ζ₃/2` self-consistency target. -/
 theorem zeta3_div_two_le_mainFormalError {params : Parameters} {eps : Error} {k : ℕ}
-    (scalars : MainFormalCascadeScalars params eps k) :
+    (scalars : MainFormalScalarBounds params eps k) :
     scalars.zeta3 / 2 ≤ mainFormalError params k eps := by
   have hzeta3 := (cascadeBounds scalars).2.2.2.1
   linarith
 
-end MainFormalCascadeScalars
+end MainFormalScalarBounds
 
 end Test
 

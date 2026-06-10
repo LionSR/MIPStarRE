@@ -19,7 +19,7 @@ The detailed tables below are preserved as a dated audit record.  They include
 obsolete rows about `prop:main-formal-source-successor-construction`,
 `prop:main-induction-successor-small-error-construction`,
 `prop:main-induction-successor-predecessor-induction`, and
-`thm:main-formal-current-interface`.  For the current classification, use the
+the retired Lean-only main-formal interface node.  For the current classification, use the
 2026-05-22 report and `docs/reports/issue-1586-sorryax-inventory.md`: the LDT
 tree currently has no direct Lean proof holes under the corrected source
 statements.  The remaining differences from the printed paper are the confirmed
@@ -200,16 +200,13 @@ from the May 20 snapshot have been retired rather than kept as live proof
 obligations.  The source entry
 `thm:naimark` is linked to the axiom-clean source-shaped Lean theorem
 `MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation`
-and is now marked `\leanok` in the local blueprint.  The source entries `thm:raz-safra` and
-`thm:classical-test-soundness` carry no Lean declaration links.  Their nearby
-Lean declarations occur only in the separate entries
-`thm:main-formal-current-interface`,
-`thm:main-induction-current-interface`,
-`prop:lean-raz-safra-interface`,
-`prop:lean-classical-test-soundness-interface`, and
-`rem:lean-questionwise-naimark`.  Thus the source-labelled statements are
-not being certified through the restricted, corrected, or external-interface
-theorems.
+and is now marked `\leanok` in the local blueprint.  The source entry
+`thm:classical-test-soundness` carries no Lean declaration link.  Its nearby
+Lean declaration occurs only in the separate entry
+`prop:lean-classical-test-soundness-interface`.  The former Lean-only
+surface-versus-point external interface has been retired.  Thus the
+source-labelled statements are not being certified through the restricted,
+corrected, or external-interface theorems.
 
 A direct scan of theorem-labelled entries also separates the checked
 paper-facing theorem nodes from the deliberately unlinked source boundaries.
@@ -221,9 +218,8 @@ The checked source theorem nodes with Lean links are
 `thm:ld-pasting-in-induction-section`.  The scan finds the Lean-only or
 bookkeeping entries separately:
 `rem:lean-questionwise-naimark`,
-`prop:lean-raz-safra-interface`,
 `prop:lean-classical-test-soundness-interface`,
-`thm:main-formal-current-interface`,
+the retired Lean-only main-formal interface node,
 `thm:main-induction-current-interface`, and the final scalar-cascade entries in
 Chapter 10.  The source theorem entries without Lean links are precisely the
 external theorem boundaries and the informal main theorem.  The two central
@@ -277,8 +273,8 @@ whose names contain
 `MainInductionStep.mainInduction_sourceRangeSmallErrorPositiveNonBaseKPosObligation`,
 `MakingMeasurementsProjective.projectiveLowRankSum_of_spectralTruncationStatement`,
 and the two final-theorem diagonal witness constructors
-`Test.MainFormalDiagonalCompletionWitness.nonempty_ofDiagonalConsistency` and
-`Test.MainFormalDiagonalOrthonormalizationWitness.nonempty_ofDiagonalConsistency`.
+`Test.retired diagonal completion witness route.nonempty_ofDiagonalConsistency` and
+`Test.retired diagonal orthonormalization witness route.nonempty_ofDiagonalConsistency`.
 
 A theorem-like-environment scan of current blueprint entries whose Lean links
 contain `Bridge`, `Package`, `Residual`, `Repair`, `Producer`, `Input`,
@@ -296,7 +292,7 @@ Thus the theorem-like suspicious-link frontier in this snapshot was classified.
 In particular, the source theorem entries `thm:main-formal` and
 `thm:main-induction` did not link to declarations whose names contain this
 vocabulary; the proof debt was then represented by the named obligations
-`Test.mainFormal_sourceSmallErrorConclusion` and
+`Test.mainFormal_smallErrorConclusion` and
 `MainInductionStep.mainInduction_sourceRangeObligation` below the source
 statements.  Later repairs retired those obligations under the corrected
 \(k\ge400md\) and \(0<k\) source-boundary statements.
@@ -313,8 +309,8 @@ The same audit previously checked the transitive Section 6 route
 \(\to\) `mainInductionSuccessorNext`
 \(\to\) `mainInductionSuccessor`
 \(\to\) `mainInduction`
-\(\to\) `strategySymmetrization_mainInduction`
-\(\to\) `MainFormalRoleInductionWitness.ofMainInduction`;
+\(\to\) `roleRegisterSymmStrategy_sourceMainInduction`
+\(\to\) `retired role-induction witness route.ofMainInduction`;
 the corrected large-\(k\) successor theorem on this route is now proved.  The
 former source-boundary interval and final two-space source-boundary nodes have
 also been superseded by the corrected theorem statements, so this dated report
@@ -455,18 +451,15 @@ original-outcome projective submeasurement.  The blueprint records this
 questionwise interface separately as `rem:lean-questionwise-naimark`;
 it is no longer the stopping point for the full tensor-product theorem.
 
-The classical overview theorems `thm:raz-safra` and
-`thm:classical-test-soundness` were checked against
-`references/ldt-paper/introduction.tex`.  Their Lean declarations
-`razSafra` and `classicalTestSoundness` are axiom-clean wrappers around explicit
-external soundness hypotheses,
-`RazSafraSoundnessStatement` and
-`PolishchukSpielmanClassicalSoundnessStatement`, respectively.  They do not
-claim to formalize the cited external theorems.  The blueprint now keeps the
-source entries unlinked and records the wrappers separately as
-`prop:lean-raz-safra-interface` and
+The classical overview theorem `thm:classical-test-soundness` was checked
+against `references/ldt-paper/introduction.tex`.  Its Lean declaration
+`classicalTestSoundness` is an axiom-clean conditional corollary around the
+explicit external soundness hypothesis
+`PolishchukSpielmanClassicalSoundnessStatement`.  It does not claim to
+formalize the cited external theorem.  The blueprint keeps the source entry
+unlinked and records the conditional corollary separately as
 `prop:lean-classical-test-soundness-interface`, whose displayed hypotheses
-include the corresponding external soundness statements.
+include the external soundness statement.
 
 The extracted blue-border nodes are:
 
@@ -479,7 +472,7 @@ The non-green or non-proof-filled nodes extracted from the same DOT payloads are
 
 | Graph | Nodes |
 |---|---|
-| Fetched public `origin/github-pages` | `rem:lean-naimark-auxiliary-declarations`, `thm:classical-test-soundness`, `thm:main-formal`, `thm:main-formal-current-interface`, `thm:main-induction`, `thm:main-informal`, `thm:naimark`, `thm:raz-safra`.  The former successor-boundary and successor-target definition nodes are still present in the public graph, but they are green-filled stale nodes rather than current unfilled frontier nodes. |
+| Fetched public `origin/github-pages` | `rem:lean-naimark-auxiliary-declarations`, `thm:classical-test-soundness`, `thm:main-formal`, the retired Lean-only main-formal interface node, `thm:main-induction`, `thm:main-informal`, `thm:naimark`, `thm:raz-safra`.  The former successor-boundary and successor-target definition nodes are still present in the public graph, but they are green-filled stale nodes rather than current unfilled frontier nodes. |
 | Local rebuilt graph | `thm:classical-test-soundness`, `thm:main-formal`, `thm:main-induction`, `thm:main-informal`, `thm:raz-safra`, together with the proof-frontier propositions `prop:main-formal-source-reduction`, `prop:main-formal-source-small-error`, `prop:main-formal-source-two-space-role-register`, `prop:main-formal-source-k-range-boundary`, and `prop:main-induction-source-range-obligation`.  The source-frontier theorem and proposition nodes with tracked proof debt are now blue/unfilled in the rebuilt local graph, not green statement-level nodes.  The Naimark source theorem, its auxiliary declaration node, the corrected current-interface nodes, and the answer-valued successor nodes are now green or proof-filled in the rebuilt local graph.  The retired nodes `def:main-formal-successor-boundary`, `def:main-formal-step6-successor-targets`, and `prop:main-induction-successor-degree-zero-family` are absent. |
 
 The same DOT extraction was also applied to green public nodes whose labels
@@ -558,19 +551,18 @@ corrected, or external-interface theorem.
 
 | Node | Paper source | Current blueprint statement | Lean linkage verdict |
 |---|---|---|---|
-| `thm:raz-safra` | `references/ldt-paper/introduction.tex:43-65` | Matches the quoted overview theorem. | No Lean declaration is attached.  The checked wrapper is split out as `prop:lean-raz-safra-interface`. |
 | `thm:classical-test-soundness` | `references/ldt-paper/introduction.tex:69-92` | Matches the quoted overview theorem. | No Lean declaration is attached.  The checked wrapper is split out as `prop:lean-classical-test-soundness-interface`. |
 | `thm:main-informal` | `references/ldt-paper/introduction.tex:199-213` | Matches the paper's informal expectation estimate. | No Lean declaration is attached; the paper directs the formal content to `thm:main-formal`. |
 | `thm:naimark` | `references/ldt-paper/orthonormalization.tex:36-75` | Records the full bipartite tensor-product correlation statement in the projective-submeasurement form produced by `lem:naimark-helper`. | Linked to the axiom-clean source-shaped Lean theorem `MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation` and marked `\leanok`.  The checked questionwise interface remains split out as `rem:lean-questionwise-naimark`. |
-| `thm:main-formal` | `references/ldt-paper/test_definition.tex:180-202` | Historical row.  The current blueprint records the documented corrections \(k\ge400md\) and \(0<k\). | The current corrected two-space Lean statement `MIPStarRE.LDT.Test.mainFormal_sourceStatement` is proof-complete.  The older source-boundary wrappers named in this row should not be read as live obligations. |
-| `thm:main-induction` | `references/ldt-paper/inductive_step.tex:7-18` | Historical row.  The current blueprint records the confirmed correction from `k >= md` to `k >= 400md`. | The current corrected large-`k` statement `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceStatement` is proof-complete.  The former wrappers for the interval `md <= k < 400md` have been retired with the statement correction. |
+| `thm:main-formal` | `references/ldt-paper/test_definition.tex:180-202` | Historical row.  The current blueprint records the documented corrections \(k\ge400md\) and \(0<k\). | The current corrected two-space Lean statement `MIPStarRE.LDT.Test.mainFormal` is proof-complete.  The older source-boundary wrappers named in this row should not be read as live obligations. |
+| `thm:main-induction` | `references/ldt-paper/inductive_step.tex:7-18` | Historical row.  The current blueprint records the confirmed correction from `k >= md` to `k >= 400md`. | The current corrected large-`k` statement `MIPStarRE.LDT.MainInductionStep.mainInduction` is proof-complete.  The former wrappers for the interval `md <= k < 400md` have been retired with the statement correction. |
 
 ## Classification
 
 | Node | Public graph status | Current source status | Mathematical status | Next action |
 |---|---|---|---|---|
 | `thm:main-formal` | Historical public graph row. | The current blueprint marks the corrected two-space source statement proof-complete. | The Lean statement uses the documented \(k\ge400md\) and \(0<k\) corrections and has no bridge, residual, repair, data, obligation, or package hypothesis. | No action in this dated row; use the 2026-05-22 status report and the current blueprint. |
-| `thm:main-formal-current-interface` | Historical public graph row. | Current source marks this separate Lean-only entry proof-complete. | This is the same-space corrected large-\(k\) interface.  It remains an intermediate theorem, while the corrected two-space source theorem is checked separately. | No action in this dated row. |
+| the retired Lean-only main-formal interface node | Historical public graph row. | Current source marks this separate Lean-only entry proof-complete. | This is the same-space corrected large-\(k\) interface.  It remains an intermediate theorem, while the corrected two-space source theorem is checked separately. | No action in this dated row. |
 | `thm:main-induction` | Historical public graph row. | The current blueprint marks the corrected \(k\ge400md\) induction theorem proof-complete. | The former `md <= k < 400md` source-range wrappers have been retired because the factor \(400\) is treated as a confirmed statement correction. | No action in this dated row. |
 | `thm:main-induction-current-interface` | Historical public graph row. | Current source marks this separate Lean-only entry proof-complete. | The corrected large-\(k\) successor route is checked, including the answer-valued induction and pasting route. | No action in this dated row. |
 | `prop:main-formal-source-small-error` | Historical public graph row. | The corrected small-error two-space branch is checked under \(k\ge400md\), \(0<k\), and \(\nu<1\). | The zero-sampling case is no longer a hidden branch; \(0<k\) is part of the corrected statement. | No action in this dated row. |
@@ -595,8 +587,6 @@ corrected, or external-interface theorem.
 | `thm:naimark` | Blue border with the non-proof blue fill on the fetched public graph. | The rebuilt local graph marks this node green with proof fill.  The source theorem is linked to `MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation` and marked `\leanok`. | This is the full tensor-product correlation statement from `references/ldt-paper/orthonormalization.tex:36-75`, read in the projective-submeasurement form produced by `lem:naimark-helper`.  The stronger complete-measurement form on the original outcome type is false for arbitrary submeasurements.  The linked Lean theorem constructs the auxiliary spaces, auxiliary product state, dilated state, and projective submeasurements from the proved one-measurement Naimark theorem, and the four-register trace identity `OneMeasNaimarkData.twoSidedCorrelationPreservation` is proved. | No Naimark proof repair remains; keep the projective-submeasurement correction documented. |
 | `rem:lean-naimark-auxiliary-declarations` | Present as an unfilled definition node on the fetched public graph. | Current source keeps this as a prose-only remark without Lean declaration links. | The former linked declarations `naimarkAuxiliaryHilbertSpace`, `naimarkAuxiliaryState`, and `naimarkAuxiliaryProductState` were unused after the tensor-product Naimark theorem was proved through the one-measurement auxiliary registers.  They were Lean-only objects, not source theorem hypotheses. | No proof repair remains; keep the Naimark source theorem linked to `naimarkTensorProductCorrelation` and keep this remark as explanatory prose only. |
 | `rem:lean-questionwise-naimark` | Present as a green auxiliary definition node on the fetched public graph and in the rebuilt local graph. | Current source marks the auxiliary entry `\leanok`; the proof-level theorem behind it is `MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark`. | This Lean-only entry records the axiom-clean theorem `MIPStarRE.LDT.MakingMeasurementsProjective.questionwiseNaimark`: it applies the one-measurement Naimark lemma separately to each indexed submeasurement and proves single-outcome marginal preservation. | No independent repair is needed; the full tensor-product boundary is now discharged at `thm:naimark`. |
-| `thm:raz-safra` | Blue border, no proof fill on the fetched public graph; blue border with non-proof blue fill in the rebuilt local graph. | The source theorem has no attached Lean declaration. | This is the external Raz--Safra theorem from `references/ldt-paper/introduction.tex:43-65`.  The Lean wrapper is recorded separately in `prop:lean-raz-safra-interface` because it assumes the specialized external soundness statement as a hypothesis. | Leave unmarked unless the classical theorem is formalized or imported as a trusted external result with a precise policy. |
-| `prop:lean-raz-safra-interface` | Present as a green conditional-interface node on the fetched public graph and in the rebuilt local graph. | Current source marks both the statement and proof `\leanok`. | This Lean-only entry is the axiom-clean wrapper `MIPStarRE.LDT.Test.razSafra`: from the modeled surface-versus-point pass condition and the explicit hypothesis `RazSafraSoundnessStatement`, it derives the corresponding point-answer soundness conclusion. | No independent repair is needed; the external theorem boundary remains at `thm:raz-safra`. |
 | `thm:classical-test-soundness` | Blue border, no proof fill on the fetched public graph; blue border with non-proof blue fill in the rebuilt local graph. | The source theorem has no attached Lean declaration. | This is the external Polishchuk--Spielman theorem from `references/ldt-paper/introduction.tex:69-92`.  The Lean wrapper is recorded separately in `prop:lean-classical-test-soundness-interface` because it assumes the specialized external soundness statement and a caller-chosen slack bound. | Leave unmarked and keep the external hypothesis explicit unless the cited theorem is formalized or imported as a trusted external result. |
 | `prop:lean-classical-test-soundness-interface` | Present as a green conditional-interface node on the fetched public graph and in the rebuilt local graph. | Current source marks both the statement and proof `\leanok`. | This Lean-only entry is the axiom-clean wrapper `MIPStarRE.LDT.Test.classicalTestSoundness`: from the modeled deterministic low-individual-degree pass condition and the explicit hypothesis `PolishchukSpielmanClassicalSoundnessStatement`, it derives the corresponding point-answer soundness conclusion at the supplied slack bound. | No independent repair is needed; the external theorem boundary remains at `thm:classical-test-soundness`. |
 | `thm:main-informal` | Blue border, no proof fill. | The theorem has no Lean declaration, and its blueprint statement has been restored to the paper's informal theorem from `references/ldt-paper/introduction.tex:199-213`. | It is the overview-level informal consequence of the formal theorem, with the displayed expectation estimate for a projective polynomial measurement.  The paper itself directs the reader to `thm:main-formal` for the formal statement and caveats. | Leave unmarked unless the informal-to-formal implication is chosen as a separate formalization target. |
@@ -617,7 +607,7 @@ above.  After rebuilding the graph with the compatible Python interpreter, the
 local DOT file agrees with the source parser for the repaired nodes.  The
 Naimark source theorem and its auxiliary declaration node are green locally.
 The corrected current interfaces
-`thm:main-formal-current-interface` and
+the retired Lean-only main-formal interface node and
 `thm:main-induction-current-interface` are now blue statement-ready nodes with
 no proof fill.  The former successor-boundary and successor-target definition
 nodes are absent from the local graph; their mathematical content is described
@@ -652,7 +642,7 @@ the source-frontier entries as intentionally not statement-complete:
 `prop:main-formal-source-small-error`, `thm:main-induction`,
 `prop:main-induction-source-range-obligation`, and
 `prop:main-induction-successor-small-error-construction`.  The current
-corrected-interface entries `thm:main-formal-current-interface` and
+corrected-interface entries the retired Lean-only main-formal interface node and
 `thm:main-induction-current-interface` are deliberately not marked
 statement-complete in the blueprint graph.  The external source theorems
 `thm:raz-safra` and `thm:classical-test-soundness` remain unlinked, while their

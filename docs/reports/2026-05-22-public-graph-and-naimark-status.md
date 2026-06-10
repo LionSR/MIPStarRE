@@ -109,7 +109,6 @@ mathematical status is as follows.
 | `prop:main-formal-source-small-error` | The final-theorem small-error wrapper under \(k\ge 400md\), \(0<k\), and \(\nu<1\).  It is proof-complete after the zero-sampling boundary was moved into the theorem statement. |
 | `prop:main-formal-source-two-space-role-register` | The general two-space role-register passage needed for the corrected final theorem.  The heterogeneous symmetrization, factor-two unsymmetrization, point-agreement branch, heterogeneous triangle step, Schwartz--Zippel Step 5 calculation, heterogeneous orthonormalization, completion, line-169 consistency, final point-evaluation triangle, and scalar absorption into `mainFormalError` are now checked under \(0<k\). |
 | `thm:main-induction` | The induction theorem from `references/ldt-paper/inductive_step.tex:7-18`, with the confirmed correction \(k\ge400md\).  Its Lean statement is proof-complete. |
-| `thm:raz-safra` | An external classical theorem quoted from Raz--Safra.  The nearby Lean node `prop:lean-raz-safra-interface` is only a conditional wrapper assuming the specialized external theorem; the source theorem is not marked as formalized. |
 | `thm:classical-test-soundness` | An external Polishchuk--Spielman theorem.  The nearby Lean node `prop:lean-classical-test-soundness-interface` is only a conditional wrapper assuming the specialized external theorem; the source theorem is not marked as formalized. |
 | `thm:main-informal` | The informal overview theorem.  It is a consequence of the final formal theorem and is not separately formalized while `thm:main-formal` remains open. |
 
@@ -147,7 +146,7 @@ The findings are exactly the expected staleness discrepancies:
 - source-frontier theorem nodes still displayed as green on the public graph:
   `thm:main-formal` and `thm:main-induction`;
 - the corrected Lean-only current interface
-  `thm:main-formal-current-interface` was present but not proof-filled on the
+  the retired Lean-only main-formal interface node was present but not proof-filled on the
   public graph;
 - the public graph had not yet picked up the now-proved Naimark display
   `thm:naimark`, and it still displayed the auxiliary Naimark remark with stale
@@ -161,7 +160,7 @@ For a reader using that stale graph, the classification was:
 | source-boundary nodes `prop:main-formal-source-reduction`, `prop:main-formal-source-small-error`, and `prop:main-formal-source-two-space-role-register` were absent | Stale graph omission at that snapshot.  These nodes are now proof-marked for the corrected source route.  The older source-range and zero-sampling frontier nodes have since been retired or moved to explanatory remarks after the corrected statements were adopted. |
 | `thm:main-formal` and `thm:main-induction` display as green | This was misleading at the stale snapshot because the graph had not yet exposed the intermediate source-boundary nodes.  In the current local source the corrected theorem statements are proof-complete, and the source-boundary nodes are present and proof-marked. |
 | proved successor nodes `prop:main-induction-successor-answer-valued-pasting`, `prop:main-induction-successor-predecessor-induction`, and `prop:main-induction-successor-small-error-construction` are absent | Stale graph omission.  Locally these nodes are present and proof-marked; the corrected large-\(k\) successor route is not the remaining obstruction. |
-| `thm:main-formal-current-interface` is not proof-filled | Stale proof colour.  The same-space corrected-range interface is proof-complete locally, but it is not the printed two-space paper theorem. |
+| the retired Lean-only main-formal interface node is not proof-filled | Stale proof colour.  The same-space corrected-range interface is proof-complete locally, but it is not the printed two-space paper theorem. |
 | `thm:naimark` is not displayed as a completed formalized node, and `rem:lean-naimark-auxiliary-declarations` still has stale proof colour | Stale proof colour.  Locally the tensor-product Naimark theorem is linked and checked as standard-axiom clean.  The auxiliary Naimark remark is now explanatory prose rather than a Lean declaration node. |
 
 ## Successor route status at this snapshot

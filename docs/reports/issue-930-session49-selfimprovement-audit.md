@@ -33,8 +33,8 @@ Branch: `gpt55/issue-930-selfimprovement-audit`
 > tracked by #1507.  The source-labelled final-theorem route additionally
 > contained the named source-boundary obligations
 > `MIPStarRE.LDT.MainInductionStep.mainInduction_sourceRangeObligation` and
-> `MIPStarRE.LDT.Test.mainFormal_sourceSmallErrorConclusion`; the wrapper
-> `MIPStarRE.LDT.Test.mainFormal_sourceConclusion` proved the saturated-error
+> `MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion`; the wrapper
+> `MIPStarRE.LDT.Test.mainFormalConclusion` proved the saturated-error
 > branch.
 >
 > **Status note, 2026-05-22.**  The Section 6 small-error successor construction

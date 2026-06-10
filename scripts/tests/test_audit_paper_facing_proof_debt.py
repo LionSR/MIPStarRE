@@ -228,16 +228,17 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             _write_repo(
                 root,
                 """
-                namespace MIPStarRE.LDT.Test
+                namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
-                theorem mainFormal_ofProjectiveCompletionTransportWitness (h : P) : Q := by
+                theorem ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements
+                    (h : P) : Q := by
                   sorry
 
-                end MIPStarRE.LDT.Test
+                end MIPStarRE.LDT.MakingMeasurementsProjective
                 """,
                 r"""
-                \begin{remark}\label{rem:main-formal-step6-constructions}
-                  \lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
+                \begin{remark}\label{rem:lean-right-register-completion-helpers}
+                  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements}
                 \end{remark}
                 """,
             )
@@ -254,7 +255,7 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(len(broad_result.source_context_findings), 1)
             self.assertEqual(
                 broad_result.source_context_findings[0].token,
-                "_ofProjectiveCompletionTransportWitness",
+                "ofOrthonormalizeAndCompleteStatements",
             )
 
     def test_known_construction_name_in_theorem_like_entry_is_still_reported(self) -> None:
@@ -263,16 +264,17 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             _write_repo(
                 root,
                 """
-                namespace MIPStarRE.LDT.Test
+                namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
-                theorem mainFormal_ofProjectiveCompletionTransportWitness (h : P) : Q := by
+                theorem ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements
+                    (h : P) : Q := by
                   sorry
 
-                end MIPStarRE.LDT.Test
+                end MIPStarRE.LDT.MakingMeasurementsProjective
                 """,
                 r"""
                 \begin{theorem}\label{thm:main-formal}
-                  \lean{MIPStarRE.LDT.Test.mainFormal_ofProjectiveCompletionTransportWitness}
+                  \lean{MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationSelfConsistencyHandoff.ofOrthonormalizeAndCompleteStatements}
                 \end{theorem}
                 """,
             )
@@ -281,7 +283,7 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(len(result.conditional_decl_findings), 1)
             self.assertEqual(
                 result.conditional_decl_findings[0].token,
-                "_ofProjectiveCompletionTransportWitness",
+                "ofOrthonormalizeAndCompleteStatements",
             )
 
     def test_internal_obligation_name_in_paper_facing_entry_is_reported(self) -> None:
@@ -815,16 +817,16 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
                 """
                 namespace MIPStarRE
 
-                theorem razSafra
-                    (hRS : RazSafraSoundnessStatement params a eps slackBound) :
+                theorem classicalTestSoundness
+                    (hPS : PolishchukSpielmanClassicalSoundnessStatement params a eps kappa) :
                     Q := by
                   sorry
 
                 end MIPStarRE
                 """,
                 r"""
-                \begin{theorem}\label{thm:raz-safra}
-                  \lean{MIPStarRE.razSafra}
+                \begin{theorem}\label{thm:classical-test-soundness}
+                  \lean{MIPStarRE.classicalTestSoundness}
                 \end{theorem}
                 """,
             )
@@ -833,7 +835,7 @@ class PaperFacingProofDebtAuditTests(unittest.TestCase):
             self.assertEqual(len(result.external_citation_findings), 1)
             self.assertEqual(
                 result.external_citation_findings[0].token,
-                "RazSafraSoundnessStatement",
+                "PolishchukSpielmanClassicalSoundnessStatement",
             )
 
     def test_external_statement_interface_is_not_hidden_in_strict_mode(self) -> None:

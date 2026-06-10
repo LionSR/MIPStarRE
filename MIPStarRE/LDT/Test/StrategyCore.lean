@@ -687,23 +687,4 @@ structure ProjStrat (params : Parameters) [FieldModel params.q]
   /-- Bob's diagonal-line measurement family, acting on `ιB`. -/
   diagonalMeasurementB : DiagonalCovariantMeasurement params ιB
 
-/-- Same-space projective strategy with built-in permutation invariance.
-
-Extends the general two-space `ProjStrat` (where `ιA = ιB = ι`) with the
-swap-symmetry data (`permInvState`, `densityFixed`) needed by the role-register
-symmetrization pipeline (`leftAsSymmetric`, `rightAsSymmetric`,
-`classicalRoleSymmStrategy`).
-
-This is the symmetrizable special case that the current symmetrization
-infrastructure (`StrategyRole`, `SymmetrizationBridge`) targets. The paper's
-`def:projective-strategy` is the general `ProjStrat` without symmetry
-assumptions; `SameSpaceProjStrat` adds those assumptions for the same-space
-sub-pipeline used by `mainFormal`. -/
-structure SameSpaceProjStrat (params : Parameters) [FieldModel params.q]
-    (ι : Type*) [Fintype ι] [DecidableEq ι] extends ProjStrat params ι ι where
-  /-- The density operator is invariant under swapping tensor factors. -/
-  permInvState : PermInvState state
-  /-- Cached swap equality for `simp`. -/
-  densityFixed : swapDensity state.density = state.density
-
 end MIPStarRE.LDT

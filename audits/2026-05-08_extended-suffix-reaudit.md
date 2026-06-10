@@ -126,7 +126,7 @@ consumer pair on inspection. Similarly:
   dead.
 - All 15 `*Package` structures are heavily used
   (`SelfImprovementData` → 54, `SliceRestrictionData` → 53,
-  `MainFormalRoleMeasurementWitness` → 44, etc.).
+  `retired role-measurement witness route` → 44, etc.).
 - All 6 `*Hypothesis(es)` structures are connected.
 
 ## Pattern analysis

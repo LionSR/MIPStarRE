@@ -15,33 +15,12 @@ arXiv:2009.12982.
 	Here $a$ denotes the prover's point answer.
 \end{theorem}
 \begin{remark}
-	The paper theorem is an external classical soundness input.  The nearby Lean
-	corollary below records the specialized conditional interface currently present
-	in the repository; it is not used to mark this source theorem as formalized.
+	The paper theorem is an external classical soundness input and is not used by
+	the current low individual degree test formalization route.
 \end{remark}
 \begin{proof}
 	\uses{def:polyfunc}
 	See Raz--Safra [RS97].
-\end{proof}
-
-\begin{proposition}[Conditional Raz--Safra corollary]\label{prop:lean-raz-safra-interface}
-	\lean{MIPStarRE.LDT.Test.SurfaceVsPointPassCondition, MIPStarRE.LDT.Test.RazSafraSoundnessStatement, MIPStarRE.LDT.Test.razSafra}
-	\leanok
-	\uses{thm:raz-safra}
-	The Lean theorem \texttt{MIPStarRE.LDT.Test.razSafra} is a conditional
-	corollary of the quoted Raz--Safra theorem.  It assumes the explicit
-	specialized external hypothesis
-	\texttt{MIPStarRE.LDT.Test.RazSafraSoundnessStatement} for the ambient
-	point-answer function, error parameter, and chosen slack bound, and assumes
-	the corresponding modeled surface-versus-point pass condition
-	\texttt{MIPStarRE.LDT.Test.SurfaceVsPointPassCondition}.  Under these two
-	hypotheses it returns a repository polynomial whose evaluations agree with the
-	point answers up to the specified slack.
-\end{proposition}
-\begin{proof}
-	\leanok
-	The Lean proof applies the specialized external Raz--Safra hypothesis to the
-	modeled surface-versus-point pass condition.
 \end{proof}
 
 % External classical source theorem recorded for orientation; the Lean-facing

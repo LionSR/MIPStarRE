@@ -38,7 +38,7 @@ At the audited snapshot, issue #931 remained open and assigned to
 `jizhengfeng`; it owned the self-improvement input producers for Section 6 and
 was outside this audit.  Issue #834 then remained open for the `mainFormal`
 Step-6 witness residual.  This audit therefore did not attempt to construct
-`MainFormalRoleInductionWitness`, line-130 orthonormalization inputs,
+`retired role-induction witness route`, line-130 orthonormalization inputs,
 completion producers, or match-mass witnesses for `mainFormal`.
 
 The requested parallel orthonormalization audit has a separate worktree and branch. I read the blueprint comments needed to understand the boundary, but I did not audit or edit `MIPStarRE/LDT/MakingMeasurementsProjective/Orthonormalization.lean`.

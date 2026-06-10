@@ -1,7 +1,7 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
+import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
 import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+import MIPStarRE.LDT.Test.SchwartzZippelStep
 import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.Evaluation
-import MIPStarRE.LDT.Test.MainTheorem.UnsymmetrizedTargets
 import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
 import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
 
@@ -54,7 +54,7 @@ theorem roleRegisterSymmStrategy_sourceMainInduction
         (MainInductionStep.mainInductionError params k
           (3 * eps) (3 * eps) (3 * eps)) := by
   exact
-    MainInductionStep.mainInduction_sourceStatement params
+    MainInductionStep.mainInduction params
       (strategy := strategy.roleRegisterSymmStrategy)
       (eps := 3 * eps) (delta := 3 * eps) (gamma := 3 * eps) (k := k)
       (roleRegisterSymmStrategy_is_good_three_mul
@@ -215,10 +215,8 @@ theorem sourceRoleRegisterPointConsistency_ofSymConsistency
 /-- Passing the two-space low individual degree test bounds the point-agreement
 branch by `3ε`.
 
-This is the heterogeneous analogue of
-`SameSpaceProjStrat.point_agreement_le_three_mul`; it follows because the
-point-agreement branch is one of the three nonnegative terms averaged in
-`ProjStrat.lowIndividualDegreeFailureProbability`. -/
+It follows because the point-agreement branch is one of the three nonnegative
+terms averaged in `ProjStrat.lowIndividualDegreeFailureProbability`. -/
 theorem pointAgreementFailureProbability_le_three_mul
     (params : Parameters)
     [FieldModel params.q]

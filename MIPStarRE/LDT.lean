@@ -13,13 +13,9 @@ import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 import MIPStarRE.LDT.Basic.OpFamily
 import MIPStarRE.LDT.Test.Defs
 import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
-import MIPStarRE.LDT.Test.StrategyRoleAverage
 import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 import MIPStarRE.LDT.Test.Classical
 import MIPStarRE.LDT.Test.SurfaceVsPoint
-import MIPStarRE.LDT.Test.SymmetrizationBridge
-import MIPStarRE.LDT.Test.Unsymmetrization
-import MIPStarRE.LDT.Test.MainTheorem.AnswerValuedRestriction
 import MIPStarRE.LDT.Test.MainTheorem.MainFormal
 import MIPStarRE.LDT.Preliminaries.FiniteFields
 import MIPStarRE.LDT.Preliminaries.Defs
@@ -47,7 +43,6 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.Conversion
 import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
 import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
-import MIPStarRE.LDT.MainInductionStep.Theorems.SourceTheorems
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
 import MIPStarRE.LDT.GlobalVariance.Defs.Families
 import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems

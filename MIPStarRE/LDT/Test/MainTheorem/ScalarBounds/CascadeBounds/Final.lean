@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Test.ErrorCascade.CascadeBounds.Zeta4
+import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Zeta4
 
 /-!
 # Error cascade — final assembly

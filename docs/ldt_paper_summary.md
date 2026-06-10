@@ -787,7 +787,6 @@ Key Lean theorem names:
 - `MIPStarRE/LDT/MainInductionStep/Defs.lean`
 - `MIPStarRE/LDT/MainInductionStep/Statements.lean`
 - `MIPStarRE/LDT/MainInductionStep/Theorems/MainTheorems/Successor.lean`
-- `MIPStarRE/LDT/MainInductionStep/Theorems/SourceTheorems.lean`
 
 Key Lean theorem names:
 

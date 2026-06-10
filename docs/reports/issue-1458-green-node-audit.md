@@ -83,10 +83,9 @@ The remaining theorem-like warnings are classified as follows.
    `X`, `XHat`, and `P` construction, with paper source in
    `references/ldt-paper/orthonormalization.tex:540-940`.
 
-4. The two Chapter 1 theorem interfaces,
-   `prop:lean-raz-safra-interface` and
-   `prop:lean-classical-test-soundness-interface`, are external citation
-   statements, not internal proof obligations.
+4. The Chapter 1 theorem interface
+   `prop:lean-classical-test-soundness-interface` is an external citation
+   statement, not an internal proof obligation.
 
 Thus the theorem-like green nodes do not presently show the forbidden pattern
 of a green paper theorem whose Lean header assumes an unproved bridge,
