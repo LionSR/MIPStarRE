@@ -26,36 +26,57 @@
   form is downstream-sufficient.
   \item \textbf{Mathlib/project split:} 100\% project-local.  The issue
   concerns the chapter~3 blueprint \verb|\lean{}| cross-references.
-  \item \textbf{Key Lean declarations:} the \verb|*_heterogeneous| siblings in
+  \item \textbf{Key mathematical inputs:} the \verb|*_heterogeneous| siblings
+  in
   \path{MIPStarRE/LDT/Preliminaries/Triangles/Core.lean},
   \path{.../Triangles/SimEq.lean},
   \path{.../ComparisonCore.lean}, and
-  \path{.../ComparisonProjective.lean}.
+  \path{.../ComparisonProjective.lean}.  All relevant declarations are
+  project-local; no external Mathlib inputs beyond the ambient linear-algebra
+  and finite-dimensionality libraries.
 \end{itemize}
 
-\section{The pattern}
+\section{Key theorem forms}
 
-The paper defines \(\simeq_\delta\) as a relation between submeasurements on
-two distinct Hilbert spaces \(\mathcal H_A\) and \(\mathcal H_B\) (see
-\path{references/ldt-paper/preliminaries.tex}, \path{def:simeq}).
-Specifically, for \(A=\{A_a^x\}\) on \(\mathcal H_A\) and \(B=\{B_a^x\}\) on
-\(\mathcal H_B\), and a state \(\ket{\psi} \in \mathcal H_A \ot \mathcal H_B\),
-\[
-  A_a^x \ot I \simeq_\delta I \ot B_a^x
-  \quad\text{when}\quad
-  \E_{x\sim\mathcal D} \sum_{a\neq b}
-  \bra{\psi} A_a^x \ot B_b^x \ket{\psi} \le \delta .
-\]
+The formalization isolates the following mathematical statements, all
+concerning the paper's approximation relation \(\simeq_\delta\) between
+submeasurements on two Hilbert spaces \cite{Ji2020LowIndividualDegree}.%
+\footnote{Tracked in \ghissue{2338}.}
 
-The six chapter~3 propositions listed below were formalized in two versions:
 \begin{enumerate}
-  \item a same-space (\(\iota\times\iota\)) specialization where both
-  submeasurement families share the same index type~\(\iota\) and the state
-  is \(\ket{\psi} \in \mathcal H_\iota \ot \mathcal H_\iota\); and
-  \item a two-space (\verb|_heterogeneous|) form where the left and right
-  submeasurements carry independent index types \(\iota_A\) and \(\iota_B\)
-  and the state is \(\ket{\psi} \in \mathcal H_{\iota_A} \ot
-  \mathcal H_{\iota_B}\), matching the paper's generality.
+  \item \textbf{Source theorem form.}  For \(A=\{A_a^x\}\) on \(\mathcal H_A\)
+  and \(B=\{B_a^x\}\) on \(\mathcal H_B\) and a state
+  \(\ket{\psi}\in\mathcal H_A\otimes\mathcal H_B\), the paper's
+  \(\simeq_\delta\) relation is defined by
+  \[
+    A_a^x\otimes I \simeq_\delta I\otimes B_a^x
+    \quad\text{when}\quad
+    \E_{x\sim\mathcal D}\sum_{a\neq b}
+    \bra{\psi}A_a^x\otimes B_b^x\ket{\psi}\le\delta .
+    \tag{\texttt{def:simeq}}
+  \]
+  The five propositions named below each assert a bound or implication
+  involving this two-space relation (see
+  \path{references/ldt-paper/preliminaries.tex}).
+
+  \item \textbf{Faithful formal form.}  Each proposition is formalized as a
+  \verb|*_heterogeneous| declaration carrying independent index types
+  \(\iota_A,\iota_B\) for the left and right submeasurement families and a
+  state \(\ket{\psi}\in\mathcal H_{\iota_A}\otimes\mathcal H_{\iota_B}\).%
+  \footnote{The declarations are \leanid{triangleSub\_heterogeneous},
+  \leanid{simeqTriangleInequality\_heterogeneous},
+  \leanid{simeqToApprox\_heterogeneous},
+  \leanid{approxToSimeq\_heterogeneous}, and
+  \leanid{simeqDataProcessing\_heterogeneous} in
+  \doclink{MIPStarRE/LDT/Preliminaries/}.}
+  The same-space \((\iota\times\iota)\) specializations also exist and are
+  retained for internal use, but the blueprint \verb|\lean{}| links now target
+  the two-space forms.
+
+  \item \textbf{Downstream theorem form.}  The main-theorem path consumes the
+  \verb|*_heterogeneous| forms (see \path{Final.lean}~lines~449,~495,~505,
+  512,~563; \path{Completion.lean}~line~925; \path{Core.lean}~line~314).  No
+  new hypotheses are needed beyond those already in the two-space forms.
 \end{enumerate}
 
 The same-space forms are retained as auxiliary internal interfaces (they are
@@ -63,8 +84,7 @@ mathematically correct as specializations and are occasionally convenient for
 proofs that already operate on a symmetrized state).  However, the
 \emph{faithful formalization} of each paper proposition is the
 \verb|_heterogeneous| form, which is the version consumed on the main-theorem
-path.  The blueprint \verb|\lean{}| links must therefore target the
-\verb|_heterogeneous| declarations.
+path.
 
 \section{Five retargeted links}
 
@@ -123,7 +143,7 @@ sandwich families
 \path{SubMeasurementFamilies.lean}:500--560) already exists and can be used to
 prove a \verb|consSubMeas\_heterogeneous| sibling.
 
-\section{Resolution status}
+\section{Conclusion}
 
 \begin{itemize}
   \item \textbf{Resolved (blueprint links retargeted):} the five
@@ -140,12 +160,15 @@ prove a \verb|consSubMeas\_heterogeneous| sibling.
   construction.
 \end{itemize}
 
-\section{Cross-references}
+There is no mathematical discrepancy.  The retargeting makes the blueprint
+cross-references more faithful to the paper's two-space definition of
+\(\simeq_\delta\).%
+\footnote{Related: \ghissue{2337} (same-space cleanup of the \verb|mainFormal|
+interface, the Preliminaries-layer analogue).  The same-space forms here are
+distinct from the genuine open mathematical gap in \ghissue{1093} (the
+\S9~\(\eta\) / total-overlap term).}
 
-\ghissue{2338} tracking issue.
-Related: \ghissue{2337} (same-space cleanup of the \verb|mainFormal| interface,
-the Preliminaries-layer analogue).
-The same-space forms here are distinct from the genuine open mathematical gap
-in \ghissue{1093} (the §9 \(\eta\) / total-overlap term).
+\bibliographystyle{alpha}
+\bibliography{references}
 
 \end{document}
