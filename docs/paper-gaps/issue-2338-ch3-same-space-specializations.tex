@@ -74,9 +74,12 @@ submeasurements on two Hilbert spaces \cite{Ji2020LowIndividualDegree}.%
   the two-space forms.
 
   \item \textbf{Downstream theorem form.}  The main-theorem path consumes the
-  \verb|*_heterogeneous| forms (see \path{Final.lean}~lines~449,~495,~505,
-  512,~563; \path{Completion.lean}~line~925; \path{Core.lean}~line~314).  No
-  new hypotheses are needed beyond those already in the two-space forms.
+  \verb|*_heterogeneous| forms at
+  \path{MIPStarRE/LDT/Test/MainTheorem/SourceRoleRegister/Final.lean}
+  lines~449,~495,~505,~512,~563;
+  \path{.../Completion.lean} line~925; and
+  \path{.../Core.lean} line~312.  No new hypotheses are needed beyond those
+  already in the two-space forms.
 \end{enumerate}
 
 The same-space forms are retained as auxiliary internal interfaces (they are
@@ -88,37 +91,47 @@ path.
 
 \section{Five retargeted links}
 
-\begin{center}
-\begin{tabular}{p{0.28\linewidth}p{0.30\linewidth}p{0.28\linewidth}}
-\textbf{Blueprint label} & \textbf{Old \Lean{} target} & \textbf{New \Lean{} target} \\
-\hline
-\verb|prop:triangle-sub| &
-\leanid{triangleSub} &
-\leanid{triangleSub\_heterogeneous} \\
+The retargeting replaces five blueprint \verb|\lean{}| cross-references.  In each
+case the same-space specialization sets \(\iota_A = \iota_B = \iota\) in the
+heterogeneous statement, reducing the two-space form
+\[
+  \ket{\psi}\in\mathcal H_{\iota_A}\otimes\mathcal H_{\iota_B},\qquad
+  A_{\iota_A}\otimes I \simeq_\delta I\otimes B_{\iota_B}
+\]
+to its diagonal
+\[
+  \ket{\psi}\in\mathcal H_\iota\otimes\mathcal H_\iota,\qquad
+  A_\iota\otimes I \simeq_\delta I\otimes B_\iota .
+\]
+The heterogeneous form is the faithful transcription of
+\path{def:simeq} in \cite[Section~3]{Ji2020LowIndividualDegree};
+the same-space form is a correct specialization retained as an auxiliary
+interface.%
 
-\verb|prop:simeq-triangle-inequality| &
-\leanid{simeqTriangleInequality} &
-\leanid{simeqTriangleInequality\_heterogeneous} \\
+\footnote{The five retargetings map
+\leanid{triangleSub}~$\to$~\leanid{triangleSub\_heterogeneous}
+(blueprint \verb|prop:triangle-sub|, bound \(\delta+\sqrt\eps\)),
+\leanid{simeqTriangleInequality}~$\to$~\leanid{simeqTriangleInequality\_heterogeneous}
+(\verb|prop:simeq-triangle-inequality|, bound \(\eps+2\sqrt{\delta+\gamma}\)),
+\leanid{simeqToApprox}~$\to$~\leanid{simeqToApprox\_heterogeneous}
+(\verb|prop:simeq-to-approx| forward, \(\simeq_\delta\Rightarrow\approx_{2\delta}\)),
+\leanid{approxToSimeq}~$\to$~\leanid{approxToSimeq\_heterogeneous}
+(converse, projective), and
+\leanid{simeqDataProcessing}~$\to$~\leanid{simeqDataProcessing\_heterogeneous}
+(\verb|prop:simeq-data-processing|, bound \(\delta\)).
+All five \verb|_heterogeneous| forms are \verb|sorry|-free.
+Four are consumed on the main-theorem path at
+\path{MIPStarRE/LDT/Test/MainTheorem/SourceRoleRegister/Final.lean}
+lines~449,~495,~505,~512,~563;
+\path{.../Completion.lean} line~925; and
+\path{.../Core.lean} line~312.
+\leanid{simeqDataProcessing\_heterogeneous} is proved but not yet
+consumed on the main-theorem path.}
 
-\verb|prop:simeq-to-approx| (forward) &
-\leanid{simeqToApprox} &
-\leanid{simeqToApprox\_heterogeneous} \\
-
-\verb|prop:simeq-to-approx| (converse) &
-\leanid{approxToSimeq} &
-\leanid{approxToSimeq\_heterogeneous} \\
-
-\verb|prop:simeq-data-processing| &
-\leanid{simeqDataProcessing} &
-\leanid{simeqDataProcessing\_heterogeneous}
-\end{tabular}
-\end{center}
-
-In every case the bound matches the paper exactly (\(\delta+\sqrt{\eps}\),
-\(\eps + 2\sqrt{\delta+\gamma}\), \(2\delta\), \(\delta\), \(\delta\)).
-All five \verb|_heterogeneous| forms are \verb|sorry|-free and consumed on the
-main-theorem path (\path{Final.lean} lines 449, 495, 505, 512, 563;
-\path{Completion.lean} line 925; \path{Core.lean} line 314).
+The bounds match the paper exactly: \(\delta+\sqrt\eps\) (triangle substitution),
+\(\eps+2\sqrt{\delta+\gamma}\) (triangle inequality),
+\(2\delta\) and \(\delta\) (forward/converse), and \(\delta\) (data
+processing).
 
 \section{\texorpdfstring{\leanid{consSubMeas}}{consSubMeas}: a single-case note}
 
