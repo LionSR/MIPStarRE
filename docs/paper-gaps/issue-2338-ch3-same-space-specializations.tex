@@ -1,0 +1,151 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{2em}
+
+\input{./command}
+
+\title{Chapter~3 Same-Space Specializations of Two-Space Paper Propositions}
+\author{}
+\date{2026-06-11}
+
+\begin{document}
+\maketitle
+
+\section{At a glance}
+
+\begin{itemize}
+  \item \textbf{Difficulty: medium as a cross-reference audit issue, low as a
+  mathematical obstruction.}  No new proof machinery is needed.  The faithful
+  two-space forms are already proved, \verb|sorry|-free, and consumed on the
+  main-theorem path.
+  \item \textbf{Estimated weight:} blueprint-only label changes for five
+  propositions; one note-only entry (\verb|consSubMeas|) where the same-space
+  form is downstream-sufficient.
+  \item \textbf{Mathlib/project split:} 100\% project-local.  The issue
+  concerns the chapter~3 blueprint \verb|\lean{}| cross-references.
+  \item \textbf{Key Lean declarations:} the \verb|*_heterogeneous| siblings in
+  \path{MIPStarRE/LDT/Preliminaries/Triangles/Core.lean},
+  \path{.../Triangles/SimEq.lean},
+  \path{.../ComparisonCore.lean}, and
+  \path{.../ComparisonProjective.lean}.
+\end{itemize}
+
+\section{The pattern}
+
+The paper defines \(\simeq_\delta\) as a relation between submeasurements on
+two distinct Hilbert spaces \(\mathcal H_A\) and \(\mathcal H_B\) (see
+\path{references/ldt-paper/preliminaries.tex}, \path{def:simeq}).
+Specifically, for \(A=\{A_a^x\}\) on \(\mathcal H_A\) and \(B=\{B_a^x\}\) on
+\(\mathcal H_B\), and a state \(\ket{\psi} \in \mathcal H_A \ot \mathcal H_B\),
+\[
+  A_a^x \ot I \simeq_\delta I \ot B_a^x
+  \quad\text{when}\quad
+  \E_{x\sim\mathcal D} \sum_{a\neq b}
+  \bra{\psi} A_a^x \ot B_b^x \ket{\psi} \le \delta .
+\]
+
+The six chapter~3 propositions listed below were formalized in two versions:
+\begin{enumerate}
+  \item a same-space (\(\iota\times\iota\)) specialization where both
+  submeasurement families share the same index type~\(\iota\) and the state
+  is \(\ket{\psi} \in \mathcal H_\iota \ot \mathcal H_\iota\); and
+  \item a two-space (\verb|_heterogeneous|) form where the left and right
+  submeasurements carry independent index types \(\iota_A\) and \(\iota_B\)
+  and the state is \(\ket{\psi} \in \mathcal H_{\iota_A} \ot
+  \mathcal H_{\iota_B}\), matching the paper's generality.
+\end{enumerate}
+
+The same-space forms are retained as auxiliary internal interfaces (they are
+mathematically correct as specializations and are occasionally convenient for
+proofs that already operate on a symmetrized state).  However, the
+\emph{faithful formalization} of each paper proposition is the
+\verb|_heterogeneous| form, which is the version consumed on the main-theorem
+path.  The blueprint \verb|\lean{}| links must therefore target the
+\verb|_heterogeneous| declarations.
+
+\section{Five retargeted links}
+
+\begin{center}
+\begin{tabular}{p{0.28\linewidth}p{0.30\linewidth}p{0.28\linewidth}}
+\textbf{Blueprint label} & \textbf{Old \Lean{} target} & \textbf{New \Lean{} target} \\
+\hline
+\verb|prop:triangle-sub| &
+\leanid{triangleSub} &
+\leanid{triangleSub\_heterogeneous} \\
+
+\verb|prop:simeq-triangle-inequality| &
+\leanid{simeqTriangleInequality} &
+\leanid{simeqTriangleInequality\_heterogeneous} \\
+
+\verb|prop:simeq-to-approx| (forward) &
+\leanid{simeqToApprox} &
+\leanid{simeqToApprox\_heterogeneous} \\
+
+\verb|prop:simeq-to-approx| (converse) &
+\leanid{approxToSimeq} &
+\leanid{approxToSimeq\_heterogeneous} \\
+
+\verb|prop:simeq-data-processing| &
+\leanid{simeqDataProcessing} &
+\leanid{simeqDataProcessing\_heterogeneous}
+\end{tabular}
+\end{center}
+
+In every case the bound matches the paper exactly (\(\delta+\sqrt{\eps}\),
+\(\eps + 2\sqrt{\delta+\gamma}\), \(2\delta\), \(\delta\), \(\delta\)).
+All five \verb|_heterogeneous| forms are \verb|sorry|-free and consumed on the
+main-theorem path (\path{Final.lean} lines 449, 495, 505, 512, 563;
+\path{Completion.lean} line 925; \path{Core.lean} line 314).
+
+\section{\texorpdfstring{\leanid{consSubMeas}}{consSubMeas}: a single-case note}
+
+The lemma \verb|prop:cons-sub-meas| (\path{ch03\_preliminaries.tex}:476) is
+currently linked to \leanid{consSubMeas}, which is a same-space
+(\(\iota\times\iota\)) specialization.  No \verb|consSubMeas\_heterogeneous|
+exists, and the submeasurement-family infrastructure that it uses
+(\leanid{diagonalSandwichFamily}, \leanid{totalSandwichFamily}) is
+\(\iota\times\iota\)-only.
+
+However, the only consumer of \verb|consSubMeas| on the main-theorem path is
+\path{MainChain.lean}:209, which applies it at the symmetrized state
+\leanid{strategy.state : QuantumState (ι×ι)}.  The global proof never needs
+the fully general two-space form of this lemma.  The same-space
+\verb|consSubMeas| is therefore \emph{downstream-sufficient} for the current
+formal proof of the main theorem.
+
+If a future development path requires \verb|consSubMeas| over \(\iota_A \times
+\iota_B\), the infrastructure for constructing the needed diagonal and
+sandwich families
+(\leanid{mkLeftPlacedSubMeas}/\leanid{mkRightPlacedSubMeas} in
+\path{SubMeasurementFamilies.lean}:500--560) already exists and can be used to
+prove a \verb|consSubMeas\_heterogeneous| sibling.
+
+\section{Resolution status}
+
+\begin{itemize}
+  \item \textbf{Resolved (blueprint links retargeted):} the five
+  \verb|_heterogeneous| link retargetings listed above.
+  \item \textbf{Documented (same-space form retained as auxiliary):}
+  \leanid{triangleSub}, \leanid{simeqTriangleInequality},
+  \leanid{simeqToApprox}, \leanid{approxToSimeq},
+  \leanid{simeqDataProcessing}, and \leanid{consSubMeas} are retained as
+  auxiliary internal interfaces.  They are not removed or renamed.  The
+  \verb|_heterogeneous| forms carry the main-theorem load.
+  \item \textbf{Deferred:} a \leanid{consSubMeas\_heterogeneous} sibling is not
+  currently needed.  If it becomes needed, the submeasurement-family
+  infrastructure in \path{SubMeasurementFamilies.lean} supports its
+  construction.
+\end{itemize}
+
+\section{Cross-references}
+
+\ghissue{2338} tracking issue.
+Related: \ghissue{2337} (same-space cleanup of the \verb|mainFormal| interface,
+the Preliminaries-layer analogue).
+The same-space forms here are distinct from the genuine open mathematical gap
+in \ghissue{1093} (the §9 \(\eta\) / total-overlap term).
+
+\end{document}

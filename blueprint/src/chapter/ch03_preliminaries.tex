@@ -270,7 +270,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{equation}
 
 \begin{lemma}[Transferring consistency through state-dependent distance]\label{prop:triangle-sub}
-	\lean{MIPStarRE.LDT.Preliminaries.triangleSub}
+	\lean{MIPStarRE.LDT.Preliminaries.triangleSub_heterogeneous}
 	\leanok
 	\uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
 	Let $A=\{A_a^x\}$ and $B=\{B_a^x\}$ be measurements and let $C=\{C_a^x\}$ be a submeasurement. If $A_a^x \ot I \simeq_\delta I \ot C_a^x$ and $A_a^x \ot I \approx_\eps B_a^x \ot I$, then
@@ -284,7 +284,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Consistency implies state-dependent distance for measurements]\label{prop:simeq-to-approx}
-	\lean{MIPStarRE.LDT.Preliminaries.simeqToApprox, MIPStarRE.LDT.Preliminaries.approxToSimeq}
+	\lean{MIPStarRE.LDT.Preliminaries.simeqToApprox_heterogeneous, MIPStarRE.LDT.Preliminaries.approxToSimeq_heterogeneous}
 	\leanok
 	\uses{def:simeq, def:approx_delta, prop:simeq-for-measurements}
 	If $A$ and $B$ are measurements and $A_a^x \ot I \simeq_\delta I \ot B_a^x$, then
@@ -445,7 +445,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{remark}
 
 \begin{lemma}[Triangle inequality for $\simeq_\delta$]\label{prop:simeq-triangle-inequality}
-	\lean{MIPStarRE.LDT.Preliminaries.simeqTriangleInequality}
+	\lean{MIPStarRE.LDT.Preliminaries.simeqTriangleInequality_heterogeneous}
 	\leanok
 	\uses{prop:simeq-to-approx, prop:triangle-inequality-for-approx_delta, prop:triangle-sub}
 	Suppose $A_a^x \ot I \simeq_\eps I \ot B_a^x$, $C_a^x \ot I \simeq_\delta I \ot B_a^x$, and $C_a^x \ot I \simeq_\gamma I \ot D_a^x$, where all four families are measurements. Then
@@ -459,7 +459,7 @@ In particular, if $A^x_a \ot I \simeq_{\eps} I \ot C^x_a$, the question is what 
 \end{proof}
 
 \begin{lemma}[Data processing for consistency]\label{prop:simeq-data-processing}
-	\lean{MIPStarRE.LDT.Preliminaries.simeqDataProcessing}
+	\lean{MIPStarRE.LDT.Preliminaries.simeqDataProcessing_heterogeneous}
 	\leanok
 	\uses{def:post-processing, def:simeq}
 	If $A=\{A_a^x\}$ and $B=\{B_a^x\}$ are measurements such that $A_a^x \ot I \simeq_\delta I \ot B_a^x$, and $f$ is a map on the answer set, then
