@@ -38,11 +38,13 @@ The blueprint is organized by **theorem ownership and proof dependency**, not by
 ```
 MIPStarRE/
 ├── Quantum/               # Reusable matrix / measurement infrastructure
+│   ├── FiniteHilbert.lean
 │   ├── FiniteMatrix.lean
-│   └── Measurement.lean
+│   ├── Measurement.lean
+│   └── ProjectorONB.lean
 └── LDT/                   # Low individual degree test (12 submodules)
-    ├── Basic/
-    ├── Test/
+    ├── Basic/             # Parameters, operators, distributions, submeasurements
+    ├── Test/              # Test definitions & main theorem
     ├── Preliminaries/
     ├── MakingMeasurementsProjective/
     ├── MainInductionStep/
@@ -51,10 +53,13 @@ MIPStarRE/
     ├── SelfImprovement/
     ├── CommutativityPoints/
     ├── Commutativity/
-    └── Pasting/
+    ├── Pasting/
+    └── Tactic/            # Project-local tactics & simp sets
 ```
 
-Each LDT submodule typically contains `Defs.lean` and `Theorems.lean`. The root module `MIPStarRE.lean` re-exports `MIPStarRE.Quantum` and `MIPStarRE.LDT`.
+Each LDT submodule typically contains `Defs.lean` and `Theorems.lean` (larger
+submodules split these across subdirectories). The root module `MIPStarRE.lean`
+re-exports `MIPStarRE.Quantum` and `MIPStarRE.LDT`.
 
 Top-level directories:
 
