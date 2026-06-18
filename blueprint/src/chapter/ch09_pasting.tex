@@ -180,6 +180,22 @@ where
 	This is exactly \ref{eq:ld-gbcon}, with \ref{eq:ld-nu1-def}.
 \end{proof}
 
+\begin{lemma}[Lean auxiliary form of the vertical-line SDD estimate]\label{lem:lean-point-vertical-line-sdd-lifted-family}
+	\lean{MIPStarRE.LDT.Pasting.pointVerticalLineSdd_liftedVerticalLine_of_axis_self}
+	\leanok
+	The formalization records the point-to-vertical-line state-dependent-distance
+	estimate with the vertical-line side written as the public submeasurement
+	family \texttt{liftedVerticalLineAnswerFamily}. The error term is the same
+	\(8m\eps+4\delta\) as in the complete measurement-valued construction.
+\end{lemma}
+\begin{proof}
+	\leanok
+	This is not a separate paper assertion. It is the representation of the same
+	estimate obtained by replacing the complete vertical-line measurement family
+	with its underlying public submeasurement family, which is the form needed in
+	the degree-zero branch.
+\end{proof}
+
 \begin{lemma}[Pasted submeasurement]\label{lem:ld-pasting-sub-measurement}
 	\lean{MIPStarRE.LDT.Pasting.ldPastingSubMeas}
 	\leanok
