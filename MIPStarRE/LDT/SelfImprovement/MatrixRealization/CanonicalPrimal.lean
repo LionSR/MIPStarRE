@@ -160,9 +160,9 @@ theorem matrixSdpCanonicalBlockDiagonal_trace_mul (params : Parameters)
       ((Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B) *
         (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D)) =
     ∑ b : MatrixSdpCanonicalBlockIndex params, Matrix.trace (B b * D b)
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e
+  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)
     (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)]
-  simp only [Matrix.reindexAlgEquiv_apply]
+  simp only [Matrix.coe_reindexAlgEquiv]
   rw [Matrix.trace_reindex, Matrix.trace_blockDiagonal_mul]
 
 /-- The trace pairing of a canonical block-diagonal operator with an arbitrary
@@ -263,7 +263,7 @@ theorem matrixSdpCanonicalBlockDiagonal_mul (params : Parameters)
         (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D) =
       (Matrix.reindexAlgEquiv ℂ ℂ e)
         (Matrix.blockDiagonal (fun b => B b * D b))
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e
+  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)
     (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)]
   congr
   rw [Matrix.blockDiagonal_mul]

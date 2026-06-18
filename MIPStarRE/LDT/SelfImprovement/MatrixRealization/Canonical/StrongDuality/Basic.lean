@@ -103,7 +103,7 @@ theorem continuous_matrixSdpCanonicalConstraintOperator
       matrixSdpCanonicalConstraintOperator params model X := by
   classical
   unfold matrixSdpCanonicalConstraintOperator matrixSdpCanonicalDiagonalBlock
-  exact continuous_finset_sum Finset.univ fun b _ =>
+  exact continuous_finsetSum Finset.univ fun b _ =>
     continuous_matrix fun i j => continuous_apply_apply (b, i) (b, j)
 
 /-- The positive-semidefinite cone of finite matrix operators is closed. -/
@@ -132,8 +132,8 @@ theorem isClosed_matrixOperator_nonnegative
     have hquad : Continuous fun X : Matrix ι ι ℂ =>
         x.sum fun i xi => x.sum fun j xj => star xi * X i j * xj := by
       simp only [Finsupp.sum]
-      exact continuous_finset_sum x.support fun i _ =>
-        continuous_finset_sum x.support fun j _ =>
+      exact continuous_finsetSum x.support fun i _ =>
+        continuous_finsetSum x.support fun j _ =>
           ((continuous_const.mul (continuous_apply_apply i j)).mul continuous_const)
     exact isClosed_le continuous_const hquad
   have hpsd : IsClosed {X : Matrix ι ι ℂ | X.PosSemidef} := by

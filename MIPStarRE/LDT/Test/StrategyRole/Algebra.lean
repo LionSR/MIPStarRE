@@ -24,7 +24,7 @@ private lemma rolePairCond_mul {ι : Type*} [Fintype ι] [DecidableEq ι]
           ((opTensor (rolePairProj rL₁ rR₁) X) *
             (opTensor (rolePairProj rL₂ rR₂) Y)) := by
               exact
-                (Matrix.reindexAlgEquiv_mul ℂ ℂ (roleRegisterPairLocalEquiv ι)
+                (map_mul (Matrix.reindexAlgEquiv ℂ ℂ (roleRegisterPairLocalEquiv ι))
                   (opTensor (rolePairProj rL₁ rR₁) X)
                   (opTensor (rolePairProj rL₂ rR₂) Y)).symm
     _ = Matrix.reindex (roleRegisterPairLocalEquiv ι) (roleRegisterPairLocalEquiv ι)

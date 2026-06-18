@@ -408,8 +408,8 @@ private lemma trace_rolePairDirectSumCond_mul {ιA ιB : Type*}
   unfold rolePairDirectSumCond
   change Matrix.trace ((Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj rL rR) X) *
       (Matrix.reindexAlgEquiv ℂ ℂ e) Y') = _
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e]
-  simp only [Matrix.reindexAlgEquiv_apply]
+  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)]
+  simp only [Matrix.coe_reindexAlgEquiv]
   rw [Matrix.trace_reindex]
   rw [rolePairProj_eq_single_pair]
   rw [trace_single_tensor_mul_eq_trace_submatrix]
