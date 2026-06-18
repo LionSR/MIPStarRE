@@ -3,7 +3,7 @@ import MIPStarRE.Quantum.FiniteMatrix
 import MIPStarRE.Quantum.ProjectorONB
 import MIPStarRE.Quantum.Measurement
 
--- Mathlib 4.31 header checks require this until aggregate imports are reorganized.
+-- Mathlib 4.31 header checks require this for this aggregate module.
 set_option linter.style.header false
 
 /-!

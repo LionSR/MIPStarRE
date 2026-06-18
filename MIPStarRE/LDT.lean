@@ -71,7 +71,7 @@ import MIPStarRE.LDT.Pasting.ContextWrappers
 import MIPStarRE.LDT.Preliminaries.Polynomials
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
--- Mathlib 4.31 header checks require this until aggregate imports are reorganized.
+-- Mathlib 4.31 header checks require this for this aggregate module.
 set_option linter.style.header false
 
 /-!
