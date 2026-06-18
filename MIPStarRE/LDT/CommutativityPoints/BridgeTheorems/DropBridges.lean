@@ -111,7 +111,8 @@ private lemma reversedDropFromLineComparison
           = rightTensor
               ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a *
                 (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).outcome b) := by
-                  simpa [Astep, Araw, e] using
+                  simpa [Astep, Araw, e, opFamilyOfOutcome,
+                    pointPairOutcomeSwapEquiv] using
                     liftRight_mul_rightPlaced_outcome
                       (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1))
                       (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2))
@@ -127,7 +128,8 @@ private lemma reversedDropFromLineComparison
           = opTensor
               ((strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b)
               ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a) := by
-                  simpa [Bstep, Braw, e] using
+                  simpa [Bstep, Braw, e, opFamilyOfOutcome,
+                    pointPairOutcomeSwapEquiv] using
                     liftRight_mul_leftPlaced_outcome
                       (sampledDiagonalLineEvaluation params strategy (q.1, q.2.1))
                       ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)

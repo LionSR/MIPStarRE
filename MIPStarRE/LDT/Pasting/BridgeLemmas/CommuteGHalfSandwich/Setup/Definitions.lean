@@ -223,7 +223,9 @@ lemma gHatSelfConsistency_sddOpRel
       (IdxSubMeas.toIdxOpFamily (gHatSelfConsistencyRightFamily params family))
       (gHatSelfConsistencyError zeta) := by
   rcases hsc with ⟨h⟩
-  exact ⟨by simpa [sddError, sddErrorOp, qSDD, qSDDOp] using h⟩
+  exact ⟨by
+    simpa [sddError, sddErrorOp, qSDD, qSDDOp, qSDDCore,
+      IdxSubMeas.toIdxOpFamily, SubMeas.toOpFamily] using h⟩
 
 lemma sddOpRel_uniform_fst
     {α β Outcome : Type*}

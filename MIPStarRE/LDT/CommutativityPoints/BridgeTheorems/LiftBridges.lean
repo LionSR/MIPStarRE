@@ -102,7 +102,8 @@ lemma orderedLiftToMixedLine
           = leftTensor
               ((strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome a *
                 (strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b) := by
-                  simpa [Astep, Araw, e] using
+                  simpa [Astep, Araw, e, opFamilyOfOutcome,
+                    pointPairOutcomeSwapEquiv] using
                     liftLeft_mul_leftPlaced_outcome
                       ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)
                       ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)
@@ -118,7 +119,8 @@ lemma orderedLiftToMixedLine
           = opTensor
               ((strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome a)
               ((sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).outcome b) := by
-                  simpa [Bstep, Braw, e] using
+                  simpa [Bstep, Braw, e, opFamilyOfOutcome,
+                    pointPairOutcomeSwapEquiv] using
                     liftLeft_mul_rightPlaced_outcome
                       ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)
                       (sampledDiagonalLineEvaluation params strategy (q.1, q.2.2))

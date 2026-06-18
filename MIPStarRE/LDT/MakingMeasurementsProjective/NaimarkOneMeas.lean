@@ -361,7 +361,12 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
             = Matrix.kronecker
                 ((1 : MIPStarRE.Quantum.Op d) * ρ)
                 (naimarkAuxProjector α * naimarkAuxProjector α) := by
-                  simpa [B, oneMeasNaimarkInputProj] using
+                  change
+                    Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (naimarkAuxProjector α) *
+                        Matrix.kronecker ρ (naimarkAuxProjector α) =
+                      Matrix.kronecker ((1 : MIPStarRE.Quantum.Op d) * ρ)
+                        (naimarkAuxProjector α * naimarkAuxProjector α)
+                  exact
                     (Matrix.mul_kronecker_mul
                       (1 : MIPStarRE.Quantum.Op d) ρ
                       (naimarkAuxProjector α) (naimarkAuxProjector α)).symm
@@ -373,7 +378,12 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
             = Matrix.kronecker
                 (ρ * (1 : MIPStarRE.Quantum.Op d))
                 (naimarkAuxProjector α * naimarkAuxProjector α) := by
-                  simpa [B, oneMeasNaimarkInputProj] using
+                  change
+                    Matrix.kronecker ρ (naimarkAuxProjector α) *
+                        Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (naimarkAuxProjector α) =
+                      Matrix.kronecker (ρ * (1 : MIPStarRE.Quantum.Op d))
+                        (naimarkAuxProjector α * naimarkAuxProjector α)
+                  exact
                     (Matrix.mul_kronecker_mul
                       ρ (1 : MIPStarRE.Quantum.Op d)
                       (naimarkAuxProjector α) (naimarkAuxProjector α)).symm

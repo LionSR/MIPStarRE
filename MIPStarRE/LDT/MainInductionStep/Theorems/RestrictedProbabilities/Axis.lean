@@ -63,10 +63,18 @@ private lemma restrictedAxisSampleError_eq
       rfl
     rw [hreadout]
     rfl
-  simp [RestrictedSymStrat.axisParallelPointAnswerFamily,
-    RestrictedSymStrat.axisParallelLineAnswerFamily, axisParallelPointAnswerFamily,
-    axisParallelLineAnswerFamily, xRestrictedStrategy]
-  simpa [AxisParallelLine.appendAtHeight] using
+  change
+    qBipartiteConsDefect strategy.state
+      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas)
+      (postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas)
+        (fun f : AxisLinePolynomial params => f.toFun zeroCoord)) =
+    qBipartiteConsDefect strategy.state
+      ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas)
+      (postprocess
+        ((strategy.axisParallelMeasurement
+          (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
+        (fun f : AxisLinePolynomial params.next => f.toFun zeroCoord))
+  exact
     congrArg
       (fun B =>
         qBipartiteConsDefect strategy.state
@@ -159,7 +167,7 @@ private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
                             (xRestrictedStrategy params strategy x) (iu.2, iu.1))
                           (RestrictedSymStrat.axisParallelLineAnswerFamily
                             (xRestrictedStrategy params strategy x) (iu.2, iu.1))) := by
-                              simpa using
+                              simpa [Prod.swap] using
                                 (MIPStarRE.LDT.avgOver_uniform_equiv
                                   (e := Equiv.prodComm (Point params) (Fin params.m))
                                   (f := fun s : Point params × Fin params.m =>
@@ -263,7 +271,7 @@ lemma weighted_axisParallel_bound
             avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err =
               avgOver (uniformDistribution (Point params.next × Fin params.next.m))
                 (fun ui => err (ui.2, ui.1)) := by
-          simpa using
+          simpa [Prod.swap] using
             (MIPStarRE.LDT.avgOver_uniform_equiv
               (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
               (f := err))

@@ -41,7 +41,7 @@ lemma sddOpRel_swap_questions
         avgOver (uniformDistribution (SlicePairQuestion params))
           (fun q => qSDDOp ψbi (A q) (B q)) := by
             symm
-            simpa [SlicePairQuestion] using
+            simpa [SlicePairQuestion, Prod.swap] using
               (avgOver_uniform_equiv
                 (α := SlicePairQuestion params)
                 (β := SlicePairQuestion params)
@@ -100,9 +100,9 @@ lemma pointWithCompletePart_as_switcheroo_input
               have hsingle :
                   (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).outcome () =
                     (family.meas q.2).total := by
-                simpa [completePartSubMeas] using
-                  (completePartSubMeas_outcome_unit
-                    (params := params) (family := family) q.2)
+                rw [← completePartSubMeas_total (params := params) (family := family) q.2]
+                exact completePartSubMeas_outcome_unit
+                  (params := params) (family := family) q.2
               rw [hsplit]
               simp [F, switcherooPointProductLeft, switcherooPointProductRight,
                 completePartProjFamily, completePartPointProductLeft,

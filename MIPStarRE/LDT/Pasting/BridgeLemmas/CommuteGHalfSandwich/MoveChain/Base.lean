@@ -133,11 +133,15 @@ lemma commuteGHalfSandwich_split_succ_iff
         headTailRotatedFamily params family (r + 1) ((splitSuccQuestionEquiv params r).symm q))
       δ
       (fun q ogs => by
-        simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
+        have hogs : (ogs.1, Fin.cons (ogs.2 0) (gHatTupleOutcomeTail ogs.2)) = ogs :=
+          (splitSuccOutcomeEquiv params r).left_inv ogs
+        simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv, hogs] using
           (commuteGHalfSandwich_moveSource_eq_split params family r
             q ((splitSuccOutcomeEquiv params r) ogs)))
       (fun q ogs => by
-        simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv] using
+        have hogs : (ogs.1, Fin.cons (ogs.2 0) (gHatTupleOutcomeTail ogs.2)) = ogs :=
+          (splitSuccOutcomeEquiv params r).left_inv ogs
+        simpa [splitSuccQuestionEquiv, splitSuccOutcomeEquiv, hogs] using
           (commuteGHalfSandwich_recursiveTarget_eq_split params family r
             q ((splitSuccOutcomeEquiv params r) ogs)))
       ho

@@ -38,7 +38,9 @@ lemma axisLinePolynomial_ne_gives_support_eval_ne
   have hs_card : s.card = params.d + 1 := by
     rw [Finset.card_image_of_injective]
     · exact hσcard
-    · exact fun i j hij => hxs (by simpa using congrArg encodeScalar hij)
+    · exact fun i j hij => by
+        exact hxs ((FieldModel.equiv (q := params.q)).symm.injective
+          (by simpa [decodeScalar, Parameters.next] using hij))
   have hs_eval : ∀ y ∈ s, _root_.Polynomial.eval y f.poly = _root_.Polynomial.eval y g.poly := by
     intro y hy
     rcases Finset.mem_image.mp hy with ⟨i, hiσ, rfl⟩
@@ -155,13 +157,21 @@ lemma restrictToVerticalLine_eval_eq_restrictAtHeight_eval
                   (MvPolynomial.eval₂
                     ((MvPolynomial.eval (decodePoint u)).comp MvPolynomial.C)
                     (fun i => MvPolynomial.eval (decodePoint u) (coord i)) h.poly) := by
-                      simpa using congrArg encodeScalar hEval
+                      have hEval' :=
+                        congrArg (encodeScalar (params := params)) hEval
+                      simpa [MvPolynomial.eval₂Hom] using hEval'
             _ = encodeScalar
                   (MvPolynomial.eval₂ (RingHom.id _)
                     (decodePoint (appendPoint params u x)) h.poly) := by
                       rw [hconst]
+                      change (encodeScalar (params := params.next)
+                          (MvPolynomial.eval₂ (RingHom.id _) (fun i =>
+                            MvPolynomial.eval (decodePoint u) (coord i)) h.poly)) =
+                        encodeScalar (MvPolynomial.eval₂ (RingHom.id _)
+                          (decodePoint (appendPoint params u x)) h.poly)
                       simpa using congrArg
-                        (fun g => encodeScalar (MvPolynomial.eval₂ (RingHom.id _) g h.poly)) hcoord
+                        (fun g => encodeScalar (params := params.next)
+                          (MvPolynomial.eval₂ (RingHom.id _) g h.poly)) hcoord
              _ = h (appendPoint params u x) := by
                    rfl
 
@@ -177,11 +187,10 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
     MvPolynomial.eval₂Hom MvPolynomial.C (Polynomial.restrictAtHeightCoordinateMap params (xs i))
       (interpolateCompletedSlicesFromSupport params xs gs σ hσsubset hσcard).poly =
       ((gs i).get (by simpa [gHatTupleSupport] using hσsubset hi)).poly := by
-  let v : Fin k → Scalar params.next := fun j => decodeScalar (xs j)
+  let v : Fin k → Scalar params := fun j => decodeScalar (xs j)
   have hvinj : Set.InjOn v (↑σ : Set (Fin k)) := by
     intro a ha b hb hab
-    apply hxs
-    simpa [v] using congrArg encodeScalar hab
+    exact hxs (by simpa [v] using congrArg (encodeScalar (params := params)) hab)
   have hcomp :
       ((MvPolynomial.eval₂Hom MvPolynomial.C
           (Polynomial.restrictAtHeightCoordinateMap params (xs i))).comp
@@ -203,7 +212,7 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
             (Lagrange.basis σ (fun i : Fin k => decodeScalar (xs i)) idx.1) *
           (MvPolynomial.rename (embedCoord params))
             (extractSlicePoly gs idx.1 (hσsubset idx.2)).poly)
-  · convert map_sum
+  · exact map_sum
       (g := MvPolynomial.eval₂Hom MvPolynomial.C
         (Polynomial.restrictAtHeightCoordinateMap params (xs i)))
       (s := σ.attach)
@@ -211,7 +220,7 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
         _root_.Polynomial.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
             (Lagrange.basis σ (fun i : Fin k => decodeScalar (xs i)) idx.1) *
           (MvPolynomial.rename (embedCoord params))
-            (extractSlicePoly gs idx.1 (hσsubset idx.2)).poly) using 1
+            (extractSlicePoly gs idx.1 (hσsubset idx.2)).poly)
   rw [Finset.sum_eq_single ⟨i, hi⟩]
   · simp_rw [map_mul]
     have hslice :
@@ -283,11 +292,18 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
                               _root_.Polynomial.eval₂ F (MvPolynomial.C (decodeScalar (xs i)))
                                 (Lagrange.basis σ (fun j : Fin k => decodeScalar (xs j)) i))
                             hcomp
-        _ = 1 := by
-              rw [_root_.Polynomial.eval₂_at_apply]
-              simpa using congrArg
-                (fun x : Scalar params => (MvPolynomial.C x : PolynomialModel params))
-                (Lagrange.eval_basis_self hvinj hi)
+          _ = 1 := by
+                rw [_root_.Polynomial.eval₂_at_apply]
+                have hscalar :
+                    _root_.Polynomial.eval (decodeScalar (xs i))
+                      (Lagrange.basis σ (fun j => decodeScalar (xs j)) i) = 1 := by
+                  simpa [v] using Lagrange.eval_basis_self hvinj hi
+                change MvPolynomial.C
+                    (_root_.Polynomial.eval (decodeScalar (xs i))
+                      (Lagrange.basis σ (fun j => decodeScalar (xs j)) i)) =
+                  (1 : PolynomialModel params)
+                rw [hscalar]
+                simp
     rw [hLi, hslice]
     simp [extractSlicePoly]
   · intro j hj hji
@@ -374,9 +390,16 @@ lemma interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
                     (s := σ) (v := fun j' : Fin k => decodeScalar (xs j'))
                     (i := j.1) (j := i) hji' hi)
               rw [_root_.Polynomial.eval₂_at_apply]
-              simpa using congrArg
-                (fun x : Scalar params => (MvPolynomial.C x : PolynomialModel params))
-                hbasis
+              have hscalar :
+                  _root_.Polynomial.eval (decodeScalar (xs i))
+                    (Lagrange.basis σ (fun j' => decodeScalar (xs j')) j.1) = 0 := by
+                simpa [v] using hbasis
+              change MvPolynomial.C
+                  (_root_.Polynomial.eval (decodeScalar (xs i))
+                    (Lagrange.basis σ (fun j' => decodeScalar (xs j')) j.1)) =
+                (0 : PolynomialModel params)
+              rw [hscalar]
+              simp
     rw [hLi, hslice]
     simp
   · intro hnot
@@ -401,7 +424,8 @@ lemma interpolateCompletedSlices_restrictAtHeight_eq_get_of_mem_supportSubset
   cases k with
   | zero => cases i.2
   | succ k =>
-      simpa [interpolateCompletedSlices, hEligible, σ, hσcard, Polynomial.restrictAtHeight] using
+      simpa [interpolateCompletedSlices, hEligible, σ, interpolationSupportSubset, hσcard,
+        Polynomial.restrictAtHeight] using
         interpolateCompletedSlicesFromSupport_restrictAtHeight_poly_eq_get_of_mem
           params xs hxs gs σ
           (interpolationSupportSubset_subset gs hEligible) hσcard hi

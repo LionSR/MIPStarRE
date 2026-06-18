@@ -76,7 +76,7 @@ private lemma interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
     rw [Finset.filter_eq_empty_iff]
     intro gs _ helig
     have hweight_le : gHatTupleHammingWeight gs ≤ k := by
-      unfold gHatTupleHammingWeight gHatTupleSupport
+      unfold gHatTupleHammingWeight
       simpa [Fintype.card_fin] using Finset.card_le_univ (gHatTupleSupport gs)
     exact hnot (le_trans helig hweight_le)
   unfold interpolationEligibleSandwichFamily restrictSubMeas
@@ -331,7 +331,7 @@ lemma overAllOutcomes_pasted_sub_expansion_le_dnoteq
     exact avgOver_mono _ _ _ fun xs => by
       unfold subMeasMass SubMeas.liftLeft
       exact ev_mono strategy.state _ _ <| by
-        simpa [leftTensor] using
+        simpa [leftTensor, opTensor] using
           (opTensor_mono_left (ι₂ := ι) (B := (1 : MIPStarRE.Quantum.Op ι))
             (restrictSubMeas_total_le_total
               (interpolationEligibleSandwichFamily params family k xs)
@@ -512,7 +512,7 @@ lemma tupleInterpolatedVerticalLine_eq_of_no_supported_mismatch
       (Polynomial.restrictAtHeight params
         (interpolateCompletedSlices params k xs gs) (xs i)) u =
       ((gs i).get hiSome) u := by
-    simpa using congrArg
+    simpa [Polynomial.toFun, evalPolynomialModel] using congrArg
       (fun p : PolynomialModel params => encodeScalar (MvPolynomial.eval (decodePoint u) p))
       hslicePoly
   have hlineEval :

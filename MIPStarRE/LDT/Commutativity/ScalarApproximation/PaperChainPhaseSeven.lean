@@ -62,10 +62,10 @@ lemma evaluatedSlice_phaseSeven_second_reverse_bound
       (((evaluatedSliceFirstFactor params family q).outcome a) *
         ((evaluatedSliceSecondFactor params family q).outcome b))
   have hAB : avgOver 𝒟 (fun q => qSDDCore strategy.state (Aop q) (Bop q)) ≤ 4 * zeta := by
-    simpa [𝒟, Aop, Bop, qSDD, evaluatedSliceSecondFactor, evaluatedPointFamily,
-      evaluatedSlicePointMeas, pointMeas, Parameters.next, IdxSubMeas.liftLeft,
-      SubMeas.liftLeft, MIPStarRE.LDT.Preliminaries.totalSandwichFamily] using
-      hcombined_snd.squaredDistanceBound
+    have hbound := hcombined_snd.squaredDistanceBound
+    change avgOver 𝒟 (fun q => qSDDCore strategy.state (Aop q) (Bop q)) ≤
+      4 * zeta at hbound
+    exact hbound
   have hC :
       ∀ q,
         ∑ b : Fq params, (∑ a : Fq params, C q b a) * (∑ a : Fq params, C q b a)ᴴ ≤ 1 := by

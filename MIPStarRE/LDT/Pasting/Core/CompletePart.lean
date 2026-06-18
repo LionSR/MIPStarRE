@@ -343,7 +343,9 @@ theorem gBotSelfConsistency_ofCompleteSelfConsistency
               apply avgOver_mono
               intro x
               simpa [completePartLeftFamily, completePartRightFamily,
-                IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjSubMeas.toIdxSubMeas] using
+                IdxSubMeas.liftLeft, IdxSubMeas.liftRight, SubMeas.liftLeft,
+                SubMeas.liftRight, leftPlacedSubMeas, rightPlacedSubMeas,
+                IdxProjSubMeas.toIdxSubMeas] using
                 qSDD_completePart_le_slice params ψbi family x
       _ ≤ zeta := hcomplete_bound
   refine ⟨?_⟩

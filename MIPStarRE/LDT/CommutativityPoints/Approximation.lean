@@ -73,7 +73,7 @@ lemma avgOver_uniform_pointNext_decompose
       avgOver (uniformDistribution (Point params × Fq params))
           (fun ux => f (appendPoint params ux.1 ux.2)) =
         avgOver (uniformDistribution (Point params.next)) f := by
-    simpa using
+    simpa [pointNextEquiv] using
       (MIPStarRE.LDT.avgOver_uniform_equiv
         (e := pointNextEquiv params)
         (f := f)).symm
@@ -328,8 +328,12 @@ private lemma sampledDiagonalLineApproximation
         (IdxMeas.toIdxSubMeas pointFamily)
         (IdxMeas.toIdxSubMeas lineFamily)
         (restrictedDiagonalLinesConsistencyError params gamma) := by
-    simpa [j, pointFamily, lineFamily, diagonalPointAnswerFamily,
-      diagonalLineAnswerFamily, IdxMeas.toIdxSubMeas] using hcons
+    change ConsRel strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params (lastRestrictionIndex params)))
+      (diagonalPointAnswerFamilyOf strategy.pointMeasurement (lastRestrictionIndex params))
+      (rawDiagonalLineAnswerFamily params strategy (lastRestrictionIndex params))
+      (restrictedDiagonalLinesConsistencyError params gamma)
+    exact hcons
   have happrox :
       Preliminaries.BipartiteSDDRel strategy.state
         (uniformDistribution (RestrictedDiagonalSample params j))
@@ -594,8 +598,12 @@ private lemma answer_sampledDiagonalLineApproximation
         (IdxMeas.toIdxSubMeas pointFamily)
         (IdxMeas.toIdxSubMeas lineFamily)
         (restrictedDiagonalLinesConsistencyError params gamma) := by
-    simpa [j, pointFamily, lineFamily, AnswerSymStrat.diagonalPointAnswerFamily,
-      rawAnswerDiagonalLineAnswerFamily, IdxMeas.toIdxSubMeas] using hcons
+    change ConsRel strategy.state
+      (uniformDistribution (RestrictedDiagonalSample params (lastRestrictionIndex params)))
+      (diagonalPointAnswerFamilyOf strategy.pointMeasurement (lastRestrictionIndex params))
+      (rawAnswerDiagonalLineAnswerFamily params strategy (lastRestrictionIndex params))
+      (restrictedDiagonalLinesConsistencyError params gamma)
+    exact hcons
   have happrox :
       Preliminaries.BipartiteSDDRel strategy.state
         (uniformDistribution (RestrictedDiagonalSample params j))
@@ -739,7 +747,8 @@ lemma answer_sampledDiagonalLineApproximation_pointWithDiagonalLine
                         ((strategy.diagonalMeasurement
                           (DiagonalLine.rebaseAt ℓ₀ (subCoord zeroCoord t))).toSubMeas)
                         (fun f : DiagonalLineAnswer params => f (addCoord t t)) := by
-                  simpa [ProjMeas.transport, Measurement.transport] using
+                  simpa [ProjMeas.transport, Measurement.transport, SubMeas.transport,
+                    DiagonalLineAnswer.reparamAtEquiv] using
                     (SubMeas.postprocess_transport
                       (e := DiagonalLineAnswer.reparamAtEquiv (params := params) t)
                       (A := (strategy.diagonalMeasurement

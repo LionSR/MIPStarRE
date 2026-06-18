@@ -121,7 +121,7 @@ lemma evaluatedSlice_phaseOne_insert_bound
   let 𝒟 : Distribution (EvaluatedSliceQuestion params) :=
     uniformDistribution (EvaluatedSliceQuestion params)
   let A : EvaluatedSliceQuestion params → Fq params → MIPStarRE.Quantum.Op (ι × ι) :=
-    fun q b => leftTensor (ι₂ := ι) ((evaluatedSliceSecondFactor params family q).outcome b)
+    fun q => (leftPlacedSubMeas (ιB := ι) (evaluatedSliceSecondFactor params family q)).outcome
   let B : EvaluatedSliceQuestion params → Fq params → MIPStarRE.Quantum.Op (ι × ι) :=
     fun q b =>
       ((MIPStarRE.LDT.Preliminaries.totalSandwichFamily
@@ -140,8 +140,10 @@ lemma evaluatedSlice_phaseOne_insert_bound
       uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
   have hAB :
       avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤ 4 * zeta := by
-    simpa [𝒟, A, B, pointMeas, Parameters.next, qSDD, evaluatedSliceSecondFactor,
-      evaluatedPointFamily, IdxSubMeas.liftLeft, SubMeas.liftLeft] using
+    simpa [𝒟, A, B, pointMeas, Parameters.next, sddError, qSDD,
+      evaluatedSliceSecondFactor, evaluatedPointFamily, evaluatedPointFamilyLeft,
+      leftPlacedSubMeas, IdxSubMeas.liftLeft, SubMeas.liftLeft,
+      MIPStarRE.LDT.Preliminaries.totalSandwichFamily] using
       hcombined_snd.squaredDistanceBound
   have hC :
       ∀ q, ∑ b : Fq params, (∑ a : Fq params, C q b a) * (∑ a : Fq params, C q b a)ᴴ ≤ 1 := by
@@ -189,7 +191,9 @@ lemma evaluatedSlice_phaseOne_insert_bound
                   ((evaluatedSliceSecondFactor params family q).outcome b) *
                   ((evaluatedSliceFirstFactor params family q).outcome a) *
                   ((evaluatedSliceSecondFactor params family q).outcome b))) := by
-              simpa [evaluatedSliceABABTerm, leftTensor_mul_leftTensor, mul_assoc] using
+              simpa [evaluatedSliceABABTerm, evaluatedSliceFirstFactor,
+                evaluatedSliceSecondFactor, evaluatedPointFamily, leftTensor_mul_leftTensor,
+                mul_assoc] using
                 (Fintype.sum_prod_type' (f := fun a : Fq params => fun b : Fq params =>
                   ev strategy.state
                     (leftTensor (ι₂ := ι)

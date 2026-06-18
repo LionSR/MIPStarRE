@@ -446,7 +446,7 @@ lemma fromHToG_SUS_context_avg_le_one
                   else (incompletePartSubMeas params family x).total) * S))) := by
               refine avgOver_congr _ _ _ ?_
               intro x
-              simpa [Aτ, S] using
+              simpa [Aτ, S, gHatSandwichFamily] using
                 (fromHToG_avgOver_tail_type_ev_sandwich params ψbi family n τ
                   (S * (if b then (completePartSubMeas params family x).total
                     else (incompletePartSubMeas params family x).total) * S))

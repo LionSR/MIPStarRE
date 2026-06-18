@@ -349,7 +349,7 @@ noncomputable def transport {α β : Type*} {ι : Type*}
   toMeasurement := Measurement.transport e A.toMeasurement
   proj := by
     intro b
-    simpa using A.proj (e.symm b)
+    simpa [Measurement.transport, SubMeas.transport] using A.proj (e.symm b)
 
 @[simp] theorem transport_trivialDistinguishedOutcome {α ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]

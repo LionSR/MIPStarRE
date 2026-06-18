@@ -148,7 +148,8 @@ lemma qSDD_liftRight_eq_liftLeft_of_permInv
     (hperm : PermInvState ψ)
     (A B : SubMeas Outcome ι) :
     qSDD ψ A.liftRight B.liftRight = qSDD ψ A.liftLeft B.liftLeft := by
-  simpa [qSDD, SubMeas.liftRight, SubMeas.liftLeft] using
+  simpa [qSDD, qSDDCore, SubMeas.liftRight, SubMeas.liftLeft,
+    mkRightPlacedSubMeas_outcome, mkLeftPlacedSubMeas_outcome] using
     MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv
       (ψ := ψ) hperm A.outcome B.outcome
 

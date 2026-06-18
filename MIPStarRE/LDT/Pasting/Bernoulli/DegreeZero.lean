@@ -266,13 +266,13 @@ private theorem degreeZero_averagedSlice_liftedVerticalLineConsistency
               (liftedVerticalLineAnswerFamily params strategy u))) := by
           apply avgOver_mono
           intro u
-          simpa [polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average params family u] using
-            qBipartiteConsDefect_averageIdxSubMeas_left_le strategy.state
-              (uniformDistribution (Fq params))
-              (fun x => family.evaluatedAtNextPoint
-                (appendPoint params (truncatePoint params u) x))
-              (liftedVerticalLineAnswerFamily params strategy u)
-              (uniformDistribution_weight_sum_le_one (Fq params))
+          rw [polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average params family u]
+          exact qBipartiteConsDefect_averageIdxSubMeas_left_le strategy.state
+            (uniformDistribution (Fq params))
+            (fun x => family.evaluatedAtNextPoint
+              (appendPoint params (truncatePoint params u) x))
+            (liftedVerticalLineAnswerFamily params strategy u)
+            (uniformDistribution_weight_sum_le_one (Fq params))
     _ = avgOver (uniformDistribution (Point params.next))
           (fun u => avgOver (uniformDistribution (Fq params))
             (fun x => F (truncatePoint params u) x)) := by
@@ -314,7 +314,7 @@ private theorem degreeZero_averagedSlice_pointConsistency
         2 * Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)) := by
   let eps' : Error := min eps 1
   let delta' : Error := min delta 1
-  let lineMeas : IdxMeas (Point params.next) (Fq params) ι := fun u =>
+  let lineMeas : IdxMeas (Point params.next) (Fq params.next) ι := fun u =>
     { toSubMeas := liftedVerticalLineAnswerFamily params strategy u
       total_eq_one := by
         let ℓ : AxisParallelLine params.next :=
@@ -322,7 +322,7 @@ private theorem degreeZero_averagedSlice_pointConsistency
             direction := lastCoord params }
         simpa [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, ℓ,
           postprocess_total] using (strategy.axisParallelMeasurement ℓ).total_eq_one }
-  let pointMeas : IdxMeas (Point params.next) (Fq params) ι :=
+  let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
     fun u => (strategy.pointMeasurement u).toMeasurement
   have hline :
       ConsRel strategy.state (uniformDistribution (Point params.next))
@@ -330,7 +330,13 @@ private theorem degreeZero_averagedSlice_pointConsistency
           (averagedSliceAppendedSubMeas params family))
         (IdxMeas.toIdxSubMeas lineMeas)
         (min zeta 1 + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) := by
-    simpa [lineMeas, eps', delta'] using
+    have hline_eq :
+        IdxMeas.toIdxSubMeas lineMeas =
+          liftedVerticalLineAnswerFamily params strategy := by
+      funext u
+      rfl
+    rw [hline_eq]
+    simpa [eps', delta'] using
       degreeZero_averagedSlice_liftedVerticalLineConsistency params strategy
         eps delta gamma zeta hgood family hcons hd_zero
   have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
@@ -351,10 +357,22 @@ private theorem degreeZero_averagedSlice_pointConsistency
         (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas lineMeas))
         (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas))
         (8 * (params.m : Error) * eps' + 4 * delta') := by
-    refine Preliminaries.sddRel_symm strategy.state
-      (uniformDistribution (Point params.next)) _ _ _ ?_
-    simpa [lineMeas, pointMeas, liftedVerticalLineAnswerFamily] using
-      pointVerticalLineSdd params strategy eps' delta' gamma hgood_small
+    have hpublic :=
+      pointVerticalLineSdd_liftedVerticalLine_of_axis_self params strategy
+        eps' delta' hgood_small.axisParallelTest hgood_small.selfConsistencyTest
+    have hline_eq :
+        IdxMeas.toIdxSubMeas lineMeas =
+          liftedVerticalLineAnswerFamily params strategy := by
+      funext u
+      rfl
+    have hpoint_eq :
+        IdxMeas.toIdxSubMeas pointMeas =
+          IdxProjMeas.toIdxSubMeas strategy.pointMeasurement := by
+      funext u
+      rfl
+    rw [hline_eq, hpoint_eq]
+    exact Preliminaries.sddRel_symm strategy.state
+      (uniformDistribution (Point params.next)) _ _ _ hpublic
   have htri :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (polynomialEvaluationFamily params.next
@@ -492,13 +510,13 @@ private theorem degreeZero_averagedSlice_liftedVerticalLineConsistency_of_axis_s
               (liftedVerticalLineAnswerFamily params strategy u))) := by
           apply avgOver_mono
           intro u
-          simpa [polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average params family u] using
-            qBipartiteConsDefect_averageIdxSubMeas_left_le strategy.state
-              (uniformDistribution (Fq params))
-              (fun x => family.evaluatedAtNextPoint
-                (appendPoint params (truncatePoint params u) x))
-              (liftedVerticalLineAnswerFamily params strategy u)
-              (uniformDistribution_weight_sum_le_one (Fq params))
+          rw [polynomialEvaluation_averagedSliceAppendedSubMeas_eq_average params family u]
+          exact qBipartiteConsDefect_averageIdxSubMeas_left_le strategy.state
+            (uniformDistribution (Fq params))
+            (fun x => family.evaluatedAtNextPoint
+              (appendPoint params (truncatePoint params u) x))
+            (liftedVerticalLineAnswerFamily params strategy u)
+            (uniformDistribution_weight_sum_le_one (Fq params))
     _ = avgOver (uniformDistribution (Point params.next))
           (fun u => avgOver (uniformDistribution (Fq params))
             (fun x => F (truncatePoint params u) x)) := by
@@ -541,7 +559,7 @@ private theorem degreeZero_averagedSlice_pointConsistency_of_axis_self
         2 * Real.sqrt (8 * (params.m : Error) * min eps 1 + 4 * min delta 1)) := by
   let eps' : Error := min eps 1
   let delta' : Error := min delta 1
-  let lineMeas : IdxMeas (Point params.next) (Fq params) ι := fun u =>
+  let lineMeas : IdxMeas (Point params.next) (Fq params.next) ι := fun u =>
     { toSubMeas := liftedVerticalLineAnswerFamily params strategy u
       total_eq_one := by
         let ℓ : AxisParallelLine params.next :=
@@ -549,7 +567,7 @@ private theorem degreeZero_averagedSlice_pointConsistency_of_axis_self
             direction := lastCoord params }
         simpa [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, ℓ,
           postprocess_total] using (strategy.axisParallelMeasurement ℓ).total_eq_one }
-  let pointMeas : IdxMeas (Point params.next) (Fq params) ι :=
+  let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
     fun u => (strategy.pointMeasurement u).toMeasurement
   have hline :
       ConsRel strategy.state (uniformDistribution (Point params.next))
@@ -557,7 +575,13 @@ private theorem degreeZero_averagedSlice_pointConsistency_of_axis_self
           (averagedSliceAppendedSubMeas params family))
         (IdxMeas.toIdxSubMeas lineMeas)
         (min zeta 1 + Real.sqrt (8 * (params.m : Error) * eps' + 4 * delta')) := by
-    simpa [lineMeas, eps', delta'] using
+    have hline_eq :
+        IdxMeas.toIdxSubMeas lineMeas =
+          liftedVerticalLineAnswerFamily params strategy := by
+      funext u
+      rfl
+    rw [hline_eq]
+    simpa [eps', delta'] using
       degreeZero_averagedSlice_liftedVerticalLineConsistency_of_axis_self params strategy
         eps delta zeta haxis hself family hcons hd_zero
   have haxis_le_one : strategy.axisParallelFailureProbability ≤ 1 := by
@@ -578,11 +602,22 @@ private theorem degreeZero_averagedSlice_pointConsistency_of_axis_self
         (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas lineMeas))
         (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas))
         (8 * (params.m : Error) * eps' + 4 * delta') := by
-    refine Preliminaries.sddRel_symm strategy.state
-      (uniformDistribution (Point params.next)) _ _ _ ?_
-    simpa [lineMeas, pointMeas, liftedVerticalLineAnswerFamily] using
-      pointVerticalLineSdd_of_axis_self params strategy eps' delta'
-        haxis_small hself_small
+    have hpublic :=
+      pointVerticalLineSdd_liftedVerticalLine_of_axis_self params strategy
+        eps' delta' haxis_small hself_small
+    have hline_eq :
+        IdxMeas.toIdxSubMeas lineMeas =
+          liftedVerticalLineAnswerFamily params strategy := by
+      funext u
+      rfl
+    have hpoint_eq :
+        IdxMeas.toIdxSubMeas pointMeas =
+          IdxProjMeas.toIdxSubMeas strategy.pointMeasurement := by
+      funext u
+      rfl
+    rw [hline_eq, hpoint_eq]
+    exact Preliminaries.sddRel_symm strategy.state
+      (uniformDistribution (Point params.next)) _ _ _ hpublic
   have htri :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (polynomialEvaluationFamily params.next
@@ -663,7 +698,7 @@ theorem degreeZeroPastedPointConsistency
       simpa [S, η] using
         degreeZero_averagedSlice_pointConsistency params strategy eps delta gamma zeta
           hgood family hcons hd_zero
-    let completedEval : IdxSubMeas (Point params.next) (Fq params) ι :=
+    let completedEval : IdxSubMeas (Point params.next) (Fq params.next) ι :=
       fun u => (Preliminaries.completeAtOutcome (evaluateAt params.next u S)
         ((pastedFallbackOutcome params) u)).toSubMeas
     have hcompletedEval :
@@ -710,7 +745,7 @@ theorem degreeZeroPastedPointConsistency
                 unfold bipartiteConsError completedEval
                 apply avgOver_mono
                 intro u
-                simpa [S, evaluateAt, postprocess_total] using
+                simpa [S, evaluateAt, IdxProjMeas.toIdxSubMeas, postprocess_total] using
                   Preliminaries.qBipartiteConsDefect_completeAtOutcome_right_le
                     strategy.state (strategy.pointMeasurement u).toMeasurement
                     (evaluateAt params.next u S)
@@ -815,7 +850,7 @@ theorem degreeZeroPastedPointConsistency_of_axis_self
       simpa [S, η] using
         degreeZero_averagedSlice_pointConsistency_of_axis_self params strategy
           eps delta zeta haxis hselfBound family hcons hd_zero
-    let completedEval : IdxSubMeas (Point params.next) (Fq params) ι :=
+    let completedEval : IdxSubMeas (Point params.next) (Fq params.next) ι :=
       fun u => (Preliminaries.completeAtOutcome (evaluateAt params.next u S)
         ((pastedFallbackOutcome params) u)).toSubMeas
     have hcompletedEval :
@@ -862,7 +897,7 @@ theorem degreeZeroPastedPointConsistency_of_axis_self
                 unfold bipartiteConsError completedEval
                 apply avgOver_mono
                 intro u
-                simpa [S, evaluateAt, postprocess_total] using
+                simpa [S, evaluateAt, IdxProjMeas.toIdxSubMeas, postprocess_total] using
                   Preliminaries.qBipartiteConsDefect_completeAtOutcome_right_le
                     strategy.state (strategy.pointMeasurement u).toMeasurement
                     (evaluateAt params.next u S)

@@ -163,8 +163,8 @@ private theorem sqrt_selfImprovementHelperError_le_ten_m_powerSum_quarter
                   mul_le_mul_of_nonneg_right hsqrt100m (Real.sqrt_nonneg _)
             _ ≤ (10 * (params.m : Error)) *
                   finalStagePowerSum params eps delta (1 / (4 : Error)) := by
-                  convert mul_le_mul_of_nonneg_left hsqrt_sum h10m_nn using 2
-                  ring_nf
+                  rw [show (1 / (4 : Error)) = (1 / (2 : Error)) / 2 by norm_num]
+                  exact mul_le_mul_of_nonneg_left hsqrt_sum h10m_nn
 
 /-- The orthogonalization threshold written as an iterated square root of the
 helper threshold.
@@ -224,8 +224,8 @@ private theorem selfImprovementOrthogonalizationError_le_four_hundred_m_powerSum
                     mul_le_mul_of_nonneg_right hsqrt10m (Real.sqrt_nonneg _)
               _ ≤ (4 * (params.m : Error)) *
                     finalStagePowerSum params eps delta (1 / (8 : Error)) := by
-                    convert mul_le_mul_of_nonneg_left hsqrt_sum h4m_nn using 2
-                    ring_nf
+                    rw [show (1 / (8 : Error)) = (1 / (4 : Error)) / 2 by norm_num]
+                    exact mul_le_mul_of_nonneg_left hsqrt_sum h4m_nn
   rw [selfImprovementOrthogonalizationError_eq]
   calc
     100 * Real.sqrt (Real.sqrt (selfImprovementHelperError params eps delta))
@@ -270,8 +270,8 @@ private theorem sqrt_selfImprovementOrthogonalizationError_le_twenty_m_powerSum_
                   mul_le_mul_of_nonneg_right hsqrt400m (Real.sqrt_nonneg _)
             _ ≤ (20 * (params.m : Error)) *
                   finalStagePowerSum params eps delta (1 / (16 : Error)) := by
-                  convert mul_le_mul_of_nonneg_left hsqrt_sum h20m_nn using 2
-                  ring_nf
+                  rw [show (1 / (16 : Error)) = (1 / (8 : Error)) / 2 by norm_num]
+                  exact mul_le_mul_of_nonneg_left hsqrt_sum h20m_nn
 
 /-- The data-processing threshold written with an ordinary square root.
 
@@ -391,8 +391,8 @@ private theorem sqrt_selfImprovementDataProcessingError_le_thirty_one_m_powerSum
                   mul_le_mul_of_nonneg_right hsqrt960m (Real.sqrt_nonneg _)
             _ ≤ (31 * (params.m : Error)) *
                   finalStagePowerSum params eps delta (1 / (32 : Error)) := by
-                  convert mul_le_mul_of_nonneg_left hsqrt_sum h31m_nn using 2
-                  ring_nf
+                  rw [show (1 / (32 : Error)) = (1 / (16 : Error)) / 2 by norm_num]
+                  exact mul_le_mul_of_nonneg_left hsqrt_sum h31m_nn
 
 private theorem final_fields_projective_residual_error_le_131_times_finalStagePowerSum
     (params : Parameters) [FieldModel params.q]

@@ -36,9 +36,18 @@ lemma switcherooSelfConsistency_bip
       (IdxProjSubMeas.toIdxSubMeas M)
       omega := by
   constructor
-  simpa [switcherooSelfConsistencyLeft, switcherooSelfConsistencyRight,
-    IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
-    hselfM.squaredDistanceBound
+  have hleft :
+      switcherooSelfConsistencyLeft params M =
+        IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas M) := by
+    funext x
+    rfl
+  have hright :
+      switcherooSelfConsistencyRight params M =
+        IdxSubMeas.liftRight (IdxProjSubMeas.toIdxSubMeas M) := by
+    funext x
+    rfl
+  rw [← hleft, ← hright]
+  exact hselfM.squaredDistanceBound
 
 /-- Lift slicewise complete-part self-consistency to the slice-pair distribution.
 

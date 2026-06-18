@@ -1,3 +1,8 @@
+import Mathlib.Analysis.Complex.Basic
+import Mathlib.Analysis.LocallyConvex.WithSeminorms
+import Mathlib.Analysis.Matrix.Normed
+import Mathlib.Topology.Bases
+import Mathlib.Topology.Instances.Matrix
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Basic
 
 /-!
@@ -19,6 +24,31 @@ open MIPStarRE.LDT.GlobalVariance
 open MIPStarRE.LDT.MakingMeasurementsProjective
 open Filter
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.Elementwise Topology
+
+noncomputable local instance matrixOperatorSeminormedAddCommGroup
+    (H : FiniteHilbertSpace) :
+    SeminormedAddCommGroup (MatrixOperator H) :=
+  Matrix.seminormedAddCommGroup
+
+noncomputable local instance matrixOperatorNormedAddCommGroup
+    (H : FiniteHilbertSpace) :
+    NormedAddCommGroup (MatrixOperator H) :=
+  Matrix.normedAddCommGroup
+
+noncomputable local instance matrixOperatorNormedSpace
+    (H : FiniteHilbertSpace) :
+    NormedSpace ℝ (MatrixOperator H) :=
+  Matrix.normedSpace
+
+local instance matrixOperatorFirstCountableTopology
+    (H : FiniteHilbertSpace) :
+    FirstCountableTopology (MatrixOperator H) :=
+  inferInstanceAs (FirstCountableTopology (H.carrier → H.carrier → ℂ))
+
+noncomputable local instance matrixOperatorLocallyConvexSpace
+    (H : FiniteHilbertSpace) :
+    LocallyConvexSpace ℝ (MatrixOperator H) :=
+  NormedSpace.toLocallyConvexSpace
 
 /-- The canonical equality-constraint operator as a continuous real-linear map. -/
 noncomputable def matrixSdpCanonicalConstraintOperatorCLM
@@ -105,7 +135,12 @@ theorem matrixSdpCanonicalPrimalImageCone_mem_of_nonnegative
   rw [← matrixSdpCanonicalPrimalConeMap_apply params model X]
   rw [matrixSdpCanonicalPrimalImageCone, ProperCone.mem_map]
   exact subset_closure <| by
-    exact (PointedCone.mem_map).2 ⟨X, by simpa using hX, rfl⟩
+    have hXcone :
+        X ∈ (matrixOperatorNonnegativeProperCone
+          (matrixSdpCanonicalBlockHilbertSpace params model)).toPointedCone := by
+      change 0 ≤ X
+      exact hX
+    exact (PointedCone.mem_map).2 ⟨X, hXcone, rfl⟩
 
 /-- A feasible canonical primal matrix maps to the image-cone point with
 constraint component equal to the identity. -/
@@ -148,7 +183,9 @@ theorem matrixSdpCanonicalPrimalImageCone_identity_mem_iff_exists_feasible_objec
     choose X hXcone hmap using hu_witness
     have hXnonneg : ∀ n : ℕ, 0 ≤ X n := by
       intro n
-      simpa using hXcone n
+      have hx := hXcone n
+      change 0 ≤ X n at hx
+      exact hx
     have hmapCLM : ∀ n : ℕ,
         matrixSdpCanonicalPrimalConeMap params model (X n) = u n := by
       intro n
@@ -168,6 +205,9 @@ theorem matrixSdpCanonicalPrimalImageCone_identity_mem_iff_exists_feasible_objec
     have htrace_tendsto_u :
         Tendsto (fun n : ℕ => Complex.re (Matrix.trace ((u n).1))) atTop
           (𝓝 (Fintype.card model.space.carrier : ℝ)) := by
+      change Tendsto (((fun Y : MatrixOperator model.space =>
+        Complex.re (Matrix.trace Y)) ∘ fun n : ℕ => (u n).1)) atTop
+          (𝓝 (Fintype.card model.space.carrier : ℝ))
       simpa [Matrix.trace_one] using
         (htrace_cont.tendsto (1 : MatrixOperator model.space)).comp hcoords.1
     have htrace_tendsto :

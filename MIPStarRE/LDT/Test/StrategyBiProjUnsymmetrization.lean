@@ -157,7 +157,8 @@ theorem extractRoleRegisterAliceBlock_le {ιA ιB : Type*}
     {X Y : MIPStarRE.Quantum.Op (RoleRegisterLocal ιA ιB)} (hXY : X ≤ Y) :
     extractRoleRegisterAliceBlock X ≤ extractRoleRegisterAliceBlock Y := by
   rw [Matrix.le_iff] at hXY ⊢
-  simpa [extractRoleRegisterAliceBlock_sub] using
+  simpa [extractRoleRegisterAliceBlock, extractRoleRegisterAliceBlock_sub,
+    Matrix.submatrix_sub] using
     hXY.submatrix (fun i : ιA => (Role.A, Sum.inl i))
 
 /-- Bob principal blocks are monotone for the matrix order. -/
@@ -165,7 +166,8 @@ theorem extractRoleRegisterBobBlock_le {ιA ιB : Type*}
     {X Y : MIPStarRE.Quantum.Op (RoleRegisterLocal ιA ιB)} (hXY : X ≤ Y) :
     extractRoleRegisterBobBlock X ≤ extractRoleRegisterBobBlock Y := by
   rw [Matrix.le_iff] at hXY ⊢
-  simpa [extractRoleRegisterBobBlock_sub] using
+  simpa [extractRoleRegisterBobBlock, extractRoleRegisterBobBlock_sub,
+    Matrix.submatrix_sub] using
     hXY.submatrix (fun i : ιB => (Role.B, Sum.inr i))
 
 end ProjStrat
@@ -451,9 +453,9 @@ private lemma opTensor_localDirectSum_roleLocalBlock_AB_submatrix
     (opTensor (localDirectSumBlock A Bfill) (roleRegisterRoleLocalBlock Role.B Y)).submatrix
       localPairABEmbedding localPairABEmbedding =
     opTensor A (extractRoleRegisterBobBlock Y) := by
-  simpa [localPairABEmbedding] using
-    opTensor_submatrix_prod (localDirectSumBlock A Bfill) (roleRegisterRoleLocalBlock Role.B Y)
-      (Sum.inl : ιA → LocalCarrierSum ιA ιB) (Sum.inr : ιB → LocalCarrierSum ιA ιB)
+  ext z w
+  simp [localPairABEmbedding, roleRegisterRoleLocalBlock,
+    extractRoleRegisterBobBlock, opTensor]
 
 private lemma opTensor_localDirectSum_roleLocalBlock_BA_submatrix
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -462,9 +464,9 @@ private lemma opTensor_localDirectSum_roleLocalBlock_BA_submatrix
     (opTensor (localDirectSumBlock Afill B) (roleRegisterRoleLocalBlock Role.A Y)).submatrix
       localPairBAEmbedding localPairBAEmbedding =
     opTensor B (extractRoleRegisterAliceBlock Y) := by
-  simpa [localPairBAEmbedding] using
-    opTensor_submatrix_prod (localDirectSumBlock Afill B) (roleRegisterRoleLocalBlock Role.A Y)
-      (Sum.inr : ιB → LocalCarrierSum ιA ιB) (Sum.inl : ιA → LocalCarrierSum ιA ιB)
+  ext z w
+  simp [localPairBAEmbedding, roleRegisterRoleLocalBlock,
+    extractRoleRegisterAliceBlock, opTensor]
 
 private lemma opTensor_roleBlock_roleRegister_AB_submatrix
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -475,11 +477,8 @@ private lemma opTensor_roleBlock_roleRegister_AB_submatrix
         Y).submatrix
       (rolePairSectorEmbedding Role.A Role.B) (rolePairSectorEmbedding Role.A Role.B) =
       opTensor (localDirectSumBlock A Bfill) (roleRegisterRoleLocalBlock Role.B Y) := by
-  simpa [rolePairSectorEmbedding] using
-    opTensor_submatrix_prod
-      (roleBlock (localDirectSumBlock A Bfill) (localDirectSumBlock Afill B)) Y
-      (fun i : LocalCarrierSum ιA ιB => (Role.A, i))
-      (fun i : LocalCarrierSum ιA ιB => (Role.B, i))
+  ext z w
+  simp [rolePairSectorEmbedding, roleRegisterRoleLocalBlock, opTensor]
 
 private lemma opTensor_roleBlock_roleRegister_BA_submatrix
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -490,11 +489,8 @@ private lemma opTensor_roleBlock_roleRegister_BA_submatrix
         Y).submatrix
       (rolePairSectorEmbedding Role.B Role.A) (rolePairSectorEmbedding Role.B Role.A) =
       opTensor (localDirectSumBlock Afill B) (roleRegisterRoleLocalBlock Role.A Y) := by
-  simpa [rolePairSectorEmbedding] using
-    opTensor_submatrix_prod
-      (roleBlock (localDirectSumBlock A Bfill) (localDirectSumBlock Afill B)) Y
-      (fun i : LocalCarrierSum ιA ιB => (Role.B, i))
-      (fun i : LocalCarrierSum ιA ιB => (Role.A, i))
+  ext z w
+  simp [rolePairSectorEmbedding, roleRegisterRoleLocalBlock, opTensor]
 
 private lemma trace_heterogeneousSwapDensity_mul_opTensor {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]

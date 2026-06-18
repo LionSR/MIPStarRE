@@ -137,8 +137,10 @@ lemma axisParallelBaseEventApproximation_weighted_sample_sum
         refine ⟨?_⟩
         simpa [SymStrat.axisParallelFailureProbability] using
           hgood.axisParallelTest
-      simpa [pointMeas, lineMeas, axisParallelPointAnswerMeasurement,
-        axisParallelLineAnswerMeasurement, IdxMeas.toIdxSubMeas] using haxis
+      change ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+        (axisParallelPointAnswerFamily strategy)
+        (axisParallelLineAnswerFamily strategy) eps
+      exact haxis
   have hcons_swapped :
       ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
         (IdxMeas.toIdxSubMeas lineMeas) (IdxMeas.toIdxSubMeas pointMeas) eps :=

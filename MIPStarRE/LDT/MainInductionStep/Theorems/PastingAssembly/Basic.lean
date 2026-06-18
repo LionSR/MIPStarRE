@@ -752,7 +752,8 @@ lemma idxPolyFamily_stronglySelfConsistent_of_slice_bounds
         qSDD ψ ((family.meas x).toSubMeas.liftLeft)
           ((family.meas x).toSubMeas.liftRight) ≤ sliceError x := by
     intro x
-    simpa [sddError, avgOver_uniform_const, constSubMeasFamily] using
+    simpa [sddError, avgOver_uniform_const, constSubMeasFamily,
+      SubMeas.liftLeft, SubMeas.liftRight, leftPlacedSubMeas, rightPlacedSubMeas] using
       (hself x).squaredDistanceBound
   calc
     sddError ψ (uniformDistribution (Fq params))

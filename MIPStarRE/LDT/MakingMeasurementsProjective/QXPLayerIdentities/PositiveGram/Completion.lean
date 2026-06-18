@@ -307,7 +307,7 @@ theorem positive_gram_completion_left_unitary_mixed_column_eq_zero
     exact hzero
   have hcoord := congrArg (fun y : EuclideanSpace ℂ ι => y r) hzero_lin
   simpa [Matrix.toEuclideanLin, Matrix.toLpLin_apply, Matrix.mul_apply,
-    Matrix.conjTranspose_apply, Matrix.transpose_apply] using hcoord
+    Matrix.conjTranspose_apply, Matrix.transpose_apply, Matrix.mulVec, dotProduct] using hcoord
 
 /-- The polar-extension mixed product is the positive-spectrum mixed product.
 

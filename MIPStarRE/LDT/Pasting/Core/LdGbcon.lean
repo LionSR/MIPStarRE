@@ -94,7 +94,10 @@ private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
             (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (· zeroCoord)).total =
               1 := by
           simpa [postprocess_total] using (strategy.axisParallelMeasurement ℓ).total_eq_one
-        simpa [ldGbconAxisLineMeasurement, ℓ] using hA'
+        change
+          (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas)
+            (fun f => f zeroCoord)).total = 1
+        exact hA'
     have hB : (ldGbconVerticalLineMeasurement params strategy u).toSubMeas.total = 1 := by
         let ℓ : AxisParallelLine params.next :=
           { base := appendPoint params (truncatePoint params u) zeroCoord
@@ -104,7 +107,10 @@ private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
               (fun f => f (pointHeight params u))).total = 1 := by
           simpa [verticalLineMeasurementFamily, ℓ, postprocess_total] using
             (strategy.axisParallelMeasurement ℓ).total_eq_one
-        simpa [ldGbconVerticalLineMeasurement] using hB'
+        change
+          (postprocess (verticalLineMeasurementFamily params strategy (truncatePoint params u))
+            (fun f => f (pointHeight params u))).total = 1
+        exact hB'
     rw [hA, hB]
 
 private lemma ldGbcon_axis_last_direction_consistency
@@ -173,8 +179,13 @@ private lemma ldGbcon_axis_last_direction_consistency
   rcases haxis with ⟨haxis⟩
   refine ⟨?_⟩
   unfold bipartiteConsError at *
-  simpa [err, axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
-    ldGbconAxisLineMeasurement] using
+  change
+    avgOver (uniformDistribution (Point params.next)) (fun u =>
+      qBipartiteConsDefect strategy.state
+        (axisParallelPointAnswerFamily strategy (u, lastCoord params))
+        (axisParallelLineAnswerFamily strategy (u, lastCoord params))) ≤
+      (params.next.m : Error) * eps
+  exact
     calc
       avgOver (uniformDistribution (Point params.next)) (fun u =>
         qBipartiteConsDefect strategy.state
@@ -212,7 +223,12 @@ theorem pointVerticalLineSdd_of_axis_self
       (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas (ldGbconVerticalLineMeasurement params strategy)))
       (8 * (params.m : Error) * eps + 4 * delta) := by
   let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
-    fun u => (strategy.pointMeasurement u).toMeasurement
+    IdxProjMeas.toIdxMeas strategy.pointMeasurement
+  have hpointMeas_sub :
+      IdxMeas.toIdxSubMeas pointMeas =
+        IdxProjMeas.toIdxSubMeas strategy.pointMeasurement := by
+    funext u
+    rfl
   have haxis_all : ConsRel strategy.state
       (uniformDistribution (AxisParallelTestSample params.next))
       (axisParallelPointAnswerFamily strategy)
@@ -229,11 +245,12 @@ theorem pointVerticalLineSdd_of_axis_self
           (IdxMeas.toIdxSubMeas pointMeas)
           delta := by
       constructor
-      simpa [pointMeas, SymStrat.selfConsistencyFailureProbability,
-        IdxProjMeas.toIdxSubMeas] using hself
-    simpa [pointMeas, IdxProjMeas.toIdxSubMeas] using
+      rw [hpointMeas_sub]
+      exact hself
+    have hcons :=
       (Preliminaries.bipartiteSSCRel_iff_consRel_self_measurement strategy.state
         (uniformDistribution (Point params.next)) pointMeas delta).mp hself_rel
+    rwa [hpointMeas_sub] at hcons
   have heps_nonneg : 0 ≤ eps := by
     exact le_trans
       (bipartiteConsError_nonneg strategy.state
@@ -258,7 +275,7 @@ theorem pointVerticalLineSdd_of_axis_self
       pointMeas
       (ldGbconAxisLineMeasurement params strategy)
       ((params.next.m : Error) * eps)
-      (by simpa [pointMeas] using haxis_last)
+      (by rwa [hpointMeas_sub])
   have haxis_sdd : SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
@@ -280,7 +297,7 @@ theorem pointVerticalLineSdd_of_axis_self
       (2 * delta) := by
         exact ⟨(Preliminaries.simeqToApprox strategy.state
           (uniformDistribution (Point params.next)) pointMeas pointMeas delta
-          (by simpa [pointMeas] using hself_cons)).leftRightSquaredDistanceBound⟩
+          (by rwa [hpointMeas_sub])).leftRightSquaredDistanceBound⟩
   have hself_sdd_symm : SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
@@ -320,6 +337,30 @@ theorem pointVerticalLineSdd_of_axis_self
           (ldGbconVerticalLineMeasurement params strategy)) := by
     rw [ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy]
   exact hlift ▸ hpoint_to_axis
+
+/-- Public-family form of `pointVerticalLineSdd_of_axis_self`.
+
+The proof above constructs the vertical-line measurement as a complete
+measurement-valued family.  Downstream arguments use only its underlying
+submeasurement family, namely `liftedVerticalLineAnswerFamily`. -/
+theorem pointVerticalLineSdd_liftedVerticalLine_of_axis_self
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params.next ι)
+    (eps delta : Error)
+    (haxis : strategy.axisParallelFailureProbability ≤ eps)
+    (hself : strategy.selfConsistencyFailureProbability ≤ delta) :
+    SDDRel strategy.state
+      (uniformDistribution (Point params.next))
+      (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      (IdxSubMeas.liftRight (liftedVerticalLineAnswerFamily params strategy))
+      (8 * (params.m : Error) * eps + 4 * delta) := by
+  change SDDRel strategy.state
+    (uniformDistribution (Point params.next))
+    (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+    (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas (ldGbconVerticalLineMeasurement params strategy)))
+    (8 * (params.m : Error) * eps + 4 * delta)
+  exact pointVerticalLineSdd_of_axis_self params strategy eps delta haxis hself
 
 /-- `lem:point-vertical-line-sdd`.
 A good strategy induces a state-dependent distance bound between the point
@@ -362,7 +403,12 @@ theorem ldGbcon_of_axis_self
           (fun f => f (pointHeight params u)))
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
   let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
-    fun u => (strategy.pointMeasurement u).toMeasurement
+    IdxProjMeas.toIdxMeas strategy.pointMeasurement
+  have hpointMeas_sub :
+      IdxMeas.toIdxSubMeas pointMeas =
+        IdxProjMeas.toIdxSubMeas strategy.pointMeasurement := by
+    funext u
+    rfl
   have haxis_all : ConsRel strategy.state
       (uniformDistribution (AxisParallelTestSample params.next))
       (axisParallelPointAnswerFamily strategy)
@@ -379,11 +425,12 @@ theorem ldGbcon_of_axis_self
           (IdxMeas.toIdxSubMeas pointMeas)
           delta := by
       constructor
-      simpa [pointMeas, SymStrat.selfConsistencyFailureProbability,
-        IdxProjMeas.toIdxSubMeas] using hself
-    simpa [pointMeas, IdxProjMeas.toIdxSubMeas] using
+      rw [hpointMeas_sub]
+      exact hself
+    have hcons :=
       (Preliminaries.bipartiteSSCRel_iff_consRel_self_measurement strategy.state
         (uniformDistribution (Point params.next)) pointMeas delta).mp hself_rel
+    rwa [hpointMeas_sub] at hcons
   have heps_nonneg : 0 ≤ eps := by
     exact le_trans
       (bipartiteConsError_nonneg strategy.state
@@ -416,8 +463,11 @@ theorem ldGbcon_of_axis_self
           (evaluateFiberFamilyAtNextPoint params
             (IdxProjSubMeas.toIdxSubMeas family.meas))
           zeta
-          (by simpa [IdxPolyFamily.evaluatedAtNextPoint, evaluateFiberFamilyAtNextPoint] using
-            hcons.pointConsistency)
+          (by
+            change ConsRel strategy.state (uniformDistribution (Point params.next))
+              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+              family.evaluatedAtNextPoint zeta
+            exact hcons.pointConsistency)
   have haxis_last : ConsRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
@@ -429,7 +479,7 @@ theorem ldGbcon_of_axis_self
       pointMeas
       (ldGbconAxisLineMeasurement params strategy)
       ((params.next.m : Error) * eps)
-      (by simpa [pointMeas] using haxis_last)
+      (by rwa [hpointMeas_sub])
   have haxis_sdd : SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
@@ -451,7 +501,7 @@ theorem ldGbcon_of_axis_self
       (2 * delta) := by
         exact ⟨(Preliminaries.simeqToApprox strategy.state
           (uniformDistribution (Point params.next)) pointMeas pointMeas delta
-          (by simpa [pointMeas] using hself_cons)).leftRightSquaredDistanceBound⟩
+          (by rwa [hpointMeas_sub])).leftRightSquaredDistanceBound⟩
   have hself_sdd_symm : SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
@@ -497,8 +547,12 @@ theorem ldGbcon_of_axis_self
       (8 * (params.m : Error) * eps + 4 * delta)
       hcons_swapped
       hpoint_to_axis
-  simpa [ldGbconVerticalLineMeasurement,
-    ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy] using htriangle
+  change ConsRel strategy.state
+    (uniformDistribution (Point params.next))
+    (evaluateFiberFamilyAtNextPoint params (IdxProjSubMeas.toIdxSubMeas family.meas))
+    (IdxMeas.toIdxSubMeas (ldGbconVerticalLineMeasurement params strategy))
+    (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
+  simpa [ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy] using htriangle
 
 /-- `lem:ld-gbcon`.
 
@@ -547,9 +601,15 @@ theorem ldGbcon_liftedVerticalLine_of_axis_self
       family.evaluatedAtNextPoint
       (liftedVerticalLineAnswerFamily params strategy)
       (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
-  simpa [IdxPolyFamily.evaluatedAtNextPoint, evaluateFiberFamilyAtNextPoint,
-    liftedVerticalLineAnswerFamily] using
-    ldGbcon_of_axis_self params strategy eps delta zeta haxis hself family hcons
+  change ConsRel strategy.state
+    (uniformDistribution (Point params.next))
+    (evaluateFiberFamilyAtNextPoint params (IdxProjSubMeas.toIdxSubMeas family.meas))
+    (fun u =>
+      postprocess
+        (verticalLineMeasurementFamily params strategy (truncatePoint params u))
+        (fun f => f (pointHeight params u)))
+    (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
+  exact ldGbcon_of_axis_self params strategy eps delta zeta haxis hself family hcons
 
 /-- Named-family form of `lem:ld-gbcon`. -/
 theorem ldGbcon_liftedVerticalLine

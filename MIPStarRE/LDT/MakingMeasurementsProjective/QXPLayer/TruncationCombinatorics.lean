@@ -3,7 +3,7 @@ import Mathlib.Algebra.BigOperators.Ring.Finset
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 import Mathlib.Data.Finset.Max
 import Mathlib.Data.Finset.Powerset
-import Mathlib.Data.Real.Sqrt
+import Mathlib.Analysis.Real.Sqrt
 
 /-!
 # Section 5 — Combinatorial core of the `r > d` truncation branch

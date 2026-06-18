@@ -61,11 +61,16 @@ lemma evaluatedSlice_phaseTwo_stability_defect_bound
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+  (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     |avgOver (uniformDistribution (Fq params))
       (evaluatedSlicePhaseTwoStabilityDefect params strategy family G)| ≤ Real.sqrt zeta := by
-  simpa [evaluatedSlicePhaseTwoStabilityDefect] using
-    (gCommStability_scalar params strategy zeta hnorm family G hG hbound)
+  have hdef :
+      evaluatedSlicePhaseTwoStabilityDefect params strategy family G =
+        gCommStabilityScalarDefect params strategy family G := by
+    funext y
+    rfl
+  rw [hdef]
+  exact gCommStability_scalar params strategy zeta hnorm family G hG hbound
 
 /-- The still-unmarginalized phase-2 defect at a sampled evaluated-slice question.
 
@@ -581,7 +586,7 @@ lemma evaluatedSlice_phaseTwo_questionDefect_avg_eq_stabilityDefect
             rfl
       _ = avgOver (uniformDistribution (Point params.next × Point params.next))
             (fun qq => defect (qq.2, qq.1)) := by
-            simpa using
+            simpa [Prod.swap] using
               (avgOver_uniform_equiv
                 (e := Equiv.prodComm (Point params.next) (Point params.next))
                 (f := fun qq : Point params.next × Point params.next => defect qq))

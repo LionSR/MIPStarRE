@@ -82,11 +82,13 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self
   have hprod' :
       ConsRel strategy.state
         (uniformDistribution (Point params × Fq params))
-        (fun ux => postprocess (evaluateAt params ux.1 ((family.meas ux.2).toSubMeas)) some)
+        (fun ux =>
+          postprocess (evaluateAt params ux.1 ((family.meas ux.2).toSubMeas))
+            (fun a => some a))
         (fun ux =>
           postprocess
             (postprocess (verticalLineMeasurementFamily params strategy ux.1) (fun f => f ux.2))
-            some)
+            (fun a => some a))
         (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta)) := by
     have hproc :=
       Preliminaries.consRelDataProcessing_questionDependent
@@ -103,9 +105,12 @@ lemma ldSandwichLineOnePoint_endpoint_ldGbcon_of_axis_self
         (zeta + Real.sqrt (8 * (params.m : Error) * eps + 4 * delta))
         (fun _ a => some a)
         hprod
-    simpa [pointNextEquiv, evaluateFiberFamilyAtNextPoint, postprocess_postprocess,
-      Function.comp] using hproc
+    simpa [pointNextEquiv, evaluateFiberFamilyAtNextPoint, IdxProjSubMeas.toIdxSubMeas,
+      postprocess_postprocess, Function.comp] using hproc
   convert hprod' using 2
+  · rename_i ux
+    rw [ldSandwichLineOnePointRightEndpointMeasurement_toSubMeas]
+    rfl
 
 -- The proof lifts the endpoint consistency relation through the split
 -- sandwiched-line equivalence; the chain of rewriting identities unfolds this
@@ -189,9 +194,6 @@ lemma gHatIdxMeas_outcome_some_eq_evaluateAt
     simp [gHatIdxMeas, completeSubMeas]
   conv_rhs =>
     simp [evaluateAt, postprocess, Finset.sum_filter]
-  refine Finset.sum_congr rfl ?_
-  intro g _hg
-  by_cases hg : g u = a <;> simp [hg]
 
 lemma gHatSandwichFamily_restrict_zero_outcome_some
     (params : Parameters)

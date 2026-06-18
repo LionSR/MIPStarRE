@@ -516,7 +516,7 @@ private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
                     have hsumP :
                         (∑ b : Fq params, (strategy.pointMeasurement vy).outcome b) =
                           (1 : MIPStarRE.Quantum.Op ι) := by
-                      simpa using (strategy.pointMeasurement vy).toMeasurement.sum_eq
+                      exact (strategy.pointMeasurement vy).toMeasurement.sum_eq
                     rw [hsumP]
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) ((G x).total) *

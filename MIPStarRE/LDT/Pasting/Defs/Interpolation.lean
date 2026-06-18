@@ -161,9 +161,11 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
         rw [← hcoord_eq]
         exact embedCoord_ne_lastCoord params oldCoord
       have hLiMv_zero : MvPolynomial.degreeOf coord LiMv ≤ 0 := by
-        simpa [LiMv, hcoord_ne_last] using
+        have hdeg :=
           (degreeOf_eval₂_C_X_le_natDegree
             (p := Li) (i := coord) (j := lastCoord params))
+        rw [if_neg hcoord_ne_last] at hdeg
+        exact hdeg
       have hslice : MvPolynomial.degreeOf coord slicePoly ≤ params.d := by
         change MvPolynomial.degreeOf coord
             (MvPolynomial.rename (embedCoord params) slice.poly :
@@ -188,9 +190,11 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
       have hLiMv : MvPolynomial.degreeOf (lastCoord params) LiMv ≤ params.d := by
         have hLiMv_nat :
             MvPolynomial.degreeOf (lastCoord params) LiMv ≤ Li.natDegree := by
-          simpa [LiMv] using
+          have hdeg :=
             (degreeOf_eval₂_C_X_le_natDegree
               (p := Li) (i := lastCoord params) (j := lastCoord params))
+          rw [if_pos rfl] at hdeg
+          exact hdeg
         exact hLiMv_nat.trans hLi_natDegree
       have hslice_zero : MvPolynomial.degreeOf (lastCoord params) slicePoly ≤ 0 := by
         change MvPolynomial.degreeOf (lastCoord params)

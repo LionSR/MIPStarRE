@@ -177,7 +177,8 @@ theorem approxToSimeq {Question Outcome : Type*}
     rw [← avgOver_const_mul]
     refine avgOver_congr _ _ _ ?_
     intro q
-    simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxProjMeas.toIdxSubMeas] using
+    simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
+      IdxProjMeas.toIdxSubMeas] using
       two_questionConsistency_eq_questionSDD_of_projective ψ (A q) (B q)
   change avgOver 𝒟
       (fun q =>
@@ -370,7 +371,8 @@ theorem approxToSimeq_heterogeneous {Question Outcome : Type*}
     rw [← avgOver_const_mul]
     refine avgOver_congr _ _ _ ?_
     intro q
-    simpa [IdxSubMeas.placeLeft, IdxSubMeas.placeRight, IdxProjMeas.toIdxSubMeas] using
+    simpa [IdxSubMeas.placeLeft, IdxSubMeas.placeRight, leftPlacedSubMeas,
+      rightPlacedSubMeas, IdxProjMeas.toIdxSubMeas] using
       two_questionConsistency_eq_questionSDD_of_projective_heterogeneous ψ (A q) (B q)
   change avgOver 𝒟
       (fun q =>

@@ -158,7 +158,8 @@ def appendAtHeight (params : Parameters) [FieldModel params.q]
     (f : AxisLinePolynomial params) (_x : Fq params) : AxisLinePolynomial params.next where
   poly := f.poly
   degreeBounded := by
-    simpa [Parameters.next] using f.degreeBounded
+    change f.poly.natDegree ≤ params.d
+    exact f.degreeBounded
 
 @[simp] theorem appendAtHeight_apply {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) (x t : Fq params) :
@@ -189,7 +190,8 @@ def restrictAtHeight (params : Parameters) [FieldModel params.q]
     (f : AxisLinePolynomial params.next) (_x : Fq params) : AxisLinePolynomial params where
   poly := f.poly
   degreeBounded := by
-    simpa [Parameters.next] using f.degreeBounded
+    change f.poly.natDegree ≤ params.d
+    exact f.degreeBounded
 
 end AxisLinePolynomial
 

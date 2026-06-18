@@ -683,15 +683,31 @@ theorem matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
           (X * (matrixSdpCanonicalDualOperator params model Z -
             matrixSdpCanonicalObjectiveOperator params model)) b =
         matrixSdpCanonicalDiagonalBlock params model 0 b at hblock
+      have hzero :
+          matrixSdpCanonicalDiagonalBlock params model
+              (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) b =
+            0 := by
+        ext i j
+        rfl
       rw [matrixSdpCanonicalDiagonalBlock_mul_dualSlack] at hblock
-      simpa [matrixSdpCanonicalDiagonalBlock] using congrFun (congrFun hblock i) j
+      rw [hzero] at hblock
+      exact congrFun (congrFun hblock i) j
     cases b with
     | none =>
         simpa [matrixSdpCanonicalBlockDiagonal, matrixSdpCanonicalPrimalBlockFamily,
-          matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement] using hentry
+          matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement] using
+          hentry.trans
+            (show (0 : ℂ) =
+                (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+                  (none, i) (none, j) by
+              rfl)
     | some g =>
         simpa [matrixSdpCanonicalBlockDiagonal, matrixSdpCanonicalPrimalBlockFamily] using
-          hentry
+          hentry.trans
+            (show (0 : ℂ) =
+                (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+                  (some g, i) (some g, j) by
+              rfl)
   · change (if b = c then
           (matrixSdpCanonicalPrimalBlockFamily params model
               (matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX) b *
@@ -717,9 +733,15 @@ theorem matrixSdpComplementarySlacknessDefect_of_canonical
     congrArg
       (fun X => matrixSdpCanonicalDiagonalBlock params model X (some g))
       hcanonical
+  have hzero :
+      matrixSdpCanonicalDiagonalBlock params model
+          (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) (some g) =
+        0 := by
+    ext i j
+    rfl
   rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack] at hblock
-  simpa [matrixSdpComplementarySlacknessDefect, matrixSdpCanonicalDiagonalBlock] using
-    hblock
+  rw [hzero] at hblock
+  simpa [matrixSdpComplementarySlacknessDefect] using hblock
 
 /-- Canonical complementary slackness for a feasible canonical matrix gives
 the paper-form defect equation for the extracted paper primal submeasurement. -/
@@ -759,8 +781,15 @@ theorem matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness
     congrArg
       (fun X => matrixSdpCanonicalDiagonalBlock params model X none)
       hcanonical
+  have hzero :
+      matrixSdpCanonicalDiagonalBlock params model
+          (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) none =
+        0 := by
+    ext i j
+    rfl
   rw [matrixSdpCanonicalPrimalBlockMatrix_mul_dualSlack] at hblock
-  simpa [matrixSdpCanonicalDiagonalBlock] using hblock
+  rw [hzero] at hblock
+  simpa using hblock
 
 /-- If the canonical slack block annihilates a dual operator which dominates the
 identity, then the slack block itself vanishes.

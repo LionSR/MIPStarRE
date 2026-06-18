@@ -229,25 +229,28 @@ theorem commutingWithGComplete_ofComMainAndSelfConsistency
         (completePartPointProductRight params family)
         (commutativitySwitcherooError zeta zeta
           (pairwiseCompletePartCommutationError params gamma zeta)) := by
-    have hswap :=
-      sddOpRel_swap_questions params strategy.state
-        (switcherooAggregateLeft params family family.meas)
-        (switcherooAggregateRight params family family.meas)
-        (commutativitySwitcherooError zeta zeta
-          (pairwiseCompletePartCommutationError params gamma zeta))
-        hswitch₁.aggregateCommutation
-    have hsymm :=
-      MIPStarRE.LDT.Preliminaries.sddOpRel_symm strategy.state
-        (uniformDistribution (SlicePairQuestion params))
-        (fun q => (switcherooAggregateLeft params family family.meas) (q.2, q.1))
-        (fun q => (switcherooAggregateRight params family family.meas) (q.2, q.1))
-        (commutativitySwitcherooError zeta zeta
-          (pairwiseCompletePartCommutationError params gamma zeta))
-        hswap
-    simpa [switcherooAggregateLeft, switcherooAggregateRight,
-      completePartPointProductLeft, completePartPointProductRight,
-      completePartSubMeas, multiplyByTotalOnRight, multiplyByTotalOnLeft]
-      using hsymm
+      have hswap :=
+        sddOpRel_swap_questions params strategy.state
+          (switcherooAggregateLeft params family family.meas)
+          (switcherooAggregateRight params family family.meas)
+          (commutativitySwitcherooError zeta zeta
+            (pairwiseCompletePartCommutationError params gamma zeta))
+          hswitch₁.aggregateCommutation
+      have hsymm :=
+        MIPStarRE.LDT.Preliminaries.sddOpRel_symm strategy.state
+          (uniformDistribution (SlicePairQuestion params))
+          (fun q => (switcherooAggregateLeft params family family.meas) (q.2, q.1))
+          (fun q => (switcherooAggregateRight params family family.meas) (q.2, q.1))
+          (commutativitySwitcherooError zeta zeta
+            (pairwiseCompletePartCommutationError params gamma zeta))
+          hswap
+      refine ⟨?_⟩
+      simpa [sddErrorOp, qSDDOp, qSDDCore,
+        switcherooAggregateLeft, switcherooAggregateRight,
+        completePartPointProductLeft, completePartPointProductRight,
+        completePartSubMeas, completePartSubMeas_total, multiplyByTotalOnRight,
+        multiplyByTotalOnLeft, OpFamily.leftPlacedOpFamily]
+        using hsymm.squaredDistanceBound
   have hpoint :
       SDDOpRel strategy.state
         (uniformDistribution (SlicePairQuestion params))
@@ -293,24 +296,27 @@ theorem commutingWithGComplete_ofComMainAndSelfConsistency
         (commutativitySwitcherooError zeta zeta
           (pairwiseCompletePartCommutationError params gamma zeta)))
       hswitch₂.aggregateCommutation
-  refine
-    { pairwiseCompletePartCommutation := by
-        simpa [pairwiseCompletePartCommutationError,
-          Commutativity.fullSliceProductLeft, Commutativity.fullSliceProductRight,
-          Commutativity.leftOrderedProductOpFamily] using hcom
-      pointWithCompletePartCommutation := hpoint
-      completePartCommutation :=
-        MIPStarRE.LDT.Preliminaries.sddOpRel_mono strategy.state
-          (uniformDistribution (SlicePairQuestion params))
-          (completePartTotalProductLeft params family)
-          (completePartTotalProductRight params family)
+  refine ⟨?_, hpoint, ?_⟩
+  · refine ⟨?_⟩
+    simpa [sddErrorOp, qSDDOp, qSDDCore, pairwiseCompletePartCommutationError,
+      Commutativity.ComMainConclusion, SlicePairQuestion, Commutativity.FullSliceQuestion,
+      Commutativity.FullSliceOutcome, Commutativity.fullSliceProductLeft,
+      Commutativity.fullSliceProductRight, Commutativity.fullSliceFirstFactor,
+      Commutativity.fullSliceSecondFactor, Commutativity.leftOrderedProductOpFamily,
+      orderedProductOpFamily, reversedProductOpFamily, OpFamily.leftPlacedOpFamily]
+      using hcom.squaredDistanceBound
+  · exact
+      MIPStarRE.LDT.Preliminaries.sddOpRel_mono strategy.state
+        (uniformDistribution (SlicePairQuestion params))
+        (completePartTotalProductLeft params family)
+        (completePartTotalProductRight params family)
+        (commutativitySwitcherooError zeta zeta
           (commutativitySwitcherooError zeta zeta
-            (commutativitySwitcherooError zeta zeta
-              (pairwiseCompletePartCommutationError params gamma zeta)))
-          (commutingWithGCompleteError params gamma zeta)
-          htotal_raw
-          (secondSwitcherooError_le_commutingWithGCompleteError params gamma zeta
-            hgamma_nonneg hzeta_nonneg hzeta hd_le_q) }
+            (pairwiseCompletePartCommutationError params gamma zeta)))
+        (commutingWithGCompleteError params gamma zeta)
+        htotal_raw
+        (secondSwitcherooError_le_commutingWithGCompleteError params gamma zeta
+          hgamma_nonneg hzeta_nonneg hzeta hd_le_q)
 
 /-- `cor:commuting-with-G-complete`, source-facing form. -/
 theorem commutingWithGComplete

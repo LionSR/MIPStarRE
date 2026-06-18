@@ -96,7 +96,7 @@ lemma tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch
       (Polynomial.restrictAtHeight params
         (interpolateCompletedSlices params k xs gs) (xs i)) u =
       ((gs i).get hiSome) u := by
-    simpa using congrArg
+    simpa [Polynomial.toFun, evalPolynomialModel] using congrArg
       (fun p : PolynomialModel params => encodeScalar (MvPolynomial.eval (decodePoint u) p))
       hslicePoly
   have hlineEval : tupleInterpolatedVerticalLine params u xs gs (xs i) = ((gs i).get hiSome) u := by
@@ -109,6 +109,8 @@ lemma tupleInterpolatedVerticalLine_ne_gives_exists_some_eval_mismatch
                   params (interpolateCompletedSlices params k xs gs) u (xs i)
       _ = ((gs i).get hiSome) u := hsliceEval
   refine ⟨i, hiSome, ?_⟩
-  simpa [hlineEval] using hEvalNe
+  exact fun h => hEvalNe (by
+    rw [hlineEval]
+    exact h)
 
 end MIPStarRE.LDT.Pasting

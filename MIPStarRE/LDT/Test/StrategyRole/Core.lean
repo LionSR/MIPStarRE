@@ -164,7 +164,7 @@ private lemma rolePairCond_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
 @[simp] private lemma swapDensity_leftTensor {ι : Type*} [Fintype ι] [DecidableEq ι]
     (M : MIPStarRE.Quantum.Op ι) :
     swapDensity (leftTensor (ι₂ := ι) M) = rightTensor (ι₁ := ι) M := by
-  simpa [leftTensor, rightTensor] using
+  simpa [leftTensor, rightTensor, opTensor, Matrix.kronecker] using
     (swapDensity_opTensor M (1 : MIPStarRE.Quantum.Op ι))
 
 /-- Swapping the density of a rank-one pure state swaps the underlying state

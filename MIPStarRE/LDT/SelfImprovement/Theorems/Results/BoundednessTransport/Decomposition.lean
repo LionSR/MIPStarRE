@@ -91,11 +91,10 @@ theorem helperAgreementOperatorAtPoint_eq_sum_polynomial
     intro a _
     have hev :
         (evaluateAt params u H).outcome a =
-          ∑ h ∈ Finset.univ.filter
-              (fun h : Polynomial params => h u = a), H.outcome h := by
+              ∑ h ∈ Finset.univ.filter
+                  (fun h : Polynomial params => h u = a), H.outcome h := by
       ext i j
-      simp only [evaluateAt, postprocess]
-      convert rfl
+      simp [evaluateAt, postprocess]
     rw [hev]
   rw [hexpand]
   calc

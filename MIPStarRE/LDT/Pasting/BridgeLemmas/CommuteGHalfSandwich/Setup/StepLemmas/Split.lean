@@ -30,7 +30,13 @@ private lemma gHatHalfSandwichLeft_split_outcome_cons
     (gHatHalfSandwichLeft params family (k + 1) ((pointTupleConsEquiv params k).symm q)).outcome
         ((gHatTupleOutcomeConsEquiv' params k).symm ogs) =
       (headTailOrderedFamily params family k q).outcome ogs := by
-  simpa [pointTupleConsEquiv, gHatTupleOutcomeConsEquiv'] using
+  have hq : (q.1, pointTupleTail (Fin.cons q.1 q.2)) = q := by
+    cases q
+    congr
+  have hogs : (ogs.1, gHatTupleOutcomeTail (Fin.cons ogs.1 ogs.2)) = ogs := by
+    cases ogs
+    congr
+  simpa [pointTupleConsEquiv, gHatTupleOutcomeConsEquiv', hq, hogs] using
     gHatHalfSandwichLeft_split_outcome params family k
       ((pointTupleConsEquiv params k).symm q)
       ((gHatTupleOutcomeConsEquiv' params k).symm ogs)
@@ -43,7 +49,13 @@ private lemma gHatHalfSandwichRight_split_outcome_cons
     (gHatHalfSandwichRight params family (k + 1) ((pointTupleConsEquiv params k).symm q)).outcome
         ((gHatTupleOutcomeConsEquiv' params k).symm ogs) =
       (headTailRotatedFamily params family k q).outcome ogs := by
-  simpa [pointTupleConsEquiv, gHatTupleOutcomeConsEquiv'] using
+  have hq : (q.1, pointTupleTail (Fin.cons q.1 q.2)) = q := by
+    cases q
+    congr
+  have hogs : (ogs.1, gHatTupleOutcomeTail (Fin.cons ogs.1 ogs.2)) = ogs := by
+    cases ogs
+    congr
+  simpa [pointTupleConsEquiv, gHatTupleOutcomeConsEquiv', hq, hogs] using
     gHatHalfSandwichRight_split_outcome params family k
       ((pointTupleConsEquiv params k).symm q)
       ((gHatTupleOutcomeConsEquiv' params k).symm ogs)

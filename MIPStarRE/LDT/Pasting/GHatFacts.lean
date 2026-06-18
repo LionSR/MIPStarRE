@@ -323,7 +323,7 @@ theorem gHatFacts_ofSelfConsistencyAndCommutation
                 qSDDOp ψbi
                   (incompletePartPointProductLeft params family q)
                   (incompletePartPointProductRight params family q)) := by
-                simpa using
+                simpa [SlicePairQuestion, Prod.swap] using
                   (avgOver_uniform_equiv
                     (Equiv.prodComm (Fq params) (Fq params))
                     (fun q =>

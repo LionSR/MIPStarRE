@@ -78,7 +78,8 @@ lemma ldSandwichLineOnePointPrefixMoved_eq_endpoint
           (evaluateAt params hq.1 ((family.meas (hq.2 ⟨0, Nat.succ_pos i⟩)).toSubMeas))
           some := by
     simpa using congrFun hzero hq
-  simpa [ldSandwichLineOnePointPrefixMovedFamily, hq, xs, xsTail] using hlocal
+  simpa [ldSandwichLineOnePointPrefixMovedFamily, ldSandwichLineOnePointLeftFamily,
+    hq, xs, xsTail] using hlocal
 
 /-- The global one-point left family at its last prefix index is the prefix family. -/
 lemma ldSandwichLineOnePointLeftFamily_self_eq_prefixOriginal
@@ -274,7 +275,8 @@ lemma gHatHalfProduct_lastReverse_eq_conjTranspose
         | zero =>
             simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
         | succ j =>
-            simpa only [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix] using
+            simpa only [pointTupleTail, pointTupleLastReverseEquiv, Equiv.coe_fn_mk,
+              Fin.cons_succ, xsPrefix] using
               congrArg xs (Fin.ext (by
                 change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
                 omega))
@@ -286,7 +288,8 @@ lemma gHatHalfProduct_lastReverse_eq_conjTranspose
         | zero =>
             simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
         | succ j =>
-            simpa only [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix] using
+            simpa only [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv,
+              Equiv.coe_fn_mk, Fin.cons_succ, gsPrefix] using
               congrArg gs (Fin.ext (by
                 change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
                 omega))
@@ -342,7 +345,8 @@ lemma gHatRotatedHalfProduct_lastReverse_eq_conjTranspose_lastFront
         | zero =>
             simp [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix]
         | succ j =>
-            simpa only [pointTupleTail, pointTupleLastReverseEquiv, xsPrefix] using
+            simpa only [pointTupleTail, pointTupleLastReverseEquiv, Equiv.coe_fn_mk,
+              Fin.cons_succ, xsPrefix] using
               congrArg xs (Fin.ext (by
                 change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
                 omega))
@@ -354,7 +358,8 @@ lemma gHatRotatedHalfProduct_lastReverse_eq_conjTranspose_lastFront
         | zero =>
             simp [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix]
         | succ j =>
-            simpa only [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv, gsPrefix] using
+            simpa only [gHatTupleOutcomeTail, gHatTupleOutcomeLastReverseEquiv,
+              Equiv.coe_fn_mk, Fin.cons_succ, gsPrefix] using
               congrArg gs (Fin.ext (by
                 change i - ((j : ℕ) + 1) = i - 1 - (j : ℕ)
                 omega))

@@ -158,7 +158,8 @@ noncomputable def matrixOperatorNonnegativeProperCone
     ProperCone ℝ (MatrixOperator H) where
   toSubmodule := PointedCone.positive ℝ (MatrixOperator H)
   isClosed' := by
-    simpa using isClosed_matrixOperator_nonnegative H
+    change IsClosed ({X : MatrixOperator H | 0 ≤ X} : Set (MatrixOperator H))
+    exact isClosed_matrixOperator_nonnegative H
 
 /-- A canonical block-diagonal operator is Hermitian when all diagonal blocks are
 Hermitian. -/

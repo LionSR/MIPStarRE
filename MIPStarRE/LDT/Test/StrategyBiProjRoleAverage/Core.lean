@@ -691,6 +691,7 @@ private lemma axisParallel_roleRegister_sample_eq_average
     (fun p : AxisLinePolynomial params => p zeroCoord)
   simpa [SymStrat.axisParallelFailureProbability, roleRegisterSymmStrategy,
     axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
+    axisParallelPointAnswerFamilyOf, axisParallelLineAnswerFamilyOf,
     roleRegisterPointMeasurement, roleRegisterAxisParallelMeasurement,
     axisParallelPointAnswerFamilyA, axisParallelPointAnswerFamilyB,
     axisParallelLineAnswerFamilyA, axisParallelLineAnswerFamilyB, ℓ,
@@ -773,6 +774,7 @@ private lemma diagonal_roleRegister_sample_eq_average
     (strategy.diagonalMeasurementA ℓ) (strategy.diagonalMeasurementB ℓ)
     (fun p : DiagonalLinePolynomial params => p zeroCoord)
   simpa [roleRegisterSymmStrategy, diagonalPointAnswerFamily, diagonalLineAnswerFamily,
+    diagonalPointAnswerFamilyOf, diagonalLineAnswerFamilyOf,
     roleRegisterPointMeasurement, roleRegisterDiagonalMeasurement,
     diagonalPointAnswerFamilyA, diagonalPointAnswerFamilyB,
     diagonalLineAnswerFamilyA, diagonalLineAnswerFamilyB, v, ℓ,

@@ -144,16 +144,27 @@ lemma commuteGHalfSandwich_commute_to_moveBackChainFamily_zero
             ogs =
             (commuteGHalfSandwich_secondSliceLiftFamily params family r
               (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
+        let G := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+        have hidx : (⟨r - (0 : Fin (r + 1)).1, by omega⟩ : Fin (r + 1)) =
+            Fin.last r := by
+          ext
+          simp
         calc
           (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs
-            = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+            = leftTensor (ι₂ := ι) G *
+                (commuteGHalfSandwich_moveChainFamily params family r
+                  (⟨r - (0 : Fin (r + 1)).1, by omega⟩ : Fin (r + 1)) q').outcome
+                  ogs' := by
+                  simp [commuteGHalfSandwich_moveBackChainFamily,
+                    commuteGHalfSandwich_secondSliceLiftFamily, q', ogs', G]
+          _ = leftTensor (ι₂ := ι) G *
+                (commuteGHalfSandwich_moveChainFamily params family r (Fin.last r) q').outcome
+                  ogs' := by
+                  rw [hidx]
+          _ = leftTensor (ι₂ := ι) G *
                 (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' := by
-                  simpa [commuteGHalfSandwich_moveBackChainFamily, q', ogs'] using
-                    congrArg
-                      (fun X =>
-                        let G := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
-                        leftTensor (ι₂ := ι) G * X)
-                      (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
+                  exact congrArg (fun X => leftTensor (ι₂ := ι) G * X)
+                    (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
           _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
                 (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
                 rfl
@@ -182,17 +193,26 @@ lemma commuteGHalfSandwich_moveBackChainFamily_zero_eq_secondSliceLift_moveFamil
     (q.1, q.2.2 0, pointTupleTail q.2.2)
   let ogs' : MoveO params r :=
     (ogs.1, ogs.2.2 0, gHatTupleOutcomeTail ogs.2.2)
+  let G := (gHatIdxMeas params family q.2.1).outcome ogs.2.1
+  have hidx : (⟨r - (0 : Fin (r + 1)).1, by omega⟩ : Fin (r + 1)) =
+      Fin.last r := by
+    ext
+    simp
   calc
     (commuteGHalfSandwich_moveBackChainFamily params family r 0 q).outcome ogs
-      = leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
+      = leftTensor (ι₂ := ι) G *
+          (commuteGHalfSandwich_moveChainFamily params family r
+            (⟨r - (0 : Fin (r + 1)).1, by omega⟩ : Fin (r + 1)) q').outcome ogs' := by
+            simp [commuteGHalfSandwich_moveBackChainFamily,
+              commuteGHalfSandwich_secondSliceLiftFamily, q', ogs', G]
+    _ = leftTensor (ι₂ := ι) G *
+          (commuteGHalfSandwich_moveChainFamily params family r (Fin.last r) q').outcome
+            ogs' := by
+            rw [hidx]
+    _ = leftTensor (ι₂ := ι) G *
           (commuteGHalfSandwich_moveFamily params family r q').outcome ogs' := by
-            simpa [commuteGHalfSandwich_moveBackChainFamily, q', ogs'] using
-              congrArg
-                (fun X =>
-                  leftTensor (ι₂ := ι)
-                      ((gHatIdxMeas params family q.2.1).outcome ogs.2.1) *
-                    X)
-                (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
+            exact congrArg (fun X => leftTensor (ι₂ := ι) G * X)
+              (commuteGHalfSandwich_moveChainFamily_last params family r q' ogs')
     _ = (commuteGHalfSandwich_secondSliceLiftFamily params family r
           (commuteGHalfSandwich_moveFamily params family r) q).outcome ogs := by
             rfl

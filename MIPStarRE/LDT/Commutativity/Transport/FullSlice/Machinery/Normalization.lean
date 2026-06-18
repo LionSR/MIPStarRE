@@ -319,7 +319,14 @@ lemma xEvaluated_selfConsistency_fst_bound
                   (fun a : Fq params => rightTensor (ι₁ := ι)
                     ((evaluatedPointFamily params family w).outcome a)))
     _ ≤ zeta := by
-          simpa [sddError, qSDD, evaluatedPointFamilyLeft, evaluatedPointFamilyRight]
-            using hpoint.squaredDistanceBound
+          have hbound := hpoint.squaredDistanceBound
+          change avgOver (uniformDistribution (Point params.next))
+            (fun w => qSDDCore strategy.state
+              (fun a : Fq params =>
+                leftTensor (ι₂ := ι) ((evaluatedPointFamily params family w).outcome a))
+              (fun a : Fq params =>
+                rightTensor (ι₁ := ι)
+                  ((evaluatedPointFamily params family w).outcome a))) ≤ zeta at hbound
+          exact hbound
 
 end MIPStarRE.LDT.Commutativity

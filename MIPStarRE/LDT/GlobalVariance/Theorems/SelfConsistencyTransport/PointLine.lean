@@ -113,9 +113,14 @@ lemma axisParallelBaseEventApproximation_swapped
   have hcons :
       ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
         (IdxMeas.toIdxSubMeas pointMeas) (IdxMeas.toIdxSubMeas lineMeas) eps := by
-    simpa [pointMeas, lineMeas, axisParallelBasePointEventMeasurement,
-      axisParallelBaseLineEventMeasurement] using
-      axisParallelBaseEventConsistency params strategy eps delta gamma hgood g
+    change ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
+      (fun s : AxisParallelTestSample params =>
+        pointConditionedEventSubMeasAtPolynomial params strategy g s.1)
+      (fun s : AxisParallelTestSample params =>
+        postprocess (axisParallelLineAnswerFamily strategy s)
+          (fun a : Fq params => if a = g s.1 then some () else none))
+      eps
+    exact axisParallelBaseEventConsistency params strategy eps delta gamma hgood g
   have hcons_swapped :
       ConsRel strategy.state (uniformDistribution (AxisParallelTestSample params))
         (IdxMeas.toIdxSubMeas lineMeas)
@@ -130,9 +135,10 @@ lemma axisParallelBaseEventApproximation_swapped
     simeqToApprox strategy.state (uniformDistribution (AxisParallelTestSample params))
       lineMeas pointMeas eps hcons_swapped
   refine ⟨?_⟩
-  simpa [pointMeas, lineMeas, axisParallelBasePointEventMeasurement,
-    axisParallelBaseLineEventMeasurement] using
-    happrox.leftRightSquaredDistanceBound
+  change sddError strategy.state (uniformDistribution (AxisParallelTestSample params))
+    (IdxSubMeas.liftLeft (IdxMeas.toIdxSubMeas lineMeas))
+    (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas)) ≤ 2 * eps
+  exact happrox.leftRightSquaredDistanceBound
 
 /-- The selected, square-root weighted point-line approximation on the native
 axis-parallel base-point sample distribution.

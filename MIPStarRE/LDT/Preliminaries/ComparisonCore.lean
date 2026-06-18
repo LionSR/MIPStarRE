@@ -184,7 +184,8 @@ theorem simeqToApprox {Question Outcome : Type*}
               total_eq_one := by
                 simpa [SubMeas.liftRight, (B q).total_eq_one] using
                   (rightTensor_one (ι₁ := ι) (ι₂ := ι)) }
-          simpa [A', B', IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxMeas.toIdxSubMeas] using
+          simpa [A', B', IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
+            SubMeas.liftLeft, SubMeas.liftRight, IdxMeas.toIdxSubMeas] using
             questionSDD_le_two_questionConsistency ψ A' B'
     _ = 2 * avgOver 𝒟
           (fun q =>
@@ -242,7 +243,7 @@ theorem simeqToApprox_heterogeneous {Question Outcome : Type*}
                 simpa [rightPlacedSubMeas, (B q).total_eq_one] using
                   (rightTensor_one (ι₁ := ιA) (ι₂ := ιB)) }
           simpa [A', B', IdxSubMeas.placeLeft, IdxSubMeas.placeRight,
-            IdxMeas.toIdxSubMeas] using
+            leftPlacedSubMeas, rightPlacedSubMeas, IdxMeas.toIdxSubMeas] using
             questionSDD_le_two_questionConsistency ψ A' B'
     _ = 2 * avgOver 𝒟
           (fun q =>

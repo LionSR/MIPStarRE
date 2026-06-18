@@ -138,11 +138,14 @@ theorem verticalLine_pointAt_appendPoint
   ext i
   by_cases hlast : i = lastCoord params
   · subst i
-    have hzero : addCoord zeroCoord x = x := by
+    have hzero :
+        addCoord (params := params.next) (zeroCoord (params := params)) x = x := by
+      change addCoord (params := params) zeroCoord x = x
       unfold addCoord zeroCoord
       rw [decode_encodeScalar]
       simp
-    simpa [AxisParallelLine.pointAt, appendPoint, lastCoord] using congrArg Fin.val hzero
+    simpa [AxisParallelLine.pointAt, appendPoint, lastCoord,
+      Nat.lt_irrefl] using congrArg Fin.val hzero
   · have him : i.1 < params.m := by
       have hi_lt : i.1 < params.m + 1 := by simpa [Parameters.next] using i.2
       by_cases hlt : i.1 < params.m

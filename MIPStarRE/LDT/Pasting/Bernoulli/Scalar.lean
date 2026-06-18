@@ -63,7 +63,9 @@ private lemma bernoulli_centered_mgf_le {p t : Error}
       smul_eq_mul, hpNN_coe, mul_comm, add_comm, add_left_comm, add_assoc]
       using hmgf
   have hcoeff : ((1 - pNN : NNReal) : Error) = 1 - p := by
-    simpa [pNN] using (NNReal.coe_sub hpNN)
+    calc
+      ((1 - pNN : NNReal) : Error) = 1 - (pNN : Error) := NNReal.coe_sub hpNN
+      _ = 1 - p := by rw [hpNN_coe]
   have hexp :
       Real.exp (t ^ (2 : ℕ) * (2 ^ (2 : ℕ))⁻¹ / 2) = Real.exp (t ^ (2 : ℕ) / 8) := by
     congr 1
@@ -109,12 +111,15 @@ private lemma binomial_centered_mgf_eq
               ENNReal.toReal_pow, ENNReal.toReal_pow, ENNReal.toReal_natCast,
               ENNReal.coe_toReal]
             let pNN : NNReal := ⟨p, hp0⟩
+            have hpNN_coe : (pNN : Error) = p := rfl
             have hpENN : (pNN : ENNReal) ≤ 1 := by
               exact_mod_cast hp1
             have hcoeff : (1 - (pNN : ENNReal)).toReal = 1 - p := by
-              simpa [pNN] using
-                (ENNReal.toReal_sub_of_le hpENN (by simp) :
-                  (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error))
+              calc
+                (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error) :=
+                  (ENNReal.toReal_sub_of_le hpENN (by simp) :
+                    (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error))
+                _ = 1 - p := by rw [hpNN_coe]
             have hcoeff' : (1 - (pNN : ENNReal)).toReal = 1 - p := hcoeff
             rw [hcoeff']
             change p ^ r * (1 - p) ^ (k - r) * (Nat.choose k r : Error) =
@@ -224,12 +229,15 @@ private lemma binomial_lowerTail_eq
     rw [PMF.binomial_apply, ENNReal.toReal_mul, ENNReal.toReal_mul, ENNReal.toReal_pow,
       ENNReal.toReal_pow, ENNReal.toReal_natCast, ENNReal.coe_toReal]
     let pNN : NNReal := ⟨p, hp0⟩
+    have hpNN_coe : (pNN : Error) = p := rfl
     have hpENN : (pNN : ENNReal) ≤ 1 := by
       exact_mod_cast hp1
     have hcoeff : (1 - (pNN : ENNReal)).toReal = 1 - p := by
-      simpa [pNN] using
-        (ENNReal.toReal_sub_of_le hpENN (by simp) :
-          (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error))
+      calc
+        (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error) :=
+          (ENNReal.toReal_sub_of_le hpENN (by simp) :
+            (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error))
+        _ = 1 - p := by rw [hpNN_coe]
     have hcoeff' : (1 - (pNN : ENNReal)).toReal = 1 - p := hcoeff
     rw [hcoeff']
     change p ^ r * (1 - p) ^ (k - r) * (Nat.choose k r : Error) = f r

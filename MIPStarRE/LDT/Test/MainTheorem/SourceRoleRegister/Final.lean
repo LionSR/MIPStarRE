@@ -448,7 +448,10 @@ theorem sourceRoleRegisterFinalPointConsistency
     have hunit :=
       Preliminaries.approxToSimeq_heterogeneous strategy.state
         (uniformDistribution Unit) leftConst rightConst (ζ₃ / 2) hQQUnitApprox
-    simpa [leftConst, rightConst, constSubMeasFamily, IdxProjMeas.toIdxSubMeas] using hunit
+    change ConsRel strategy.state (uniformDistribution Unit)
+      (IdxProjMeas.toIdxSubMeas leftConst)
+      (IdxProjMeas.toIdxSubMeas rightConst) (ζ₃ / 2)
+    exact hunit
   have hleftLineEval : ConsRel strategy.state (uniformDistribution (Point params))
       (polynomialEvaluationFamily params Q_A.toSubMeas)
       (polynomialEvaluationFamily params G_B.toSubMeas) η := by
@@ -475,19 +478,34 @@ theorem sourceRoleRegisterFinalPointConsistency
     Test.polynomialEvaluationMeasurementFamily params Q_B.toMeasurement
   have hpointAGBMeas : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas pointA) (IdxMeas.toIdxSubMeas gBEval) σ := by
-    simpa [pointA, gBEval, σ, Test.polynomialEvaluationMeasurementFamily] using hpointAGB
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (polynomialEvaluationFamily params G_B.toSubMeas) σ
+    simpa [σ] using hpointAGB
   have hGApointBMeas : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas gAEval) (IdxMeas.toIdxSubMeas pointB) σ := by
-    simpa [pointB, gAEval, σ, Test.polynomialEvaluationMeasurementFamily] using hGApointB
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params G_A.toSubMeas)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) σ
+    simpa [σ] using hGApointB
   have hleftLineMeas : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas qAEval) (IdxMeas.toIdxSubMeas gBEval) η := by
-    simpa [qAEval, gBEval, Test.polynomialEvaluationMeasurementFamily] using hleftLineEval
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params Q_A.toSubMeas)
+      (polynomialEvaluationFamily params G_B.toSubMeas) η
+    exact hleftLineEval
   have hrightLineMeas : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas gAEval) (IdxMeas.toIdxSubMeas qBEval) η := by
-    simpa [gAEval, qBEval, Test.polynomialEvaluationMeasurementFamily] using hrightLineEval
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params G_A.toSubMeas)
+      (polynomialEvaluationFamily params Q_B.toSubMeas) η
+    exact hrightLineEval
   have hQQEvalMeas : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas qAEval) (IdxMeas.toIdxSubMeas qBEval) (ζ₃ / 2) := by
-    simpa [qAEval, qBEval, Test.polynomialEvaluationMeasurementFamily] using hQQEval
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (polynomialEvaluationFamily params Q_A.toSubMeas)
+      (polynomialEvaluationFamily params Q_B.toSubMeas) (ζ₃ / 2)
+    exact hQQEval
   have hAliceFinal : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas pointA) (IdxMeas.toIdxSubMeas qBEval)
       (σ + 2 * Real.sqrt (η + ζ₃ / 2)) := by
@@ -570,8 +588,14 @@ theorem sourceRoleRegisterFinalPointConsistency
       (σ + 2 * Real.sqrt (η + ζ₃ / 2)) := by
     simpa [hsqrt_four] using hBobRaw
   refine ⟨Q_A, Q_B, ?_, ?_, hQQEval, hQQUnit⟩
-  · simpa [pointA, qBEval, Test.polynomialEvaluationMeasurementFamily] using hAliceFinal
-  · simpa [pointB, qAEval, Test.polynomialEvaluationMeasurementFamily] using hBobFinal
+  · change ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas pointA) (IdxMeas.toIdxSubMeas qBEval)
+      (σ + 2 * Real.sqrt (η + ζ₃ / 2))
+    exact hAliceFinal
+  · change ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas qAEval) (IdxMeas.toIdxSubMeas pointB)
+      (σ + 2 * Real.sqrt (η + ζ₃ / 2))
+    exact hBobFinal
 
 
 end ProjStrat

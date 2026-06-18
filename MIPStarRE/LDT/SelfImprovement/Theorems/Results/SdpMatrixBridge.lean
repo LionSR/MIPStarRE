@@ -341,18 +341,19 @@ theorem toSdpOptimalPairWithSlackness
     SdpOptimalPairWithSlackness params strategy (matrixSubmeasurementToSubMeas T) Z where
   toSdpOptimalPair := {
     primalTotalOperator := by
-      simpa [matrixSubmeasurementToSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
-        h.primalTotalEqOne
+      change (∑ g : Polynomial params, T.effect g) = (1 : MIPStarRE.Quantum.Op ι)
+      exact h.primalTotalEqOne
     dualFeasible := by
       intro g
-      simpa [matrixSdpDualSlackOperator_ofPointRealization] using h.dualFeasible g
+      rw [← matrixSdpDualSlackOperator_ofPointRealization params strategy Z g]
+      exact h.dualFeasible g
   }
   complementarySlackness := by
     intro g
-    simpa [matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
-      matrixSdpComplementarySlacknessEquation,
-      matrixAveragedPointOperator_ofPointRealization] using
-        h.complementarySlacknessEquation g
+    dsimp [matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
+      sdpDualSlackOperator, matrixSdpPointRealizationOfStrategy]
+    rw [← matrixAveragedPointOperator_ofPointRealization params strategy g]
+    exact h.complementarySlacknessEquation g
 
 end MatrixSdpOptimalWitness
 
@@ -554,18 +555,19 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPair
       params model X h.feasible Z h.dualFeasible h.strongDuality
       h.complementarySlackness h.slackBlock_eq_zero
   have htotal : (matrixSubmeasurementToSubMeas Tsub).total = 1 := by
-    simpa [matrixSubmeasurementToSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
-      hopt.primalTotalEqOne
+    change (∑ g : Polynomial params, Tsub.effect g) = (1 : MIPStarRE.Quantum.Op ι)
+    exact hopt.primalTotalEqOne
   let T : Measurement (Polynomial params) ι :=
     (matrixSubmeasurementToSubMeas Tsub).toMeasurement htotal
   refine ⟨T, hopt.dualPositive, ?_, ?_⟩
   · intro g
-    simpa [matrixSdpDualSlackOperator_ofPointRealization] using hopt.dualFeasible g
+    rw [← matrixSdpDualSlackOperator_ofPointRealization params strategy Z g]
+    exact hopt.dualFeasible g
   · intro g
-    simpa [T, matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
-      matrixSdpComplementarySlacknessEquation,
-      matrixAveragedPointOperator_ofPointRealization] using
-        hopt.complementarySlacknessEquation g
+    dsimp [T, matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
+      sdpDualSlackOperator, matrixSdpPointRealizationOfStrategy, model]
+    rw [← matrixAveragedPointOperator_ofPointRealization params strategy g]
+    exact hopt.complementarySlacknessEquation g
 
 /-- An existential saturated canonical optimal pair gives the displayed
 abstract SDP measurement witness.

@@ -53,9 +53,9 @@ lemma evaluatedSlice_phaseEight_tail_bound
       (((evaluatedSliceFirstFactor params family q).outcome a) *
         ((evaluatedSliceSecondFactor params family q).outcome b))
   have hAB : avgOver 𝒟 (fun q => qSDDCore strategy.state (Aop q) (Bop q)) ≤ zeta := by
-    simpa [𝒟, Aop, Bop, qSDD, evaluatedPointFamilyLeft, evaluatedPointFamilyRight,
-      evaluatedSliceSecondFactor, leftPlacedSubMeas, rightPlacedSubMeas] using
-      hpostSSC_snd.squaredDistanceBound
+    have hbound := hpostSSC_snd.squaredDistanceBound
+    change avgOver 𝒟 (fun q => qSDDCore strategy.state (Aop q) (Bop q)) ≤ zeta at hbound
+    exact hbound
   have hC :
       ∀ q,
         ∑ b : Fq params, (∑ a : Fq params, C q b a) * (∑ a : Fq params, C q b a)ᴴ ≤ 1 := by
@@ -160,9 +160,10 @@ lemma evaluatedSlice_phaseNine_tail_bound
             intro q
             simp only [qSDDCore, hAop_herm q, hBop_herm q]
       _ ≤ zeta := by
-          simpa [𝒟, Aop, Bop, qSDD, evaluatedPointFamilyLeft, evaluatedPointFamilyRight,
-            evaluatedSliceSecondFactor, leftPlacedSubMeas, rightPlacedSubMeas] using
-            hpostSSC_snd.squaredDistanceBound
+          have hbound := hpostSSC_snd.squaredDistanceBound
+          change avgOver 𝒟 (fun q => qSDDCore strategy.state (Aop q) (Bop q)) ≤
+            zeta at hbound
+          exact hbound
   have hC :
       ∀ q,
         ∑ b : Fq params, (∑ a : Fq params, C q b a)ᴴ * (∑ a : Fq params, C q b a) ≤ 1 := by

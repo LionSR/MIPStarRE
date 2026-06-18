@@ -301,7 +301,7 @@ lemma sigmaFinRangeEmbedding_qa_eq {Outcome : Type uOutcome}
                 (onb (e.symm x.1)).vec x.2 i *
                   star ((onb (e.symm x.1)).vec x.2 j)
               else 0 := by
-              simpa using
+              simpa [Equiv.ulift] using
                 (Equiv.sum_comp (Equiv.ulift : ULift.{uι} S ≃ S)
                   (fun x : S =>
                     if x.1 = e a then
@@ -471,7 +471,7 @@ lemma sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
   by_cases hax : ax = ay
   · subst ay
     simpa [sigmaFinRangeEmbedding, Matrix.mul_apply, Matrix.conjTranspose_apply,
-      Matrix.one_apply] using
+      Matrix.one_apply, dotProduct] using
       (MIPStarRE.Quantum.IsProj.rangeONB (Q ((Fintype.equivFin Outcome).symm ax))
         (hproj ((Fintype.equivFin Outcome).symm ax))).orthonormal ix iy
   · have hab : (Fintype.equivFin Outcome).symm ax ≠
@@ -482,7 +482,7 @@ lemma sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
       projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one
         Q hproj hsum_le_one hab ix iy
     simpa [sigmaFinRangeEmbedding, Matrix.mul_apply, Matrix.conjTranspose_apply,
-      Matrix.one_apply, hax] using hdot
+      Matrix.one_apply, dotProduct, hax] using hdot
 
 /-- The finite-enumeration `Q` layer associated to an operator family.
 
@@ -536,10 +536,20 @@ noncomputable def QXPLayerData.ofSigmaRangeAndSvdIdentities
     (sigmaFinRangeEmbedding q.outcome qa_projective) xHat
     (by
       intro a
-      simpa [qLayer, sigmaRangeQLayer, Ta] using
-        sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a)
-    (by simpa [qLayer, sigmaRangeQLayer] using xHat_coisometry)
-    (by simpa [qLayer, QTotal] using xHat_mixed)
+      change q.outcome a =
+        (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ *
+          (sigmaFinProjMeas (fun a : Outcome => Matrix.rank (q.outcome a))).outcome a *
+        sigmaFinRangeEmbedding q.outcome qa_projective
+      exact sigmaFinRangeEmbedding_qa_eq q.outcome qa_projective a)
+    (by
+      change xHat * xHatᴴ =
+        (1 : MIPStarRE.Quantum.Op (ULift.{uι}
+          (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => Matrix.rank (q.outcome a)))))
+      exact xHat_coisometry)
+    (by
+      change (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ * xHat = CFC.sqrt q.total
+      exact xHat_mixed)
 
 /-- Assemble the sigma-space `Q/X/Xhat/P` layer from a rank-reduction witness
 and the remaining SVD/polar identities for `Xhat`.

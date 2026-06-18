@@ -172,20 +172,22 @@ private lemma roundedProjectorFamily_outcome_qSDD_bound {Outcome : Type uOutcome
       cfc (fun x => (x - truncationCutoff δ x) ^ (2 : Nat)) (A.outcome a) =
         (A.outcome a - (roundedProjectorFamily A δ).outcome a) *
           (A.outcome a - (roundedProjectorFamily A δ).outcome a) := by
+    have hid : cfc (R := ℝ) (id : Error → Error) (A.outcome a) = A.outcome a := by
+      change cfc (fun x : Error => x) (A.outcome a) = A.outcome a
+      exact cfc_id' ℝ (A.outcome a) (ha := hsa)
     have hsub :
         cfc (fun x => x - truncationCutoff δ x) (A.outcome a) =
           A.outcome a - cfc (truncationCutoff δ) (A.outcome a) := by
       calc
         cfc (fun x => x - truncationCutoff δ x) (A.outcome a)
-          = cfc id (A.outcome a) - cfc (truncationCutoff δ) (A.outcome a) := by
+          = cfc (R := ℝ) (id : Error → Error) (A.outcome a) -
+              cfc (truncationCutoff δ) (A.outcome a) := by
               simpa using
                 (cfc_sub (R := ℝ) (f := id) (g := truncationCutoff δ) (a := A.outcome a)
                   (hf := continuousOn_outcome_spectrum A a id)
                   (hg := continuousOn_outcome_spectrum A a (truncationCutoff δ)))
         _ = A.outcome a - cfc (truncationCutoff δ) (A.outcome a) := by
-              simpa using congrArg
-                (fun t => t - cfc (truncationCutoff δ) (A.outcome a))
-                (cfc_id' ℝ (A.outcome a) (ha := hsa))
+              rw [hid]
     calc
       cfc (fun x => (x - truncationCutoff δ x) ^ (2 : Nat)) (A.outcome a)
         = cfc (fun x => x - truncationCutoff δ x) (A.outcome a) ^ 2 := by
@@ -200,21 +202,23 @@ private lemma roundedProjectorFamily_outcome_qSDD_bound {Outcome : Type uOutcome
   have hright :
       cfc (fun x => (1 / δ) * (x - x ^ (2 : Nat))) (A.outcome a) =
         (((1 / δ) : Error) : ℂ) • (A.outcome a - A.outcome a * A.outcome a) := by
+    have hid : cfc (R := ℝ) (id : Error → Error) (A.outcome a) = A.outcome a := by
+      change cfc (fun x : Error => x) (A.outcome a) = A.outcome a
+      exact cfc_id' ℝ (A.outcome a) (ha := hsa)
     have hsub :
         cfc (fun x : Error => x - x ^ (2 : Nat)) (A.outcome a) =
           A.outcome a - A.outcome a * A.outcome a := by
       calc
         cfc (fun x : Error => x - x ^ (2 : Nat)) (A.outcome a)
-          = cfc id (A.outcome a) - cfc (fun x : Error => x ^ (2 : Nat)) (A.outcome a) := by
+          = cfc (R := ℝ) (id : Error → Error) (A.outcome a) -
+              cfc (fun x : Error => x ^ (2 : Nat)) (A.outcome a) := by
               simpa using
                 (cfc_sub (R := ℝ) (f := id) (g := fun x : Error => x ^ (2 : Nat))
                   (a := A.outcome a)
                   (hf := continuousOn_outcome_spectrum A a id)
                   (hg := continuousOn_outcome_spectrum A a (fun x : Error => x ^ (2 : Nat))))
         _ = A.outcome a - cfc (fun x : Error => x ^ (2 : Nat)) (A.outcome a) := by
-              simpa using congrArg
-                (fun t => t - cfc (fun x : Error => x ^ (2 : Nat)) (A.outcome a))
-                (cfc_id' ℝ (A.outcome a) (ha := hsa))
+              rw [hid]
         _ = A.outcome a - A.outcome a * A.outcome a := by
               rw [cfc_pow_id (R := ℝ) (A.outcome a) 2 (ha := hsa)]
               simp [pow_two]
@@ -463,7 +467,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
                   (hherm.eigenvalues i - truncationCutoff 0 (hherm.eigenvalues i)) ^
                     (2 : Nat) := by
               exact sq_nonneg _
-            simpa only [hfi, if_neg] using div_nonneg hgap_nonneg hdef_nonneg
+            simpa [hfi, defect] using div_nonneg hgap_nonneg hdef_nonneg
         have hgap_le :
             ∀ x ∈ spectrum ℝ (A.outcome a), gap x ≤ K * defect x := by
           intro x hx
@@ -515,20 +519,22 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
             cfc gap (A.outcome a) =
               (A.outcome a - (roundedProjectorFamily A 0).outcome a) *
                 (A.outcome a - (roundedProjectorFamily A 0).outcome a) := by
+          have hid : cfc (R := ℝ) (id : Error → Error) (A.outcome a) = A.outcome a := by
+            change cfc (fun x : Error => x) (A.outcome a) = A.outcome a
+            exact cfc_id' ℝ (A.outcome a) (ha := hsa)
           have hsub :
               cfc (fun x : Error => x - truncationCutoff 0 x) (A.outcome a) =
                 A.outcome a - cfc (truncationCutoff 0) (A.outcome a) := by
             calc
               cfc (fun x : Error => x - truncationCutoff 0 x) (A.outcome a)
-                = cfc id (A.outcome a) - cfc (truncationCutoff 0) (A.outcome a) := by
+                = cfc (R := ℝ) (id : Error → Error) (A.outcome a) -
+                    cfc (truncationCutoff 0) (A.outcome a) := by
                     simpa using
                       (cfc_sub (R := ℝ) (f := id) (g := truncationCutoff 0) (a := A.outcome a)
                         (hf := continuousOn_outcome_spectrum A a id)
                         (hg := continuousOn_outcome_spectrum A a (truncationCutoff 0)))
               _ = A.outcome a - cfc (truncationCutoff 0) (A.outcome a) := by
-                    simpa using congrArg
-                      (fun t => t - cfc (truncationCutoff 0) (A.outcome a))
-                      (cfc_id' ℝ (A.outcome a) (ha := hsa))
+                    rw [hid]
           calc
             cfc gap (A.outcome a)
               = cfc (fun x : Error => x - truncationCutoff 0 x) (A.outcome a) ^ 2 := by
@@ -544,20 +550,22 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
         have hright :
             cfc (fun x : Error => K * defect x) (A.outcome a) =
               (K : Error) • (A.outcome a - A.outcome a * A.outcome a) := by
+          have hid : cfc (R := ℝ) (id : Error → Error) (A.outcome a) = A.outcome a := by
+            change cfc (fun x : Error => x) (A.outcome a) = A.outcome a
+            exact cfc_id' ℝ (A.outcome a) (ha := hsa)
           have hsub :
               cfc defect (A.outcome a) = A.outcome a - A.outcome a * A.outcome a := by
             calc
               cfc defect (A.outcome a)
-                = cfc id (A.outcome a) - cfc (fun x : Error => x ^ (2 : Nat)) (A.outcome a) := by
+                = cfc (R := ℝ) (id : Error → Error) (A.outcome a) -
+                    cfc (fun x : Error => x ^ (2 : Nat)) (A.outcome a) := by
                     simpa using
                       (cfc_sub (R := ℝ) (f := id)
                         (g := fun x : Error => x ^ (2 : Nat)) (a := A.outcome a)
                         (hf := continuousOn_outcome_spectrum A a id)
                         (hg := continuousOn_outcome_spectrum A a (fun x : Error => x ^ (2 : Nat))))
               _ = A.outcome a - cfc (fun x : Error => x ^ (2 : Nat)) (A.outcome a) := by
-                    simpa using congrArg
-                      (fun t => t - cfc (fun x : Error => x ^ (2 : Nat)) (A.outcome a))
-                      (cfc_id' ℝ (A.outcome a) (ha := hsa))
+                    rw [hid]
               _ = A.outcome a - A.outcome a * A.outcome a := by
                     rw [cfc_pow_id (R := ℝ) (A.outcome a) 2 (ha := hsa)]
                     simp [pow_two]
@@ -656,13 +664,16 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_large
           2 * spectralTruncationError ζ :=
       le_trans hq1 hbound
     simpa [sddErrorOp, avgOver, uniformDistribution, constOpFamily, Z] using hq
-  · simpa [Z] using
+  · simpa [Z, SubMeas.toOpFamily] using
       (zeroProjSubMeas (Outcome := Outcome) (ι := ι)).toSubMeas.sum_eq_total
   · have hζ_nonneg : 0 ≤ ζ := le_trans (by positivity : 0 ≤ (1 / 4 : Error)) hlarge.le
     have hcoeff_nonneg : 0 ≤ (1 + 2 * spectralTruncationError ζ : Error) := by
       have hs_nonneg : 0 ≤ spectralTruncationError ζ := spectralTruncationError_nonneg hζ_nonneg
       positivity
-    simpa [Z, zeroProjSubMeas, RCLike.real_smul_eq_coe_smul (K := ℂ)] using
+    have hZtotal : Z.total = 0 := by
+      simp [Z, zeroProjSubMeas, SubMeas.toOpFamily]
+    rw [hZtotal]
+    simpa [RCLike.real_smul_eq_coe_smul (K := ℂ)] using
       (smul_nonneg hcoeff_nonneg
         (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι)))
 

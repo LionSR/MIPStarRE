@@ -70,17 +70,22 @@ lemma evaluatedSlice_phaseFour_pointSwap_right_bound_of_commutativityPoints
   let Lrev : EvaluatedSliceQuestion params → OpFamily (EvaluatedSliceOutcome params) (ι × ι) :=
     fun q => OpFamily.leftPlacedOpFamily (ιB := ι) <|
       reversedProductOpFamily
-        ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
-        ((strategy.pointMeasurement q.2).toSubMeas : SubMeas (Fq params.next) ι)
+        ((evaluatedSlicePointMeas params strategy q.1).toSubMeas : SubMeas (Fq params) ι)
+        ((evaluatedSlicePointMeas params strategy q.2).toSubMeas : SubMeas (Fq params) ι)
   let Lord : EvaluatedSliceQuestion params → OpFamily (EvaluatedSliceOutcome params) (ι × ι) :=
     fun q => OpFamily.leftPlacedOpFamily (ιB := ι) <|
       orderedProductOpFamily
-        ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
-        ((strategy.pointMeasurement q.2).toSubMeas : SubMeas (Fq params.next) ι)
+        ((evaluatedSlicePointMeas params strategy q.1).toSubMeas : SubMeas (Fq params) ι)
+        ((evaluatedSlicePointMeas params strategy q.2).toSubMeas : SubMeas (Fq params) ι)
   have hleft :
       SDDOpRel strategy.state 𝒟 Lord Lrev (commutativityPointsError params.next gamma) := by
-    simpa [𝒟, Lord, Lrev, pointMeasurementProductLeft, pointMeasurementProductRight,
-      EvaluatedSliceQuestion, EvaluatedSliceOutcome, Parameters.next] using hcomm
+    change
+      SDDOpRel strategy.state
+        (uniformDistribution (PointPairQuestion params.next))
+        (pointMeasurementProductLeft params.next strategy)
+        (pointMeasurementProductRight params.next strategy)
+        (commutativityPointsError params.next gamma)
+    exact hcomm
   have hleft_symm :
       SDDOpRel strategy.state 𝒟 Lrev Lord (commutativityPointsError params.next gamma) := by
     exact sddOpRel_symm strategy.state 𝒟 Lord Lrev
@@ -95,19 +100,22 @@ lemma evaluatedSlice_phaseFour_pointSwap_right_bound_of_commutativityPoints
             intro q
             simpa [qSDDOp, Lrev, Lord, Rrev, Rord, evaluatedSlicePointMeas,
               OpFamily.leftPlacedOpFamily, OpFamily.rightPlacedOpFamily,
-              reversedProductOpFamily, orderedProductOpFamily, Parameters.next] using
+              reversedProductOpFamily, orderedProductOpFamily, PointPairOutcome,
+              EvaluatedSliceOutcome, Parameters.next] using
               (MIPStarRE.LDT.Preliminaries.qSDDCore_rightTensor_eq_leftTensor_of_permInv
                 (ι := ι) (ψ := strategy.state) strategy.permInvState
                 (fun ab =>
                   (reversedProductOpFamily
-                    ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
-                    ((strategy.pointMeasurement q.2).toSubMeas :
-                      SubMeas (Fq params.next) ι)).outcome ab)
+                    ((evaluatedSlicePointMeas params strategy q.1).toSubMeas :
+                      SubMeas (Fq params) ι)
+                    ((evaluatedSlicePointMeas params strategy q.2).toSubMeas :
+                      SubMeas (Fq params) ι)).outcome ab)
                 (fun ab =>
                   (orderedProductOpFamily
-                  ((strategy.pointMeasurement q.1).toSubMeas : SubMeas (Fq params.next) ι)
-                    ((strategy.pointMeasurement q.2).toSubMeas :
-                      SubMeas (Fq params.next) ι)).outcome ab))
+                    ((evaluatedSlicePointMeas params strategy q.1).toSubMeas :
+                      SubMeas (Fq params) ι)
+                    ((evaluatedSlicePointMeas params strategy q.2).toSubMeas :
+                      SubMeas (Fq params) ι)).outcome ab))
       _ ≤ commutativityPointsError params.next gamma := by
             simpa [sddErrorOp] using h
   have hC' :

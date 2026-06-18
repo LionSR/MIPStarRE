@@ -708,7 +708,7 @@ lemma hBConsistencyBadMass_le_one
           have hTle : T ≤ 1 := by simpa [T] using (
               interpolationEligibleSandwichFamily params family k xs).total_le_one
           have hop : opTensor T (1 : MIPStarRE.Quantum.Op ι) ≤ 1 := by
-            simpa [leftTensor] using leftTensor_le_one (ι₂ := ι) (A := T) hTle
+            simpa [opTensor, leftTensor] using leftTensor_le_one (ι₂ := ι) (A := T) hTle
           simpa [ev_one_of_isNormalized strategy.state strategy.isNormalized] using
             (ev_mono strategy.state _ _ hop)
 

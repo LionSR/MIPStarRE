@@ -166,9 +166,12 @@ private lemma qBipartiteConsDefect_le_postprocess_add_localCollision
         ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B - c ≤
           max 0 (ev ψ (opTensor A.total B.total) -
             (qBipartiteMatchMass ψ A B + c)) := by
-      convert le_max_right 0
-        (ev ψ (opTensor A.total B.total) - (qBipartiteMatchMass ψ A B + c)) using 1
-      ring
+      have hrewrite :
+          ev ψ (opTensor A.total B.total) - qBipartiteMatchMass ψ A B - c =
+            ev ψ (opTensor A.total B.total) - (qBipartiteMatchMass ψ A B + c) := by
+        rw [sub_add_eq_sub_sub]
+      rw [hrewrite]
+      exact le_max_right 0 _
     linarith
 
 private lemma avg_localCollisionMass_eval_eq_polynomialCollisionMass

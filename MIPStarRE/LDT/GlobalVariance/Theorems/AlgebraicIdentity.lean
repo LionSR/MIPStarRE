@@ -69,8 +69,8 @@ lemma polynomialWeightSqrtOperator_conjTranspose
     (G : SubMeas (Polynomial params) ι) (g : Polynomial params) :
     (polynomialWeightSqrtOperator params G g)ᴴ =
       polynomialWeightSqrtOperator params G g := by
-  simpa [polynomialWeightSqrtOperator] using
-    (CFC.sqrt_nonneg (G.outcome g)).isSelfAdjoint
+  simpa [polynomialWeightSqrtOperator, Matrix.star_eq_conjTranspose] using
+    (CFC.sqrt_nonneg (G.outcome g)).isSelfAdjoint.star_eq
 
 lemma polynomialWeightSqrtOperator_mul_self
     (params : Parameters)

@@ -55,8 +55,8 @@ lemma add_in_u_cs_chain_q3_q4_self_energy_factor_le_one
       Au * (S u).outcome h * Au = (S u).outcome h := by
     intro u h Au
     have hproj : Au * Au = Au := by
-      simpa [pointConditionedOutcomeOperatorAtPolynomial] using
-        (strategy.pointMeasurement u).proj (h u)
+      dsimp [Au, pointConditionedOutcomeOperatorAtPolynomial]
+      exact (strategy.pointMeasurement u).proj (h u)
     have hMh_eq : (S u).outcome h = Au * T.outcome h * Au := rfl
     rw [hMh_eq]
     exact proj_outer_sandwich_eq Au (T.outcome h) hproj

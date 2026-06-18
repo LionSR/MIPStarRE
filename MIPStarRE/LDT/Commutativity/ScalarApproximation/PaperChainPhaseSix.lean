@@ -90,10 +90,10 @@ lemma evaluatedSlice_phaseSix_first_reverse_bound
             intro q
             simp only [qSDDCore, hAop_herm q, hBop_herm q]
       _ ≤ 4 * zeta := by
-          simpa [𝒟, Aop, Bop, qSDD, evaluatedSliceFirstFactor, evaluatedPointFamily,
-            evaluatedSlicePointMeas, pointMeas, Parameters.next, IdxSubMeas.liftLeft,
-            SubMeas.liftLeft, MIPStarRE.LDT.Preliminaries.totalSandwichFamily] using
-            hcombined_fst.squaredDistanceBound
+          have hbound := hcombined_fst.squaredDistanceBound
+          change avgOver 𝒟 (fun q => qSDDCore strategy.state (Aop q) (Bop q)) ≤
+            4 * zeta at hbound
+          exact hbound
   have hC :
       ∀ q,
         ∑ a : Fq params, (∑ b : Fq params, C q a b)ᴴ * (∑ b : Fq params, C q a b) ≤ 1 := by

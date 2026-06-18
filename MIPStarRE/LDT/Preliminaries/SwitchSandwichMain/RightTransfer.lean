@@ -38,7 +38,8 @@ lemma switchSandwich_rightTransfer
         (fun q =>
           qSDD ψ ((A q).toSubMeas.liftLeft) ((A q).toSubMeas.liftRight)) ≤ δ := by
     simpa [BipartiteSDDRel, sddError, IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft,
-      IdxSubMeas.liftRight] using happrox.leftRightSquaredDistanceBound
+      IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight] using
+      happrox.leftRightSquaredDistanceBound
   have hpointwise :
       ∀ q,
         |(∑ a, ev ψ
@@ -295,7 +296,7 @@ lemma switchSandwich_rightTransfer
                         rw [ev_sub]
                         rw [ev_add]
                         have hscale : ev ψ ((2 : Error) • (LA * RA)) = 2 * ev ψ (LA * RA) := by
-                          simpa using (ev_scale ψ (2 : Error) (LA * RA))
+                          exact ev_scale ψ (2 : Error) (LA * RA)
                         rw [hscale]
           _ =
               (∑ a, ev ψ (rightTensor (ι₁ := ι) ((A q).outcome a))) +
@@ -313,7 +314,7 @@ lemma switchSandwich_rightTransfer
         _ = ev ψ RT + ev ψ LT - 2 * ev ψ (LT * RT) := by
               rw [ev_sub, ev_add]
               have hscale : ev ψ ((2 : Error) • (LT * RT)) = 2 * ev ψ (LT * RT) := by
-                simpa using (ev_scale ψ (2 : Error) (LT * RT))
+                exact ev_scale ψ (2 : Error) (LT * RT)
               rw [hscale]
         _ ≤
             (∑ a, ev ψ (rightTensor (ι₁ := ι) ((A q).outcome a))) +

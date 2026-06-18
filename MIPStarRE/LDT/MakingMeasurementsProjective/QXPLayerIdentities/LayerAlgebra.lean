@@ -46,9 +46,9 @@ lemma qaRestated {Outcome : Type*}
           (Xa data a)ᴴ * Xa data a =
               data.xᴴ * Ta data.qLayer a * (Ta data.qLayer a * data.x) := by
                 simp [Xa, Matrix.conjTranspose_mul, hTa, Matrix.mul_assoc]
-          _ = data.xᴴ * Ta data.qLayer a * data.x := by
-                simpa [Matrix.mul_assoc] using
-                  congrArg (fun M => data.xᴴ * (M * data.x)) (data.qLayer.t.proj a)
+            _ = data.xᴴ * Ta data.qLayer a * data.x := by
+                  simpa [Ta, Matrix.mul_assoc] using
+                    congrArg (fun M => data.xᴴ * (M * data.x)) (data.qLayer.t.proj a)
   · constructor
     · exact data.qa_eq a
     · calc
@@ -230,7 +230,7 @@ lemma xExpressionToQExpression {Outcome : Type*}
   have hQaLeft : (Xa data a)ᴴ * data.x = Qa data.qLayer a := by
     exact (qaRestated data a).2.2.symm
   have hQaRight : data.xᴴ * Xa data a = Qa data.qLayer a := by
-    simpa [Xa, Matrix.mul_assoc] using (data.qa_eq a).symm
+    simpa [Qa, Xa, Matrix.mul_assoc] using (data.qa_eq a).symm
   calc
     (Xa data a)ᴴ *
         ((data.x * data.xᴴ - 1) * (data.x * data.xᴴ - 1)) *

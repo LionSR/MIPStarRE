@@ -131,7 +131,7 @@ theorem leftConsistency_of_completion_and_sdd
     simpa [qBipartiteConsDefect, qBipartiteMatchMass, Q_A.total_eq_one,
       G_B.total_eq_one, opTensor] using hmax
   constructor
-  simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
+  simpa [Q_A, bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefectQ
 
 /-- Bob-side mirror of `leftConsistency_of_completion_and_sdd`, still using the
@@ -201,7 +201,7 @@ theorem rightConsistency_of_completion_and_sdd
     simpa [qBipartiteConsDefect, qBipartiteMatchMass, Q_B.total_eq_one,
       G_A.total_eq_one, opTensor] using hmax
   constructor
-  simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
+  simpa [Q_B, bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefectQ
 
 /-- Checked local repair of the paper's Alice-side completion-transport replacement.

@@ -122,15 +122,24 @@ theorem sourceRoleRegisterPointConsistency_ofSymConsistency
       unfold bipartiteConsError
       apply avgOver_mono
       intro u
+      let Gu := Test.polynomialEvaluationMeasurementFamily params G u
       have hpoint :=
         qBipartiteConsDefect_extractRoleRegisterBob_le_two_symm
           strategy.state strategy.isNormalized
           (strategy.pointMeasurementA u) (strategy.pointMeasurementB u)
-          (Test.polynomialEvaluationMeasurementFamily params G u)
+          Gu
       rw [congrFun (polynomialEvaluationFamily_measurement_extractRoleRegisterBob G) u]
-      simpa [IdxProjMeas.toIdxSubMeas, polynomialEvaluationFamily,
-        roleRegisterSymmStrategy, roleRegisterPointMeasurement,
-        Test.polynomialEvaluationMeasurementFamily] using hpoint
+      change
+        qBipartiteConsDefect strategy.state
+            (strategy.pointMeasurementA u).toSubMeas
+            (Gu.extractRoleRegisterBob).toSubMeas
+          ≤
+          2 *
+            qBipartiteConsDefect (roleRegisterSymmState strategy.state)
+              (roleRegisterProjMeas (strategy.pointMeasurementA u)
+                (strategy.pointMeasurementB u)).toSubMeas
+              Gu.toSubMeas
+      exact hpoint
     have hscale :
         avgOver (uniformDistribution (Point params)) (fun u =>
           2 * qBipartiteConsDefect (strategy.roleRegisterSymmStrategy).state
@@ -174,15 +183,24 @@ theorem sourceRoleRegisterPointConsistency_ofSymConsistency
       unfold bipartiteConsError
       apply avgOver_mono
       intro u
+      let Gu := Test.polynomialEvaluationMeasurementFamily params G u
       have hpoint :=
         qBipartiteConsDefect_extractRoleRegisterAlice_le_two_symm
           strategy.state strategy.isNormalized
           (strategy.pointMeasurementA u) (strategy.pointMeasurementB u)
-          (Test.polynomialEvaluationMeasurementFamily params G u)
+          Gu
       rw [congrFun (polynomialEvaluationFamily_measurement_extractRoleRegisterAlice G) u]
-      simpa [IdxProjMeas.toIdxSubMeas, polynomialEvaluationFamily,
-        roleRegisterSymmStrategy, roleRegisterPointMeasurement,
-        Test.polynomialEvaluationMeasurementFamily] using hpoint
+      change
+        qBipartiteConsDefect strategy.state
+            (Gu.extractRoleRegisterAlice).toSubMeas
+            (strategy.pointMeasurementB u).toSubMeas
+          ≤
+          2 *
+            qBipartiteConsDefect (roleRegisterSymmState strategy.state)
+              (roleRegisterProjMeas (strategy.pointMeasurementA u)
+                (strategy.pointMeasurementB u)).toSubMeas
+              Gu.toSubMeas
+      exact hpoint
     have hscale :
         avgOver (uniformDistribution (Point params)) (fun u =>
           2 * qBipartiteConsDefect (strategy.roleRegisterSymmStrategy).state
@@ -295,6 +313,9 @@ theorem sourceRoleRegisterFullPolynomialSelfConsistency_ofPointConsistency
   have hpoint : ConsRel strategy.state (uniformDistribution (Point params))
       (IdxMeas.toIdxSubMeas pointA) (IdxMeas.toIdxSubMeas pointB) (3 * eps) := by
     refine ⟨?_⟩
+    change bipartiteConsError strategy.state (uniformDistribution (Point params))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) ≤ 3 * eps
     simpa [ProjStrat.pointAgreementFailureProbability] using
       pointAgreementFailureProbability_le_three_mul params hpass
   have hright : ConsRel strategy.state (uniformDistribution (Point params))
@@ -313,8 +334,10 @@ theorem sourceRoleRegisterFullPolynomialSelfConsistency_ofPointConsistency
         (uniformDistribution (Point params)) strategy.isNormalized
         (uniformDistribution_weight_sum_le_one (Point params))
         leftEval pointA pointB rightEval σ (3 * eps) σ hleft hpoint hright
-    simpa [leftEval, rightEval, pointA, pointB,
-      Test.polynomialEvaluationMeasurementFamily] using htriangle
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (IdxMeas.toIdxSubMeas leftEval) (IdxMeas.toIdxSubMeas rightEval)
+      (σ + 2 * Real.sqrt (3 * eps + σ))
+    exact htriangle
   exact
     Test.mainFormalStep5_selfConsistency_ofExpansionBound_heterogeneous params strategy.state
       strategy.isNormalized G_A.toSubMeas G_B.toSubMeas
