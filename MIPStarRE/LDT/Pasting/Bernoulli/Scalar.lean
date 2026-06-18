@@ -1,6 +1,5 @@
 import Mathlib.Probability.Moments.SubGaussian
-import Mathlib.Probability.ProbabilityMassFunction.Binomial
-import Mathlib.Probability.ProbabilityMassFunction.Integrals
+import Mathlib.Probability.Distributions.Binomial
 import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
 /-!
@@ -71,68 +70,35 @@ private lemma bernoulli_centered_mgf_le {p t : Error}
 corresponding one-step Bernoulli moment-generating function. -/
 private lemma binomial_centered_mgf_eq
     (k : ℕ) {p t : Error} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
-    ProbabilityTheory.mgf (fun i : Fin (k + 1) => p * k - i)
-      ((PMF.binomial ⟨p, hp0⟩ (by exact hp1) k).toMeasure) t =
+    ProbabilityTheory.mgf (fun i : ℕ => p * k - i)
+      (ProbabilityTheory.binomial k (⟨p, hp0, hp1⟩ : unitInterval)) t =
         ∑ r ∈ Finset.range (k + 1),
           (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
             Real.exp (t * (p * k - r)) := by
-  let pmf : PMF (Fin (k + 1)) := PMF.binomial ⟨p, hp0⟩ (by exact hp1) k
+  let pI : unitInterval := ⟨p, hp0, hp1⟩
+  have hpI_coe : (pI : Error) = p := rfl
   calc
-    ProbabilityTheory.mgf (fun i : Fin (k + 1) => p * k - i) pmf.toMeasure t
-      = ∑ i : Fin (k + 1), (pmf i).toReal * Real.exp (t * (p * k - i)) := by
-          rw [ProbabilityTheory.mgf, PMF.integral_eq_sum]
-          simp [pmf, smul_eq_mul]
-    _ = ∑ r ∈ Finset.range (k + 1),
-          (pmf (Fin.ofNat (k + 1) r)).toReal * Real.exp (t * (p * k - r)) := by
-          simpa using (Fin.sum_univ_eq_sum_range
-            (f := fun r =>
-              (pmf (Fin.ofNat (k + 1) r)).toReal * Real.exp (t * (p * k - r)))
-            (n := k + 1))
+    ProbabilityTheory.mgf (fun i : ℕ => p * k - i) (ProbabilityTheory.binomial k pI) t
+      = ∫ i, Real.exp (t * (p * k - i)) ∂ProbabilityTheory.binomial k pI := by
+          rfl
+    _ = ∑ r ∈ Finset.Iic k,
+          (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
+            Real.exp (t * (p * k - r)) := by
+          rw [ProbabilityTheory.integral_binomial]
+          refine Finset.sum_congr rfl ?_
+          intro r hr
+          simp [hpI_coe, smul_eq_mul]
+          ring
     _ = ∑ r ∈ Finset.range (k + 1),
           (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
             Real.exp (t * (p * k - r)) := by
-          refine Finset.sum_congr rfl ?_
-          intro r hr
-          have hr' : r < k + 1 := Finset.mem_range.mp hr
-          have hpmf : ((pmf (Fin.ofNat (k + 1) r)).toReal : Error) =
-              (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) := by
-            have hfin : Fin.ofNat (k + 1) r = ⟨r, hr'⟩ := by
-              ext
-              simp [Fin.ofNat, Nat.mod_eq_of_lt hr']
-            rw [hfin]
-            change (((PMF.binomial ⟨p, hp0⟩ (by exact hp1) k) ⟨r, hr'⟩).toReal : Error) = _
-            rw [PMF.binomial_apply, ENNReal.toReal_mul, ENNReal.toReal_mul,
-              ENNReal.toReal_pow, ENNReal.toReal_pow, ENNReal.toReal_natCast,
-              ENNReal.coe_toReal]
-            let pNN : NNReal := ⟨p, hp0⟩
-            have hpNN_coe : (pNN : Error) = p := rfl
-            have hpENN : (pNN : ENNReal) ≤ 1 := by
-              exact_mod_cast hp1
-            have hcoeff : (1 - (pNN : ENNReal)).toReal = 1 - p := by
-              calc
-                (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error) :=
-                  (ENNReal.toReal_sub_of_le hpENN (by simp) :
-                    (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error))
-                _ = 1 - p := by rw [hpNN_coe]
-            have hcoeff' : (1 - (pNN : ENNReal)).toReal = 1 - p := hcoeff
-            rw [hcoeff']
-            change p ^ r * (1 - p) ^ (k - r) * (Nat.choose k r : Error) =
-              (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))
-            ring
-          calc
-            (pmf (Fin.ofNat (k + 1) r)).toReal * Real.exp (t * (p * k - r))
-              = ((Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))) *
-                  Real.exp (t * (p * k - r)) := by
-                    rw [hpmf]
-            _ = (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
-                  Real.exp (t * (p * k - r)) := by
-                    ring
+          rw [Nat.range_succ_eq_Iic]
 
 /-- A Hoeffding bound for the centered binomial moment-generating function. -/
 private lemma binomial_centered_mgf_le
     (k : ℕ) {p t : Error} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
-    ProbabilityTheory.mgf (fun i : Fin (k + 1) => p * k - i)
-      ((PMF.binomial ⟨p, hp0⟩ (by exact hp1) k).toMeasure) t ≤
+    ProbabilityTheory.mgf (fun i : ℕ => p * k - i)
+      (ProbabilityTheory.binomial k (⟨p, hp0, hp1⟩ : unitInterval)) t ≤
         Real.exp ((k : Error) * t ^ (2 : ℕ) / 8) := by
   let a : Error := p * Real.exp (t * (p - 1))
   let b : Error := (1 - p) * Real.exp (t * p)
@@ -175,9 +141,10 @@ private lemma binomial_centered_mgf_le
       (∑ r ∈ Finset.range (k + 1), (Nat.choose k r : Error) * (a ^ r * b ^ (k - r))) =
         (a + b) ^ k := by
     simpa [mul_assoc, mul_left_comm, mul_comm] using (add_pow a b k).symm
+  let pI : unitInterval := ⟨p, hp0, hp1⟩
   calc
-    ProbabilityTheory.mgf (fun i : Fin (k + 1) => p * k - i)
-        ((PMF.binomial ⟨p, hp0⟩ (by exact hp1) k).toMeasure) t
+    ProbabilityTheory.mgf (fun i : ℕ => p * k - i)
+        (ProbabilityTheory.binomial k pI) t
       = ∑ r ∈ Finset.range (k + 1),
           (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) *
             Real.exp (t * (p * k - r)) :=
@@ -207,66 +174,32 @@ private lemma binomial_centered_mgf_le
 /-- The lower tail of the binomial law is the lower partial sum of the Bernoulli polynomial. -/
 private lemma binomial_lowerTail_eq
     (k degree : ℕ) {p : Error} (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
-    ((PMF.binomial ⟨p, hp0⟩ (by exact hp1) k).toMeasure).real
-        {i : Fin (k + 1) | (i : Error) ≤ degree} =
+    (ProbabilityTheory.binomial k (⟨p, hp0, hp1⟩ : unitInterval)).real
+        {i : ℕ | (i : Error) ≤ degree} =
       scalarBernoulliLowerTail k degree p := by
-  let pmf : PMF (Fin (k + 1)) := PMF.binomial ⟨p, hp0⟩ (by exact hp1) k
+  let pI : unitInterval := ⟨p, hp0, hp1⟩
+  have hpI_coe : (pI : Error) = p := rfl
   let f : ℕ → Error := fun r =>
     (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r))
-  have hpmf : ∀ {r : ℕ}, r < k + 1 → ((pmf (Fin.ofNat (k + 1) r)).toReal : Error) = f r := by
-    intro r hr
-    have hfin : Fin.ofNat (k + 1) r = ⟨r, hr⟩ := by
-      ext
-      simp [Fin.ofNat, Nat.mod_eq_of_lt hr]
-    rw [hfin]
-    change (((PMF.binomial ⟨p, hp0⟩ (by exact hp1) k) ⟨r, hr⟩).toReal : Error) = f r
-    rw [PMF.binomial_apply, ENNReal.toReal_mul, ENNReal.toReal_mul, ENNReal.toReal_pow,
-      ENNReal.toReal_pow, ENNReal.toReal_natCast, ENNReal.coe_toReal]
-    let pNN : NNReal := ⟨p, hp0⟩
-    have hpNN_coe : (pNN : Error) = p := rfl
-    have hpENN : (pNN : ENNReal) ≤ 1 := by
-      exact_mod_cast hp1
-    have hcoeff : (1 - (pNN : ENNReal)).toReal = 1 - p := by
-      calc
-        (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error) :=
-          (ENNReal.toReal_sub_of_le hpENN (by simp) :
-            (1 - (pNN : ENNReal)).toReal = 1 - (pNN : Error))
-        _ = 1 - p := by rw [hpNN_coe]
-    have hcoeff' : (1 - (pNN : ENNReal)).toReal = 1 - p := hcoeff
-    rw [hcoeff']
-    change p ^ r * (1 - p) ^ (k - r) * (Nat.choose k r : Error) = f r
-    ring
   calc
-    pmf.toMeasure.real {i : Fin (k + 1) | (i : Error) ≤ degree}
-      = ∑ i : Fin (k + 1), if (i : Error) ≤ degree then (pmf i).toReal else 0 := by
-          rw [measureReal_def]
-          let s : Finset (Fin (k + 1)) :=
-            Finset.univ.filter fun i : Fin (k + 1) => (i : Error) ≤ degree
-          have hs : (↑s : Set (Fin (k + 1))) = {i : Fin (k + 1) | (i : Error) ≤ degree} := by
-            ext i
-            simp [s]
-          rw [← hs, PMF.toMeasure_apply_finset, ENNReal.toReal_sum]
-          · simp [s, Finset.sum_filter]
-          · intro i hi
-            simpa using PMF.apply_ne_top pmf i
-    _ = ∑ r ∈ Finset.range (k + 1),
-          if (r : Error) ≤ degree then (pmf (Fin.ofNat (k + 1) r)).toReal else 0 := by
-          simpa using (Fin.sum_univ_eq_sum_range
-            (f := fun r =>
-              if (r : Error) ≤ degree then (pmf (Fin.ofNat (k + 1) r)).toReal else 0)
-            (n := k + 1))
+    (ProbabilityTheory.binomial k pI).real {i : ℕ | (i : Error) ≤ degree}
+      = ∑ r ∈ Finset.Iic k, if r ≤ degree then f r else 0 := by
+          rw [measureReal_def, ProbabilityTheory.binomial_eq_sum_dirac,
+            Measure.finsetSum_apply, ENNReal.toReal_sum]
+          · refine Finset.sum_congr rfl ?_
+            intro r hr
+            by_cases hrd : r ≤ degree
+            · have hcoeff_nonneg :
+                  0 ≤ (Nat.choose k r : Error) * p ^ r * (1 - p) ^ (k - r) := by
+                positivity
+              simp [Measure.smul_apply, hrd, f, hpI_coe, smul_eq_mul]
+              exact (ENNReal.toReal_ofReal hcoeff_nonneg).trans (by ring)
+            · simp [Measure.smul_apply, hrd, f, hpI_coe, smul_eq_mul]
+          · intro r hr
+            refine ENNReal.mul_ne_top ENNReal.ofReal_ne_top ?_
+            by_cases hrd : r ≤ degree <;> simp [Set.indicator, hrd]
     _ = ∑ r ∈ Finset.range (k + 1), if r ≤ degree then f r else 0 := by
-          refine Finset.sum_congr rfl ?_
-          intro r hr
-          have hr' : r < k + 1 := Finset.mem_range.mp hr
-          by_cases hrd : r ≤ degree
-          · have hrd' : (r : Error) ≤ degree := by
-              exact_mod_cast hrd
-            rw [if_pos hrd', if_pos hrd]
-            exact hpmf hr'
-          · have hrd' : ¬ (r : Error) ≤ degree := by
-              exact fun h => hrd (by exact_mod_cast h)
-            rw [if_neg hrd', if_neg hrd]
+          rw [Nat.range_succ_eq_Iic]
     _ = ∑ r ∈ Finset.range (degree + 1), f r := by
           by_cases hdk : degree ≤ k
           · have hRange :
@@ -342,7 +275,8 @@ private lemma scalarBernoulliLowerTail_le_exp
       exact_mod_cast Nat.pos_iff_ne_zero.mpr hk0
     let ε : Error := p * (k : Error) - degree
     let t : Error := 4 * (p - degree / (k : Error))
-    let pmf : PMF (Fin (k + 1)) := PMF.binomial ⟨p, hp0⟩ (by exact hp1) k
+    let pI : unitInterval := ⟨p, hp0, hp1⟩
+    let μ : Measure ℕ := ProbabilityTheory.binomial k pI
     have hε_nonneg : 0 ≤ ε := by
       dsimp [ε]
       have hpd' : (degree : Error) ≤ p * (k : Error) := by
@@ -353,27 +287,26 @@ private lemma scalarBernoulliLowerTail_le_exp
       dsimp [t]
       nlinarith
     have hInt :
-        Integrable (fun i : Fin (k + 1) => Real.exp (t * (p * (k : Error) - i)))
-          pmf.toMeasure := by
-      exact Integrable.of_finite
+        Integrable (fun i : ℕ => Real.exp (t * (p * (k : Error) - i))) μ := by
+      exact ProbabilityTheory.integrable_binomial _
     have hCher :=
       ProbabilityTheory.measure_ge_le_exp_mul_mgf
-        (μ := pmf.toMeasure) (X := fun i : Fin (k + 1) => p * (k : Error) - i) (t := t) ε
+        (μ := μ) (X := fun i : ℕ => p * (k : Error) - i) (t := t) ε
         ht_nonneg hInt
     have hEvent :
-        {i : Fin (k + 1) | ε ≤ p * (k : Error) - i} =
-          {i : Fin (k + 1) | (i : Error) ≤ degree} := by
+        {i : ℕ | ε ≤ p * (k : Error) - i} =
+          {i : ℕ | (i : Error) ≤ degree} := by
       ext i
       dsimp [ε]
       constructor <;> intro hi <;> linarith
     calc
       scalarBernoulliLowerTail k degree p
-        = pmf.toMeasure.real {i : Fin (k + 1) | ε ≤ p * (k : Error) - i} := by
+        = μ.real {i : ℕ | ε ≤ p * (k : Error) - i} := by
             rw [hEvent]
             symm
             exact binomial_lowerTail_eq k degree hp0 hp1
-      _ ≤ Real.exp (-t * ε) * ProbabilityTheory.mgf (fun i : Fin (k + 1) => p * (k : Error) - i)
-            pmf.toMeasure t := hCher
+      _ ≤ Real.exp (-t * ε) *
+            ProbabilityTheory.mgf (fun i : ℕ => p * (k : Error) - i) μ t := hCher
       _ ≤ Real.exp (-t * ε) * Real.exp ((k : Error) * t ^ (2 : ℕ) / 8) := by
             gcongr
             exact binomial_centered_mgf_le k hp0 hp1 (t := t)
