@@ -61,7 +61,7 @@ lemma evaluatedSlice_phaseTwo_stability_defect_bound
     (family : IdxPolyFamily params ι)
     (G : Fq params → SubMeas (Polynomial params) ι)
     (hG : ∀ x, G x = (family.meas x).toSubMeas)
-  (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
+    (hbound : IdxPolyFamily.SliceBoundednessInput strategy family zeta) :
     |avgOver (uniformDistribution (Fq params))
       (evaluatedSlicePhaseTwoStabilityDefect params strategy family G)| ≤ Real.sqrt zeta := by
   have hdef :
