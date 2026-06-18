@@ -71,6 +71,7 @@ import MIPStarRE.LDT.Pasting.ContextWrappers
 import MIPStarRE.LDT.Preliminaries.Polynomials
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
+-- This aggregate re-export file follows the repository's no-copyright-header convention.
 set_option linter.style.header false
 
 /-!

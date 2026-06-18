@@ -3,6 +3,7 @@ import MIPStarRE.Quantum.FiniteMatrix
 import MIPStarRE.Quantum.ProjectorONB
 import MIPStarRE.Quantum.Measurement
 
+-- This aggregate re-export file follows the repository's no-copyright-header convention.
 set_option linter.style.header false
 
 /-!
