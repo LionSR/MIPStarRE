@@ -36,11 +36,9 @@ private lemma bernoulli_centered_mgf_le {p t : Error}
     (hp0 : 0 ≤ p) (hp1 : p ≤ 1) :
     (1 - p) * Real.exp (t * p) + p * Real.exp (t * (p - 1)) ≤
       Real.exp (t ^ (2 : ℕ) / 8) := by
-  let pNN : NNReal := ⟨p, hp0⟩
-  have hpNN_coe : (pNN : Error) = p := rfl
-  have hpNN : pNN ≤ 1 := by
-    exact hp1
-  let μ : Measure Bool := (PMF.bernoulli pNN hpNN).toMeasure
+  let pI : unitInterval := ⟨p, hp0, hp1⟩
+  have hpI_coe : (pI : Error) = p := rfl
+  let μ : Measure Bool := ProbabilityTheory.bernoulliMeasure true false pI
   have hm : AEMeasurable (fun b : Bool => cond b (1 : Error) 0) μ := by
     simpa using (measurable_of_finite (fun b : Bool => cond b (1 : Error) 0)).aemeasurable
   have hb : ∀ᵐ b ∂μ, (cond b (1 : Error) 0) ∈ Set.Icc (0 : Error) 1 := by
@@ -53,24 +51,20 @@ private lemma bernoulli_centered_mgf_le {p t : Error}
         ((‖(1 : Error) - 0‖₊ / 2) ^ (2 : ℕ)) μ := by
     refine hsubG.neg.congr ?_
     filter_upwards with b
-    simp [μ, PMF.bernoulli_expectation, hpNN_coe]
+    simp [μ, ProbabilityTheory.integral_bernoulliMeasure, hpI_coe]
   have hmgf := hcentered.mgf_le t
   have hmgf' :
       p * Real.exp (t * (p - 1)) +
-          Real.exp (p * t) * ((1 - pNN : NNReal) : Error) ≤
+          (1 - p) * Real.exp (p * t) ≤
         Real.exp (t ^ (2 : ℕ) * (2 ^ (2 : ℕ))⁻¹ / 2) := by
-    simpa [μ, ProbabilityTheory.mgf, PMF.integral_eq_sum, PMF.bernoulli_apply,
-      smul_eq_mul, hpNN_coe, mul_comm, add_comm, add_left_comm, add_assoc]
+    simpa [μ, ProbabilityTheory.mgf, ProbabilityTheory.integral_bernoulliMeasure,
+      smul_eq_mul, hpI_coe, mul_comm, add_comm]
       using hmgf
-  have hcoeff : ((1 - pNN : NNReal) : Error) = 1 - p := by
-    calc
-      ((1 - pNN : NNReal) : Error) = 1 - (pNN : Error) := NNReal.coe_sub hpNN
-      _ = 1 - p := by rw [hpNN_coe]
   have hexp :
       Real.exp (t ^ (2 : ℕ) * (2 ^ (2 : ℕ))⁻¹ / 2) = Real.exp (t ^ (2 : ℕ) / 8) := by
     congr 1
     ring_nf
-  rw [hcoeff, hexp] at hmgf'
+  rw [hexp] at hmgf'
   simpa [mul_comm, add_comm] using hmgf'
 
 /-- The centered moment-generating function of the binomial law is the binomial expansion of the
