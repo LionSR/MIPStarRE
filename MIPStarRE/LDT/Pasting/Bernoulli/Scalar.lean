@@ -192,8 +192,17 @@ private lemma binomial_lowerTail_eq
             · have hcoeff_nonneg :
                   0 ≤ (Nat.choose k r : Error) * p ^ r * (1 - p) ^ (k - r) := by
                 positivity
-              simp [Measure.smul_apply, hrd, f, hpI_coe, smul_eq_mul]
-              exact (ENNReal.toReal_ofReal hcoeff_nonneg).trans (by ring)
+              have hmem : r ∈ {i : ℕ | i ≤ degree} := hrd
+              have htoReal :
+                  (ENNReal.ofReal ((Nat.choose k r : Error) * p ^ r *
+                    (1 - p) ^ (k - r))).toReal =
+                    (Nat.choose k r : Error) * (p ^ r * (1 - p) ^ (k - r)) := by
+                rw [ENNReal.toReal_ofReal hcoeff_nonneg]
+                ring
+              simpa only [Nat.cast_le, Measure.smul_apply,
+                MeasurableSpace.measurableSet_top, Measure.dirac_apply', smul_eq_mul,
+                Set.indicator_of_mem hmem, Pi.one_apply, mul_one, hrd, if_true, f, hpI_coe]
+                using htoReal
             · simp [Measure.smul_apply, hrd, f, hpI_coe, smul_eq_mul]
           · intro r hr
             refine ENNReal.mul_ne_top ENNReal.ofReal_ne_top ?_
