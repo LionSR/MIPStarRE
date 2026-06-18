@@ -338,10 +338,10 @@ theorem pointVerticalLineSdd_of_axis_self
     rw [ldGbconAxisLineMeasurement_eq_verticalLineMeasurement params strategy]
   exact hlift ▸ hpoint_to_axis
 
-/-- Public-family form of `pointVerticalLineSdd_of_axis_self`.
+/-- Named submeasurement-family form of `pointVerticalLineSdd_of_axis_self`.
 
 The proof above constructs the vertical-line measurement as a complete
-measurement-valued family.  Downstream arguments use only its underlying
+measurement-valued family.  The degree-zero estimates use only its underlying
 submeasurement family, namely `liftedVerticalLineAnswerFamily`. -/
 theorem pointVerticalLineSdd_liftedVerticalLine_of_axis_self
     (params : Parameters)
