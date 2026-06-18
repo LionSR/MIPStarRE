@@ -248,17 +248,6 @@ lemma ldSandwichLineOnePointLeftFamily_drop_last_outcome_some
           0)
       (by
         intro gs
-        change
-          (if Option.map (fun g : Polynomial params => g q.1) (gs ⟨i, hiFull⟩) = some a then
-            let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 gs
-            half * halfᴴ
-          else
-            0) =
-          (if Option.map (fun g : Polynomial params => g q.1) ((e gs).1 ⟨i, hi⟩) = some a then
-            let half := gHatHalfProductOutcomeOperator params family (n + 1) q.2 (e.symm (e gs))
-            half * halfᴴ
-          else
-            0)
         have hleft : e.symm (e gs) = gs := by
           exact e.left_inv gs
         rw [hleft]

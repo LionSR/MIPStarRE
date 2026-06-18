@@ -3,6 +3,8 @@ import MIPStarRE.Quantum.FiniteMatrix
 import MIPStarRE.Quantum.ProjectorONB
 import MIPStarRE.Quantum.Measurement
 
+set_option linter.style.header false
+
 /-!
 # Quantum infrastructure
 

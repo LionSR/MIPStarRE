@@ -80,8 +80,7 @@ theorem matrixSdpStrictDualWitness_nonneg {params : Parameters} [FieldModel para
 theorem one_le_matrixSdpStrictDualWitness {params : Parameters} [FieldModel params.q]
     (model : MatrixSdpRealization params) :
     (1 : MatrixOperator model.space) ≤ matrixSdpStrictDualWitness model := by
-  simpa [matrixSdpStrictDualWitness, sdpStrictDualWitness] using
-    (one_le_sdpStrictDualWitness (ι := model.space.carrier))
+  exact one_le_sdpStrictDualWitness (ι := model.space.carrier)
 
 /-- The concrete operator `A^u_{g(u)}` entering the SDP average. -/
 noncomputable def matrixAveragedPointOperatorContribution (params : Parameters)

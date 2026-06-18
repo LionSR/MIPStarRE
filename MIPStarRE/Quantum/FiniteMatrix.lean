@@ -235,9 +235,14 @@ theorem realTracePairingCLM_tracePairingMatrixOfRealCLM
                 (X i j).im • Matrix.single i j Complex.I := by
             rw [Matrix.smul_single]
             simp
-          simp [tracePairingMatrixOfRealCLM, Complex.mul_re]
-          rw [hre, him]
-          rw [map_smul, map_smul]
+          simp only [Complex.mul_re, Matrix.smul_single, Complex.real_smul, mul_one, map_add]
+          have hreTrace :
+              (tracePairingMatrixOfRealCLM ψ j i).re = ψ (Matrix.single i j (1 : ℂ)) := by
+            simp [tracePairingMatrixOfRealCLM]
+          have himTrace :
+              (tracePairingMatrixOfRealCLM ψ j i).im = -ψ (Matrix.single i j Complex.I) := by
+            simp [tracePairingMatrixOfRealCLM]
+          rw [hre, him, map_smul, map_smul, hreTrace, himTrace]
           ring_nf
     _ = ψ (∑ i, ∑ j, Matrix.single i j (X i j)) := by
           simp
