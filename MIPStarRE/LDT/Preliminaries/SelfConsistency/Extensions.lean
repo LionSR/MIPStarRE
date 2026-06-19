@@ -10,7 +10,8 @@ bundling the axis-parallel, self-consistency, and diagonal branches.
 
 ## References
 
-- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+- `references/ldt-paper/preliminaries.tex`
+- `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -323,7 +324,10 @@ theorem completenessTransferSelfConsistentA
     calc
       avgOver 𝒟 gap
         ≤ avgOver 𝒟 (fun q => 2 * Real.sqrt (sdd q)) := hgap_avg
-      _ ≤ 2 * Real.sqrt (sddError ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B)) := hsdd_sqrt
+      _ ≤
+          2 * Real.sqrt
+            (sddError ψ 𝒟 (IdxSubMeas.liftLeft A) (IdxSubMeas.liftLeft B)) := by
+            exact hsdd_sqrt
       _ ≤ 2 * Real.sqrt ε := by
             exact mul_le_mul_of_nonneg_left hsqrt_ε (by positivity)
   have hsplit :

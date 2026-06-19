@@ -7,7 +7,8 @@ The middle-to-right transfer estimate used in `prop:switch-sandwich`.
 
 ## References
 
-- arXiv:2009.12982, Section 7 (`prop:switch-sandwich`).
+- `references/ldt-paper/preliminaries.tex`, `prop:switch-sandwich`
+- `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

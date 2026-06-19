@@ -9,8 +9,8 @@ canonical parameterization, rebasing, and slice-embedding operations.
 
 ## References
 
-- arXiv:2009.12982, Section 3 (low individual degree test, axis-parallel line
-  questions).
+- `references/ldt-paper/test_definition.tex`
+- `blueprint/src/chapter/ch02_test.tex`
 -/
 
 namespace MIPStarRE.LDT
@@ -47,7 +47,8 @@ def sampleParameter {params : Parameters} [FieldModel params.q]
     (u : Point params) (i : Fin params.m) : Fq params :=
   u i
 
-/-- Rebase an axis-parallel line so that the old point `ℓ.pointAt t` becomes the new base point. -/
+/-- Rebase an axis-parallel line so that the old point `ℓ.pointAt t`
+becomes the new base point. -/
 def rebaseAt {params : Parameters} [FieldModel params.q]
     (ℓ : AxisParallelLine params) (t : Fq params) : AxisParallelLine params where
   base := ℓ.pointAt t

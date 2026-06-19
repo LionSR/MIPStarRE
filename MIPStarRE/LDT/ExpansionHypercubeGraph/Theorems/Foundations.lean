@@ -12,8 +12,9 @@ families.
 
 ## References
 
-- arXiv:2009.12982, Section 7, especially `lem:local-rewrite` and
-  `lem:global-rewrite`.
+- `references/ldt-paper/expansion.tex`, especially `lem:local-rewrite` and
+  `lem:global-rewrite`
+- `blueprint/src/chapter/ch05_expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph

@@ -7,8 +7,8 @@ Polynomial answer types attached to axis-parallel and diagonal lines.
 
 ## References
 
-- arXiv:2009.12982, Section 3 (low individual degree test, line polynomial
-  answers).
+- `references/ldt-paper/test_definition.tex`
+- `blueprint/src/chapter/ch02_test.tex`
 -/
 
 namespace MIPStarRE.LDT

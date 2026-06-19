@@ -9,7 +9,8 @@ forms, and the later lemmas compare a submeasurement with its completion.
 
 ## References
 
-- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+- `references/ldt-paper/preliminaries.tex`
+- `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

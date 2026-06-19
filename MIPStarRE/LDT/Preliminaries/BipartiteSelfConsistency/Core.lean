@@ -10,7 +10,8 @@ question-level state-dependent distance `qSDD` and its lift to the family-level
 
 ## References
 
-- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+- `references/ldt-paper/preliminaries.tex`
+- `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

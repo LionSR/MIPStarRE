@@ -12,8 +12,9 @@ formalization.
 
 ## References
 
-- arXiv:2009.12982, Section 7, `prop:laplacian-rewrite`,
-  `lem:local-rewrite`, `lem:global-rewrite`, and `lem:local-to-global`.
+- `references/ldt-paper/expansion.tex`, especially `prop:laplacian-rewrite`,
+  `lem:local-rewrite`, `lem:global-rewrite`, and `lem:local-to-global`
+- `blueprint/src/chapter/ch05_expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph

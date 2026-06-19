@@ -8,7 +8,8 @@ error under `approx_δ` families.
 
 ## References
 
-- arXiv:2009.12982, Section 7 (switch-sandwich preliminaries, `prop:switch-sandwich`).
+- `references/ldt-paper/preliminaries.tex`, `prop:switch-sandwich`
+- `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
