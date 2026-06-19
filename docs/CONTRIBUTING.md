@@ -116,7 +116,7 @@ Three issue templates are available in `.github/ISSUE_TEMPLATE/`:
 Use a descriptive, **bracket-free** title that names the mathematical content:
 
 ```
-Chapter 9 — finish the sandwich-chain corollaries in BridgeLemmas
+Chapter 9 — finish the sandwich-chain corollaries in ComparisonLemmas
 ```
 
 Avoid prefixes like `[Chapter 9] ...`: bot-generated branch names inherit those

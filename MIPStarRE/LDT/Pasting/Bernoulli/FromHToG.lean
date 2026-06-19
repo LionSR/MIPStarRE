@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Telescope
 
 /-!

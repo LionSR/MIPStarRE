@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.AveragesAndOps
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.StageMass
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
 
 /-!
 # Section 12 pasting: exact identities and error-bound lemma
