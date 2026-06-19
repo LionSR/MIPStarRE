@@ -32,10 +32,9 @@ def totalWeight {α : Type*} (𝒟 : Distribution α) : Error :=
 def IsProbability {α : Type*} (𝒟 : Distribution α) : Prop :=
   𝒟.totalWeight = 1
 
-/-- View a Mathlib probability mass function on a finite type as the
-project-local explicit-support distribution.  This is the compatibility
-boundary between the LDT notation `avgOver` and Mathlib's `PMF` API. -/
-noncomputable def ofPMF {α : Type*} [Fintype α] [DecidableEq α]
+/-- View a probability mass function on a finite type as a `Distribution`
+with full finite support. -/
+noncomputable def ofPMF {α : Type*} [Fintype α]
     (p : PMF α) : Distribution α where
   support := Finset.univ
   weight := fun a => (p a).toReal
@@ -43,17 +42,17 @@ noncomputable def ofPMF {α : Type*} [Fintype α] [DecidableEq α]
   outsideSupport := by intro a ha; exact absurd (Finset.mem_univ a) ha
 
 @[simp]
-theorem ofPMF_support {α : Type*} [Fintype α] [DecidableEq α]
+theorem ofPMF_support {α : Type*} [Fintype α]
     (p : PMF α) :
     (ofPMF p).support = Finset.univ := rfl
 
 @[simp]
-theorem ofPMF_weight {α : Type*} [Fintype α] [DecidableEq α]
+theorem ofPMF_weight {α : Type*} [Fintype α]
     (p : PMF α) (a : α) :
     (ofPMF p).weight a = (p a).toReal := rfl
 
-/-- A finite `PMF` gives a project-local probability distribution. -/
-theorem ofPMF_isProbability {α : Type*} [Fintype α] [DecidableEq α]
+/-- A finite `PMF` gives a probability distribution. -/
+theorem ofPMF_isProbability {α : Type*} [Fintype α]
     (p : PMF α) :
     (ofPMF p).IsProbability := by
   classical
@@ -123,17 +122,16 @@ def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
 
 namespace Distribution
 
-/-- Averaging against `Distribution.ofPMF p` is the finite sum weighted by the
-Mathlib probability mass function `p`. -/
-theorem avgOver_ofPMF_eq_pmf_sum {α : Type*} [Fintype α] [DecidableEq α]
+/-- Averaging against `Distribution.ofPMF p` is the finite sum weighted by `p`. -/
+theorem avgOver_ofPMF_eq_pmf_sum {α : Type*} [Fintype α]
     (p : PMF α) (f : α → Error) :
     avgOver (ofPMF p) f = ∑ a : α, (p a).toReal * f a := by
   simp [avgOver, ofPMF]
 
 /-- Averaging against `Distribution.ofPMF p` is the Bochner integral against
-the measure associated to the Mathlib probability mass function `p`. -/
+the measure associated to `p`. -/
 theorem avgOver_ofPMF_eq_pmf_integral {α : Type*}
-    [Fintype α] [DecidableEq α]
+    [Fintype α]
     [MeasurableSpace α] [MeasurableSingletonClass α]
     (p : PMF α) (f : α → Error) :
     avgOver (ofPMF p) f = ∫ a, f a ∂p.toMeasure := by
@@ -392,8 +390,8 @@ theorem avgOver_uniform_const {α : Type*}
   simpa [uniformProbabilityDistribution] using
     (ProbabilityDistribution.avgOver_const (uniformProbabilityDistribution α) c)
 
-/-- The repository's uniform average is the finite integral against Mathlib's
-uniform probability mass function. -/
+/-- The uniform average with respect to `uniformDistribution` is the finite integral
+with respect to the uniform probability mass function. -/
 theorem avgOver_uniform_eq_pmf_integral {α : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]
     [MeasurableSpace α] [MeasurableSingletonClass α]
