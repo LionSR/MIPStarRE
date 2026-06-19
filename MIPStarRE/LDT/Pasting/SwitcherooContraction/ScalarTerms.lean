@@ -1,9 +1,9 @@
 import MIPStarRE.LDT.Pasting.SwitcherooContraction.Commuted
 
 /-!
-# Section 12 pasting: switcheroo raw scalars
+# Section 12 pasting: switcheroo scalar expressions
 
-Named raw scalar packages for the switcheroo contraction chain.
+Named scalar expressions for the switcheroo contraction chain.
 -/
 
 namespace MIPStarRE.LDT.Pasting
@@ -16,7 +16,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- The post-second-`√ζ` left-front expression in the paper's cross-term chain. -/
-noncomputable def switcherooAggregateLeftFrontRaw
+noncomputable def switcherooAggregateLeftFrontScalar
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -32,7 +32,7 @@ noncomputable def switcherooAggregateLeftFrontRaw
             (M q.2).outcome go.2)))
 
 /-- The split-by-`g` expression that collapses back to the first positive term. -/
-noncomputable def switcherooAggregateFirstSplitRaw
+noncomputable def switcherooAggregateFirstSplitScalar
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -46,8 +46,8 @@ noncomputable def switcherooAggregateFirstSplitRaw
             ((family.meas q.1).outcome go.1 *
               (M q.2).outcome go.2))))
 
-/-- The post-first-`√χ` raw expression in the fourth-term chain. -/
-noncomputable def switcherooAggregateOnceCommutedRaw
+/-- The post-first-`√χ` scalar expression in the fourth-term chain. -/
+noncomputable def switcherooAggregateOnceCommutedScalar
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -63,8 +63,8 @@ noncomputable def switcherooAggregateOnceCommutedRaw
             (M q.2).outcome go.2 *
             (family.meas q.1).outcome go.1)))
 
-/-- Repackage the first `sqrt chi` step using the named raw scalar. -/
-lemma switcherooAggregateFourthTerm_close_once_commuted_raw
+/-- Restate the first `sqrt chi` step using the named scalar expression. -/
+lemma switcherooAggregateFourthTerm_close_once_commuted_scalar
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -78,14 +78,14 @@ lemma switcherooAggregateFourthTerm_close_once_commuted_raw
       (switcherooPointProductRight params family M)
       chi) :
     |switcherooAggregateFourthTerm params ψbi family M -
-        switcherooAggregateOnceCommutedRaw params ψbi family M| ≤
+        switcherooAggregateOnceCommutedScalar params ψbi family M| ≤
       Real.sqrt chi := by
-  simpa [switcherooAggregateOnceCommutedRaw] using
+  simpa [switcherooAggregateOnceCommutedScalar] using
     switcherooAggregateFourthTerm_split_close_once_commuted
       params ψbi hnorm family M chi hcomm
 
-/-- The post-first-`√ζ` mixed-tensor raw expression in the fourth-term chain. -/
-noncomputable def switcherooAggregateMixedRaw
+/-- The post-first-`√ζ` mixed tensor scalar expression in the fourth-term chain. -/
+noncomputable def switcherooAggregateMixedScalar
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -101,9 +101,9 @@ noncomputable def switcherooAggregateMixedRaw
             (M q.2).outcome o)) *
           rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)))
 
-/-- Repackage the second `sqrt zeta` step using the named raw left-front
-scalar. -/
-lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
+/-- Restate the second `sqrt zeta` step using the named left-front scalar
+expression. -/
+lemma switcherooAggregateFourthTerm_mixed_close_left_front_scalar
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -137,7 +137,8 @@ lemma switcherooAggregateFourthTerm_mixed_close_left_front_raw
     fun q g => leftTensor (ι₂ := ι) ((family.meas q.1).outcome g)
   let B : SlicePairQuestion params → Polynomial params → MIPStarRE.Quantum.Op (ι × ι) :=
     fun q g => rightTensor (ι₁ := ι) ((family.meas q.1).outcome g)
-  let C : SlicePairQuestion params → Polynomial params → Outcome → MIPStarRE.Quantum.Op (ι × ι) :=
+  let C : SlicePairQuestion params → Polynomial params → Outcome →
+      MIPStarRE.Quantum.Op (ι × ι) :=
     fun q g o =>
       leftTensor (ι₂ := ι)
         ((completePartSubMeas params family q.1).total *
