@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
-import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
 import MIPStarRE.LDT.Pasting.Defs.Context
 
 /-!

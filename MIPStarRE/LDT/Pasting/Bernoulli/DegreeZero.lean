@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
-import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
 
 /-!
 # Section 12 pasting: degree-zero branch

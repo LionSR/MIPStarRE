@@ -36,7 +36,7 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 | `Test/StrategyRoleAverage.lean` | 422 | 31.6 | 47.2 | 2× 1,000,000 | 1 | Massive `calc` blocks with `ev_add`, `abel_nf` expansions |
 | `MainInductionStep/Theorems.lean` | 3,484 | 26.1 | 71.4 | 1× 1,000,000 | 9 | 71 `positivity` calls, 6 `field_simp`, re-export file |
 | `Pasting/SwitcherooCompletion.lean` | 1,673 | 23.1 | 34.8 | 1× 1,000,000 | 2 | Heavy sqrt/rpow chain |
-| split; `Pasting/BridgeLemmas/LdSandwichLineOnePoint/` carries the line-one-point bridge | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | Former root wrapper no longer carries the proof |
+| split; `Pasting/ComparisonLemmas/LdSandwichLineOnePoint/` carries the line-one-point transport estimate | 3,827 | 22.3 | 41.9 | 1× 400,000 | 1 | Former root wrapper no longer carries the proof |
 | split; `Pasting/Bernoulli/FromHToG/Core/` carries the core recurrence lemmas | 1,339 | 20.6 | 24.3 | 1× 800,000 | 7 | Former root wrapper removed |
 | `Pasting/CommutingWithG/Complete.lean` | 476 | 17.5 | 22.5 | 1× 1,000,000 | 1 | Sqrt/rpow chain |
 | split; `Test/ErrorCascade/Definitions.lean`, `Test/ErrorCascade/EnvelopeBounds.lean`, and `Test/ErrorCascade/CascadeBounds/` carry the cascade | 1,482 | 16.1 | 39.7 | none | 2 | Former root wrapper removed |
@@ -48,9 +48,9 @@ All timings measured with `lake env lean` (prebuilt dependencies). Real/user/sys
 |------|-------|------|------|------------|
 | deleted; `Pasting/Bernoulli/FromHToG/PaperMoveChain/{Moves,Telescope}.lean` carries the chain | 986 | 11.5 | 11.2 | 2× 500,000 |
 | `Pasting/Core.lean` | 1,202 | 11.5 | 13.7 | none |
-| `Pasting/BridgeLemmas/OverAllOutcomes.lean` | 1,547 | 11.0 | 15.2 | none |
+| `Pasting/ComparisonLemmas/OverAllOutcomes.lean` | 1,547 | 11.0 | 15.2 | none |
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | 10.8 | 24.6 | none |
-| `Pasting/BridgeLemmas/LineInterpolation.lean` | 2,902 | 10.2 | 24.1 | none |
+| `Pasting/ComparisonLemmas/LineInterpolation.lean` | 2,902 | 10.2 | 24.1 | none |
 | `Commutativity/GCommStability/Scalar/RawSecond.lean` | 648 | 10.2 | 9.2 | 1× 1,200,000 |
 | split; `CommuteGHalfSandwich/MoveChain/{Base,Lifting,Chain,BackChain,FlatChain,FlatChainStep,Core}.lean` carries the chain | 2,409 | 9.9 | 17.7 | none |
 | split; `CommuteGHalfSandwich/Setup/{Definitions,SumBounds,StepLemmas}` carries setup | 1,886 | 8.9 | 18.3 | none |
@@ -102,17 +102,17 @@ Files sorted by heartbeat override magnitude:
 
 | File | Lines | Compile Time | Heartbeat Override | Key Tactics |
 |------|-------|-------------|-------------------|-------------|
-| split; `BridgeLemmas/LdSandwichLineOnePoint/` carries the bridge | 3,827 | 22.3s | 400K | 137 simp |
+| split; `ComparisonLemmas/LdSandwichLineOnePoint/` carries the transport estimate | 3,827 | 22.3s | 400K | 137 simp |
 | `MainInductionStep/Theorems.lean` | 3,484 | 26.1s | 1M | 47 simp, 71 positivity, 6 field_simp |
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | 10.8s | — | 56 simp |
 | `Test/MainTheorem.lean` | 2,971 | 8.8s | — | 1 simp (mostly assembly) |
 | deleted; final reductions now live in `GlobalVariance/Theorems/MainTheorems.lean` | 2,950 | 8.6s | — | 63 simp |
-| `BridgeLemmas/LineInterpolation.lean` | 2,902 | 10.2s | — | 119 simp |
+| `ComparisonLemmas/LineInterpolation.lean` | 2,902 | 10.2s | — | 119 simp |
 | split; `CommuteGHalfSandwich/MoveChain/{Base,Lifting,Chain,BackChain,FlatChain,FlatChainStep,Core}.lean` carries the chain | 2,409 | 9.9s | — | 74 simp |
 | `ScalarApproximation/ProcessedG.lean` | 2,035 | 15.2s | 5M | 27 simp, 30 calc |
 | split; `CommuteGHalfSandwich/Setup/` carries setup | 1,886 | 8.9s | — | 48 simp |
 | `SwitcherooCompletion.lean` | 1,673 | 23.1s | 1M | 28 simp |
-| `BridgeLemmas/OverAllOutcomes.lean` | 1,547 | 11.0s | — | 24 simp |
+| `ComparisonLemmas/OverAllOutcomes.lean` | 1,547 | 11.0s | — | 24 simp |
 | deleted; `FromHToG/AdjacentStages/Chain/{HalfSandwich,FinalMove}.lean` now carries the chain | 1,533 | 7.8s | — | 0 simp (mostly arithmetic) |
 | split; `Test/ErrorCascade/{Definitions,EnvelopeBounds,CascadeBounds}.lean` carries the cascade | 1,482 | 16.1s | — | 3 simp |
 | split; `FromHToG/Core/` carries core recurrence lemmas | 1,339 | 20.6s | 800K | 54 simp |
@@ -149,7 +149,7 @@ change trigger a large rebuild.
 
 1. **Keep the `LdSandwichLineOnePoint` split focused on proof-bearing leaves**
    - The former 3,827-line wrapper has been split into leaf modules under
-     `Pasting/BridgeLemmas/LdSandwichLineOnePoint/`.
+     `Pasting/ComparisonLemmas/LdSandwichLineOnePoint/`.
    - Future compile-time work should optimize the leaves, not the public
      re-export file.
    - **Expected benefit:** smaller per-file iteration targets and better
@@ -220,12 +220,12 @@ change trigger a large rebuild.
 
 | Current File | Lines | Suggested Split |
 |-------------|-------|-----------------|
-| split; `Pasting/BridgeLemmas/LdSandwichLineOnePoint/` | 3,827 | Keep optimizing proof-bearing leaves |
-| `MainInductionStep/Theorems.lean` | 3,484 | `SlicePrep`, `PastingBridge`, `FinalTelescope` |
+| split; `Pasting/ComparisonLemmas/LdSandwichLineOnePoint/` | 3,827 | Keep optimizing proof-bearing leaves |
+| `MainInductionStep/Theorems.lean` | 3,484 | `SlicePrep`, `PastingAssembly`, `FinalTelescope` |
 | `Commutativity/Transport/FullSlice.lean` | 3,210 | `BaseSlice`, `SliceEvaluation`, `FullSlice` |
 | `Test/MainTheorem.lean` | 2,971 | Already mostly assembly — low priority |
 | deleted; final reductions now live in `GlobalVariance/Theorems/MainTheorems.lean` | 2,950 | `VarianceBounds`, `CrossTerms`, `FinalAssembly` |
-| `Pasting/BridgeLemmas/LineInterpolation.lean` | 2,902 | `PointInterpolation`, `LineExtension`, `FullInterpolation` |
+| `Pasting/ComparisonLemmas/LineInterpolation.lean` | 2,902 | `PointInterpolation`, `LineExtension`, `FullInterpolation` |
 
 ---
 

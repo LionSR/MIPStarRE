@@ -6,9 +6,9 @@ import MIPStarRE.LDT.Pasting.Defs.Tuples
 import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
 import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
-import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
-import MIPStarRE.LDT.Pasting.BridgeLemmas.HAConsistency
-import MIPStarRE.LDT.Pasting.BridgeLemmas.OverAllOutcomes.Final
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
+import MIPStarRE.LDT.Pasting.ComparisonLemmas.OverAllOutcomes.Final
 
 /-!
 # Section 12 pasting: final pasting theorems
