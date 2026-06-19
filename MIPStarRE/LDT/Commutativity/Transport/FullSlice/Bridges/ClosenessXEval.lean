@@ -3,9 +3,9 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 
 /-!
-# X-evaluated full-slice closeness bridge
+# X-evaluated full-slice closeness comparison
 
-Single `closenessOfIP` bridge for the x-evaluated/full-y scalar-to-tensor
+Single `closenessOfIP` comparison for the x-evaluated/full-y scalar-to-tensor
 transition; extracted from `Closeness.lean` per #1127.
 
 ## References
@@ -22,7 +22,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- X-evaluated/full-y scalar-to-tensor bridge for paper line 360.
+/-- X-evaluated/full-y scalar-to-tensor comparison for paper line 360.
 
 After the x-side Schwartz--Zippel step, the first family has already been
 postprocessed at `u`, while the y-family is still full-polynomial.  This lemma
@@ -31,8 +31,9 @@ move the trailing `G^y_h` in
 `G^x_[g(u)=a] G^y_h G^x_[g(u)=a] G^y_h ⊗ I` to the right register, yielding
 `G^x_[g(u)=a] G^y_h G^x_[g(u)=a] ⊗ G^y_h`.
 
-The preceding line-359 bridge from the `BAB ⊗ A` tensor endpoint to this scalar
-endpoint remains separate because it follows a different `closenessOfIP` leg. -/
+The preceding line-359 comparison from the `BAB ⊗ A` tensor endpoint to this
+scalar endpoint remains separate because it follows a different `closenessOfIP`
+leg. -/
 lemma xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι)

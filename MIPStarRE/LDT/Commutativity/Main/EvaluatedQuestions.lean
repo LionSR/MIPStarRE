@@ -56,7 +56,7 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
 
   The paper first reduces to the small-parameter regime
   `γ ≤ 1`, `ζ ≤ 1`, and `d / q ≤ 1`; otherwise `comMainError` is already large
-  enough while the raw `sddErrorOp` is trivially bounded.
+  enough while the unexpanded `sddErrorOp` is trivially bounded.
 
   In the small-parameter case, the proof uses two Schwartz-Zippel
   marginalizations together with `closenessOfIP` and the evaluated
@@ -109,10 +109,10 @@ lemma fullSliceCommutation_of_evaluated_on_evaluated_questions
       --        ≤ |fullABA − evalABA| + |evalABA − evalABAB|
       --          + |evalABAB − fullABAB|`
       -- * `fullSlice_scalar_marginalize_x`: the first-term switch-sandwich
-      --   wrapper costs `4√ζ`.
+      --   comparison costs `4√ζ`.
       -- * `fullSlice_scalar_marginalize_y`: the paper-faithful second-term
-      --   wrapper splits into the proved x-prefix `md/q + √ζ`, the proved
-      --   line-359 bridge `√ζ`, the proved line-360 bridge `√ζ`, and the proved
+      --   comparison splits into the proved x-prefix `md/q + √ζ`, the proved
+      --   line-359 comparison `√ζ`, the proved line-360 comparison `√ζ`, and the proved
       --   y-tail `md/q + √ζ`, for a total of `2md/q + 4√ζ`.
       -- * `fullSlice_closenessOfIP_CAB_hEval_sqrt`: the direct evaluated-side
       --   route gives `|evalABA − evalABAB| ≤ √ν`.

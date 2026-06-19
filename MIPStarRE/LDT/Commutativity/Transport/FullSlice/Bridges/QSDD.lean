@@ -1,13 +1,13 @@
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
 
 /-!
-# Full-slice `qSDDOp` averaging assembly
+# Full-slice `qSDDOp` averaging identity
 
 Averaging identities expanding the full-slice `qSDDOp` and proving the scalar
 commutation identity `fullSliceCommutation_qSDDOp_avg_eq`.
 
-Ex-private definitions are tensor-form machinery per architecture decision
-#713; downstream code should use the scalar public API.
+This scalar expansion is used by the full-slice transport theorems that compare
+the quartic scalar averages appearing in `commutativity-G.tex`.
 
 ## References
 

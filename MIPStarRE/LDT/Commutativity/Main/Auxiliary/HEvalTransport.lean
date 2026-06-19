@@ -13,7 +13,7 @@ Evaluated-side closeness-of-IP transport and strong `hEval` bounds
 
 Provides the evaluated-side `closenessOfIP` chain on `CAB` products,
 including zero-operator triangulation helpers and the sharp bound
-`fullSlice_closenessOfIP_CAB_hEval_sqrt` and its paper-envelope wrapper
+`fullSlice_closenessOfIP_CAB_hEval_sqrt` and its paper-envelope estimate
 `fullSlice_closenessOfIP_CAB_hEval`.
 
 ## References
@@ -227,7 +227,7 @@ The direct evaluated-side route transports `hEval` to
 normalized-state bound `sddErrorOp ≤ 4` for the evaluated product families.  It
 yields the sharper estimate
 `|evaluatedSliceABAAvg - evaluatedSliceABABAvg| ≤ √ν`, where
-`ν = commDataProcessedGError params gamma zeta`.  The paper-envelope wrapper
+`ν = commDataProcessedGError params gamma zeta`.  The paper-envelope estimate
 `fullSlice_closenessOfIP_CAB_hEval` below recovers the older `6√ζ + √ν`
 statement when that displayed Section 11 bound is convenient. -/
 lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
