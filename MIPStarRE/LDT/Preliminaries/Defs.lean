@@ -2,12 +2,11 @@ import MIPStarRE.LDT.Test.Defs
 import MIPStarRE.LDT.Tactic.QuantumNonneg
 
 /-!
-# Preliminary definition packages
+# Preliminary definitions and statement structures
 
 This file collects the lightweight statement and definition layer for the
-preliminaries chapter of the LDT development. It packages the paper's
-consistency, sandwich, and completion interfaces in a form convenient for later
-files.
+preliminaries chapter of the LDT development. It records the paper's
+consistency, sandwich, and completion statements in a form used by later files.
 
 ## Main definitions
 
@@ -15,7 +14,7 @@ files.
   relation.
 - `ConsAgreement`: the measurement reformulation of consistency.
 - `ConsSubMeasStmt`, `SwitchSandwichStmt`, `CompTransferStmt`, and
-  `CompletingToMeasStmt`: bundled outputs for the main preliminary bridge
+  `CompletingToMeasStmt`: conclusion statements for the main preliminary
   propositions.
 - `completeAtOutcome`: completion of a submeasurement at a distinguished
   outcome.
@@ -32,7 +31,7 @@ namespace MIPStarRE.LDT.Preliminaries
 open MIPStarRE.LDT
 open MIPStarRE.Quantum
 
-/-! ## Consistency and distance packages -/
+/-! ## Consistency and distance statements -/
 
 /-- Source-style left/right relation `A^x_a ⊗ I ≈_δ I ⊗ B^x_a`. -/
 structure BipartiteSDDRel {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -58,7 +57,7 @@ noncomputable def agreementProbability {Question Outcome : Type*}
         (IdxMeas.toIdxSubMeas A)
         (IdxMeas.toIdxSubMeas B)
 
-/-- Output package for the measurement reformulation of consistency. -/
+/-- Conclusion statement for the measurement reformulation of consistency. -/
 structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
@@ -376,7 +375,7 @@ noncomputable def rightSandwichExpectation {Question Outcome : Type*}
     ∑ a, ev ψ
       (leftTensor (ι₂ := ι) (B * (A q).outcome a))
 
-/-- Output package for `prop:switch-sandwich`. -/
+/-- Conclusion statement for `prop:switch-sandwich`. -/
 structure SwitchSandwichStmt {Question Outcome : Type*}
     {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
@@ -391,7 +390,7 @@ structure SwitchSandwichStmt {Question Outcome : Type*}
       rightSandwichExpectation ψ 𝒟 A B|
       ≤ Real.sqrt δ
 
-/-- Output package for `prop:completeness-transfer-projective-P`. -/
+/-- Conclusion statement for `prop:completeness-transfer-projective-P`. -/
 structure CompTransferStmt {Question Outcome : Type*}
     {ι : Type*} [Fintype Outcome] [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (𝒟 : Distribution Question)
