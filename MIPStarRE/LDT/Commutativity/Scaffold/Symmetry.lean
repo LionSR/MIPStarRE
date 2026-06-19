@@ -1,11 +1,11 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Core
 
 /-!
-# Section 11 commutativity: scaffold symmetry
+# Section 11 commutativity: symmetry transport
 
-Symmetry transport between coded `F_q` points and the underlying scalar model,
-packaging the scaffold theorem statements used by the Section 11 commutativity
-argument.
+Symmetry transport between coded `F_q` points and the underlying scalar model.
+The lemmas below put the point-consistency relation into the orientations used
+by the Section 11 commutativity argument.
 
 ## References
 
@@ -21,7 +21,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Package the point-consistency field using the local evaluated-point-family
+/-- The point-consistency relation written in local evaluated-point-family
 notation. -/
 lemma evaluatedPointFamily_pointConsistency
     (params : Parameters)

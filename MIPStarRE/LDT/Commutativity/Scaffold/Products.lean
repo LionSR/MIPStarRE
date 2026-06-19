@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
 
 /-!
-# Section 11 commutativity: scaffold product lemmas
+# Section 11 commutativity: product estimates
 
 Basic product-style lemmas on projective submeasurement outcomes — in
 particular orthogonality of distinct outcomes — reused throughout the
