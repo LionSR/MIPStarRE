@@ -5,11 +5,11 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
 
 Normalization-condition bounds, evaluated projective submeasurements, and
 full-slice and evaluated-slice self-consistency estimates used by the scalar-to-tensor
-bridge chain.
+comparison.
 
-Ex-private definitions are tensor-form machinery per architecture decision
-#713; downstream code should use the scalar public API exposed by the
-full-slice transport theorems.
+The tensor-form estimates are internal to the scalar/tensor comparison recorded
+in `docs/decisions/713-scalar-tensor-decision.md`; downstream code should use
+the scalar public API exposed by the full-slice transport theorems.
 
 ## References
 
@@ -48,7 +48,7 @@ lemma normalizationCondition_sandwich_bound
 /-- Evaluate a polynomial-indexed projective submeasurement at a point, retaining
 projectivity of the postprocessed outcomes.
 
-This reuses the shared scaffold postprocessing projectivity lemma rather than
+This reuses the shared postprocessing projectivity lemma rather than
 reproving the orthogonality/postprocessing infrastructure locally. -/
 noncomputable def evaluateAtProjSubMeas
     (params : Parameters) [FieldModel params.q] (u : Point params)

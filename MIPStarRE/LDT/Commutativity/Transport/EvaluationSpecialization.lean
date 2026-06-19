@@ -139,7 +139,7 @@ lemma evaluationSpecialization_sddErrorOp_eq
   simp_rw [evaluatedFromFullSliceProductLeft_outcome_eq,
       evaluatedFromFullSliceProductRight_outcome_eq]
 
-/-- Repackage the evaluated-from-full-slice commutation bound as a bound for the
+/-- Restate the evaluated-from-full-slice commutation bound as a bound for the
 evaluated-slice product families, using the pointwise postprocessing identities. -/
 lemma evaluatedSliceCommutation_of_evaluationSpecialization
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)

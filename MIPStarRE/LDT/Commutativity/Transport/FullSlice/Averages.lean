@@ -4,14 +4,15 @@ import MIPStarRE.LDT.Commutativity.Transport.Pullback
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
-# Full-slice averages and data indices
+# Full-slice averages and index equivalences
 
 Zero-family definition, shared average-reindexing helpers, and averaged scalar
-and tensor quantities for
-the full-slice outcome space, together with data-reindexing equivalences.
+and tensor quantities for the full-slice outcome space, together with
+data-reindexing equivalences.
 
-Ex-private definitions are tensor-form machinery per architecture
-decision #713; downstream code should use the scalar public API.
+The tensor-form averages are internal to the scalar/tensor comparison recorded
+in `docs/decisions/713-scalar-tensor-decision.md`; downstream code should use
+the scalar public API.
 
 ## References
 
@@ -155,7 +156,7 @@ lemma fullSliceCommutation_avg_swap_terms
               exact avgOver_sum_eq_card_mul_avgOver_prod
                 (fun q gh => fullSliceABABTerm params strategy family q gh)
 
-/-- The zero raw family on the full-slice outcome space. -/
+/-- The zero operator family on the full-slice outcome space. -/
 noncomputable def zeroFullSliceOpFamily
     (params : Parameters) [FieldModel params.q] :
     OpFamily (FullSliceOutcome params) (ι × ι) where
@@ -224,8 +225,8 @@ noncomputable def evaluatedSliceABABAvg
 This is the manifestly-PSD tensor-form partner of `fullSliceABAAvg` used by the
 marginalization step: each summand factors as `V† V` with
 `V = (G^x_g G^y_h) ⊗ √(G^x_g)`, so the outer absolute value drops and the
-Schwartz–Zippel collision bound applies per outcome. Internal per architecture
-decision #713 (scalar public API, tensor-form machinery internal). -/
+Schwartz–Zippel collision bound applies per outcome. This tensor-form average
+is internal to the scalar public API recorded by decision #713. -/
 noncomputable def fullSliceBABAtensorAvg
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) (family : IdxPolyFamily params ι) : Error :=

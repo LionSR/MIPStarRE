@@ -11,11 +11,9 @@ import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 Schwartz–Zippel marginalization helpers (`eq:evaluate-gcom-at-points`,
 `eq:gcom4-diff`) used in the final full-slice commutation theorem.
 
-Architecture: Implements the scalar↔tensor bridge chain (Option 3 hybrid).
-Public lemmas `fullSlice_scalar_marginalize_x` and
-`fullSlice_scalar_marginalize_y` are pure scalar inequalities; their proofs
-compose internal-use tensor-form bridges from
-`Transport/FullSlice/Bridges/` over tensor averages defined in
+The public lemmas `fullSlice_scalar_marginalize_x` and
+`fullSlice_scalar_marginalize_y` are pure scalar inequalities.  Their proofs
+compose internal tensor-form comparisons over the tensor averages defined in
 `Transport/FullSlice/Averages.lean`, with `closenessOfIP` at cost `√ζ` each.
 
 See `docs/decisions/713-scalar-tensor-decision.md` for the full decision record.
@@ -34,7 +32,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The evaluated point family, bundled as a projective submeasurement family. -/
+/-- The evaluated point family viewed as a projective submeasurement family. -/
 private noncomputable def evaluatedPointProj
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
@@ -372,10 +370,12 @@ lemma fullSlice_scalar_marginalize_x
   let evalCenter : Error :=
     MIPStarRE.LDT.Preliminaries.middleSandwichExpectation strategy.state
       (uniformDistribution (Point params.next)) (evaluatedPointProj params family) G
-  have hfull : |fullSliceABAAvg params strategy family - fullCenter| ≤ 2 * Real.sqrt zeta := by
+  have hfull :
+      |fullSliceABAAvg params strategy family - fullCenter| ≤ 2 * Real.sqrt zeta := by
     simpa [fullCenter, G, fullSliceABAAvg_eq_leftSandwichExpectation]
       using hfullSwitch.leftSandwichTransfer
-  have heval : |evalCenter - evaluatedSliceABAAvg params strategy family| ≤ 2 * Real.sqrt zeta := by
+  have heval :
+      |evalCenter - evaluatedSliceABAAvg params strategy family| ≤ 2 * Real.sqrt zeta := by
     have h := hevalSwitch.leftSandwichTransfer
     have h' : |evaluatedSliceABAAvg params strategy family - evalCenter| ≤
         2 * Real.sqrt zeta := by
@@ -393,11 +393,11 @@ lemma fullSlice_scalar_marginalize_x
 /-- Paper-faithful second-term transport bound.
 
 The proved x-prefix (`eq:gcom4` plus `eq:gcom4-diff`, paper lines 332--354)
-costs `md/q + √ζ`; the proved line-359 `closenessOfIP` bridge costs `√ζ`;
-the line-360 scalar↔tensor bridge is proved in
+costs `md/q + √ζ`; the proved line-359 `closenessOfIP` comparison costs `√ζ`;
+the line-360 scalar↔tensor comparison is proved in
 `xEvaluatedFullSliceABABAvg_to_xEvaluatedFullSliceABABtensorAvg` and costs
 another `√ζ`; and the proved y-tail uses y-Schwartz--Zippel marginalization
-(paper lines 369--385) plus the `√ζ` doubly-evaluated scalar↔tensor bridge. Thus
+(paper lines 369--385) plus the `√ζ` doubly-evaluated scalar↔tensor comparison. Thus
 the whole scalar second-term comparison costs `2·md/q + 4√ζ`. -/
 lemma fullSlice_scalar_marginalize_y
     (params : Parameters) [FieldModel params.q]

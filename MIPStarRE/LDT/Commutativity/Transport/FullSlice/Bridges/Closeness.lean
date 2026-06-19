@@ -4,18 +4,18 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessCore
 
 /-!
-# Full-slice scalar-to-tensor closeness bridges
+# Full-slice scalar-to-tensor closeness comparison
 
-`closenessOfIP` bridges transforming scalar quartic averages into manifestly
-positive tensor-form partners, together with the tensor-marginalization bridge
-chain connecting full-slice and evaluated-slice `ABAB` averages.
+`closenessOfIP` comparisons transform scalar quartic averages into manifestly
+positive tensor-form partners.  The same route includes tensor-marginalization
+identities connecting full-slice and evaluated-slice `ABAB` averages.
 
-The core `closenessOfIP` scalar↔tensor bridges are factored into
+The core `closenessOfIP` scalar↔tensor comparison lemmas are factored into
 `ClosenessCore.lean` (extracted per #1127).
 
-Previously private lemmas are tensor-form machinery per architecture decision
-#713; downstream code should use the scalar public API exposed by the
-full-slice transport theorems.
+The tensor-form lemmas are internal to the scalar/tensor comparison recorded in
+`docs/decisions/713-scalar-tensor-decision.md`; downstream code should use the
+scalar public API exposed by the full-slice transport theorems.
 
 ## References
 
@@ -163,7 +163,7 @@ lemma xEvaluatedSliceBABAtensor_to_xEvaluatedFullSliceABABAvg
           rw [abs_sub_comm]
     _ ≤ Real.sqrt zeta := hclose
 
-/-- Evaluated-slice y-side scalar-to-tensor bridge: move the trailing
+/-- Evaluated-slice y-side scalar-to-tensor comparison: move the trailing
 `G^y_[h(v)=b]` in the scalar quartic to the right register, producing the tensor
 form in paper `commutativity-G.tex` line 360. -/
 private lemma evaluatedSliceABAB_scalar_to_ABABtensor
@@ -266,9 +266,9 @@ private lemma evaluatedSliceABAB_scalar_to_ABABtensor
 /-- Proved x-prefix from the full scalar quartic to the x-evaluated `BAB ⊗ A`
 tensor endpoint.
 
-This packages the first two paper steps for the second term in
+This combines the first two paper steps for the second term in
 `commutativity-G.tex` lines 332--354: the `eq:gcom4` scalar-to-`BAB ⊗ A`
-bridge costs `√ζ`, and the `eq:gcom4-diff` Schwartz--Zippel
+comparison costs `√ζ`, and the `eq:gcom4-diff` Schwartz--Zippel
 postprocessing of the `x` polynomial outcome costs `md/q`. The remaining
 paper lines 356--360 are intentionally not included here; they are the two
 `closenessOfIP` legs from `xEvaluatedSliceBABAtensorAvg` to
@@ -282,7 +282,7 @@ lemma fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg
     |fullSliceABABAvg params strategy family -
         xEvaluatedSliceBABAtensorAvg params strategy family| ≤
       (↑params.m : Error) * ↑params.d / ↑params.q + Real.sqrt zeta := by
-  have hbridge := fullSliceABAB_scalar_to_BABAtensor params strategy family zeta hnorm hself
+  have hComparison := fullSliceABAB_scalar_to_BABAtensor params strategy family zeta hnorm hself
   have hx := fullSliceBABA_tensor_marginalize_x params strategy family hnorm
   have hx' :
       |fullSliceBABAtensorAvg params strategy family -
@@ -299,7 +299,7 @@ lemma fullSliceABAB_to_xEvaluatedSliceBABAtensorAvg
 /-- Proved y-tail from the mixed `ABA ⊗ B` tensor endpoint to the evaluated
 scalar quartic.
 
-This packages the paper steps after the x-stage has already reached
+This combines the paper steps after the x-stage has already reached
 `xEvaluatedFullSliceABABtensorAvg`: y-Schwartz-Zippel marginalization
 (`commutativity-G.tex` lines 369--385) followed by the `√ζ`
 `closenessOfIP` move that swaps a trailing `G^y_{[h(v)=b]}` between the
@@ -316,12 +316,12 @@ lemma xEvaluatedFullSliceABABtensor_to_evaluatedSliceABABAvg
       (↑params.m : Error) * ↑params.d / ↑params.q + Real.sqrt zeta := by
   have hyTensor :=
     fullSliceABAB_tensor_marginalize_y params strategy family hnorm
-  have hevalBridge :=
+  have hevalComparison :=
     evaluatedSliceABAB_scalar_to_ABABtensor params strategy family zeta hnorm hself
-  have hevalBridge' :
+  have hevalComparison' :
       |evaluatedSliceABABtensorAvg params strategy family -
           evaluatedSliceABABAvg params strategy family| ≤ Real.sqrt zeta := by
-    rwa [abs_sub_comm] at hevalBridge
+    rwa [abs_sub_comm] at hevalComparison
   have htri :=
     abs_sub_le
       (xEvaluatedFullSliceABABtensorAvg params strategy family)

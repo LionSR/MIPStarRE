@@ -3,15 +3,16 @@ import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 
 /-!
-# Core full-slice closeness-of-inner-product bridges
+# Core full-slice closeness-of-inner-product comparison
 
-Standalone `closenessOfIP` scalar↔tensor bridge extracted from
+Standalone `closenessOfIP` scalar↔tensor comparison lemma extracted from
 `Closeness.lean` per #1127.  This lemma is the core
 tensor-form machinery that moves a trailing measurement outcome between
 the scalar quartic and a manifestly positive tensor register.
 
-Previously private lemmas are tensor-form machinery per architecture decision
-#713; downstream code should use the scalar public API exposed by
+The tensor-form lemmas are internal to the scalar/tensor comparison recorded in
+`docs/decisions/713-scalar-tensor-decision.md`; downstream code should use
+the scalar public API exposed by
 `Closeness.lean` and `ClosenessXEval.lean`.
 
 ## References
@@ -28,7 +29,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Scalar-to-tensor bridge for paper `eq:gcom4`
+/-- Scalar-to-tensor comparison for paper `eq:gcom4`
 (`commutativity-G.tex` lines 332-337).
 
 One `closenessOfIP` application moves the trailing `G^x_g` in the scalar quartic
