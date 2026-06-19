@@ -5,8 +5,8 @@ import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 /-!
 # Section 12 — Statements
 
-This file packages the Section 12 pasting conclusions into reusable proposition-valued
-structures. It records the displayed error formulas and the statement bundles for the
+This file records the Section 12 pasting conclusions as reusable proposition-valued
+structures. It gives the displayed error formulas and the statement structures for the
 switcheroo, completed-family, half-sandwich, recurrence, Chernoff, and final pasting steps.
 
 ## References
@@ -407,7 +407,7 @@ Lean statement for `lem:over-all-outcomes`.
 
 The paper's displayed statement is a scalar approximation of expectation values,
 not a stronger `≈_δ` relation between already-collapsed `Unit`-indexed
-submeasurements.  Accordingly, this bundle stores only the absolute-value bound
+submeasurements.  Accordingly, this structure stores only the absolute-value bound
 between the pasted mass and the all-outcomes expansion mass. -/
 structure OverAllOutcomesStatement (params : Parameters)
     [FieldModel params.q]
@@ -476,7 +476,7 @@ noncomputable def fromHToGBernoulliTailMass (params : Parameters)
 Lean statement for `lem:from-H-to-G`.
 
 The paper's displayed statement is a scalar approximation of expectation values,
-not a new `≈_δ` relation between submeasurements.  Accordingly, this bundle
+not a new `≈_δ` relation between submeasurements.  Accordingly, this statement
 stores only the final all-outcomes vs. Bernoulli-tail comparison; the
 adjacent-stage estimates are recorded by the internal construction lemmas. -/
 structure FromHToGStatement (params : Parameters)
