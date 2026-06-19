@@ -1,10 +1,11 @@
 import MIPStarRE.LDT.Preliminaries.DistanceBounds
 
 /-!
-# Preliminary comparison theorems: consistency bridges
+# Preliminary comparison theorems: consistency-to-distance estimates
 
-Bridge lemmas for the consistency-to-submeasurement-control part of the
-preliminaries chapter.
+Estimates converting consistency of a submeasurement and a measurement into
+state-dependent distance controls for the diagonal and total sandwich families
+of `prop:cons-sub-meas`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -13,7 +14,7 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-! ### Bridge lemmas for `prop:cons-sub-meas` -/
+/-! ### Consistency controls for `prop:cons-sub-meas` -/
 
 private lemma consSubMeas_controlHelper
     {Outcome : Type*} {κ : Type*} [Fintype κ] [DecidableEq κ]
