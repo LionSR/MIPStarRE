@@ -9,7 +9,9 @@ stability steps of the Section 11 commutativity argument.
 
 ## References
 
-- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+- `references/ldt-paper/commutativity-points.tex`
+- `references/ldt-paper/commutativity-G.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -22,11 +24,25 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 variable (params : Parameters) [FieldModel params.q]
+
+/-- Evaluated-slice questions consist of the two sampled points in the next
+ambient space. Their height coordinates are later retained as a full-slice
+question. -/
 abbrev EvaluatedSliceQuestion (params : Parameters) := Point params.next × Point params.next
+
+/-- Evaluated-slice outcomes are the two field values obtained after evaluating
+the selected slice polynomials at the sampled points. -/
 abbrev EvaluatedSliceOutcome (params : Parameters) := Fq params × Fq params
+
+/-- Full-slice questions are the two height coordinates associated with an
+evaluated-slice sample. -/
 abbrev FullSliceQuestion (params : Parameters) := Fq params × Fq params
+
+/-- Full-slice outcomes are the pair of slice polynomials measured at the two
+height coordinates of a full-slice question. -/
 abbrev FullSliceOutcome (params : Parameters) [FieldModel params.q] :=
   Polynomial params × Polynomial params
+
 /-- Outcomes for the `G^y` stability step.
 
 We keep the first coordinate evaluated at `u`, but retain the full second
