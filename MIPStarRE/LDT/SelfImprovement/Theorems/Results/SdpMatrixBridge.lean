@@ -15,14 +15,14 @@ that bound can be used to prove saturation of the extra canonical slack block.
 The dominance-carrying interfaces are Lean-only technical routes; they are not
 additional hypotheses in the paper SDP statement.
 
-Mathlib 4.28.0 provides the underlying finite-dimensional matrix order and
-convex-cone infrastructure used throughout this project, but it does not yet
-provide a ready-made finite-dimensional semidefinite-programming strong-duality
-theorem with complementary slackness in the shape needed here.  Consequently
-this file does not reprove SDP duality.  It only transports the project-local
-matrix witness `MatrixSdpStatementWithSlackness` to the abstract Section 9
-interface.  If a Mathlib SDP theorem is later available, its output should
-replace the project-local witness while the comparison theorem below should remain the
+Mathlib provides the underlying finite-dimensional matrix order and convex-cone
+infrastructure used throughout this project, but it does not yet provide a
+ready-made finite-dimensional semidefinite-programming strong-duality theorem
+with complementary slackness in the shape needed here.  Consequently this file
+does not reprove SDP duality.  It only transports the project-local matrix
+witness `MatrixSdpStatementWithSlackness` to the abstract Section 9 interface.
+If a Mathlib SDP theorem is later available, its output should replace the
+project-local witness while the comparison theorem below should remain the
 comparison with the self-improvement notation.
 
 ## References
