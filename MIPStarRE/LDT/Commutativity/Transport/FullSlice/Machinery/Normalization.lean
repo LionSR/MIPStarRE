@@ -13,7 +13,8 @@ the scalar public API exposed by the full-slice transport theorems.
 
 ## References
 
-- arXiv:2009.12982, Section 11.
+- `references/ldt-paper/commutativity-G.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.Commutativity
