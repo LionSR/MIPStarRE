@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Pasting.SwitcherooContraction.Raw
+import MIPStarRE.LDT.Pasting.SwitcherooContraction.ScalarTerms
 import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 
 /-!
@@ -18,8 +18,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Pointwise identity rewriting the mixed raw scalar into the right/left tensor order. -/
-lemma switcherooAggregateMixedRaw_point
+/-- Pointwise identity rewriting the mixed scalar expression into right/left tensor order. -/
+lemma switcherooAggregateMixedScalar_point
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -48,8 +48,8 @@ lemma switcherooAggregateMixedRaw_point
   intro o _
   rw [rightTensor_mul_leftTensor_eq_opTensor, leftTensor_mul_rightTensor_eq_opTensor]
 
-/-- Bridge: the mixed raw scalar is within √ζ of the left-front raw scalar. -/
-lemma switcherooAggregateMixedRaw_close_leftFrontRaw
+/-- The mixed scalar expression is within `√ζ` of the left-front scalar expression. -/
+lemma switcherooAggregateMixedScalar_close_leftFrontScalar
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -58,8 +58,8 @@ lemma switcherooAggregateMixedRaw_close_leftFrontRaw
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta : Error)
     (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    |switcherooAggregateMixedRaw params ψbi family M -
-        switcherooAggregateLeftFrontRaw params ψbi family M| ≤ Real.sqrt zeta := by
+    |switcherooAggregateMixedScalar params ψbi family M -
+        switcherooAggregateLeftFrontScalar params ψbi family M| ≤ Real.sqrt zeta := by
   have hleft :
       avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
           ∑ g : Polynomial params, ∑ o : Outcome,
@@ -70,8 +70,8 @@ lemma switcherooAggregateMixedRaw_close_leftFrontRaw
                     (M q.2).outcome o *
                     (family.meas q.1).outcome g *
                     (M q.2).outcome o))) =
-        switcherooAggregateLeftFrontRaw params ψbi family M := by
-    unfold switcherooAggregateLeftFrontRaw
+        switcherooAggregateLeftFrontScalar params ψbi family M := by
+    unfold switcherooAggregateLeftFrontScalar
     apply avgOver_congr
     intro q
     calc
@@ -155,15 +155,15 @@ lemma switcherooAggregateMixedRaw_close_leftFrontRaw
                     (M q.2).outcome o *
                     (family.meas q.1).outcome g *
                     (M q.2).outcome o))) =
-        switcherooAggregateMixedRaw params ψbi family M := by
-    unfold switcherooAggregateMixedRaw
+        switcherooAggregateMixedScalar params ψbi family M := by
+    unfold switcherooAggregateMixedScalar
     apply avgOver_congr
     intro q
-    simpa [switcherooAggregateMixedRaw] using
-      switcherooAggregateMixedRaw_point params ψbi family M q
+    simpa [switcherooAggregateMixedScalar] using
+      switcherooAggregateMixedScalar_point params ψbi family M q
   calc
-    |switcherooAggregateMixedRaw params ψbi family M -
-        switcherooAggregateLeftFrontRaw params ψbi family M|
+    |switcherooAggregateMixedScalar params ψbi family M -
+        switcherooAggregateLeftFrontScalar params ψbi family M|
       = |avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
             ∑ g : Polynomial params, ∑ o : Outcome,
               ev ψbi
@@ -184,11 +184,11 @@ lemma switcherooAggregateMixedRaw_close_leftFrontRaw
                       (M q.2).outcome o)))| := by
             rw [hleft, hright, abs_sub_comm]
     _ ≤ Real.sqrt zeta :=
-      switcherooAggregateFourthTerm_mixed_close_left_front_raw
+      switcherooAggregateFourthTerm_mixed_close_left_front_scalar
           params ψbi hnorm family M zeta hselfG
 
-/-- Sum-rewrite identity collapsing the product-type sum for the once-commuted raw scalar. -/
-lemma switcherooAggregateOnceCommutedRaw_point
+/-- Sum-rewrite identity collapsing the product-type sum for the once-commuted scalar. -/
+lemma switcherooAggregateOnceCommutedScalar_point
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -223,8 +223,8 @@ lemma switcherooAggregateOnceCommutedRaw_point
     ∑ go : Polynomial params × Outcome, f go.1 go.2
   simpa using (Fintype.sum_prod_type' (f := f)).symm
 
-/-- Bridge: the once-commuted raw scalar is within √ζ of the mixed raw scalar. -/
-lemma switcherooAggregateOnceCommutedRaw_close_mixed
+/-- The once-commuted scalar expression is within `√ζ` of the mixed scalar expression. -/
+lemma switcherooAggregateOnceCommutedScalar_close_mixed
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -233,8 +233,8 @@ lemma switcherooAggregateOnceCommutedRaw_close_mixed
     (M : IdxProjSubMeas (Fq params) Outcome ι)
     (zeta : Error)
     (hselfG : GCompleteSelfConsistencyStatement params ψbi family zeta) :
-    |switcherooAggregateOnceCommutedRaw params ψbi family M -
-        switcherooAggregateMixedRaw params ψbi family M| ≤ Real.sqrt zeta := by
+    |switcherooAggregateOnceCommutedScalar params ψbi family M -
+        switcherooAggregateMixedScalar params ψbi family M| ≤ Real.sqrt zeta := by
   have hleft :
       avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
           ∑ g : Polynomial params, ∑ o : Outcome,
@@ -245,7 +245,7 @@ lemma switcherooAggregateOnceCommutedRaw_close_mixed
                   (family.meas q.1).outcome g *
                   (M q.2).outcome o *
                   (family.meas q.1).outcome g))) =
-        switcherooAggregateOnceCommutedRaw params ψbi family M := by
+        switcherooAggregateOnceCommutedScalar params ψbi family M := by
     change avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
         ∑ g : Polynomial params, ∑ o : Outcome,
           ev ψbi
@@ -266,7 +266,7 @@ lemma switcherooAggregateOnceCommutedRaw_close_mixed
                 (family.meas q.1).outcome go.1)))
     apply avgOver_congr
     intro q
-    exact switcherooAggregateOnceCommutedRaw_point params ψbi family M q
+    exact switcherooAggregateOnceCommutedScalar_point params ψbi family M q
   have hright :
       avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
           ∑ g : Polynomial params, ∑ o : Outcome,
@@ -277,11 +277,11 @@ lemma switcherooAggregateOnceCommutedRaw_close_mixed
                   (family.meas q.1).outcome g *
                     (M q.2).outcome o)) *
                 rightTensor (ι₁ := ι) ((family.meas q.1).outcome g))) =
-        switcherooAggregateMixedRaw params ψbi family M := by
+        switcherooAggregateMixedScalar params ψbi family M := by
     rfl
   calc
-    |switcherooAggregateOnceCommutedRaw params ψbi family M -
-        switcherooAggregateMixedRaw params ψbi family M|
+    |switcherooAggregateOnceCommutedScalar params ψbi family M -
+        switcherooAggregateMixedScalar params ψbi family M|
       = |avgOver (uniformDistribution (SlicePairQuestion params)) (fun q =>
             ∑ g : Polynomial params, ∑ o : Outcome,
               ev ψbi
@@ -305,13 +305,13 @@ lemma switcherooAggregateOnceCommutedRaw_close_mixed
         switcherooAggregateFourthTerm_once_commuted_close_mixed
           params ψbi hnorm family M zeta hselfG
 
--- The last `χ`-step needs only pointwise normalization for the raw `G_g M_o`
+-- The last `χ`-step needs only pointwise normalization for the `G_g M_o`
 -- factors inside `closenessOfInnerProduct_right`; the heavy adjoint rewrites are
 -- isolated in the two pointwise helper lemmas above.
-/-- The final `sqrt chi` bridge in the fourth-term chain: compare the left-front
-raw scalar with the split-by-`g` scalar that later collapses to the first
+/-- The final `sqrt chi` comparison in the fourth-term chain: compare the left-front
+scalar expression with the split-by-`g` scalar that later collapses to the first
 positive switcheroo term. -/
-lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
+lemma switcherooAggregateLeftFrontScalar_close_firstSplitScalar
     {Outcome : Type*} [Fintype Outcome]
     (params : Parameters) [FieldModel params.q]
     (ψbi : QuantumState (ι × ι))
@@ -324,14 +324,16 @@ lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
       (switcherooPointProductLeft params family M)
       (switcherooPointProductRight params family M)
       chi) :
-    |switcherooAggregateLeftFrontRaw params ψbi family M -
-        switcherooAggregateFirstSplitRaw params ψbi family M| ≤
+    |switcherooAggregateLeftFrontScalar params ψbi family M -
+        switcherooAggregateFirstSplitScalar params ψbi family M| ≤
       Real.sqrt chi := by
   let 𝒟q : Distribution (SlicePairQuestion params) :=
     uniformDistribution (SlicePairQuestion params)
-  let A : SlicePairQuestion params → Polynomial params × Outcome → MIPStarRE.Quantum.Op (ι × ι) :=
+  let A : SlicePairQuestion params → Polynomial params × Outcome →
+      MIPStarRE.Quantum.Op (ι × ι) :=
     fun q go => ((switcherooPointProductLeft params family M q).outcome go)ᴴ
-  let B : SlicePairQuestion params → Polynomial params × Outcome → MIPStarRE.Quantum.Op (ι × ι) :=
+  let B : SlicePairQuestion params → Polynomial params × Outcome →
+      MIPStarRE.Quantum.Op (ι × ι) :=
     fun q go => ((switcherooPointProductRight params family M q).outcome go)ᴴ
   let C : SlicePairQuestion params → Polynomial params × Outcome → Unit →
       MIPStarRE.Quantum.Op (ι × ι) :=
@@ -355,8 +357,8 @@ lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
       avgOver 𝒟q (fun q =>
           ∑ a : Polynomial params × Outcome,
             ∑ b : Unit, ev ψbi (A q a * C q a b)) =
-        switcherooAggregateFirstSplitRaw params ψbi family M := by
-    unfold switcherooAggregateFirstSplitRaw
+        switcherooAggregateFirstSplitScalar params ψbi family M := by
+    unfold switcherooAggregateFirstSplitScalar
     apply avgOver_congr
     intro q
     refine Finset.sum_congr rfl ?_
@@ -381,8 +383,8 @@ lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
       avgOver 𝒟q (fun q =>
           ∑ a : Polynomial params × Outcome,
             ∑ b : Unit, ev ψbi (B q a * C q a b)) =
-        switcherooAggregateLeftFrontRaw params ψbi family M := by
-    unfold switcherooAggregateLeftFrontRaw
+        switcherooAggregateLeftFrontScalar params ψbi family M := by
+    unfold switcherooAggregateLeftFrontScalar
     apply avgOver_congr
     intro q
     refine Finset.sum_congr rfl ?_
@@ -402,12 +404,12 @@ lemma switcherooAggregateLeftFrontRaw_close_firstSplitRaw
   have hleft' :
       avgOver 𝒟q (fun q =>
           ∑ a : Polynomial params × Outcome, ev ψbi (A q a * C q a ())) =
-        switcherooAggregateFirstSplitRaw params ψbi family M := by
+        switcherooAggregateFirstSplitScalar params ψbi family M := by
     simpa using hleft
   have hright' :
       avgOver 𝒟q (fun q =>
           ∑ a : Polynomial params × Outcome, ev ψbi (B q a * C q a ())) =
-        switcherooAggregateLeftFrontRaw params ψbi family M := by
+        switcherooAggregateLeftFrontScalar params ψbi family M := by
     simpa using hright
   have hclose :=
     Preliminaries.closenessOfInnerProduct_right ψbi hnorm 𝒟q h𝒟q A B C chi hAB hC
