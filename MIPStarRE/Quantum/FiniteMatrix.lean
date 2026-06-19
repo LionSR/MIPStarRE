@@ -143,6 +143,55 @@ theorem norm_le_trace_re_of_nonneg {A : Op d} (hA : 0 ≤ A) :
   exact (Matrix.norm_le_iff htrace_nonneg).mpr
     (norm_apply_le_trace_re_of_nonneg hA)
 
+/-- The positive-semidefinite cone in a matrix algebra is closed. -/
+theorem isClosed_op_nonnegative {ι : Type*} : IsClosed {A : Op ι | 0 ≤ A} := by
+  classical
+  have hhermitian : IsClosed {A : Op ι | A.IsHermitian} := by
+    simpa [Matrix.IsHermitian] using
+      isClosed_eq (Continuous.matrix_conjTranspose continuous_id) continuous_id
+  have hquadratic : IsClosed
+      {A : Op ι |
+        ∀ x : ι →₀ ℂ,
+          0 ≤ x.sum fun i xi => x.sum fun j xj => star xi * A i j * xj} := by
+    rw [show
+        {A : Op ι |
+          ∀ x : ι →₀ ℂ,
+            0 ≤ x.sum fun i xi => x.sum fun j xj => star xi * A i j * xj} =
+        ⋂ x : ι →₀ ℂ,
+          {A : Op ι |
+            0 ≤ x.sum fun i xi => x.sum fun j xj => star xi * A i j * xj} by
+      ext A
+      simp]
+    refine isClosed_iInter fun x => ?_
+    have hquad : Continuous fun A : Op ι =>
+        x.sum fun i xi => x.sum fun j xj => star xi * A i j * xj := by
+      simp only [Finsupp.sum]
+      exact continuous_finsetSum x.support fun i _ =>
+        continuous_finsetSum x.support fun j _ =>
+          ((continuous_const.mul (continuous_apply_apply i j)).mul continuous_const)
+    exact isClosed_le continuous_const hquad
+  have hpsd : IsClosed {A : Op ι | A.PosSemidef} := by
+    rw [show {A : Op ι | A.PosSemidef} =
+        {A : Op ι | A.IsHermitian} ∩
+          {A : Op ι |
+            ∀ x : ι →₀ ℂ,
+              0 ≤ x.sum fun i xi => x.sum fun j xj => star xi * A i j * xj} by
+      ext A
+      rfl]
+    exact hhermitian.inter hquadratic
+  rw [show {A : Op ι | 0 ≤ A} = {A : Op ι | A.PosSemidef} by
+    ext A
+    exact Matrix.nonneg_iff_posSemidef]
+  exact hpsd
+
+/-- The positive-semidefinite cone in a finite matrix algebra as a proper cone. -/
+noncomputable def opNonnegativeProperCone (d : Type*) [Fintype d] [DecidableEq d] :
+    ProperCone ℝ (Op d) where
+  toSubmodule := PointedCone.positive ℝ (Op d)
+  isClosed' := by
+    change IsClosed ({A : Op d | 0 ≤ A} : Set (Op d))
+    exact isClosed_op_nonnegative (ι := d)
+
 /-- Sandwiching a PSD operator by a Hermitian operator preserves positivity. -/
 theorem sandwich_nonneg {M P : Op d} (hP : 0 ≤ P) (hMH : Mᴴ = M) :
     0 ≤ M * P * M := by

@@ -106,61 +106,6 @@ theorem continuous_matrixSdpCanonicalConstraintOperator
   exact continuous_finsetSum Finset.univ fun b _ =>
     continuous_matrix fun i j => continuous_apply_apply (b, i) (b, j)
 
-/-- The positive-semidefinite cone of finite matrix operators is closed. -/
-theorem isClosed_matrixOperator_nonnegative
-    (H : FiniteHilbertSpace) :
-    IsClosed {X : MatrixOperator H | 0 ≤ X} := by
-  classical
-  let ι := H.carrier
-  have hhermitian : IsClosed {X : Matrix ι ι ℂ | X.IsHermitian} := by
-    simpa [Matrix.IsHermitian] using
-      isClosed_eq (Continuous.matrix_conjTranspose continuous_id) continuous_id
-  have hquadratic : IsClosed
-      {X : Matrix ι ι ℂ |
-        ∀ x : ι →₀ ℂ,
-          0 ≤ x.sum fun i xi => x.sum fun j xj => star xi * X i j * xj} := by
-    rw [show
-        {X : Matrix ι ι ℂ |
-          ∀ x : ι →₀ ℂ,
-            0 ≤ x.sum fun i xi => x.sum fun j xj => star xi * X i j * xj} =
-        ⋂ x : ι →₀ ℂ,
-          {X : Matrix ι ι ℂ |
-            0 ≤ x.sum fun i xi => x.sum fun j xj => star xi * X i j * xj} by
-      ext X
-      simp]
-    refine isClosed_iInter fun x => ?_
-    have hquad : Continuous fun X : Matrix ι ι ℂ =>
-        x.sum fun i xi => x.sum fun j xj => star xi * X i j * xj := by
-      simp only [Finsupp.sum]
-      exact continuous_finsetSum x.support fun i _ =>
-        continuous_finsetSum x.support fun j _ =>
-          ((continuous_const.mul (continuous_apply_apply i j)).mul continuous_const)
-    exact isClosed_le continuous_const hquad
-  have hpsd : IsClosed {X : Matrix ι ι ℂ | X.PosSemidef} := by
-    rw [show {X : Matrix ι ι ℂ | X.PosSemidef} =
-        {X : Matrix ι ι ℂ | X.IsHermitian} ∩
-          {X : Matrix ι ι ℂ |
-            ∀ x : ι →₀ ℂ,
-              0 ≤ x.sum fun i xi => x.sum fun j xj => star xi * X i j * xj} by
-      ext X
-      rfl]
-    exact hhermitian.inter hquadratic
-  rw [show
-      {X : MatrixOperator H | 0 ≤ X} =
-      {X : Matrix ι ι ℂ | X.PosSemidef} by
-    ext X
-    exact Matrix.nonneg_iff_posSemidef]
-  exact hpsd
-
-/-- The positive-semidefinite operators on a finite Hilbert space form a proper cone. -/
-noncomputable def matrixOperatorNonnegativeProperCone
-    (H : FiniteHilbertSpace) :
-    ProperCone ℝ (MatrixOperator H) where
-  toSubmodule := PointedCone.positive ℝ (MatrixOperator H)
-  isClosed' := by
-    change IsClosed ({X : MatrixOperator H | 0 ≤ X} : Set (MatrixOperator H))
-    exact isClosed_matrixOperator_nonnegative H
-
 /-- A canonical block-diagonal operator is Hermitian when all diagonal blocks are
 Hermitian. -/
 theorem matrixSdpCanonicalBlockDiagonal_isHermitian
@@ -290,7 +235,8 @@ theorem matrixSdpCanonicalPrimalFeasible_isClosed
   classical
   have hnonneg : IsClosed
       {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) | 0 ≤ X} :=
-    isClosed_matrixOperator_nonnegative (matrixSdpCanonicalBlockHilbertSpace params model)
+    MIPStarRE.Quantum.isClosed_op_nonnegative
+      (ι := (matrixSdpCanonicalBlockHilbertSpace params model).carrier)
   have hconstraint : IsClosed
       {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) |
         matrixSdpCanonicalConstraintOperator params model X = (1 : MatrixOperator model.space)} :=
@@ -334,7 +280,7 @@ theorem matrixSdpCanonicalDualFeasible_isClosed
     unfold matrixSdpDualSlackOperator
     exact continuous_id.sub continuous_const
   simpa [Set.preimage] using
-    (isClosed_matrixOperator_nonnegative model.space).preimage hslack
+    (MIPStarRE.Quantum.isClosed_op_nonnegative (ι := model.space.carrier)).preimage hslack
 
 /-- The paper-form canonical dual objective is continuous. -/
 theorem continuous_matrixSdpDualObjective

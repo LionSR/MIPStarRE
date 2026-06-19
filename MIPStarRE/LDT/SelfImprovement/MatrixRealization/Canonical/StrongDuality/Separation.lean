@@ -119,7 +119,8 @@ noncomputable def matrixSdpCanonicalPrimalImageCone
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params) :
     ProperCone ℝ (MatrixOperator model.space × ℝ) :=
-  (matrixOperatorNonnegativeProperCone (matrixSdpCanonicalBlockHilbertSpace params model)).map
+  (MIPStarRE.Quantum.opNonnegativeProperCone
+      (matrixSdpCanonicalBlockHilbertSpace params model).carrier).map
     (matrixSdpCanonicalPrimalConeMap params model)
 
 /-- An actual positive semidefinite canonical primal matrix maps into the closed
@@ -136,8 +137,8 @@ theorem matrixSdpCanonicalPrimalImageCone_mem_of_nonnegative
   rw [matrixSdpCanonicalPrimalImageCone, ProperCone.mem_map]
   exact subset_closure <| by
     have hXcone :
-        X ∈ (matrixOperatorNonnegativeProperCone
-          (matrixSdpCanonicalBlockHilbertSpace params model)).toPointedCone := by
+        X ∈ (MIPStarRE.Quantum.opNonnegativeProperCone
+          (matrixSdpCanonicalBlockHilbertSpace params model).carrier).toPointedCone := by
       change 0 ≤ X
       exact hX
     exact (PointedCone.mem_map).2 ⟨X, hXcone, rfl⟩
@@ -173,8 +174,8 @@ theorem matrixSdpCanonicalPrimalImageCone_identity_mem_iff_exists_feasible_objec
     obtain ⟨u, hu_mem, hu_tendsto⟩ := mem_closure_iff_seq_limit.mp hmem
     have hu_witness : ∀ n : ℕ,
         ∃ X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model),
-          X ∈ (matrixOperatorNonnegativeProperCone
-            (matrixSdpCanonicalBlockHilbertSpace params model)).toPointedCone ∧
+          X ∈ (MIPStarRE.Quantum.opNonnegativeProperCone
+            (matrixSdpCanonicalBlockHilbertSpace params model).carrier).toPointedCone ∧
           (matrixSdpCanonicalPrimalConeMap params model :
             MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →ₗ[ℝ]
               MatrixOperator model.space × ℝ) X = u n := by
@@ -238,8 +239,8 @@ theorem matrixSdpCanonicalPrimalImageCone_identity_mem_iff_exists_feasible_objec
     obtain ⟨X₀, _hX₀closure, k, hkmono, hX₀tendsto⟩ :=
       tendsto_subseq_of_frequently_bounded hsBounded heventS.frequently
     have hX₀nonneg : 0 ≤ X₀ :=
-      (isClosed_matrixOperator_nonnegative
-        (matrixSdpCanonicalBlockHilbertSpace params model)).mem_of_tendsto
+      (MIPStarRE.Quantum.isClosed_op_nonnegative
+        (ι := (matrixSdpCanonicalBlockHilbertSpace params model).carrier)).mem_of_tendsto
         hX₀tendsto (Eventually.of_forall fun n => hXnonneg (k n))
     have hmap_tendsto_X₀ :
         Tendsto
