@@ -16,7 +16,9 @@ See `docs/decisions/713-scalar-tensor-decision.md`.
 
 ## References
 
-- arXiv:2009.12982, Section 11 (`thm:com-main`).
+- `references/ldt-paper/commutativity-points.tex`
+- `references/ldt-paper/commutativity-G.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.Commutativity

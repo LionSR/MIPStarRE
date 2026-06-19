@@ -12,7 +12,8 @@ estimate.
 
 ## References
 
-- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+- `references/ldt-paper/commutativity-G.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -146,7 +147,9 @@ lemma evaluatedSlice_phaseOne_insert_bound
       MIPStarRE.LDT.Preliminaries.totalSandwichFamily] using
       hcombined_snd.squaredDistanceBound
   have hC :
-      ∀ q, ∑ b : Fq params, (∑ a : Fq params, C q b a) * (∑ a : Fq params, C q b a)ᴴ ≤ 1 := by
+      ∀ q,
+        ∑ b : Fq params,
+          (∑ a : Fq params, C q b a) * (∑ a : Fq params, C q b a)ᴴ ≤ 1 := by
     intro q
     simpa [C, evaluatedSliceFirstFactor, evaluatedSliceSecondFactor,
       evaluatedSliceFirstProj] using
