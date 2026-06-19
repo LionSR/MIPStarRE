@@ -8,7 +8,8 @@ the Section 11 commutativity argument.
 
 ## References
 
-- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+- `references/ldt-paper/commutativity-G.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -75,9 +76,12 @@ structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι)
     (Q : ProjSubMeas OutcomeB ι) : Prop where
+  /-- The two square operators formed from `∑_b Q_b P_a Q_b` agree. -/
   sandwichedHermitianSquare :
     normalizationConditionAdjointSquareOperator P Q =
       normalizationConditionSquareOperator P Q
+  /-- The square operator formed from the sandwiched family is bounded by the
+  identity operator. -/
   sandwichedBoundedByIdentity :
     normalizationConditionSquareOperator P Q ≤ normalizationConditionIdentityBound P Q
 

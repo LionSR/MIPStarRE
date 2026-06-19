@@ -9,7 +9,8 @@ Section 11 commutativity argument.
 
 ## References
 
-- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+- `references/ldt-paper/commutativity-G.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.Commutativity
@@ -40,6 +41,8 @@ lemma evaluatedPointFamily_outcome_proj
     postprocess_proj_outcome (family.meas (pointHeight params u))
       (fun g => g (truncatePoint params u)) a
 
+/-- The positive square root of a submeasurement outcome squares back to that
+outcome. -/
 lemma sqrt_subMeas_outcome_mul_self
     {α : Type*} [Fintype α]
     (A : SubMeas α ι) (a : α) :
