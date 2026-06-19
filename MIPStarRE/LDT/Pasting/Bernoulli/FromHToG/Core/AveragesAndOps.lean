@@ -16,20 +16,12 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Operator-valued constant averages factor through the scalar distribution mass. -/
-lemma averageOperatorOverDistribution_const {α : Type*}
-    (𝒟 : Distribution α) (A : MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution 𝒟 (fun _ : α => A) =
-      (∑ x ∈ 𝒟.support, 𝒟.weight x) • A := by
-  unfold averageOperatorOverDistribution
-  rw [Finset.sum_smul]
-
 lemma fromHToG_averageOperator_uniform_const_one
     (α : Type*) [Fintype α] [DecidableEq α] [Nonempty α] :
     averageOperatorOverDistribution (uniformDistribution α)
       (fun _ : α => (1 : MIPStarRE.Quantum.Op ι)) = 1 := by
-  rw [averageOperatorOverDistribution_const]
-  rw [uniformDistribution_weight_sum_eq_one, one_smul]
+  exact averageOperatorOverDistribution_const_of_isProbability
+    (uniformDistribution α) (uniformDistribution_isProbability α) 1
 
 /-- The completed branch of `\widehat G` averages to the operator `G` used in the
 Bernoulli recurrence, matching `references/ldt-paper/ld-pasting.tex:1408--1415`
@@ -119,7 +111,8 @@ lemma fromHToG_leftTensor_mul_rightTensor_indicator
 
 /-- Right tensor placement distributes over addition. -/
 lemma fromHToG_rightTensor_add (A B : MIPStarRE.Quantum.Op ι) :
-    rightTensor (ι₁ := ι) (A + B) = rightTensor (ι₁ := ι) A + rightTensor (ι₁ := ι) B := by
+    rightTensor (ι₁ := ι) (A + B) =
+      rightTensor (ι₁ := ι) A + rightTensor (ι₁ := ι) B := by
   simpa [Fintype.sum_bool] using
     (rightTensor_finset_sum (ι₁ := ι) (Finset.univ : Finset Bool)
       (fun b : Bool => if b then A else B)).symm

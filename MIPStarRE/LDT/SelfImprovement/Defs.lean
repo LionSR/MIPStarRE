@@ -150,10 +150,10 @@ theorem averagedPointOperator_nonneg (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι) (g : Polynomial params) :
     0 ≤ averagedPointOperator params strategy g := by
-  unfold averagedPointOperator averageOperatorOverDistribution
-  exact Finset.sum_nonneg fun u _ =>
-    smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
-      ((strategy.pointMeasurement u).toSubMeas.outcome_pos (g u))
+  unfold averagedPointOperator
+  exact averageOperatorOverDistribution_nonneg (uniformDistribution (Point params))
+    (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
+    (fun u => (strategy.pointMeasurement u).toSubMeas.outcome_pos (g u))
 
 /--
 The operator `T_g A_g` contributing to the primal SDP objective.
@@ -321,12 +321,9 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
         (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
     outcome_pos := by
       intro h
-      simp only [averageOperatorOverDistribution]
-      apply Finset.sum_nonneg
-      intro u _
-      exact smul_nonneg
-        ((uniformDistribution (Point params)).nonnegative u)
-        ((sandwichedPolynomialSubMeasAt params strategy T u).outcome_pos h)
+      exact averageOperatorOverDistribution_nonneg (uniformDistribution (Point params))
+        (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
+        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).outcome_pos h)
     sum_eq_total := by
       rfl
     total_le_one := by
@@ -349,16 +346,14 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
                 refine Finset.sum_congr rfl ?_
                 intro u _
                 simp [sandwichedPolynomialSubMeasAt]
-        _ ≤ ∑ u ∈ 𝒟.support, 𝒟.weight u • (1 : MIPStarRE.Quantum.Op ι) := by
-              exact Finset.sum_le_sum fun u _ =>
-                smul_le_smul_of_nonneg_left
-                  (sandwichedPolynomialSubMeasAt params strategy T u).total_le_one
-                  (𝒟.nonnegative u)
-        _ = (∑ u ∈ 𝒟.support, 𝒟.weight u) • (1 : MIPStarRE.Quantum.Op ι) := by
-              rw [Finset.sum_smul]
-        _ = (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
-              rw [uniformDistribution_weight_sum_eq_one]
-        _ = 1 := by simp }
+        _ = averageOperatorOverDistribution 𝒟
+              (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total) := by
+                rfl
+        _ ≤ 1 := by
+              exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟
+                (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total)
+                (uniformDistribution_weight_sum_le_one (Point params))
+                (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total_le_one) }
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)

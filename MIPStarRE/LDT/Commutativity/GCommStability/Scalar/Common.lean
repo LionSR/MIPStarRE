@@ -26,9 +26,9 @@ lemma averagedSlicePointEvaluationOperator_nonneg
     (x : Fq params) (g : Polynomial params) :
     0 ≤ IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g := by
   unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
-  exact Finset.sum_nonneg fun u _ =>
-    smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
-      ((strategy.pointMeasurement (appendPoint params u x)).outcome_pos (g u))
+  exact averageOperatorOverDistribution_nonneg (uniformDistribution (Point params))
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).outcome_pos (g u))
 
 lemma averagedSlicePointEvaluationOperator_le_one
     (params : Parameters) [FieldModel params.q]
@@ -36,21 +36,11 @@ lemma averagedSlicePointEvaluationOperator_le_one
     (x : Fq params) (g : Polynomial params) :
     IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ 1 := by
   unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
-  calc
-    averageOperatorOverDistribution (uniformDistribution (Point params))
-        (fun u => (strategy.pointMeasurement (appendPoint params u x)).outcome (g u))
-      ≤ ∑ u ∈ (uniformDistribution (Point params)).support,
-          (uniformDistribution (Point params)).weight u • (1 : MIPStarRE.Quantum.Op ι) := by
-            simp only [averageOperatorOverDistribution]
-            exact Finset.sum_le_sum fun u _ =>
-              smul_le_smul_of_nonneg_left
-                ((strategy.pointMeasurement (appendPoint params u x)).outcome_le_one (g u))
-                ((uniformDistribution (Point params)).nonnegative u)
-    _ = (∑ u ∈ (uniformDistribution (Point params)).support,
-          (uniformDistribution (Point params)).weight u) • (1 : MIPStarRE.Quantum.Op ι) := by
-          rw [Finset.sum_smul]
-    _ = 1 := by
-          simp [uniformDistribution]
+  exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one
+    (uniformDistribution (Point params))
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
+    (uniformDistribution_weight_sum_le_one (Point params))
+    (fun u => (strategy.pointMeasurement (appendPoint params u x)).outcome_le_one (g u))
 
 lemma averagedSlicePointEvaluationOperator_hermitian
     (params : Parameters) [FieldModel params.q]
