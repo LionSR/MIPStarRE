@@ -65,7 +65,11 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
-/-- `A_a ⊗ B_a`, the diagonal bipartite bridge from `prop:cons-sub-meas`. -/
+/-- `A_a ⊗ B_a`, the diagonal bipartite family from `prop:cons-sub-meas`.
+
+This same-space version is the specialization used by the existing
+main-theorem path.  The paper-facing two-space version is
+`heterogeneousDiagonalSandwichFamily`. -/
 noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -141,7 +145,11 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
         _ ≤ 1 := leftTensor_le_one (ι₂ := ι) (A q).total_le_one
   }
 
-/-- `A ⊗ B_a`, the total bipartite bridge from `prop:cons-sub-meas`. -/
+/-- `A ⊗ B_a`, the total bipartite family from `prop:cons-sub-meas`.
+
+This same-space version is the specialization used by the existing
+main-theorem path.  The paper-facing two-space version is
+`heterogeneousTotalSandwichFamily`. -/
 noncomputable def totalSandwichFamily {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
@@ -174,7 +182,127 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
         _ ≤ 1 := leftTensor_le_one (ι₂ := ι) (A q).total_le_one
   }
 
-/-- Output package for `prop:cons-sub-meas`. -/
+/-- `A_a ⊗ B_a` for the two-space statement of `prop:cons-sub-meas`.
+
+Here `A` acts on the left Hilbert space and `B` acts on the right Hilbert
+space; the resulting family acts on the tensor-product state space
+`ιA × ιB`. -/
+noncomputable def heterogeneousDiagonalSandwichFamily {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxMeas Question Outcome ιB) :
+    IdxSubMeas Question Outcome (ιA × ιB) :=
+  fun q => {
+    outcome := fun a =>
+      leftTensor (ι₂ := ιB) ((A q).outcome a) *
+        rightTensor (ι₁ := ιA) ((B q).outcome a)
+    total := ∑ a : Outcome,
+      leftTensor (ι₂ := ιB) ((A q).outcome a) *
+        rightTensor (ι₁ := ιA) ((B q).outcome a)
+    outcome_pos := by
+      intro a
+      rw [leftTensor_mul_rightTensor_eq_opTensor]
+      quantum_nonneg
+    sum_eq_total := by
+      rfl
+    total_le_one := by
+      calc
+        ∑ a : Outcome,
+            leftTensor (ι₂ := ιB) ((A q).outcome a) *
+              rightTensor (ι₁ := ιA) ((B q).outcome a)
+          ≤ ∑ a : Outcome, leftTensor (ι₂ := ιB) ((A q).outcome a) := by
+              refine Finset.sum_le_sum ?_
+              intro a ha
+              have hopTensor_le :
+                  opTensor ((A q).outcome a) ((B q).outcome a) ≤
+                    leftTensor (ι₂ := ιB) ((A q).outcome a) := by
+                change
+                  (leftTensor (ι₂ := ιB) ((A q).outcome a) -
+                    opTensor ((A q).outcome a) ((B q).outcome a)).PosSemidef
+                have hrewrite :
+                    leftTensor (ι₂ := ιB) ((A q).outcome a) -
+                      opTensor ((A q).outcome a) ((B q).outcome a) =
+                    opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
+                  have hneg :
+                      Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) =
+                        -Matrix.kronecker ((A q).outcome a) ((B q).outcome a) := by
+                    simpa using
+                      (Matrix.kronecker_smul (-1 : ℂ) ((A q).outcome a) ((B q).outcome a))
+                  calc
+                    leftTensor (ι₂ := ιB) ((A q).outcome a) -
+                        opTensor ((A q).outcome a) ((B q).outcome a)
+                      =
+                        Matrix.kronecker ((A q).outcome a) 1 +
+                          Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) := by
+                            rw [hneg]
+                            simp [leftTensor, opTensor, sub_eq_add_neg]
+                    _ = Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a) := by
+                          simpa [sub_eq_add_neg] using
+                            (Matrix.kronecker_add ((A q).outcome a) 1 (-((B q).outcome a))).symm
+                    _ = opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
+                          simp [opTensor]
+                have hpsd :
+                    Matrix.PosSemidef
+                      (opTensor ((A q).outcome a) (1 - (B q).outcome a)) := by
+                  change
+                    Matrix.PosSemidef
+                      (Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a))
+                  exact
+                    Matrix.PosSemidef.kronecker
+                      (Matrix.nonneg_iff_posSemidef.mp ((A q).outcome_pos a))
+                      (Matrix.nonneg_iff_posSemidef.mp
+                        (sub_nonneg.mpr (Measurement.outcome_le_one (B q) a)))
+                rwa [hrewrite]
+              rw [leftTensor_mul_rightTensor_eq_opTensor]
+              exact hopTensor_le
+        _ = leftTensor (ι₂ := ιB) ((A q).total) := by
+          rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ (fun a => (A q).outcome a)]
+          rw [(A q).sum_eq_total]
+        _ ≤ 1 := leftTensor_le_one (ι₂ := ιB) (A q).total_le_one
+  }
+
+/-- `A ⊗ B_a` for the two-space statement of `prop:cons-sub-meas`.
+
+The total operator `A^x = ∑_a A^x_a` remains on the left tensor factor, while
+the measurement outcome `B^x_a` remains on the right tensor factor. -/
+noncomputable def heterogeneousTotalSandwichFamily {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxMeas Question Outcome ιB) :
+    IdxSubMeas Question Outcome (ιA × ιB) :=
+  fun q => {
+    outcome := fun a =>
+      leftTensor (ι₂ := ιB) ((A q).total) *
+        rightTensor (ι₁ := ιA) ((B q).outcome a)
+    total := ∑ a : Outcome,
+      leftTensor (ι₂ := ιB) ((A q).total) *
+        rightTensor (ι₁ := ιA) ((B q).outcome a)
+    outcome_pos := by
+      intro a
+      rw [leftTensor_mul_rightTensor_eq_opTensor]
+      quantum_nonneg
+    sum_eq_total := by
+      rfl
+    total_le_one := by
+      calc
+        ∑ a : Outcome,
+            leftTensor (ι₂ := ιB) ((A q).total) *
+              rightTensor (ι₁ := ιA) ((B q).outcome a)
+          = leftTensor (ι₂ := ιB) ((A q).total) := by
+              rw [← Finset.mul_sum]
+              rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ
+                (fun a => (B q).outcome a)]
+              rw [(B q).sum_eq]
+              simp [leftTensor, rightTensor]
+        _ ≤ 1 := leftTensor_le_one (ι₂ := ιB) (A q).total_le_one
+  }
+
+/-- Same-space output statement for `prop:cons-sub-meas`.
+
+The paper-facing two-space output statement is
+`ConsSubMeasHeterogeneousStmt`. -/
 structure ConsSubMeasStmt {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
@@ -186,6 +314,32 @@ structure ConsSubMeasStmt {Question Outcome : Type*} {ι : Type*} [Fintype ι] [
     SDDRel ψ 𝒟 (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ
   combinedControl :
     SDDRel ψ 𝒟 (IdxSubMeas.liftLeft A) (totalSandwichFamily A B) (4 * γ)
+
+/-- Two-space output statement for `prop:cons-sub-meas`.
+
+It records the two estimates
+`A^x_a ⊗ I ≈_γ A^x_a ⊗ B^x_a` and
+`A^x_a ⊗ B^x_a ≈_γ A^x ⊗ B^x_a`, and the resulting
+`4γ` estimate from `A^x_a ⊗ I` to `A^x ⊗ B^x_a`. -/
+structure ConsSubMeasHeterogeneousStmt {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxMeas Question Outcome ιB) (γ : Error) : Prop where
+  /-- `A^x_a ⊗ I` is close to the diagonal family `A^x_a ⊗ B^x_a`. -/
+  diagonalControl :
+    SDDRel ψ 𝒟 (IdxSubMeas.placeLeft A) (heterogeneousDiagonalSandwichFamily A B) γ
+  /-- The diagonal family `A^x_a ⊗ B^x_a` is close to `A^x ⊗ B^x_a`. -/
+  sandwichControl :
+    SDDRel ψ 𝒟
+      (heterogeneousDiagonalSandwichFamily A B)
+      (heterogeneousTotalSandwichFamily A B) γ
+  /-- The two preceding estimates give `A^x_a ⊗ I ≈_{4γ} A^x ⊗ B^x_a`. -/
+  combinedControl :
+    SDDRel ψ 𝒟
+      (IdxSubMeas.placeLeft A)
+      (heterogeneousTotalSandwichFamily A B) (4 * γ)
 
 /-! ## Sandwich expectations -/
 

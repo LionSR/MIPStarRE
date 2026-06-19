@@ -16,11 +16,11 @@ open MIPStarRE.LDT
 /-! ### Bridge lemmas for `prop:cons-sub-meas` -/
 
 private lemma consSubMeas_controlHelper
-    {Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {Outcome : Type*} {κ : Type*} [Fintype κ] [DecidableEq κ]
     [Fintype Outcome]
-    (ψ : QuantumState (ι × ι))
-    (P Q M N : SubMeas Outcome (ι × ι))
-    (X : Outcome → MIPStarRE.Quantum.Op (ι × ι))
+    (ψ : QuantumState κ)
+    (P Q M N : SubMeas Outcome κ)
+    (X : Outcome → MIPStarRE.Quantum.Op κ)
     (hSq :
       ∀ a : Outcome,
         ev ψ
@@ -164,7 +164,10 @@ private lemma consSubMeas_diagonalControl
                           rw [(B q).total_eq_one]
                           simp [leftTensor, rightTensor]
                         rw [htotalOverlap]
-    _ ≤ γ := hcons
+    _ ≤ γ := by
+      simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxSubMeas.placeLeft,
+        IdxSubMeas.placeRight, leftPlacedSubMeas, rightPlacedSubMeas,
+        IdxMeas.toIdxSubMeas] using hcons
 
 private lemma consSubMeas_sandwichControl
     {Question Outcome : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
@@ -293,9 +296,286 @@ private lemma consSubMeas_sandwichControl
                             rightTensor (ι₁ := ι) ((B q).total) by rfl]
                         rw [(B q).total_eq_one]
                         simp [IdxSubMeas.liftLeft, rightTensor, leftTensor]
+    _ ≤ γ := by
+      simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, IdxSubMeas.placeLeft,
+        IdxSubMeas.placeRight, leftPlacedSubMeas, rightPlacedSubMeas,
+        IdxMeas.toIdxSubMeas] using hcons
+
+private lemma consSubMeas_diagonalControl_heterogeneous
+    {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxMeas Question Outcome ιB) (γ : Error) :
+    ConsRel ψ 𝒟
+      A
+      (IdxMeas.toIdxSubMeas B) γ →
+    SDDRel ψ 𝒟 (IdxSubMeas.placeLeft A)
+      (heterogeneousDiagonalSandwichFamily A B) γ := by
+  intro ⟨hcons⟩
+  rw [bipartiteConsError_eq_consError_placed] at hcons
+  constructor
+  unfold sddError consError at *
+  calc
+    avgOver 𝒟
+        (fun q => qSDD ψ
+          ((IdxSubMeas.placeLeft A) q)
+          ((heterogeneousDiagonalSandwichFamily A B) q))
+      ≤ avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              ((IdxSubMeas.placeLeft A) q)
+              ((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q)) := by
+          apply avgOver_mono
+          intro q
+          let X : Outcome → MIPStarRE.Quantum.Op (ιA × ιB) := fun a =>
+            ((IdxSubMeas.placeLeft A) q).outcome a -
+              ((heterogeneousDiagonalSandwichFamily A B) q).outcome a
+          have hX_nonneg : ∀ a : Outcome, 0 ≤ X a := by
+            intro a
+            dsimp [X]
+            simp only [IdxSubMeas.placeLeft, heterogeneousDiagonalSandwichFamily,
+              LDT.leftTensor_mul_rightTensor_eq_opTensor, sub_nonneg]
+            exact MIPStarRE.LDT.opTensor_le_leftTensor
+              ((A q).outcome_pos a)
+              (Measurement.outcome_le_one (B q) a)
+          have hX_le_one : ∀ a : Outcome, X a ≤ 1 := by
+            intro a
+            have hX_le_left :
+                X a ≤ ((IdxSubMeas.placeLeft A) q).outcome a := by
+              dsimp [X]
+              exact sub_le_self _
+                ((heterogeneousDiagonalSandwichFamily A B q).outcome_pos a)
+            exact le_trans hX_le_left <|
+              leftTensor_le_one (ι₂ := ιB) ((A q).outcome_le_one a)
+          refine consSubMeas_controlHelper ψ
+            (((IdxSubMeas.placeLeft A) q))
+            (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q))
+            (((IdxSubMeas.placeLeft A) q))
+            (((heterogeneousDiagonalSandwichFamily A B) q))
+            X
+            ?_
+            hX_nonneg
+            hX_le_one
+            ?_
+          · intro a
+            have hXh : (X a)ᴴ = X a :=
+              (Matrix.nonneg_iff_posSemidef.mp (hX_nonneg a)).isHermitian.eq
+            simp [X, hXh]
+          · have hleft :
+                ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) ((A q).outcome a)) =
+                  ev ψ (leftTensor (ι₂ := ιB) ((A q).total)) := by
+              rw [← ev_sum ψ (fun a : Outcome => leftTensor (ι₂ := ιB) ((A q).outcome a))]
+              simp [leftTensor_finset_sum, (A q).sum_eq_total]
+            calc
+              ∑ a : Outcome, ev ψ (X a)
+                = ∑ a : Outcome, ev ψ (leftTensor (ι₂ := ιB) ((A q).outcome a)) -
+                    ∑ a : Outcome,
+                      ev ψ
+                        (leftTensor (ι₂ := ιB) ((A q).outcome a) *
+                          rightTensor (ι₁ := ιA) ((B q).outcome a)) := by
+                          simp [X, IdxSubMeas.placeLeft,
+                            heterogeneousDiagonalSandwichFamily, ev_sub]
+              _ = ev ψ (leftTensor (ι₂ := ιB) ((A q).total)) -
+                    qMatchMass ψ
+                      (((IdxSubMeas.placeLeft A) q))
+                      (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                          unfold qMatchMass
+                          simp [hleft, IdxSubMeas.placeLeft, IdxSubMeas.placeRight,
+                            IdxMeas.toIdxSubMeas]
+              _ =
+                  ev ψ
+                    ((((IdxSubMeas.placeLeft A) q).total) *
+                      (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                    qMatchMass ψ
+                      (((IdxSubMeas.placeLeft A) q))
+                      (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                        have htotalOverlap :
+                            ev ψ
+                                ((((IdxSubMeas.placeLeft A) q).total) *
+                                  (((IdxSubMeas.placeRight
+                                      (IdxMeas.toIdxSubMeas B)) q).total)) =
+                              ev ψ (leftTensor (ι₂ := ιB) ((A q).total)) := by
+                          rw [show (((IdxSubMeas.placeLeft A) q).total) *
+                              (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q).total) =
+                                leftTensor (ι₂ := ιB) ((A q).total) *
+                                  rightTensor (ι₁ := ιA) ((B q).total) by rfl]
+                          rw [(B q).total_eq_one]
+                          simp [leftTensor, rightTensor]
+                        rw [htotalOverlap]
     _ ≤ γ := hcons
 
-/-- `prop:cons-sub-meas`. -/
+private lemma consSubMeas_sandwichControl_heterogeneous
+    {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxMeas Question Outcome ιB) (γ : Error) :
+    ConsRel ψ 𝒟
+      A
+      (IdxMeas.toIdxSubMeas B) γ →
+    SDDRel ψ 𝒟
+      (heterogeneousDiagonalSandwichFamily A B)
+      (heterogeneousTotalSandwichFamily A B) γ := by
+  intro ⟨hcons⟩
+  rw [bipartiteConsError_eq_consError_placed] at hcons
+  constructor
+  unfold sddError consError at *
+  calc
+    avgOver 𝒟
+        (fun q => qSDD ψ
+          ((heterogeneousDiagonalSandwichFamily A B) q)
+          ((heterogeneousTotalSandwichFamily A B) q))
+      ≤ avgOver 𝒟
+          (fun q =>
+            qConsDefect ψ
+              ((IdxSubMeas.placeLeft A) q)
+              ((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q)) := by
+          apply avgOver_mono
+          intro q
+          let X : Outcome → MIPStarRE.Quantum.Op (ιA × ιB) := fun a =>
+            ((heterogeneousTotalSandwichFamily A B) q).outcome a -
+              ((heterogeneousDiagonalSandwichFamily A B) q).outcome a
+          have hX_nonneg : ∀ a : Outcome, 0 ≤ X a := by
+            intro a
+            dsimp [X]
+            simp only [heterogeneousTotalSandwichFamily,
+              LDT.leftTensor_mul_rightTensor_eq_opTensor,
+              heterogeneousDiagonalSandwichFamily, sub_nonneg]
+            exact MIPStarRE.LDT.opTensor_mono_left
+              ((A q).outcome_le_total a)
+              ((B q).outcome_pos a)
+          have hX_le_one : ∀ a : Outcome, X a ≤ 1 := by
+            intro a
+            have hX_le_total :
+                X a ≤ ((heterogeneousTotalSandwichFamily A B) q).outcome a := by
+              dsimp [X]
+              exact sub_le_self _
+                ((heterogeneousDiagonalSandwichFamily A B q).outcome_pos a)
+            have htotal_le :
+                ((heterogeneousTotalSandwichFamily A B) q).outcome a ≤ 1 := by
+              dsimp [heterogeneousTotalSandwichFamily]
+              have hop :
+                  opTensor ((A q).total) ((B q).outcome a) ≤
+                    leftTensor (ι₂ := ιB) ((A q).total) := by
+                exact MIPStarRE.LDT.opTensor_le_leftTensor
+                  ((A q).total_nonneg)
+                  (Measurement.outcome_le_one (B q) a)
+              simpa [MIPStarRE.LDT.leftTensor_mul_rightTensor_eq_opTensor] using
+                le_trans hop (leftTensor_le_one (ι₂ := ιB) (A q).total_le_one)
+            exact le_trans hX_le_total htotal_le
+          refine consSubMeas_controlHelper ψ
+            (((IdxSubMeas.placeLeft A) q))
+            (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q))
+            (((heterogeneousDiagonalSandwichFamily A B) q))
+            (((heterogeneousTotalSandwichFamily A B) q))
+            X
+            ?_
+            hX_nonneg
+            hX_le_one
+            ?_
+          · intro a
+            have hXh : (X a)ᴴ = X a :=
+              (Matrix.nonneg_iff_posSemidef.mp (hX_nonneg a)).isHermitian.eq
+            have hneg :
+                ((heterogeneousDiagonalSandwichFamily A B) q).outcome a -
+                    ((heterogeneousTotalSandwichFamily A B) q).outcome a =
+                  -(X a) := by
+              simp [X]
+            simp [hneg, hXh]
+          · have htotal :
+                ∑ a : Outcome,
+                    ev ψ
+                      (((heterogeneousTotalSandwichFamily A B) q).outcome a) =
+                  ev ψ (leftTensor (ι₂ := ιB) ((A q).total)) := by
+              rw [← ev_sum ψ
+                (fun a : Outcome => ((heterogeneousTotalSandwichFamily A B) q).outcome a)]
+              calc
+                ev ψ (∑ a : Outcome, ((heterogeneousTotalSandwichFamily A B) q).outcome a)
+                  =
+                    ev ψ
+                      (∑ a : Outcome,
+                        leftTensor (ι₂ := ιB) ((A q).total) *
+                          rightTensor (ι₁ := ιA) ((B q).outcome a)) := by
+                            simp [heterogeneousTotalSandwichFamily]
+                _ = ev ψ
+                      (leftTensor (ι₂ := ιB) ((A q).total) *
+                        ∑ a : Outcome, rightTensor (ι₁ := ιA) ((B q).outcome a)) := by
+                            rw [← Finset.mul_sum]
+                _ = ev ψ
+                      (leftTensor (ι₂ := ιB) ((A q).total) *
+                        rightTensor (ι₁ := ιA) (∑ a : Outcome, (B q).outcome a)) := by
+                            rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ
+                              (fun a : Outcome => (B q).outcome a)]
+                _ =
+                    ev ψ
+                      (leftTensor (ι₂ := ιB) ((A q).total) *
+                        rightTensor (ι₁ := ιA) 1) := by
+                            rw [(B q).sum_eq]
+                _ = ev ψ (leftTensor (ι₂ := ιB) ((A q).total)) := by
+                            simp [leftTensor, rightTensor]
+            calc
+              ∑ a : Outcome, ev ψ (X a)
+                = ∑ a : Outcome,
+                    ev ψ (((heterogeneousTotalSandwichFamily A B) q).outcome a) -
+                    ∑ a : Outcome,
+                      ev ψ (((heterogeneousDiagonalSandwichFamily A B) q).outcome a) := by
+                        simp [X, ev_sub]
+              _ = ev ψ (leftTensor (ι₂ := ιB) ((A q).total)) -
+                    qMatchMass ψ
+                      (((IdxSubMeas.placeLeft A) q))
+                      (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                        unfold qMatchMass
+                        simp [htotal, heterogeneousDiagonalSandwichFamily,
+                          IdxSubMeas.placeLeft, IdxSubMeas.placeRight,
+                          IdxMeas.toIdxSubMeas]
+              _ =
+                  ev ψ
+                    ((((IdxSubMeas.placeLeft A) q).total) *
+                      (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q).total)) -
+                    qMatchMass ψ
+                      (((IdxSubMeas.placeLeft A) q))
+                      (((IdxSubMeas.placeRight (IdxMeas.toIdxSubMeas B)) q)) := by
+                        rw [show ((IdxSubMeas.placeRight
+                            (IdxMeas.toIdxSubMeas B)) q).total =
+                            rightTensor (ι₁ := ιA) ((B q).total) by rfl]
+                        rw [(B q).total_eq_one]
+                        simp [IdxSubMeas.placeLeft, rightTensor, leftTensor]
+    _ ≤ γ := hcons
+
+/-- `prop:cons-sub-meas`, in the two-space form stated in
+`references/ldt-paper/preliminaries.tex` lines 708--744. -/
+theorem consSubMeas_heterogeneous {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome]
+    (ψ : QuantumState (ιA × ιB)) (𝒟 : Distribution Question)
+    (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxMeas Question Outcome ιB) (γ : Error) :
+    ConsRel ψ 𝒟
+      A
+      (IdxMeas.toIdxSubMeas B) γ →
+    ConsSubMeasHeterogeneousStmt ψ 𝒟 A B γ := by
+  intro hcons
+  have hdc := consSubMeas_diagonalControl_heterogeneous ψ 𝒟 A B γ hcons
+  have hsc := consSubMeas_sandwichControl_heterogeneous ψ 𝒟 A B γ hcons
+  exact {
+    diagonalControl := hdc
+    sandwichControl := hsc
+    combinedControl := by
+      have h :=
+        stateDependentDistanceRel_triangle ψ 𝒟 (IdxSubMeas.placeLeft A)
+          (heterogeneousDiagonalSandwichFamily A B)
+          (heterogeneousTotalSandwichFamily A B) γ γ hdc hsc
+      exact
+        stateDependentDistanceRel_mono ψ 𝒟 (IdxSubMeas.placeLeft A)
+          (heterogeneousTotalSandwichFamily A B) (2 * (γ + γ)) (4 * γ) (by linarith) h
+  }
+
+/-- Same-space specialization of `prop:cons-sub-meas`.
+
+The paper-facing two-space theorem is `consSubMeas_heterogeneous`. -/
 theorem consSubMeas {Question Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
