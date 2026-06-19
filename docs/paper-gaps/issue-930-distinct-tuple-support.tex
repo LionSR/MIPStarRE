@@ -14,14 +14,33 @@
 \begin{document}
 \maketitle
 
-\section{The assertion}
+\section{At a glance}
 
 This note concerns the distinct-tuple distribution used in the pasting section of
 \cite{Ji2020LowIndividualDegree}.%
 \footnote{Tracked as part of the discrepancy audit in \ghissue{930}.  In the
 TeX source consulted here, the definition and comparison proposition are in
 \path{references/ldt-paper/ld-pasting.tex}, lines~167--213.}
-For $k\ge 1$, the paper defines
+
+\begin{itemize}
+  \item \textbf{Difficulty.}  Low.  The issue is a boundary convention for an
+  empty finite support, not a change to the proof of the pasting theorem.
+  \item \textbf{Estimated weight.}  Small.  The formal repair is already in
+  place; this note records how the all-\(k\) Lean object agrees with the
+  paper's probability-language statement when \(k\le q\).
+  \item \textbf{Mathlib/project split.}  Mostly project-local.  The argument
+  uses finite supports and total variation estimates from the project
+  distribution API; Mathlib supplies the finite-type background.
+  \item \textbf{Key mathematical inputs.}  The set
+  \(\mathsf{Distinct}_k\subseteq \F_q^k\) is nonempty exactly when \(k\le q\);
+  when \(k>q\), the displayed \(k^2/q\) error term is already large enough to
+  make the comparison trivial after the formal object is interpreted as the
+  zero finite weight.
+\end{itemize}
+
+\section{Key theorem forms}
+
+For \(k\ge 1\), the paper defines
 \[
   \mathsf{Distinct}_k=\{(x_1,\ldots,x_k)\in \F_q^k: x_i\ne x_j
     \text{ for }i\ne j\}
@@ -51,8 +70,8 @@ formal interpretation.
 The blueprint repeats the paper's convention rather than making the boundary
 case explicit.  The node \path{def:distinct-tuples} in
 \path{blueprint/src/chapter/ch09_pasting.tex}, lines~198--202, carries
-\verb|\lean| annotations for \path{MIPStarRE.LDT.Pasting.distinctTuples} and
-\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution}, together with
+\verb|\lean| annotations for \leanid{MIPStarRE.LDT.Pasting.distinctTuples} and
+\leanid{MIPStarRE.LDT.Pasting.distinctTupleDistribution}, together with
 \verb|\leanok|, and states: ``For $k\ge 1$, let
 $\mathsf{Distinct}_k\subseteq \F_q^k$ be the set of tuples
 $(x_1,\dots,x_k)$ with pairwise distinct coordinates.''  This is the same
@@ -60,7 +79,7 @@ all-$k\ge 1$ convention as the paper; the blueprint definition does not add the
 missing nonemptiness hypothesis $k\le q$.
 
 The companion node \path{prop:ld-dnoteq} in the same file, lines~204--226, has a
-\verb|\lean| annotation for \path{MIPStarRE.LDT.Pasting.ldDnoteq} and is also
+\verb|\lean| annotation for \leanid{MIPStarRE.LDT.Pasting.ldDnoteq} and is also
 tagged \verb|\leanok|.
 It states that if $x=(x_1,\dots,x_k)$ is uniformly random in $\F_q^k$ and
 $y=(y_1,\dots,y_k)$ is uniformly random in $\mathsf{Distinct}_k$, then
@@ -77,24 +96,24 @@ interpretation only when the support is nonempty, equivalently when $k\le q$.
 
 The formal development uses a finite-support weighted distribution rather than
 forcing every distribution object to be normalized.  The declaration
-\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution} assigns weight
+\leanid{MIPStarRE.LDT.Pasting.distinctTupleDistribution} assigns weight
 $1/|\mathsf{Distinct}_k|$ to each distinct tuple when the support is nonempty, and
 weight zero outside the support.  If $k>q$, the support is empty, so this is the
 zero finite measure rather than a probability distribution.%
 \footnote{See \doclink{MIPStarRE/LDT/Pasting/Defs/Tuples.lean}, lines~23--36.}
 
 The formalization records both facts.  The general theorem
-\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution_weight_sum_le_one}
+\leanid{MIPStarRE.LDT.Pasting.distinctTupleDistribution\_weight\_sum\_le\_one}
 proves that the total mass is at most $1$ for every $k$.  The normalized form
-\path{MIPStarRE.LDT.Pasting.distinctTupleDistribution_weight_sum_eq_one_of_le}
+\leanid{MIPStarRE.LDT.Pasting.distinctTupleDistribution\_weight\_sum\_eq\_one\_of\_le}
 adds the missing hypothesis $k\le q$ and proves that the total mass is exactly
 $1$.%
 \footnote{The normalized statement is in
-\doclink{MIPStarRE/LDT/Pasting/BridgeLemmas/Common.lean}, lines~311--343 of the
+\doclink{MIPStarRE/LDT/Pasting/ComparisonLemmas/Common.lean}, lines~145--178 of the
 source file.}
 
 The total-variation comparison
-\path{MIPStarRE.LDT.Pasting.ldDnoteq} is correspondingly case-split.  When
+\leanid{MIPStarRE.LDT.Pasting.ldDnoteq} is correspondingly case-split.  When
 $k\le q$, it proves the usual collision-probability estimate.  When $k>q$, the
 support is empty; the formal total variation between the uniform tuple
 distribution and the zero distinct-tuple weight is $1/2$, and this is bounded
