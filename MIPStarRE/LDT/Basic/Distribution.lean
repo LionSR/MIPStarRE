@@ -11,7 +11,7 @@ a probability predicate and wrapper, averaging, uniform distribution,
 and outcome summation.
 -/
 
-open scoped BigOperators
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT
 
@@ -150,6 +150,74 @@ noncomputable def averageOperatorOverDistribution {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι) : MIPStarRE.Quantum.Op ι :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
+
+namespace Distribution
+
+/-- Operator-valued averaging against `Distribution.ofPMF p` is the finite
+operator sum weighted by the probability mass function `p`. -/
+theorem averageOperatorOverDistribution_ofPMF_eq_sum {α : Type*} [Fintype α]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (p : PMF α) (f : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution (ofPMF p) f =
+      ∑ a : α, (p a).toReal • f a := by
+  simp [averageOperatorOverDistribution, ofPMF]
+
+end Distribution
+
+/-- Operator averages preserve positivity. -/
+theorem averageOperatorOverDistribution_nonneg {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι)
+    (hf : ∀ a, 0 ≤ f a) :
+    0 ≤ averageOperatorOverDistribution 𝒟 f := by
+  unfold averageOperatorOverDistribution
+  exact Finset.sum_nonneg fun a _ => smul_nonneg (𝒟.nonnegative a) (hf a)
+
+/-- Operator averages preserve pointwise order. -/
+theorem averageOperatorOverDistribution_mono {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (f g : α → MIPStarRE.Quantum.Op ι)
+    (hfg : ∀ a, f a ≤ g a) :
+    averageOperatorOverDistribution 𝒟 f ≤ averageOperatorOverDistribution 𝒟 g := by
+  unfold averageOperatorOverDistribution
+  exact Finset.sum_le_sum fun a _ =>
+    smul_le_smul_of_nonneg_left (hfg a) (𝒟.nonnegative a)
+
+/-- The average of a constant operator is the total mass times that operator. -/
+theorem averageOperatorOverDistribution_const {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (A : MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 (fun _ : α => A) =
+      (∑ a ∈ 𝒟.support, 𝒟.weight a) • A := by
+  unfold averageOperatorOverDistribution
+  rw [Finset.sum_smul]
+
+/-- The average of a constant operator over a probability distribution is that
+operator. -/
+theorem averageOperatorOverDistribution_const_of_isProbability {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (A : MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 (fun _ : α => A) = A := by
+  rw [averageOperatorOverDistribution_const, h𝒟.weight_sum_eq_one]
+  simp
+
+/-- An average of effects against a sub-probability distribution is again bounded
+above by the identity operator. -/
+theorem averageOperatorOverDistribution_le_one_of_weight_sum_le_one {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (f : α → MIPStarRE.Quantum.Op ι)
+    (h𝒟 : ∑ a ∈ 𝒟.support, 𝒟.weight a ≤ 1)
+    (hf : ∀ a, f a ≤ 1) :
+    averageOperatorOverDistribution 𝒟 f ≤ 1 := by
+  calc
+    averageOperatorOverDistribution 𝒟 f
+        ≤ averageOperatorOverDistribution 𝒟 (fun _ : α => 1) := by
+          exact averageOperatorOverDistribution_mono 𝒟 f (fun _ : α => 1) hf
+    _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) • (1 : MIPStarRE.Quantum.Op ι) := by
+          exact averageOperatorOverDistribution_const 𝒟 1
+    _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
+          exact smul_le_smul_of_nonneg_right h𝒟 zero_le_one
+    _ = 1 := by simp
 
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
@@ -409,6 +477,18 @@ theorem avgOver_uniform_eq_pmf_sum {α : Type*}
       ∑ a : α, (PMF.uniformOfFintype α a).toReal * f a := by
   simpa [uniformDistribution] using
     Distribution.avgOver_ofPMF_eq_pmf_sum (PMF.uniformOfFintype α) f
+
+/-- The uniform operator average is the finite operator sum weighted by
+`PMF.uniformOfFintype`. -/
+theorem averageOperatorOverDistribution_uniform_eq_pmf_sum {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution (uniformDistribution α) f =
+      ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
+  simpa [uniformDistribution] using
+    Distribution.averageOperatorOverDistribution_ofPMF_eq_sum
+      (PMF.uniformOfFintype α) f
 
 /-- A uniform average is bounded by any nonnegative pointwise upper bound. -/
 theorem avgOver_uniform_le_of_pointwise_le {α : Type*}
