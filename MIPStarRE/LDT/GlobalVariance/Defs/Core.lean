@@ -82,42 +82,12 @@ noncomputable def averageUnitSubMeas {α : Type*}
     total := averageOperatorOverDistribution (uniformDistribution α) f
     outcome_pos := by
       intro _
-      simp only [averageOperatorOverDistribution, uniformDistribution, Distribution.ofPMF_support,
-        Distribution.ofPMF_weight]
-      apply Finset.sum_nonneg
-      intro a ha
-      exact smul_nonneg ENNReal.toReal_nonneg (hpsd a)
+      exact averageOperatorOverDistribution_nonneg (uniformDistribution α) f hpsd
     sum_eq_total := by
       simp
     total_le_one := by
-      have hsum :
-          ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a ≤
-            ∑ a : α,
-              (PMF.uniformOfFintype α a).toReal • (1 : MIPStarRE.Quantum.Op ι) := by
-        apply Finset.sum_le_sum
-        intro a ha
-        exact smul_le_smul_of_nonneg_left (hle a) ENNReal.toReal_nonneg
-      have hconst :
-          (∑ a : α,
-              (PMF.uniformOfFintype α a).toReal • (1 : MIPStarRE.Quantum.Op ι)) =
-            (1 : MIPStarRE.Quantum.Op ι) := by
-        have hpmf : ∑ a : α, (PMF.uniformOfFintype α a).toReal = 1 := by
-          have h := Distribution.ofPMF_isProbability (PMF.uniformOfFintype α)
-          exact h.weight_sum_eq_one
-        calc
-          ∑ a : α, (PMF.uniformOfFintype α a).toReal •
-                (1 : MIPStarRE.Quantum.Op ι)
-              = ((∑ a : α, (PMF.uniformOfFintype α a).toReal) : Error) •
-                  (1 : MIPStarRE.Quantum.Op ι) := by
-                    simpa using
-                      (Finset.sum_smul (s := Finset.univ)
-                        (f := fun a : α => (PMF.uniformOfFintype α a).toReal)
-                        (x := (1 : MIPStarRE.Quantum.Op ι))).symm
-          _ = (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
-                rw [hpmf]
-          _ = 1 := by simp
-      simpa [averageOperatorOverDistribution, uniformDistribution] using
-        le_trans hsum (le_of_eq hconst) }
+      exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one
+        (uniformDistribution α) f (uniformDistribution_weight_sum_le_one α) hle }
 
 /-- The unique outcome of `averageUnitSubMeas` is the uniform operator average
 of the underlying family. -/

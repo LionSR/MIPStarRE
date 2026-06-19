@@ -469,9 +469,8 @@ noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
     averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
   outcome_pos := by
     intro a
-    unfold averageOperatorOverDistribution
-    exact Finset.sum_nonneg fun q _ =>
-      smul_nonneg (𝒟.nonnegative q) ((A q).outcome_pos a)
+    exact averageOperatorOverDistribution_nonneg 𝒟
+      (fun q => (A q).outcome a) (fun q => (A q).outcome_pos a)
   sum_eq_total := by
     classical
     unfold averageOperatorOverDistribution
@@ -488,17 +487,8 @@ noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
             intro q _
             rw [(A q).sum_eq_total]
   total_le_one := by
-    unfold averageOperatorOverDistribution
-    calc
-      (∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).total)
-        ≤ ∑ q ∈ 𝒟.support, 𝒟.weight q • (1 : MIPStarRE.Quantum.Op ι) := by
-            exact Finset.sum_le_sum fun q _ =>
-              smul_le_smul_of_nonneg_left (A q).total_le_one (𝒟.nonnegative q)
-      _ = (∑ q ∈ 𝒟.support, 𝒟.weight q) • (1 : MIPStarRE.Quantum.Op ι) := by
-            rw [Finset.sum_smul]
-      _ ≤ (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
-            exact smul_le_smul_of_nonneg_right h𝒟 zero_le_one
-      _ = 1 := by simp
+    exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟
+      (fun q => (A q).total) h𝒟 (fun q => (A q).total_le_one)
 
 
 /-! ### Tensor-placement constructors -/
