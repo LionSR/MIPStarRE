@@ -51,7 +51,7 @@ lemma switcherooSelfConsistency_bip
 
 /-- Lift slicewise complete-part self-consistency to the slice-pair distribution.
 
-This packages the `G^x` self-consistency input in the form used by the
+This states the `G^x` self-consistency input in the form used by the
 switcheroo tensor-bound steps. -/
 lemma switcherooCompletePartSelfConsistency_pairBound
     (params : Parameters) [FieldModel params.q]

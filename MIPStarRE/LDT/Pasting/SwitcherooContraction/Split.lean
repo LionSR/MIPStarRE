@@ -15,7 +15,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ### Shared switcheroo contraction helper package -/
+/-! ### Shared switcheroo contraction helper definitions -/
 
 /-- The `g`-indexed sandwich family used in the once-commuted contraction bounds. -/
 noncomputable def switcherooAggregateFourthTermX

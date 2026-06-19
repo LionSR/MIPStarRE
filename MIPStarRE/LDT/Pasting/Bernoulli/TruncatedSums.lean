@@ -200,7 +200,7 @@ private lemma full_gHatType_sum_eq_one
 
 /-- `lem:truncated-type-sum-recurrence`.
 
-This packages the Hermitian, positivity, boundedness, and one-step recurrence
+This records the Hermitian, positivity, boundedness, and one-step recurrence
 properties of the truncated type sums used in the `fromHToG` reduction. -/
 theorem truncatedTypeSumRecurrence
     (G : MIPStarRE.Quantum.Op ι)

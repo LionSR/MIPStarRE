@@ -59,7 +59,7 @@ private lemma switcherooCompletePartCenter_eq_target
               (ι := ι) (params := params) (ψbi := ψbi) (family := family) (M := M)).symm
 
 -- After extracting the pointwise normalization helpers above, the final
--- four-term packaging proof elaborates within the default heartbeat budget.
+-- four-term assembly proof elaborates within the default heartbeat budget.
 /-- Internal form of `lem:commutativity-switcheroo` after applying
 `lem:g-complete-self-consistency`.
 

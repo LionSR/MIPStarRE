@@ -289,7 +289,7 @@ lemma qSDD_completePart_le_slice
   nlinarith
 
 /-- `lem:g-complete-self-consistency`.
-This is exactly the slice strong self-consistency hypothesis, repackaged under
+This is exactly the slice strong self-consistency hypothesis, stated under
 the Section 12 statement name. -/
 lemma gCompleteSelfConsistency
     (params : Parameters)

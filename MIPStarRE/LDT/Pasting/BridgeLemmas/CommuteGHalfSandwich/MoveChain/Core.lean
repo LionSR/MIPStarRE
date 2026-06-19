@@ -14,7 +14,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 The flat-chain construction and the final error envelope.
 -/
-/-- Bridge: the staged move-commute-move chain for `commuteGHalfSandwich`.
+/-- The staged move-commute-move chain for `commuteGHalfSandwich`.
 
 Constructs the sequence of `3k - 4` intermediate bipartite operator families
 joined by `3k - 5` elementary edges. These edges repeatedly move `Ĝ₁` through

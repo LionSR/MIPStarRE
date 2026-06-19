@@ -68,7 +68,7 @@ lemma ldSandwichLineOnePoint_prefix_cauchySchwarz_transport
 
 This is the match-mass lower-bound step after unfolding `ConsRel`: it bounds the
 averaged off-diagonal defect for the prefix-marginalized one-point family.  The
-helper consumes only the adjoint raw-core bound; endpoint packaging,
+helper consumes only the adjoint raw-core bound; endpoint identifications,
 raw-family reindexing, exact tail deletion, and match-mass expansion are now
 proved directly in the local lemmas that use them. -/
 lemma ldSandwichLineOnePoint_matchMass_lower_bound
