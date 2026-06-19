@@ -33,6 +33,8 @@ The n-step SDDOpRel composition lemma (`sddOpRel_chain`) lives in
 `MIPStarRE.LDT.Preliminaries.CompletionTransfer` alongside `sddOpRel_triangle`,
 since it is a general-purpose result used by multiple chapters. -/
 
+/-- Split a nonempty tuple of slice questions into its first coordinate and
+the remaining tail. -/
 def pointTupleConsEquiv (params : Parameters) (k : ℕ) :
     PointTuple params (k + 1) ≃ SliceQuestion params × PointTuple params k where
   toFun xs := (xs 0, pointTupleTail xs)
@@ -46,6 +48,7 @@ def pointTupleConsEquiv (params : Parameters) (k : ℕ) :
     cases p
     rfl
 
+/-- Reverse-ordered half-product of completed-slice outcome operators. -/
 noncomputable def gHatReverseHalfProductOutcomeOperator
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
@@ -57,6 +60,8 @@ noncomputable def gHatReverseHalfProductOutcomeOperator
           (pointTupleTail xs) (gHatTupleOutcomeTail gs) *
         ((gHatIdxMeas params family (xs 0)).toSubMeas).outcome (gs 0)
 
+/-- Ordered head-tail family with the head completed-slice operator followed
+by the remaining half-product on the left tensor register. -/
 noncomputable def headTailOrderedFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -73,6 +78,8 @@ noncomputable def headTailOrderedFamily
         leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) *
           leftTensor (ι₂ := ι) (gHatHalfProductTotalOperator params family r q.2) }
 
+/-- Rotated head-tail family with the tail half-product placed before the head
+completed-slice operator. -/
 noncomputable def headTailRotatedFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -89,6 +96,8 @@ noncomputable def headTailRotatedFamily
         leftTensor (ι₂ := ι) (gHatHalfProductTotalOperator params family r q.2) *
           leftTensor (ι₂ := ι) ((gHatIdxMeas params family q.1).total) }
 
+/-- Move-family endpoint with two distinguished left-register factors and the
+reverse half-product on the right register. -/
 noncomputable def commuteGHalfSandwich_moveFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -108,6 +117,8 @@ noncomputable def commuteGHalfSandwich_moveFamily
           rightTensor (ι₁ := ι)
             (gHatHalfProductTotalOperator params family r q.2.2) }
 
+/-- Commuted endpoint obtained by interchanging the two distinguished
+left-register completed-slice factors. -/
 noncomputable def commuteGHalfSandwich_commuteFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -286,8 +297,11 @@ lemma gHatPairProduct_sddOpRel_triple
 
 /-! ### Slice-front equivalences -/
 
+/-- Move the third distinguished slice coordinate to the front while preserving
+the other two distinguished coordinates and the tail. -/
 def thirdSliceFrontEquiv (params : Parameters) (r : ℕ) :
-    (SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r) ≃
+    (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
+      PointTuple params r) ≃
       (SliceQuestion params × (SliceQuestion params × SliceQuestion params ×
           PointTuple params r)) where
   toFun q := (q.2.2.1, (q.1, q.2.1, q.2.2.2))
@@ -301,6 +315,8 @@ def thirdSliceFrontEquiv (params : Parameters) (r : ℕ) :
 
 /-! ### Question/outcome equivalences -/
 
+/-- Reassociate a head-tail slice question together with one additional slice
+question as a move-chain question. -/
 def splitQuestionEquiv (params : Parameters) (r : ℕ) :
     ((SliceQuestion params × PointTuple params r) × SliceQuestion params) ≃
       (SliceQuestion params × SliceQuestion params × PointTuple params r) where
@@ -309,6 +325,8 @@ def splitQuestionEquiv (params : Parameters) (r : ℕ) :
   left_inv q := by cases q; rfl
   right_inv q := by cases q; rfl
 
+/-- Outcome analogue of `splitQuestionEquiv`, with the additional completed-slice
+outcome placed in the second distinguished position. -/
 def prefixTripleOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     ((GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) ≃
       (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
@@ -317,6 +335,8 @@ def prefixTripleOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : �
   left_inv og := by cases og; rfl
   right_inv og := by cases og; rfl
 
+/-- Reassociate a pair of distinguished completed-slice outcomes and an outcome
+tail as a move-chain outcome. -/
 def pairTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r) ≃
       (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
@@ -327,6 +347,8 @@ def pairTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
 
 /-! ### Split-successor and move-tail equivalences -/
 
+/-- Expose the first coordinate of a successor point tuple as the second
+distinguished slice question. -/
 def splitSuccQuestionEquiv (params : Parameters) (r : ℕ) :
     (SliceQuestion params × PointTuple params (r + 1)) ≃
       (SliceQuestion params × SliceQuestion params × PointTuple params r) where
@@ -344,6 +366,7 @@ def splitSuccQuestionEquiv (params : Parameters) (r : ℕ) :
     cases q
     rfl
 
+/-- Outcome analogue of `splitSuccQuestionEquiv`. -/
 def splitSuccOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     (GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
       (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) where
@@ -361,6 +384,7 @@ def splitSuccOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) 
     cases og
     rfl
 
+/-- Expose the first coordinate of the tail in a successor move question. -/
 def moveTailQuestionEquiv (params : Parameters) (r : ℕ) :
     (SliceQuestion params × SliceQuestion params × PointTuple params (r + 1)) ≃
       (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
@@ -379,6 +403,7 @@ def moveTailQuestionEquiv (params : Parameters) (r : ℕ) :
     cases q
     rfl
 
+/-- Outcome analogue of `moveTailQuestionEquiv`. -/
 def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     (GHatOutcome params × GHatOutcome params × GHatTupleOutcome params (r + 1)) ≃
       (GHatOutcome params × GHatOutcome params × GHatOutcome params ×
@@ -397,8 +422,11 @@ def moveTailOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     cases og
     rfl
 
+/-- Move a new leading slice coordinate from the product suffix to the front of
+the exposed move-tail question. -/
 def firstSliceBackQuestionEquiv (params : Parameters) (r : ℕ) :
-    ((SliceQuestion params × SliceQuestion params × PointTuple params r) × SliceQuestion params) ≃
+    ((SliceQuestion params × SliceQuestion params × PointTuple params r) ×
+      SliceQuestion params) ≃
       (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
         PointTuple params r) where
   toFun q := (q.2, q.1.1, q.1.2.1, q.1.2.2)
@@ -410,8 +438,10 @@ def firstSliceBackQuestionEquiv (params : Parameters) (r : ℕ) :
     rcases q with ⟨x₁, x₂, x₃, xs⟩
     rfl
 
+/-- Outcome analogue of `firstSliceBackQuestionEquiv`. -/
 def firstSliceBackOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
-    ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) × GHatOutcome params) ≃
+    ((GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r) ×
+      GHatOutcome params) ≃
       (GHatOutcome params × GHatOutcome params × GHatOutcome params ×
         GHatTupleOutcome params r) where
   toFun og := (og.2, og.1.1, og.1.2.1, og.1.2.2)
@@ -425,6 +455,8 @@ def firstSliceBackOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : 
 
 /-! ### Move-step and source families -/
 
+/-- Source family for a single move step: three distinguished completed-slice
+operators and the tail half-product all lie on the left tensor register. -/
 noncomputable def commuteGHalfSandwich_moveStepSourceFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -446,6 +478,8 @@ noncomputable def commuteGHalfSandwich_moveStepSourceFamily
           leftTensor (ι₂ := ι)
             (gHatHalfProductTotalOperator params family r q.2.2.2) }
 
+/-- Target family for a single move step: the exposed tail coordinate and the
+reverse tail half-product have been moved to the right tensor register. -/
 noncomputable def commuteGHalfSandwich_moveStepTargetFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -467,6 +501,8 @@ noncomputable def commuteGHalfSandwich_moveStepTargetFamily
           rightTensor (ι₁ := ι)
             (gHatHalfProductTotalOperator params family r q.2.2.2) }
 
+/-- Intermediate family for a move step, after the third distinguished
+completed-slice operator but before that operator is moved to the right. -/
 noncomputable def commuteGHalfSandwich_moveStepMidFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -488,6 +524,8 @@ noncomputable def commuteGHalfSandwich_moveStepMidFamily
           rightTensor (ι₁ := ι)
             (gHatHalfProductTotalOperator params family r q.2.2.2) }
 
+/-- Source endpoint of the move chain before the first tail coordinate has been
+exposed. -/
 noncomputable def commuteGHalfSandwich_moveSourceFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -560,6 +598,7 @@ lemma commuteGHalfSandwich_move_recursive_zero
 
 /-! ### One-element tuple equivalences -/
 
+/-- Identify a one-element point tuple with its unique slice question. -/
 def pointTupleOneEquiv (params : Parameters) :
     PointTuple params 1 ≃ SliceQuestion params where
   toFun xs := xs 0
@@ -570,6 +609,8 @@ def pointTupleOneEquiv (params : Parameters) :
     rfl
   right_inv x := by rfl
 
+/-- Identify a one-element completed-slice outcome tuple with its unique
+outcome. -/
 def gHatTupleOutcomeOneEquiv (params : Parameters) [FieldModel params.q] :
     GHatTupleOutcome params 1 ≃ GHatOutcome params where
   toFun gs := gs 0
@@ -580,6 +621,7 @@ def gHatTupleOutcomeOneEquiv (params : Parameters) [FieldModel params.q] :
     rfl
   right_inv g := by rfl
 
+/-- Specialization of `splitQuestionEquiv` for a one-element tuple. -/
 def splitQuestionEquivOne (params : Parameters) :
     (SliceQuestion params × PointTuple params 1) ≃ SlicePairQuestion params where
   toFun q := (q.1, (pointTupleOneEquiv params) q.2)
@@ -591,6 +633,7 @@ def splitQuestionEquivOne (params : Parameters) :
     rcases q with ⟨x, y⟩
     exact congrArg (fun ys => (x, ys)) ((pointTupleOneEquiv params).right_inv y)
 
+/-- Outcome specialization matching `splitQuestionEquivOne`. -/
 def splitOutcomeEquivOne (params : Parameters) [FieldModel params.q] :
     (GHatOutcome params × GHatTupleOutcome params 1) ≃ (GHatOutcome params ×
         GHatOutcome params) where
@@ -605,8 +648,10 @@ def splitOutcomeEquivOne (params : Parameters) [FieldModel params.q] :
 
 /-! ### Outcome slice-front equivalences -/
 
+/-- Outcome analogue of `thirdSliceFrontEquiv`. -/
 def thirdSliceFrontOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
-    (GHatOutcome params × ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r)) ≃
+    (GHatOutcome params ×
+      ((GHatOutcome params × GHatOutcome params) × GHatTupleOutcome params r)) ≃
       (GHatOutcome params × GHatOutcome params × GHatOutcome params ×
           GHatTupleOutcome params r) where
   toFun og := (og.2.1.1, og.2.1.2, og.1, og.2.2)
