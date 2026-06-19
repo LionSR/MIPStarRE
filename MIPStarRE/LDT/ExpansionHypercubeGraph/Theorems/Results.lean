@@ -1,5 +1,21 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Matrix
 
+/-!
+# Section 7 hypercube graph: local-to-global variance theorems
+
+This file assembles the public Section 7 results about the hypercube graph:
+the Laplacian edge-difference formula, the local and global variance rewrites,
+and the local-to-global inequality.  The proof route passes through the
+matrix-realization theorems and then exposes the statements in the
+`QuantumState` and operator-family language used elsewhere in the LDT
+formalization.
+
+## References
+
+- arXiv:2009.12982, Section 7, `prop:laplacian-rewrite`,
+  `lem:local-rewrite`, `lem:global-rewrite`, and `lem:local-to-global`.
+-/
+
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT
@@ -285,7 +301,12 @@ noncomputable def bipartiteGlobalVariance (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ιA) (ψ : QuantumState (ιA × ιB)) : Error :=
   globalVariance params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
-/-- General local-to-global inequality for an arbitrary operator family. -/
+/-- General local-to-global inequality for an arbitrary operator family on a
+finite-dimensional state space.
+
+This is the abstract form behind `lem:local-to-global`: the global variance over
+two independent vertices is bounded by `m` times the local variance over the
+rerandomized-coordinate edge distribution. -/
 lemma localToGlobal (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
@@ -312,7 +333,11 @@ lemma localToGlobalBipartite (params : Parameters)
       (params.m : Error) * bipartiteLocalVariance params A ψ := by
   exact localToGlobal params (fun u => leftTensor (ι₂ := ιB) (A u)) ψ
 
-/-- `lem:local-rewrite`. -/
+/-- `lem:local-rewrite`.
+
+The local variance agrees with the Laplacian trace form of the combined
+operator family.  The proof is obtained from the concrete matrix rewrite, with a
+separate zero-dimensional branch for the empty state space. -/
 lemma localRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     LocalRewriteStatement params A ψ := by

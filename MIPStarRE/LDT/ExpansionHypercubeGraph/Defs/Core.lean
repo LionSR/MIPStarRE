@@ -37,11 +37,15 @@ def coordinateDisagreementCount (params : Parameters)
 def IsHypercubeEdge (params : Parameters) (u v : Point params) : Prop :=
   coordinateDisagreementCount params u v ≤ 1
 
+/-- Decidability of the hypercube edge relation, obtained from the finite
+coordinate disagreement count. -/
 instance instDecidableIsHypercubeEdge (params : Parameters) (u v : Point params) :
     Decidable (IsHypercubeEdge params u v) := by
   unfold IsHypercubeEdge
   infer_instance
 
+/-- Decidable predicate form of the hypercube edge relation on ordered pairs of
+vertices. -/
 instance instDecidablePredHypercubeEdgePair (params : Parameters) :
     DecidablePred (fun uv : Point params × Point params => IsHypercubeEdge params uv.1 uv.2) := by
   intro uv
@@ -57,6 +61,9 @@ noncomputable def rerandomizeCoordWeight (params : Parameters)
       if Function.update u p.1 p.2 = v then (1 : ℕ) else 0) : ℕ) : Error) /
     (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)
 
+/-- The probability distribution on ordered edges of the hypercube graph used in
+the paper's local variance.  It samples a vertex `u`, a coordinate, and a new
+coordinate value, then records the ordered pair `(u, v)`. -/
 noncomputable def rerandomizeCoord (params : Parameters) :
     Distribution (Point params × Point params) :=
   { support := Finset.univ
@@ -76,6 +83,7 @@ noncomputable def rerandomizeCoord (params : Parameters) :
       intro uv huv
       exact False.elim (huv (Finset.mem_univ uv)) }
 
+/-- The rerandomized-coordinate edge distribution has total mass one. -/
 theorem rerandomizeCoord_mass_eq_one (params : Parameters) :
     ∑ uv ∈ (rerandomizeCoord params).support, (rerandomizeCoord params).weight uv = 1 := by
   classical
@@ -140,6 +148,8 @@ noncomputable def independentPointPairWeight (params : Parameters)
     (_uv : Point params × Point params) : Error :=
   ((hypercubeVertexCount params : Error)⁻¹) * ((hypercubeVertexCount params : Error)⁻¹)
 
+/-- The product distribution on two independently sampled hypercube vertices,
+used in the paper's global variance. -/
 noncomputable def independentPointPair (params : Parameters) :
     Distribution (Point params × Point params) :=
   { support := Finset.univ
