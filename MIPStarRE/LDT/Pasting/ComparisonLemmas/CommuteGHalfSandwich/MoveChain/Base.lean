@@ -1,6 +1,20 @@
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
 
+/-!
+# Section 12 pasting: half-sandwich move-chain base
+
+This module introduces the question and outcome types used by the finite
+commutation chain in `lem:commute-g-half-sandwich`.  It also defines the first
+recursive target family and proves the equivalence between the source
+split-successor comparison and the first move-chain comparison.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -16,18 +30,27 @@ These are the basic building blocks for the half-sandwich commutation chain:
 type abbreviations, the recursive target family, and the split-succ equivalence
 (`split_succ_iff`) plus the prefix-second-slice-left lemma.
 -/
+/-- Questions for the move-chain state with two distinguished slice coordinates
+and an `r`-tuple tail. -/
 abbrev MoveQ (params : Parameters) (r : ℕ) :=
   SliceQuestion params × SliceQuestion params × PointTuple params r
 
+/-- Outcomes matching `MoveQ`: two distinguished completed-slice outcomes and
+an `r`-tuple tail. -/
 abbrev MoveO (params : Parameters) [FieldModel params.q] (r : ℕ) :=
   GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r
 
+/-- Questions for the move-chain step after exposing the first tail coordinate. -/
 abbrev MoveTailQ (params : Parameters) (r : ℕ) :=
   SliceQuestion params × SliceQuestion params × SliceQuestion params × PointTuple params r
 
+/-- Outcomes for `MoveTailQ`, with three distinguished completed-slice
+outcomes and an `r`-tuple tail. -/
 abbrev MoveTailO (params : Parameters) [FieldModel params.q] (r : ℕ) :=
   GHatOutcome params × GHatOutcome params × GHatOutcome params × GHatTupleOutcome params r
 
+/-- The recursive target family obtained after one distinguished factor has
+been moved into the rotated half-product. -/
 noncomputable def commuteGHalfSandwich_recursiveTargetFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :

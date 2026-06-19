@@ -1,6 +1,19 @@
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.FlatChain
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.BackChain
 
+/-!
+# Section 12 pasting: half-sandwich flat-chain steps
+
+This module proves the adjacent-edge estimates for the post-move and combined
+flat chains.  These estimates are the local inputs to the final chain
+composition in the proof of `commuteGHalfSandwich_core`.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
