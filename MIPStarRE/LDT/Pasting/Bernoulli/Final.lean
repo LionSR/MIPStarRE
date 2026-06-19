@@ -312,10 +312,10 @@ theorem ldPastingNCompleteness_of_overAllOutcomes_fromHToG_tail
 /-- `cor:ld-pasting-N-completeness` once the Bernoulli-tail lower bound is
 supplied explicitly.
 
-This packages the downstream scalar algebra after `lem:over-all-outcomes` and
+This records the downstream scalar algebra after `lem:over-all-outcomes` and
 `lem:from-H-to-G`. The hypothesis `htail` is exactly the `θ = 1 / (200m)`
 specialization of `lem:chernoff-bernoulli-matrix` for the averaged complete
-operator `G = \mathbb E_x \sum_g G^x_g`, repackaged as the concrete
+operator `G = \mathbb E_x \sum_g G^x_g`, expressed as the concrete
 `fromHToGBernoulliTailMass` lower bound with error
 `κ · (1 + 1/(100m)) + exp(-k / (80000 m²))`. -/
 theorem ldPastingNCompleteness_of_tailLowerBound

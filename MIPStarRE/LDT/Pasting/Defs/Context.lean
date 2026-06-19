@@ -12,7 +12,7 @@ The paper theorem is unrestricted.  Immediately after the statement, the
 paper observes that the proof may restrict to the nontrivial regime in which
 the small parameters and `d/q` are at most `1`; the complementary cases are
 now fully discharged in `Pasting/Bernoulli/Final.lean` (the unrestricted
-`ldPasting`).  This context packages the data and additional nontrivial-regime
+`ldPasting`).  This context records the data and additional nontrivial-regime
 hypotheses used by the restricted Lean theorem
 `ldPastingNontrivial` and the downstream Section 12 lemmas.
 

@@ -303,7 +303,7 @@ The parameter `prefixLen` is the Lean 0-based stage index. In the ambient
 `tailLen = k - prefixLen`, so Lean stage `prefixLen` corresponds to the paper's
 stage `prefixLen + 1`.
 
-Concretely, this packages
+Concretely, this records
 $$
 \mathbb E_{x_{\ge \ell}} \sum_{g_{\ge \ell} \in \mathsf{Outcomes}_{\tau_{\ge \ell}}}
   \widehat H^{x_{\ge \ell}}_{g_{\ge \ell}} \otimes S_{\tau_{\ge \ell}}.

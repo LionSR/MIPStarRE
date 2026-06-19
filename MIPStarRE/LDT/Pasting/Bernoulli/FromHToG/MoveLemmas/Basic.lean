@@ -83,7 +83,7 @@ lemma fromHToG_ev_leftTensor_rightTensor_mono_right_of_nonneg_left
   exact MIPStarRE.LDT.opTensor_mono_right hA hBC
 
 /-- If `S` is a PSD contraction commuting with `B`, then `S * B * S ≤ B`.  This
-packages the paper's `eq:S-sandwich` domination step without using explicit
+formalizes the paper's `eq:S-sandwich` domination step without using explicit
 square roots. -/
 lemma psd_contraction_comm_sandwich_le
     {S B : MIPStarRE.Quantum.Op ι}
@@ -136,7 +136,7 @@ lemma fromHToGRecurrenceWeight_sandwich_one_sub_base_le
     (sub_nonneg.mpr family.averagedSubMeas.total_le_one)
     (fromHToGRecurrenceWeight_commute_one_sub_base params family prefixLen τtail)
 
-/-- Completed `ĝ` measurement outcomes are Hermitian.  This packages the
+/-- Completed `ĝ` measurement outcomes are Hermitian.  This records the
 positivity-to-Hermitian conversion used when orienting the adjoint
 half-sandwich commutator in the `M₂ → M₃` move. -/
 lemma fromHToG_gHatIdxMeas_outcome_isHermitian

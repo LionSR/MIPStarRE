@@ -21,7 +21,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Bridge: aggregate one-point consistency bounds over all slice indices,
+/-- Aggregate one-point consistency bounds over all slice indices,
 plus the distinct-tuple approximation error.
 
 Paper reference: `lem:h-b-consistency` proof in `ld-pasting.tex`

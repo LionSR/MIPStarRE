@@ -223,7 +223,7 @@ lemma switcheroo_second_aggregate_term_close
           simpa [𝒟x] using
             avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
 
-/-- The complete-part `M ⊗ G` switcheroo center, repackaged as a slice-pair
+/-- The complete-part `M ⊗ G` switcheroo center, expressed as a slice-pair
 `opTensor` average over the `M`-totals and complete-part `G`-totals. -/
 lemma switcherooAggregateMGCenterComplete_eq_opTensor_avg
     {Outcome : Type*} [Fintype Outcome]
@@ -290,7 +290,7 @@ lemma switcherooAggregateMGCenterComplete_eq_opTensor_avg
           exact completePartSubMeas_outcome_unit params family x
         simp [F, Gtotal, Mtotal, hsingle, leftTensor_mul_rightTensor_eq_opTensor]
 
-/-- The `G ⊗ M` switcheroo center, repackaged as a slice-pair `opTensor` average
+/-- The `G ⊗ M` switcheroo center, expressed as a slice-pair `opTensor` average
 over the complete-part `G`-totals and `M`-totals. -/
 lemma switcherooAggregateTarget_eq_opTensor_avg
     {Outcome : Type*} [Fintype Outcome]

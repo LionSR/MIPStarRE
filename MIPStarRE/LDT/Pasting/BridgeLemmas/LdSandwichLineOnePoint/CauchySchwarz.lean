@@ -471,7 +471,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds
 /-- One-sided route for the two off-diagonal Cauchy--Schwarz moves in
 `ld-pasting.tex:964--1010`.
 
-The substantive analytic residual is the absolute-value package
+The substantive analytic residual is the pair of absolute-value estimates
 `ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_abs_bounds`; this lemma
 only converts those two `closenessOfIP`-style bounds into the one-sided
 inequalities consumed by the downstream scalar transport. -/
@@ -569,7 +569,7 @@ expression `Σ_a ⟨ψ|A_a ⊗ (I - B_a)|ψ⟩`.  This lemma proves the exact
 bookkeeping reduction from the averaged linear consistency defects to that
 expanded residual, using the measurement-valued right family and the fact that
 both option-valued families have zero `none` mass.  The remaining analytic gap is
-therefore the split CS package
+therefore the split Cauchy--Schwarz route
 `ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_route`; the arithmetic
 absorption into `ν₅` is proved separately in
 `ldSandwichLineOnePoint_endpoint_comm_error_le`. -/

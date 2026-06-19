@@ -808,7 +808,7 @@ theorem degreeZeroPastedPointConsistency
 construction.
 
 This is the same construction as `degreeZeroPastedPointConsistency`, with the
-ordinary good-strategy package replaced by the two estimates actually used in
+ordinary good-strategy hypotheses replaced by the two estimates actually used in
 the proof. -/
 theorem degreeZeroPastedPointConsistency_of_axis_self
     (params : Parameters)
