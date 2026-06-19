@@ -59,7 +59,7 @@ theorem goodStrategyCharacterization {params : Parameters} [FieldModel params.q]
     unfold bipartiteSSCError bipartiteConsError
     apply avgOver_congr
     intro u
-    simpa using hself_eq_point u
+    simpa [IdxProjMeas.toIdxSubMeas] using hself_eq_point u
   constructor
   · intro h
     refine ⟨⟨h.axisParallelTest⟩, ?_, h.diagonalLineTest⟩

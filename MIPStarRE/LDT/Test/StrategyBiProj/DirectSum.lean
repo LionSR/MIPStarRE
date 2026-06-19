@@ -216,7 +216,7 @@ theorem heterogeneousSwapDensity_nonneg {ιA ιB : Type*}
       heterogeneousSwapDensity X * heterogeneousSwapDensity Y := by
   classical
   unfold heterogeneousSwapDensity
-  exact Matrix.reindexAlgEquiv_mul ℂ ℂ (Equiv.prodComm ιA ιB) X Y
+  exact map_mul (Matrix.reindexAlgEquiv ℂ ℂ (Equiv.prodComm ιA ιB)) X Y
 
 @[simp] theorem swapDensity_localPairABBlock {ιA ιB : Type*}
     (X : MIPStarRE.Quantum.Op (ιA × ιB)) :
@@ -363,7 +363,7 @@ theorem normalizedTrace_rolePairDirectSumCond {ιA ιB : Type*}
   change (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj rL rR) X) *
       (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj rL rR) Y) =
     (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj rL rR) (X * Y))
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e]
+  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)]
   congr 1
   simp [opTensor_mul, rolePairProj, roleProj_mul_self]
 
@@ -379,7 +379,7 @@ theorem rolePairDirectSumCond_mul_eq_zero_of_ne {ιA ιB : Type*}
   let e := roleRegisterPairLocalEquiv ιA ιB
   change (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj rL rR) X) *
       (Matrix.reindexAlgEquiv ℂ ℂ e) (opTensor (rolePairProj sL sR) Y) = 0
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e]
+  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)]
   rw [opTensor_mul, rolePairProj_mul_eq_zero_of_ne rL rR sL sR h]
   simp [opTensor]
 
@@ -701,7 +701,7 @@ noncomputable def roleBlock {ιA ιB : Type*}
       (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)) =
     (Matrix.reindexAlgEquiv ℂ ℂ e)
       (Matrix.blockDiagonal (roleBlockFamily (A₁ * A₂) (B₁ * B₂)))
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e
+  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)
     (Matrix.blockDiagonal (roleBlockFamily A₁ B₁))
     (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)), ← Matrix.blockDiagonal_mul]
   congr 2

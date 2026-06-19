@@ -132,8 +132,8 @@ theorem fourier_fact_scalar (a : F) :
       · have hψ : ψ ≠ 0 := by
           have hprimitive : (ffChar (p := p) (F := F)).IsPrimitive := by
             exact AddChar.IsPrimitive.of_ne_one (by
-              simpa using (ffChar_ne_zero (p := p) (F := F)))
-          simpa [ψ] using hprimitive ha
+              simpa [AddChar.one_eq_zero] using (ffChar_ne_zero (p := p) (F := F)))
+          simpa [ψ, AddChar.one_eq_zero] using hprimitive ha
         simp [ha, hψ]
 
 section Vector

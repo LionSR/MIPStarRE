@@ -123,7 +123,8 @@ private noncomputable def pointPairSharedDiagonalLine_ignore_first_equiv
   left_inv := by
     rintro ⟨⟨u, v⟩, t⟩
     refine Prod.ext ?_ ?_
-    · simpa [Prod.ext_iff, sharedDiagonalLineQuestionOfPointPair, addCoord, subCoord] using
+    · simpa [Prod.ext_iff, sampledPointPairFromSharedDiagonalQuestion,
+        sharedDiagonalLineQuestionOfPointPair, addCoord, subCoord] using
         sharedDiagonalLineQuestionOfPointPair_sampledPointPair params ((u, v), t)
     · simp [sharedDiagonalLineQuestionOfPointPair, addCoord, subCoord]
   right_inv := by
@@ -147,7 +148,8 @@ private noncomputable def pointPairSharedDiagonalLine_ignore_second_equiv
   left_inv := by
     rintro ⟨⟨u, v⟩, t⟩
     refine Prod.ext ?_ ?_
-    · simpa [Prod.ext_iff, sharedDiagonalLineQuestionOfPointPair] using
+    · simpa [Prod.ext_iff, sampledPointPairFromSharedDiagonalQuestion,
+        sharedDiagonalLineQuestionOfPointPair] using
         sharedDiagonalLineQuestionOfPointPair_sampledPointPair params ((u, v), t)
     · simp [sharedDiagonalLineQuestionOfPointPair]
   right_inv := by

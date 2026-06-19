@@ -299,9 +299,6 @@ noncomputable def restrictToAxisParallelLine (params : Parameters) [FieldModel p
           (MvPolynomial.monomial n (g.poly.coeff n)))
       (n := params.d) ?_
     intro n hn
-    change
-      (MvPolynomial.eval₂Hom _root_.Polynomial.C (axisCoordinatePolynomial params ℓ)
-        (MvPolynomial.monomial n (g.poly.coeff n))).natDegree ≤ params.d
     rw [MvPolynomial.eval₂Hom_monomial]
     calc
       ((_root_.Polynomial.C (g.poly.coeff n) : LinePolynomialModel params) *
@@ -420,9 +417,6 @@ noncomputable def restrictToDiagonalLine (params : Parameters) [FieldModel param
           (MvPolynomial.monomial n (g.poly.coeff n)))
       (n := params.m * params.d) ?_
     intro n hn
-    change
-      (MvPolynomial.eval₂Hom _root_.Polynomial.C (diagonalCoordinatePolynomial params ℓ)
-        (MvPolynomial.monomial n (g.poly.coeff n))).natDegree ≤ params.m * params.d
     rw [MvPolynomial.eval₂Hom_monomial]
     calc
       ((_root_.Polynomial.C (g.poly.coeff n) : LinePolynomialModel params) *

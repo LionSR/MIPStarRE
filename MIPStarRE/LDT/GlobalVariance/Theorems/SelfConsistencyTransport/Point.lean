@@ -51,14 +51,24 @@ lemma pointConditionedEventSelfConsistency
     refine ⟨?_⟩
     simpa [SymStrat.selfConsistencyFailureProbability] using
       hgood.selfConsistencyTest
-  simpa [pointConditionedEventSubMeasAtPolynomial] using
-    (twoNotionsOfSelfConsistencyAfterEvaluation
+  change SDDRel strategy.state (uniformDistribution (Point params))
+    (IdxSubMeas.liftLeft
+      (fun u : Point params =>
+        postprocess (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement u)
+          (fun a : Fq params => if a = g u then some () else none)))
+    (IdxSubMeas.liftRight
+      (fun u : Point params =>
+        postprocess (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement u)
+          (fun a : Fq params => if a = g u then some () else none)))
+    (2 * delta)
+  exact
+    twoNotionsOfSelfConsistencyAfterEvaluation
       strategy.state strategy.permInvState
       (uniformDistribution (Point params))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       delta
       (fun u a => if a = g u then some () else none)
-      hssc)
+      hssc
 
 /-- The first self-consistency move in `lem:local-variance-of-points`, after
 applying `prop:cab-approx-delta` with the multiplier `I ⊗ (G_g)^{1/2}` but
@@ -170,7 +180,11 @@ lemma pointConditionedEventSelfConsistency_weighted_point_sum
       refine ⟨?_⟩
       simpa [SymStrat.selfConsistencyFailureProbability] using
         hgood.selfConsistencyTest
-    simpa [pointMeas] using
+    change SDDRel strategy.state (uniformDistribution (Point params))
+      (IdxSubMeas.liftLeft (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      (2 * delta)
+    exact
       twoNotionsOfSelfConsistency strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement) delta
         ⟨strategy.permInvState, hssc⟩

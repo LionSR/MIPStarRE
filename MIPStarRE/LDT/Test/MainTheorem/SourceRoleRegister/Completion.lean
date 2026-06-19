@@ -631,7 +631,7 @@ private lemma completedLeftConsistency_of_consistency_and_sdd
     simpa [qBipartiteConsDefect, qBipartiteMatchMass, Q_A.total_eq_one,
       G_B.total_eq_one, opTensor] using hmax
   constructor
-  simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
+  simpa [Q_A, bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefect_Q
 
 /-- Bob-side repaired line-169 consistency after completing the projective
@@ -704,7 +704,7 @@ private lemma completedRightConsistency_of_consistency_and_sdd
     simpa [qBipartiteConsDefect, qBipartiteMatchMass, G_A.total_eq_one,
       Q_B.total_eq_one, opTensor] using hmax
   constructor
-  simpa [bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
+  simpa [Q_B, bipartiteConsError, avgOver, uniformDistribution, constSubMeasFamily]
     using hdefect_Q
 
 /-- Complete two projective submeasurements obtained after the line-130
@@ -914,14 +914,20 @@ theorem completedProjectiveConsistency_ofFullConsistency
   have hfullMeas : ConsRel strategy.state (uniformDistribution Unit)
       (IdxMeas.toIdxSubMeas G_A_const)
       (IdxMeas.toIdxSubMeas G_B_const) ζ := by
-    simpa [G_A_const, G_B_const, constSubMeasFamily, IdxMeas.toIdxSubMeas] using hfull
+    change ConsRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily G_A.toSubMeas)
+      (constSubMeasFamily G_B.toSubMeas) ζ
+    exact hfull
   have hmid :
       SDDRel strategy.state (uniformDistribution Unit)
         (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) G_A.toSubMeas))
         (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) G_B.toSubMeas))
         (2 * ζ) := by
-    simpa [G_A_const, G_B_const, constSubMeasFamily, IdxMeas.toIdxSubMeas,
-      IdxSubMeas.placeLeft, IdxSubMeas.placeRight] using
+    change SDDRel strategy.state (uniformDistribution Unit)
+      (IdxSubMeas.placeLeft (ιB := ιB) (IdxMeas.toIdxSubMeas G_A_const))
+      (IdxSubMeas.placeRight (ιA := ιA) (IdxMeas.toIdxSubMeas G_B_const))
+      (2 * ζ)
+    exact
       Preliminaries.simeqToApprox_heterogeneous strategy.state
         (uniformDistribution Unit) G_A_const G_B_const ζ hfullMeas
   have hleftSymm :

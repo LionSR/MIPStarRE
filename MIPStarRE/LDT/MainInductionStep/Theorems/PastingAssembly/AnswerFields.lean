@@ -116,6 +116,8 @@ theorem answerSuccessorAveragedFamilyFields_ofMainInductionHypothesis.{uι', uF}
         (selfImprovementInInductionError params.next eps delta gamma)
         (by
           intro x
+          change tensorFailureExpectation strategy.state (sliceWitness x)
+              (sliceProj x).toSubMeas ≤ sliceSelfError x
           simpa [family, sliceSelfError] using hboundedSlice x)
         (by
           simpa [sliceSelfError] using havgZeta)
@@ -290,11 +292,12 @@ theorem answerComMainForCarrier_ofAnswerGood
         (CommutativityPoints.pointMeasurementProductLeft params.next carrier)
         (CommutativityPoints.pointMeasurementProductRight params.next carrier)
         (CommutativityPoints.commutativityPointsError params.next gamma) := by
-    simpa [carrier, answerSelfImprovementCarrier,
-      CommutativityPoints.answerPointMeasurementProductLeft,
-      CommutativityPoints.answerPointMeasurementProductRight,
-      CommutativityPoints.pointMeasurementProductLeft,
-      CommutativityPoints.pointMeasurementProductRight] using hcommAnswer
+    change SDDOpRel strategy.state
+      (uniformDistribution (MIPStarRE.LDT.GlobalVariance.PointPairQuestion params.next))
+      (CommutativityPoints.answerPointMeasurementProductLeft params.next strategy)
+      (CommutativityPoints.answerPointMeasurementProductRight params.next strategy)
+      (CommutativityPoints.commutativityPointsError params.next gamma)
+    exact hcommAnswer
   have hconsCarrier : family.ConsistentWithPoints carrier zeta := by
     exact ⟨by simpa [carrier, answerSelfImprovementCarrier] using hcons⟩
   exact

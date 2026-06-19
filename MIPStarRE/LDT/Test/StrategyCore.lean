@@ -60,7 +60,7 @@ lemma swapDensity_mul {ι : Type*} [Fintype ι]
     swapDensity (X * Y) = swapDensity X * swapDensity Y := by
   classical
   simpa [swapDensity_eq_reindex] using
-    (Matrix.reindexAlgEquiv_mul ℂ ℂ (Equiv.prodComm ι ι) X Y)
+    (map_mul (Matrix.reindexAlgEquiv ℂ ℂ (Equiv.prodComm ι ι)) X Y)
 
 lemma swapDensity_opTensor {ι : Type*} [Fintype ι] [DecidableEq ι]
     (X Y : MIPStarRE.Quantum.Op ι) :

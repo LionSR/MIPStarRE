@@ -200,7 +200,6 @@ lemma fromHToGAdjacentStageM2M3_paperMove
         ∑ ogs : GHatOutcome params × GHatTupleOutcome params n,
           ∑ u : Unit, ev ψbi (Cop q ogs u * Bop q ogs)
       have hcsLR : |L - R| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k) := by
-        change |L - R| ≤ Real.sqrt (commuteGHalfSandwichError params gamma zeta k)
         exact hcs
       have hM₂_R : M₂ = R := by
         rw [hM₂_prod]
@@ -326,7 +325,6 @@ lemma fromHToGAdjacentStageM3E_paperMove
       ∑ ogs : GHatOutcome params × GHatTupleOutcome params n,
         ∑ u : Unit, ev ψbi (C q ogs u * Bop q ogs)
     have hcsLR : |L - R| ≤ Real.sqrt (2 * zeta) := by
-      change |L - R| ≤ Real.sqrt (2 * zeta)
       exact hM3M4_cauchySchwarz
     have hM₃_shape : M₃ =
         avgOver (uniformDistribution (Fq params × PointTuple params n)) fun q =>

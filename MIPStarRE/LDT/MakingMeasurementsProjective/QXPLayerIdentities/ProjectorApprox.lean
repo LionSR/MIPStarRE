@@ -557,10 +557,14 @@ lemma pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
   have hx_coisometry :
       data.x * data.xᴴ =
         (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
-    simpa [data, QXPLayerData.ofSigmaRangeAndSvdIdentities,
-      QXPLayerData.ofQLayerAndSvdIdentities, sigmaRangeQLayer] using
-      sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
-        qLayer.q.outcome hRank.projective hsum_le_one
+    change
+      sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective *
+          (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ =
+        (1 : MIPStarRE.Quantum.Op (ULift.{uι}
+          (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => Matrix.rank (qLayer.q.outcome a)))))
+    exact sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
+      qLayer.q.outcome hRank.projective hsum_le_one
   refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl,
     hx_coisometry, ?_⟩
   exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer

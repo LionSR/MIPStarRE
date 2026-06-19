@@ -293,11 +293,8 @@ private lemma update_eq_fixed_count (params : Parameters)
         (Finset.univ.filter fun u : Point params => Function.update u i x = v).card
             = Fintype.card {u : Point params // Function.update u i x = v} := by
                 simpa using
-                  (Fintype.card_ofFinset
-                    (s := Finset.univ.filter fun u : Point params => Function.update u i x = v)
-                    (H := by
-                      intro u
-                      constructor <;> intro hu <;> simpa using hu)).symm
+                  (Fintype.card_subtype
+                    (fun u : Point params => Function.update u i x = v)).symm
         _ = params.q := hcard
     calc
       (∑ u : Point params, if Function.update u i x = v then (1 : ℕ) else 0)

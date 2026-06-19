@@ -266,7 +266,8 @@ private lemma matrixAdjacencyOperator_spectral_decomp (params : Parameters) :
                     ((matrixAdjacencyOperator params).mulVec (fourierBasisState params α)) u := by
                         refine Finset.sum_congr rfl ?_
                         intro α _
-                        simpa [Matrix.mulVec, dotProduct] using
+                        rw [Matrix.mulVec, dotProduct]
+                        exact
                           (Finset.mul_sum
                             (s := (Finset.univ : Finset (Point params)))
                             (a := star (fourierBasisState params α v))
@@ -330,8 +331,11 @@ private lemma fourierBasisChangeMatrix_star_mul_self (params : Parameters) :
     star (fourierBasisChangeMatrix params) * fourierBasisChangeMatrix params =
       (1 : MatrixOperator (pointHilbertSpace params)) := by
   ext α β
-  simpa [fourierBasisChangeMatrix, Matrix.mul_apply, Matrix.one_apply] using
-    fourierBasisState_inner_product params α β
+  change
+    (∑ x : Point params,
+      star (fourierBasisState params α x) * fourierBasisState params β x) =
+        if α = β then 1 else 0
+  exact fourierBasisState_inner_product params α β
 
 private noncomputable def fourierBasisChangeUnitary (params : Parameters) :
     Matrix.unitaryGroup (Point params) ℂ :=
@@ -425,22 +429,35 @@ private lemma fourierBasisChange_conj_laplacian (params : Parameters) :
 private lemma matrixLaplacianOperator_charpoly_roots_eq_fourier (params : Parameters) :
     (matrixLaplacianOperator params).charpoly.roots.map Complex.re =
       (Finset.univ : Finset (Point params)).val.map (laplacianEigenvalue params) := by
-  let U := fourierBasisChangeUnitary params
   let d : Point params → ℂ := fun α => ((laplacianEigenvalue params α : Error) : ℂ)
   let F : Matrix (Point params) (Point params) ℂ := fun u α => fourierBasisState params α u
   let L : Matrix (Point params) (Point params) ℂ := fun u v => matrixLaplacianOperator params u v
   have hF_mul_star : F * star F = 1 := by
-    simpa [U, F, fourierBasisChangeUnitary] using U.2.2
+    ext u v
+    rw [Matrix.mul_apply, Matrix.one_apply]
+    trans ∑ α : Point params,
+        star (fourierBasisState params α v) * fourierBasisState params α u
+    · refine Finset.sum_congr rfl ?_
+      intro α _
+      simp [F, mul_comm]
+    · rw [fourierBasisState_inner_product_dual params v u]
+      by_cases h : v = u
+      · subst v
+        simp
+      · simp [h, show u ≠ v by intro huv; exact h huv.symm]
   have hdiagMatrix :
       star F * L * F = Matrix.diagonal d := by
-    simpa [F, L, d, fourierBasisChangeMatrix] using
-      fourierBasisChange_conj_laplacian params
+    change star (fourierBasisChangeMatrix params) * matrixLaplacianOperator params *
+        fourierBasisChangeMatrix params =
+      Matrix.diagonal (fun α => ((laplacianEigenvalue params α : Error) : ℂ))
+    exact fourierBasisChange_conj_laplacian params
   have hcharpoly :
       (matrixLaplacianOperator params).charpoly = (Matrix.diagonal d).charpoly := by
     calc
       (matrixLaplacianOperator params).charpoly
         = (star F * L * F).charpoly := by
-              simpa [L] using (show L.charpoly = (star F * L * F).charpoly from by
+              change L.charpoly = (star F * L * F).charpoly
+              exact (show L.charpoly = (star F * L * F).charpoly from by
                 rw [Matrix.charpoly_mul_comm, ← mul_assoc, hF_mul_star, one_mul])
       _ = (Matrix.diagonal d).charpoly := by rw [hdiagMatrix]
   calc
@@ -528,7 +545,18 @@ private lemma hypercubeSpectralGap_operator_posSemidef (params : Parameters) :
       (fourierBasisProjector params α).PosSemidef := by
     simpa [fourierBasisProjector] using
       (Matrix.posSemidef_vecMulVec_self_star (fourierBasisState params α))
-  convert hproj.smul (hcoeff_nonneg α hα) using 1
+  have hmatrix :
+      ((laplacianEigenvalue params α - hypercubeSpectralGap params : Error) •
+          fourierBasisProjector params α) =
+        (((laplacianEigenvalue params α - hypercubeSpectralGap params : Error) : ℂ) •
+          fourierBasisProjector params α) := by
+    ext u v
+    simp
+  change
+    ((((laplacianEigenvalue params α - hypercubeSpectralGap params : Error) : ℂ) •
+      fourierBasisProjector params α)).PosSemidef
+  rw [← hmatrix]
+  exact hproj.smul (hcoeff_nonneg α hα)
 
 /-- The operator spectral gap inequality for the hypercube:
 `(1 / (m M)) · P⊥ ≤ L`, with `M = q^m`. -/
@@ -826,7 +854,11 @@ theorem laplacianSpectralGapOrdered (params : Parameters)
       grind [List.pairwise_iff_getElem]
     exact hpairwise.sortedLE
   have hsortedIdx_perm : List.Perm sortedIdxList (List.ofFn id) := by
-    simpa [sortedIdxList, pairRaw] using hsortedPairs_perm.map Prod.snd
+    have hindexList : List.ofFn (Prod.snd ∘ pairRaw) = List.ofFn id := by
+      rw [List.ofFn_inj]
+      funext i
+      simp [pairRaw, Function.comp]
+    simpa [sortedIdxList, hindexList] using hsortedPairs_perm.map Prod.snd
   have hsortedIdx_nodup : sortedIdxList.Nodup := by
     exact hsortedIdx_perm.nodup_iff.mpr (List.nodup_ofFn_ofInjective fun i j h => h)
   have hsortedIdx_mem : ∀ i : Fin M, i ∈ sortedIdxList := by

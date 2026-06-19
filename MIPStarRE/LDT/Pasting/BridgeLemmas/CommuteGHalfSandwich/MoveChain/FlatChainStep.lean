@@ -301,10 +301,33 @@ lemma commuteGHalfSandwich_flatChainStep
         ((commuteGHalfSandwich_flatChainError params gamma zeta r) i)
   | 0, i => by
       fin_cases i
-      simpa [commuteGHalfSandwich_flatChainFamily, commuteGHalfSandwich_flatChainError,
-        commuteGHalfSandwich_postMoveFlatLength] using
+      let izero : Fin (commuteGHalfSandwich_postMoveFlatLength 0) :=
+        ⟨0, by simp [commuteGHalfSandwich_postMoveFlatLength]⟩
+      have hstep :=
         commuteGHalfSandwich_postMoveFlatStep params ψbi family gamma zeta hsc hcom 0
-          ⟨0, by simp [commuteGHalfSandwich_postMoveFlatLength]⟩
+          izero
+      have htransport :
+          SDDOpRel ψbi (uniformDistribution (MoveQ params 0))
+            (commuteGHalfSandwich_moveSourceFamily params family 0)
+            (commuteGHalfSandwich_recursiveTargetFamily params family 0)
+            (commuteGHalfSandwich_postMoveFlatError params gamma zeta 0 izero) :=
+        CommutativityPoints.sddOpRel_congr_outcome ψbi
+          (uniformDistribution (MoveQ params 0))
+          (commuteGHalfSandwich_moveFamily params family 0)
+          (commuteGHalfSandwich_recursiveTargetFamily params family 0)
+          (commuteGHalfSandwich_moveSourceFamily params family 0)
+          (commuteGHalfSandwich_recursiveTargetFamily params family 0)
+          (commuteGHalfSandwich_postMoveFlatError params gamma zeta 0 izero)
+          (fun q ogs => by
+            simp [commuteGHalfSandwich_moveSourceFamily, commuteGHalfSandwich_moveFamily,
+              gHatHalfProductOutcomeOperator, gHatReverseHalfProductOutcomeOperator,
+              leftTensor_one, leftTensor_mul_leftTensor, mul_assoc])
+          (fun _ _ => rfl)
+          hstep
+      simpa [commuteGHalfSandwich_flatChainFamily, commuteGHalfSandwich_flatChainError,
+        commuteGHalfSandwich_postMoveFlatLength, commuteGHalfSandwich_postMoveFlatFamily,
+        commuteGHalfSandwich_moveChainFamily, izero] using
+        htransport
   | r + 1, i => by
       by_cases hi : i.1 < r + 1
       · let imove : Fin (r + 1) := ⟨i.1, hi⟩

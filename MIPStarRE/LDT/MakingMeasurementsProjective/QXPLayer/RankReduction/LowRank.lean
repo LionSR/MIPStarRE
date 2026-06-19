@@ -99,7 +99,8 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
     exact hR.projective a
   · intro a
     have hproj := hR.projective a
-    simpa using hproj.isStarProjection.nonneg
+    change 0 ≤ R.outcome a
+    exact hproj.isStarProjection.nonneg
   · simpa [Qa, QTotal, data] using hR.sum_eq_total
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)
@@ -147,7 +148,8 @@ lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
     exact hR.projective a
   · intro a
     have hproj := hR.projective a
-    simpa using hproj.isStarProjection.nonneg
+    change 0 ≤ R.outcome a
+    exact hproj.isStarProjection.nonneg
   · simpa [Qa, QTotal, data] using hR.sum_eq_total
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)

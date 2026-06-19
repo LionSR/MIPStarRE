@@ -165,15 +165,15 @@ private lemma trace_combined_tensor_eq (params : Parameters)
         P u v * (model.state.matrix * ((model.family v)ᴴ * model.family u)).trace := by
   rw [Matrix.trace_mul_comm]
   suffices
-      ∑ a : Point params × model.space.carrier, ∑ b : model.space.carrier,
-        (∑ c : Point params × model.space.carrier,
-          P a.1 c.1 * model.state.matrix a.2 c.2 *
-          (starRingEnd ℂ) (model.family c.1 b c.2)) *
+      ∑ a : (tensorHilbertSpace (pointHilbertSpace params) model.space).carrier,
+        ∑ b : model.space.carrier,
+        ((matrixTensorOperator P model.state.matrix *
+          matrixCombinedOperator params model) a b) *
           model.family a.1 b a.2 =
         ∑ u, ∑ v, P u v *
           ∑ i, (model.state.matrix * ((model.family v)ᴴ * model.family u)).diag i by
-    simpa [Matrix.trace, Matrix.mul_apply, matrixCombinedOperator, matrixTensorOperator]
-      using this
+    simpa [Matrix.trace, Matrix.mul_apply, Matrix.conjTranspose_apply,
+      matrixCombinedOperator, mul_assoc] using this
   let f : (Point params × model.space.carrier) → model.space.carrier →
       (Point params × model.space.carrier) → ℂ :=
     fun x i z => P x.1 z.1 * model.state.matrix x.2 z.2 *
@@ -188,11 +188,33 @@ private lemma trace_combined_tensor_eq (params : Parameters)
     simp [Matrix.mul_apply, Matrix.conjTranspose_apply, Finset.mul_sum, mul_assoc]
   refine Finset.sum_congr rfl ?_
   intro x hx
-  simpa [mul_assoc, mul_left_comm, mul_comm] using
-    (sum_reorder_four (h := fun x₁ x₂ x₃ x₄ =>
-      P x x₃ *
-        (model.state.matrix x₁ x₄ *
-          (model.family x x₂ x₁ * (starRingEnd ℂ) (model.family x₃ x₂ x₄)))))
+  calc
+    ∑ x₁, ∑ x₂, ∑ x₃, ∑ x₄,
+        P x x₃ * model.state.matrix x₁ x₄ *
+          (starRingEnd ℂ) (model.family x₃ x₂ x₄) * model.family x x₂ x₁
+      = ∑ x₁, ∑ x₃, ∑ x₂, ∑ x₄,
+          P x x₃ * model.state.matrix x₁ x₄ *
+            (starRingEnd ℂ) (model.family x₃ x₂ x₄) * model.family x x₂ x₁ := by
+          refine Finset.sum_congr rfl ?_
+          intro x₁ _
+          rw [Finset.sum_comm]
+    _ = ∑ x₃, ∑ x₁, ∑ x₂, ∑ x₄,
+          P x x₃ * model.state.matrix x₁ x₄ *
+            (starRingEnd ℂ) (model.family x₃ x₂ x₄) * model.family x x₂ x₁ := by
+          rw [Finset.sum_comm]
+    _ = ∑ x₃, ∑ x₁, ∑ x₄, ∑ x₂,
+          P x x₃ * model.state.matrix x₁ x₄ *
+            (starRingEnd ℂ) (model.family x₃ x₂ x₄) * model.family x x₂ x₁ := by
+          refine Finset.sum_congr rfl ?_
+          intro x₃ _
+          refine Finset.sum_congr rfl ?_
+          intro x₁ _
+          rw [Finset.sum_comm]
+    _ = ∑ x₁, ∑ x₂, ∑ x₃, ∑ i,
+          P x x₁ *
+            (model.state.matrix x₂ x₃ *
+              ((starRingEnd ℂ) (model.family x₁ i x₃) * model.family x i x₂)) := by
+          simp [mul_assoc, mul_left_comm, mul_comm]
 
 /-- Expand the normalized trace of the combined tensor witness into its explicit
 double-sum form. -/
@@ -227,11 +249,17 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
             (∑ u, ∑ v,
               (1 : MatrixOperator (pointHilbertSpace params)) u v *
                 matrixExpectation model.state ((model.family v)ᴴ * model.family u)) := by
-      simpa [model, w, abstractMatrixModel, globalVarianceTraceWitness,
-        matrixTensorOperator, matrixCombinedOperator, combinedOperator] using
-        congrArg Complex.re
-          (normalizedTrace_combined_tensor_eq params model
-            (P := (1 : MatrixOperator (pointHilbertSpace params))))
+      change Complex.re (MIPStarRE.Quantum.normalizedTrace
+          ((matrixCombinedOperator params model)ᴴ *
+            (matrixTensorOperator (1 : MatrixOperator (pointHilbertSpace params))
+              model.state.matrix * matrixCombinedOperator params model))) =
+        Complex.re
+          (∑ u, ∑ v,
+            (1 : MatrixOperator (pointHilbertSpace params)) u v *
+              matrixExpectation model.state ((model.family v)ᴴ * model.family u))
+      exact congrArg Complex.re
+        (normalizedTrace_combined_tensor_eq params model
+          (P := (1 : MatrixOperator (pointHilbertSpace params))))
     have hdiag :
         Complex.re
           (∑ u, ∑ v,

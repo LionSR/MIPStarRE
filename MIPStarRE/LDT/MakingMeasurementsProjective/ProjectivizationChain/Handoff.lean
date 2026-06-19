@@ -42,8 +42,10 @@ theorem fullPolynomialConsistency {Outcome : Type*} {ι : Type*}
   let GRight : IdxMeas Unit Outcome ι := fun _ => G_B
   have hpreMeas : ConsRel ψ (uniformDistribution Unit)
       (IdxMeas.toIdxSubMeas GLeft) (IdxMeas.toIdxSubMeas GRight) ζ₁ := by
-    simpa [GLeft, GRight, ldt_simp] using
-      handoff.preProjectiveConsistency
+    refine ⟨?_⟩
+    simpa [bipartiteConsError, qBipartiteConsDefect, qBipartiteMatchMass,
+      GLeft, GRight, constSubMeasFamily, IdxMeas.toIdxSubMeas] using
+      handoff.preProjectiveConsistency.offDiagonalBound
   have hGBip :=
     MIPStarRE.LDT.Preliminaries.simeqToApprox ψ (uniformDistribution Unit)
       GLeft GRight ζ₁ hpreMeas

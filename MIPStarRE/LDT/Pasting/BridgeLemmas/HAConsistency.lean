@@ -67,15 +67,13 @@ theorem hAConsistency_submeas_from_lineConsistency_of_axis_self
         (MainInductionStep.ldPastingInInductionNu params k
           eps delta gamma zeta) := by
   let pointLineMeas : IdxMeas (Point params.next) (Fq params.next) ι := fun u =>
-    { toSubMeas :=
-        postprocess
-          (verticalLineMeasurementFamily params strategy (truncatePoint params u))
-          (fun f => f (pointHeight params u))
+    { toSubMeas := liftedVerticalLineAnswerFamily params strategy u
       total_eq_one := by
         let ℓ : AxisParallelLine params.next :=
           { base := appendPoint params (truncatePoint params u) zeroCoord
             direction := lastCoord params }
-        simpa [verticalLineMeasurementFamily, ℓ, postprocess_total] using
+        simpa [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, ℓ,
+          postprocess_total] using
           (strategy.axisParallelMeasurement ℓ).total_eq_one }
   let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
     fun u => (strategy.pointMeasurement u).toMeasurement
@@ -143,20 +141,45 @@ theorem hAConsistency_submeas_from_lineConsistency_of_axis_self
         νB
         (fun u f => f (pointHeight params u))
         hline_next
-    simpa [pointLineMeas, polynomialEvaluationFamily,
-      postprocess_hRestrictionToVerticalLine_eq_evaluateAt] using hproc
+    have hleft :
+        (fun u : Point params.next =>
+          postprocess
+            (hRestrictionToVerticalLine params H (truncatePoint params u))
+            (fun f => f (pointHeight params u))) =
+          (fun u => evaluateAt params.next u H) := by
+      funext u
+      exact postprocess_hRestrictionToVerticalLine_eq_evaluateAt params H u
+    rw [hleft] at hproc
+    change ConsRel strategy.state (uniformDistribution (Point params.next))
+      (fun u => evaluateAt params.next u H)
+      (fun u =>
+        postprocess
+          (verticalLineMeasurementFamily params strategy (truncatePoint params u))
+          (fun f => f (pointHeight params u)))
+      νB
+    exact hproc
   have hpoint_sdd :
       SDDRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointLineMeas))
-      (IdxSubMeas.liftRight (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement))
+      (IdxSubMeas.liftRight (IdxMeas.toIdxSubMeas pointMeas))
       (8 * (params.m : Error) * eps' + 4 * delta') := by
+    have hpublic :=
+      MIPStarRE.LDT.Pasting.pointVerticalLineSdd_liftedVerticalLine_of_axis_self
+        params strategy eps' delta' haxis_small hself_small
+    have hline_eq :
+        IdxMeas.toIdxSubMeas pointLineMeas =
+          liftedVerticalLineAnswerFamily params strategy := by
+      funext u
+      rfl
+    have hpoint_eq :
+        IdxMeas.toIdxSubMeas pointMeas =
+          IdxProjMeas.toIdxSubMeas strategy.pointMeasurement := by
+      funext u
+      rfl
+    rw [hline_eq, hpoint_eq]
     exact Preliminaries.sddRel_symm strategy.state
-      (uniformDistribution (Point params.next))
-      _ _ _
-      (by simpa [pointLineMeas, eps', delta'] using
-        (MIPStarRE.LDT.Pasting.pointVerticalLineSdd_of_axis_self
-          params strategy eps' delta' haxis_small hself_small))
+      (uniformDistribution (Point params.next)) _ _ _ hpublic
   have htri :
       ConsRel strategy.state (uniformDistribution (Point params.next))
         (polynomialEvaluationFamily params.next H)
@@ -446,7 +469,7 @@ theorem hAConsistency_completed_from_submeas
       (MainInductionStep.ldPastingInInductionError params k
         eps delta gamma kappa zeta) := by
   let ν := MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta
-  let completedEval : IdxSubMeas (Point params.next) (Fq params) ι :=
+  let completedEval : IdxSubMeas (Point params.next) (Fq params.next) ι :=
     fun u => (Preliminaries.completeAtOutcome (evaluateAt params.next u H)
       ((pastedFallbackOutcome params) u)).toSubMeas
   have hcompletedEval :
@@ -454,7 +477,7 @@ theorem hAConsistency_completed_from_submeas
         polynomialEvaluationFamily params.next
           (Preliminaries.completeAtOutcome H (pastedFallbackOutcome params)).toSubMeas := by
     funext u
-    simpa [completedEval, pastedFallbackOutcome] using
+    simpa [completedEval, pastedFallbackOutcome, polynomialEvaluationFamily] using
       (Preliminaries.evaluateAt_completeAtOutcome params.next H
         (pastedFallbackOutcome params) u).symm
   have hresidualMass :
@@ -505,7 +528,7 @@ theorem hAConsistency_completed_from_submeas
                 unfold bipartiteConsError completedEval
                 apply avgOver_mono
                 intro u
-                simpa [evaluateAt, postprocess_total, ν] using
+                simpa [evaluateAt, IdxProjMeas.toIdxSubMeas, postprocess_total, ν] using
                   Preliminaries.qBipartiteConsDefect_completeAtOutcome_right_le
                     strategy.state (strategy.pointMeasurement u).toMeasurement
                     (evaluateAt params.next u H)

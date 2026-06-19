@@ -409,7 +409,7 @@ theorem positive_gram_spectrum_image_rows_mixed_eq_sqrt
       ∑ i : ι, coeff i := by
     rw [← hsplit]
     simp [hzero]
-  simpa [coeff, mul_assoc] using hpositive_sum
+  simpa [coeff, Matrix.vecMulVec, mul_assoc] using hpositive_sum
 
 /-- Zero Gram eigenvectors are killed by the rectangular matrix.
 

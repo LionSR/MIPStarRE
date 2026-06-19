@@ -82,8 +82,15 @@ lemma commuteGHalfSandwich_moveChain_step
           commuteGHalfSandwich_moveChain_step params ψbi family zeta hsc r ⟨i.1, hi⟩
         let j : Fin r := ⟨i.1, hi⟩
         have hsrc : i.1 < r + 1 := Nat.lt_trans hi (Nat.lt_succ_self r)
+        have hj_cast : j.castSucc = i := by
+          ext
+          rfl
+        have hj_succ :
+            j.succ = (⟨i.1 + 1, Nat.succ_lt_succ hi⟩ : Fin (r + 1)) := by
+          ext
+          rfl
         simpa [commuteGHalfSandwich_moveChainFamily, hi,
-          hsrc, Nat.succ_lt_succ hi] using
+          hsrc, Nat.succ_lt_succ hi, hj_cast, hj_succ] using
           commuteGHalfSandwich_moveChainLift params ψbi family r
             ((commuteGHalfSandwich_moveChainFamily params family r) j.castSucc)
             ((commuteGHalfSandwich_moveChainFamily params family r) j.succ)
@@ -94,7 +101,10 @@ lemma commuteGHalfSandwich_moveChain_step
         cases hi_last
         have hlast := commuteGHalfSandwich_moveChainLift_moveFamily_last params ψbi family zeta
             r hsc
-        simpa [commuteGHalfSandwich_moveChainFamily] using
+        have hlastIndex : (⟨r, Nat.lt_succ_self r⟩ : Fin (r + 1)) = Fin.last r := by
+          ext
+          rfl
+        simpa [commuteGHalfSandwich_moveChainFamily, hlastIndex] using
           (CommutativityPoints.sddOpRel_congr_outcome ψbi
             (uniformDistribution (SliceQuestion params × SliceQuestion params ×
                 PointTuple params (r + 1)))

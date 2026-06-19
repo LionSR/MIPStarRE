@@ -121,7 +121,10 @@ theorem self_closeness_transport_through_orthonormalization
       (IdxSubMeas.liftRight (constSubMeasFamily B))
       ε (2 * δ) ε horth_left_swap hA_lr horth_right
   -- Reshape the IdxSubMeas.liftLeft/liftRight wrappers back to constSubMeasFamily form.
-  simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight, constSubMeasFamily] using htri
+  change SDDRel strategy.state (uniformDistribution Unit)
+    (IdxSubMeas.liftLeft (constSubMeasFamily B))
+    (IdxSubMeas.liftRight (constSubMeasFamily B)) (3 * (ε + 2 * δ + ε))
+  exact htri
 
 /-- Final-fields self-closeness construction.
 
@@ -169,7 +172,11 @@ theorem final_fields_self_closeness
         (IdxSubMeas.liftLeft (constSubMeasFamily Hhat))
         (IdxSubMeas.liftLeft (constSubMeasFamily H.toSubMeas))
         (selfImprovementOrthogonalizationError params eps delta) := by
-    simpa [IdxSubMeas.liftLeft, constSubMeasFamily] using horth
+    change SDDRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily Hhat.liftLeft)
+      (constSubMeasFamily H.toSubMeas.liftLeft)
+      (selfImprovementOrthogonalizationError params eps delta)
+    exact horth
   -- Apply the generic transport theorem.
   have hresult :=
     self_closeness_transport_through_orthonormalization params strategy
@@ -179,8 +186,13 @@ theorem final_fields_self_closeness
       hssc horthIdx
   -- Reshape `B.liftLeft / B.liftRight` into the `leftPlacedSubMeas /
   -- rightPlacedSubMeas` form used by the `selfCloseness` field.
-  simpa [SubMeas.liftLeft, SubMeas.liftRight,
-    leftPlacedSubMeas, rightPlacedSubMeas, constSubMeasFamily] using hresult
+  change SDDRel strategy.state (uniformDistribution Unit)
+    (constSubMeasFamily H.toSubMeas.liftLeft)
+    (constSubMeasFamily H.toSubMeas.liftRight)
+    (3 * (selfImprovementOrthogonalizationError params eps delta
+      + 2 * selfImprovementHelperError params eps delta
+      + selfImprovementOrthogonalizationError params eps delta))
+  exact hresult
 
 /-- Literal-threshold self-closeness construction under the standard
 unit-interval hypotheses.

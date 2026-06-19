@@ -194,7 +194,18 @@ theorem final_fields_completeness_of_helper_completeness
         (IdxSubMeas.liftLeft (constSubMeasFamily Hhat))
         (IdxSubMeas.liftLeft (constSubMeasFamily H.toSubMeas))
         (selfImprovementOrthogonalizationError params eps delta) := by
-    simpa [IdxSubMeas.liftLeft, constSubMeasFamily] using horth
+    have hleft :
+        constSubMeasFamily Hhat.liftLeft =
+          IdxSubMeas.liftLeft (constSubMeasFamily Hhat) := by
+      funext u
+      rfl
+    have hright :
+        constSubMeasFamily H.toSubMeas.liftLeft =
+          IdxSubMeas.liftLeft (constSubMeasFamily H.toSubMeas) := by
+      funext u
+      rfl
+    rw [← hleft, ← hright]
+    exact horth
   -- Apply the generic transport theorem.
   have hresult :=
     completeness_transport_through_orthonormalization params strategy Hhat H.toSubMeas

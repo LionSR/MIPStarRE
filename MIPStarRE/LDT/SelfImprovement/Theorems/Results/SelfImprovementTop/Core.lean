@@ -481,15 +481,18 @@ theorem selfImprovement
               (constSubMeasFamily Hhat.liftLeft)
               Pconst
               (selfImprovementOrthogonalizationError params eps delta)
-            simpa [Pconst, IdxProjSubMeas.toIdxSubMeas, constSubMeasFamily,
-              ProjSubMeas.liftLeft, SubMeas.liftLeft] using horth
+            change SDDRel strategy.state (uniformDistribution Unit)
+              (constSubMeasFamily Hhat.liftLeft)
+              (constSubMeasFamily H.toSubMeas.liftLeft)
+              (orthonormalizationError (selfImprovementHelperError params eps delta))
+            exact horth
           have hleft :
               ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) ≥
                 ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) -
                   2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
-            simpa [idxSubMeasMass, avgOver, uniformDistribution,
+            simpa [idxSubMeasMass, avgOver, uniformDistribution, subMeasMass,
               constSubMeasFamily, Pconst, IdxProjSubMeas.toIdxSubMeas,
-              ProjSubMeas.liftLeft, SubMeas.liftLeft] using
+              ProjSubMeas.liftLeft, SubMeas.liftLeft, mkLeftPlacedSubMeas_total] using
               hcomp.completenessTransfer
           have hleft' :
               ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) -
@@ -509,7 +512,11 @@ theorem selfImprovement
                 (IdxSubMeas.liftLeft (constSubMeasFamily Hhat))
                 (IdxSubMeas.liftLeft (constSubMeasFamily H.toSubMeas))
                 (selfImprovementOrthogonalizationError params eps delta) := by
-            simpa [IdxSubMeas.liftLeft, constSubMeasFamily] using horth
+            change SDDRel strategy.state (uniformDistribution Unit)
+              (constSubMeasFamily Hhat.liftLeft)
+              (constSubMeasFamily H.toSubMeas.liftLeft)
+              (orthonormalizationError (selfImprovementHelperError params eps delta))
+            exact horth
           have hcomp :=
             Preliminaries.completenessTransferSelfConsistentA
               strategy.state strategy.permInvState strategy.isNormalized
@@ -525,8 +532,9 @@ theorem selfImprovement
                 ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) -
                   selfImprovementHelperError params eps delta -
                     2 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta) := by
-            simpa [idxSubMeasMass, avgOver, uniformDistribution,
-              constSubMeasFamily, SubMeas.liftLeft] using hcomp
+            simpa [idxSubMeasMass, avgOver, uniformDistribution, subMeasMass,
+              constSubMeasFamily, IdxSubMeas.liftLeft, SubMeas.liftLeft,
+              mkLeftPlacedSubMeas_total] using hcomp
           have hleft' :
               ev strategy.state (leftTensor (ι₂ := ι) Hhat.total) -
                 ev strategy.state (leftTensor (ι₂ := ι) H.toSubMeas.total) ≤
@@ -559,31 +567,40 @@ theorem selfImprovement
               (IdxSubMeas.liftLeft (IdxProjSubMeas.toIdxSubMeas (fun _ : Point params => H)))
               (IdxSubMeas.liftLeft (fun _ : Point params => Hhat))
               (selfImprovementOrthogonalizationError params eps delta) := by
-          simpa [IdxProjSubMeas.toIdxSubMeas] using
-            sddRel_uniform_const strategy.state H.toSubMeas.liftLeft Hhat.liftLeft
-              (selfImprovementOrthogonalizationError params eps delta)
-              (MIPStarRE.LDT.Preliminaries.sddRel_symm strategy.state
-                (uniformDistribution Unit)
-                (constSubMeasFamily Hhat.liftLeft)
-                (constSubMeasFamily H.toSubMeas.liftLeft)
-                (selfImprovementOrthogonalizationError params eps delta) horth)
+          change SDDRel strategy.state (uniformDistribution (Point params))
+            (fun _ : Point params => H.toSubMeas.liftLeft)
+            (fun _ : Point params => Hhat.liftLeft)
+            (selfImprovementOrthogonalizationError params eps delta)
+          exact sddRel_uniform_const strategy.state H.toSubMeas.liftLeft Hhat.liftLeft
+            (selfImprovementOrthogonalizationError params eps delta)
+            (MIPStarRE.LDT.Preliminaries.sddRel_symm strategy.state
+              (uniformDistribution Unit)
+              (constSubMeasFamily Hhat.liftLeft)
+              (constSubMeasFamily H.toSubMeas.liftLeft)
+              (selfImprovementOrthogonalizationError params eps delta) horth)
         have hdataRev :
             SDDRel strategy.state (uniformDistribution (Point params))
               ((polynomialEvaluationFamily params H.toSubMeas).liftLeft)
               ((polynomialEvaluationFamily params Hhat).liftLeft)
               (selfImprovementDataProcessingError params eps delta) := by
-          simpa [polynomialEvaluationFamily, evaluateAt,
-            selfImprovementDataProcessingError_eq params eps delta] using
-            Preliminaries.selfConsistencyImpliesDataProcessing
-              strategy.state strategy.permInvState strategy.isNormalized
-              (uniformDistribution (Point params))
-              (uniformDistribution_weight_sum_le_one (Point params))
-              (fun _ : Point params => Hhat)
-              (fun _ : Point params => H)
-              (selfImprovementHelperError params eps delta)
-              (selfImprovementOrthogonalizationError params eps delta)
-              (fun u g => g u)
-              hhelperSSCPoint horthPoint
+          rw [selfImprovementDataProcessingError_eq params eps delta]
+          change SDDRel strategy.state (uniformDistribution (Point params))
+            (IdxSubMeas.liftLeft
+              (fun q : Point params => postprocess H.toSubMeas (fun g => g q)))
+            (IdxSubMeas.liftLeft
+              (fun q : Point params => postprocess Hhat (fun g => g q)))
+            (8 * selfImprovementHelperError params eps delta +
+              8 * Real.sqrt (selfImprovementOrthogonalizationError params eps delta))
+          exact Preliminaries.selfConsistencyImpliesDataProcessing
+            strategy.state strategy.permInvState strategy.isNormalized
+            (uniformDistribution (Point params))
+            (uniformDistribution_weight_sum_le_one (Point params))
+            (fun _ : Point params => Hhat)
+            (fun _ : Point params => H)
+            (selfImprovementHelperError params eps delta)
+            (selfImprovementOrthogonalizationError params eps delta)
+            (fun u g => g u)
+            hhelperSSCPoint horthPoint
         have hdata :
             SDDRel strategy.state (uniformDistribution (Point params))
               ((polynomialEvaluationFamily params Hhat).liftLeft)

@@ -306,10 +306,13 @@ theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
   refine ⟨hopt.toMatrixSdpOptimalWitness.primalMeasurement, Z,
     hopt.toMatrixSdpOptimalWitness.dualPositive, hopt.dualDominatesIdentity,
     hopt.toMatrixSdpOptimalWitness.dualFeasible, ?_, ?_⟩
-  · simpa [MatrixSdpOptimalWitness.primalMeasurement] using
+  · simpa [MatrixSdpOptimalWitness.primalMeasurement, matrixSdpPrimalObjective,
+      matrixSdpPrimalContributionOperator, MIPStarRE.Quantum.Measurement.ofSumEqOne] using
       hopt.toMatrixSdpOptimalWitness.strongDuality
   · intro g
-    simpa using hopt.toMatrixSdpOptimalWitness.complementarySlacknessEquation g
+    simpa [MatrixSdpOptimalWitness.primalMeasurement, matrixSdpComplementarySlacknessEquation,
+      MIPStarRE.Quantum.Measurement.ofSumEqOne] using
+      hopt.toMatrixSdpOptimalWitness.complementarySlacknessEquation g
 
 end MatrixSdpStatementWithSlacknessAndDominance
 
@@ -357,10 +360,13 @@ theorem matrixSdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
   refine ⟨hopt.toMatrixSdpOptimalWitness.primalMeasurement,
     hopt.toMatrixSdpOptimalWitness.dualPositive, hopt.dualDominatesIdentity,
     hopt.toMatrixSdpOptimalWitness.dualFeasible, ?_, ?_⟩
-  · simpa [MatrixSdpOptimalWitness.primalMeasurement] using
+  · simpa [MatrixSdpOptimalWitness.primalMeasurement, matrixSdpPrimalObjective,
+      matrixSdpPrimalContributionOperator, MIPStarRE.Quantum.Measurement.ofSumEqOne] using
       hopt.toMatrixSdpOptimalWitness.strongDuality
   · intro g
-    simpa using hopt.toMatrixSdpOptimalWitness.complementarySlacknessEquation g
+    simpa [MatrixSdpOptimalWitness.primalMeasurement, matrixSdpComplementarySlacknessEquation,
+      MIPStarRE.Quantum.Measurement.ofSumEqOne] using
+      hopt.toMatrixSdpOptimalWitness.complementarySlacknessEquation g
 
 namespace MatrixSdpStatementWithSlackness
 
@@ -380,9 +386,13 @@ theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
           T.effect g * Z = T.effect g * matrixAveragedPointOperator params model g := by
   obtain ⟨Tsub, Z, hopt⟩ := h.witness
   refine ⟨hopt.primalMeasurement, Z, hopt.dualPositive, hopt.dualFeasible, ?_, ?_⟩
-  · simpa [MatrixSdpOptimalWitness.primalMeasurement] using hopt.strongDuality
+  · simpa [MatrixSdpOptimalWitness.primalMeasurement, matrixSdpPrimalObjective,
+      matrixSdpPrimalContributionOperator, MIPStarRE.Quantum.Measurement.ofSumEqOne] using
+      hopt.strongDuality
   · intro g
-    simpa using hopt.complementarySlacknessEquation g
+    simpa [MatrixSdpOptimalWitness.primalMeasurement, matrixSdpComplementarySlacknessEquation,
+      MIPStarRE.Quantum.Measurement.ofSumEqOne] using
+      hopt.complementarySlacknessEquation g
 
 end MatrixSdpStatementWithSlackness
 

@@ -45,7 +45,9 @@ lemma completePartProjFamily_selfConsistency_generic
             apply avgOver_mono
             intro x
             simpa [switcherooSelfConsistencyLeft, switcherooSelfConsistencyRight,
-              completePartProjFamily, IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+              completePartProjFamily, IdxProjSubMeas.toIdxSubMeas,
+              IdxSubMeas.liftLeft, IdxSubMeas.liftRight, SubMeas.liftLeft,
+              SubMeas.liftRight, leftPlacedSubMeas, rightPlacedSubMeas] using
               qSDD_completePart_le_slice params ψbi family x
     _ ≤ zeta := hself_bound
 

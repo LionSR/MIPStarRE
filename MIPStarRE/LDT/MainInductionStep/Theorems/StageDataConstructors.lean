@@ -295,7 +295,15 @@ noncomputable def AnswerPerSliceInductionData.ofPerSliceInductionData
   sliceMeasurement := perSliceInduction.sliceMeasurement
   pointConsistency := by
     intro x
-    simpa using perSliceInduction.pointConsistency x
+    have hpoint_eq :
+        IdxProjMeas.toIdxSubMeas
+            (xRestrictedStrategy params strategy x).pointMeasurement =
+          IdxProjMeas.toIdxSubMeas
+            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
+      funext u
+      rfl
+    rw [← hpoint_eq]
+    exact perSliceInduction.pointConsistency x
   error_le := by
     intro x
     simpa [SliceRestrictionData.ofAnswer] using perSliceInduction.error_le x
@@ -323,7 +331,15 @@ noncomputable def PerSliceInductionData.ofAnswer
   sliceMeasurement := answerInduction.sliceMeasurement
   pointConsistency := by
     intro x
-    simpa using answerInduction.pointConsistency x
+    have hpoint_eq :
+        IdxProjMeas.toIdxSubMeas
+            (xRestrictedStrategy params strategy x).pointMeasurement =
+          IdxProjMeas.toIdxSubMeas
+            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
+      funext u
+      rfl
+    rw [hpoint_eq]
+    exact answerInduction.pointConsistency x
   error_le := by
     intro x
     simpa [SliceRestrictionData.ofAnswer] using answerInduction.error_le x
@@ -360,6 +376,14 @@ noncomputable def SelfImprovementData.ofAnswerForPerSliceInductionData
       using answerSelf.completeness x
   pointConsistency := by
     intro x
+    have hpoint_eq :
+        IdxProjMeas.toIdxSubMeas
+            (xRestrictedStrategy params strategy x).pointMeasurement =
+          IdxProjMeas.toIdxSubMeas
+            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
+      funext u
+      rfl
+    rw [hpoint_eq]
     simpa [AnswerPerSliceInductionData.ofPerSliceInductionData, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.pointConsistency x
@@ -414,6 +438,14 @@ noncomputable def SelfImprovementData.ofAnswer
       using answerSelf.completeness x
   pointConsistency := by
     intro x
+    have hpoint_eq :
+        IdxProjMeas.toIdxSubMeas
+            (xRestrictedStrategy params strategy x).pointMeasurement =
+          IdxProjMeas.toIdxSubMeas
+            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
+      funext u
+      rfl
+    rw [hpoint_eq]
     simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.pointConsistency x
@@ -470,6 +502,14 @@ noncomputable def AnswerSelfImprovementData.ofSelfImprovementData
       using selfImprovement.completeness x
   pointConsistency := by
     intro x
+    have hpoint_eq :
+        IdxProjMeas.toIdxSubMeas
+            (xRestrictedStrategy params strategy x).pointMeasurement =
+          IdxProjMeas.toIdxSubMeas
+            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
+      funext u
+      rfl
+    rw [← hpoint_eq]
     simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using selfImprovement.pointConsistency x

@@ -115,15 +115,25 @@ theorem commutingWithGIncomplete_ofComplete
               have hq1 :
                   (postprocess ((family.meas q.1).toSubMeas) (fun _ => ())).outcome () =
                     (family.meas q.1).total := by
-                simpa [completePartSubMeas] using
-                  (completePartSubMeas_outcome_unit
-                    (params := params) (family := family) q.1)
+                calc
+                  (postprocess ((family.meas q.1).toSubMeas) (fun _ => ())).outcome () =
+                      (completePartSubMeas params family q.1).total := by
+                    exact completePartSubMeas_outcome_unit
+                      (params := params) (family := family) q.1
+                  _ = (family.meas q.1).total := by
+                    exact completePartSubMeas_total
+                      (params := params) (family := family) q.1
               have hq2 :
                   (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).outcome () =
                     (family.meas q.2).total := by
-                simpa [completePartSubMeas] using
-                  (completePartSubMeas_outcome_unit
-                    (params := params) (family := family) q.2)
+                calc
+                  (postprocess ((family.meas q.2).toSubMeas) (fun _ => ())).outcome () =
+                      (completePartSubMeas params family q.2).total := by
+                    exact completePartSubMeas_outcome_unit
+                      (params := params) (family := family) q.2
+                  _ = (family.meas q.2).total := by
+                    exact completePartSubMeas_total
+                      (params := params) (family := family) q.2
               have hdiff :
                   (incompletePartTotalProductLeft params family q).outcome () -
                       (incompletePartTotalProductRight params family q).outcome () =
@@ -136,6 +146,14 @@ theorem commutingWithGIncomplete_ofComplete
                 have hinner : (1 - A) * (1 - B) - (1 - B) * (1 - A) = A * B - B * A := by
                   dsimp [A, B]
                   noncomm_ring
+                have hA : A = (family.meas q.1).total := by
+                  dsimp [A]
+                  exact completePartSubMeas_total
+                    (params := params) (family := family) q.1
+                have hB : B = (family.meas q.2).total := by
+                  dsimp [B]
+                  exact completePartSubMeas_total
+                    (params := params) (family := family) q.2
                 ext i j
                 rcases i with ⟨i₁, i₂⟩
                 rcases j with ⟨j₁, j₂⟩
@@ -145,7 +163,7 @@ theorem commutingWithGIncomplete_ofComplete
                     completePartTotalProductLeft, completePartTotalProductRight,
                     OpFamily.leftPlacedOpFamily, multiplyByTotalOnRight,
                     multiplyByTotalOnLeft, incompletePartSubMeas, completePartSubMeas,
-                    sub_eq_add_neg, leftTensor, A, B, hq1, hq2, h₂,
+                    sub_eq_add_neg, leftTensor, A, B, hA, hB, hq1, hq2, h₂,
                     (family.meas q.1).sum_eq_total,
                     (family.meas q.2).sum_eq_total] using hentry
                 · simp [incompletePartTotalProductLeft, incompletePartTotalProductRight,

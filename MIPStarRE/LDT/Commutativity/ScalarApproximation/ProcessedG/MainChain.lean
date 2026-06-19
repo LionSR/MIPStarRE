@@ -121,7 +121,23 @@ private lemma evaluatedSlice_pointSwap_right_bound_of_norms
             (evaluatedSlicePhaseFourSwapped (ι := ι) params strategy C)| := by
             rw [hlhs, hrhs]
     _ ≤ 6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error)) := by
-          simpa [evaluatedSlicePhaseFourInserted, evaluatedSlicePhaseFourSwapped] using hswap
+          change
+            |(avgOver (uniformDistribution (EvaluatedSliceQuestion params)) fun q =>
+                  ∑ ab,
+                    ev strategy.state
+                      (C q ab *
+                        rightTensor (ι₁ := ι)
+                          ((evaluatedSlicePointMeas params strategy q.2).outcome ab.2 *
+                            (evaluatedSlicePointMeas params strategy q.1).outcome ab.1))) -
+                avgOver (uniformDistribution (EvaluatedSliceQuestion params)) fun q =>
+                  ∑ ab,
+                    ev strategy.state
+                      (C q ab *
+                        rightTensor (ι₁ := ι)
+                          ((evaluatedSlicePointMeas params strategy q.1).outcome ab.1 *
+                            (evaluatedSlicePointMeas params strategy q.2).outcome ab.2))| ≤
+              6 * Real.sqrt (gamma * (((params.m + 1 : ℕ)) : Error))
+          exact hswap
 
 /- Scalar approximation chain for the evaluated-slice commutation.
 
@@ -225,7 +241,8 @@ lemma evaluatedSlice_scalar_chain_bound
         (4 * zeta) := by
     rcases hconsSub.combinedControl with ⟨h⟩
     constructor
-    simpa [sddError, evaluatedPointFamilyLeft] using
+    simpa [sddError, qSDD, evaluatedPointFamilyLeft, IdxSubMeas.liftLeft,
+      leftPlacedSubMeas] using
       (avgOver_uniform_snd (α := Point params.next) (β := Point params.next)
         (f := fun u =>
           qSDD strategy.state
@@ -244,7 +261,8 @@ lemma evaluatedSlice_scalar_chain_bound
         (4 * zeta) := by
     rcases hconsSub.combinedControl with ⟨h⟩
     constructor
-    simpa [sddError, evaluatedPointFamilyLeft] using
+    simpa [sddError, qSDD, evaluatedPointFamilyLeft, IdxSubMeas.liftLeft,
+      leftPlacedSubMeas] using
       (avgOver_uniform_fst (α := Point params.next) (β := Point params.next)
         (f := fun u =>
           qSDD strategy.state
@@ -388,9 +406,10 @@ lemma evaluatedSlice_scalar_chain_bound
             ((evaluatedSlicePointMeas params strategy q.2).outcome b)
     have hAB :
         avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤ 4 * zeta := by
-      simpa [𝒟, A, B, qSDD, evaluatedSliceFirstFactor, evaluatedPointFamily,
-        evaluatedSlicePointMeas, pointMeas, Parameters.next, IdxSubMeas.liftLeft,
-        SubMeas.liftLeft] using hcombined_fst.squaredDistanceBound
+      have hbound := hcombined_fst.squaredDistanceBound
+      change avgOver 𝒟 (fun q => qSDDCore strategy.state (A q) (B q)) ≤
+        4 * zeta at hbound
+      exact hbound
     have hC :
         ∀ q, ∑ a : Fq params, (∑ b : Fq params, C q a b) * (∑ b : Fq params, C q a b)ᴴ ≤ 1 := by
       intro q

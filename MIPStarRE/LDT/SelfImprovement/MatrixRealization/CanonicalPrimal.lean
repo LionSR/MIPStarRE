@@ -114,8 +114,8 @@ theorem matrixSdpCanonicalBlockDiagonal_nonneg_iff
       have hreindexed :
           (Matrix.reindex e e (Matrix.blockDiagonal B)).PosSemidef := by
         refine Matrix.nonneg_iff_posSemidef.mp ?_
-        simpa [e, matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal]
-          using hB
+        rw [← matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal params model B]
+        exact hB
       exact (Matrix.posSemidef_submatrix_equiv
         (M := Matrix.blockDiagonal B) e.symm).1 hreindexed
     exact (Matrix.blockDiagonal_nonneg_iff B).mp hblock b
@@ -160,9 +160,9 @@ theorem matrixSdpCanonicalBlockDiagonal_trace_mul (params : Parameters)
       ((Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B) *
         (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D)) =
     ∑ b : MatrixSdpCanonicalBlockIndex params, Matrix.trace (B b * D b)
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e
+  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)
     (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)]
-  simp only [Matrix.reindexAlgEquiv_apply]
+  simp only [Matrix.coe_reindexAlgEquiv]
   rw [Matrix.trace_reindex, Matrix.trace_blockDiagonal_mul]
 
 /-- The trace pairing of a canonical block-diagonal operator with an arbitrary
@@ -263,7 +263,7 @@ theorem matrixSdpCanonicalBlockDiagonal_mul (params : Parameters)
         (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D) =
       (Matrix.reindexAlgEquiv ℂ ℂ e)
         (Matrix.blockDiagonal (fun b => B b * D b))
-  rw [← Matrix.reindexAlgEquiv_mul (R := ℂ) (A := ℂ) e
+  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)
     (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)]
   congr
   rw [Matrix.blockDiagonal_mul]
@@ -408,7 +408,11 @@ theorem matrixSdpCanonicalDiagonalBlock_nonneg
     0 ≤ matrixSdpCanonicalDiagonalBlock params model X b := by
   refine Matrix.nonneg_iff_posSemidef.mpr ?_
   have hpos : Matrix.PosSemidef X := Matrix.nonneg_iff_posSemidef.mp hX
-  convert hpos.submatrix (fun i : model.space.carrier => (b, i)) using 1
+  change Matrix.PosSemidef
+    (Matrix.submatrix X
+      (fun i : model.space.carrier => (b, i))
+      (fun i : model.space.carrier => (b, i)))
+  exact hpos.submatrix (fun i : model.space.carrier => (b, i))
 
 /-- The polynomial diagonal blocks of a feasible canonical primal matrix form a
 submeasurement total.

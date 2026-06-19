@@ -122,9 +122,11 @@ lemma evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
         (uniformDistribution (Fq params))
         (IdxProjSubMeas.toIdxSubMeas family.meas)
         (zeta / 2) := by
-    simpa [IdxProjSubMeas.toIdxSubMeas] using
-      (gCommStability_sliceSSC params strategy zeta family
-        (fun x => (family.meas x).toSubMeas) (fun _ => rfl) hself)
+    change BipartiteSSCRel strategy.state
+      (uniformDistribution (Fq params))
+      (fun x => (family.meas x).toSubMeas) (zeta / 2)
+    exact gCommStability_sliceSSC params strategy zeta family
+      (fun x => (family.meas x).toSubMeas) (fun _ => rfl) hself
   have hpost :
       ∀ u : Point params,
         SDDRel strategy.state
@@ -153,7 +155,7 @@ lemma evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
           (IdxSubMeas.liftRight
             (fun x => evaluateAt params u ((family.meas x).toSubMeas))) ≤
         2 * (zeta / 2) := by
-      simpa [evaluateAt] using htmp.squaredDistanceBound
+      simpa [evaluateAt, IdxProjSubMeas.toIdxSubMeas] using htmp.squaredDistanceBound
     calc
       sddError strategy.state
           (uniformDistribution (Fq params))

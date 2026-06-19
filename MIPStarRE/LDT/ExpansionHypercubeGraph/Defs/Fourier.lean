@@ -509,7 +509,7 @@ lemma fourierBasisState_inner_product (params : Parameters) (α β : Point param
             _ = pointAddChar params β u / pointAddChar params α u := by
                   rw [div_eq_mul_inv, mul_comm]
             _ = pointAddChar params (β - α) u := by
-                  simpa [pointAddCharRight] using
+                  simpa [pointAddChar, pointAddCharRight] using
                     (AddChar.map_sub_eq_div (ψ := pointAddCharRight params u) β α).symm
     _ = 𝔼 u : Point params, pointAddChar params (β - α) u := by
           rw [Fintype.expect_eq_sum_div_card, div_eq_mul_inv]

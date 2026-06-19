@@ -149,9 +149,12 @@ private lemma matrixTraceForm_localToGlobal (params : Parameters)
       matrixTensorOperator (((hypercubeSpectralGap params : ℂ) •
           orthogonalModeProjectorMatrix params)) model.state.matrix ≤
         matrixTensorOperator (matrixLaplacianOperator params) model.state.matrix := by
-    simpa [matrixTensorOperator] using
-      MIPStarRE.Quantum.kronecker_mono_left
-        (hypercubeSpectralGap_operator params) model.state.positive
+    change Matrix.kronecker
+        (((hypercubeSpectralGap params : ℂ) • orthogonalModeProjectorMatrix params))
+        model.state.matrix ≤
+      Matrix.kronecker (matrixLaplacianOperator params) model.state.matrix
+    exact MIPStarRE.Quantum.kronecker_mono_left
+      (hypercubeSpectralGap_operator params) model.state.positive
   have hwitness :
       ((hypercubeSpectralGap params : ℂ) • matrixGlobalVarianceTraceWitness params model) ≤
         matrixLocalVarianceTraceWitness params model := by
@@ -288,8 +291,9 @@ lemma localToGlobal (params : Parameters)
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
   by_cases hι : Nonempty ι
   · letI := hι
-    simpa [abstractMatrixModel] using
-      (matrixLocalToGlobal params (abstractMatrixModel params A ψ))
+    change matrixGlobalVariance params (abstractMatrixModel params A ψ) ≤
+      (params.m : Error) * matrixLocalVariance params (abstractMatrixModel params A ψ)
+    exact matrixLocalToGlobal params (abstractMatrixModel params A ψ)
   · rw [globalVariance_eq_zero_of_isEmpty hι params A ψ,
       localVariance_eq_zero_of_isEmpty hι params A ψ]
     positivity
@@ -315,8 +319,9 @@ lemma localRewrite (params : Parameters)
   by_cases hι : Nonempty ι
   · letI := hι
     exact ⟨by
-      simpa [abstractMatrixModel] using
-        (matrixLocalRewrite params (abstractMatrixModel params A ψ)).traceFormula⟩
+      change matrixLocalVariance params (abstractMatrixModel params A ψ) =
+        matrixLocalVarianceTraceForm params (abstractMatrixModel params A ψ)
+      exact (matrixLocalRewrite params (abstractMatrixModel params A ψ)).traceFormula⟩
   · exact ⟨by
       rw [localVariance_eq_zero_of_isEmpty hι params A ψ,
         localVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ]⟩
@@ -339,8 +344,15 @@ lemma globalRewrite (params : Parameters)
             (hypercubeVertexCount params : Error)⁻¹ *
               (hypercubeVertexCount params : Error)⁻¹ *
                 ∑ u, ∑ v, ev ψ ((A v)ᴴ * A u) := by
-              simpa [abstractMatrixModel] using
-                (matrixGlobalVariance_eq_closedForm params (abstractMatrixModel params A ψ))
+              change matrixGlobalVariance params (abstractMatrixModel params A ψ) =
+                ((hypercubeVertexCount params : Error)⁻¹ *
+                    ∑ u, ev (matrixModelState (abstractMatrixModel params A ψ))
+                      ((A u)ᴴ * A u) -
+                  (hypercubeVertexCount params : Error)⁻¹ *
+                    (hypercubeVertexCount params : Error)⁻¹ *
+                      ∑ u, ∑ v, ev (matrixModelState (abstractMatrixModel params A ψ))
+                        ((A v)ᴴ * A u))
+              exact matrixGlobalVariance_eq_closedForm params (abstractMatrixModel params A ψ)
       _ = globalVarianceTraceForm params A ψ (canonicalGlobalVarianceDecomposition params A) := by
               symm
               simpa using

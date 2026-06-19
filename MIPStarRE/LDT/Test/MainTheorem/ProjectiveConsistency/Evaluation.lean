@@ -73,7 +73,10 @@ theorem consRel_constPolynomialEvaluation
   have hprocessed :=
     Preliminaries.consRelDataProcessing_questionDependent ψ
       (uniformDistribution (Point params)) Aconst Bconst δ (fun u g => g u) hconstPoint
-  simpa [Aconst, Bconst, polynomialEvaluationFamily, evaluateAt] using hprocessed
+  change ConsRel ψ (uniformDistribution (Point params))
+    (fun u => postprocess A.toSubMeas (fun g : Polynomial params => g.toFun u))
+    (fun u => postprocess B.toSubMeas (fun g : Polynomial params => g.toFun u)) δ
+  simpa [Aconst, Bconst] using hprocessed
 
 /-- Heterogeneous form of `consRel_constPolynomialEvaluation`.
 
@@ -131,7 +134,10 @@ theorem consRel_constPolynomialEvaluation_heterogeneous
   have hprocessed :=
     Preliminaries.consRelDataProcessing_questionDependent ψ
       (uniformDistribution (Point params)) Aconst Bconst δ (fun u g => g u) hconstPoint
-  simpa [Aconst, Bconst, polynomialEvaluationFamily, evaluateAt] using hprocessed
+  change ConsRel ψ (uniformDistribution (Point params))
+    (fun u => postprocess A.toSubMeas (fun g : Polynomial params => g.toFun u))
+    (fun u => postprocess B.toSubMeas (fun g : Polynomial params => g.toFun u)) δ
+  simpa [Aconst, Bconst] using hprocessed
 
 /-- Turn a line-156 projective approximation into the evaluated consistency used
 in the final point-consistency triangles.

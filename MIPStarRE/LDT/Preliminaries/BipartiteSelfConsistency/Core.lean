@@ -306,7 +306,9 @@ theorem twoNotionsOfSelfConsistency {Question Outcome : Type*}
         avgOver 𝒟 (fun q => 2 * qBipartiteSSCDefect ψ (A q)) := by
           apply avgOver_mono
           intro q
-          simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight] using
+          simpa [IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
+            SubMeas.liftLeft, SubMeas.liftRight,
+            leftPlacedSubMeas, rightPlacedSubMeas] using
             qSDD_liftLeft_liftRight_le_two_qBipartiteSSCDefect ψ hψ (A q)
     _ = 2 * avgOver 𝒟 (fun q => qBipartiteSSCDefect ψ (A q)) := by
           rw [avgOver_const_mul]

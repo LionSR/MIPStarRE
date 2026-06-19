@@ -155,7 +155,7 @@ lemma qBipartiteSSCDefect_eq_half_qSDD_of_proj
               _ = ev ψ LA + ev ψ RA - 2 * ev ψ (LA * RA) := by
                     rw [ev_sub, ev_add]
                     have hscale : ev ψ ((2 : Error) • (LA * RA)) = 2 * ev ψ (LA * RA) := by
-                      simpa using (ev_scale ψ (2 : Error) (LA * RA))
+                      exact ev_scale ψ (2 : Error) (LA * RA)
                     rw [hscale]
               _ = ev ψ (leftTensor (ι₂ := ι) (P.outcome a)) +
                     ev ψ (rightTensor (ι₁ := ι) (P.outcome a)) -

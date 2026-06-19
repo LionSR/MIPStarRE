@@ -203,7 +203,8 @@ private lemma gCommStabilityTwo_pointwise_bound
     _ ≤ ev strategy.state
           (leftTensor (ι₂ := ι) (1 - (G (pointHeight params q.1)).total) *
             rightTensor (ι₁ := ι) ((G (pointHeight params q.1)).total)) := by
-          simpa using gCommStabilityTwo_pointwise_sum_bound params strategy family G hG q
+          simpa [gCommOverlapTerm] using
+            gCommStabilityTwo_pointwise_sum_bound params strategy family G hG q
 
 /-- Overlap-only version of the second stability estimate.
 

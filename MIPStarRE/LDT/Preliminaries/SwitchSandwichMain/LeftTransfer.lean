@@ -48,7 +48,8 @@ lemma switchSandwich_leftTransfer
         (fun q =>
           qSDD ψ ((A q).toSubMeas.liftLeft) ((A q).toSubMeas.liftRight)) ≤ δ := by
     simpa [BipartiteSDDRel, sddError, IdxProjSubMeas.toIdxSubMeas, IdxSubMeas.liftLeft,
-      IdxSubMeas.liftRight] using happrox.leftRightSquaredDistanceBound
+      IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight] using
+      happrox.leftRightSquaredDistanceBound
   have hleft_gap :
       |leftSandwichExpectation ψ 𝒟 A B - inter| ≤ Real.sqrt δ := by
     calc

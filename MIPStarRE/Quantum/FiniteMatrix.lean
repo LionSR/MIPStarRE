@@ -225,8 +225,25 @@ theorem realTracePairingCLM_tracePairingMatrixOfRealCLM
                     simp [Complex.re_add_im]
                   · simp [Matrix.single, Ne.symm hbj]
                 · simp [Matrix.single, Ne.symm hai]]
-          simp [tracePairingMatrixOfRealCLM, Complex.mul_re]
-          ring
+          have hre :
+              Matrix.single i j ((X i j).re : ℂ) =
+                (X i j).re • Matrix.single i j (1 : ℂ) := by
+            rw [Matrix.smul_single]
+            simp
+          have him :
+              Matrix.single i j ((X i j).im * Complex.I) =
+                (X i j).im • Matrix.single i j Complex.I := by
+            rw [Matrix.smul_single]
+            simp
+          simp only [Complex.mul_re, Matrix.smul_single, Complex.real_smul, mul_one, map_add]
+          have hreTrace :
+              (tracePairingMatrixOfRealCLM ψ j i).re = ψ (Matrix.single i j (1 : ℂ)) := by
+            simp [tracePairingMatrixOfRealCLM]
+          have himTrace :
+              (tracePairingMatrixOfRealCLM ψ j i).im = -ψ (Matrix.single i j Complex.I) := by
+            simp [tracePairingMatrixOfRealCLM]
+          rw [hre, him, map_smul, map_smul, hreTrace, himTrace]
+          ring_nf
     _ = ψ (∑ i, ∑ j, Matrix.single i j (X i j)) := by
           simp
     _ = ψ X := by
@@ -262,7 +279,7 @@ theorem realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
   rw [tracePairingHermitianPart, smul_mul_assoc, Matrix.add_mul]
   rw [show Matrix.trace ((1 / 2 : ℝ) • (Z * X + Zᴴ * X)) =
       (1 / 2 : ℝ) • Matrix.trace (Z * X + Zᴴ * X) by
-        simp [Matrix.trace, Finset.mul_sum]]
+        rw [Matrix.trace_smul]]
   rw [Matrix.trace_add, Complex.smul_re, Complex.add_re]
   rw [hZX]
   ring
@@ -511,9 +528,10 @@ theorem blockDiagonal_nonneg_iff {o m : Type*}
     have hsub :
         ((Matrix.blockDiagonal B).submatrix e e).PosSemidef :=
       (Matrix.nonneg_iff_posSemidef.mp hB).submatrix e
-    convert hsub using 1
-    ext i j
-    simp [e, Matrix.blockDiagonal_apply]
+    have hEq : (Matrix.blockDiagonal B).submatrix e e = B b := by
+      ext i j
+      simp [e, Matrix.blockDiagonal_apply_eq]
+    simpa [hEq] using hsub
   · exact Matrix.blockDiagonal_nonneg B
 
 end Matrix

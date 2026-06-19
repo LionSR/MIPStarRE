@@ -133,7 +133,8 @@ lemma orthonormalizationMeasurement_of_consistency {Outcome : Type*}
         (constSubMeasFamily A.toSubMeas.liftLeft)
         (constSubMeasFamily P.toSubMeas.liftLeft) ≤
         orthonormalizationMainLemmaError ζ := by
-    simpa [SubMeas.liftLeft] using hP
+    simpa [sddError, qSDD, qSDDCore, SubMeas.liftLeft, leftPlacedSubMeas,
+      leftPlacedSubMeas_outcome, mkLeftPlacedSubMeas_outcome] using hP
   constructor
   exact hP'.trans
     (Orthonormalization.ErrorBounds.orthonormalizationMainLemmaError_le_orthonormalizationError

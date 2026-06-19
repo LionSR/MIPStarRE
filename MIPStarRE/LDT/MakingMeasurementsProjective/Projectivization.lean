@@ -456,7 +456,7 @@ lemma consistencyToAlmostProjective {Outcome : Type*}
     calc
       qSSCDefect ψ A_lifted.toSubMeas
         ≤ 2 * qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
-            simpa [A_lifted] using
+            simpa [A_lifted, leftLiftedMeasurement, leftPlacedSubMeas] using
               qSSCDefect_leftPlacedMeasurement_le_two_qBipartiteConsDefect
                 (ψ := ψ) A B
       _ ≤ 2 * ζ := by
@@ -508,7 +508,7 @@ lemma consistencyToAlmostProjective_right {Outcome : Type*}
     calc
       qSSCDefect ψ B_lifted.toSubMeas
         ≤ 2 * qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
-            simpa [B_lifted] using
+            simpa [B_lifted, rightLiftedMeasurement, rightPlacedSubMeas] using
               qSSCDefect_rightPlacedMeasurement_le_two_qBipartiteConsDefect
                 (ψ := ψ) A B
       _ ≤ 2 * ζ := by

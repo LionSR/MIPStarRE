@@ -124,7 +124,6 @@ private lemma avgOver_slice_total_left_sandwich_eq
         (((uniformDistribution (Fq params)).weight y : Error) : ℂ) •
           (A * (family.meas y).total * A) := by
     simp [mul_assoc]
-    rfl
   rw [hmatrix]
   rw [← leftTensor_smul (ι₂ := ι)
     (((uniformDistribution (Fq params)).weight y : Error) : ℂ)
@@ -348,8 +347,20 @@ lemma fullSlice_scalar_marginalize_x
         (IdxProjSubMeas.toIdxSubMeas (evaluatedPointProj params family))
         (IdxProjSubMeas.toIdxSubMeas (evaluatedPointProj params family)) zeta := by
     refine ⟨?_⟩
-    simpa [MIPStarRE.LDT.Preliminaries.BipartiteSDDRel, evaluatedPointProj]
-      using hevalRel.squaredDistanceBound
+    have hleft :
+        evaluatedPointFamilyLeft params family =
+          IdxSubMeas.liftLeft
+            (IdxProjSubMeas.toIdxSubMeas (evaluatedPointProj params family)) := by
+      funext u
+      rfl
+    have hright :
+        evaluatedPointFamilyRight params family =
+          IdxSubMeas.liftRight
+            (IdxProjSubMeas.toIdxSubMeas (evaluatedPointProj params family)) := by
+      funext u
+      rfl
+    rw [← hleft, ← hright]
+    exact hevalRel.squaredDistanceBound
   have hevalSwitch :=
     MIPStarRE.LDT.Preliminaries.switchSandwich strategy.state
       (uniformDistribution (Point params.next)) hnorm

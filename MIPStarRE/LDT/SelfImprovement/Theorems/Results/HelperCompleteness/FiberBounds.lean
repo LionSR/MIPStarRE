@@ -474,7 +474,7 @@ theorem helper_second_move_pointwise_abs_le_sqrt
   rw [opTensor_mul] at hcs
   rw [conjTranspose_opTensor, hTf_herm, Matrix.conjTranspose_one, opTensor_mul] at hcs
   rw [conjTranspose_opTensor, hAu_herm, hOneSub_herm, opTensor_mul] at hcs
-  simpa [Tf, Au, leftTensor] using hcs
+  simpa [Tf, Au, leftTensor, opTensor] using hcs
 
 /-- The second Cauchy--Schwarz move in the helper-completeness proof.
 

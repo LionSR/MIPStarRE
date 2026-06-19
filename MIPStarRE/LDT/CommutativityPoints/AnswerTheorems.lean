@@ -243,8 +243,16 @@ private lemma answerSampledDiagonalLineApproximation_ignore_first
           (IdxSubMeas.liftRight (answerSampledDiagonalLineEvaluation params strategy)) := by
             rfl
     _ ≤ pointDiagonalLineApproxError params gamma := by
-          simpa [answerSampledPointMeasurement, answerSampledDiagonalLineEvaluation,
-            sampledPointFromDiagonalQuestion] using happrox
+          change
+            sddError strategy.state (pointWithDiagonalLineDistribution params)
+              (IdxSubMeas.liftLeft
+                (fun q : PointDiagonalLineQuestion params =>
+                  (strategy.pointMeasurement (q.1.pointAt q.2)).toSubMeas))
+              (IdxSubMeas.liftRight
+                (fun q : PointDiagonalLineQuestion params =>
+                  postprocess (strategy.diagonalMeasurement.toIdxProjMeas q.1).toSubMeas
+                    (fun f => f q.2))) ≤ pointDiagonalLineApproxError params gamma
+          exact happrox
 
 private lemma answerSampledDiagonalLineApproximation_ignore_second
     (params : Parameters)
@@ -307,8 +315,16 @@ private lemma answerSampledDiagonalLineApproximation_ignore_second
           (IdxSubMeas.liftRight (answerSampledDiagonalLineEvaluation params strategy)) := by
             rfl
     _ ≤ pointDiagonalLineApproxError params gamma := by
-          simpa [answerSampledPointMeasurement, answerSampledDiagonalLineEvaluation,
-            sampledPointFromDiagonalQuestion] using happrox
+          change
+            sddError strategy.state (pointWithDiagonalLineDistribution params)
+              (IdxSubMeas.liftLeft
+                (fun q : PointDiagonalLineQuestion params =>
+                  (strategy.pointMeasurement (q.1.pointAt q.2)).toSubMeas))
+              (IdxSubMeas.liftRight
+                (fun q : PointDiagonalLineQuestion params =>
+                  postprocess (strategy.diagonalMeasurement.toIdxProjMeas q.1).toSubMeas
+                    (fun f => f q.2))) ≤ pointDiagonalLineApproxError params gamma
+          exact happrox
 
 /-- **Lean-only:** A local tensor-placement comparison in the answer-valued
 point-commutativity chain.
@@ -396,7 +412,8 @@ private lemma answerOrderedLiftToMixedLine
           = leftTensor
               ((strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome a *
                 (strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b) := by
-                  simpa [Astep, Araw, e] using
+                  simpa [Astep, Araw, e, opFamilyOfOutcome,
+                    pointPairOutcomeSwapEquiv] using
                     liftLeft_mul_leftPlaced_outcome
                       ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)
                       ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)
@@ -414,7 +431,8 @@ private lemma answerOrderedLiftToMixedLine
           = opTensor
               ((strategy.pointMeasurement (q.1.pointAt q.2.1)).outcome a)
               ((answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.2)).outcome b) := by
-                  simpa [Bstep, Braw, e] using
+                  simpa [Bstep, Braw, e, opFamilyOfOutcome,
+                    pointPairOutcomeSwapEquiv] using
                     liftLeft_mul_rightPlaced_outcome
                       ((strategy.pointMeasurement (q.1.pointAt q.2.1)).toSubMeas)
                       (answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.2))
@@ -662,7 +680,8 @@ private lemma answerOrderedDropFromLineComparison
                     (q.1, q.2.1)).outcome a *
                   (answerSampledDiagonalLineEvaluation params strategy
                     (q.1, q.2.2)).outcome b) := by
-                    simpa [Astep, Araw, e] using
+                    simpa [Astep, Araw, e, opFamilyOfOutcome,
+                      pointPairOutcomeSwapEquiv] using
                       liftRight_mul_rightPlaced_outcome
                         (answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.1))
                         (answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.2))
@@ -679,7 +698,8 @@ private lemma answerOrderedDropFromLineComparison
             = opTensor
                 ((strategy.pointMeasurement (q.1.pointAt q.2.2)).outcome b)
                 ((answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.1)).outcome a) := by
-                    simpa [Bstep, Braw, e] using
+                    simpa [Bstep, Braw, e, opFamilyOfOutcome,
+                      pointPairOutcomeSwapEquiv] using
                       liftRight_mul_leftPlaced_outcome
                         (answerSampledDiagonalLineEvaluation params strategy (q.1, q.2.1))
                         ((strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas)

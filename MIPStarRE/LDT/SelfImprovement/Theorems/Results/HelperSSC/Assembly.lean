@@ -796,7 +796,7 @@ theorem helper_strong_self_consistency_of_helper_conclusion
     exact selfImprovementHelperError_nonneg params eps delta
   constructor
   simpa [bipartiteSSCError, avgOver, uniformDistribution, constSubMeasFamily,
-    qBipartiteSSCDefect, subMeasMass, SubMeas.liftLeft] using
+    qBipartiteSSCDefect, qBipartiteMatchMass, subMeasMass, SubMeas.liftLeft] using
     (max_le hhelperErr_nonneg hhelperGap_absorbed)
 
 end MIPStarRE.LDT.SelfImprovement

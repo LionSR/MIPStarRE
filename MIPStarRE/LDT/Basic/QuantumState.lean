@@ -198,7 +198,7 @@ theorem leftTensor_one
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂] :
     leftTensor (ι₂ := ι₂) (1 : MIPStarRE.Quantum.Op ι₁) =
       (1 : MIPStarRE.Quantum.Op (ι₁ × ι₂)) := by
-  simpa only [leftTensor] using
+  simpa only [leftTensor, Matrix.kronecker] using
     (Matrix.one_kronecker_one (m := ι₁) (n := ι₂) (α := ℂ))
 
 /-- Right placement of the identity is the identity on the product space. -/
@@ -206,7 +206,7 @@ theorem rightTensor_one
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂] :
     rightTensor (ι₁ := ι₁) (1 : MIPStarRE.Quantum.Op ι₂) =
       (1 : MIPStarRE.Quantum.Op (ι₁ × ι₂)) := by
-  simpa only [rightTensor] using
+  simpa only [rightTensor, Matrix.kronecker] using
     (Matrix.one_kronecker_one (m := ι₁) (n := ι₂) (α := ℂ))
 
 /-- Local tensor placements multiply to the full Kronecker product. -/
@@ -476,7 +476,7 @@ theorem leftTensor_sub
     (A B : MIPStarRE.Quantum.Op ι₁) :
     leftTensor (ι₂ := ι₂) A - leftTensor (ι₂ := ι₂) B =
       leftTensor (ι₂ := ι₂) (A - B) := by
-  simpa [leftTensor] using
+  simpa [leftTensor, opTensor, Matrix.kronecker] using
     (opTensor_sub_left (ι₁ := ι₁) (ι₂ := ι₂) A B (1 : MIPStarRE.Quantum.Op ι₂))
 
 /-- Right tensor placement commutes with subtraction. -/

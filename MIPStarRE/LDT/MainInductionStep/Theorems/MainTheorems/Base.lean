@@ -75,8 +75,15 @@ theorem mainInductionBaseCase
             ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
             (· zeroCoord))
         strategy.axisParallelFailureProbability := by
-    simpa [IdxProjMeas.toIdxSubMeas, axisParallelPointAnswerFamily,
-      axisParallelLineAnswerFamily, eSample, i0] using
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (fun b => (strategy.pointMeasurement b).toSubMeas)
+      (fun u =>
+        postprocess
+          ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
+          (· zeroCoord))
+      strategy.axisParallelFailureProbability
+    simpa [axisParallelPointAnswerFamily, axisParallelLineAnswerFamily,
+      axisParallelPointAnswerFamilyOf, axisParallelLineAnswerFamilyOf, eSample, i0] using
       ((Preliminaries.consRel_uniform_equiv
         (e := eSample)
         (ψ := strategy.state)
@@ -232,8 +239,16 @@ theorem answerMainInductionBaseCase
             ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
             (· zeroCoord))
         strategy.axisParallelFailureProbability := by
-    simpa [IdxProjMeas.toIdxSubMeas, AnswerSymStrat.axisParallelPointAnswerFamily,
-      AnswerSymStrat.axisParallelLineAnswerFamily, eSample, i0] using
+    change ConsRel strategy.state (uniformDistribution (Point params))
+      (fun b => (strategy.pointMeasurement b).toSubMeas)
+      (fun u =>
+        postprocess
+          ((strategy.axisParallelMeasurement { base := u, direction := i0 }).toSubMeas)
+          (· zeroCoord))
+      strategy.axisParallelFailureProbability
+    simpa [AnswerSymStrat.axisParallelPointAnswerFamily,
+      AnswerSymStrat.axisParallelLineAnswerFamily, axisParallelPointAnswerFamilyOf,
+      axisParallelLineAnswerFamilyOf, eSample, i0] using
       ((Preliminaries.consRel_uniform_equiv
         (e := eSample)
         (ψ := strategy.state)

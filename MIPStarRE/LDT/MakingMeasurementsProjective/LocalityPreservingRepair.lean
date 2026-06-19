@@ -643,7 +643,7 @@ theorem rightPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
           SDDOpRel φ (uniformDistribution Unit)
             (constOpFamily (B.toSubMeas : OpFamily Outcome ιB))
             (constOpFamily data.qLayer.q) (roundingToProjectiveError ζ) := by
-        simpa [hq] using hRank.closeness
+        simpa [hq, sigmaRangeQLayer] using hRank.closeness
       have hBP_local :
           SDDOpRel φ (uniformDistribution Unit)
             (constOpFamily (B.toSubMeas : OpFamily Outcome ιB))
@@ -750,7 +750,8 @@ theorem leftLiftedProjectivizationRepair_of_sourceAlmostProjective_two_mul
       (ψ := ψ) (hψ := hψ) (A := A) (ζ := ζ) hζ hsource
   refine ⟨P, ?_⟩
   constructor
-  simpa [leftLiftedMeasurement, ProjSubMeas.liftLeft, SubMeas.liftLeft]
+  simpa [leftLiftedMeasurement, ProjSubMeas.liftLeft, SubMeas.liftLeft,
+    leftPlacedSubMeas]
     using hP
 
 /-- Paper-labelled name for the locality-preserving projectivization repair.
