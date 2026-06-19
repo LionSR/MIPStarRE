@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint.CauchySchwarz
 
 /-!
-# Section 12 pasting: line one-point bridge — core theorems
+# Section 12 pasting: line one-point transport — core theorems
 
 Internal helper module; part of the file-split for `#1127`.
 
@@ -131,7 +131,7 @@ lemma ldSandwichLineOnePoint_matchMass_lower_bound
       heps_nonneg hdelta_nonneg hgamma_nonneg hzeta_nonneg hzeta_le
 
 /-- Turn the scalar match-mass lower bound into the `ConsRel` needed by the
-public one-point bridge. -/
+public line-one-point statement. -/
 lemma ldSandwichLineOnePoint_nonzero_prefix_transport
     (params : Parameters)
     [FieldModel params.q]

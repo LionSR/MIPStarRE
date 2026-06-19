@@ -19,7 +19,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Exact bookkeeping at the end of the adjacent-stage bridge.
+/-- Exact bookkeeping at the end of the adjacent-stage comparison.
 
 This isolates the paper's `S`-recurrence step
 `references/ldt-paper/ld-pasting.tex:1417--1425` and its use in the final

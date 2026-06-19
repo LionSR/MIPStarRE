@@ -2,7 +2,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint.EndpointEquivs
 import MIPStarRE.LDT.Pasting.Core.LdGbcon
 
 /-!
-# Section 12 pasting: line one-point bridge — endpoint lemmas
+# Section 12 pasting: line one-point transport — endpoint lemmas
 
 Internal helper module; part of the file-split for `#1127`.
 

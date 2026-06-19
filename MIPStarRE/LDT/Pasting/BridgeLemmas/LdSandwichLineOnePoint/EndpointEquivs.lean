@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich
 
 /-!
-# Section 12 pasting: line one-point bridge — endpoint equivalences
+# Section 12 pasting: line one-point transport — endpoint equivalences
 
 Internal helper module; part of the file-split for `#1127`.
 

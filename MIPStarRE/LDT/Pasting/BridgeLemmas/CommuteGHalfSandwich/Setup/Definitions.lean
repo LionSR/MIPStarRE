@@ -24,7 +24,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ### Bridge lemmas for the sandwich chain
+/-! ### Sandwich-chain comparison lemmas
 
 These lemmas capture the infrastructure needed for the `lem:commute-g-half-sandwich`
 through `cor:h-a-consistency` chain in `ld-pasting.tex` §9.3.

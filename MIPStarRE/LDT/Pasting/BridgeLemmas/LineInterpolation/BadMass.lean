@@ -1,9 +1,9 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.BadLine
 
 /-!
-# Line interpolation: bad-mass bridge
+# Line interpolation: bad-mass comparison
 
-Main bad-mass bridge lemmas: sandwich mismatch sums, `qBipartiteConsDefect`
+Main bad-mass comparison lemmas: sandwich mismatch sums, `qBipartiteConsDefect`
 equality via single-outcome measurements, `hBConsistencyBadMass`, line-point
 defect bounds, and `pastedInterpolation_verticalLine_defect_le_badMass`.
 
