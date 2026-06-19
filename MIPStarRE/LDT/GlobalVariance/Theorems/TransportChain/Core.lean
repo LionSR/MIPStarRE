@@ -252,10 +252,11 @@ lemma avgOver_axisParallelTestSample_update_eq_rerandomizeCoord
       (Fintype.card (AxisParallelTestSample params × Fq params) : Error) =
         (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error) := by
     simp [AxisParallelTestSample, hypercubeVertexCount, Fintype.card_fin]
-  unfold avgOver uniformDistribution rerandomizeCoord rerandomizeCoordWeight
+  rw [avgOver_uniform_eq_pmf_sum]
+  unfold avgOver rerandomizeCoord rerandomizeCoordWeight
   change
-      (∑ sx ∈ (Finset.univ : Finset (AxisParallelTestSample params × Fq params)),
-        (1 / (Fintype.card (AxisParallelTestSample params × Fq params) : Error)) *
+      (∑ sx : AxisParallelTestSample params × Fq params,
+        (PMF.uniformOfFintype (AxisParallelTestSample params × Fq params) sx).toReal *
           f (sx.1.1, Function.update sx.1.1 sx.1.2 sx.2)) =
       ∑ uv ∈ (Finset.univ : Finset (Point params × Point params)),
         ((((∑ p : Fin params.m × Fq params,
@@ -263,6 +264,7 @@ lemma avgOver_axisParallelTestSample_update_eq_rerandomizeCoord
             Error) /
           (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) *
           f uv
+  simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
   rw [hcard]
   symm
   calc
@@ -337,10 +339,10 @@ lemma avgOver_axisParallelTestSample_update_eq_rerandomizeCoord
           (1 / (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) *
             f (sx.1.1, Function.update sx.1.1 sx.1.2 sx.2) := by
           simp [AxisParallelTestSample, Fintype.sum_prod_type]
-    _ = ∑ sx ∈ (Finset.univ : Finset (AxisParallelTestSample params × Fq params)),
-          (1 / (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) *
+    _ = ∑ sx : AxisParallelTestSample params × Fq params,
+          ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error))⁻¹ *
             f (sx.1.1, Function.update sx.1.1 sx.1.2 sx.2) := by
-          simp
+          simp [one_div]
 
 lemma weightedGeneralizeBRightOperatorAtPolynomial_point_eq
     (params : Parameters)

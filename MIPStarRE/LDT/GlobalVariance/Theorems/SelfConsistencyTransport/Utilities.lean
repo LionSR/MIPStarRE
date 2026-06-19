@@ -118,7 +118,7 @@ lemma avgOver_rerandomizeCoord_fst
     avgOver (rerandomizeCoord params) (fun uv => f uv.1) =
       avgOver (uniformDistribution (Point params)) f := by
   classical
-  unfold avgOver rerandomizeCoord uniformDistribution
+  unfold avgOver rerandomizeCoord
   rw [Fintype.sum_prod_type]
   calc
     (∑ u : Point params, ∑ v : Point params,
@@ -135,8 +135,9 @@ lemma avgOver_rerandomizeCoord_fst
           refine Finset.sum_congr rfl ?_
           intro u _
           simp [rerandomizeCoordWeight_rowSum]
-    _ = ∑ u : Point params, (1 / (Fintype.card (Point params) : Error)) * f u := by
-          simp [hypercubeVertexCount, one_div]
+    _ = avgOver (uniformDistribution (Point params)) f := by
+          rw [avgOver_uniform_eq_pmf_sum]
+          simp [hypercubeVertexCount, PMF.uniformOfFintype_apply]
 
 /-- The second marginal of the rerandomized hypercube-edge distribution is uniform.
 This is the symmetric endpoint form of the sampling statement in `expansion.tex`,
@@ -147,7 +148,7 @@ lemma avgOver_rerandomizeCoord_snd
     avgOver (rerandomizeCoord params) (fun uv => f uv.2) =
       avgOver (uniformDistribution (Point params)) f := by
   classical
-  unfold avgOver rerandomizeCoord uniformDistribution
+  unfold avgOver rerandomizeCoord
   rw [Fintype.sum_prod_type]
   calc
     (∑ u : Point params, ∑ v : Point params,
@@ -167,8 +168,9 @@ lemma avgOver_rerandomizeCoord_snd
           refine Finset.sum_congr rfl ?_
           intro v _
           simp [rerandomizeCoordWeight_colSum]
-    _ = ∑ v : Point params, (1 / (Fintype.card (Point params) : Error)) * f v := by
-          simp [hypercubeVertexCount, one_div]
+    _ = avgOver (uniformDistribution (Point params)) f := by
+          rw [avgOver_uniform_eq_pmf_sum]
+          simp [hypercubeVertexCount, PMF.uniformOfFintype_apply]
 
 /-- The right tensor of the square-root polynomial weight is a contraction.
 
