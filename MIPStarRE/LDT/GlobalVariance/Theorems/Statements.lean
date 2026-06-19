@@ -9,12 +9,12 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Statement packages -/
+/-! ## Statement structures -/
 
 /-- Paper origin: `references/ldt-paper/expansion.tex:273-291`
 (`\label{lem:generalize-b}`).
 
-Output package for `lem:generalize-b`.
+Conclusion statement for `lem:generalize-b`.
 `ψbi` is the bipartite state on `d * d` (passed as `strategy.state`
 by callers). -/
 structure GeneralizeBStatement (params : Parameters) [FieldModel params.q]
@@ -38,7 +38,7 @@ structure GeneralizeBStatement (params : Parameters) [FieldModel params.q]
 /-- Paper origin: `references/ldt-paper/expansion.tex:292-324`
 (`\label{lem:local-variance-of-points}`).
 
-Output package for `lem:local-variance-of-points`. -/
+Conclusion statement for `lem:local-variance-of-points`. -/
 structure LocalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) (eps delta : Error) : Prop where
@@ -67,7 +67,7 @@ structure LocalVarianceOfPointsStatement (params : Parameters) [FieldModel param
 /-- Paper origin: `references/ldt-paper/expansion.tex:325-353`
 (`\label{lem:global-variance-of-points}`).
 
-Output package for `lem:global-variance-of-points`. -/
+Conclusion statement for `lem:global-variance-of-points`. -/
 structure GlobalVarianceOfPointsStatement (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) (ψbi : QuantumState (ι × ι))
     (G : SubMeas (Polynomial params) ι) (eps delta : Error) : Prop where

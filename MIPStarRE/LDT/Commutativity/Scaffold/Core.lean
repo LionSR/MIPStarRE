@@ -1,9 +1,9 @@
 import MIPStarRE.LDT.Commutativity.Defs.Normalization
 
 /-!
-# Section 11 commutativity: scaffold core
+# Section 11 commutativity: core operator estimates
 
-Core operator-ordering notation and basic scaffolding lemmas shared across
+Core operator-ordering notation and elementary comparison lemmas shared across
 the Section 11 commutativity argument.
 
 ## References
@@ -70,7 +70,7 @@ abbrev ComMainConclusion (params : Parameters)
 identity-bound expansion used inside the proof of the commutativity theorem
 `\label{thm:com-main}` (`references/ldt-paper/commutativity-G.tex:228-378`).
 
-Output package for `lem:normalization-condition`. -/
+Conclusion statement for `lem:normalization-condition`. -/
 structure NormalizationConditionStatement {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
     (P : SubMeas OutcomeA ι)
