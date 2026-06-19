@@ -10,7 +10,8 @@ the `G`-stability estimate, used as the base for the averaged scalar bound.
 
 ## References
 
-- arXiv:2009.12982, Section 11 (commutativity of the Pauli-`X` and `Z` players).
+- `references/ldt-paper/commutativity-G.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.Commutativity
