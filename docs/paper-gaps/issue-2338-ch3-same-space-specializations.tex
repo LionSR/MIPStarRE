@@ -18,12 +18,14 @@
 
 \begin{itemize}
   \item \textbf{Difficulty: medium as a cross-reference audit issue, low as a
-  mathematical obstruction.}  No new proof machinery is needed.  The faithful
-  two-space forms are already proved, \verb|sorry|-free, and consumed on the
-  main-theorem path.
-  \item \textbf{Estimated weight:} blueprint-only label changes for five
-  propositions; one note-only entry (\verb|consSubMeas|) where the same-space
-  form is downstream-sufficient.
+  mathematical obstruction.}  The faithful two-space forms are now proved
+  \verb|sorry|-free.  The last formerly note-only entry,
+  \verb|consSubMeas|, was resolved by adding the two-space theorem
+  \leanid{consSubMeas\_heterogeneous}.
+  \item \textbf{Estimated weight:} blueprint label changes for six
+  propositions.  The same-space forms remain available as auxiliary
+  specializations for downstream uses that already work over \(\iota\times
+  \iota\).
   \item \textbf{Mathlib/project split:} 100\% project-local.  The issue
   concerns the chapter~3 blueprint \verb|\lean{}| cross-references.
   \item \textbf{Key mathematical inputs:} the \verb|*_heterogeneous| siblings
@@ -31,7 +33,9 @@
   \path{MIPStarRE/LDT/Preliminaries/Triangles/Core.lean},
   \path{.../Triangles/SimEq.lean},
   \path{.../ComparisonCore.lean}, and
-  \path{.../ComparisonProjective.lean}.  All relevant declarations are
+  \path{.../ComparisonProjective.lean}, together with the
+  \leanid{consSubMeas\_heterogeneous} theorem in
+  \path{.../ConsistencyBridges.lean}.  All relevant declarations are
   project-local; no external Mathlib inputs beyond the ambient linear-algebra
   and finite-dimensionality libraries.
 \end{itemize}
@@ -133,44 +137,35 @@ The bounds match the paper exactly: \(\delta+\sqrt\eps\) (triangle substitution)
 \(2\delta\) and \(\delta\) (forward/converse), and \(\delta\) (data
 processing).
 
-\section{\texorpdfstring{\leanid{consSubMeas}}{consSubMeas}: a single-case note}
+\section{\texorpdfstring{\leanid{consSubMeas\_heterogeneous}}{consSubMeas\_heterogeneous}}
 
 The lemma \verb|prop:cons-sub-meas| (\path{ch03\_preliminaries.tex}:476) is
-currently linked to \leanid{consSubMeas}, which is a same-space
-(\(\iota\times\iota\)) specialization.  No \verb|consSubMeas\_heterogeneous|
-exists, and the submeasurement-family infrastructure that it uses
-(\leanid{diagonalSandwichFamily}, \leanid{totalSandwichFamily}) is
-\(\iota\times\iota\)-only.
+now linked to \leanid{consSubMeas\_heterogeneous}, whose state space is
+\(\iota_A\times\iota_B\).  Its conclusion uses the two-space sandwich families
+\leanid{heterogeneousDiagonalSandwichFamily} and
+\leanid{heterogeneousTotalSandwichFamily}, corresponding respectively to
+\(A_a^x\otimes B_a^x\) and \(A^x\otimes B_a^x\).
 
-However, the only consumer of \verb|consSubMeas| on the main-theorem path is
+The same-space theorem \leanid{consSubMeas} is retained as an auxiliary
+specialization.  The only consumer of this specialization on the main-theorem path is
 \path{MainChain.lean}:209, which applies it at the symmetrized state
 \leanid{strategy.state : QuantumState (ι×ι)}.  The global proof never needs
-the fully general two-space form of this lemma.  The same-space
-\verb|consSubMeas| is therefore \emph{downstream-sufficient} for the current
-formal proof of the main theorem.
-
-If a future development path requires \verb|consSubMeas| over \(\iota_A \times
-\iota_B\), the infrastructure for constructing the needed diagonal and
-sandwich families
-(\leanid{mkLeftPlacedSubMeas}/\leanid{mkRightPlacedSubMeas} in
-\path{SubMeasurementFamilies.lean}:500--560) already exists and can be used to
-prove a \verb|consSubMeas\_heterogeneous| sibling.
+the fully general two-space form at that point.  The retained same-space
+\leanid{consSubMeas} is therefore \emph{downstream-sufficient}, while the
+blueprint now advertises the source-faithful two-space theorem.
 
 \section{Conclusion}
 
 \begin{itemize}
-  \item \textbf{Resolved (blueprint links retargeted):} the five
-  \verb|_heterogeneous| link retargetings listed above.
+  \item \textbf{Resolved (blueprint links retargeted):} all six
+  two-space link retargetings listed above, including
+  \leanid{consSubMeas\_heterogeneous}.
   \item \textbf{Documented (same-space form retained as auxiliary):}
   \leanid{triangleSub}, \leanid{simeqTriangleInequality},
   \leanid{simeqToApprox}, \leanid{approxToSimeq},
   \leanid{simeqDataProcessing}, and \leanid{consSubMeas} are retained as
   auxiliary internal interfaces.  They are not removed or renamed.  The
   \verb|_heterogeneous| forms carry the main-theorem load.
-  \item \textbf{Deferred:} a \leanid{consSubMeas\_heterogeneous} sibling is not
-  currently needed.  If it becomes needed, the submeasurement-family
-  infrastructure in \path{SubMeasurementFamilies.lean} supports its
-  construction.
 \end{itemize}
 
 There is no mathematical discrepancy.  The retargeting makes the blueprint
