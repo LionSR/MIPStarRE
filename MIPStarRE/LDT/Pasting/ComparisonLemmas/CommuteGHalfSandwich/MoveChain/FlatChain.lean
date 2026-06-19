@@ -1,5 +1,20 @@
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.Chain
 
+/-!
+# Section 12 pasting: half-sandwich flat chain
+
+This module defines the post-move and combined flat chains used after the
+distinguished completed-slice factor has been moved to the right tensor
+register.  The chain alternates between pairwise commutation and
+self-consistency steps, with an explicit error sequence for the final
+composition.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -16,10 +31,12 @@ The post-move flat chain (`postMoveFlatFamily`, `postMoveFlatError`) and the
 combined flat chain (`flatChainFamily`, `flatChainError`) together with their
 endpoint and summation lemmas.
 -/
+/-- Length of the post-move part of the flat chain. -/
 def commuteGHalfSandwich_postMoveFlatLength : ℕ → ℕ
   | 0 => 1
   | r + 1 => commuteGHalfSandwich_postMoveFlatLength r + 2
 
+/-- Operator-family sequence for the post-move part of the flat chain. -/
 noncomputable def commuteGHalfSandwich_postMoveFlatFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :
@@ -46,6 +63,7 @@ noncomputable def commuteGHalfSandwich_postMoveFlatFamily
                     exact i.2
                   omega⟩))
 
+/-- Error sequence for the post-move flat chain. -/
 noncomputable def commuteGHalfSandwich_postMoveFlatError
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error) :
@@ -85,9 +103,12 @@ lemma commuteGHalfSandwich_postMoveFlatError_sum
         gHatSelfConsistencyError]
       ring
 
+/-- Length of the combined move and post-move flat chain. -/
 def commuteGHalfSandwich_flatChainLength (r : ℕ) : ℕ :=
   r + commuteGHalfSandwich_postMoveFlatLength r
 
+/-- Operator-family sequence obtained by concatenating the move chain and the
+post-move flat chain. -/
 noncomputable def commuteGHalfSandwich_flatChainFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
@@ -104,6 +125,7 @@ noncomputable def commuteGHalfSandwich_flatChainFamily
             have hi_lt : i.1 < r + commuteGHalfSandwich_postMoveFlatLength r + 1 := i.2
             omega⟩
 
+/-- Error sequence for the combined flat chain. -/
 noncomputable def commuteGHalfSandwich_flatChainError
     (params : Parameters) [FieldModel params.q]
     (gamma zeta : Error) (r : ℕ) :

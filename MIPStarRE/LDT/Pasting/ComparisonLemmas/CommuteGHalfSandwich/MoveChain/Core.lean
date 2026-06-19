@@ -1,5 +1,18 @@
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.FlatChainStep
 
+/-!
+# Section 12 pasting: half-sandwich chain assembly
+
+This module assembles the move chain, the flat post-move chain, and the
+move-back chain to prove the operator-family estimate used by
+`lem:commute-g-half-sandwich`.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT

@@ -1,5 +1,18 @@
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.Base
 
+/-!
+# Section 12 pasting: half-sandwich lifting constructions
+
+This module contains the reindexing equivalences and lifted operator families
+which transport an `r`-step half-sandwich move comparison to the corresponding
+`r+1`-step comparison.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -16,6 +29,8 @@ Lifting constructions: swapped-front equivalences, `splitSuccLiftFamily`,
 `prefixSecondSliceLeftFamily`, `secondSliceLiftFamily`, and the
 `moveChainLift` construction that lifts an `r`-step chain to `r+1`.
 -/
+/-- Swap the first two distinguished slice coordinates after exposing the tail
+coordinate of a move-chain question. -/
 def swappedFrontQuestionEquiv (params : Parameters) (r : ℕ) :
     (MoveTailQ params r) ≃
       (SliceQuestion params × SliceQuestion params × SliceQuestion params ×
@@ -29,6 +44,7 @@ def swappedFrontQuestionEquiv (params : Parameters) (r : ℕ) :
     rcases q with ⟨x₁, x₂, x₃, xs⟩
     rfl
 
+/-- Outcome analogue of `swappedFrontQuestionEquiv`. -/
 def swappedFrontOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : ℕ) :
     (MoveTailO params r) ≃
       (GHatOutcome params × GHatOutcome params × GHatOutcome params ×
@@ -42,17 +58,21 @@ def swappedFrontOutcomeEquiv (params : Parameters) [FieldModel params.q] (r : �
     rcases og with ⟨g₁, g₂, g₃, gs⟩
     rfl
 
+/-- Expose the tail coordinate of an `(r+1)`-move question and put the first two
+distinguished slice coordinates in swapped-front order. -/
 def moveTailSwappedFrontQuestionEquiv (params : Parameters) (r : ℕ) :
     (MoveQ params (r + 1)) ≃
       (MoveTailQ params r) :=
   (moveTailQuestionEquiv params r).trans (swappedFrontQuestionEquiv params r)
 
+/-- Outcome analogue of `moveTailSwappedFrontQuestionEquiv`. -/
 def moveTailSwappedFrontOutcomeEquiv
     (params : Parameters) [FieldModel params.q] (r : ℕ) :
     (MoveO params (r + 1)) ≃
       (MoveTailO params r) :=
   (moveTailOutcomeEquiv params r).trans (swappedFrontOutcomeEquiv params r)
 
+/-- Reindex an `r`-move operator family along the split-successor equivalences. -/
 noncomputable def commuteGHalfSandwich_splitSuccLiftFamily
     (params : Parameters) [FieldModel params.q]
     (r : ℕ)
@@ -69,6 +89,8 @@ noncomputable def commuteGHalfSandwich_splitSuccLiftFamily
         (F ((splitSuccQuestionEquiv params r) q)).outcome ((splitSuccOutcomeEquiv params r) ogs)
       total := (F ((splitSuccQuestionEquiv params r) q)).total }
 
+/-- Add a completed-slice factor on the left of an operator family, with the new
+slice coordinate placed in the second distinguished position. -/
 noncomputable def commuteGHalfSandwich_prefixSecondSliceLeftFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
@@ -108,7 +130,8 @@ lemma commuteGHalfSandwich_prefixSecondSliceLeftLift
       δ := by
   have hABfst :
       SDDOpRel ψbi
-        (uniformDistribution ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
+        (uniformDistribution
+          ((SliceQuestion params × PointTuple params r) × SliceQuestion params))
         (fun q => A q.1)
         (fun q => B q.1)
         δ :=
@@ -275,6 +298,8 @@ lemma commuteGHalfSandwich_splitSuccLift
     (fun _ _ => rfl)
     hsplit
 
+/-- Lift an `r`-move operator family to the `(r+1)`-move questions by inserting
+the new second distinguished slice factor. -/
 noncomputable def commuteGHalfSandwich_secondSliceLiftFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)
@@ -343,17 +368,22 @@ lemma commuteGHalfSandwich_moveFamily_eq_moveStepTarget
             simp [commuteGHalfSandwich_moveStepTargetFamily, moveTailQuestionEquiv,
               moveTailOutcomeEquiv, A, B, T, G, mul_assoc]
 
+/-- Reindex a question pair consisting of an `r`-move state and a new leading
+slice coordinate as an `(r+1)`-move state. -/
 def commuteGHalfSandwich_moveChainLiftQuestionEquiv (params : Parameters) (r : ℕ) :
     ((MoveQ params r) × SliceQuestion params) ≃
       (MoveQ params (r + 1)) :=
   (firstSliceBackQuestionEquiv params r).trans (moveTailQuestionEquiv params r).symm
 
+/-- Outcome analogue of `commuteGHalfSandwich_moveChainLiftQuestionEquiv`. -/
 def commuteGHalfSandwich_moveChainLiftOutcomeEquiv
     (params : Parameters) [FieldModel params.q] (r : ℕ) :
     ((MoveO params r) × GHatOutcome params) ≃
       (MoveO params (r + 1)) :=
   (firstSliceBackOutcomeEquiv params r).trans (moveTailOutcomeEquiv params r).symm
 
+/-- Lift an `r`-move chain family by adjoining a new leading completed-slice
+factor on the left tensor register. -/
 noncomputable def commuteGHalfSandwich_moveChainLiftFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ)

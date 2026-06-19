@@ -1,5 +1,19 @@
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.Lifting
 
+/-!
+# Section 12 pasting: half-sandwich move chain
+
+This module defines the recursive sequence of operator families which moves a
+completed-slice factor through the half-product.  The adjacent edges in this
+sequence are supplied by the self-consistency estimate for the completed-slice
+family.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -16,6 +30,8 @@ The recursive `moveChainFamily` indexed over `Fin (r+1)`, with the step lemma
 `moveChain_step` and the aggregate lemma `move_chain` that composes the
 `r` self-consistency edges.
 -/
+/-- The finite sequence of operator families which moves the distinguished
+completed-slice factor across an `r`-tuple tail. -/
 noncomputable def commuteGHalfSandwich_moveChainFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) :

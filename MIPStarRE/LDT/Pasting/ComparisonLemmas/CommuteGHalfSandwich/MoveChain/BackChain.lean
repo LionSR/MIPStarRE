@@ -1,5 +1,19 @@
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.Chain
 
+/-!
+# Section 12 pasting: half-sandwich move-back chain
+
+This module contains the reverse part of the finite commutation chain used in
+`lem:commute-g-half-sandwich`.  After the initial move chain and the flat
+post-move comparison, these families bring the leading completed-slice
+measurement back to the position required by the rotated half-sandwich endpoint.
+
+## References
+
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
+-/
+
 namespace MIPStarRE.LDT.Pasting
 
 open MIPStarRE.LDT
@@ -16,6 +30,8 @@ The `moveBackChainFamily` and its endpoint lemmas reverse the commutation to
 bring the leading `Ĝ` back into position.
 -/
 
+/-- Reverse the move-chain indexing so that the leading completed-slice factor
+is moved back through the product. -/
 noncomputable def commuteGHalfSandwich_moveBackChainFamily
     (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (r : ℕ) :
