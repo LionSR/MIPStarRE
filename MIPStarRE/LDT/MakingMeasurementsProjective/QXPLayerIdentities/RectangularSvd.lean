@@ -47,6 +47,20 @@ theorem rectangularSvd_xHat_coisometry
     _ = U * Uᴴ := by rw [hIro, Matrix.mul_one]
     _ = 1 := hU_left
 
+/-- The row-coisometry identity for the rectangular SVD choice of `Xhat`,
+with the square factors represented as unitary group elements. -/
+theorem rectangularSvd_xHat_coisometry_unitaryGroup
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (U : Matrix.unitaryGroup μ ℂ) (V : Matrix.unitaryGroup ι ℂ)
+    (Iro : Matrix μ ι ℂ)
+    (hIro : Iro * Iroᴴ = (1 : Matrix μ μ ℂ)) :
+    ((U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ) *
+        ((U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ)ᴴ =
+      (1 : Matrix μ μ ℂ) :=
+  rectangularSvd_xHat_coisometry (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ) Iro
+    (Matrix.mem_unitaryGroup_iff.mp U.property)
+    (Matrix.mem_unitaryGroup_iff'.mp V.property) hIro
+
 /-- The mixed product obtained by multiplying the rectangular SVD formulae.
 
 This lemma contains only the matrix algebra.  The spectral identification of the
@@ -73,6 +87,18 @@ theorem rectangularSvd_xHat_mixed_raw
                   simp [Matrix.mul_assoc]
             _ = V * Sᴴ * (Iro * Vᴴ) := by rw [hUcollapse]
             _ = V * (Sᴴ * Iro) * Vᴴ := by simp [Matrix.mul_assoc]
+
+/-- The mixed product obtained by multiplying the rectangular SVD formulae,
+with the left square factor represented as a unitary group element. -/
+theorem rectangularSvd_xHat_mixed_raw_unitaryGroup
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix.unitaryGroup μ ℂ) (V : Matrix ι ι ℂ)
+    (S Iro : Matrix μ ι ℂ)
+    (hx : x = (U : Matrix μ μ ℂ) * S * Vᴴ) :
+    xᴴ * ((U : Matrix μ μ ℂ) * Iro * Vᴴ) = V * (Sᴴ * Iro) * Vᴴ :=
+  rectangularSvd_xHat_mixed_raw x (U : Matrix μ μ ℂ) V S Iro
+    (Matrix.mem_unitaryGroup_iff'.mp U.property) hx
 
 /-- The first mixed product obtained from the rectangular SVD formulae.
 
@@ -102,6 +128,18 @@ theorem rectangularSvd_x_mul_xHat_conjTranspose_raw
                   simp [Matrix.mul_assoc]
             _ = U * S * (Iroᴴ * Uᴴ) := by rw [hVcollapse]
             _ = U * (S * Iroᴴ) * Uᴴ := by simp [Matrix.mul_assoc]
+
+/-- The first mixed product obtained from the rectangular SVD formulae, with
+the right square factor represented as a unitary group element. -/
+theorem rectangularSvd_x_mul_xHat_conjTranspose_raw_unitaryGroup
+    {μ ι : Type*} [Fintype μ] [Fintype ι] [DecidableEq ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix μ μ ℂ) (V : Matrix.unitaryGroup ι ℂ)
+    (S Iro : Matrix μ ι ℂ)
+    (hx : x = U * S * (V : Matrix ι ι ℂ)ᴴ) :
+    x * (U * Iro * (V : Matrix ι ι ℂ)ᴴ)ᴴ = U * (S * Iroᴴ) * Uᴴ :=
+  rectangularSvd_x_mul_xHat_conjTranspose_raw x U (V : Matrix ι ι ℂ) S Iro
+    (Matrix.mem_unitaryGroup_iff'.mp V.property) hx
 
 /-- A positive operator whose square is `Q` is the CFC square root of `Q`.
 
@@ -151,6 +189,19 @@ theorem rectangularSvd_xHat_mixed_of_sqrtQ
     xᴴ * (U * Iro * Vᴴ) = CFC.sqrt Q := by
   rw [rectangularSvd_xHat_mixed_raw x U V S Iro hU_right hx, hSqrt]
 
+/-- The mixed rectangular SVD identity with the left square factor represented
+as a unitary group element. -/
+theorem rectangularSvd_xHat_mixed_of_sqrtQ_unitaryGroup
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    [NonUnitalContinuousFunctionalCalculus ℝ (Matrix ι ι ℂ) IsSelfAdjoint]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix.unitaryGroup μ ℂ) (V : Matrix ι ι ℂ)
+    (S Iro : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hx : x = (U : Matrix μ μ ℂ) * S * Vᴴ)
+    (hSqrt : V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt Q) :
+    xᴴ * ((U : Matrix μ μ ℂ) * Iro * Vᴴ) = CFC.sqrt Q := by
+  rw [rectangularSvd_xHat_mixed_raw_unitaryGroup x U V S Iro hx, hSqrt]
+
 /-- The rectangular SVD data determine a candidate `Xhat` and its two primitive
 identities.
 
@@ -178,6 +229,26 @@ theorem exists_xHat_of_rectangularSvd
   refine ⟨U * Iro * Vᴴ, rfl, ?_, ?_⟩
   · exact rectangularSvd_xHat_coisometry U V Iro hU_left hV_right hIro
   · exact rectangularSvd_xHat_mixed_of_sqrtQ x U V S Iro Q hU_right hx hSqrt
+
+/-- The rectangular SVD data determine a candidate `Xhat` and its two primitive
+identities, with the square factors represented as unitary group elements. -/
+theorem exists_xHat_of_rectangularSvd_unitaryGroup
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (x : Matrix μ ι ℂ)
+    (U : Matrix.unitaryGroup μ ℂ) (V : Matrix.unitaryGroup ι ℂ)
+    (S Iro : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hIro : Iro * Iroᴴ = (1 : Matrix μ μ ℂ))
+    (hx : x = (U : Matrix μ μ ℂ) * S * (V : Matrix ι ι ℂ)ᴴ)
+    (hSqrt : (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ =
+      CFC.sqrt Q) :
+    ∃ xHat : Matrix μ ι ℂ,
+      xHat = (U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ ∧
+        xHat * xHatᴴ = (1 : Matrix μ μ ℂ) ∧
+          xᴴ * xHat = CFC.sqrt Q := by
+  refine ⟨(U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ, rfl, ?_, ?_⟩
+  · exact rectangularSvd_xHat_coisometry_unitaryGroup U V Iro hIro
+  · exact rectangularSvd_xHat_mixed_of_sqrtQ_unitaryGroup x U
+      (V : Matrix ι ι ℂ) S Iro Q hx hSqrt
 
 /-- Assemble `QXPLayerData` from a rank-reduction witness and the SVD
 identities for `Xhat`.

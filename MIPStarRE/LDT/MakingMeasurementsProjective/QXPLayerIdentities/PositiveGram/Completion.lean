@@ -53,11 +53,37 @@ private theorem exists_orthonormalBasis_extension_of_embedding
   refine ⟨b, fun i => ?_⟩
   rw [hb (e i) ⟨i, rfl⟩, hrowFull i]
 
+/-- A square unitary group element whose selected rows are a prescribed
+orthonormal family.
+
+The row equations are stated pointwise so that later matrix calculations can
+rewrite entries without unfolding the chosen orthonormal basis. -/
+theorem exists_unitaryGroup_rows_extending_orthonormal
+    {κ μ : Type*} [Fintype μ] [DecidableEq μ]
+    (row : κ → EuclideanSpace ℂ μ)
+    (hrow : Orthonormal ℂ row)
+    (e : κ ↪ μ) :
+    ∃ U : Matrix.unitaryGroup μ ℂ,
+      ∀ (i : κ) (r : μ), (U : Matrix μ μ ℂ) (e i) r = row i r := by
+  classical
+  obtain ⟨b, hb⟩ := exists_orthonormalBasis_extension_of_embedding row hrow e
+  let Umat : Matrix μ μ ℂ := Matrix.of fun i r => b i r
+  have hleft : Umat * Umatᴴ = (1 : Matrix μ μ ℂ) := by
+    simpa [Umat] using
+      Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
+        (fun i : μ => b i) b.orthonormal
+  let U : Matrix.unitaryGroup μ ℂ := ⟨Umat, (Matrix.mem_unitaryGroup_iff).2 hleft⟩
+  refine ⟨U, ?_⟩
+  intro i r
+  simp [U, Umat, hb i]
+
 /-- A square unitary matrix whose selected rows are a prescribed orthonormal
 family.
 
 The row equations are stated pointwise so that later matrix calculations can
-rewrite entries without unfolding the chosen orthonormal basis. -/
+rewrite entries without unfolding the chosen orthonormal basis.  This
+equation-valued form is retained for compatibility; the construction itself
+passes through `exists_unitaryGroup_rows_extending_orthonormal`. -/
 theorem exists_unitary_rows_extending_orthonormal
     {κ μ : Type*} [Fintype μ] [DecidableEq μ]
     (row : κ → EuclideanSpace ℂ μ)
@@ -67,18 +93,42 @@ theorem exists_unitary_rows_extending_orthonormal
       U * Uᴴ = (1 : Matrix μ μ ℂ) ∧
         Uᴴ * U = (1 : Matrix μ μ ℂ) ∧
           ∀ (i : κ) (r : μ), U (e i) r = row i r := by
+  obtain ⟨U, hrows⟩ := exists_unitaryGroup_rows_extending_orthonormal row hrow e
+  exact ⟨(U : Matrix μ μ ℂ),
+    Matrix.mem_unitaryGroup_iff.mp U.property,
+    Matrix.mem_unitaryGroup_iff'.mp U.property,
+    hrows⟩
+
+/-- The positive Gram image rows can be embedded into a square unitary group
+element.
+
+The hypothesis `e` chooses distinct row positions for the strictly positive
+eigenvalues of the Gram operator.  The theorem then completes the corresponding
+normalized image rows to a unitary element on the row space.  This is the
+basis-extension ingredient needed to turn the positive spectral part into the
+left unitary factor of the rectangular polar construction. -/
+theorem exists_unitaryGroup_with_positive_gram_spectrum_rows
+    {μ ι : Type*}
+    [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ) :
+    ∃ U : Matrix.unitaryGroup μ ℂ,
+      ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+        (U : Matrix μ μ ℂ) (e i) r =
+          positiveGramSpectrumImageRows X Q hQ i r := by
   classical
-  obtain ⟨b, hb⟩ := exists_orthonormalBasis_extension_of_embedding row hrow e
-  let U : Matrix μ μ ℂ := Matrix.of fun i r => b i r
-  have hleft : U * Uᴴ = (1 : Matrix μ μ ℂ) := by
-    simpa [U] using
-      Matrix.mul_conjTranspose_eq_one_of_orthonormal_rows
-        (fun i : μ => b i) b.orthonormal
-  have hright : Uᴴ * U = (1 : Matrix μ μ ℂ) := by
-    exact mul_eq_one_comm.mp hleft
-  refine ⟨U, hleft, hright, ?_⟩
+  let row : {i : ι // 0 < hQ.eigenvalues i} → EuclideanSpace ℂ μ := fun i =>
+    ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
+      Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)
+  obtain ⟨U, hrows⟩ :=
+    exists_unitaryGroup_rows_extending_orthonormal row
+      (orthonormal_normalized_matrix_image_of_positive_gram_spectrum X Q hQ hgram) e
+  refine ⟨U, ?_⟩
   intro i r
-  simp [U, hb i]
+  simpa [row, positiveGramSpectrumImageRows, normalizedMatrixImageRows] using
+    hrows i r
 
 /-- The positive Gram image rows can be embedded into a square unitary matrix.
 
@@ -86,7 +136,9 @@ The hypothesis `e` chooses distinct row positions for the strictly positive
 eigenvalues of the Gram operator.  The theorem then completes the corresponding
 normalized image rows to a unitary matrix on the row space.  This is the
 basis-extension ingredient needed to turn the positive spectral part into the
-left unitary factor of the rectangular polar construction. -/
+left unitary factor of the rectangular polar construction.  This
+equation-valued form is retained for compatibility; the construction itself
+passes through `exists_unitaryGroup_with_positive_gram_spectrum_rows`. -/
 theorem exists_unitary_with_positive_gram_spectrum_rows
     {μ ι : Type*}
     [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
@@ -99,24 +151,46 @@ theorem exists_unitary_with_positive_gram_spectrum_rows
         Uᴴ * U = (1 : Matrix μ μ ℂ) ∧
           ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
             U (e i) r = positiveGramSpectrumImageRows X Q hQ i r := by
+  obtain ⟨U, hrows⟩ :=
+    exists_unitaryGroup_with_positive_gram_spectrum_rows X Q hQ hgram e
+  exact ⟨(U : Matrix μ μ ℂ),
+    Matrix.mem_unitaryGroup_iff.mp U.property,
+    Matrix.mem_unitaryGroup_iff'.mp U.property,
+    hrows⟩
+
+/-- Existential form of
+`exists_unitaryGroup_with_positive_gram_spectrum_rows`.
+
+The normalized positive Gram image rows have cardinality at most the row
+dimension, so one may choose distinct row positions and then extend those rows
+to a square unitary group element. -/
+theorem exists_unitaryGroup_with_positive_gram_spectrum_rows_of_card
+    {μ ι : Type*}
+    [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian)
+    (hgram : Xᴴ * X = Q) :
+    ∃ e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ,
+      ∃ U : Matrix.unitaryGroup μ ℂ,
+        ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+          (U : Matrix μ μ ℂ) (e i) r =
+            positiveGramSpectrumImageRows X Q hQ i r := by
   classical
-  let row : {i : ι // 0 < hQ.eigenvalues i} → EuclideanSpace ℂ μ := fun i =>
-    ((1 / Real.sqrt (hQ.eigenvalues i.1) : ℝ) : ℂ) •
-      Matrix.toEuclideanLin X (hQ.eigenvectorBasis i.1)
-  obtain ⟨U, hU_left, hU_right, hrows⟩ :=
-    exists_unitary_rows_extending_orthonormal row
-      (orthonormal_normalized_matrix_image_of_positive_gram_spectrum X Q hQ hgram) e
-  refine ⟨U, hU_left, hU_right, ?_⟩
-  intro i r
-  simpa [row, positiveGramSpectrumImageRows, normalizedMatrixImageRows] using
-    hrows i r
+  have hcard :
+      Fintype.card {i : ι // 0 < hQ.eigenvalues i} ≤ Fintype.card μ :=
+    positive_gram_spectrum_card_le_rows X Q hQ hgram
+  let e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ :=
+    Classical.choice (Function.Embedding.nonempty_of_card_le hcard)
+  exact ⟨e, exists_unitaryGroup_with_positive_gram_spectrum_rows X Q hQ hgram e⟩
 
 /-- Existential form of
 `exists_unitary_with_positive_gram_spectrum_rows`.
 
 The normalized positive Gram image rows have cardinality at most the row
 dimension, so one may choose distinct row positions and then extend those rows
-to a square unitary matrix. -/
+to a square unitary matrix.  This equation-valued form is retained for
+compatibility; the construction itself passes through
+`exists_unitaryGroup_with_positive_gram_spectrum_rows_of_card`. -/
 theorem exists_unitary_with_positive_gram_spectrum_rows_of_card
     {μ ι : Type*}
     [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
@@ -129,13 +203,12 @@ theorem exists_unitary_with_positive_gram_spectrum_rows_of_card
           Uᴴ * U = (1 : Matrix μ μ ℂ) ∧
             ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
               U (e i) r = positiveGramSpectrumImageRows X Q hQ i r := by
-  classical
-  have hcard :
-      Fintype.card {i : ι // 0 < hQ.eigenvalues i} ≤ Fintype.card μ :=
-    positive_gram_spectrum_card_le_rows X Q hQ hgram
-  let e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ :=
-    Classical.choice (Function.Embedding.nonempty_of_card_le hcard)
-  exact ⟨e, exists_unitary_with_positive_gram_spectrum_rows X Q hQ hgram e⟩
+  obtain ⟨e, U, hrows⟩ :=
+    exists_unitaryGroup_with_positive_gram_spectrum_rows_of_card X Q hQ hgram
+  exact ⟨e, (U : Matrix μ μ ℂ),
+    Matrix.mem_unitaryGroup_iff.mp U.property,
+    Matrix.mem_unitaryGroup_iff'.mp U.property,
+    hrows⟩
 
 /-- Extend an orthonormal row family to a rectangular coisometry.
 
@@ -204,28 +277,51 @@ theorem exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows
     exists_rectangular_coisometry_extending_orthonormal_rows row hrow e hcard
   exact ⟨W, hW, by simpa [row] using hrows⟩
 
+/-- Left multiplication by the transpose of a unitary group element preserves
+row coisometries.
+
+This is the coisometry half of the polar-extension calculation for the
+candidate `Xhat = Uᵀ W`: the rectangular factor `W` has orthonormal rows, and
+the square factor `U` merely changes the orthonormal basis of the row space. -/
+theorem transpose_unitaryGroup_mul_rectangular_coisometry
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    (U : Matrix.unitaryGroup μ ℂ) (W : Matrix μ ι ℂ)
+    (hW : W * Wᴴ = (1 : Matrix μ μ ℂ)) :
+    ((U : Matrix μ μ ℂ)ᵀ * W) * ((U : Matrix μ μ ℂ)ᵀ * W)ᴴ =
+      (1 : Matrix μ μ ℂ) := by
+  have hU_right : (U : Matrix μ μ ℂ)ᴴ * (U : Matrix μ μ ℂ) =
+      (1 : Matrix μ μ ℂ) :=
+    Matrix.mem_unitaryGroup_iff'.mp U.property
+  have hU_transpose :
+      (U : Matrix μ μ ℂ)ᵀ * ((U : Matrix μ μ ℂ)ᵀ)ᴴ =
+        (1 : Matrix μ μ ℂ) := by
+    rw [show ((U : Matrix μ μ ℂ)ᵀ)ᴴ = ((U : Matrix μ μ ℂ)ᴴ)ᵀ from rfl,
+      ← Matrix.transpose_mul, hU_right, Matrix.transpose_one]
+  calc
+    ((U : Matrix μ μ ℂ)ᵀ * W) * ((U : Matrix μ μ ℂ)ᵀ * W)ᴴ =
+        (U : Matrix μ μ ℂ)ᵀ * (W * Wᴴ) * ((U : Matrix μ μ ℂ)ᵀ)ᴴ := by
+          rw [Matrix.conjTranspose_mul]
+          simp [Matrix.mul_assoc]
+    _ = (U : Matrix μ μ ℂ)ᵀ * ((U : Matrix μ μ ℂ)ᵀ)ᴴ := by
+          rw [hW, Matrix.mul_one]
+    _ = 1 := hU_transpose
+
 /-- Left multiplication by the transpose of a unitary preserves row
 coisometries.
 
 This is the coisometry half of the polar-extension calculation for the
 candidate `Xhat = Uᵀ W`: the rectangular factor `W` has orthonormal rows, and
-the square factor `U` merely changes the orthonormal basis of the row space. -/
+the square factor `U` merely changes the orthonormal basis of the row space.
+This equation-valued form is retained for compatibility; the construction
+itself passes through `transpose_unitaryGroup_mul_rectangular_coisometry`. -/
 theorem transpose_unitary_mul_rectangular_coisometry
     {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
     (U : Matrix μ μ ℂ) (W : Matrix μ ι ℂ)
     (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
     (hW : W * Wᴴ = (1 : Matrix μ μ ℂ)) :
     (Uᵀ * W) * (Uᵀ * W)ᴴ = (1 : Matrix μ μ ℂ) := by
-  have hU_transpose : Uᵀ * (Uᵀ)ᴴ = (1 : Matrix μ μ ℂ) := by
-    rw [show (Uᵀ : Matrix μ μ ℂ)ᴴ = (Uᴴ)ᵀ from rfl,
-      ← Matrix.transpose_mul, hU_right, Matrix.transpose_one]
-  calc
-    (Uᵀ * W) * (Uᵀ * W)ᴴ =
-        Uᵀ * (W * Wᴴ) * (Uᵀ)ᴴ := by
-          rw [Matrix.conjTranspose_mul]
-          simp [Matrix.mul_assoc]
-    _ = Uᵀ * (Uᵀ)ᴴ := by rw [hW, Matrix.mul_one]
-    _ = 1 := hU_transpose
+  let Ugroup : Matrix.unitaryGroup μ ℂ := ⟨U, (Matrix.mem_unitaryGroup_iff').2 hU_right⟩
+  exact transpose_unitaryGroup_mul_rectangular_coisometry Ugroup W hW
 
 /-- Completion rows of the left unitary outside the positive Gram spectrum are
 killed by `X†`.
@@ -390,6 +486,29 @@ theorem positive_gram_polar_extension_mixed_eq_positive_rows
 
 This combines the finite-dimensional completion calculation for
 `Xhat = Uᵀ W` with the positive-spectrum square-root identity. -/
+theorem positive_gram_polar_extension_mixed_eq_sqrt_unitaryGroup
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
+    (hQ : Q.IsHermitian) (hQ_pos : Q.PosSemidef)
+    (hgram : Xᴴ * X = Q)
+    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ)
+    (U : Matrix.unitaryGroup μ ℂ) (W : Matrix μ ι ℂ)
+    (hU_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
+      (U : Matrix μ μ ℂ) (e i) r = positiveGramSpectrumImageRows X Q hQ i r)
+    (hW_rows : ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : ι),
+      W (e i) r = positiveGramSpectrumRightRows Q hQ i r) :
+    Xᴴ * ((U : Matrix μ μ ℂ)ᵀ * W) = CFC.sqrt Q := by
+  rw [positive_gram_polar_extension_mixed_eq_positive_rows X Q hQ hQ_pos
+    hgram e (U : Matrix μ μ ℂ) W
+    (Matrix.mem_unitaryGroup_iff.mp U.property) hU_rows hW_rows]
+  exact positive_gram_spectrum_image_rows_mixed_eq_sqrt X Q hQ hQ_pos hgram
+
+/-- The polar-extension mixed product is the square root of the Gram operator.
+
+This combines the finite-dimensional completion calculation for
+`Xhat = Uᵀ W` with the positive-spectrum square-root identity.  This
+equation-valued form is retained for compatibility; the construction itself
+passes through `positive_gram_polar_extension_mixed_eq_sqrt_unitaryGroup`. -/
 theorem positive_gram_polar_extension_mixed_eq_sqrt
     {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
     (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
