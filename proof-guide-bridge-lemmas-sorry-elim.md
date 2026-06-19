@@ -3,7 +3,7 @@
 ## Scope
 
 - Branch: `bridge-lemmas-sorry-elim`
-- Target: `MIPStarRE/LDT/Pasting/BridgeLemmas.lean`
+- Target: `MIPStarRE/LDT/Pasting/ComparisonLemmas/`
 - Paper source: `references/ldt-paper/ld-pasting.tex`
 - Blueprint source: `blueprint/src/chapter/ch09_pasting.tex`
 
@@ -278,7 +278,7 @@ The historical split helper stack worth porting is now more specific.
 #### Remaining blocker before the rest of Section 12 closes
 
 `ldSandwichLineOnePoint_core` is still open. With `hBConsistency_core` done, the only remaining
-live theorem holes in `BridgeLemmas.lean` are:
+live theorem holes in the comparison-lemma subtree are:
 
 - `ldSandwichLineOnePoint_core`
 - `overAllOutcomes`
