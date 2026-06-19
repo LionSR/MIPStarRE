@@ -1,5 +1,21 @@
 import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
 
+/-!
+# Section 7 hypercube graph: trace-form foundations
+
+This file provides the abstract theorem statements and trace-form identities
+used to formalize the local and global variance rewrites in Section 7 of the LDT
+paper.  The concrete matrix-realization statements are proved first; the
+public-facing statements in `MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results`
+then specialize these identities to arbitrary finite-dimensional operator
+families.
+
+## References
+
+- arXiv:2009.12982, Section 7, especially `lem:local-rewrite` and
+  `lem:global-rewrite`.
+-/
+
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
 open MIPStarRE.LDT
@@ -19,6 +35,7 @@ Output package for `lem:local-rewrite`: the local variance is rewritten as a
 trace-form expectation in the operator family `A`. -/
 structure LocalRewriteStatement (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
+  /-- The local variance agrees with the trace form built from the Laplacian. -/
   traceFormula :
     localVariance params A ψ = localVarianceTraceForm params A ψ
 
@@ -30,11 +47,13 @@ trace-form expectation along the eigenbasis of the hypercube graph
 Laplacian. -/
 structure GlobalRewriteStatement (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : Prop where
+  /-- A Fourier-mode decomposition whose trace form recovers the global variance. -/
   decomposition :
     ∃ decomp : GlobalVarianceDecomposition params A,
       globalVariance params A ψ = globalVarianceTraceForm params A ψ decomp
 
-/-- Reinterpret an abstract operator family and state as a concrete matrix realization. -/
+/-- Reinterpret an abstract operator family and quantum state as the concrete
+matrix realization used by the trace-form proof of Section 7. -/
 def abstractMatrixModel (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) [Nonempty ι] :
     MatrixOperatorFamilyRealization params where
@@ -383,7 +402,9 @@ lemma globalVarianceTraceForm_eq_closedForm (params : Parameters)
               refine Finset.sum_congr rfl ?_
               intro u hu
               rw [decomp.orthogonalComponent_eq_sub_average u]
-      _ = ∑ u, (diag u + ev ψ (avgᴴ * avg) - ev ψ ((A u)ᴴ * avg) - ev ψ (avgᴴ * A u)) := by
+      _ = ∑ u,
+            (diag u + ev ψ (avgᴴ * avg) - ev ψ ((A u)ᴴ * avg) -
+              ev ψ (avgᴴ * A u)) := by
               refine Finset.sum_congr rfl ?_
               intro u hu
               have hexpand :
