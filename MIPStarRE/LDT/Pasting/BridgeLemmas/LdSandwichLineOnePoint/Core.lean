@@ -24,7 +24,7 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 The substantive paper gap is now the averaged linear defect bound
 `ldSandwichLineOnePoint_prefix_linearDefect_average_cauchySchwarz_bound`; this
-lemma is only the proved wrapper that reinstates the `max 0` bipartite
+lemma is only the proved reduction that reinstates the `max 0` bipartite
 consistency error using the measurement-valued right family. -/
 lemma ldSandwichLineOnePoint_prefix_cauchySchwarz_transport
     (params : Parameters)
@@ -328,7 +328,7 @@ lemma ldSandwichLineOnePoint_ofGHatFacts_of_axis_self
 /-- Internal form of `lem:ld-sandwich-line-one-point` after applying
 `cor:G-hat-facts`.
 
-This source-facing wrapper retains the usual good-strategy hypothesis. -/
+This source-facing statement retains the usual good-strategy hypothesis. -/
 lemma ldSandwichLineOnePoint_ofGHatFacts
     (params : Parameters)
     [FieldModel params.q]

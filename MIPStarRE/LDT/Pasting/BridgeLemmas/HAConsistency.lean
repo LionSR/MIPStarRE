@@ -219,7 +219,7 @@ theorem hAConsistency_submeas_from_lineConsistency_of_axis_self
 
 /-- Convert source-style vertical-line consistency to point consistency.
 
-This source-style wrapper specializes
+This source-style restatement specializes
 `hAConsistency_submeas_from_lineConsistency_of_axis_self` to the two estimates
 contained in `strategy.IsGood`. -/
 theorem hAConsistency_submeas_from_lineConsistency

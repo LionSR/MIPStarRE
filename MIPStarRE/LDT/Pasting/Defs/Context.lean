@@ -18,7 +18,7 @@ hypotheses used by the restricted Lean theorem
 
 This file only introduces the carrier and re-exposes the paper's standing
 `ν` / `σ` abbreviations on top of it. It performs no proof work: all
-downstream theorems are re-stated via thin wrappers in later modules.
+downstream theorems are re-stated in later modules.
 
 ## References
 

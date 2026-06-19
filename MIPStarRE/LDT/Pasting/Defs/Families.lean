@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 /-!
 # Section 12 — Definitions: consistency and families
 
-Global-consistency predicates and the completed-slice family wrappers.
+Global-consistency predicates and the completed-slice family constructions.
 -/
 
 namespace MIPStarRE.LDT.Pasting

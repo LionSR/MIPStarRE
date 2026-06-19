@@ -88,7 +88,7 @@ lemma qBipartiteLinearConsDefect_option_eq_sum_some_complement
 
 /-- The linear consistency defect is nonnegative when the right-hand family is a
 measurement.  This lets the paper's averaged linear estimate feed the `max 0`
-`qBipartiteConsDefect` wrapper without needing a pointwise absolute-value gap.
+`qBipartiteConsDefect` maximum form without needing a pointwise absolute-value gap.
 
 Internal helper for the `LdSandwichLineOnePoint` Cauchy--Schwarz setup;
 exposed for a future file-split (`#1127`). -/
@@ -125,7 +125,7 @@ lemma qBipartiteLinearConsDefect_nonneg_of_right_total_one
 family is measurement-valued, then the averaged `max 0` bipartite consistency
 error comparison follows.
 
-This is the paper-faithful wrapper for `lem:ld-sandwich-line-one-point`: the
+This is the paper-faithful formulation of `lem:ld-sandwich-line-one-point`: the
 Cauchy--Schwarz argument controls an averaged linear expression, not an average
 of pointwise absolute values.  Nonnegativity of the linear defects removes the
 outer `max 0`.

@@ -560,7 +560,7 @@ lemma ldSandwichLineOnePoint_prefix_outcomeSum_cauchySchwarz_bound
   simpa [ldSandwichLineOnePoint_prefix_sourceOutcomeSum,
     ldSandwichLineOnePoint_prefix_movedOutcomeSum] using htwo
 
-/-- Linear-defect wrapper for the expanded off-diagonal post-deletion transport in
+/-- Linear-defect reduction for the expanded off-diagonal post-deletion transport in
 `lem:ld-sandwich-line-one-point`.
 
 The paper's two Cauchy--Schwarz moves and prefix collapse from
