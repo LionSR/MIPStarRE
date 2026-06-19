@@ -82,37 +82,39 @@ noncomputable def averageUnitSubMeas {α : Type*}
     total := averageOperatorOverDistribution (uniformDistribution α) f
     outcome_pos := by
       intro _
-      simp only [averageOperatorOverDistribution, uniformDistribution, one_div]
+      simp only [averageOperatorOverDistribution, uniformDistribution, Distribution.ofPMF_support,
+        Distribution.ofPMF_weight]
       apply Finset.sum_nonneg
       intro a ha
-      exact smul_nonneg (by positivity) (hpsd a)
+      exact smul_nonneg ENNReal.toReal_nonneg (hpsd a)
     sum_eq_total := by
       simp
     total_le_one := by
       have hsum :
-          ∑ a : α, (1 / (Fintype.card α : Error)) • f a ≤
-            ∑ a : α, (1 / (Fintype.card α : Error)) • (1 : MIPStarRE.Quantum.Op ι) := by
+          ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a ≤
+            ∑ a : α,
+              (PMF.uniformOfFintype α a).toReal • (1 : MIPStarRE.Quantum.Op ι) := by
         apply Finset.sum_le_sum
         intro a ha
-        exact smul_le_smul_of_nonneg_left (hle a) (by positivity)
+        exact smul_le_smul_of_nonneg_left (hle a) ENNReal.toReal_nonneg
       have hconst :
-          (∑ a : α, (1 / (Fintype.card α : Error)) • (1 : MIPStarRE.Quantum.Op ι)) =
+          (∑ a : α,
+              (PMF.uniformOfFintype α a).toReal • (1 : MIPStarRE.Quantum.Op ι)) =
             (1 : MIPStarRE.Quantum.Op ι) := by
-        have hcard : (Fintype.card α : Error) ≠ 0 := by positivity
+        have hpmf : ∑ a : α, (PMF.uniformOfFintype α a).toReal = 1 := by
+          have h := Distribution.ofPMF_isProbability (PMF.uniformOfFintype α)
+          exact h.weight_sum_eq_one
         calc
-          ∑ a : α, (1 / (Fintype.card α : Error)) • (1 : MIPStarRE.Quantum.Op ι)
-              = ((∑ a : α, (1 / (Fintype.card α : Error))) : Error) •
+          ∑ a : α, (PMF.uniformOfFintype α a).toReal •
+                (1 : MIPStarRE.Quantum.Op ι)
+              = ((∑ a : α, (PMF.uniformOfFintype α a).toReal) : Error) •
                   (1 : MIPStarRE.Quantum.Op ι) := by
                     simpa using
                       (Finset.sum_smul (s := Finset.univ)
-                        (f := fun _ : α => (1 / (Fintype.card α : Error)))
+                        (f := fun a : α => (PMF.uniformOfFintype α a).toReal)
                         (x := (1 : MIPStarRE.Quantum.Op ι))).symm
-          _ = ((Fintype.card α : Error) * (1 / (Fintype.card α : Error))) •
-                (1 : MIPStarRE.Quantum.Op ι) := by
-                  simp [Finset.sum_const, nsmul_eq_mul]
           _ = (1 : Error) • (1 : MIPStarRE.Quantum.Op ι) := by
-                congr 1
-                field_simp [hcard]
+                rw [hpmf]
           _ = 1 := by simp
       simpa [averageOperatorOverDistribution, uniformDistribution] using
         le_trans hsum (le_of_eq hconst) }

@@ -123,28 +123,32 @@ lemma avgOver_axisParallelLineQuestionDistribution
           have hcard : ((Finset.univ.filter p).card : Error) =
               (Fintype.card {qu : AxisParallelLineQuestion params // p qu} : Error) := by
             simp [p, Fintype.card_subtype]
-          unfold axisParallelLineQuestionDistribution avgOver uniformDistribution
+          unfold axisParallelLineQuestionDistribution
+          rw [avgOver_uniform_eq_pmf_sum]
+          unfold avgOver
           dsimp only
+          simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv,
+            ENNReal.toReal_natCast]
           rw [← hcard]
           let support : Finset (AxisParallelLineQuestion params) := Finset.univ.filter p
           change (∑ x ∈ support,
               (if x ∈ support then 1 / (support.card : Error) else 0) * f x) =
             ∑ x : {qu : AxisParallelLineQuestion params // p qu},
-              (1 / (support.card : Error)) * f x.1
+              (support.card : Error)⁻¹ * f x.1
           calc
             (∑ x ∈ support,
                 (if x ∈ support then 1 / (support.card : Error) else 0) * f x)
-              = ∑ x ∈ support, (1 / (support.card : Error)) * f x := by
+              = ∑ x ∈ support, (support.card : Error)⁻¹ * f x := by
                   refine Finset.sum_congr rfl ?_
                   intro x hx
                   simp [hx]
             _ = ∑ x : {qu : AxisParallelLineQuestion params // p qu},
-                (1 / (support.card : Error)) * f x.1 := by
+                (support.card : Error)⁻¹ * f x.1 := by
                   simpa [support, p] using
                     (Finset.sum_subtype_eq_sum_filter
                       (s := (Finset.univ : Finset (AxisParallelLineQuestion params)))
                       (f := fun qu : AxisParallelLineQuestion params =>
-                        (1 / ((Finset.univ.filter p).card : Error)) * f qu)
+                        ((Finset.univ.filter p).card : Error)⁻¹ * f qu)
                       (p := p)).symm
     _ = avgOver (uniformDistribution (AxisParallelLine params × Fq params))
           (fun ℓt => f (ℓt.1, ℓt.1.pointAt ℓt.2)) := by

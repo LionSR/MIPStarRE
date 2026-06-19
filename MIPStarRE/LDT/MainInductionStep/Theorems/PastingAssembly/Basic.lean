@@ -178,7 +178,8 @@ lemma ldPastingInInductionNu_le_fifth_mainInductionNu
           3000 * n ≤ (n ^ (31 : ℕ)) * n := hmul
           _ = n ^ (32 : ℕ) := by ring_nf
       calc
-        Real.rpow (3000 * n) (1 / (32 : Error)) ≤ Real.rpow (n ^ (32 : ℕ)) (1 / (32 : Error)) := by
+        Real.rpow (3000 * n) (1 / (32 : Error)) ≤
+            Real.rpow (n ^ (32 : ℕ)) (1 / (32 : Error)) := by
               exact Real.rpow_le_rpow (by positivity) hcoeff_le_pow (by positivity)
         _ = n := by
               have hn_nonneg : 0 ≤ n := le_trans (by norm_num : (0 : Error) ≤ 2) hn_two
@@ -297,7 +298,8 @@ lemma ldPastingInInductionNu_le_fifth_mainInductionNu
               exact mul_le_mul_of_nonneg_left hsum_le (by positivity : 0 ≤ n)
             exact le_trans hstep₁ hstep₂
           simpa [sum32, mul_assoc] using
-            (mul_le_mul_of_nonneg_left hinner (by positivity : 0 ≤ 100 * ((k : Error) ^ (2 : ℕ))))
+            (mul_le_mul_of_nonneg_left hinner
+              (by positivity : 0 ≤ 100 * ((k : Error) ^ (2 : ℕ))))
     _ = (1 / (5 : Error)) * mainInductionNu params.next k eps delta gamma := by
           dsimp [n, A, B, C, D]
           simp [mainInductionNu, Parameters.next]
@@ -425,26 +427,21 @@ lemma idxPolyFamily_averagedMass_eq_avg
     subMeasMass ψ family.averagedSubMeas.liftLeft =
       avgOver (uniformDistribution (Fq params))
         (fun x => subMeasMass ψ ((family.meas x).toSubMeas.liftLeft)) := by
-  change
-    ev ψ
-        (leftTensor (ι₂ := ι)
-          (∑ x : Fq params,
-            ((1 / (Fintype.card (Fq params) : Error)) : Error) •
-              (family.meas x).toSubMeas.total)) =
-      ∑ x : Fq params,
-        (1 / (Fintype.card (Fq params) : Error)) *
-          ev ψ (leftTensor (ι₂ := ι) ((family.meas x).toSubMeas.total))
+  rw [avgOver_uniform_eq_pmf_sum]
+  simp only [subMeasMass, IdxPolyFamily.averagedSubMeas, uniformDistribution,
+    Distribution.ofPMF_support, Distribution.ofPMF_weight, SubMeas.liftLeft,
+    mkLeftPlacedSubMeas_total]
   rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ
-    (fun x : Fq params => ((1 / (Fintype.card (Fq params) : Error)) : Error) •
+    (fun x : Fq params => (PMF.uniformOfFintype (Fq params) x).toReal •
       (family.meas x).toSubMeas.total)]
   rw [ev_sum]
   refine Finset.sum_congr rfl ?_
   intro x hx
   have hsmul :
       leftTensor (ι₂ := ι)
-          (((1 / (Fintype.card (Fq params) : Error)) : Error) •
+          ((PMF.uniformOfFintype (Fq params) x).toReal •
             (family.meas x).toSubMeas.total) =
-        ((1 / (Fintype.card (Fq params) : Error)) : Error) •
+        (PMF.uniformOfFintype (Fq params) x).toReal •
           leftTensor (ι₂ := ι) ((family.meas x).toSubMeas.total) := by
     ext i j
     rcases i with ⟨i₁, i₂⟩
@@ -453,9 +450,9 @@ lemma idxPolyFamily_averagedMass_eq_avg
       simp [leftTensor, h₁, h₂]
   rw [hsmul]
   have hreal_complex :
-      ((1 / (Fintype.card (Fq params) : Error)) : Error) •
+      (PMF.uniformOfFintype (Fq params) x).toReal •
           leftTensor (ι₂ := ι) ((family.meas x).toSubMeas.total) =
-        (((1 / (Fintype.card (Fq params) : Error)) : Error) : ℂ) •
+        (((PMF.uniformOfFintype (Fq params) x).toReal : Error) : ℂ) •
           leftTensor (ι₂ := ι) ((family.meas x).toSubMeas.total) := by
     ext i j
     simp
