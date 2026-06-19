@@ -7,8 +7,8 @@ Diagonal-line geometry and rebasing operations.
 
 ## References
 
-- arXiv:2009.12982, Section 3 (low individual degree test, diagonal line
-  questions).
+- `references/ldt-paper/test_definition.tex`
+- `blueprint/src/chapter/ch02_test.tex`
 -/
 
 namespace MIPStarRE.LDT

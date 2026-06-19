@@ -9,7 +9,8 @@ the hypercube adjacency matrix `K`.
 
 ## References
 
-- arXiv:2009.12982, Section 7 (expansion of the hypercube graph).
+- `references/ldt-paper/expansion.tex`
+- `blueprint/src/chapter/ch05_expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
@@ -183,7 +184,8 @@ noncomputable def fourierBasisProjector (params : Parameters)
 /-- Paper origin: `references/ldt-paper/expansion.tex:145-154`
 (`\label{lem:local-rewrite}`); trace witness for the local-variance rewrite. -/
 noncomputable def localVarianceTraceWitness (params : Parameters)
-    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) : MIPStarRE.Quantum.Op ι :=
+    (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
+    MIPStarRE.Quantum.Op ι :=
   let Acombine := combinedOperator params A
   let liftedLaplacianState :
       Matrix (combinedColumnIndex params ι) (combinedColumnIndex params ι) ℂ :=
@@ -194,8 +196,8 @@ noncomputable def localVarianceTraceWitness (params : Parameters)
 
 The Lean witness stores the pointwise average `A_avg = E_u A^u` together with the
 full residual family `u ↦ A^u - A_avg`. This carries the same geometric content as
-writing `A_combine = |φ₀⟩ ⊗ A₀ + |φ_⊥⟩ ⊗ A_⊥`, but it does not force the orthogonal
-part to be rank one on `Point params ⊗ ι`. -/
+writing `A_combine = |φ₀⟩ ⊗ A₀ + |φ_⊥⟩ ⊗ A_⊥`, but it does not force
+the orthogonal part to be rank one on `Point params ⊗ ι`. -/
 structure GlobalVarianceDecomposition (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) where
   averageComponent : MIPStarRE.Quantum.Op ι
@@ -243,9 +245,13 @@ noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
     intro x hx
     calc
       A x i j = (1 : ℂ) * A x i j := by simp
-      _ = ((hypercubeVertexCount params : ℂ) * (hypercubeVertexCount params : ℂ)⁻¹) * A x i j := by
+      _ =
+          ((hypercubeVertexCount params : ℂ) *
+            (hypercubeVertexCount params : ℂ)⁻¹) * A x i j := by
             simp [hM_ne]
-      _ = (hypercubeVertexCount params : ℂ) * ((hypercubeVertexCount params : ℂ)⁻¹ * A x i j) := by
+      _ =
+          (hypercubeVertexCount params : ℂ) *
+            ((hypercubeVertexCount params : ℂ)⁻¹ * A x i j) := by
             ring_nf
       _ = (params.q ^ params.m : ℂ) * (((params.q ^ params.m : ℂ)⁻¹) * A x i j) := by
             simp [hypercubeVertexCount]

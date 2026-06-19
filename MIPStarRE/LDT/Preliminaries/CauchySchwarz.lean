@@ -11,7 +11,9 @@ Formalizes Cauchy–Schwarz-style propositions from Section 3
 - `cabApproxDelta` — Proposition `prop:cab-approx-delta`
 
 ## References
-* arXiv:2009.12982, Section 3 (Preliminaries)
+
+- `references/ldt-paper/preliminaries.tex`
+- `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -156,8 +158,10 @@ theorem easyApproxFromApproxDelta
 
 /-- `prop:closeness-of-ip` (`eq:closeness3`).
 
-If `A ≈_γ B` (raw matrices) and `Σ_a (Σ_b C_{a,b})(Σ_b C_{a,b})† ≤ I`, then
-`|𝔼_x Σ_{a,b} ⟨ψ| C_{a,b} A_a |ψ⟩ - 𝔼_x Σ_{a,b} ⟨ψ| C_{a,b} B_a |ψ⟩| ≤ √γ`. -/
+If `A ≈_γ B` (raw matrices) and `Σ_a (Σ_b C_{a,b})(Σ_b C_{a,b})† ≤ I`,
+then
+`|𝔼_x Σ_{a,b} ⟨ψ| C_{a,b} A_a |ψ⟩ -
+  𝔼_x Σ_{a,b} ⟨ψ| C_{a,b} B_a |ψ⟩| ≤ √γ`. -/
 theorem closenessOfIP
     {Question OutcomeA OutcomeB : Type*} {ι : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
@@ -168,7 +172,10 @@ theorem closenessOfIP
     (C : Question → OutcomeA → OutcomeB → MIPStarRE.Quantum.Op ι)
     (γ : Error)
     (hAB : avgOver 𝒟 (fun q => qSDDCore ψ (A q) (B q)) ≤ γ)
-    (hC : ∀ q, ∑ a : OutcomeA, (∑ b : OutcomeB, C q a b) * (∑ b : OutcomeB, C q a b)ᴴ ≤ 1) :
+    (hC :
+      ∀ q,
+        ∑ a : OutcomeA,
+          (∑ b : OutcomeB, C q a b) * (∑ b : OutcomeB, C q a b)ᴴ ≤ 1) :
     |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * A q a)) -
         avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (C q a b * B q a))| ≤
       Real.sqrt γ := by
@@ -177,7 +184,8 @@ theorem closenessOfIP
 /-- `prop:closeness-of-ip` (`eq:closeness4`, adjoint version).
 
 If `A† ≈_γ B†` and `Σ_a (Σ_b C_{a,b})†(Σ_b C_{a,b}) ≤ I`, then
-`|𝔼_x Σ_{a,b} ⟨ψ| A_a C_{a,b} |ψ⟩ - 𝔼_x Σ_{a,b} ⟨ψ| B_a C_{a,b} |ψ⟩| ≤ √γ`. -/
+`|𝔼_x Σ_{a,b} ⟨ψ| A_a C_{a,b} |ψ⟩ -
+  𝔼_x Σ_{a,b} ⟨ψ| B_a C_{a,b} |ψ⟩| ≤ √γ`. -/
 theorem closenessOfIPAdjoint
     {Question OutcomeA OutcomeB : Type*} {ι : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB] [Fintype ι] [DecidableEq ι]
@@ -187,8 +195,13 @@ theorem closenessOfIPAdjoint
     (A B : Question → OutcomeA → MIPStarRE.Quantum.Op ι)
     (C : Question → OutcomeA → OutcomeB → MIPStarRE.Quantum.Op ι)
     (γ : Error)
-    (hAB : avgOver 𝒟 (fun q => qSDDCore ψ (fun a => (A q a)ᴴ) (fun a => (B q a)ᴴ)) ≤ γ)
-    (hC : ∀ q, ∑ a : OutcomeA, (∑ b : OutcomeB, C q a b)ᴴ * (∑ b : OutcomeB, C q a b) ≤ 1) :
+    (hAB :
+      avgOver 𝒟
+        (fun q => qSDDCore ψ (fun a => (A q a)ᴴ) (fun a => (B q a)ᴴ)) ≤ γ)
+    (hC :
+      ∀ q,
+        ∑ a : OutcomeA,
+          (∑ b : OutcomeB, C q a b)ᴴ * (∑ b : OutcomeB, C q a b) ≤ 1) :
     |avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) -
         avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b))| ≤
       Real.sqrt γ := by

@@ -9,7 +9,8 @@ test.
 
 ## References
 
-- arXiv:2009.12982, Introduction, Theorem 1.1 (`thm:raz-safra`).
+- `references/ldt-paper/introduction.tex`, Theorem 1.1 (`thm:raz-safra`)
+- `blueprint/src/chapter/ch01_overview.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

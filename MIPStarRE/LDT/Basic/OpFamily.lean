@@ -10,8 +10,13 @@ honest submeasurements.
 
 ## References
 
-- arXiv:2009.12982, Sections 9-12, where `≈_δ` chains pass through raw
-  operator families before they are upgraded back to honest submeasurements.
+- `references/ldt-paper/self_improvement.tex`
+- `references/ldt-paper/commutativity-points.tex`
+- `references/ldt-paper/commutativity-G.tex`
+- `references/ldt-paper/ld-pasting.tex`
+- `blueprint/src/chapter/ch07_self_improvement.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
+- `blueprint/src/chapter/ch09_pasting.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

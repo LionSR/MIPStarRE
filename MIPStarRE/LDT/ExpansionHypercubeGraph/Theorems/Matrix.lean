@@ -9,7 +9,8 @@ realization model.
 
 ## References
 
-- arXiv:2009.12982, Section 7 (expansion of the hypercube graph).
+- `references/ldt-paper/expansion.tex`
+- `blueprint/src/chapter/ch05_expansion.tex`
 -/
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph

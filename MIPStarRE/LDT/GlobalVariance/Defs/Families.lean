@@ -8,7 +8,8 @@ operator families used to build the global-variance comparisons.
 
 ## References
 
-- arXiv:2009.12982, Section 8 (global variance).
+- `references/ldt-paper/expansion.tex`
+- `blueprint/src/chapter/ch06_variance.tex`
 -/
 
 namespace MIPStarRE.LDT.GlobalVariance

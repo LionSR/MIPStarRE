@@ -11,7 +11,8 @@ postprocessing a measurement cannot substantially decrease consistency.
 
 ## References
 
-- arXiv:2009.12982, Section 7 (self-consistency preliminaries).
+- `references/ldt-paper/preliminaries.tex`
+- `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -240,11 +241,14 @@ private lemma wrongSideEstimate
               unfold idxSubMeasMass subMeasMass avgOver
               calc
                 ∑ q ∈ 𝒟.support,
-                    𝒟.weight q * (ev ψ (LPf q).total + ev ψ (RAf q).total - 2 * crossPost q)
+                    𝒟.weight q *
+                      (ev ψ (LPf q).total + ev ψ (RAf q).total -
+                        2 * crossPost q)
                   =
                     ∑ q ∈ 𝒟.support,
                       (𝒟.weight q * ev ψ (LPf q).total +
-                        (𝒟.weight q * ev ψ (RAf q).total - 2 * (𝒟.weight q * crossPost q))) := by
+                        (𝒟.weight q * ev ψ (RAf q).total -
+                          2 * (𝒟.weight q * crossPost q))) := by
                           refine Finset.sum_congr rfl ?_
                           intro q hq
                           ring

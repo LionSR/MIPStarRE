@@ -8,7 +8,8 @@ the switch-sandwich argument.
 
 ## References
 
-- arXiv:2009.12982, Section 7 (switch-sandwich preliminaries, `prop:switch-sandwich`).
+- `references/ldt-paper/preliminaries.tex`, `prop:switch-sandwich`
+- `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -246,8 +247,11 @@ theorem closenessOfInnerProduct_right
         intro q
         simpa [Matrix.conjTranspose_sum] using hC q)
   have hA :
-      avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C q a b)ᴴ * (A q a)ᴴ)) =
-        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) := by
+      avgOver 𝒟
+          (fun q =>
+            ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C q a b)ᴴ * (A q a)ᴴ)) =
+        avgOver 𝒟
+          (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (A q a * C q a b)) := by
     apply avgOver_congr
     intro q
     refine Finset.sum_congr rfl ?_
@@ -256,8 +260,11 @@ theorem closenessOfInnerProduct_right
     intro b _
     simpa [Matrix.conjTranspose_mul] using ev_adjoint_eq ψ (A q a * C q a b)
   have hB :
-      avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C q a b)ᴴ * (B q a)ᴴ)) =
-        avgOver 𝒟 (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b)) := by
+      avgOver 𝒟
+          (fun q =>
+            ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ ((C q a b)ᴴ * (B q a)ᴴ)) =
+        avgOver 𝒟
+          (fun q => ∑ a : OutcomeA, ∑ b : OutcomeB, ev ψ (B q a * C q a b)) := by
     apply avgOver_congr
     intro q
     refine Finset.sum_congr rfl ?_

@@ -9,7 +9,8 @@ point-commutativity argument.
 
 ## References
 
-- arXiv:2009.12982, Section 10 (commutativity of the point measurements).
+- `references/ldt-paper/commutativity-points.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.CommutativityPoints
@@ -36,14 +37,18 @@ private lemma reversedDropFromLineComparison
   `I ⊗ (L^ℓ_[f(u)=a] L^ℓ_[f(v)=b]) ≈ A^v_b ⊗ L^ℓ_[f(u)=a]`.
   -/
   let e := pointPairOutcomeSwapEquiv params
-  let Araw : IdxOpFamily (PointPairDiagonalLineQuestion params) (Fq params × Fq params) (ι × ι) :=
+  let Araw :
+      IdxOpFamily (PointPairDiagonalLineQuestion params)
+        (Fq params × Fq params) (ι × ι) :=
     fun q =>
       let Lu := sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)
       let Lv := sampledDiagonalLineEvaluation params strategy (q.1, q.2.2)
       opFamilyOfOutcome fun ab : PointPairOutcome params =>
         (Lu.liftRight).outcome ab.2 *
           (OpFamily.rightPlacedOpFamily (ιA := ι) Lv.toOpFamily).outcome ab.1
-  let Braw : IdxOpFamily (PointPairDiagonalLineQuestion params) (PointPairOutcome params) (ι × ι) :=
+  let Braw :
+      IdxOpFamily (PointPairDiagonalLineQuestion params)
+        (PointPairOutcome params) (ι × ι) :=
     fun q =>
       let Lu := sampledDiagonalLineEvaluation params strategy (q.1, q.2.1)
       let Av := (strategy.pointMeasurement (q.1.pointAt q.2.2)).toSubMeas

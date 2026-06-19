@@ -8,7 +8,8 @@ questions, used by both the lift and drop comparisons.
 
 ## References
 
-- arXiv:2009.12982, Section 10 (commutativity of the point measurements).
+- `references/ldt-paper/commutativity-points.tex`
+- `blueprint/src/chapter/ch08_commutativity.tex`
 -/
 
 namespace MIPStarRE.LDT.CommutativityPoints
