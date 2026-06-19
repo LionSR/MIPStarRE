@@ -26,7 +26,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- The zero polynomial used as the distinguished completion outcome for the
-reduced Lean wrapper around the paper's strict-feasible primal SDP witness. -/
+reduced Lean completion of the paper's strict-feasible primal SDP witness. -/
 noncomputable def sdpDistinguishedPolynomial (params : Parameters) [FieldModel params.q] :
     Polynomial params :=
   ⟨0, by
