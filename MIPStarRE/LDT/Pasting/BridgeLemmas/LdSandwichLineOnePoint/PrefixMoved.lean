@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint.Endpoint
 
 /-!
-# Section 12 pasting: line one-point bridge — prefix moved lemmas
+# Section 12 pasting: line one-point transport — prefix moved lemmas
 
 Internal helper module; part of the file-split for `#1127`.
 

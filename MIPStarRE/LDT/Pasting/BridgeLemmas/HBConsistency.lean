@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.LineInterpolation.HBError
 /-!
 # Section 12 pasting: H-B consistency
 
-Aggregation bridge proving `lem:h-b-consistency` from the one-point line consistency statements.
+Aggregation theorem proving `lem:h-b-consistency` from the one-point line consistency statements.
 
 ## References
 

@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Moves
 # Section 12 pasting: from-H-to-G paper telescope
 
 This file assembles the adjacent-stage paper move chain and records the final
-stage-mass telescope for the `fromHToG` bridge.
+stage-mass telescope for the `fromHToG` reduction.
 -/
 
 namespace MIPStarRE.LDT.Pasting

@@ -308,7 +308,7 @@ theorem ldPastingNCompleteness_of_overAllOutcomes_fromHToG_tail
     linarith
   simpa [ν, ldPastingCompletenessLowerBound, overAllOutcomesPastedMass] using hmass
 
--- The downstream completeness theorem elaborates the full `fromHToG` bridge facts.
+-- The downstream completeness theorem elaborates the full `fromHToG` reduction facts.
 /-- `cor:ld-pasting-N-completeness` once the Bernoulli-tail lower bound is
 supplied explicitly.
 

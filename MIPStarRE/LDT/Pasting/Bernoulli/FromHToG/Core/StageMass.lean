@@ -403,7 +403,7 @@ lemma fromHToGStageMass_zero_eq
                 else 0))
 
 /-- Tail-level version of the exact `S`-recurrence used at the end of the
-adjacent-stage bridge.  After the analytic move-right / commute / move-right
+adjacent-stage comparison.  After the analytic move-right / commute / move-right
 steps, the remaining paper expression collapses to the next Lean stage by
 expanding the recurrence weight as
 `S_{τ_{>ℓ}} = S_{1 :: τ_{>ℓ}} G + S_{0 :: τ_{>ℓ}} (I-G)`; this lemma records

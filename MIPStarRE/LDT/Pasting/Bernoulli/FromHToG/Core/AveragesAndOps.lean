@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Pasting.Bernoulli.Weights
 # Section 12 pasting: operator averages and projective submeasurement lemmas
 
 Averages over uniform distributions, tensor placement identities, and
-projective submeasurement algebraic lemmas for the `fromHToG` bridge.
+projective submeasurement algebraic lemmas for the `fromHToG` reduction.
 -/
 
 namespace MIPStarRE.LDT.Pasting

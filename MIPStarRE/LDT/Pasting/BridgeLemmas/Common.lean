@@ -4,10 +4,10 @@ import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 import MIPStarRE.LDT.Basic.LowDegreePolynomial
 
 /-!
-# Section 12 pasting: bridge common helpers
+# Section 12 pasting: comparison common helpers
 
 Shared postprocessing, symmetry, distribution, boundedness, and arithmetic helpers for the Section
-12 bridge lemmas.
+12 comparison lemmas.
 
 ## References
 

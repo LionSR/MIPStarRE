@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint.OutcomeLemmas
 
 /-!
-# Section 12 pasting: line one-point bridge — Cauchy-Schwarz setup
+# Section 12 pasting: line one-point transport — Cauchy-Schwarz setup
 
 Internal helper module; part of the file-split for `#1127`.
 
@@ -621,7 +621,7 @@ noncomputable def ldSandwichLineOnePointCS_secondTargetRaw
           (ldSandwichLineOnePointCS_Arot params family hi q gs)ᴴ))
 
 /-- Exact low-level facts needed to turn the generic `closenessOfIP*` lemmas into
-`ld-pasting.tex:964--1010` for the line-one-point bridge.
+`ld-pasting.tex:964--1010` for the line-one-point statement.
 
 This record separates the generic CS theorem instantiation (proved below) from
 the paper-specific facts:

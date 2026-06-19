@@ -1,7 +1,7 @@
 import MIPStarRE.LDT.Pasting.BridgeLemmas.LdSandwichLineOnePoint.CSSetup
 
 /-!
-# Section 12 pasting: line one-point bridge — Cauchy-Schwarz chain
+# Section 12 pasting: line one-point transport — Cauchy-Schwarz chain
 
 Internal helper module; part of the file-split for `#1127`.
 
