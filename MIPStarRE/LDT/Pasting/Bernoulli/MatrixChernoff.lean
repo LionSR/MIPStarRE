@@ -4,9 +4,9 @@ import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
 import MIPStarRE.LDT.Pasting.Statements
 
 /-!
-# Section 12 pasting: matrix Chernoff wrapper
+# Section 12 pasting: matrix Chernoff comparison
 
-Continuous-functional-calculus wrapper for the Bernoulli matrix Chernoff lemma.
+Continuous-functional-calculus form of the Bernoulli matrix Chernoff lemma.
 -/
 
 namespace MIPStarRE.LDT.Pasting

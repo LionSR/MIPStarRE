@@ -3,7 +3,7 @@ import MIPStarRE.LDT.Pasting.BridgeLemmas.CommuteGHalfSandwich.MoveChain.Core
 /-!
 # Section 12 pasting: commute G half-sandwich
 
-Public wrapper for `lem:commute-g-half-sandwich`.
+Public statement for `lem:commute-g-half-sandwich`.
 
 ## References
 

@@ -5,7 +5,7 @@ import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 /-!
 # Scalar Bernoulli polynomial helpers for pasting
 
-Purely scalar inequalities used by the matrix Chernoff wrapper.
+Purely scalar inequalities used by the matrix Chernoff comparison.
 -/
 
 namespace MIPStarRE.LDT.Pasting

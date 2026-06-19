@@ -4,7 +4,7 @@ import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 /-!
 # Section 12 pasting: Bernoulli recurrence weights
 
-Recurrence-weight wrappers for the `fromHToG` bridge.
+Recurrence-weight identities for the `fromHToG` reduction.
 -/
 
 namespace MIPStarRE.LDT.Pasting
