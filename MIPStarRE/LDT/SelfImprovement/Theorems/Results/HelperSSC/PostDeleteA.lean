@@ -214,7 +214,7 @@ private lemma helperDeleteA_clone_mass_factor_le_one
     intro uv
     exact helper_pair_tensor_mass_le_one params strategy
       (sandwichedPolynomialSubMeasAt params strategy T uv.1) T
-  exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
+  exact avgOver_uniform_le_const _ 1 hpointwise
 
 -- This post-delete transport combines the clone variance factor estimate with
 -- the local-to-global variance transfer.

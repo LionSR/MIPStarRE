@@ -178,9 +178,9 @@ lemma gCommStability_raw_le_one_of
             unfold sddErrorOp
             exact avgOver_mono _ _ _ hpointwise
     _ ≤ 1 := by
-          exact avgOver_uniform_le_of_pointwise_le
+          exact avgOver_uniform_le_const
             (fun q => gCommOverlapTerm params strategy G (pointHeight params (point q)))
-            1 zero_le_one
+            1
             (fun q => gCommOverlapTerm_le_one
               params strategy hnorm G (pointHeight params (point q)))
 

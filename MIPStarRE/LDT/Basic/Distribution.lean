@@ -524,14 +524,6 @@ theorem avgOver_uniform_le_const {α : Type*}
     avgOver (uniformDistribution α) f ≤ δ :=
   avgOver_uniform_le_of_forall_le_on_support f δ fun a _ => hf a
 
-/-- A uniform average is bounded by any nonnegative pointwise upper bound. -/
-theorem avgOver_uniform_le_of_pointwise_le {α : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    (f : α → Error) (δ : Error) (_hδ_nonneg : 0 ≤ δ)
-    (hf : ∀ a, f a ≤ δ) :
-    avgOver (uniformDistribution α) f ≤ δ :=
-  avgOver_uniform_le_const f δ hf
-
 /-- Reindexing a uniform average along an equivalence preserves its value. -/
 theorem avgOver_uniform_equiv
     {α β : Type*}

@@ -107,7 +107,7 @@ lemma add_in_u_cs_chain_q3_q4_self_energy_factor_le_one
       _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) :=
             ev_mono strategy.state _ _ hop_sum_le_one
       _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
-  exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
+  exact avgOver_uniform_le_const _ 1 hpointwise
 
 /-- Self-energy factor `≤ 1` for the `Q₂ → Q₃` factored Cauchy--Schwarz.
 
@@ -191,7 +191,7 @@ lemma add_in_u_cs_chain_q2_q3_self_energy_factor_le_one
             simpa [F] using
               sandwichTensor_residual_sum_le_one strategy.state strategy.isNormalized
                 Outer Inner Right
-  exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
+  exact avgOver_uniform_le_const _ 1 hpointwise
 
 /-- The variance factor in the `Q₂ → Q₃` factored Cauchy--Schwarz estimate is
 bounded by the polynomial sum of the global-variance deviations.

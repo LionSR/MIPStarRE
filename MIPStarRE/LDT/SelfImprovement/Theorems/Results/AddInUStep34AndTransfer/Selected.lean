@@ -467,7 +467,7 @@ private lemma addInU_selected_cs_chain_self_energy_factor_le_one_at
       _ ≤ ev strategy.state (1 : MIPStarRE.Quantum.Op (ι × ι)) :=
             ev_mono strategy.state _ _ hop_le
       _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
-  exact avgOver_uniform_le_of_pointwise_le _ 1 zero_le_one hpointwise
+  exact avgOver_uniform_le_const _ 1 hpointwise
 
 /-- The selected Step 3/4 variance factor is bounded by the summed
 global-variance deviation.
