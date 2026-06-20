@@ -103,15 +103,7 @@ noncomputable def axisParallelLineQuestionDistribution (params : Parameters) [Fi
   classical
   let support : Finset (AxisParallelLineQuestion params) :=
     Finset.univ.filter (pointOnLine (params := params))
-  exact
-    { support := support
-      weight := fun qu => if qu ∈ support then 1 / (support.card : Error) else 0
-      nonnegative := by
-        intro qu
-        by_cases hqu : qu ∈ support <;> simp [hqu]
-      outsideSupport := by
-        intro qu hqu
-        simp [hqu] }
+  exact Distribution.uniformOnFinset support
 
 /-- The uniform distribution over bundled low-individual-degree polynomials. -/
 noncomputable def polynomialDistribution (params : Parameters) [FieldModel params.q] :
