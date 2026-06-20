@@ -185,9 +185,8 @@ shared diagonal-line question. -/
 noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters)
     [FieldModel params.q] :
     Distribution (PointPairDiagonalLineQuestion params) :=
-  Distribution.ofPMF <|
-    (PMF.uniformOfFintype (PointPairQuestion params × Fq params)).map
-      (sharedDiagonalLineQuestionOfPointPair params)
+  (uniformDistribution (PointPairQuestion params × Fq params)).map
+    (sharedDiagonalLineQuestionOfPointPair params)
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)

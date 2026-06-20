@@ -92,17 +92,9 @@ private lemma avgOver_pointPairSharedDiagonalLine_eq_uniform_seed
     avgOver (pointPairSharedDiagonalLineDistribution params) f =
       avgOver (uniformDistribution (PointPairQuestion params × Fq params))
         (fun s => f (sharedDiagonalLineQuestionOfPointPair params s)) := by
-  change
-    avgOver
-        (Distribution.ofPMF
-          ((PMF.uniformOfFintype (PointPairQuestion params × Fq params)).map
-            (sharedDiagonalLineQuestionOfPointPair params)))
-        f =
-      avgOver (uniformDistribution (PointPairQuestion params × Fq params))
-        (fun s => f (sharedDiagonalLineQuestionOfPointPair params s))
-  simpa [uniformDistribution] using
-    (Distribution.avgOver_ofPMF_map
-      (p := PMF.uniformOfFintype (PointPairQuestion params × Fq params))
+  simpa [pointPairSharedDiagonalLineDistribution] using
+    (Distribution.avgOver_map
+      (𝒟 := uniformDistribution (PointPairQuestion params × Fq params))
       (e := sharedDiagonalLineQuestionOfPointPair params) (f := f))
 
 private noncomputable def pointPairSharedDiagonalLine_ignore_first_equiv
