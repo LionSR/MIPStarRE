@@ -32,40 +32,6 @@ def totalWeight {α : Type*} (𝒟 : Distribution α) : Error :=
 def IsProbability {α : Type*} (𝒟 : Distribution α) : Prop :=
   𝒟.totalWeight = 1
 
-/-- View a probability mass function on a finite type as a `Distribution`
-with full finite support. -/
-noncomputable def ofPMF {α : Type*} [Fintype α]
-    (p : PMF α) : Distribution α where
-  support := Finset.univ
-  weight := fun a => (p a).toReal
-  nonnegative := by intro _; positivity
-  outsideSupport := by intro a ha; exact absurd (Finset.mem_univ a) ha
-
-@[simp]
-theorem ofPMF_support {α : Type*} [Fintype α]
-    (p : PMF α) :
-    (ofPMF p).support = Finset.univ := rfl
-
-@[simp]
-theorem ofPMF_weight {α : Type*} [Fintype α]
-    (p : PMF α) (a : α) :
-    (ofPMF p).weight a = (p a).toReal := rfl
-
-/-- A finite `PMF` gives a probability distribution. -/
-theorem ofPMF_isProbability {α : Type*} [Fintype α]
-    (p : PMF α) :
-    (ofPMF p).IsProbability := by
-  classical
-  dsimp [IsProbability, totalWeight, ofPMF]
-  calc
-    ∑ a : α, (p a).toReal = (∑ a : α, p a).toReal := by
-      rw [ENNReal.toReal_sum]
-      exact fun a _ => p.apply_ne_top a
-    _ = 1 := by
-      have hsum : (∑ a : α, p a) = 1 := by
-        simpa [tsum_fintype] using p.tsum_coe
-      simp [hsum]
-
 /-- Push a finite-support distribution forward along a map.
 
 This is the project `Distribution` analogue of `PMF.map`.  The support is the
@@ -189,38 +155,6 @@ theorem avgOver_map {α β : Type*} [DecidableEq β]
             (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩)
             (fun a => 𝒟.weight a * f (e a))
 
-/-- Averaging against `Distribution.ofPMF p` is the finite sum weighted by `p`. -/
-theorem avgOver_ofPMF_eq_pmf_sum {α : Type*} [Fintype α]
-    (p : PMF α) (f : α → Error) :
-    avgOver (ofPMF p) f = ∑ a : α, (p a).toReal * f a := by
-  simp [avgOver, ofPMF]
-
-/-- Averaging against `Distribution.ofPMF p` is the Bochner integral against
-the measure associated to `p`. -/
-theorem avgOver_ofPMF_eq_pmf_integral {α : Type*}
-    [Fintype α]
-    [MeasurableSpace α] [MeasurableSingletonClass α]
-    (p : PMF α) (f : α → Error) :
-    avgOver (ofPMF p) f = ∫ a, f a ∂p.toMeasure := by
-  rw [PMF.integral_eq_sum]
-  simp [avgOver, ofPMF]
-
-/-- Averaging a scalar function against the push-forward of a finite `PMF`
-is the same as averaging the pulled-back scalar function against the original
-`PMF`. -/
-theorem avgOver_ofPMF_map {α β : Type*} [Fintype α] [Fintype β]
-    (p : PMF α) (e : α → β) (f : β → Error) :
-    avgOver (ofPMF (p.map e)) f = avgOver (ofPMF p) (fun a => f (e a)) := by
-  classical
-  letI : MeasurableSpace α := ⊤
-  letI : MeasurableSpace β := ⊤
-  rw [avgOver_ofPMF_eq_pmf_integral, avgOver_ofPMF_eq_pmf_integral]
-  rw [← PMF.toMeasure_map (f := e) p (by fun_prop : Measurable e)]
-  rw [MeasureTheory.integral_map
-    (by fun_prop : AEMeasurable e p.toMeasure)
-    (by fun_prop : MeasureTheory.AEStronglyMeasurable f
-      (MeasureTheory.Measure.map e p.toMeasure))]
-
 end Distribution
 
 /-- Weighted sum of operators over a distribution's finite support, using the same
@@ -263,15 +197,6 @@ theorem averageOperatorOverDistribution_map {α β : Type*} [DecidableEq β]
             (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
             (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩)
             (fun a => 𝒟.weight a • f (e a))
-
-/-- Operator-valued averaging against `Distribution.ofPMF p` is the finite
-operator sum weighted by the probability mass function `p`. -/
-theorem averageOperatorOverDistribution_ofPMF_eq_sum {α : Type*} [Fintype α]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (p : PMF α) (f : α → MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution (ofPMF p) f =
-      ∑ a : α, (p a).toReal • f a := by
-  simp [averageOperatorOverDistribution, ofPMF]
 
 end Distribution
 
@@ -426,7 +351,7 @@ end Distribution
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α :=
-  Distribution.ofPMF (PMF.uniformOfFintype α)
+  Distribution.uniformOnFinset Finset.univ
 
 /-- Total variation distance between two distributions:
 `TV(μ, ν) = ½ ∑_a |μ(a) - ν(a)|` over the union of supports. -/
@@ -624,7 +549,10 @@ end Distribution.IsProbability
 theorem uniformDistribution_weight_sum_eq_one (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] :
     ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a = 1 := by
-  have h := Distribution.ofPMF_isProbability (PMF.uniformOfFintype α)
+  have h : (uniformDistribution α).IsProbability := by
+    simpa [uniformDistribution] using
+      Distribution.uniformOnFinset_isProbability (Finset.univ : Finset α)
+        Finset.univ_nonempty
   exact h.weight_sum_eq_one
 
 /-- The uniform distribution is a genuine probability distribution. -/
@@ -632,7 +560,7 @@ theorem uniformDistribution_isProbability (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] :
     (uniformDistribution α).IsProbability := by
   simpa [uniformDistribution] using
-    Distribution.ofPMF_isProbability (PMF.uniformOfFintype α)
+    Distribution.uniformOnFinset_isProbability (Finset.univ : Finset α) Finset.univ_nonempty
 
 /-- The weights of a uniform distribution sum to at most `1`. -/
 theorem uniformDistribution_weight_sum_le_one (α : Type*)
@@ -648,6 +576,17 @@ theorem avgOver_uniform_const {α : Type*}
   exact avgOver_const_of_isProbability
     (uniformDistribution α) (uniformDistribution_isProbability α) c
 
+/-- Finite-sum expression for the uniform average, stated without measurable-space
+assumptions. -/
+theorem avgOver_uniform_eq_pmf_sum {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α] (f : α → Error) :
+    avgOver (uniformDistribution α) f =
+      ∑ a : α, (PMF.uniformOfFintype α a).toReal * f a := by
+  unfold uniformDistribution avgOver
+  rw [Distribution.uniformOnFinset_support]
+  simp [Distribution.uniformOnFinset_weight, PMF.uniformOfFintype_apply,
+    ENNReal.toReal_inv, ENNReal.toReal_natCast]
+
 /-- The uniform average with respect to `uniformDistribution` is the finite integral
 with respect to the uniform probability mass function. -/
 theorem avgOver_uniform_eq_pmf_integral {α : Type*}
@@ -656,17 +595,8 @@ theorem avgOver_uniform_eq_pmf_integral {α : Type*}
     (f : α → Error) :
     avgOver (uniformDistribution α) f =
       ∫ a, f a ∂(PMF.uniformOfFintype α).toMeasure := by
-  simpa [uniformDistribution] using
-    Distribution.avgOver_ofPMF_eq_pmf_integral (PMF.uniformOfFintype α) f
-
-/-- Finite-sum form of `avgOver_uniform_eq_pmf_integral`, avoiding any
-measurable-space assumptions. -/
-theorem avgOver_uniform_eq_pmf_sum {α : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α] (f : α → Error) :
-    avgOver (uniformDistribution α) f =
-      ∑ a : α, (PMF.uniformOfFintype α a).toReal * f a := by
-  simpa [uniformDistribution] using
-    Distribution.avgOver_ofPMF_eq_pmf_sum (PMF.uniformOfFintype α) f
+  rw [avgOver_uniform_eq_pmf_sum, PMF.integral_eq_sum]
+  simp
 
 /-- A uniform average over a finite support is the same as the uniform average
 over the corresponding finite subtype. -/
@@ -704,9 +634,10 @@ theorem averageOperatorOverDistribution_uniform_eq_pmf_sum {α : Type*}
     (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (uniformDistribution α) f =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
-  simpa [uniformDistribution] using
-    Distribution.averageOperatorOverDistribution_ofPMF_eq_sum
-      (PMF.uniformOfFintype α) f
+  unfold uniformDistribution averageOperatorOverDistribution
+  rw [Distribution.uniformOnFinset_support]
+  simp [Distribution.uniformOnFinset_weight, PMF.uniformOfFintype_apply,
+    ENNReal.toReal_inv, ENNReal.toReal_natCast]
 
 /-- A uniform average of effects is again bounded above by the identity operator. -/
 theorem averageOperatorOverDistribution_uniform_le_one {α : Type*}
