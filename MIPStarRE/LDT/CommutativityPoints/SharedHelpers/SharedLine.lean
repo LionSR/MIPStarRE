@@ -92,22 +92,18 @@ private lemma avgOver_pointPairSharedDiagonalLine_eq_uniform_seed
     avgOver (pointPairSharedDiagonalLineDistribution params) f =
       avgOver (uniformDistribution (PointPairQuestion params × Fq params))
         (fun s => f (sharedDiagonalLineQuestionOfPointPair params s)) := by
-  let e : PointPairQuestion params × Fq params → PointPairDiagonalLineQuestion params :=
-    sharedDiagonalLineQuestionOfPointPair params
-  have hinj : Function.Injective e := by
-    refine Function.LeftInverse.injective
-      (g := fun q => (sampledPointPairFromSharedDiagonalQuestion params q, q.2.1)) ?_
-    intro s
-    exact Prod.ext (sharedDiagonalLineQuestionOfPointPair_sampledPointPair params s) rfl
-  unfold avgOver pointPairSharedDiagonalLineDistribution uniformDistribution
-  rw [Finset.sum_image]
-  · apply Finset.sum_congr rfl
-    intro s _
-    have hs : e s ∈ Finset.univ.image e := by
-      exact Finset.mem_image.mpr ⟨s, Finset.mem_univ s, rfl⟩
-    simp [e, hs]
-  · intro s₁ _ s₂ _ hs
-    exact hinj hs
+  change
+    avgOver
+        (Distribution.ofPMF
+          ((PMF.uniformOfFintype (PointPairQuestion params × Fq params)).map
+            (sharedDiagonalLineQuestionOfPointPair params)))
+        f =
+      avgOver (uniformDistribution (PointPairQuestion params × Fq params))
+        (fun s => f (sharedDiagonalLineQuestionOfPointPair params s))
+  simpa [uniformDistribution] using
+    (Distribution.avgOver_ofPMF_map
+      (p := PMF.uniformOfFintype (PointPairQuestion params × Fq params))
+      (e := sharedDiagonalLineQuestionOfPointPair params) (f := f))
 
 private noncomputable def pointPairSharedDiagonalLine_ignore_first_equiv
     (params : Parameters)
