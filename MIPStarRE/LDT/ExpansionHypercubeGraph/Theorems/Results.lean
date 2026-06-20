@@ -100,7 +100,8 @@ private lemma matrixLocalVariance_eq_closedForm (params : Parameters)
                 (s := (Finset.univ : Finset (Point params)))
                 (f := diag)
                 (a := (hypercubeVertexCount params : Error)⁻¹)).symm
-  unfold matrixLocalVariance avgOver matrixHypercubeEdgeDistribution rerandomizeCoord
+  unfold matrixLocalVariance matrixHypercubeEdgeDistribution
+  rw [avgOver_rerandomizeCoord_eq_weight_sum]
   rw [Fintype.sum_prod_type]
   simp_rw [hsqdiff]
   let diagSum : Error := ∑ u, diag u
