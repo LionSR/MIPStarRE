@@ -177,17 +177,12 @@ lemma gCommStability_raw_le_one_of
           (fun q => gCommOverlapTerm params strategy G (pointHeight params (point q))) := by
             unfold sddErrorOp
             exact avgOver_mono _ _ _ hpointwise
-    _ ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => 1) := by
-          apply avgOver_mono
-          intro q
-          exact gCommOverlapTerm_le_one
-            params strategy hnorm G (pointHeight params (point q))
-    _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
-          (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
-          simp [avgOver]
     _ ≤ 1 := by
-          simpa using
-            uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+          exact avgOver_uniform_le_of_pointwise_le
+            (fun q => gCommOverlapTerm params strategy G (pointHeight params (point q)))
+            1 zero_le_one
+            (fun q => gCommOverlapTerm_le_one
+              params strategy hnorm G (pointHeight params (point q)))
 
 /-- Upgrade raw `zeta / 2` and `1` bounds to the displayed `sqrt zeta` relation. -/
 lemma sddOpRel_of_sqrt_bound_from_half_one
