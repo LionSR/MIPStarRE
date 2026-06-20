@@ -155,10 +155,23 @@ lemma matrixGlobalVariance_eq_closedForm (params : Parameters)
             simpa [diag] using hdiag_left
   have hM_ne : (hypercubeVertexCount params : Error) ≠ 0 := by
     exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
-  unfold matrixGlobalVariance avgOver independentPointPair independentPointPairWeight
+  unfold matrixGlobalVariance avgOver independentPointPair uniformDistribution
+  rw [Distribution.uniformOnFinset_support]
+  simp_rw [Distribution.uniformOnFinset_weight]
+  simp only [Finset.mem_univ, if_true]
   rw [Fintype.sum_prod_type]
   simp_rw [hsqdiff]
   let M : Error := hypercubeVertexCount params
+  have huniformWeight :
+      (1 / (((Finset.univ : Finset (Point params × Point params)).card : Error))) =
+        M⁻¹ * M⁻¹ := by
+    have hcard :
+        (((Finset.univ : Finset (Point params × Point params)).card : Error)) = M * M := by
+      rw [Finset.card_univ, Fintype.card_prod]
+      simp [M, hypercubeVertexCount]
+    rw [hcard]
+    field_simp [M, hM_ne]
+  simp_rw [huniformWeight]
   let diagSum : Error := ∑ u, diag u
   let corrSum : Error := ∑ u, ∑ v, corr u v
   let diagLeft : Error := ∑ u : Point params, ∑ v : Point params, diag u

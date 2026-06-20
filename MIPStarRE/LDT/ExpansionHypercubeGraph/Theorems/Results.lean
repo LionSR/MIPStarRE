@@ -32,8 +32,7 @@ lemma avgOver_independentPointPair_eq_uniform_prod
     (f : Point params × Point params → Error) :
     avgOver (independentPointPair params) f =
       avgOver (uniformDistribution (Point params × Point params)) f := by
-  unfold avgOver independentPointPair independentPointPairWeight uniformDistribution
-  simp [hypercubeVertexCount, Fintype.card_prod]
+  rfl
 
 private lemma matrixLocalVariance_eq_closedForm (params : Parameters)
     (model : MatrixOperatorFamilyRealization params) :
