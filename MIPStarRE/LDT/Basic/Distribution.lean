@@ -7,7 +7,8 @@ import Mathlib.Probability.ProbabilityMassFunction.Integrals
 # Distribution infrastructure for the low individual degree test
 
 Shared distribution definitions: finite-support weighted distributions,
-a probability predicate, averaging, uniform distribution, and outcome summation.
+a probability predicate, push-forward distributions, averaging, uniform
+distribution, and outcome summation.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -65,6 +66,47 @@ theorem ofPMF_isProbability {α : Type*} [Fintype α]
         simpa [tsum_fintype] using p.tsum_coe
       simp [hsum]
 
+/-- Push a finite-support distribution forward along a map.
+
+This is the project `Distribution` analogue of `PMF.map`.  The support is the
+image of the original finite support, and each new weight is the sum of the
+weights in the corresponding fiber. -/
+noncomputable def map {α β : Type*} [DecidableEq β]
+    (𝒟 : Distribution α) (e : α → β) : Distribution β where
+  support := 𝒟.support.image e
+  weight := fun b => ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a
+  nonnegative := by
+    intro b
+    exact Finset.sum_nonneg fun a _ => 𝒟.nonnegative a
+  outsideSupport := by
+    intro b hb
+    exact Finset.sum_eq_zero fun a ha => by
+      rcases Finset.mem_filter.mp ha with ⟨ha𝒟, hae⟩
+      have hb' : b ∈ 𝒟.support.image e := by
+        rw [← hae]
+        exact Finset.mem_image.mpr ⟨a, ha𝒟, rfl⟩
+      exact (hb hb').elim
+
+@[simp]
+theorem map_support {α β : Type*} [DecidableEq β]
+    (𝒟 : Distribution α) (e : α → β) :
+    (𝒟.map e).support = 𝒟.support.image e := rfl
+
+@[simp]
+theorem map_weight {α β : Type*} [DecidableEq β]
+    (𝒟 : Distribution α) (e : α → β) (b : β) :
+    (𝒟.map e).weight b =
+      ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a := rfl
+
+/-- Push-forward preserves total mass. -/
+theorem map_totalWeight {α β : Type*} [DecidableEq β]
+    (𝒟 : Distribution α) (e : α → β) :
+    (𝒟.map e).totalWeight = 𝒟.totalWeight := by
+  simpa [totalWeight, map] using
+    (Finset.sum_fiberwise_of_maps_to
+      (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
+      (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩) 𝒟.weight)
+
 end Distribution
 
 /-- On a finite ambient type, a summand that vanishes outside a distribution's
@@ -109,6 +151,12 @@ theorem weight_sum_le_one {α : Type*}
     ∑ a ∈ 𝒟.support, 𝒟.weight a ≤ 1 :=
   le_of_eq h𝒟.weight_sum_eq_one
 
+/-- Push-forward preserves the probability invariant. -/
+theorem map {α β : Type*} [DecidableEq β]
+    {𝒟 : Distribution α} (h𝒟 : 𝒟.IsProbability) (e : α → β) :
+    (𝒟.map e).IsProbability := by
+  simpa [Distribution.IsProbability, Distribution.map_totalWeight] using h𝒟
+
 end Distribution.IsProbability
 
 /-- Average a scalar function against the stored finite support of a distribution. -/
@@ -116,6 +164,30 @@ def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a * f a
 
 namespace Distribution
+
+/-- Averaging against a pushed-forward distribution is averaging the pulled-back
+function against the original distribution. -/
+theorem avgOver_map {α β : Type*} [DecidableEq β]
+    (𝒟 : Distribution α) (e : α → β) (f : β → Error) :
+    avgOver (𝒟.map e) f = avgOver 𝒟 (fun a => f (e a)) := by
+  classical
+  unfold avgOver Distribution.map
+  calc
+    ∑ b ∈ 𝒟.support.image e,
+        (∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a) * f b
+        = ∑ b ∈ 𝒟.support.image e,
+            ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a * f (e a) := by
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          rw [Finset.sum_mul]
+          refine Finset.sum_congr rfl ?_
+          intro a ha
+          exact congrArg (fun x => 𝒟.weight a * f x) (Finset.mem_filter.mp ha).2.symm
+    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * f (e a) := by
+          exact Finset.sum_fiberwise_of_maps_to
+            (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
+            (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩)
+            (fun a => 𝒟.weight a * f (e a))
 
 /-- Averaging against `Distribution.ofPMF p` is the finite sum weighted by `p`. -/
 theorem avgOver_ofPMF_eq_pmf_sum {α : Type*} [Fintype α]
@@ -132,22 +204,6 @@ theorem avgOver_ofPMF_eq_pmf_integral {α : Type*}
     avgOver (ofPMF p) f = ∫ a, f a ∂p.toMeasure := by
   rw [PMF.integral_eq_sum]
   simp [avgOver, ofPMF]
-
-/-- Finite real-weight expansion of `PMF.map_apply`. -/
-theorem pmf_map_apply_toReal_sum {α β : Type*} [Fintype α]
-    [DecidableEq β]
-    (p : PMF α) (e : α → β) (b : β) :
-    ((p.map e) b).toReal =
-      ∑ a : α, (if b = e a then (p a).toReal else 0) := by
-  classical
-  rw [PMF.map_apply, tsum_fintype, ENNReal.toReal_sum]
-  · refine Finset.sum_congr rfl ?_
-    intro a _
-    by_cases h : b = e a <;> simp [h]
-  · intro a _
-    by_cases h : b = e a
-    · simpa [h] using p.apply_ne_top a
-    · simp [h]
 
 /-- Averaging a scalar function against the push-forward of a finite `PMF`
 is the same as averaging the pulled-back scalar function against the original
@@ -180,6 +236,34 @@ noncomputable def averageOperatorOverDistribution {α : Type*}
 
 namespace Distribution
 
+/-- Operator-valued averaging against a pushed-forward distribution is
+operator-valued averaging of the pulled-back family against the original
+distribution. -/
+theorem averageOperatorOverDistribution_map {α β : Type*} [DecidableEq β]
+    (𝒟 : Distribution α) (e : α → β)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : β → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution (𝒟.map e) f =
+      averageOperatorOverDistribution 𝒟 (fun a => f (e a)) := by
+  classical
+  unfold averageOperatorOverDistribution Distribution.map
+  calc
+    ∑ b ∈ 𝒟.support.image e,
+        (∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a) • f b
+        = ∑ b ∈ 𝒟.support.image e,
+            ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a • f (e a) := by
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          rw [Finset.sum_smul]
+          refine Finset.sum_congr rfl ?_
+          intro a ha
+          exact congrArg (fun x => 𝒟.weight a • f x) (Finset.mem_filter.mp ha).2.symm
+    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a • f (e a) := by
+          exact Finset.sum_fiberwise_of_maps_to
+            (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
+            (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩)
+            (fun a => 𝒟.weight a • f (e a))
+
 /-- Operator-valued averaging against `Distribution.ofPMF p` is the finite
 operator sum weighted by the probability mass function `p`. -/
 theorem averageOperatorOverDistribution_ofPMF_eq_sum {α : Type*} [Fintype α]
@@ -188,40 +272,6 @@ theorem averageOperatorOverDistribution_ofPMF_eq_sum {α : Type*} [Fintype α]
     averageOperatorOverDistribution (ofPMF p) f =
       ∑ a : α, (p a).toReal • f a := by
   simp [averageOperatorOverDistribution, ofPMF]
-
-/-- Operator-valued averaging against the push-forward of a finite `PMF`
-is the same as averaging the pulled-back operator family against the original
-`PMF`. -/
-theorem averageOperatorOverDistribution_ofPMF_map {α β : Type*} [Fintype α] [Fintype β]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (p : PMF α) (e : α → β) (f : β → MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution (ofPMF (p.map e)) f =
-      averageOperatorOverDistribution (ofPMF p) (fun a => f (e a)) := by
-  classical
-  rw [averageOperatorOverDistribution_ofPMF_eq_sum,
-    averageOperatorOverDistribution_ofPMF_eq_sum]
-  calc
-    ∑ b : β, ((p.map e) b).toReal • f b
-        = ∑ b : β,
-            (∑ a : α, (if b = e a then (p a).toReal else 0)) • f b := by
-          refine Finset.sum_congr rfl ?_
-          intro b _
-          rw [pmf_map_apply_toReal_sum p e b]
-    _ = ∑ b : β, ∑ a : α, (if b = e a then (p a).toReal else 0) • f b := by
-          refine Finset.sum_congr rfl ?_
-          intro b _
-          rw [Finset.sum_smul]
-    _ = ∑ a : α, ∑ b : β, (if b = e a then (p a).toReal else 0) • f b := by
-          rw [Finset.sum_comm]
-    _ = ∑ a : α, (p a).toReal • f (e a) := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.sum_eq_single (e a)]
-          · simp
-          · intro b _ hb
-            simp [hb]
-          · intro hmem
-            exact (hmem (Finset.mem_univ (e a))).elim
 
 end Distribution
 
