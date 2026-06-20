@@ -202,9 +202,10 @@ lemma switcheroo_first_term_close
           simp [avgOver, Finset.sum_sub_distrib, mul_sub]
     _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun x => |L x - C x|) := by
           exact avgOver_abs_le_avgOver_abs _ _
-    _ ≤ avgOver (uniformDistribution (SliceQuestion params)) (fun _ => 2 * Real.sqrt omega) := by
-          exact avgOver_mono _ _ _ hpoint
-    _ = 2 * Real.sqrt omega :=
-          avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt omega)
+    _ ≤ 2 * Real.sqrt omega := by
+          exact avgOver_uniform_le_const
+            (fun x : SliceQuestion params => |L x - C x|)
+            (2 * Real.sqrt omega)
+            hpoint
 
 end MIPStarRE.LDT.Pasting

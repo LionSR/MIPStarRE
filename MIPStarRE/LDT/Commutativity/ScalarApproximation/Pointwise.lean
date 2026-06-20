@@ -219,12 +219,12 @@ lemma evaluatedPointFamily_selfConsistency_of_stronglySelfConsistent
     _ = avgOver (uniformDistribution (Point params))
           (fun u => avgOver (uniformDistribution (Fq params)) (fun x => f u x)) := by
             exact MIPStarRE.LDT.avgOver_uniform_prod f
-    _ ≤ avgOver (uniformDistribution (Point params)) (fun _ => zeta) := by
-          apply avgOver_mono
-          intro u
-          exact (hpost u).squaredDistanceBound
-    _ = zeta := by
-          exact avgOver_uniform_const zeta
+    _ ≤ zeta := by
+          exact avgOver_uniform_le_const
+            (fun u : Point params =>
+              avgOver (uniformDistribution (Fq params)) (fun x => f u x))
+            zeta
+            (fun u => (hpost u).squaredDistanceBound)
 
 /-- A sandwiched product of two submeasurements is controlled by the overlap of
 the right-hand total with its complement. -/
