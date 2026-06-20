@@ -531,13 +531,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   objective value, canonical complementary slackness, and vanishing of the
   extra canonical slack block.  This datum gives both the abstract
   slackness-carrying SDP statement and the displayed measurement witness without
-  assuming \(I \le Z\).  Lean also proves a compatibility constructor for the
-  older dominance route: the canonical complementary-slackness equation on the
-  extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound
-  \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\).  This directly
-  produces the saturated canonical optimal pair, without introducing a separate
-  canonical record carrying the dominance hypothesis.  The paper-facing
-  self-improvement helper consumes the resulting abstract SDP statement.
+  assuming \(I \le Z\).  The canonical saturation datum is now the only
+  matrix-level input used to pass from strong duality to the abstract SDP
+  statement.  The paper-facing self-improvement helper consumes the resulting
+  abstract SDP statement.
 \end{lemma}
 \begin{proof}
   \leanok
@@ -556,13 +553,13 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \texttt{MIPStarRE.LDT.SelfImprovement.selfImprovement}.
 \end{remark}
 
-\begin{remark}[Lean reduced SDP and dominance interfaces]\label{rem:lean-reduced-sdp-dominance-interfaces}
-  Lean also contains reduced SDP and dominance-carrying matrix interfaces.  The
-  reduced theorem \texttt{sdp} proves only the measurement-total and
-  dual-feasibility fragment used before strong duality is supplied.  The
-  dominance-carrying declarations add the auxiliary condition \(I\le Z\) and
-  are retained as technical routes to slackness-carrying data.  These
-  declarations are not advertised as formalizations of Lemma~\ref{lem:sdp}.
+\begin{remark}[Lean reduced SDP interface]\label{rem:lean-reduced-sdp-dominance-interfaces}
+  Lean also contains a reduced SDP interface.  The reduced theorem \texttt{sdp}
+  proves only the measurement-total and dual-feasibility fragment used before
+  strong duality is supplied.  Earlier Lean versions also contained
+  dominance-carrying declarations with the auxiliary condition \(I\le Z\).  Those
+  declarations have been removed, and they are not advertised as formalizations
+  of Lemma~\ref{lem:sdp}.
 \end{remark}
 
 \begin{lemma}[Dual SDP and complementary slackness]\label{lem:sdp}

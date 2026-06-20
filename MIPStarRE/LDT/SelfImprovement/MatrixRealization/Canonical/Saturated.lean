@@ -407,8 +407,9 @@ with an explicitly saturated slack block.
 
 This is the statement form of
 `matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness`.
-It records the paper-form strong-duality output without adding the auxiliary
-dominance condition used by one internal saturation route. -/
+It records the paper-form strong-duality output with the saturated canonical
+slack block as an explicit hypothesis, and it does not add an auxiliary
+dominance condition. -/
 theorem matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackness
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params)

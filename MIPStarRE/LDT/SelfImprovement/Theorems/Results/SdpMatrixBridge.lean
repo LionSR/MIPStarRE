@@ -9,11 +9,9 @@ This file compares the concrete matrix-level SDP slackness interface with the
 abstract self-improvement SDP statement interface.
 
 The comparison is intentionally split into two interfaces.  The source-shaped
-matrix optimal witness supplies dual feasibility and complementary slackness.
-Some internal routes also retain the auxiliary dominance bound `I ≤ Z`, because
-that bound can be used to prove saturation of the extra canonical slack block.
-The dominance-carrying interfaces are Lean-only technical routes; they are not
-additional hypotheses in the paper SDP statement.
+matrix optimal witness supplies dual feasibility, complementary slackness, and
+the saturated canonical slack block needed for the abstract Section 9 statement.
+No auxiliary dominance bound `I ≤ Z` is part of this comparison theorem.
 
 Mathlib provides the underlying finite-dimensional matrix order and convex-cone
 infrastructure used throughout this project, but it does not yet provide a
