@@ -512,13 +512,10 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpStatementWithSlackness_of_canonicalFeasibleSaturatedComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlacknessAndDominance.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.toMatrixSdpStatementWithSlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.withDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlacknessAndDominance}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toCanonicalOptimalPair}
-  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPairWithDominance.toMatrixSdpStatementWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpCanonicalOptimalPair.dualDominanceSaturatesSlackBlock}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpComplementarySlacknessEquation}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSubmeasurementToSubMeas}
@@ -527,11 +524,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair}
-  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPairWithDominance}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_exists_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_exists_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness}
-  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPairWithDominance}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
@@ -543,14 +540,13 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   objective value, canonical complementary slackness, and vanishing of the
   extra canonical slack block.  This datum gives both the abstract
   slackness-carrying SDP statement and the displayed measurement witness without
-  assuming \(I \le Z\).  Lean also proves the converse saturation step for the
-  dominance-carrying optimal pair: the canonical complementary-slackness
-  equation on the extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and
-  the lower bound \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\).
-  Thus the dominance-carrying optimal pair canonically determines the
-  saturated optimal pair, and hence also the matrix slackness statement without
-  the dominance field.  The paper-facing self-improvement helper consumes the
-  resulting abstract SDP statement.
+  assuming \(I \le Z\).  Lean also proves a compatibility constructor for the
+  older dominance route: the canonical complementary-slackness equation on the
+  extra block gives \(X_{\mathrm{none},\mathrm{none}}Z=0\), and the lower bound
+  \(I\leq Z\) forces \(X_{\mathrm{none},\mathrm{none}}=0\).  This directly
+  produces the saturated canonical optimal pair, without introducing a separate
+  canonical record carrying the dominance hypothesis.  The paper-facing
+  self-improvement helper consumes the resulting abstract SDP statement.
 \end{lemma}
 \begin{proof}
   \leanok
