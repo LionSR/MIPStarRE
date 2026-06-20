@@ -78,21 +78,6 @@ structure SdpOptimalPairWithSlackness (params : Parameters) [FieldModel params.q
     ∀ g : Polynomial params,
       sdpComplementarySlacknessEquation params strategy T Z g
 
-/-- Lean-only reduced fragment of `lem:sdp`.
-
-Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
-(`\label{lem:sdp}`).
-
-This is not the source-facing SDP theorem: it records only the measurement-total
-and dual-feasibility fragment used by earlier reduced helper interfaces.  The
-source-shaped target is `SdpStatementWithSlackness`, whose proof supplies the
-strong-duality and complementary-slackness conclusions. -/
-structure SdpStatement (params : Parameters) [FieldModel params.q]
-    (strategy : SymStrat params ι) : Prop where
-  witness :
-    ∃ T : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SdpOptimalPair params strategy T Z
-
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
 (`\label{lem:sdp}`); the complementary-slackness equation `T_g · Z = T_g · A_g`
 is `eq:complementary-slackness` at line 179.
@@ -106,9 +91,9 @@ there is an optimal pair `{T_g}`, `Z` with `∑ g, T_g = I` and
 Slater's condition, strong duality, and complementary slackness to derive these
 same measurement-total and slackness conclusions from the canonical SDP.
 
-This is the statement shape expected from that paper argument: it has the same
-witnesses as `SdpStatement`, but their optimal-pair data also contains
-complementary slackness. -/
+This is the statement shape expected from that paper argument: it records the
+complete primal measurement, the dual-feasible operator, and the
+complementary-slackness equations. -/
 structure SdpStatementWithSlackness (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
@@ -306,10 +291,10 @@ Reduced conclusion for the SDP and `addInU` stage of
 `lem:self-improvement-helper`.
 
 This structure intentionally records only the guarantees produced directly by
-the current `sdp` and `addInU` arguments: the SDP witness, the averaged
-construction of `H`, and the reduced `addInU` variance bound. Positivity and
-pointwise dual feasibility of `Z` are read from the bundled SDP witness rather
-than repeated as helper fields.
+the current slackness-carrying SDP route and the `addInU` argument: the SDP
+witness, the averaged construction of `H`, and the reduced `addInU` variance
+bound. Positivity and pointwise dual feasibility of `Z` are read from the
+bundled SDP witness rather than repeated as helper fields.
 
 The paper and blueprint state four additional helper-lemma guarantees
 (`completeness`, `pointConsistency`, strong self-consistency, and boundedness).

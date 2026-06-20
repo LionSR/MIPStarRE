@@ -18,9 +18,6 @@ to `thm:self-improvement` in the blueprint.
 
 ## Contents
 
-- **selfImprovementHelperConstruction** — reduced construction lemma producing
-  `T`, `Ĥ`, `Z`, and `SelfImprovementHelperConclusion` from the feasibility
-  fragment `sdp` and the variance-bound specialization `addInU`.
 - **selfImprovementHelper** — `lem:self-improvement-helper`, with the paper's
   input consistency hypothesis and four helper conclusions.
 - **self_improvement_helper_with_slackness** — companion helper producing the
@@ -43,41 +40,6 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
-
-/-- Construction lemma for the SDP and add-in-`u` stage of
-`lem:self-improvement-helper`.
-
-This lemma records the construction of the SDP measurement `T`, the averaged
-sandwiched submeasurement `H`, and the dual witness `Z`. The paper's consistency
-hypothesis for the input measurement is not needed for these three constructed
-objects; it is used by `selfImprovementHelper` to prove the four helper
-conclusions. -/
-lemma selfImprovementHelperConstruction
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (eps delta gamma : Error)
-    (hgood : strategy.IsGood eps delta gamma)
-    (_nu : Error)
-    -- These arguments keep this construction lemma aligned with the helper
-    -- theorem; the constructed SDP measurement is independent of `G`.
-    (_G : Measurement (Polynomial params) ι) :
-    ∃ T : Measurement (Polynomial params) ι,
-      ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-        SelfImprovementHelperConclusion params strategy T H Z eps delta := by
-  obtain ⟨Tsub, Z, hsdp⟩ := (sdp (ι := ι) params strategy).witness
-  let T : Measurement (Polynomial params) ι :=
-    { toSubMeas := Tsub
-      total_eq_one := hsdp.primalTotalOperator }
-  let Hhat : SubMeas (Polynomial params) ι :=
-    averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
-  refine ⟨T, Hhat, Z, ?_⟩
-  refine
-    { sdpWitness := ?_
-      averagedConstruction := rfl
-      addInUVarianceBound := ?_ }
-  · simpa [T] using hsdp
-  · exact addInU (ι := ι) params strategy eps delta gamma hgood T
 
 /-- Conditional form of the helper lemma from a slackness-carrying SDP
 conclusion.
@@ -122,11 +84,8 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
 /-- Helper lemma driven by the Section 9 SDP statement with complementary
 slackness.
 
-This is the slackness-carrying companion to `selfImprovementHelperConstruction`:
-it applies the Section 9 statement `sdp_statement_with_slackness`, which records
-the strong-duality conclusion with complementary slackness.  The construction
-lemma remains separate from `selfImprovementHelperConstruction`, whose reduced
-`sdp` input records only the feasibility fragment. -/
+This applies the Section 9 statement `sdp_statement_with_slackness`, which
+records the strong-duality conclusion with complementary slackness. -/
 lemma self_improvement_helper_with_slackness
     (params : Parameters)
     [FieldModel params.q]

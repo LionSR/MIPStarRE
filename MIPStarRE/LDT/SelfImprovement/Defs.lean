@@ -25,8 +25,8 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- The zero polynomial used as the distinguished completion outcome for the
-reduced Lean completion of the paper's strict-feasible primal SDP witness. -/
+/-- The zero polynomial used as the distinguished polynomial block in canonical
+SDP completion arguments. -/
 noncomputable def sdpDistinguishedPolynomial (params : Parameters) [FieldModel params.q] :
     Polynomial params :=
   ⟨0, by
@@ -87,31 +87,13 @@ noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
           (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))) }
 
 /-- The paper's uniform strict-feasible primal witness has total mass
-`(1 / 2) • I`, leaving the residual `(1 / 2) • I` used by
-`sdpPrimalWitness`'s completion step. -/
+`(1 / 2) • I`. -/
 @[simp] theorem sdpStrictPrimalSubMeas_total (params : Parameters)
     [FieldModel params.q] :
     (sdpStrictPrimalSubMeas (ι := ι) params).total =
       ((1 / 2 : Error) • (1 : MIPStarRE.Quantum.Op ι)) := by
   simpa [sdpStrictPrimalSubMeas] using
     sdpStrictPrimalConstantSum (ι := ι) params
-
-/-- Paper origin: `references/ldt-paper/self_improvement.tex:62-88`
-(`\label{lem:sdp}`), strict Slater witness at lines 168-176;
-`docs/paper-gaps/issue-196-sdp-weakening.tex` (submeasurement vs measurement).
-
-The reduced Lean completion form completes `sdpStrictPrimalSubMeas` at the zero
-polynomial so that downstream lemmas can keep using a full measurement.
-
-After this completion, the zero-polynomial outcome is no longer the paper's
-uniform Slater witness `(2 |\polyfunc{m}{q}{d}|)^{-1} I`; the strict-feasibility
-claim from Section 9 applies to the pre-completion submeasurement
-`sdpStrictPrimalSubMeas`. -/
-noncomputable def sdpPrimalWitness (params : Parameters)
-    [FieldModel params.q] : Measurement (Polynomial params) ι :=
-  Preliminaries.completeAtOutcome
-    (sdpStrictPrimalSubMeas (ι := ι) params)
-    (sdpDistinguishedPolynomial params)
 
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:168-176`
 (`\label{lem:sdp}` strict feasible dual witness `Z = 2I`);
