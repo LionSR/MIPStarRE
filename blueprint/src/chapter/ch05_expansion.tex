@@ -7,12 +7,20 @@
 
 \begin{definition}[Rerandomizing one coordinate]\label{def:rerandomize-coord}
 	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoordWeight, MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord_mass_eq_one}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.RerandomizeCoordSample, MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoordSampleToPair}
+	\lean{MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord_isProbability, MIPStarRE.LDT.ExpansionHypercubeGraph.avgOver_rerandomizeCoord_eq_uniform_sample, MIPStarRE.LDT.ExpansionHypercubeGraph.avgOver_rerandomizeCoord_eq_weight_sum}
 	\leanok
 	For $u \in \F_q^m$, an index $i \in \{1,\dots,m\}$, and $x \in \F_q$, let
 	\[
 		\operatorname{rerand}_i(u,x) = u + x e_i.
 	\]
 	This is the move obtained by rerandomizing the $i$-th coordinate of $u$ by a uniform additive shift.
+	In Lean, the same edge distribution is represented as the push-forward of the uniform distribution
+	on triples $(u,i,x)$ by the map that replaces the $i$-th coordinate by $x$; since $x$ is uniform,
+	this is the same distribution as the additive-shift presentation.  The corresponding
+	weight-sum identity identifies this push-forward distribution with the explicit edge
+	coefficient used in the matrix proof.
 \end{definition}
 
 \begin{definition}[Hypercube graph]\label{def:hypercube-graph}
@@ -46,6 +54,7 @@
 	\]
 \end{lemma}
 \begin{proof}
+	\lean{MIPStarRE.LDT.GlobalVariance.avgOver_rerandomizeCoord_fst, MIPStarRE.LDT.GlobalVariance.avgOver_rerandomizeCoord_snd}
 	\leanok
 	The two vertex marginals of a random edge are uniform on $\F_q^m$. Expanding the right-hand side yields $(1/M)I-K$.
 \end{proof}

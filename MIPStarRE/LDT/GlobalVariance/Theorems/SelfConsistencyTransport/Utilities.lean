@@ -117,27 +117,17 @@ lemma avgOver_rerandomizeCoord_fst
     (f : Point params → Error) :
     avgOver (rerandomizeCoord params) (fun uv => f uv.1) =
       avgOver (uniformDistribution (Point params)) f := by
-  classical
-  unfold avgOver rerandomizeCoord
-  rw [Fintype.sum_prod_type]
+  rw [avgOver_rerandomizeCoord_eq_uniform_sample]
   calc
-    (∑ u : Point params, ∑ v : Point params,
-        rerandomizeCoordWeight params u v * f u) =
-        ∑ u : Point params, (∑ v : Point params, rerandomizeCoordWeight params u v) * f u := by
-          refine Finset.sum_congr rfl ?_
-          intro u _
-          simpa using
-            (Finset.sum_mul
-              (s := (Finset.univ : Finset (Point params)))
-              (f := fun v : Point params => rerandomizeCoordWeight params u v)
-              (a := f u)).symm
-    _ = ∑ u : Point params, (hypercubeVertexCount params : Error)⁻¹ * f u := by
-          refine Finset.sum_congr rfl ?_
-          intro u _
-          simp [rerandomizeCoordWeight_rowSum]
+    avgOver (uniformDistribution (RerandomizeCoordSample params))
+        (fun sample => f (rerandomizeCoordSampleToPair params sample).1)
+      = avgOver (uniformDistribution (Point params × Fin params.m))
+          (fun ui => f ui.1) := by
+          exact avgOver_uniform_fst
+            (α := Point params × Fin params.m) (β := Fq params)
+            (fun ui => f ui.1)
     _ = avgOver (uniformDistribution (Point params)) f := by
-          rw [avgOver_uniform_eq_pmf_sum]
-          simp [hypercubeVertexCount, PMF.uniformOfFintype_apply]
+          exact avgOver_uniform_fst (α := Point params) (β := Fin params.m) f
 
 /-- The second marginal of the rerandomized hypercube-edge distribution is uniform.
 This is the symmetric endpoint form of the sampling statement in `expansion.tex`,
@@ -148,7 +138,7 @@ lemma avgOver_rerandomizeCoord_snd
     avgOver (rerandomizeCoord params) (fun uv => f uv.2) =
       avgOver (uniformDistribution (Point params)) f := by
   classical
-  unfold avgOver rerandomizeCoord
+  rw [avgOver_rerandomizeCoord_eq_weight_sum]
   rw [Fintype.sum_prod_type]
   calc
     (∑ u : Point params, ∑ v : Point params,

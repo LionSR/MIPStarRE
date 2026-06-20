@@ -62,87 +62,141 @@ noncomputable def rerandomizeCoordWeight (params : Parameters)
       if Function.update u p.1 p.2 = v then (1 : ℕ) else 0) : ℕ) : Error) /
     (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)
 
+/-- The finite sample space for a rerandomized hypercube edge:
+a point, a coordinate, and the new value placed in that coordinate. -/
+abbrev RerandomizeCoordSample (params : Parameters) :=
+  (Point params × Fin params.m) × Fq params
+
+/-- The map from a rerandomization sample to the corresponding ordered edge. -/
+def rerandomizeCoordSampleToPair (params : Parameters)
+    (sample : RerandomizeCoordSample params) : Point params × Point params :=
+  (sample.1.1, Function.update sample.1.1 sample.1.2 sample.2)
+
 /-- The probability distribution on ordered edges of the hypercube graph used in
 the paper's local variance.  It samples a vertex `u`, a coordinate, and a new
 coordinate value, then records the ordered pair `(u, v)`. -/
 noncomputable def rerandomizeCoord (params : Parameters) :
     Distribution (Point params × Point params) :=
-  { support := Finset.univ
-    weight := fun uv => rerandomizeCoordWeight params uv.1 uv.2
-    -- Normalization: `∑ uv, weight uv = 1`. Each triple `(u, i, x)`
-    -- contributes to exactly one pair `(u, Function.update u i x)`, so the
-    -- total count is `q^m * m * q = hypercubeVertexCount * m * q`, matching
-    -- the denominator. `Distribution` doesn't carry a mass field; the
-    -- normalization should be proved as a standalone lemma when needed.
-    nonnegative := by
-      intro uv
-      have hden :
-          0 ≤ (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error) := by
-        positivity
-      exact div_nonneg (by positivity) hden
-    outsideSupport := by
-      intro uv huv
-      exact False.elim (huv (Finset.mem_univ uv)) }
+  Distribution.map (uniformDistribution (RerandomizeCoordSample params))
+    (rerandomizeCoordSampleToPair params)
+
+/-- The rerandomized-coordinate edge distribution is a probability distribution. -/
+theorem rerandomizeCoord_isProbability (params : Parameters) :
+    (rerandomizeCoord params).IsProbability := by
+  simpa [rerandomizeCoord] using
+    (uniformDistribution_isProbability (RerandomizeCoordSample params)).map
+      (rerandomizeCoordSampleToPair params)
 
 /-- The rerandomized-coordinate edge distribution has total mass one. -/
 theorem rerandomizeCoord_mass_eq_one (params : Parameters) :
     ∑ uv ∈ (rerandomizeCoord params).support, (rerandomizeCoord params).weight uv = 1 := by
+  exact (rerandomizeCoord_isProbability params).weight_sum_eq_one
+
+/-- Averaging over `rerandomizeCoord` is the same as averaging over the uniform
+sample space of a point, a coordinate, and a replacement coordinate value. -/
+theorem avgOver_rerandomizeCoord_eq_uniform_sample (params : Parameters)
+    (f : Point params × Point params → Error) :
+    avgOver (rerandomizeCoord params) f =
+      avgOver (uniformDistribution (RerandomizeCoordSample params))
+        (fun sample => f (rerandomizeCoordSampleToPair params sample)) := by
+  exact Distribution.avgOver_map
+    (uniformDistribution (RerandomizeCoordSample params))
+    (rerandomizeCoordSampleToPair params) f
+
+/-- The push-forward presentation of `rerandomizeCoord` has the same averages as
+the explicit counting coefficient `rerandomizeCoordWeight`.
+
+The explicit coefficient remains useful for the matrix calculation of the
+hypercube adjacency and Laplacian.  This lemma identifies its weighted sum with
+the probability-side push-forward average. -/
+theorem avgOver_rerandomizeCoord_eq_weight_sum (params : Parameters)
+    (f : Point params × Point params → Error) :
+    avgOver (rerandomizeCoord params) f =
+      ∑ uv : Point params × Point params,
+        rerandomizeCoordWeight params uv.1 uv.2 * f uv := by
   classical
-  have hvertex_pos : 0 < hypercubeVertexCount params := by
-    simp [hypercubeVertexCount, pow_pos params.hq]
-  have hden_ne :
-      ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) ≠ 0 := by
-    exact_mod_cast (Nat.ne_of_gt (Nat.mul_pos (Nat.mul_pos hvertex_pos params.hm) params.hq))
-  have hcount :
-      (∑ uv : Point params × Point params,
-        ∑ p : Fin params.m × Fq params,
-          if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) =
-        hypercubeVertexCount params * params.m * params.q := by
-    calc
-      (∑ uv : Point params × Point params,
-          ∑ p : Fin params.m × Fq params,
-            if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0)
-        = ∑ p : Fin params.m × Fq params,
-            ∑ uv : Point params × Point params,
-              if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0 := by
-                rw [Finset.sum_comm]
-      _ = ∑ p : Fin params.m × Fq params, hypercubeVertexCount params := by
-            refine Finset.sum_congr rfl ?_
-            intro p hp
-            rw [Fintype.sum_prod_type]
-            simp [hypercubeVertexCount, Fintype.card_fin]
-      _ = hypercubeVertexCount params * params.m * params.q := by
-            simp [hypercubeVertexCount, Fintype.card_fin]
-            ring_nf
-  have hcount_cast :
-      (∑ uv : Point params × Point params,
-        (((∑ p : Fin params.m × Fq params,
-            if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error)) =
-        ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)) := by
-    simpa using congrArg (fun n : ℕ => (n : Error)) hcount
-  simp only [rerandomizeCoord, rerandomizeCoordWeight]
-  simp_rw [div_eq_mul_inv]
+  have hcard :
+      (Fintype.card (RerandomizeCoordSample params) : Error) =
+        (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error) := by
+    simp [RerandomizeCoordSample, hypercubeVertexCount, Fintype.card_fin]
+  rw [avgOver_rerandomizeCoord_eq_uniform_sample]
+  rw [avgOver_uniform_eq_pmf_sum]
+  simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
+  rw [hcard]
+  symm
   calc
     ∑ uv : Point params × Point params,
         (((∑ p : Fin params.m × Fq params,
             if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error) *
-          ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹)
-      = (∑ uv : Point params × Point params,
-          (((∑ p : Fin params.m × Fq params,
-              if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) : Error)) *
-            ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹) := by
-              simpa using
-                (Finset.sum_mul
-                  (s := (Finset.univ : Finset (Point params × Point params)))
-                  (f := fun uv =>
-                    (((∑ p : Fin params.m × Fq params,
-                        if Function.update uv.1 p.1 p.2 = uv.2 then (1 : ℕ) else 0) : ℕ) :
-                      Error))
-                  (a := ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) :
-                    Error)⁻¹))).symm
-    _ = 1 := by
-          rw [hcount_cast]
-          exact mul_inv_cancel₀ hden_ne
+          ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹) *
+          f uv
+      = ∑ x : Point params,
+          ∑ y : Point params,
+            (((∑ p : Fin params.m × Fq params,
+              if Function.update x p.1 p.2 = y then (1 : ℕ) else 0) : ℕ) : Error) *
+              ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹) *
+              f (x, y) := by
+          rw [Fintype.sum_prod_type]
+    _ = ∑ x : Point params,
+          ∑ p : Fin params.m × Fq params,
+            (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹ *
+              f (x, Function.update x p.1 p.2) := by
+          refine Finset.sum_congr rfl ?_
+          intro x _
+          calc
+            ∑ y : Point params,
+                (((∑ p : Fin params.m × Fq params,
+                  if Function.update x p.1 p.2 = y then (1 : ℕ) else 0) : ℕ) : Error) *
+                  ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) :
+                    Error)⁻¹) *
+                  f (x, y)
+              = ∑ y : Point params,
+                  ∑ p : Fin params.m × Fq params,
+                    (if Function.update x p.1 p.2 = y then
+                      ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) :
+                        Error)⁻¹) * f (x, y)
+                    else 0) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro y _
+                  have hcast :
+                      (((∑ p : Fin params.m × Fq params,
+                        if Function.update x p.1 p.2 = y then (1 : ℕ) else 0) :
+                        ℕ) : Error) =
+                      ∑ p : Fin params.m × Fq params,
+                        if Function.update x p.1 p.2 = y then (1 : Error) else 0 := by
+                    simp
+                  rw [hcast]
+                  rw [Finset.sum_ite]
+                  simp only [Finset.sum_const_zero]
+                  rw [Finset.sum_ite]
+                  simp only [Finset.sum_const_zero]
+                  simp [Finset.sum_const, nsmul_eq_mul]
+                  ring
+              _ = ∑ p : Fin params.m × Fq params,
+                  ∑ y : Point params,
+                    (if Function.update x p.1 p.2 = y then
+                      ((((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) :
+                        Error)⁻¹) * f (x, y)
+                    else 0) := by
+                  rw [Finset.sum_comm]
+              _ = ∑ p : Fin params.m × Fq params,
+                  (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) :
+                    Error)⁻¹ *
+                    f (x, Function.update x p.1 p.2) := by
+                  refine Finset.sum_congr rfl ?_
+                  intro p _
+                  simp
+    _ = ∑ x : Point params,
+          ∑ i : Fin params.m,
+            ∑ a : Fq params,
+              (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) :
+                Error)⁻¹ *
+                f (x, Function.update x i a) := by
+          simp [Fintype.sum_prod_type]
+    _ = ∑ sample : RerandomizeCoordSample params,
+          (((hypercubeVertexCount params : ℕ) * params.m * params.q : ℕ) : Error)⁻¹ *
+            f (rerandomizeCoordSampleToPair params sample) := by
+          simp [RerandomizeCoordSample, rerandomizeCoordSampleToPair, Fintype.sum_prod_type]
 
 /-- The product distribution on two independently sampled hypercube vertices,
 used in the paper's global variance. -/

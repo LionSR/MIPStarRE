@@ -153,13 +153,12 @@ theorem matrixSdpCanonicalDualOperator_sub_objectiveOperator
   · subst c
     cases b with
     | none =>
-        simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
-          matrixSdpCanonicalBlockDiagonal]
+        simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator]
     | some g =>
         simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
-          matrixSdpCanonicalBlockDiagonal, matrixSdpDualSlackOperator]
+          matrixSdpDualSlackOperator]
   · simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
-      matrixSdpCanonicalBlockDiagonal, hbc]
+      hbc]
 
 /-- The canonical dual slack block matrix is positive semidefinite under paper
 dual feasibility.
@@ -694,7 +693,7 @@ theorem matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
       exact congrFun (congrFun hblock i) j
     cases b with
     | none =>
-        simpa [matrixSdpCanonicalBlockDiagonal, matrixSdpCanonicalPrimalBlockFamily,
+        simpa [matrixSdpCanonicalPrimalBlockFamily,
           matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement] using
           hentry.trans
             (show (0 : ℂ) =
@@ -702,7 +701,7 @@ theorem matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
                   (none, i) (none, j) by
               rfl)
     | some g =>
-        simpa [matrixSdpCanonicalBlockDiagonal, matrixSdpCanonicalPrimalBlockFamily] using
+        simpa [matrixSdpCanonicalPrimalBlockFamily] using
           hentry.trans
             (show (0 : ℂ) =
                 (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))

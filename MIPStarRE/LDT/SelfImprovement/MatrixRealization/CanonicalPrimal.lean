@@ -81,6 +81,24 @@ theorem matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal
         (Matrix.blockDiagonal B) :=
   rfl
 
+/-- Entrywise form of the canonical block-diagonal matrix.
+
+This is the old case-split presentation, now derived from Mathlib's
+`Matrix.blockDiagonal` through the index reordering used by
+`matrixSdpCanonicalBlockDiagonal`. -/
+@[simp] theorem matrixSdpCanonicalBlockDiagonal_apply
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space)
+    (b c : MatrixSdpCanonicalBlockIndex params) (i j : model.space.carrier) :
+    matrixSdpCanonicalBlockDiagonal params model B (b, i) (c, j) =
+      if b = c then B b i j else 0 := by
+  by_cases hbc : b = c
+  · subst c
+    simp [matrixSdpCanonicalBlockDiagonal]
+  · simpa [matrixSdpCanonicalBlockDiagonal, hbc] using
+      (Matrix.blockDiagonal_apply_ne B i j hbc)
+
 /-- A canonical block-diagonal operator is positive semidefinite when all of its
 diagonal matrix blocks are positive semidefinite. -/
 theorem matrixSdpCanonicalBlockDiagonal_nonneg (params : Parameters) [FieldModel params.q]
