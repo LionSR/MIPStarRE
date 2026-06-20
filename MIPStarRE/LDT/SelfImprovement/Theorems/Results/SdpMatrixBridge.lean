@@ -461,27 +461,6 @@ theorem sdpStatementWithSlackness_of_exists_canonicalOptimalPair
   exact sdpStatementWithSlackness_of_canonicalOptimalPair
     params strategy X Z hpair
 
-/-- A saturated canonical optimal pair, together with a separately proved
-dominance bound `I ≤ Z`, gives the abstract Section 9 SDP statement with
-complementary slackness.
-
-The abstract target does not record the dominance bound.  The extra input is
-therefore retained only for compatibility with earlier callers whose hypotheses
-already included it. -/
-theorem sdpStatementWithSlackness_of_canonicalOptimalPair_of_dualDominatesIdentity
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
-      (matrixSdpPointRealizationOfStrategy params strategy)))
-    (Z : MIPStarRE.Quantum.Op ι)
-    (h : MatrixSdpCanonicalOptimalPair params
-      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
-    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
-    SdpStatementWithSlackness params strategy := by
-  have _hcompat : (1 : MIPStarRE.Quantum.Op ι) ≤ Z := hOneLe
-  exact sdpStatementWithSlackness_of_canonicalOptimalPair params strategy X Z h
-
 /-- A saturated canonical optimal pair gives the displayed abstract SDP
 measurement witness, without asserting the auxiliary dominance condition
 `I ≤ Z`.
@@ -608,29 +587,6 @@ theorem sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
   obtain ⟨T, hZpos, hdual_abs, hslack⟩ :=
     sdpMeasurementWitness_of_canonicalOptimalPair params strategy X Z hpair
   exact ⟨T, hZpos, hOneLe, hdual_abs, hslack⟩
-
-/-- A saturated canonical optimal pair, together with a separately proved
-dominance bound `I ≤ Z`, gives the displayed abstract SDP measurement
-witness. -/
-theorem sdpMeasurementWitness_of_canonicalOptimalPair_of_dualDominatesIdentity
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
-      (matrixSdpPointRealizationOfStrategy params strategy)))
-    (Z : MIPStarRE.Quantum.Op ι)
-    (h : MatrixSdpCanonicalOptimalPair params
-      (matrixSdpPointRealizationOfStrategy params strategy) X Z)
-    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
-    ∃ T : Measurement (Polynomial params) ι,
-      0 ≤ Z ∧
-      (1 : MIPStarRE.Quantum.Op ι) ≤ Z ∧
-      (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
-      ∀ g : Polynomial params,
-        sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
-  obtain ⟨T, hZpos, hdual, hslack⟩ :=
-    sdpMeasurementWitness_of_canonicalOptimalPair params strategy X Z h
-  exact ⟨T, hZpos, hOneLe, hdual, hslack⟩
 
 /-- Canonical strong-duality and complementary-slackness construction for the
 point-measurement realization of the Section 9 SDP.
