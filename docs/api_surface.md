@@ -143,6 +143,9 @@ These are useful when a proof wants to drop from stronger structure to plain `Su
   - Adds failure outcome `none ↦ 1 - A.total`.
   - Standard way to turn a submeasurement into a complete measurement.
 
+- `def SubMeas.singleOutcome (A : Op ι) (hA_pos : 0 ≤ A) (hA_le_one : A ≤ 1) : SubMeas Unit ι`
+  - Constructs a one-outcome submeasurement from a positive operator bounded by the identity.
+
 - `def constSubMeasFamily (A : SubMeas α ι) : IdxSubMeas Unit α ι`
 
 ### Tensor / placement lemmas
