@@ -2131,7 +2131,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGroup" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGroup</a></li>
           
         </ul>
     
@@ -2142,7 +2142,7 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>       The paper presents this step by choosing a singular value decomposition </p>
+  <p>           The paper presents this step by choosing a singular value decomposition </p>
 <div class="displaymath" id="a0000000230">
   \[  X = U \cdot \Sigma _{m \times d} \cdot V^\dagger .  \]
 </div>
@@ -2158,7 +2158,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>  Apply the finite-dimensional singular value decomposition to \(X\) and record exactly the consequences used later: the identities for \(X^\dagger X\), \(\widehat X\widehat X^\dagger \), \(X^\dagger \widehat X\), and the restatement of the \(Q_a\)’s. </p>
+  <p>  Apply the finite-dimensional singular value decomposition to \(X\) and record exactly the consequences used later: the identities for \(X^\dagger X\), \(\widehat X\widehat X^\dagger \), \(X^\dagger \widehat X\), and the restatement of the \(Q_a\)’s. The unitary-group constructors are the same rectangular-SVD calculation with the square unitaries represented as elements of Mathlib’s \(\operatorname {unitaryGroup}\), rather than as matrices accompanied by separate unitarity equations. </p>
 
   </div>
 </div>
@@ -2752,7 +2752,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup</a></li>
           
         </ul>
     
@@ -2966,7 +2966,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup" class="lean_decl">MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup</a></li>
           
         </ul>
     
@@ -2992,7 +2992,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.34</a>. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used to obtain the QXP-internal fresh-outcome comparison \(Q_{\mathrm{none}} \leq P_{\mathrm{none}}\). An additional source-to-\(Q\) comparison is still needed for source-facing residual domination. The quantity to bound is </p>
+  <p> The formal proof follows this argument directly from the primitive \(X\), \(\widehat X\), and \(P\) identities; the \(30\zeta ^{1/4}\) estimate is derived here rather than stored as part of the reduced datum. The rectangular-SVD lemma combines the same estimate with the positive-square identification of the middle factor from <a href="chap-projective.html#lem:X-times-X-hat">4.34</a>; the unitary-group variant has the same conclusion, with the square unitary factors represented by their Mathlib unitary-group type. The positive-Gram sigma-space lemma also records the coisometry \(X X^\dagger =I\) for the original sigma embedding when the projective \(Q\)-family is subnormalized; this is the construction-level hypothesis later used to obtain the QXP-internal fresh-outcome comparison \(Q_{\mathrm{none}} \leq P_{\mathrm{none}}\). An additional source-to-\(Q\) comparison is still needed for source-facing residual domination. The quantity to bound is </p>
 <div class="equation" id="eq:P-Q-thing-to-bound">
 <p>
   <div class="equation_content">
