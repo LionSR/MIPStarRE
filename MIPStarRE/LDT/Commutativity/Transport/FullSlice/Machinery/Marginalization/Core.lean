@@ -110,12 +110,10 @@ lemma fullSliceBABA_tensor_marginalize_x_collision_bound
         (fun xy => fullSliceBABAxCollisionFactored params strategy family xy) ≤
       (params.m * params.d : Error) / params.q := by
   let δ : Error := (params.m * params.d : Error) / params.q
-  have hδ_nonneg : 0 ≤ δ := by
-    exact div_nonneg (by positivity) (by positivity)
-  exact avgOver_uniform_le_of_pointwise_le
+  exact avgOver_uniform_le_const
     (α := FullSliceQuestion params)
     (fun xy => fullSliceBABAxCollisionFactored params strategy family xy)
-    δ hδ_nonneg
+    δ
     (by
       intro xy
       simpa [δ] using
@@ -132,12 +130,10 @@ lemma fullSliceABAB_tensor_marginalize_y_collision_bound
         (fun ux => fullSliceABAByCollisionFactored params strategy family ux.1 ux.2) ≤
       (params.m * params.d : Error) / params.q := by
   let δ : Error := (params.m * params.d : Error) / params.q
-  have hδ_nonneg : 0 ≤ δ := by
-    exact div_nonneg (by positivity) (by positivity)
-  exact avgOver_uniform_le_of_pointwise_le
+  exact avgOver_uniform_le_const
     (α := Point params × FullSliceQuestion params)
     (fun ux => fullSliceABAByCollisionFactored params strategy family ux.1 ux.2)
-    δ hδ_nonneg
+    δ
     (by
       intro ux
       simpa [δ] using

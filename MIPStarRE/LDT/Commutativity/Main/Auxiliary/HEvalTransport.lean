@@ -270,12 +270,12 @@ lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
         1 := by
       constructor
       unfold sddErrorOp
-      exact avgOver_uniform_le_of_pointwise_le
+      exact avgOver_uniform_le_const
         (fun q =>
           qSDDOp strategy.state
             (evaluatedSliceProductLeft params strategy family q)
             (zeroEvaluatedSliceOpFamily (ι := ι) params))
-        1 zero_le_one
+        1
         (fun q =>
           evaluatedSliceProductLeft_qSDDOp_zero_le_one params strategy family hnorm q)
     have hright : SDDOpRel strategy.state
@@ -285,12 +285,12 @@ lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
         1 := by
       constructor
       unfold sddErrorOp
-      exact avgOver_uniform_le_of_pointwise_le
+      exact avgOver_uniform_le_const
         (fun q =>
           qSDDOp strategy.state
             (zeroEvaluatedSliceOpFamily (ι := ι) params)
             (evaluatedSliceProductRight params strategy family q))
-        1 zero_le_one
+        1
         (fun q =>
           zero_qSDDOp_evaluatedSliceProductRight_le_one params strategy family hnorm q)
     have htri :=

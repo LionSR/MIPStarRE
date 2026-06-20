@@ -441,8 +441,6 @@ theorem polynomial_collision_pointMeasurement_sandwichTensor_avg_le_mdq
       (params.m * params.d : Error) / params.q := by
   classical
   let δ : Error := (params.m * params.d : Error) / params.q
-  have hδ_nonneg : 0 ≤ δ := by
-    exact div_nonneg (by positivity) (by positivity)
   have hpointwise : ∀ v : Point params,
       (∑ gg : Polynomial params × Polynomial params,
           ∑ a : Fq params,
@@ -464,7 +462,7 @@ theorem polynomial_collision_pointMeasurement_sandwichTensor_avg_le_mdq
         (Outer := Outer) (Inner := T) (Right := T)
     simpa [δ, Outer, pointConditionedOutcomeOperatorAtPolynomial,
       leftTensor_mul_rightTensor_eq_opTensor] using hcollision
-  exact avgOver_uniform_le_of_pointwise_le _ δ hδ_nonneg hpointwise
+  exact avgOver_uniform_le_const _ δ hpointwise
 
 /-- Schwartz--Zippel bound for the selected off-diagonal residual endpoint.
 

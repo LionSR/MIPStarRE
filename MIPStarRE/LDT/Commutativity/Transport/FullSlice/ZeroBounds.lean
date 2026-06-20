@@ -219,13 +219,13 @@ lemma fullSliceProductLeft_to_zero_le_one
       1 := by
   constructor
   unfold sddErrorOp
-  exact avgOver_uniform_le_of_pointwise_le
+  exact avgOver_uniform_le_const
     (fun q =>
       qSDDOp strategy.state
         (fullSliceProductLeft params strategy family
           (fullSliceQuestionOfEvaluatedSlice params q))
         (zeroFullSliceOpFamily (ι := ι) params))
-    1 zero_le_one
+    1
     (fun q => fullSliceProductLeft_qSDDOp_zero_le_one params strategy family hnorm
       (fullSliceQuestionOfEvaluatedSlice params q))
 
@@ -243,13 +243,13 @@ lemma zero_to_fullSliceProductRight_le_one
       1 := by
   constructor
   unfold sddErrorOp
-  exact avgOver_uniform_le_of_pointwise_le
+  exact avgOver_uniform_le_const
     (fun q =>
       qSDDOp strategy.state
         (zeroFullSliceOpFamily (ι := ι) params)
         (fullSliceProductRight params strategy family
           (fullSliceQuestionOfEvaluatedSlice params q)))
-    1 zero_le_one
+    1
     (fun q => zero_qSDDOp_fullSliceProductRight_le_one params strategy family hnorm
       (fullSliceQuestionOfEvaluatedSlice params q))
 

@@ -226,8 +226,8 @@ theorem helperOffDiagonalBareQuantity_le_one
         _ = 1 := ev_one_of_isNormalized strategy.state strategy.isNormalized
     exact hoffdiag_le_full.trans hfull_le_one
   simpa [helperOffDiagonalBareQuantity] using
-    avgOver_uniform_le_of_pointwise_le
-      _ (1 : Error) zero_le_one hpointwise
+    avgOver_uniform_le_const
+      _ (1 : Error) hpointwise
 
 /-! ### Off-diagonal variance swaps -/
 
