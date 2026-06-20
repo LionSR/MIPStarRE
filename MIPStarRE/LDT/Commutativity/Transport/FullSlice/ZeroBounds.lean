@@ -219,22 +219,15 @@ lemma fullSliceProductLeft_to_zero_le_one
       1 := by
   constructor
   unfold sddErrorOp
-  calc
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q =>
-          qSDDOp strategy.state
-            (fullSliceProductLeft params strategy family
-              (fullSliceQuestionOfEvaluatedSlice params q))
-            (zeroFullSliceOpFamily (ι := ι) params))
-      ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => (1 : Error)) := by
-          apply avgOver_mono
-          intro q
-          exact fullSliceProductLeft_qSDDOp_zero_le_one params strategy family hnorm
-            (fullSliceQuestionOfEvaluatedSlice params q)
-    _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
-          (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
-            simp [avgOver]
-    _ ≤ 1 := uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+  exact avgOver_uniform_le_of_pointwise_le
+    (fun q =>
+      qSDDOp strategy.state
+        (fullSliceProductLeft params strategy family
+          (fullSliceQuestionOfEvaluatedSlice params q))
+        (zeroFullSliceOpFamily (ι := ι) params))
+    1 zero_le_one
+    (fun q => fullSliceProductLeft_qSDDOp_zero_le_one params strategy family hnorm
+      (fullSliceQuestionOfEvaluatedSlice params q))
 
 /-- Averaging zero against the reversed full-slice product costs at most `1`. -/
 lemma zero_to_fullSliceProductRight_le_one
@@ -250,21 +243,14 @@ lemma zero_to_fullSliceProductRight_le_one
       1 := by
   constructor
   unfold sddErrorOp
-  calc
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q =>
-          qSDDOp strategy.state
-            (zeroFullSliceOpFamily (ι := ι) params)
-            (fullSliceProductRight params strategy family
-              (fullSliceQuestionOfEvaluatedSlice params q)))
-      ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params)) (fun _ => (1 : Error)) := by
-          apply avgOver_mono
-          intro q
-          exact zero_qSDDOp_fullSliceProductRight_le_one params strategy family hnorm
-            (fullSliceQuestionOfEvaluatedSlice params q)
-    _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
-          (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
-            simp [avgOver]
-    _ ≤ 1 := uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+  exact avgOver_uniform_le_of_pointwise_le
+    (fun q =>
+      qSDDOp strategy.state
+        (zeroFullSliceOpFamily (ι := ι) params)
+        (fullSliceProductRight params strategy family
+          (fullSliceQuestionOfEvaluatedSlice params q)))
+    1 zero_le_one
+    (fun q => zero_qSDDOp_fullSliceProductRight_le_one params strategy family hnorm
+      (fullSliceQuestionOfEvaluatedSlice params q))
 
 end MIPStarRE.LDT.Commutativity

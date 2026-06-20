@@ -363,15 +363,33 @@ theorem avgOver_mono_on_support {α : Type*} (𝒟 : Distribution α)
   exact Finset.sum_le_sum fun a ha =>
     mul_le_mul_of_nonneg_left (h a ha) (𝒟.nonnegative a)
 
+/-- The average of a constant scalar is the total mass times that scalar. -/
+theorem avgOver_const {α : Type*} (𝒟 : Distribution α) (c : Error) :
+    avgOver 𝒟 (fun _ : α => c) =
+      (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by
+  unfold avgOver
+  rw [Finset.sum_mul]
+
 /-- Averaging a constant against a probability distribution returns that constant. -/
 theorem avgOver_const_of_isProbability {α : Type*} (𝒟 : Distribution α)
     (h𝒟 : 𝒟.IsProbability) (c : Error) :
     avgOver 𝒟 (fun _ : α => c) = c := by
+  rw [avgOver_const, h𝒟.weight_sum_eq_one, one_mul]
+
+/-- A scalar average against a sub-probability distribution is bounded by any
+nonnegative pointwise upper bound. -/
+theorem avgOver_le_of_weight_sum_le_one {α : Type*} (𝒟 : Distribution α)
+    (f : α → Error) (δ : Error)
+    (h𝒟 : ∑ a ∈ 𝒟.support, 𝒟.weight a ≤ 1)
+    (hδ_nonneg : 0 ≤ δ)
+    (hf : ∀ a, f a ≤ δ) :
+    avgOver 𝒟 f ≤ δ := by
   calc
-    avgOver 𝒟 (fun _ : α => c)
-      = ∑ a ∈ 𝒟.support, 𝒟.weight a * c := by simp [avgOver]
-    _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * c := by rw [← Finset.sum_mul]
-    _ = c := by rw [h𝒟.weight_sum_eq_one, one_mul]
+    avgOver 𝒟 f ≤ avgOver 𝒟 (fun _ : α => δ) := by
+      exact avgOver_mono 𝒟 f (fun _ : α => δ) hf
+    _ = (∑ a ∈ 𝒟.support, 𝒟.weight a) * δ := avgOver_const 𝒟 δ
+    _ ≤ 1 * δ := mul_le_mul_of_nonneg_right h𝒟 hδ_nonneg
+    _ = δ := one_mul δ
 
 /-- If two operator-valued families agree pointwise, their averages agree. -/
 theorem averageOperatorOverDistribution_congr {α : Type*}
@@ -496,17 +514,8 @@ theorem avgOver_uniform_le_of_pointwise_le {α : Type*}
     (f : α → Error) (δ : Error) (hδ_nonneg : 0 ≤ δ)
     (hf : ∀ a, f a ≤ δ) :
     avgOver (uniformDistribution α) f ≤ δ := by
-  calc
-    avgOver (uniformDistribution α) f
-      ≤ avgOver (uniformDistribution α) (fun _ => δ) := by
-          exact avgOver_mono _ _ _ hf
-    _ = (∑ a ∈ (uniformDistribution α).support,
-          (uniformDistribution α).weight a) * δ := by
-          simp [avgOver, Finset.sum_mul]
-    _ ≤ 1 * δ := by
-          exact mul_le_mul_of_nonneg_right
-            (uniformDistribution_weight_sum_le_one α) hδ_nonneg
-    _ = δ := by ring
+  exact avgOver_le_of_weight_sum_le_one (uniformDistribution α) f δ
+    (uniformDistribution_weight_sum_le_one α) hδ_nonneg hf
 
 /-- Reindexing a uniform average along an equivalence preserves its value. -/
 theorem avgOver_uniform_equiv

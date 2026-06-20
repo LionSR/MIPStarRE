@@ -270,21 +270,14 @@ lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
         1 := by
       constructor
       unfold sddErrorOp
-      calc
-        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-            (fun q =>
-              qSDDOp strategy.state
-                (evaluatedSliceProductLeft params strategy family q)
-                (zeroEvaluatedSliceOpFamily (ι := ι) params))
-          ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-              (fun _ => (1 : Error)) := by
-              apply avgOver_mono
-              intro q
-              exact evaluatedSliceProductLeft_qSDDOp_zero_le_one params strategy family hnorm q
-        _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
-              (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
-                simp [avgOver]
-        _ ≤ 1 := uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+      exact avgOver_uniform_le_of_pointwise_le
+        (fun q =>
+          qSDDOp strategy.state
+            (evaluatedSliceProductLeft params strategy family q)
+            (zeroEvaluatedSliceOpFamily (ι := ι) params))
+        1 zero_le_one
+        (fun q =>
+          evaluatedSliceProductLeft_qSDDOp_zero_le_one params strategy family hnorm q)
     have hright : SDDOpRel strategy.state
         (uniformDistribution (EvaluatedSliceQuestion params))
         (fun _ => zeroEvaluatedSliceOpFamily (ι := ι) params)
@@ -292,21 +285,14 @@ lemma fullSlice_closenessOfIP_CAB_hEval_sqrt
         1 := by
       constructor
       unfold sddErrorOp
-      calc
-        avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-            (fun q =>
-              qSDDOp strategy.state
-                (zeroEvaluatedSliceOpFamily (ι := ι) params)
-                (evaluatedSliceProductRight params strategy family q))
-          ≤ avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-              (fun _ => (1 : Error)) := by
-              apply avgOver_mono
-              intro q
-              exact zero_qSDDOp_evaluatedSliceProductRight_le_one params strategy family hnorm q
-        _ = ∑ q ∈ (uniformDistribution (EvaluatedSliceQuestion params)).support,
-              (uniformDistribution (EvaluatedSliceQuestion params)).weight q := by
-                simp [avgOver]
-        _ ≤ 1 := uniformDistribution_weight_sum_le_one (EvaluatedSliceQuestion params)
+      exact avgOver_uniform_le_of_pointwise_le
+        (fun q =>
+          qSDDOp strategy.state
+            (zeroEvaluatedSliceOpFamily (ι := ι) params)
+            (evaluatedSliceProductRight params strategy family q))
+        1 zero_le_one
+        (fun q =>
+          zero_qSDDOp_evaluatedSliceProductRight_le_one params strategy family hnorm q)
     have htri :=
       MIPStarRE.LDT.Preliminaries.stateDependentDistanceOpRel_triangle
         strategy.state
