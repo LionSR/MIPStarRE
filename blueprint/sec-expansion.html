@@ -254,7 +254,11 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord_isProbability" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.rerandomizeCoord_isProbability</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.avgOver_rerandomizeCoord_eq_uniform_sample" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.avgOver_rerandomizeCoord_eq_uniform_sample</a></li>
+          
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.ExpansionHypercubeGraph.avgOver_rerandomizeCoord_eq_weight_sum" class="lean_decl">MIPStarRE.LDT.ExpansionHypercubeGraph.avgOver_rerandomizeCoord_eq_weight_sum</a></li>
           
         </ul>
     
@@ -265,11 +269,11 @@
         </div>
   </div>
   <div class="definition_thmcontent">
-  <p>  For \(u \in \mathbb {F}_q^m\), an index \(i \in \{ 1,\dots ,m\} \), and \(x \in \mathbb {F}_q\), let </p>
+  <p>     For \(u \in \mathbb {F}_q^m\), an index \(i \in \{ 1,\dots ,m\} \), and \(x \in \mathbb {F}_q\), let </p>
 <div class="displaymath" id="a0000000272">
   \[  \operatorname {rerand}_i(u,x) = u + x e_i.  \]
 </div>
-<p> This is the move obtained by rerandomizing the \(i\)-th coordinate of \(u\) by a uniform additive shift. </p>
+<p> This is the move obtained by rerandomizing the \(i\)-th coordinate of \(u\) by a uniform additive shift. In Lean, the same edge distribution is represented as the push-forward of the uniform distribution on triples \((u,i,x)\) by the map that replaces the \(i\)-th coordinate by \(x\); since \(x\) is uniform, this is the same distribution as the additive-shift presentation. The corresponding weight-sum identity identifies this push-forward distribution with the explicit edge coefficient used in the matrix proof. </p>
 
   </div>
 </div>
@@ -490,7 +494,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The two vertex marginals of a random edge are uniform on \(\mathbb {F}_q^m\). Expanding the right-hand side yields \((1/M)I-K\). </p>
+  <p> The two vertex marginals of a random edge are uniform on \(\mathbb {F}_q^m\). Expanding the right-hand side yields \((1/M)I-K\). </p>
 
   </div>
 </div>
