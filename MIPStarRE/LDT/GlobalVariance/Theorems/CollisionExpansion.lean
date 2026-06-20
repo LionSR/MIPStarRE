@@ -120,36 +120,39 @@ lemma avgOver_axisParallelLineQuestionDistribution
           {qu : AxisParallelLineQuestion params // pointOnLine (params := params) qu})
           (fun qu => f qu.1) := by
           let p : AxisParallelLineQuestion params → Prop := pointOnLine (params := params)
-          have hcard : ((Finset.univ.filter p).card : Error) =
-              (Fintype.card {qu : AxisParallelLineQuestion params // p qu} : Error) := by
-            simp [p, Fintype.card_subtype]
-          unfold axisParallelLineQuestionDistribution
-          rw [avgOver_uniform_eq_pmf_sum]
-          unfold avgOver
-          dsimp only
-          simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv,
-            ENNReal.toReal_natCast]
-          rw [← hcard]
           let support : Finset (AxisParallelLineQuestion params) := Finset.univ.filter p
-          change (∑ x ∈ support,
-              (if x ∈ support then 1 / (support.card : Error) else 0) * f x) =
-            ∑ x : {qu : AxisParallelLineQuestion params // p qu},
-              (support.card : Error)⁻¹ * f x.1
+          haveI :
+              Nonempty {qu : AxisParallelLineQuestion params // qu ∈ support} := by
+            rcases (inferInstance :
+                Nonempty {qu : AxisParallelLineQuestion params // p qu}) with ⟨qu⟩
+            exact ⟨⟨qu.1, Finset.mem_filter.mpr ⟨Finset.mem_univ qu.1, qu.2⟩⟩⟩
+          let eSupport :
+              {qu : AxisParallelLineQuestion params // qu ∈ support} ≃
+                {qu : AxisParallelLineQuestion params // p qu} :=
+            { toFun := fun qu => ⟨qu.1, (Finset.mem_filter.mp qu.2).2⟩
+              invFun := fun qu =>
+                ⟨qu.1, Finset.mem_filter.mpr ⟨Finset.mem_univ qu.1, qu.2⟩⟩
+              left_inv := by
+                intro qu
+                rfl
+              right_inv := by
+                intro qu
+                rfl }
           calc
-            (∑ x ∈ support,
-                (if x ∈ support then 1 / (support.card : Error) else 0) * f x)
-              = ∑ x ∈ support, (support.card : Error)⁻¹ * f x := by
-                  refine Finset.sum_congr rfl ?_
-                  intro x hx
-                  simp [hx]
-            _ = ∑ x : {qu : AxisParallelLineQuestion params // p qu},
-                (support.card : Error)⁻¹ * f x.1 := by
-                  simpa [support, p] using
-                    (Finset.sum_subtype_eq_sum_filter
-                      (s := (Finset.univ : Finset (AxisParallelLineQuestion params)))
-                      (f := fun qu : AxisParallelLineQuestion params =>
-                        ((Finset.univ.filter p).card : Error)⁻¹ * f qu)
-                      (p := p)).symm
+            avgOver (axisParallelLineQuestionDistribution params) f =
+                avgOver (uniformDistribution
+                  {qu : AxisParallelLineQuestion params // qu ∈ support})
+                  (fun qu => f qu.1) := by
+                  simpa [axisParallelLineQuestionDistribution, support, p] using
+                    (avgOver_uniformOnFinset_eq_subtype (s := support) (f := f))
+            _ = avgOver (uniformDistribution
+                  {qu : AxisParallelLineQuestion params // p qu})
+                  (fun qu => f qu.1) := by
+                  simpa [eSupport] using
+                    (avgOver_uniform_equiv (e := eSupport)
+                      (f := fun qu :
+                        {qu : AxisParallelLineQuestion params // qu ∈ support} =>
+                          f qu.1))
     _ = avgOver (uniformDistribution (AxisParallelLine params × Fq params))
           (fun ℓt => f (ℓt.1, ℓt.1.pointAt ℓt.2)) := by
           have h := (avgOver_uniform_equiv (e := e.symm)

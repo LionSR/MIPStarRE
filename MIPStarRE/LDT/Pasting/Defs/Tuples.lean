@@ -25,13 +25,7 @@ noncomputable def distinctTupleDistribution (params : Parameters) (k : ℕ) :
     Distribution (PointTuple params k) := by
   classical
   let support := Finset.univ.filter (fun xs : PointTuple params k => Function.Injective xs)
-  exact {
-    support := support
-    weight := fun xs =>
-      if xs ∈ support then 1 / (support.card : Error) else 0
-    nonnegative := by intro xs; split_ifs <;> positivity
-    outsideSupport := by intro xs hxs; simp_all
-  }
+  exact Distribution.uniformOnFinset support
 
 /-- The distinct-tuple distribution has total mass at most `1`. -/
 theorem distinctTupleDistribution_weight_sum_le_one (params : Parameters) (k : ℕ) :
@@ -39,30 +33,8 @@ theorem distinctTupleDistribution_weight_sum_le_one (params : Parameters) (k : �
       (distinctTupleDistribution params k).weight xs ≤ 1 := by
   classical
   let support := Finset.univ.filter (fun xs : PointTuple params k => Function.Injective xs)
-  have hsupport :
-      (distinctTupleDistribution params k).support = support := by
-    simp [distinctTupleDistribution, support]
-  have hweight :
-      ∀ xs, (distinctTupleDistribution params k).weight xs =
-        if xs ∈ support then 1 / (support.card : Error) else 0 := by
-    intro xs
-    simp [distinctTupleDistribution, support]
-  rw [hsupport]
-  simp_rw [hweight]
-  by_cases hs : support.Nonempty
-  · have hcard_nat : support.card ≠ 0 := Finset.card_ne_zero.mpr hs
-    have hcard : (support.card : Error) ≠ 0 := by
-      exact_mod_cast hcard_nat
-    have hsum :
-        (∑ xs ∈ support, if xs ∈ support then 1 / (support.card : Error) else 0) =
-          ∑ xs ∈ support, 1 / (support.card : Error) := by
-      apply Finset.sum_congr rfl
-      intro xs hxs
-      simp [hxs]
-    rw [hsum]
-    simp [Finset.sum_const, hcard]
-  · have hempty : support = ∅ := Finset.not_nonempty_iff_eq_empty.mp hs
-    simp [hempty]
+  simpa [distinctTupleDistribution, support] using
+    Distribution.uniformOnFinset_weight_sum_le_one support
 
 /-- The outcome type of the completed family `\widehat G`. -/
 abbrev GHatOutcome (params : Parameters) [FieldModel params.q] := Option (Polynomial params)

@@ -145,8 +145,6 @@ lemma distinctTupleDistribution_weight_sum_eq_one_of_le
       (distinctTupleDistribution params k).weight xs = 1 := by
   classical
   let support := Finset.univ.filter (fun xs : PointTuple params k => Function.Injective xs)
-  have hsupport : (distinctTupleDistribution params k).support = support := by
-    simp [distinctTupleDistribution, support]
   have hsupport_nonempty : support.Nonempty := by
     refine ⟨fun i => ⟨i.1, Nat.lt_of_lt_of_le i.2 hk⟩, ?_⟩
     refine Finset.mem_filter.mpr ?_
@@ -154,24 +152,8 @@ lemma distinctTupleDistribution_weight_sum_eq_one_of_le
     · simp
     · intro i j hij
       exact Fin.ext (by simpa using congrArg Fin.val hij)
-  have hcard_nat : support.card ≠ 0 := Finset.card_ne_zero.mpr hsupport_nonempty
-  have hcard : (support.card : Error) ≠ 0 := by
-    exact_mod_cast hcard_nat
-  have hweight :
-      ∀ xs, (distinctTupleDistribution params k).weight xs =
-        if xs ∈ support then 1 / (support.card : Error) else 0 := by
-    intro xs
-    simp [distinctTupleDistribution, support]
-  rw [hsupport]
-  simp_rw [hweight]
-  have hsum :
-      (∑ xs ∈ support, if xs ∈ support then 1 / (support.card : Error) else 0) =
-        ∑ xs ∈ support, 1 / (support.card : Error) := by
-    apply Finset.sum_congr rfl
-    intro xs hxs
-    simp [hxs]
-  rw [hsum]
-  simp [Finset.sum_const, hcard]
+  simpa [distinctTupleDistribution, support] using
+    (Distribution.uniformOnFinset_isProbability support hsupport_nonempty).weight_sum_eq_one
 
 lemma qBipartiteSSCDefect_le_one
     {Outcome : Type*} [Fintype Outcome]

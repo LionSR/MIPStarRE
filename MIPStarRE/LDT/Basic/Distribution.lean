@@ -308,6 +308,90 @@ theorem averageOperatorOverDistribution_le_one_of_isProbability {α : Type*}
     averageOperatorOverDistribution 𝒟 f ≤ 1 :=
   averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟 f h𝒟.weight_sum_le_one hf
 
+namespace Distribution
+
+/-- The uniform distribution on a specified finite support.
+
+When the support is nonempty this is Mathlib's `PMF.uniformOfFinset`, transported
+to the project `Distribution` representation while preserving the finite support
+as the stored support.  When the support is empty the distribution has zero mass,
+matching the sub-probability convention used for degenerate filtered supports in
+the LDT development. -/
+noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α := by
+  classical
+  by_cases hs : s.Nonempty
+  · exact
+      { support := s
+        weight := fun a => (PMF.uniformOfFinset s hs a).toReal
+        nonnegative := by
+          intro a
+          positivity
+        outsideSupport := by
+          intro a ha
+          rw [PMF.uniformOfFinset_apply_of_notMem hs ha]
+          simp }
+  · exact
+      { support := s
+        weight := fun _ => 0
+        nonnegative := by
+          intro a
+          positivity
+        outsideSupport := by
+          intro a ha
+          rfl }
+
+@[simp]
+theorem uniformOnFinset_support {α : Type*} (s : Finset α) :
+    (uniformOnFinset s).support = s := by
+  classical
+  by_cases hs : s.Nonempty <;> simp [uniformOnFinset, hs]
+
+@[simp]
+theorem uniformOnFinset_weight {α : Type*} [DecidableEq α] (s : Finset α) (a : α) :
+    (uniformOnFinset s).weight a =
+      if a ∈ s then 1 / (s.card : Error) else 0 := by
+  classical
+  by_cases hs : s.Nonempty
+  · by_cases ha : a ∈ s
+    · simp [uniformOnFinset, hs, ha, ENNReal.toReal_inv, ENNReal.toReal_natCast]
+    · simp [uniformOnFinset, hs, ha]
+  · have ha : a ∉ s := by
+      intro has
+      exact hs ⟨a, has⟩
+    simp [uniformOnFinset, hs, ha]
+
+/-- A nonempty finite support gives a probability distribution. -/
+theorem uniformOnFinset_isProbability {α : Type*} (s : Finset α) (hs : s.Nonempty) :
+    (uniformOnFinset s).IsProbability := by
+  classical
+  dsimp [IsProbability, totalWeight]
+  rw [uniformOnFinset_support]
+  simp_rw [uniformOnFinset_weight]
+  have hcard_nat : s.card ≠ 0 := Finset.card_ne_zero.mpr hs
+  have hcard : (s.card : Error) ≠ 0 := by
+    exact_mod_cast hcard_nat
+  have hsum :
+      (∑ a ∈ s, if a ∈ s then 1 / (s.card : Error) else 0) =
+        ∑ _a ∈ s, 1 / (s.card : Error) := by
+    refine Finset.sum_congr rfl ?_
+    intro a ha
+    simp [ha]
+  rw [hsum]
+  simp [Finset.sum_const, hcard]
+
+/-- The uniform distribution on any finite support is a sub-probability
+distribution.  It has mass `1` on nonempty support and mass `0` on empty
+support. -/
+theorem uniformOnFinset_weight_sum_le_one {α : Type*} (s : Finset α) :
+    ∑ a ∈ (uniformOnFinset s).support, (uniformOnFinset s).weight a ≤ 1 := by
+  classical
+  by_cases hs : s.Nonempty
+  · exact (uniformOnFinset_isProbability s hs).weight_sum_le_one
+  · have hsempty : s = ∅ := Finset.not_nonempty_iff_eq_empty.mp hs
+    simp [hsempty]
+
+end Distribution
+
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α :=
@@ -584,6 +668,34 @@ theorem avgOver_uniform_eq_pmf_sum {α : Type*}
       ∑ a : α, (PMF.uniformOfFintype α a).toReal * f a := by
   simpa [uniformDistribution] using
     Distribution.avgOver_ofPMF_eq_pmf_sum (PMF.uniformOfFintype α) f
+
+/-- A uniform average over a finite support is the same as the uniform average
+over the corresponding finite subtype. -/
+theorem avgOver_uniformOnFinset_eq_subtype {α : Type*} [DecidableEq α]
+    (s : Finset α) [Nonempty {a : α // a ∈ s}] (f : α → Error) :
+    avgOver (Distribution.uniformOnFinset s) f =
+      avgOver (uniformDistribution {a : α // a ∈ s}) (fun a => f a.1) := by
+  classical
+  have hcard : (s.card : Error) = (Fintype.card {a : α // a ∈ s} : Error) := by
+    rw [Fintype.card_coe s]
+  rw [avgOver_uniform_eq_pmf_sum]
+  unfold avgOver
+  rw [Distribution.uniformOnFinset_support]
+  simp_rw [Distribution.uniformOnFinset_weight]
+  simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
+  rw [← hcard]
+  calc
+    ∑ x ∈ s, (if x ∈ s then 1 / (s.card : Error) else 0) * f x
+        = ∑ x ∈ s, (s.card : Error)⁻¹ * f x := by
+          refine Finset.sum_congr rfl ?_
+          intro x hx
+          simp [hx]
+    _ = ∑ x ∈ s.attach, (s.card : Error)⁻¹ * f x.1 := by
+          exact
+            (Finset.sum_attach s
+              (fun x : α => (s.card : Error)⁻¹ * f x)).symm
+    _ = ∑ x : {x : α // x ∈ s}, (s.card : Error)⁻¹ * f x.1 := by
+          rw [Finset.attach_eq_univ]
 
 /-- The uniform operator average is the finite operator sum weighted by
 `PMF.uniformOfFintype`. -/

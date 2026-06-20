@@ -133,15 +133,7 @@ marginal is still uniform on `Point params`. When `params.m < 2`, no genuine
 2-dimensional surfaces exist, so this support is empty. -/
 noncomputable def surfaceVsPointDistribution (params : Parameters) [FieldModel params.q] :
     Distribution (SurfaceVsPointSample params) :=
-  let support := surfaceVsPointSupport params
-  { support := support
-    weight := fun sample => if sample ∈ support then 1 / (support.card : Error) else 0
-    nonnegative := by
-      intro sample
-      by_cases hs : sample ∈ support <;> simp [hs]
-    outsideSupport := by
-      intro sample hs
-      simp [hs] }
+  Distribution.uniformOnFinset (surfaceVsPointSupport params)
 
 /-- Deterministic classical answers for the `k = 2` surface-versus-point test:
 Prover A answers point queries, and Prover B answers surface queries. -/
