@@ -86,8 +86,7 @@ noncomputable def averageUnitSubMeas {α : Type*}
     sum_eq_total := by
       simp
     total_le_one := by
-      exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one
-        (uniformDistribution α) f (uniformDistribution_weight_sum_le_one α) hle }
+      exact averageOperatorOverDistribution_uniform_le_one f hle }
 
 /-- The unique outcome of `averageUnitSubMeas` is the uniform operator average
 of the underlying family. -/

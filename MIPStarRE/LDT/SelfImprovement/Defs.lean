@@ -350,10 +350,10 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
               (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total) := by
                 rfl
         _ ≤ 1 := by
-              exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟
-                (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total)
-                (uniformDistribution_weight_sum_le_one (Point params))
-                (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total_le_one) }
+              simpa [𝒟] using
+                averageOperatorOverDistribution_uniform_le_one
+                  (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total)
+                  (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total_le_one) }
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)
