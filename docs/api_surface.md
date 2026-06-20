@@ -144,7 +144,7 @@ These are useful when a proof wants to drop from stronger structure to plain `Su
   - Standard way to turn a submeasurement into a complete measurement.
 
 - `def SubMeas.singleOutcome (A : Op ι) (hA_pos : 0 ≤ A) (hA_le_one : A ≤ 1) : SubMeas Unit ι`
-  - Packages one positive operator bounded by the identity as a one-outcome submeasurement.
+  - Constructs a one-outcome submeasurement from a positive operator bounded by the identity.
 
 - `def constSubMeasFamily (A : SubMeas α ι) : IdxSubMeas Unit α ι`
 
