@@ -915,11 +915,19 @@
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities}
 		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvd}
+		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvd}
+		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdUnitaryGroup}
+		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroup}
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities}
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd}
+		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGroup}
 		\leanok
 		\uses{def:matrix-decomposition-Q}
 		The paper presents this step by choosing a singular value decomposition
@@ -937,15 +945,23 @@
 	\begin{proof}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX,
 			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvd,
 			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvd,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdUnitaryGroup,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroup,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities,
-			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd}
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd,
+			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGroup}
 		\leanok
 		\uses{def:matrix-decomposition-Q}
 		Apply the finite-dimensional singular value decomposition to \(X\) and
 		record exactly the consequences used later: the identities for
 		\(X^\dagger X\), \(\widehat X\widehat X^\dagger\),
-		\(X^\dagger\widehat X\), and the restatement of the \(Q_a\)'s.
+		\(X^\dagger\widehat X\), and the restatement of the \(Q_a\)'s.  The
+		unitary-group constructors are the same rectangular-SVD calculation with
+		the square unitaries represented as elements of Mathlib's
+		\(\operatorname{unitaryGroup}\), rather than as matrices accompanied by
+		separate unitarity equations.
 	\end{proof}
 
 	\begin{remark}[Formalization support for orthogonal projector families]\label{rem:motivation-for-P}
@@ -1224,6 +1240,9 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRootUnitaryGroup}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGroup}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup}
 		\leanok
 		\begin{equation*}
 			X \cdot \widehat{X}^\dagger =
@@ -1331,6 +1350,7 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup}
 		\leanok
 		\begin{equation*}
 			Q_a \ot I \approx_{30\zeta^{1/4}} P_a \ot I.
@@ -1343,7 +1363,9 @@
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
 		derived here rather than stored as part of the reduced datum.  The
 		rectangular-SVD lemma combines the same estimate with the positive-square
-		identification of the middle factor from \ref{lem:X-times-X-hat}.  The
+		identification of the middle factor from \ref{lem:X-times-X-hat}; the
+		unitary-group variant has the same conclusion, with the square unitary
+		factors represented by their Mathlib unitary-group type.  The
 		positive-Gram sigma-space lemma also records the coisometry
 		\(X X^\dagger=I\) for the original sigma embedding when the projective
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis
