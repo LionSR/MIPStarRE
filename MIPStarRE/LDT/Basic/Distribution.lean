@@ -508,14 +508,29 @@ theorem averageOperatorOverDistribution_uniform_eq_pmf_sum {α : Type*}
     Distribution.averageOperatorOverDistribution_ofPMF_eq_sum
       (PMF.uniformOfFintype α) f
 
+/-- A uniform average is bounded by any supportwise upper bound. -/
+theorem avgOver_uniform_le_of_forall_le_on_support {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    (f : α → Error) (δ : Error)
+    (hf : ∀ a, a ∈ (uniformDistribution α).support → f a ≤ δ) :
+    avgOver (uniformDistribution α) f ≤ δ :=
+  Distribution.IsProbability.avgOver_le_of_forall_le_on_support
+    (uniformDistribution_isProbability α) f δ hf
+
+/-- A uniform average is bounded by any pointwise upper bound. -/
+theorem avgOver_uniform_le_const {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    (f : α → Error) (δ : Error) (hf : ∀ a, f a ≤ δ) :
+    avgOver (uniformDistribution α) f ≤ δ :=
+  avgOver_uniform_le_of_forall_le_on_support f δ fun a _ => hf a
+
 /-- A uniform average is bounded by any nonnegative pointwise upper bound. -/
 theorem avgOver_uniform_le_of_pointwise_le {α : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]
-    (f : α → Error) (δ : Error) (hδ_nonneg : 0 ≤ δ)
+    (f : α → Error) (δ : Error) (_hδ_nonneg : 0 ≤ δ)
     (hf : ∀ a, f a ≤ δ) :
-    avgOver (uniformDistribution α) f ≤ δ := by
-  exact avgOver_le_of_weight_sum_le_one (uniformDistribution α) f δ
-    (uniformDistribution_weight_sum_le_one α) hδ_nonneg hf
+    avgOver (uniformDistribution α) f ≤ δ :=
+  avgOver_uniform_le_const f δ hf
 
 /-- Reindexing a uniform average along an equivalence preserves its value. -/
 theorem avgOver_uniform_equiv

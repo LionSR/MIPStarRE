@@ -519,15 +519,18 @@ lemma generalizeBLineCollisionExpansion_le_error
             apply avgOver_congr
             intro ℓ
             rw [Finset.mul_sum]
-    _ ≤ avgOver (uniformDistribution (AxisParallelLine params))
-          (fun _ℓ => δ * 1) := by
-            refine avgOver_mono _ _ _ ?_
-            intro ℓ
-            exact mul_le_mul_of_nonneg_left
-              (generalizeBLineCollisionTensorMass_sum_le_one params strategy G g ℓ)
-              hδ_nonneg
-    _ = δ := by
-            simpa using (avgOver_uniform_const (α := AxisParallelLine params) (c := δ))
+    _ ≤ δ := by
+            exact avgOver_uniform_le_const
+              (fun ℓ : AxisParallelLine params => δ *
+                ∑ f : AxisLinePolynomial params,
+                  ev strategy.state (opTensor
+                    ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
+                    (G.outcome g)))
+              δ
+              (fun ℓ => by
+                simpa using mul_le_mul_of_nonneg_left
+                  (generalizeBLineCollisionTensorMass_sum_le_one params strategy G g ℓ)
+                  hδ_nonneg)
     _ = generalizeBError params := rfl
 
 /-- The uniform line/parameter seed collision expansion is bounded by `m*d/q`.

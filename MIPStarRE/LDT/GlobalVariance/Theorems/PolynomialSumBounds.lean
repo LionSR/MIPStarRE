@@ -203,16 +203,18 @@ lemma generalizeBLineCollisionExpansion_polysum_le_error
                 ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
                 (G.outcome g))) := by
             rw [← avgOver_const_mul]
-    _ ≤ avgOver (uniformDistribution (AxisParallelLine params))
-          (fun _ℓ => δ * 1) := by
-            refine avgOver_mono _ _ _ ?_
-            intro ℓ
-            exact mul_le_mul_of_nonneg_left
-              (generalizeBLineCollisionTensorMass_polysum_le_one params strategy G ℓ)
-              hδ_nonneg
-    _ = δ := by
-            simpa using
-              (avgOver_uniform_const (α := AxisParallelLine params) (c := δ))
+    _ ≤ δ := by
+            exact avgOver_uniform_le_const
+              (fun ℓ : AxisParallelLine params => δ *
+                ∑ g : Polynomial params, ∑ f : AxisLinePolynomial params,
+                  ev strategy.state (opTensor
+                    ((strategy.axisParallelMeasurement ℓ).toSubMeas.outcome f)
+                    (G.outcome g)))
+              δ
+              (fun ℓ => by
+                simpa using mul_le_mul_of_nonneg_left
+                  (generalizeBLineCollisionTensorMass_polysum_le_one params strategy G ℓ)
+                  hδ_nonneg)
 
 /-- Polynomial-sum analogue of `generalizeBSeedCollisionExpansion_le_error`.
 

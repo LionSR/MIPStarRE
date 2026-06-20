@@ -196,12 +196,8 @@ lemma avgOver_uniform_eligibleMass_le_distinct_add_dnoteq
     linarith
   · have hkq : params.q < k := lt_of_not_ge hk
     have hUle : avgOver (uniformDistribution (PointTuple params k)) F ≤ 1 := by
-      calc
-        avgOver (uniformDistribution (PointTuple params k)) F
-          ≤ avgOver (uniformDistribution (PointTuple params k)) (fun _ => 1) := by
-              exact avgOver_mono _ _ _ fun xs => eligibleMass_le_one params strategy family xs
-        _ = 1 := by
-              simpa using avgOver_uniform_const (α := PointTuple params k) (1 : Error)
+      exact avgOver_uniform_le_const F (1 : Error) fun xs =>
+        eligibleMass_le_one params strategy family xs
     have hDnonneg : 0 ≤ avgOver (distinctTupleDistribution params k) F := by
       unfold avgOver F
       exact Finset.sum_nonneg fun xs _ =>

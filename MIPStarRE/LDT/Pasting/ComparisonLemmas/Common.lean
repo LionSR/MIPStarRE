@@ -135,12 +135,9 @@ lemma bipartiteConsError_uniform_le_one
     (A B : IdxSubMeas Question Outcome ι) :
     bipartiteConsError ψ (uniformDistribution Question) A B ≤ 1 := by
   unfold bipartiteConsError
-  calc
-    avgOver (uniformDistribution Question) (fun q => qBipartiteConsDefect ψ (A q) (B q))
-      ≤ avgOver (uniformDistribution Question) (fun _ => (1 : Error)) := by
-          exact avgOver_mono _ _ _ (fun q => qBipartiteConsDefect_le_one ψ hnorm (A q) (B q))
-    _ = 1 := by
-          simpa using avgOver_uniform_const (α := Question) (c := (1 : Error))
+  exact avgOver_uniform_le_const
+    (fun q => qBipartiteConsDefect ψ (A q) (B q)) (1 : Error)
+    (fun q => qBipartiteConsDefect_le_one ψ hnorm (A q) (B q))
 
 lemma distinctTupleDistribution_weight_sum_eq_one_of_le
     (params : Parameters) (k : ℕ) (hk : k ≤ params.q) :
@@ -203,12 +200,9 @@ lemma bipartiteSSCError_uniform_le_one
     (A : IdxSubMeas Question Outcome ι) :
     bipartiteSSCError ψ (uniformDistribution Question) A ≤ 1 := by
   unfold bipartiteSSCError
-  calc
-    avgOver (uniformDistribution Question) (fun q => qBipartiteSSCDefect ψ (A q))
-      ≤ avgOver (uniformDistribution Question) (fun _ => (1 : Error)) := by
-          exact avgOver_mono _ _ _ (fun q => qBipartiteSSCDefect_le_one ψ hnorm (A q))
-    _ = 1 := by
-          simpa using avgOver_uniform_const (α := Question) (c := (1 : Error))
+  exact avgOver_uniform_le_const
+    (fun q => qBipartiteSSCDefect ψ (A q)) (1 : Error)
+    (fun q => qBipartiteSSCDefect_le_one ψ hnorm (A q))
 
 lemma sqrt_min_le_rpow32
     (x : Error) (hx : 0 ≤ x) :
@@ -246,11 +240,13 @@ lemma hAConsistency_sqrt_bound_of_pos
     · exact hm_nonneg
     · nlinarith
   have hsqrt8_le_three : Real.sqrt (8 : Error) ≤ 3 := by
-    have : (Real.sqrt (8 : Error)) ^ (2 : ℕ) ≤ (3 : Error) ^ (2 : ℕ) := by norm_num
+    have : (Real.sqrt (8 : Error)) ^ (2 : ℕ) ≤ (3 : Error) ^ (2 : ℕ) := by
+      norm_num
     nlinarith [Real.sq_sqrt (show 0 ≤ (8 : Error) by positivity), this]
   have heps_term :
       Real.sqrt (8 * (params.m : Error) * min eps 1)
-        ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
+        ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+            Real.rpow eps (1 / (32 : Error)) := by
     calc
       Real.sqrt (8 * (params.m : Error) * min eps 1)
         = Real.sqrt (8 : Error) * Real.sqrt (params.m : Error) * Real.sqrt (min eps 1) := by
@@ -281,7 +277,8 @@ lemma hAConsistency_sqrt_bound_of_pos
                     exact mul_le_mul_of_nonneg_right hfac hsqrt_nonneg
               _ ≤ (3 * (params.m : Error)) * Real.rpow eps (1 / (32 : Error)) := by
                     exact mul_le_mul_of_nonneg_left hmin (by positivity)
-      _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * Real.rpow eps (1 / (32 : Error)) := by
+      _ ≤ 3 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) *
+            Real.rpow eps (1 / (32 : Error)) := by
             have hroot_nonneg : 0 ≤ Real.rpow eps (1 / (32 : Error)) :=
               Real.rpow_nonneg heps_nonneg _
             have hmroot_nonneg :
@@ -390,7 +387,9 @@ lemma hAConsistency_error_le_nu_of_pos
                 (44 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S)
     _ = 47 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by ring
     _ ≤ 100 * ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
-          have hcoeff_nonneg : 0 ≤ ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by positivity
+          have hcoeff_nonneg :
+              0 ≤ ((k : Error) ^ (2 : ℕ)) * (params.m : Error) * S := by
+            positivity
           nlinarith
     _ = MainInductionStep.ldPastingInInductionNu params k eps delta gamma zeta := by
           simp [MainInductionStep.ldPastingInInductionNu, S]

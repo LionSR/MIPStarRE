@@ -217,11 +217,12 @@ lemma switcheroo_second_aggregate_term_close
           simp [avgOver, Finset.sum_sub_distrib, mul_sub]
     _ ≤ avgOver 𝒟x (fun y => |L y - C y|) := by
           exact avgOver_abs_le_avgOver_abs _ _
-    _ ≤ avgOver 𝒟x (fun _ => 2 * Real.sqrt zeta) := by
-          exact avgOver_mono _ _ _ hpoint
-    _ = 2 * Real.sqrt zeta := by
+    _ ≤ 2 * Real.sqrt zeta := by
           simpa [𝒟x] using
-            avgOver_uniform_const (α := SliceQuestion params) (2 * Real.sqrt zeta)
+            avgOver_uniform_le_const
+              (fun y : SliceQuestion params => |L y - C y|)
+              (2 * Real.sqrt zeta)
+              hpoint
 
 /-- The complete-part `M ⊗ G` switcheroo center, expressed as a slice-pair
 `opTensor` average over the `M`-totals and complete-part `G`-totals. -/
