@@ -23,7 +23,7 @@ If `U` and `V` are unitary in the directions used below, and if the rectangular
 identity factor `Iro` has orthonormal rows, then the paper's matrix
 `U * Iro * Vᴴ` also has orthonormal rows.  This is the elementary matrix
 calculation behind `lem:X-hat-squared`. -/
-theorem rectangularSvd_xHat_coisometry
+private theorem rectangularSvd_xHat_coisometry
     {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
     (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
     (Iro : Matrix μ ι ℂ)

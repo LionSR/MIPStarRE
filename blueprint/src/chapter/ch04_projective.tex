@@ -952,10 +952,9 @@
 		record exactly the consequences used later: the identities for
 		\(X^\dagger X\), \(\widehat X\widehat X^\dagger\),
 		\(X^\dagger\widehat X\), and the restatement of the \(Q_a\)'s.  The
-		unitary-group constructors are the same rectangular-SVD calculation with
-		the square unitaries represented as elements of Mathlib's
-		\(\operatorname{unitaryGroup}\), rather than as matrices accompanied by
-		separate unitarity equations.
+		unitary-group constructors are the same rectangular-SVD calculation, with
+		the square factors taken as elements of the relevant unitary groups
+		rather than as matrices accompanied by separate unitarity equations.
 	\end{proof}
 
 	\begin{remark}[Formalization support for orthogonal projector families]\label{rem:motivation-for-P}
@@ -1156,21 +1155,15 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_image_rows_transpose_mixed}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_spectrum_card_le_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitaryGroup_rows_extending_orthonormal}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_rows_extending_orthonormal}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitaryGroup_with_positive_gram_spectrum_rows}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_positive_gram_spectrum_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitaryGroup_with_positive_gram_spectrum_rows_of_card}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_positive_gram_spectrum_rows_of_card}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_extending_orthonormal_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.transpose_unitaryGroup_mul_rectangular_coisometry}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.transpose_unitary_mul_rectangular_coisometry}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitary_with_qxp_positive_gram_spectrum_rows}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitaryGroup_with_qxp_positive_gram_spectrum_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHat_of_positive_gram_spectrum_unitaryGroup_choices}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHat_of_positive_gram_spectrum_choices}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry_unitaryGroup}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_positive_gram_spectrum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_sigmaFinRangeEmbedding_positiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram}
@@ -1197,15 +1190,16 @@
 		\texttt{positive\_gram\_spectrum\_image\_rows\_transpose\_mixed} records the
 		adjoint action $X^\dagger(\lambda^{-1/2}Xv)=\lambda^{1/2}v$ on the positive
 		spectral part of the Gram operator.  The formal lemma
-		\texttt{exists\_unitary\_with\_positive\_gram\_spectrum\_rows} records the
+		\texttt{exists\_unitaryGroup\_with\_positive\_gram\_spectrum\_rows} records the
 		next finite-dimensional step: after choosing distinct row positions for the
 		positive spectrum, these normalized image rows extend to a square unitary
-		matrix on the row space.  The companion lemma
+		group element on the row space.  The companion lemma
 		\texttt{exists\_rectangular\_coisometry\_extending\_orthonormal\_rows}
 		records the analogous rectangular completion for prescribed right rows
 		when the dimension bound permits it.  The formal lemma
-		\texttt{rectangularSvd\_xHat\_coisometry} records the corresponding matrix
-		calculation.  The unconditional positive-Gram route is
+		\texttt{rectangularSvd\_xHat\_coisometry\_unitaryGroup} records the corresponding
+		matrix calculation for square factors regarded as unitary group elements.  The
+		unconditional positive-Gram route is
 		\texttt{exists\_xHat\_of\_sigmaFinRangeEmbedding\_positiveGram}, which
 		constructs $\widehat X$ from the rank-reduction witness and proves
 		$\widehat X\widehat X^\dagger=I$ together with the mixed square-root
@@ -1218,7 +1212,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_completion_left_unitary_mixed_column_eq_zero}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_polar_extension_mixed_eq_positive_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_polar_extension_mixed_eq_sqrt_unitaryGroup}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.positive_gram_polar_extension_mixed_eq_sqrt}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_raw_unitaryGroup}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_raw}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_x_mul_xHat_conjTranspose_raw_unitaryGroup}
@@ -1352,8 +1345,8 @@
 		derived here rather than stored as part of the reduced datum.  The
 		unitary-group rectangular-SVD lemma combines the same estimate with the
 		positive-square identification of the middle factor from
-		\ref{lem:X-times-X-hat}; the square unitary factors are represented by
-		their Mathlib unitary-group type.  The
+		\ref{lem:X-times-X-hat}; the square unitary factors are again carried as
+		elements of the relevant unitary groups.  The
 		positive-Gram sigma-space lemma also records the coisometry
 		\(X X^\dagger=I\) for the original sigma embedding when the projective
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis

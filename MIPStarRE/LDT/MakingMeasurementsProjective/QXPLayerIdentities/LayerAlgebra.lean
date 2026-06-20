@@ -189,25 +189,21 @@ lemma qtotal_eigenvalues_nonneg_of_x_squared {Outcome : Type*}
 
 For the matrix `X` stored in a QXP layer, the positive spectral part of
 `Q = X†X` determines normalized image rows.  These rows can be placed in
-distinct auxiliary coordinates and then completed to a square unitary matrix on
-the auxiliary Hilbert space. -/
-theorem exists_unitary_with_qxp_positive_gram_spectrum_rows {Outcome : Type*}
+distinct auxiliary coordinates and then completed to a square unitary group
+element on the auxiliary Hilbert space. -/
+theorem exists_unitaryGroup_with_qxp_positive_gram_spectrum_rows {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (data : QXPLayerData Outcome ι) :
     ∃ e : {i : ι // 0 < (qtotal_isHermitian_of_x_squared data).eigenvalues i} ↪
         data.qLayer.auxSpace.carrier,
-      ∃ U : Matrix data.qLayer.auxSpace.carrier data.qLayer.auxSpace.carrier ℂ,
-        U * Uᴴ =
-            (1 : Matrix data.qLayer.auxSpace.carrier data.qLayer.auxSpace.carrier ℂ) ∧
-          Uᴴ * U =
-            (1 : Matrix data.qLayer.auxSpace.carrier data.qLayer.auxSpace.carrier ℂ) ∧
-            ∀ (i : {i : ι // 0 < (qtotal_isHermitian_of_x_squared data).eigenvalues i})
-                (r : data.qLayer.auxSpace.carrier),
-              U (e i) r =
-                positiveGramSpectrumImageRows data.x (QTotal data.qLayer)
-                  (qtotal_isHermitian_of_x_squared data) i r := by
-  exact exists_unitary_with_positive_gram_spectrum_rows_of_card data.x
+      ∃ U : Matrix.unitaryGroup data.qLayer.auxSpace.carrier ℂ,
+        ∀ (i : {i : ι // 0 < (qtotal_isHermitian_of_x_squared data).eigenvalues i})
+            (r : data.qLayer.auxSpace.carrier),
+          (U : Matrix data.qLayer.auxSpace.carrier data.qLayer.auxSpace.carrier ℂ) (e i) r =
+            positiveGramSpectrumImageRows data.x (QTotal data.qLayer)
+              (qtotal_isHermitian_of_x_squared data) i r := by
+  exact exists_unitaryGroup_with_positive_gram_spectrum_rows_of_card data.x
     (QTotal data.qLayer) (qtotal_isHermitian_of_x_squared data) data.x_gram_right
 
 /-- **`X`-expression to `Q`-expression** (`lem:X-expression-to-Q-expression`).

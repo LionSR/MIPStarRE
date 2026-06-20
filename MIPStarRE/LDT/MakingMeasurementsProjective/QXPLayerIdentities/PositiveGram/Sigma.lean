@@ -53,43 +53,6 @@ theorem xHat_of_positive_gram_spectrum_unitaryGroup_choices
   · exact positive_gram_polar_extension_mixed_eq_sqrt_unitaryGroup X Q hQ hQ_pos
       hgram e U W hU_rows hW_rows
 
-/-- Explicit positive-Gram polar extension from chosen row-extension data.
-
-The existential construction of `Xhat` first chooses an embedding of the
-positive spectral subspace into the auxiliary row space, then chooses a unitary
-`U` extending the normalized image rows and a rectangular coisometry `W`
-extending the right singular rows.  This theorem records the deterministic
-matrix produced from those choices, namely `Uᵀ * W`, together with the two QXP
-identities it satisfies.
-
-The explicit form is useful when a later argument needs to impose additional
-structure on the chosen rows, such as fresh option-completion row preservation
-used to derive the QXP-internal comparison `Q_none ≤ P_none`. -/
-theorem xHat_of_positive_gram_spectrum_choices
-    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
-    (X : Matrix μ ι ℂ) (Q : Matrix ι ι ℂ)
-    (hQ : Q.IsHermitian) (hQ_pos : Q.PosSemidef)
-    (hgram : Xᴴ * X = Q)
-    (e : {i : ι // 0 < hQ.eigenvalues i} ↪ μ)
-    (U : Matrix μ μ ℂ) (W : Matrix μ ι ℂ)
-    (hU_left : U * Uᴴ = (1 : Matrix μ μ ℂ))
-    (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
-    (hU_rows :
-      ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : μ),
-        U (e i) r = positiveGramSpectrumImageRows X Q hQ i r)
-    (hW : W * Wᴴ = (1 : Matrix μ μ ℂ))
-    (hW_rows :
-      ∀ (i : {i : ι // 0 < hQ.eigenvalues i}) (r : ι),
-        W (e i) r = positiveGramSpectrumRightRows Q hQ i r) :
-    (Uᵀ * W) * (Uᵀ * W)ᴴ = (1 : Matrix μ μ ℂ) ∧
-      Xᴴ * (Uᵀ * W) = CFC.sqrt Q := by
-  constructor
-  · exact transpose_unitary_mul_rectangular_coisometry U W hU_right hW
-  · let Ugroup : Matrix.unitaryGroup μ ℂ :=
-      ⟨U, (Matrix.mem_unitaryGroup_iff).2 hU_left⟩
-    exact positive_gram_polar_extension_mixed_eq_sqrt_unitaryGroup
-      X Q hQ hQ_pos hgram e Ugroup W hU_rows hW_rows
-
 /-- Existence of the polar-extension `Xhat` from a positive Gram factorization.
 
 If `Q = X†X` is positive semidefinite and the row dimension is at most the
