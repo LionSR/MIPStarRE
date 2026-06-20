@@ -428,9 +428,20 @@ lemma idxPolyFamily_averagedMass_eq_avg
       avgOver (uniformDistribution (Fq params))
         (fun x => subMeasMass ψ ((family.meas x).toSubMeas.liftLeft)) := by
   rw [avgOver_uniform_eq_pmf_sum]
-  simp only [subMeasMass, IdxPolyFamily.averagedSubMeas, uniformDistribution,
-    Distribution.ofPMF_support, Distribution.ofPMF_weight, SubMeas.liftLeft,
+  have htotal :
+      (∑ x ∈ (uniformDistribution (Fq params)).support,
+          (uniformDistribution (Fq params)).weight x •
+            (family.meas x).toSubMeas.total) =
+        ∑ x : Fq params,
+          (PMF.uniformOfFintype (Fq params) x).toReal •
+            (family.meas x).toSubMeas.total := by
+    simpa [averageOperatorOverDistribution] using
+      (averageOperatorOverDistribution_uniform_eq_pmf_sum
+        (α := Fq params) (ι := ι)
+        (fun x => (family.meas x).toSubMeas.total))
+  simp only [subMeasMass, IdxPolyFamily.averagedSubMeas, SubMeas.liftLeft,
     mkLeftPlacedSubMeas_total]
+  rw [htotal]
   rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ
     (fun x : Fq params => (PMF.uniformOfFintype (Fq params) x).toReal •
       (family.meas x).toSubMeas.total)]
