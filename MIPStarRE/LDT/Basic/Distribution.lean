@@ -268,60 +268,41 @@ namespace Distribution
 
 /-- The uniform distribution on a specified finite support.
 
-When the support is nonempty this is Mathlib's `PMF.uniformOfFinset`, transported
-to the project `Distribution` representation while preserving the finite support
-as the stored support.  When the support is empty the distribution has zero mass,
-matching the sub-probability convention used for degenerate filtered supports in
-the LDT development. -/
+The stored support is `s`, and the weight of a point is the elementary finite
+uniform weight `1 / s.card` on `s` and `0` off `s`.  When the support is empty
+this gives the zero sub-probability distribution, matching the convention used
+for degenerate filtered supports in the LDT development. -/
 noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α := by
   classical
-  by_cases hs : s.Nonempty
-  · exact
-      { support := s
-        weight := fun a => (PMF.uniformOfFinset s hs a).toReal
-        nonnegative := by
-          intro a
-          positivity
-        outsideSupport := by
-          intro a ha
-          rw [PMF.uniformOfFinset_apply_of_notMem hs ha]
-          simp }
-  · exact
-      { support := s
-        weight := fun _ => 0
-        nonnegative := by
-          intro a
-          positivity
-        outsideSupport := by
-          intro a ha
-          rfl }
+  exact
+    { support := s
+      weight := fun a => if a ∈ s then 1 / (s.card : Error) else 0
+      nonnegative := by
+        intro a
+        by_cases ha : a ∈ s
+        · simp [ha]
+        · simp [ha]
+      outsideSupport := by
+        intro a ha
+        simp [ha] }
 
 @[simp]
 theorem uniformOnFinset_support {α : Type*} (s : Finset α) :
-    (uniformOnFinset s).support = s := by
-  classical
-  by_cases hs : s.Nonempty <;> simp [uniformOnFinset, hs]
+    (uniformOnFinset s).support = s := rfl
 
 @[simp]
 theorem uniformOnFinset_weight {α : Type*} [DecidableEq α] (s : Finset α) (a : α) :
     (uniformOnFinset s).weight a =
       if a ∈ s then 1 / (s.card : Error) else 0 := by
-  classical
-  by_cases hs : s.Nonempty
-  · by_cases ha : a ∈ s
-    · simp [uniformOnFinset, hs, ha, ENNReal.toReal_inv, ENNReal.toReal_natCast]
-    · simp [uniformOnFinset, hs, ha]
-  · have ha : a ∉ s := by
-      intro has
-      exact hs ⟨a, has⟩
-    simp [uniformOnFinset, hs, ha]
+  by_cases ha : a ∈ s
+  · simp [uniformOnFinset, ha]
+  · simp [uniformOnFinset, ha]
 
 /-- A nonempty finite support gives a probability distribution. -/
 theorem uniformOnFinset_isProbability {α : Type*} (s : Finset α) (hs : s.Nonempty) :
     (uniformOnFinset s).IsProbability := by
   classical
   dsimp [IsProbability, totalWeight]
-  rw [uniformOnFinset_support]
   simp_rw [uniformOnFinset_weight]
   have hcard_nat : s.card ≠ 0 := Finset.card_ne_zero.mpr hs
   have hcard : (s.card : Error) ≠ 0 := by
