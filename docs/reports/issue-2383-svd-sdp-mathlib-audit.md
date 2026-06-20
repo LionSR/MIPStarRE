@@ -114,7 +114,7 @@ which follow from supplied factors \(U,V,\Sigma,I_{m\times d}\):
 - `rectangularSvd_xHat_mixed_raw`;
 - `rectangularSvd_x_mul_xHat_conjTranspose_raw`;
 - `rectangularSvd_middle_eq_sqrt_of_square`;
-- `exists_xHat_of_rectangularSvd`.
+- `exists_xHat_of_rectangularSvd_unitaryGroup`.
 
 These declarations are algebraic comparison lemmas.  They do not assert that a
 rectangular singular value decomposition exists.
@@ -158,6 +158,13 @@ the paper-specific consequences needed downstream:
 \(\widehat X\widehat X^\dagger=I\),
 \(X^\dagger\widehat X=\sqrt Q\), and
 \(Q_a=X^\dagger T_aX\).
+
+Status update, 2026-06-20: issue #2425 retired the duplicate
+constructor-facing rectangular-SVD forms whose square unitary factors were
+ordinary matrices equipped with separate unitarity hypotheses.  The remaining
+constructor and existence forms use `Matrix.unitaryGroup` for the square factors,
+while the raw rectangular matrix identities remain available as the elementary
+algebraic calculations behind those constructors.
 
 ## SDP Layer
 

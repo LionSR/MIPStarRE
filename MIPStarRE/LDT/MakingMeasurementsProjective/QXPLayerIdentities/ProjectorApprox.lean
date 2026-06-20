@@ -569,73 +569,11 @@ lemma pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
     hx_coisometry, ?_⟩
   exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
 
-/-- Apply `lem:P-Q-approx` to the canonical sigma-space QXP layer obtained
-from rectangular SVD data and the positive-square characterization of the
-middle factor.
-
-This is the paper-facing producer for the full local `Q -> X -> Xhat -> P`
-stage: the rank-reduction witness supplies the projective `Q` layer, the
-sigma-range embedding supplies `X`, the rectangular SVD supplies `Xhat`, and the
-positive-square hypothesis identifies the mixed product with `sqrt Q`. -/
-lemma pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error)
-    {qLayer : QLayerData Outcome ι}
-    (hRank : RankReductionWitness ψ A ζ qLayer)
-    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank)))
-      (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ)
-    (V : Matrix ι ι ℂ)
-    (S Iro : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
-    (hU_left : U * Uᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
-    (hU_right : Uᴴ * U =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
-    (hV_right : Vᴴ * V = (1 : Matrix ι ι ℂ))
-    (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
-    (hx : sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective = U * S * Vᴴ)
-    (hMiddle_nonneg : 0 ≤ V * (Sᴴ * Iro) * Vᴴ)
-    (hMiddle_sq :
-      (V * (Sᴴ * Iro) * Vᴴ) * (V * (Sᴴ * Iro) * Vᴴ) = QTotal qLayer)
-    (hψ : ψ.IsNormalized)
-    (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
-    ∃ data : QXPLayerData Outcome ι,
-      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
-        hq ▸ data.x =
-          (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-            sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
-        hq ▸ data.xHat =
-          (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-            U * Iro * Vᴴ) ∧
-        SDDOpRel ψ (uniformDistribution Unit)
-          (constOpFamily data.qLayer.q)
-          (constOpFamily (PFamily data))
-          (30 * zetaQuarterRoot ζ) := by
-  classical
-  let data : QXPLayerData Outcome ι :=
-    QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot (q := qLayer.q)
-      hRank.projective hRank.sum_eq_total U V S Iro
-        hU_left hU_right hV_right hIro hx hMiddle_nonneg hMiddle_sq
-  refine ⟨data, rfl, rfl, rfl, ?_⟩
-  exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
-
 /-- Apply `lem:P-Q-approx` to unitary-group rectangular SVD data and the
 positive-square characterization of the middle factor.
 
-This is the same producer as
-`pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot`, but with the
-square SVD factors represented as elements of `Matrix.unitaryGroup`; hence the
-unitarity laws are no longer separate hypotheses. -/
+The square SVD factors are represented as elements of `Matrix.unitaryGroup`;
+hence the unitarity laws are not separate hypotheses. -/
 lemma pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
