@@ -7,8 +7,7 @@ import Mathlib.Probability.ProbabilityMassFunction.Integrals
 # Distribution infrastructure for the low individual degree test
 
 Shared distribution definitions: finite-support weighted distributions,
-a probability predicate and wrapper, averaging, uniform distribution,
-and outcome summation.
+a probability predicate, averaging, uniform distribution, and outcome summation.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -68,10 +67,6 @@ theorem ofPMF_isProbability {α : Type*} [Fintype α]
 
 end Distribution
 
-/-- Bundled finite-support probability distributions. -/
-abbrev ProbabilityDistribution (α : Type*) :=
-  {𝒟 : Distribution α // 𝒟.IsProbability}
-
 /-- On a finite ambient type, a summand that vanishes outside a distribution's
 explicit support has the same total sum over all ambient values as over that support.
 
@@ -128,6 +123,16 @@ theorem avgOver_ofPMF_eq_pmf_sum {α : Type*} [Fintype α]
     avgOver (ofPMF p) f = ∑ a : α, (p a).toReal * f a := by
   simp [avgOver, ofPMF]
 
+/-- Averaging against `Distribution.ofPMF p` is the Bochner integral against
+the measure associated to `p`. -/
+theorem avgOver_ofPMF_eq_pmf_integral {α : Type*}
+    [Fintype α]
+    [MeasurableSpace α] [MeasurableSingletonClass α]
+    (p : PMF α) (f : α → Error) :
+    avgOver (ofPMF p) f = ∫ a, f a ∂p.toMeasure := by
+  rw [PMF.integral_eq_sum]
+  simp [avgOver, ofPMF]
+
 /-- Finite real-weight expansion of `PMF.map_apply`. -/
 theorem pmf_map_apply_toReal_sum {α β : Type*} [Fintype α]
     [DecidableEq β]
@@ -151,38 +156,14 @@ theorem avgOver_ofPMF_map {α β : Type*} [Fintype α] [Fintype β]
     (p : PMF α) (e : α → β) (f : β → Error) :
     avgOver (ofPMF (p.map e)) f = avgOver (ofPMF p) (fun a => f (e a)) := by
   classical
-  rw [avgOver_ofPMF_eq_pmf_sum, avgOver_ofPMF_eq_pmf_sum]
-  calc
-    ∑ b : β, ((p.map e) b).toReal * f b
-        = ∑ b : β, (∑ a : α, (if b = e a then (p a).toReal else 0)) * f b := by
-          refine Finset.sum_congr rfl ?_
-          intro b _
-          rw [pmf_map_apply_toReal_sum p e b]
-    _ = ∑ b : β, ∑ a : α, (if b = e a then (p a).toReal else 0) * f b := by
-          refine Finset.sum_congr rfl ?_
-          intro b _
-          rw [Finset.sum_mul]
-    _ = ∑ a : α, ∑ b : β, (if b = e a then (p a).toReal else 0) * f b := by
-          rw [Finset.sum_comm]
-    _ = ∑ a : α, (p a).toReal * f (e a) := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.sum_eq_single (e a)]
-          · simp
-          · intro b _ hb
-            simp [hb]
-          · intro hmem
-            exact (hmem (Finset.mem_univ (e a))).elim
-
-/-- Averaging against `Distribution.ofPMF p` is the Bochner integral against
-the measure associated to `p`. -/
-theorem avgOver_ofPMF_eq_pmf_integral {α : Type*}
-    [Fintype α]
-    [MeasurableSpace α] [MeasurableSingletonClass α]
-    (p : PMF α) (f : α → Error) :
-    avgOver (ofPMF p) f = ∫ a, f a ∂p.toMeasure := by
-  rw [PMF.integral_eq_sum]
-  simp [avgOver, ofPMF]
+  letI : MeasurableSpace α := ⊤
+  letI : MeasurableSpace β := ⊤
+  rw [avgOver_ofPMF_eq_pmf_integral, avgOver_ofPMF_eq_pmf_integral]
+  rw [← PMF.toMeasure_map (f := e) p (by fun_prop : Measurable e)]
+  rw [MeasureTheory.integral_map
+    (by fun_prop : AEMeasurable e p.toMeasure)
+    (by fun_prop : MeasureTheory.AEStronglyMeasurable f
+      (MeasureTheory.Measure.map e p.toMeasure))]
 
 end Distribution
 
@@ -589,33 +570,6 @@ theorem avgOver_le_of_forall_le_on_support {α : Type*} {𝒟 : Distribution α}
 
 end Distribution.IsProbability
 
-namespace ProbabilityDistribution
-
-/-- Unpack the equality form of the bundled probability invariant. -/
-theorem weight_sum_eq_one {α : Type*} (𝒟 : ProbabilityDistribution α) :
-    ∑ a ∈ (𝒟 : Distribution α).support, (𝒟 : Distribution α).weight a = 1 := by
-  have h𝒟 : (𝒟 : Distribution α).IsProbability := 𝒟.2
-  exact h𝒟.weight_sum_eq_one
-
-/-- On a finite ambient type, the weights of a bundled probability distribution sum to
-`1` over all ambient values, not just over the stored support. -/
-theorem weight_sum_univ_eq_one {α : Type*} [Fintype α]
-    (𝒟 : ProbabilityDistribution α) :
-    (∑ a : α, (𝒟 : Distribution α).weight a) = 1 :=
-  Distribution.IsProbability.weight_sum_univ_eq_one 𝒟.2
-
-/-- A bundled probability distribution has total weight at most `1`. -/
-theorem weight_sum_le_one {α : Type*} (𝒟 : ProbabilityDistribution α) :
-    ∑ a ∈ (𝒟 : Distribution α).support, (𝒟 : Distribution α).weight a ≤ 1 :=
-  le_of_eq 𝒟.weight_sum_eq_one
-
-/-- Averaging a constant against a bundled probability distribution returns that constant. -/
-theorem avgOver_const {α : Type*} (𝒟 : ProbabilityDistribution α) (c : Error) :
-    avgOver (𝒟 : Distribution α) (fun _ : α => c) = c :=
-  avgOver_const_of_isProbability (𝒟 : Distribution α) 𝒟.2 c
-
-end ProbabilityDistribution
-
 /-- The weights of a uniform distribution sum to exactly `1`. -/
 theorem uniformDistribution_weight_sum_eq_one (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] :
@@ -630,11 +584,6 @@ theorem uniformDistribution_isProbability (α : Type*)
   simpa [uniformDistribution] using
     Distribution.ofPMF_isProbability (PMF.uniformOfFintype α)
 
-/-- The uniform distribution packaged as a bundled probability distribution. -/
-noncomputable def uniformProbabilityDistribution (α : Type*)
-    [Fintype α] [DecidableEq α] [Nonempty α] : ProbabilityDistribution α :=
-  ⟨uniformDistribution α, uniformDistribution_isProbability α⟩
-
 /-- The weights of a uniform distribution sum to at most `1`. -/
 theorem uniformDistribution_weight_sum_le_one (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] :
@@ -646,8 +595,8 @@ returns that constant. -/
 theorem avgOver_uniform_const {α : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α] (c : Error) :
     avgOver (uniformDistribution α) (fun _ : α => c) = c := by
-  simpa [uniformProbabilityDistribution] using
-    (ProbabilityDistribution.avgOver_const (uniformProbabilityDistribution α) c)
+  exact avgOver_const_of_isProbability
+    (uniformDistribution α) (uniformDistribution_isProbability α) c
 
 /-- The uniform average with respect to `uniformDistribution` is the finite integral
 with respect to the uniform probability mass function. -/

@@ -55,10 +55,10 @@ private lemma closenessAfterCompletion_core_local {Outcome : Type*}
   have hgap :
       |diagA - overlap| ≤ Real.sqrt δ ∧
         |overlap - diagB| ≤ Real.sqrt δ := by
-    simpa [diagA, diagB, overlap, constSubMeasFamily, avgOver,
-        uniformDistribution, uniformProbabilityDistribution] using
-      MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta_twoFamily_of_probabilityDistribution ψ
-        (uniformProbabilityDistribution Unit) hψ
+    simpa [diagA, diagB, overlap, constSubMeasFamily, avgOver, uniformDistribution] using
+      MIPStarRE.LDT.Preliminaries.easyApproxFromApproxDelta_twoFamily ψ
+        (uniformDistribution Unit) hψ
+        (uniformDistribution_weight_sum_le_one Unit)
         (constSubMeasFamily A.toSubMeas)
         (constSubMeasFamily B) δ (by exact ⟨hδ⟩)
   have hgapA_raw :
