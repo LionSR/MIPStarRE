@@ -53,6 +53,46 @@ noncomputable def matrixSubmeasurementToSubMeas {Outcome : Type*}
   total_le_one := by
     simpa [MIPStarRE.Quantum.Submeasurement.total] using M.sum_le_one
 
+@[simp] theorem matrixSubmeasurementToSubMeas_outcome {Outcome : Type*}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {H : FiniteHilbertSpace}
+    (M : MatrixSubmeasurement Outcome H) (a : Outcome) :
+    (matrixSubmeasurementToSubMeas M).outcome a = M.effect a :=
+  rfl
+
+@[simp] theorem matrixSubmeasurementToSubMeas_total {Outcome : Type*}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {H : FiniteHilbertSpace}
+    (M : MatrixSubmeasurement Outcome H) :
+    (matrixSubmeasurementToSubMeas M).total =
+      MIPStarRE.Quantum.Submeasurement.total M :=
+  rfl
+
+/-- View a matrix measurement as the paper-local `Measurement` structure. -/
+noncomputable def matrixMeasurementToMeasurement {Outcome : Type*}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {H : FiniteHilbertSpace}
+    (M : MatrixMeasurement Outcome H) : Measurement Outcome H.carrier where
+  toSubMeas := matrixSubmeasurementToSubMeas M.toSubmeasurement
+  total_eq_one := by
+    simpa [matrixSubmeasurementToSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
+      M.sum_eq_one
+
+@[simp] theorem matrixMeasurementToMeasurement_toSubMeas {Outcome : Type*}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {H : FiniteHilbertSpace}
+    (M : MatrixMeasurement Outcome H) :
+    (matrixMeasurementToMeasurement M).toSubMeas =
+      matrixSubmeasurementToSubMeas M.toSubmeasurement :=
+  rfl
+
+@[simp] theorem matrixMeasurementToMeasurement_outcome {Outcome : Type*}
+    [Fintype Outcome] [DecidableEq Outcome]
+    {H : FiniteHilbertSpace}
+    (M : MatrixMeasurement Outcome H) (a : Outcome) :
+    (matrixMeasurementToMeasurement M).outcome a = M.effect a :=
+  rfl
+
 /-- The point-measurement part of the matrix SDP realization associated to a strategy.
 
 The present comparison only uses the point-measurement fields of
@@ -554,17 +594,15 @@ theorem sdpMeasurementWitness_of_canonicalOptimalPair
     matrixSdpOptimalWitness_of_canonicalFeasibleSaturatedComplementarySlackness
       params model X h.feasible Z h.dualFeasible h.strongDuality
       h.complementarySlackness h.slackBlock_eq_zero
-  have htotal : (matrixSubmeasurementToSubMeas Tsub).total = 1 := by
-    change (∑ g : Polynomial params, Tsub.effect g) = (1 : MIPStarRE.Quantum.Op ι)
-    exact hopt.primalTotalEqOne
   let T : Measurement (Polynomial params) ι :=
-    (matrixSubmeasurementToSubMeas Tsub).toMeasurement htotal
+    matrixMeasurementToMeasurement hopt.primalMeasurement
   refine ⟨T, hopt.dualPositive, ?_, ?_⟩
   · intro g
     rw [← matrixSdpDualSlackOperator_ofPointRealization params strategy Z g]
     exact hopt.dualFeasible g
   · intro g
-    dsimp [T, matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
+    dsimp [T, matrixMeasurementToMeasurement, matrixSubmeasurementToSubMeas,
+      MatrixSdpOptimalWitness.primalMeasurement, sdpComplementarySlacknessEquation,
       sdpDualSlackOperator, matrixSdpPointRealizationOfStrategy, model]
     rw [← matrixAveragedPointOperator_ofPointRealization params strategy g]
     exact hopt.complementarySlacknessEquation g
