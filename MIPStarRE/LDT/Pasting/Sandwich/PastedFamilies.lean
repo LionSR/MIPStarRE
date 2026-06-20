@@ -239,27 +239,37 @@ noncomputable def allOutcomesExpansionFamily (params : Parameters) [FieldModel p
     IdxSubMeas Unit Unit ι :=
   pastedMeasurementTotal (averagedEligibleSandwichSubMeas params family k)
 
+/-- The one-outcome submeasurement whose unique effect is the Bernoulli-tail
+operator of `X`. -/
+noncomputable def bernoulliTailSubMeas {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι)
+    (hXpsd : 0 ≤ X) (hXleOne : X ≤ 1) : SubMeas Unit ι :=
+  SubMeas.singleOutcome (bernoulliTailOperator k degree X)
+    (bernoulliTailOperator_nonneg k degree X hXpsd hXleOne)
+    (bernoulliTailOperator_le_one k degree X hXpsd hXleOne)
+
+@[simp] theorem bernoulliTailSubMeas_outcome {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι)
+    (hXpsd : 0 ≤ X) (hXleOne : X ≤ 1) (u : Unit) :
+    (bernoulliTailSubMeas k degree X hXpsd hXleOne).outcome u =
+      bernoulliTailOperator k degree X :=
+  rfl
+
+@[simp] theorem bernoulliTailSubMeas_total {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (k degree : ℕ) (X : MIPStarRE.Quantum.Op ι)
+    (hXpsd : 0 ≤ X) (hXleOne : X ≤ 1) :
+    (bernoulliTailSubMeas k degree X hXpsd hXleOne).total =
+      bernoulliTailOperator k degree X :=
+  rfl
+
 /-- The Bernoulli-tail polynomial in the averaged complete operator `G = E_x \sum_g G^x_g`. -/
 noncomputable def bernoulliTailFromFamily (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (k : ℕ) :
     IdxSubMeas Unit Unit ι :=
   constSubMeasFamily <|
-    let Y := bernoulliTailOperator k params.d ((IdxPolyFamily.averagedSubMeas family).total)
-    { outcome := fun _ => Y
-      total := Y
-      outcome_pos := by
-        intro _
-        let G := (IdxPolyFamily.averagedSubMeas family).total
-        have hG : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
-        have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
-        simpa [G] using bernoulliTailOperator_nonneg k params.d G hG hGle
-      sum_eq_total := by
-        simp
-      total_le_one := by
-        let G := (IdxPolyFamily.averagedSubMeas family).total
-        have hG : 0 ≤ G := (IdxPolyFamily.averagedSubMeas family).total_nonneg
-        have hGle : G ≤ 1 := (IdxPolyFamily.averagedSubMeas family).total_le_one
-        simpa [Y, G] using bernoulliTailOperator_le_one k params.d G hG hGle }
+    bernoulliTailSubMeas k params.d (IdxPolyFamily.averagedSubMeas family).total
+      (IdxPolyFamily.averagedSubMeas family).total_nonneg
+      (IdxPolyFamily.averagedSubMeas family).total_le_one
 
 /-- Average the sandwiched completed-slice family over tuples whose completed/
 incomplete pattern is exactly `τtail`.

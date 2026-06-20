@@ -177,11 +177,7 @@ private lemma fromHToGBernoulliTailMass_lower_bound
     exact leftTensor_le_one (ι₂ := ι) hGle
   have hbase :
       CompletenessAtLeast strategy.state
-        ({ outcome := fun _ : Unit => X
-           total := X
-           outcome_pos := by intro _; exact hXpsd
-           sum_eq_total := by simp
-           total_le_one := hXle } : SubMeas Unit (ι × ι))
+        (SubMeas.singleOutcome X hXpsd hXle)
         (1 - kappa) := by
     refine ⟨?_⟩
     simpa [subMeasMass, X, G, SubMeas.liftLeft] using hcomplete.averageCompleteness.lowerBound
@@ -197,18 +193,12 @@ private lemma fromHToGBernoulliTailMass_lower_bound
     nlinarith
   have hchern := chernoffBernoulliMatrix strategy.state strategy.isNormalized
     (1 / (200 * (params.m : Error))) k params.d X kappa
-    htheta_pos htheta_lt_one (ldPasting_chernoff_size params k hk) hXpsd hXle hbase
+    htheta_pos htheta_lt_one (ldPasting_chernoff_size params k hk) hXpsd hXle
+    (by simpa [SubMeas.singleOutcome] using hbase)
   have hmassLower := hchern.matrixTailBound.lowerBound
   have hmass_eq :
       subMeasMass strategy.state
-        ({ outcome := fun _ : Unit => bernoulliTailOperator k params.d X
-           total := bernoulliTailOperator k params.d X
-           outcome_pos := by
-             intro _
-             exact bernoulliTailOperator_nonneg k params.d X hXpsd hXle
-           sum_eq_total := by simp
-           total_le_one := bernoulliTailOperator_le_one k params.d X hXpsd hXle } :
-          SubMeas Unit (ι × ι)) =
+        (bernoulliTailSubMeas k params.d X hXpsd hXle) =
         fromHToGBernoulliTailMass params strategy.state family k := by
     have hswap :
         ev strategy.state

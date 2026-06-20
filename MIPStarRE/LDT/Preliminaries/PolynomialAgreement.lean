@@ -414,11 +414,7 @@ lemma polynomialCollisionMass_le_mdq
     polynomialCollisionMass params ψ Left Right ≤
       (params.m * params.d : Error) / params.q := by
   let One : SubMeas Unit ιA :=
-    { outcome := fun _ => (1 : MIPStarRE.Quantum.Op ιA)
-      total := 1
-      outcome_pos := by intro _; exact zero_le_one
-      sum_eq_total := by simp
-      total_le_one := le_rfl }
+    SubMeas.singleOutcome (1 : MIPStarRE.Quantum.Op ιA) zero_le_one le_rfl
   have h := polynomialCollision_sandwichTensor_le_mdq
     (params := params) (ψ := ψ) (hnorm := hnorm)
     (Outer := One) (Inner := Left) (Right := Right)
