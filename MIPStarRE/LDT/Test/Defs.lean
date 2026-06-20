@@ -405,17 +405,6 @@ theorem bipartiteConsError_le_one_of_isProbability {Question Outcome : Type*}
           exact qBipartiteConsDefect_le_one_of_isNormalized ψ hψ (A q) (B q)
     _ = 1 := avgOver_const_of_isProbability 𝒟 h𝒟 1
 
-/-- Under a bundled probability question distribution, the averaged bipartite
-consistency error is bounded by `1`. -/
-theorem bipartiteConsError_le_one_of_probabilityDistribution {Question Outcome : Type*}
-    {ιA ιB : Type*} [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB]
-    [DecidableEq ιB]
-    (ψ : QuantumState (ιA × ιB)) (𝒟 : ProbabilityDistribution Question)
-    (hψ : ψ.IsNormalized)
-    (A : IdxSubMeas Question Outcome ιA) (B : IdxSubMeas Question Outcome ιB) :
-    bipartiteConsError ψ (𝒟 : Distribution Question) A B ≤ 1 := by
-  exact bipartiteConsError_le_one_of_isProbability ψ hψ (𝒟 : Distribution Question) 𝒟.2 A B
-
 /-- Under the uniform question distribution, the averaged bipartite consistency
 error is bounded by `1`. -/
 theorem bipartiteConsError_uniform_le_one {Question Outcome : Type*}
@@ -424,9 +413,8 @@ theorem bipartiteConsError_uniform_le_one {Question Outcome : Type*}
     (ψ : QuantumState (ιA × ιB)) (hψ : ψ.IsNormalized)
     (A : IdxSubMeas Question Outcome ιA) (B : IdxSubMeas Question Outcome ιB) :
     bipartiteConsError ψ (uniformDistribution Question) A B ≤ 1 := by
-  simpa [uniformProbabilityDistribution] using
-    bipartiteConsError_le_one_of_probabilityDistribution ψ
-      (uniformProbabilityDistribution Question) hψ A B
+  exact bipartiteConsError_le_one_of_isProbability ψ hψ
+    (uniformDistribution Question) (uniformDistribution_isProbability Question) A B
 
 /-- The bipartite strong self-consistency defect is nonneg by definition (`max 0 _`). -/
 theorem qBipartiteSSCDefect_nonneg {Outcome : Type*}
