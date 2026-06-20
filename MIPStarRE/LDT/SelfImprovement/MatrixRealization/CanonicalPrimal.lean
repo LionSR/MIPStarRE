@@ -63,7 +63,10 @@ noncomputable def matrixSdpCanonicalBlockDiagonal (params : Parameters) [FieldMo
     (model : MatrixSdpRealization params)
     (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
     MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
-  fun x y => if x.1 = y.1 then B x.1 x.2 y.2 else 0
+  Matrix.reindex
+    (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params))
+    (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params))
+    (Matrix.blockDiagonal B)
 
 /-- The canonical SDP block layout is the Mathlib block-diagonal layout after
 commuting the matrix-space index with the block index. -/
@@ -75,11 +78,8 @@ theorem matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal
       Matrix.reindex
         (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params))
         (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params))
-        (Matrix.blockDiagonal B) := by
-  ext x y
-  rcases x with ⟨b, i⟩
-  rcases y with ⟨c, j⟩
-  simp [matrixSdpCanonicalBlockDiagonal, Matrix.reindex_apply, Matrix.blockDiagonal_apply]
+        (Matrix.blockDiagonal B) :=
+  rfl
 
 /-- A canonical block-diagonal operator is positive semidefinite when all of its
 diagonal matrix blocks are positive semidefinite. -/
