@@ -153,16 +153,13 @@ adding the stronger hypothesis $I\preceq Z$, because then $Z\succeq0$ and
 $S(Z-I)\succeq0$ after commuting the positive factors; from $SZ=0$ this gives
 $0\preceq -S$, hence $S=0$.
 
-The corresponding matrix-order lemma is therefore deliberately conditional.  The
-declaration
-\[
-  \leanid{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
-\]
-proves the matrix-order fact under $I\preceq Z$.  Earlier versions of the
-formalization packaged the resulting SDP data in declarations whose names ended
-in \leanid{WithDominance}; those wrappers have now been removed from the live
-SDP interface.  Their former existence did not prove that an arbitrary optimal
-dual witness selected by Slater duality satisfies $I\preceq Z$.
+The corresponding matrix-order assertion is therefore deliberately conditional:
+it is valid under the additional hypothesis $I\preceq Z$, but not under dual
+feasibility alone.  Earlier versions of the formalization packaged the
+resulting SDP data in declarations whose names ended in \leanid{WithDominance};
+those wrappers have now been removed from the live SDP interface.  Their former
+existence did not prove that an arbitrary optimal dual witness selected by
+Slater duality satisfies $I\preceq Z$.
 
 \section{How the proof uses the optimum}
 
