@@ -219,6 +219,15 @@ theorem averageOperatorOverDistribution_le_one_of_weight_sum_le_one {α : Type*}
           exact smul_le_smul_of_nonneg_right h𝒟 zero_le_one
     _ = 1 := by simp
 
+/-- An average of effects against a probability distribution is again bounded
+above by the identity operator. -/
+theorem averageOperatorOverDistribution_le_one_of_isProbability {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability)
+    (f : α → MIPStarRE.Quantum.Op ι) (hf : ∀ a, f a ≤ 1) :
+    averageOperatorOverDistribution 𝒟 f ≤ 1 :=
+  averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟 f h𝒟.weight_sum_le_one hf
+
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α :=
@@ -507,6 +516,15 @@ theorem averageOperatorOverDistribution_uniform_eq_pmf_sum {α : Type*}
   simpa [uniformDistribution] using
     Distribution.averageOperatorOverDistribution_ofPMF_eq_sum
       (PMF.uniformOfFintype α) f
+
+/-- A uniform average of effects is again bounded above by the identity operator. -/
+theorem averageOperatorOverDistribution_uniform_le_one {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → MIPStarRE.Quantum.Op ι) (hf : ∀ a, f a ≤ 1) :
+    averageOperatorOverDistribution (uniformDistribution α) f ≤ 1 :=
+  averageOperatorOverDistribution_le_one_of_isProbability
+    (uniformDistribution α) (uniformDistribution_isProbability α) f hf
 
 /-- A uniform average is bounded by any supportwise upper bound. -/
 theorem avgOver_uniform_le_of_forall_le_on_support {α : Type*}

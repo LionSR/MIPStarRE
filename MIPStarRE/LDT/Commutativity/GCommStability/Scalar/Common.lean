@@ -36,10 +36,8 @@ lemma averagedSlicePointEvaluationOperator_le_one
     (x : Fq params) (g : Polynomial params) :
     IdxPolyFamily.averagedSlicePointEvaluationOperator strategy x g ≤ 1 := by
   unfold IdxPolyFamily.averagedSlicePointEvaluationOperator
-  exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one
-    (uniformDistribution (Point params))
+  exact averageOperatorOverDistribution_uniform_le_one
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).toSubMeas.outcome (g u))
-    (uniformDistribution_weight_sum_le_one (Point params))
     (fun u => (strategy.pointMeasurement (appendPoint params u x)).outcome_le_one (g u))
 
 lemma averagedSlicePointEvaluationOperator_hermitian
