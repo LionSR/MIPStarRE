@@ -21,8 +21,8 @@
 
 \begin{itemize}
   \item \textbf{Difficulty: easy.} This issue is about the feasible set of one
-  displayed SDP, not about proving SDP strong duality. The full duality theorem
-  is a separate hard task.%
+  displayed SDP, not about proving SDP strong duality. The strong-duality and
+  complementary-slackness producer is documented separately.%
   \footnote{The full strong-duality producer is discussed in
   \path{docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex}.}
   \item \textbf{Estimated weight:} already resolved; replaying the repair is about
@@ -92,6 +92,7 @@ $(\{T_g\},Z)$ for which
   \qquad
   T_g Z=T_g A_g \quad(g\in\cP).
   \tag{\texttt{lem:sdp}}
+  \label{lem:sdp}
 \]
 This equality is a conclusion about a chosen optimal solution. It is not the
 feasibility constraint of the primal SDP.
@@ -130,16 +131,17 @@ family $T=\{T_g\}$ with $T_g\ge 0$, total
 $\sum_g T_g$, and proof that this total is at most $I$. A measurement is the
 special case where the total is exactly $I$.
 \footnote{These are the declarations
-\path{MIPStarRE.LDT.SubMeas} and \path{MIPStarRE.LDT.Measurement} in
+\leanid{MIPStarRE.LDT.SubMeas} and \leanid{MIPStarRE.LDT.Measurement} in
 \path{MIPStarRE/LDT/Basic/SubMeasurementCore.lean}, lines 13--28.}
 The self-improvement SDP definitions now use the submeasurement type for the
 primal variable. In particular, the primal contribution, primal objective, and
 complementary-slackness equation all take $T$ to be a submeasurement, not a
 measurement.
 \footnote{See
-\path{MIPStarRE.LDT.SelfImprovement.sdpPrimalContributionOperator},
-\path{sdpPrimalObjectiveOperator}, \path{sdpPrimalObjective}, and
-\path{sdpComplementarySlacknessEquation} in
+\leanid{MIPStarRE.LDT.SelfImprovement.sdpPrimalContributionOperator},
+\leanid{MIPStarRE.LDT.SelfImprovement.sdpPrimalObjectiveOperator},
+\leanid{MIPStarRE.LDT.SelfImprovement.sdpPrimalObjective}, and
+\leanid{MIPStarRE.LDT.SelfImprovement.sdpComplementarySlacknessEquation} in
 \path{MIPStarRE/LDT/SelfImprovement/Defs.lean}, lines 139--184. The same file
 also defines the sandwiched family \path{sandwichedPolynomialSubMeasAt} and the
 averaged family \path{averagedSandwichedPolynomialSubMeas} with
@@ -154,16 +156,13 @@ $T_g=(2|\cP|)^{-1}I$, and the theorem
 \path{sdpStrictPrimalSubMeas_total} proves that its total is $\frac12 I$.
 \footnote{These are in
 \path{MIPStarRE/LDT/SelfImprovement/Defs.lean}, lines 37--97.}
-This is the formal counterpart of the paper's Slater witness. The declaration
-\path{sdpPrimalWitness} then completes this submeasurement at the zero polynomial
-when a later reduced wrapper needs an honest measurement.
-\footnote{The completion wrapper is
-\path{MIPStarRE.LDT.SelfImprovement.sdpPrimalWitness} in
-\path{MIPStarRE/LDT/SelfImprovement/Defs.lean}, lines 99--110. The surrounding
-comment records that the completed zero-polynomial outcome is no longer the
-paper's uniform strict-feasibility witness.}
-That completion is a downstream packaging step. It is not the primal feasible
-set of the SDP.
+This is the formal counterpart of the paper's Slater witness. Earlier Lean
+versions also exposed a declaration \leanid{sdpPrimalWitness}, which completed
+this submeasurement at the zero polynomial for a reduced theorem named
+\leanid{sdp}.  That completion wrapper and the reduced theorem it served were
+retired in \ghpr{2430}.  The active SDP route keeps the strict witness as a
+submeasurement and obtains a saturated measurement only from the optimal-pair
+conclusion.  Thus completion is not part of the primal feasible set of the SDP.
 
 The informal blueprint already agrees with the paper on this point: its SDP
 lemma states the primal with $\sum_g T_g\le I$, and only afterwards states the
@@ -173,17 +172,21 @@ blueprint.
 \footnote{See \path{blueprint/src/chapter/ch07_self_improvement.tex}, lines
 281--304.}
 
-At the statement layer, the reduced SDP wrapper exposes the primal witness as a
-submeasurement: \path{SdpStatement.witness} quantifies over
-$T$ of type \path{SubMeas}. The associated witness record still contains a
-field \path{primalTotalOperator} asserting $T$'s total is $I$, but this is the
-paper's saturated-optimum conclusion, not a definition of primal feasibility.
-\footnote{See \path{MIPStarRE.LDT.SelfImprovement.SdpOptimalPair} and
-\path{MIPStarRE.LDT.SelfImprovement.SdpStatement} in
-\path{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}, lines 27--49. The
-current proof of the reduced lemma \path{sdp} returns the completed witness by
-coercing it back to a submeasurement; see
-\path{MIPStarRE/LDT/SelfImprovement/Theorems/Results.lean}, lines 74--99.}
+At the statement layer, the active source-facing route exposes the primal
+witness as a submeasurement inside
+\leanid{SdpStatementWithSlackness.witness}. The associated witness record still
+contains a field \path{primalTotalOperator} asserting $T$'s total is $I$, but
+this is the paper's saturated-optimum conclusion, not a definition of primal
+feasibility.
+\footnote{See
+\leanid{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness} and
+\leanid{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness} in
+\path{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}, lines 61--104.
+The source-facing theorem is
+\leanid{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness} in
+\path{MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness/Bracketed.lean},
+lines 493--510, using the canonical block-SDP transport from
+\path{MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixBridge.lean}.}
 The matrix-level realization follows the same convention: primal variables are
 matrix submeasurements, while the optimal-witness record stores the additional
 identity-total conclusion.
@@ -204,18 +207,21 @@ Slater witness $T_g=(2|\cP|)^{-1}I$.
 
 The mismatch is now resolved at the SDP-interface level. The formal objective,
 complementary-slackness relation, strict primal witness, sandwiched-family
-construction, and reduced SDP statement all expose the primal variable as a
-submeasurement. Where the current reduced proof later completes a particular
-submeasurement to a measurement, that completion is explicit and is separated
-from the paper's strict-feasible SDP witness.
+construction, and slackness-carrying SDP statement all expose the primal
+variable as a submeasurement. Saturation is recorded only for the selected
+optimal witness and is extracted as a measurement by
+\leanid{sdp_slackness_measurement}.
 
-There remains one scope caveat. The present \Lean{} theorem named
-\path{sdp} is a reduced wrapper for the facts currently consumed by the
-self-improvement pipeline; it does not yet formalize the full canonical SDP
-duality argument, Slater theorem, or complementary slackness theorem from the
-paper. If that full argument is later formalized, it should keep the
-submeasurement feasible set until the point where the paper derives the
-saturated optimal witness $\sum_g T_g=I$.
+The former reduced interface has been retired: \ghpr{2430} removed
+\leanid{sdpPrimalWitness}, the reduced \leanid{SdpStatement} structure, the theorem
+named \leanid{sdp}, and the wrapper \leanid{selfImprovementHelperConstruction}. The
+current \Lean{} route for Lemma~\ref{lem:sdp} is
+\leanid{sdp_statement_with_slackness}, whose output is
+\leanid{SdpStatementWithSlackness}.  The canonical block-SDP strong-duality route
+is documented in
+\path{docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex}. Future
+refactors should preserve the submeasurement feasible set until the point where
+the paper derives the saturated optimal witness $\sum_g T_g=I$.
 
 \bibliographystyle{alpha}
 \bibliography{references}

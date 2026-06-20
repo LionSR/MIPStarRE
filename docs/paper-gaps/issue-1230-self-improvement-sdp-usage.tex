@@ -30,8 +30,9 @@
   substantial project-local canonical SDP layer, while the analytic inputs are
   ordinary finite-dimensional matrix-order and separation facts.
   \item \textbf{Traceability.}  The issue is tracked in \ghissue{1230}; the
-  canonical strong-duality route was completed in \ghpr{1708}, and the obsolete
-  dominance wrappers were removed in \ghpr{2422}.
+  canonical strong-duality route was completed in \ghpr{1708}, the obsolete
+  dominance wrappers were removed in \ghpr{2422}, and the reduced
+  \path{SdpStatement}/\path{sdp} interface was retired in \ghpr{2430}.
   \item \textbf{Implemented route:} project-local canonicalization, compactness
   and separation for the canonical SDP image cone, equality of primal and dual
   optima, complementary slackness from weak duality, saturation of the auxiliary
@@ -198,9 +199,10 @@ Lean keeps the submeasurement boundary explicit, and \ghpr{1708} supplies the
 \footnote{Representative declarations are \leanid{sdpStrictPrimalSubMeas},
 \leanid{sdpPrimalObjective}, \leanid{sdpComplementarySlacknessEquation}, and
 \leanid{averagedSandwichedPolynomialSubMeas} in
-\doclink{MIPStarRE/LDT/SelfImprovement/Defs.lean}.  The interfaces are
-\leanid{SdpStatement} and \leanid{SdpStatementWithSlackness} in
-\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}.}
+\doclink{MIPStarRE/LDT/SelfImprovement/Defs.lean}.  The active source-facing
+interface is \leanid{SdpStatementWithSlackness} in
+\doclink{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}; the former
+reduced \leanid{SdpStatement} interface was retired in \ghpr{2430}.}
 
 \section{Conclusion}
 
@@ -219,6 +221,10 @@ The faithful completion of the paper route is now represented by
 formalization proves strong duality with complementary slackness for the
 canonical block SDP, produces a saturated optimal witness without assuming
 $I\preceq Z$, and connects that witness to the self-improvement interface.
+The reduced theorem \leanid{sdp}, its \leanid{SdpStatement} record, and the
+wrapper \leanid{selfImprovementHelperConstruction} have been removed; the
+remaining paper-facing route is the slackness-carrying statement
+\leanid{SdpStatementWithSlackness}.
 
 \bibliographystyle{alpha}
 \bibliography{references}
