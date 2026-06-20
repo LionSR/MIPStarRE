@@ -9,11 +9,9 @@ This file compares the concrete matrix-level SDP slackness interface with the
 abstract self-improvement SDP statement interface.
 
 The comparison is intentionally split into two interfaces.  The source-shaped
-matrix optimal witness supplies dual feasibility and complementary slackness.
-Some internal routes also retain the auxiliary dominance bound `I ≤ Z`, because
-that bound can be used to prove saturation of the extra canonical slack block.
-The dominance-carrying interfaces are Lean-only technical routes; they are not
-additional hypotheses in the paper SDP statement.
+matrix optimal witness supplies dual feasibility, complementary slackness, and
+the saturated canonical slack block needed for the abstract Section 9 statement.
+No auxiliary dominance bound `I ≤ Z` is part of this comparison theorem.
 
 Mathlib provides the underlying finite-dimensional matrix order and convex-cone
 infrastructure used throughout this project, but it does not yet provide a
@@ -241,63 +239,6 @@ theorem toMatrixSdpStatementWithSlackness
     params model X h.feasible Z h.dualFeasible h.strongDuality
     h.complementarySlackness h.slackBlock_eq_zero
 
-/-- Compatibility constructor from the older dominance route into the saturated
-canonical optimal-pair interface.
-
-Paper-gap note: `docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
-Elimination: replace callers by the source-facing constructor
-`MatrixSdpCanonicalOptimalPair.ofFeasibleStrongDualitySaturateSlackBlock` or by
-an already saturated canonical optimal pair, and then delete this compatibility
-route.
-
-The source-facing canonical output records the vanishing of the extra slack
-block directly.  This lemma is the Lean-only route which derives that vanishing
-from the canonical complementary-slackness equation and the auxiliary lower
-bound \(I \le Z\).  It avoids introducing a separate canonical record carrying
-the dominance hypothesis. -/
-theorem dualDominanceSaturatesSlackBlock
-    {params : Parameters}
-    [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    {X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)}
-    {Z : MatrixOperator model.space}
-    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
-    (hdual :
-      ∀ g : Polynomial params,
-        0 ≤ matrixSdpDualSlackOperator params model Z g)
-    (hstrong :
-      Complex.re (Matrix.trace
-          (matrixSdpCanonicalObjectiveOperator params model * X)) =
-        matrixSdpDualObjective model Z)
-    (hcanonical :
-      X * (matrixSdpCanonicalDualOperator params model Z -
-            matrixSdpCanonicalObjectiveOperator params model) =
-        0)
-    (hOneLe : (1 : MatrixOperator model.space) ≤ Z) :
-    MatrixSdpCanonicalOptimalPair params model X Z where
-  feasible := hX
-  dualFeasible := hdual
-  strongDuality := hstrong
-  complementarySlackness := hcanonical
-  slackBlock_eq_zero := by
-    let T := matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX
-    have hcanonical_T :
-        matrixSdpCanonicalPrimalBlockMatrix params model T *
-            (matrixSdpCanonicalDualOperator params model Z -
-              matrixSdpCanonicalObjectiveOperator params model) =
-          0 :=
-      matrixSdpCanonicalPrimalBlockMatrix_extracted_mul_dualSlack_of_canonical
-        params model X hX Z hcanonical
-    have hSlackDual : matrixSdpCanonicalSlackOperator params model T * Z = 0 :=
-      matrixSdpCanonicalSlack_mul_dual_of_complementarySlackness
-        params model T Z hcanonical_T
-    have hSlack : matrixSdpCanonicalSlackOperator params model T = 0 :=
-      matrixSdpCanonicalSlackOperator_eq_zero_of_mul_dual_eq_zero_of_one_le
-        params model T Z hSlackDual hOneLe
-    simpa [T] using
-      (matrixSdpCanonicalSlackOperator_extractedPrimalSubmeasurement
-        params model X hX).symm.trans hSlack
-
 end MatrixSdpCanonicalOptimalPair
 
 namespace MatrixSdpOptimalWitness
@@ -352,49 +293,6 @@ theorem toSdpStatementWithSlackness
     hopt.toSdpOptimalPairWithSlackness⟩
 
 end MatrixSdpStatementWithSlackness
-
-/-- Canonical block-SDP feasibility, objective equality, complementary
-slackness, and auxiliary dual dominance give the abstract Section 9 SDP
-statement.
-
-This is a compatibility form for the older route which supplied the auxiliary
-bound \(I \le Z\).  The proof first turns complementary slackness and this
-bound into the saturated canonical optimal-pair interface, and then uses the
-dominance-free transport to `SdpStatementWithSlackness`. -/
-theorem sdpStatementWithSlackness_of_canonicalFeasibleComplementarySlackness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
-      (matrixSdpPointRealizationOfStrategy params strategy)))
-    (hX : MatrixSdpCanonicalPrimalFeasible params
-      (matrixSdpPointRealizationOfStrategy params strategy) X)
-    (Z : MIPStarRE.Quantum.Op ι)
-    (hdual :
-      ∀ g : Polynomial params,
-        0 ≤ matrixSdpDualSlackOperator params
-          (matrixSdpPointRealizationOfStrategy params strategy) Z g)
-    (hstrong :
-      Complex.re (Matrix.trace
-          (matrixSdpCanonicalObjectiveOperator params
-            (matrixSdpPointRealizationOfStrategy params strategy) * X)) =
-        matrixSdpDualObjective
-          (matrixSdpPointRealizationOfStrategy params strategy) Z)
-    (hcanonical :
-      X * (matrixSdpCanonicalDualOperator params
-          (matrixSdpPointRealizationOfStrategy params strategy) Z -
-            matrixSdpCanonicalObjectiveOperator params
-              (matrixSdpPointRealizationOfStrategy params strategy)) =
-        0)
-    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
-    SdpStatementWithSlackness params strategy :=
-  let model := matrixSdpPointRealizationOfStrategy params strategy
-  have hpair : MatrixSdpCanonicalOptimalPair params model X Z :=
-    MatrixSdpCanonicalOptimalPair.dualDominanceSaturatesSlackBlock
-      (params := params) (model := model) (X := X) (Z := Z)
-      hX hdual hstrong hcanonical hOneLe
-  MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness
-    params strategy hpair.toMatrixSdpStatementWithSlackness
 
 /-- A saturated canonical optimal pair gives the abstract Section 9 SDP
 statement with complementary slackness. -/
@@ -519,56 +417,6 @@ theorem sdpMeasurementWitness_of_exists_canonicalOptimalPair
   obtain ⟨T, hZpos, hdual, hslack⟩ :=
     sdpMeasurementWitness_of_canonicalOptimalPair params strategy X Z hpair
   exact ⟨T, Z, hZpos, hdual, hslack⟩
-
-/-- Canonical block-SDP feasibility, objective equality, complementary
-slackness, and dual dominance give the displayed abstract SDP measurement
-witness.
-
-This theorem is the compatibility extraction from canonical block data at the
-point-measurement realization of a strategy.  The proof first obtains the
-saturated canonical optimal pair from complementary slackness and \(I \le Z\),
-uses the dominance-free measurement witness, and then records the supplied
-dominance bound explicitly in the conclusion. -/
-theorem sdpMeasurementWitness_of_canonicalFeasibleComplementarySlackness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
-      (matrixSdpPointRealizationOfStrategy params strategy)))
-    (hX : MatrixSdpCanonicalPrimalFeasible params
-      (matrixSdpPointRealizationOfStrategy params strategy) X)
-    (Z : MIPStarRE.Quantum.Op ι)
-    (hdual :
-      ∀ g : Polynomial params,
-        0 ≤ matrixSdpDualSlackOperator params
-          (matrixSdpPointRealizationOfStrategy params strategy) Z g)
-    (hstrong :
-      Complex.re (Matrix.trace
-          (matrixSdpCanonicalObjectiveOperator params
-            (matrixSdpPointRealizationOfStrategy params strategy) * X)) =
-        matrixSdpDualObjective
-          (matrixSdpPointRealizationOfStrategy params strategy) Z)
-    (hcanonical :
-      X * (matrixSdpCanonicalDualOperator params
-          (matrixSdpPointRealizationOfStrategy params strategy) Z -
-            matrixSdpCanonicalObjectiveOperator params
-              (matrixSdpPointRealizationOfStrategy params strategy)) =
-        0)
-    (hOneLe : (1 : MIPStarRE.Quantum.Op ι) ≤ Z) :
-    ∃ T : Measurement (Polynomial params) ι,
-      0 ≤ Z ∧
-      (1 : MIPStarRE.Quantum.Op ι) ≤ Z ∧
-      (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
-      ∀ g : Polynomial params,
-        sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
-  let model := matrixSdpPointRealizationOfStrategy params strategy
-  have hpair : MatrixSdpCanonicalOptimalPair params model X Z :=
-    MatrixSdpCanonicalOptimalPair.dualDominanceSaturatesSlackBlock
-      (params := params) (model := model) (X := X) (Z := Z)
-      hX hdual hstrong hcanonical hOneLe
-  obtain ⟨T, hZpos, hdual_abs, hslack⟩ :=
-    sdpMeasurementWitness_of_canonicalOptimalPair params strategy X Z hpair
-  exact ⟨T, hZpos, hOneLe, hdual_abs, hslack⟩
 
 /-- Canonical strong-duality and complementary-slackness construction for the
 point-measurement realization of the Section 9 SDP.
