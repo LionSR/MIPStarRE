@@ -70,34 +70,6 @@ instance (params : Parameters) [FieldModel params.q] : Nonempty (Polynomial para
     -- Sound because each individual degree of the zero polynomial is `0`.
     simp [MvPolynomial.degreeOf_zero]⟩⟩
 
-/-! ## Uniform averages -/
-
-/-- Uniformly average a family of bounded operators into a `Unit`-valued submeasurement. -/
-noncomputable def averageUnitSubMeas {α : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    (f : α → MIPStarRE.Quantum.Op ι)
-    (hpsd : ∀ a, 0 ≤ f a) (hle : ∀ a, f a ≤ 1) :
-    SubMeas Unit ι :=
-  { outcome := fun _ => averageOperatorOverDistribution (uniformDistribution α) f
-    total := averageOperatorOverDistribution (uniformDistribution α) f
-    outcome_pos := by
-      intro _
-      exact averageOperatorOverDistribution_nonneg (uniformDistribution α) f hpsd
-    sum_eq_total := by
-      simp
-    total_le_one := by
-      exact averageOperatorOverDistribution_uniform_le_one f hle }
-
-/-- The unique outcome of `averageUnitSubMeas` is the uniform operator average
-of the underlying family. -/
-@[simp] lemma averageUnitSubMeas_outcome
-    {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
-    (f : α → MIPStarRE.Quantum.Op ι)
-    (hpsd : ∀ a, 0 ≤ f a) (hle : ∀ a, f a ≤ 1) :
-    (averageUnitSubMeas (ι := ι) f hpsd hle).outcome () =
-      averageOperatorOverDistribution (uniformDistribution α) f :=
-  rfl
-
 /-- A valid axis-parallel line question pairs a line with a point lying on it. -/
 def pointOnLine {params : Parameters} [FieldModel params.q]
     (qu : AxisParallelLineQuestion params) : Prop :=

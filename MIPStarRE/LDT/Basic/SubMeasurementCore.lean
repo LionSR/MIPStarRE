@@ -163,6 +163,31 @@ operators. -/
           cases Subsingleton.elim Bproj Aproj
           rfl
 
+/-- A one-outcome submeasurement associated to a single positive operator
+bounded by the identity. -/
+def SubMeas.singleOutcome {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : MIPStarRE.Quantum.Op ι) (hA_pos : 0 ≤ A) (hA_le_one : A ≤ 1) :
+    SubMeas Unit ι where
+  outcome := fun _ => A
+  total := A
+  outcome_pos := by
+    intro _
+    exact hA_pos
+  sum_eq_total := by
+    simp
+  total_le_one := hA_le_one
+
+@[simp] theorem SubMeas.singleOutcome_outcome {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : MIPStarRE.Quantum.Op ι) (hA_pos : 0 ≤ A) (hA_le_one : A ≤ 1)
+    (u : Unit) :
+    (SubMeas.singleOutcome (ι := ι) A hA_pos hA_le_one).outcome u = A :=
+  rfl
+
+@[simp] theorem SubMeas.singleOutcome_total {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : MIPStarRE.Quantum.Op ι) (hA_pos : 0 ≤ A) (hA_le_one : A ≤ 1) :
+    (SubMeas.singleOutcome (ι := ι) A hA_pos hA_le_one).total = A :=
+  rfl
+
 /-- PSD outcomes are Hermitian. -/
 theorem SubMeas.outcome_hermitian {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
