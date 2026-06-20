@@ -503,15 +503,7 @@ structure ChernoffBernoulliMatrixStatement {ι : Type*} [Fintype ι] [DecidableE
     (hXleOne : X ≤ 1) : Prop where
   matrixTailBound :
     CompletenessAtLeast ψ
-      ({ outcome := fun _ => bernoulliTailOperator k degree X
-         total := bernoulliTailOperator k degree X
-         outcome_pos := by
-           intro _
-           exact bernoulliTailOperator_nonneg k degree X hXpsd hXleOne
-         sum_eq_total := by
-           simp
-         total_le_one := by
-           exact bernoulliTailOperator_le_one k degree X hXpsd hXleOne } : SubMeas Unit ι)
+      (bernoulliTailSubMeas k degree X hXpsd hXleOne)
       (1 - kappa / (1 - theta) - Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2))
 
 /-- Paper origin: `references/ldt-paper/ld-pasting.tex:1799-1849`

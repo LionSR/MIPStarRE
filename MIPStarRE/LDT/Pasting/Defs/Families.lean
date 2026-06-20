@@ -115,15 +115,9 @@ noncomputable def completePartSubMeas (params : Parameters) [FieldModel params.q
 noncomputable def incompletePartSubMeas (params : Parameters) [FieldModel params.q]
     (family : IdxPolyFamily params ι) (x : Fq params) : SubMeas Unit ι :=
   let X := 1 - (completePartSubMeas params family x).total
-  { outcome := fun _ => X
-    total := X
-    outcome_pos := by
-      intro _
-      exact sub_nonneg.mpr (completePartSubMeas params family x).total_le_one
-    sum_eq_total := by
-      simp
-    total_le_one := by
-      exact sub_le_self _ (completePartSubMeas params family x).total_nonneg }
+  SubMeas.singleOutcome X
+    (sub_nonneg.mpr (completePartSubMeas params family x).total_le_one)
+    (sub_le_self _ (completePartSubMeas params family x).total_nonneg)
 
 /-- Complete each projective slice submeasurement by adjoining the failure outcome. -/
 noncomputable def gHatIdxMeas (params : Parameters) [FieldModel params.q]
