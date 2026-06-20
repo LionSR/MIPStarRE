@@ -913,19 +913,15 @@
 	\begin{definition}[SVD of~$X$]\label{def:svd-of-X}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX}
 		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndSvdIdentities}
+		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities}
-		\leanok
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvd}
-		\leanok
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvd}
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdUnitaryGroup}
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroup}
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities}
-		\leanok
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd}
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGroup}
 		\leanok
@@ -944,13 +940,11 @@
 	\end{definition}
 	\begin{proof}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.svdOfX,
+			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndSvdIdentities,
 			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities,
-			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvd,
-			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvd,
 			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdUnitaryGroup,
 			MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroup,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities,
-			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvd,
 			MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGroup}
 		\leanok
 		\uses{def:matrix-decomposition-Q}
@@ -1177,7 +1171,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry_unitaryGroup}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_coisometry}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_rectangularSvd}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_positive_gram_spectrum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_sigmaFinRangeEmbedding_positiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram}
@@ -1233,13 +1226,9 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_positive_gram_spectrum}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_sigmaFinRangeEmbedding_positiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ_unitaryGroup}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_xHat_mixed_of_sqrtQ}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_xHat_of_rectangularSvd_unitaryGroup}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvd_middle_eq_sqrt_of_square}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.x_mul_xHat_adjoint_spectral_theorem}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRoot}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRoot}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndRectangularSvdSquareRootUnitaryGroup}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGroup}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup}
@@ -1265,9 +1254,9 @@
 		calculation under explicit rectangular-SVD data, where the middle factor
 		\(S I_{m\times d}^\dagger\) is the formal square matrix
 		\(\Sigma_{m\times m}\).  The formal lemma
-		\texttt{rectangularSvd\_xHat\_mixed\_of\_sqrtQ} records the second matrix
-		calculation in the form whose square-root target is the operator $Q$
-		supplied by the QXP construction.  The formal lemma
+		\texttt{rectangularSvd\_xHat\_mixed\_of\_sqrtQ\_unitaryGroup} records the
+		second matrix calculation in the form whose square-root target is the
+		operator $Q$ supplied by the QXP construction.  The formal lemma
 		\texttt{rectangularSvd\_middle\_eq\_sqrt\_of\_square} records the spectral
 		step: a positive middle factor whose square is $Q$ is the positive square
 		root of $Q$.  The reduced datum then records this mixed-product
@@ -1349,7 +1338,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup}
 		\leanok
 		\begin{equation*}
@@ -1362,10 +1350,10 @@
 		The formal proof follows this argument directly from the primitive
 		$X$, $\widehat X$, and $P$ identities; the $30\zeta^{1/4}$ estimate is
 		derived here rather than stored as part of the reduced datum.  The
-		rectangular-SVD lemma combines the same estimate with the positive-square
-		identification of the middle factor from \ref{lem:X-times-X-hat}; the
-		unitary-group variant has the same conclusion, with the square unitary
-		factors represented by their Mathlib unitary-group type.  The
+		unitary-group rectangular-SVD lemma combines the same estimate with the
+		positive-square identification of the middle factor from
+		\ref{lem:X-times-X-hat}; the square unitary factors are represented by
+		their Mathlib unitary-group type.  The
 		positive-Gram sigma-space lemma also records the coisometry
 		\(X X^\dagger=I\) for the original sigma embedding when the projective
 		\(Q\)-family is subnormalized; this is the construction-level hypothesis
