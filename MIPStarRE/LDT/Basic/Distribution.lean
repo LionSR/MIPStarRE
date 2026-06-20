@@ -128,6 +128,52 @@ theorem avgOver_ofPMF_eq_pmf_sum {α : Type*} [Fintype α]
     avgOver (ofPMF p) f = ∑ a : α, (p a).toReal * f a := by
   simp [avgOver, ofPMF]
 
+/-- Finite real-weight expansion of `PMF.map_apply`. -/
+theorem pmf_map_apply_toReal_sum {α β : Type*} [Fintype α]
+    [DecidableEq β]
+    (p : PMF α) (e : α → β) (b : β) :
+    ((p.map e) b).toReal =
+      ∑ a : α, (if b = e a then (p a).toReal else 0) := by
+  classical
+  rw [PMF.map_apply, tsum_fintype, ENNReal.toReal_sum]
+  · refine Finset.sum_congr rfl ?_
+    intro a _
+    by_cases h : b = e a <;> simp [h]
+  · intro a _
+    by_cases h : b = e a
+    · simpa [h] using p.apply_ne_top a
+    · simp [h]
+
+/-- Averaging a scalar function against the push-forward of a finite `PMF`
+is the same as averaging the pulled-back scalar function against the original
+`PMF`. -/
+theorem avgOver_ofPMF_map {α β : Type*} [Fintype α] [Fintype β]
+    (p : PMF α) (e : α → β) (f : β → Error) :
+    avgOver (ofPMF (p.map e)) f = avgOver (ofPMF p) (fun a => f (e a)) := by
+  classical
+  rw [avgOver_ofPMF_eq_pmf_sum, avgOver_ofPMF_eq_pmf_sum]
+  calc
+    ∑ b : β, ((p.map e) b).toReal * f b
+        = ∑ b : β, (∑ a : α, (if b = e a then (p a).toReal else 0)) * f b := by
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          rw [pmf_map_apply_toReal_sum p e b]
+    _ = ∑ b : β, ∑ a : α, (if b = e a then (p a).toReal else 0) * f b := by
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          rw [Finset.sum_mul]
+    _ = ∑ a : α, ∑ b : β, (if b = e a then (p a).toReal else 0) * f b := by
+          rw [Finset.sum_comm]
+    _ = ∑ a : α, (p a).toReal * f (e a) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.sum_eq_single (e a)]
+          · simp
+          · intro b _ hb
+            simp [hb]
+          · intro hmem
+            exact (hmem (Finset.mem_univ (e a))).elim
+
 /-- Averaging against `Distribution.ofPMF p` is the Bochner integral against
 the measure associated to `p`. -/
 theorem avgOver_ofPMF_eq_pmf_integral {α : Type*}
@@ -161,6 +207,40 @@ theorem averageOperatorOverDistribution_ofPMF_eq_sum {α : Type*} [Fintype α]
     averageOperatorOverDistribution (ofPMF p) f =
       ∑ a : α, (p a).toReal • f a := by
   simp [averageOperatorOverDistribution, ofPMF]
+
+/-- Operator-valued averaging against the push-forward of a finite `PMF`
+is the same as averaging the pulled-back operator family against the original
+`PMF`. -/
+theorem averageOperatorOverDistribution_ofPMF_map {α β : Type*} [Fintype α] [Fintype β]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (p : PMF α) (e : α → β) (f : β → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution (ofPMF (p.map e)) f =
+      averageOperatorOverDistribution (ofPMF p) (fun a => f (e a)) := by
+  classical
+  rw [averageOperatorOverDistribution_ofPMF_eq_sum,
+    averageOperatorOverDistribution_ofPMF_eq_sum]
+  calc
+    ∑ b : β, ((p.map e) b).toReal • f b
+        = ∑ b : β,
+            (∑ a : α, (if b = e a then (p a).toReal else 0)) • f b := by
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          rw [pmf_map_apply_toReal_sum p e b]
+    _ = ∑ b : β, ∑ a : α, (if b = e a then (p a).toReal else 0) • f b := by
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          rw [Finset.sum_smul]
+    _ = ∑ a : α, ∑ b : β, (if b = e a then (p a).toReal else 0) • f b := by
+          rw [Finset.sum_comm]
+    _ = ∑ a : α, (p a).toReal • f (e a) := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.sum_eq_single (e a)]
+          · simp
+          · intro b _ hb
+            simp [hb]
+          · intro hmem
+            exact (hmem (Finset.mem_univ (e a))).elim
 
 end Distribution
 

@@ -95,7 +95,8 @@ noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
           leftTensor (ι₂ := ι) (A.outcome ab.1) * rightTensor (ι₁ := ι) (B.outcome ab.2)
           = ∑ a : α,
               ∑ b : β,
-                leftTensor (ι₂ := ι) (A.outcome a) * rightTensor (ι₁ := ι) (B.outcome b) := by
+                leftTensor (ι₂ := ι) (A.outcome a) *
+                  rightTensor (ι₁ := ι) (B.outcome b) := by
                   simpa using
                     (Fintype.sum_prod_type' (f := fun a b =>
                       leftTensor (ι₂ := ι) (A.outcome a) *
@@ -183,24 +184,10 @@ noncomputable def sharedDiagonalLineQuestionOfPointPair (params : Parameters)
 shared diagonal-line question. -/
 noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters)
     [FieldModel params.q] :
-    Distribution (PointPairDiagonalLineQuestion params) where
-  support := Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params)
-  weight := fun q =>
-    if q ∈ Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params) then
-      1 / (Fintype.card (PointPairQuestion params × Fq params) : Error)
-    else
-      0
-  nonnegative := by
-    intro q
-    by_cases hq : q ∈ Finset.univ.image (sharedDiagonalLineQuestionOfPointPair params)
-    · have hqpos : 0 < (params.q : Error) := by
-        exact_mod_cast params.hq
-      simp only [hq, if_pos]
-      positivity
-    · simp [hq]
-  outsideSupport := by
-    intro q hq
-    simp [hq]
+    Distribution (PointPairDiagonalLineQuestion params) :=
+  Distribution.ofPMF <|
+    (PMF.uniformOfFintype (PointPairQuestion params × Fq params)).map
+      (sharedDiagonalLineQuestionOfPointPair params)
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)
