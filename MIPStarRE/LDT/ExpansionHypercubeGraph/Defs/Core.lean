@@ -144,24 +144,11 @@ theorem rerandomizeCoord_mass_eq_one (params : Parameters) :
           rw [hcount_cast]
           exact mul_inv_cancel₀ hden_ne
 
-/-- Independent sampling of two uniformly random points. -/
-noncomputable def independentPointPairWeight (params : Parameters)
-    (_uv : Point params × Point params) : Error :=
-  ((hypercubeVertexCount params : Error)⁻¹) * ((hypercubeVertexCount params : Error)⁻¹)
-
 /-- The product distribution on two independently sampled hypercube vertices,
 used in the paper's global variance. -/
 noncomputable def independentPointPair (params : Parameters) :
     Distribution (Point params × Point params) :=
-  { support := Finset.univ
-    weight := independentPointPairWeight params
-    nonnegative := by
-      intro uv
-      simp only [independentPointPairWeight]
-      apply mul_nonneg <;> exact inv_nonneg.mpr (Nat.cast_nonneg _)
-    outsideSupport := by
-      intro uv huv
-      exact False.elim (huv (Finset.mem_univ uv)) }
+  uniformDistribution (Point params × Point params)
 
 /-- An honest finite matrix register for the hypercube vertices. -/
 def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
