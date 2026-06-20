@@ -53,16 +53,12 @@ lemma averagedPointOperator_le_one
     (strategy : SymStrat params ι)
     (g : Polynomial params) :
     averagedPointOperator params strategy g ≤ 1 := by
-  let A : SubMeas Unit ι :=
-    averageUnitSubMeas (ι := ι)
-      (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
-      (fun u => by
-        simpa [pointConditionedOutcomeOperatorAtPolynomial] using
-          (strategy.pointMeasurement u).outcome_pos (g u))
-      (fun u => by
-        simpa [pointConditionedOutcomeOperatorAtPolynomial] using
-          Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u))
-  simpa [A, averagedPointOperator, averageUnitSubMeas_outcome] using A.outcome_le_one ()
+  unfold averagedPointOperator
+  exact averageOperatorOverDistribution_uniform_le_one
+    (pointConditionedOutcomeOperatorAtPolynomial params strategy g)
+    (fun u => by
+      simpa [pointConditionedOutcomeOperatorAtPolynomial] using
+        Measurement.outcome_le_one (strategy.pointMeasurement u).toMeasurement (g u))
 
 /-- Internal helper: lift bipartite SSC from `Unit` to any nonempty question type. -/
 lemma bipartiteSSCRel_uniform_const

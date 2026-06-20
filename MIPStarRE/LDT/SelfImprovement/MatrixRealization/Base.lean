@@ -107,21 +107,17 @@ theorem matrixAveragedPointOperator_le_one (params : Parameters)
     (model : MatrixSdpRealization params)
     (g : Polynomial params) :
     matrixAveragedPointOperator params model g ≤ 1 := by
-  let A : SubMeas Unit model.space.carrier :=
-    averageUnitSubMeas (ι := model.space.carrier)
-      (matrixAveragedPointOperatorContribution params model g)
-      (fun u => (model.pointMeasurement u).pos (g u))
-      (fun u => by
-        calc
-          (model.pointMeasurement u).effect (g u)
-              ≤ ∑ a : Fq params, (model.pointMeasurement u).effect a :=
-                Finset.single_le_sum
-                  (fun a _ => (model.pointMeasurement u).pos a)
-                  (Finset.mem_univ (g u))
-          _ ≤ 1 := (model.pointMeasurement u).sum_le_one)
-  simpa [A, matrixAveragedPointOperator, matrixAveragedPointOperatorContribution,
-    averageUnitSubMeas_outcome] using
-      A.outcome_le_one ()
+  unfold matrixAveragedPointOperator matrixAveragedPointOperatorContribution
+  exact averageOperatorOverDistribution_uniform_le_one
+    (fun u => (model.pointMeasurement u).effect (g u))
+    (fun u => by
+      calc
+        (model.pointMeasurement u).effect (g u)
+            ≤ ∑ a : Fq params, (model.pointMeasurement u).effect a :=
+              Finset.single_le_sum
+                (fun a _ => (model.pointMeasurement u).pos a)
+                (Finset.mem_univ (g u))
+        _ ≤ 1 := (model.pointMeasurement u).sum_le_one)
 
 /-- The averaged point operator `A_g` is positive semidefinite. -/
 theorem matrixAveragedPointOperator_nonneg (params : Parameters)
@@ -129,10 +125,10 @@ theorem matrixAveragedPointOperator_nonneg (params : Parameters)
     (model : MatrixSdpRealization params)
     (g : Polynomial params) :
     0 ≤ matrixAveragedPointOperator params model g := by
-  unfold matrixAveragedPointOperator averageOperatorOverDistribution
-  exact Finset.sum_nonneg fun u _ =>
-    smul_nonneg ((uniformDistribution (Point params)).nonnegative u)
-      ((model.pointMeasurement u).pos (g u))
+  unfold matrixAveragedPointOperator matrixAveragedPointOperatorContribution
+  exact averageOperatorOverDistribution_nonneg (uniformDistribution (Point params))
+    (fun u => (model.pointMeasurement u).effect (g u))
+    (fun u => (model.pointMeasurement u).pos (g u))
 
 /-- The concrete primal contribution `T_g A_g`. -/
 noncomputable def matrixSdpPrimalContributionOperator (params : Parameters)
