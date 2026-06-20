@@ -893,7 +893,7 @@
     Remark
     </span>
     <span class="remark_thmlabel">7.7</span>
-    <span class="remark_thmtitle">Lean reduced SDP interface</span>
+    <span class="remark_thmtitle">Removed reduced SDP interface</span>
     <div class="thm_header_extras">
 
         </div>
@@ -906,7 +906,7 @@
         </div>
   </div>
   <div class="remark_thmcontent">
-  <p> Lean also contains a reduced SDP interface. The reduced theorem <span class="ttfamily">sdp</span> proves only the measurement-total and dual-feasibility fragment used before strong duality is supplied. Earlier Lean versions also contained dominance-carrying declarations with the auxiliary condition \(I\le Z\). Those declarations have been removed, and they are not advertised as formalizations of Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>. </p>
+  <p> Earlier Lean versions also contained a reduced theorem <span class="ttfamily">sdp</span> proving only the measurement-total and dual-feasibility fragment used before strong duality was supplied, as well as dominance-carrying declarations with the auxiliary condition \(I\le Z\). These declarations have been removed, and they are not advertised as formalizations of Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>. The active Lean route for Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a> is the slackness-carrying statement <span class="ttfamily">sdp_statement_with_slackness</span>. </p>
 
   </div>
 </div>
