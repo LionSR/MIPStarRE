@@ -353,24 +353,6 @@ theorem toSdpStatementWithSlackness
 
 end MatrixSdpStatementWithSlackness
 
-namespace MatrixSdpStatementWithSlacknessAndDominance
-
-/-- A dominance-carrying matrix strong-duality statement forgets its auxiliary
-dominance field and gives the abstract SDP statement with complementary
-slackness. -/
-theorem toSdpStatementWithSlackness
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (h : MatrixSdpStatementWithSlacknessAndDominance params
-      (matrixSdpPointRealizationOfStrategy params strategy)) :
-    SdpStatementWithSlackness params strategy := by
-  obtain ⟨T, Z, hopt⟩ := h.witness
-  exact ⟨matrixSubmeasurementToSubMeas T, Z,
-    hopt.toMatrixSdpOptimalWitness.toSdpOptimalPairWithSlackness⟩
-
-end MatrixSdpStatementWithSlacknessAndDominance
-
 /-- Canonical block-SDP feasibility, objective equality, complementary
 slackness, and auxiliary dual dominance give the abstract Section 9 SDP
 statement.

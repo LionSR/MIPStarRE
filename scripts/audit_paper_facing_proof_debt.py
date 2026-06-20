@@ -247,11 +247,6 @@ SOURCE_CONTEXT_TOKENS = {
         "self-improvement proof; see references/ldt-paper/"
         "self_improvement.tex:635-671"
     ),
-    "MatrixSdpStatementWithSlacknessAndDominance": (
-        "Lean-only matrix SDP dominance interface used below the "
-        "self-improvement proof; see docs/reports/"
-        "issue-1458-green-node-name-inventory.md"
-    ),
     "OrthonormalizeAndCompleteStatement": (
         "internal Section 5 projectivization-chain statement used for "
         "left/right completion transport; see references/ldt-paper/"

@@ -17,11 +17,21 @@
 \section{At a glance}
 
 \begin{itemize}
-  \item \textbf{Status: discharged in PR~\#1708.}  The former issue was the full
+  \item \textbf{Status: discharged in \ghpr{1708}.}  The former issue was the full
   \textbf{strong-duality and complementary-slackness producer} for the
   self-improvement SDP, not just the already-fixed submeasurement interface.
   The current formalization proves this producer in the canonical finite-
   dimensional SDP model and transports it to the paper-facing statement.
+  \item \textbf{Difficulty: medium.}  The underlying SDP argument is standard
+  finite-dimensional convex duality, but the formalization must choose a
+  canonical block SDP whose optimal primal witness has no slack block without
+  assuming the auxiliary dominance condition $I\preceq Z$.
+  \item \textbf{Estimated weight: medium.}  The completed proof uses a
+  substantial project-local canonical SDP layer, while the analytic inputs are
+  ordinary finite-dimensional matrix-order and separation facts.
+  \item \textbf{Traceability.}  The issue is tracked in \ghissue{1230}; the
+  canonical strong-duality route was completed in \ghpr{1708}, and the obsolete
+  dominance wrappers were removed in \ghpr{2422}.
   \item \textbf{Implemented route:} project-local canonicalization, compactness
   and separation for the canonical SDP image cone, equality of primal and dual
   optima, complementary slackness from weak duality, saturation of the auxiliary
@@ -143,15 +153,16 @@ adding the stronger hypothesis $I\preceq Z$, because then $Z\succeq0$ and
 $S(Z-I)\succeq0$ after commuting the positive factors; from $SZ=0$ this gives
 $0\preceq -S$, hence $S=0$.
 
-The corresponding Lean lemma is therefore deliberately conditional.  The
+The corresponding matrix-order lemma is therefore deliberately conditional.  The
 declaration
 \[
   \leanid{MIPStarRE.Quantum.eq_zero_of_nonneg_mul_eq_zero_of_one_le}
 \]
-proves the matrix-order fact under $I\preceq Z$, and the declarations ending in
-\leanid{WithDominance} package the resulting SDP data with that extra field.
-They do not prove that an arbitrary optimal dual witness selected by Slater
-duality satisfies $I\preceq Z$.
+proves the matrix-order fact under $I\preceq Z$.  Earlier versions of the
+formalization packaged the resulting SDP data in declarations whose names ended
+in \leanid{WithDominance}; those wrappers have now been removed from the live
+SDP interface.  Their former existence did not prove that an arbitrary optimal
+dual witness selected by Slater duality satisfies $I\preceq Z$.
 
 \section{How the proof uses the optimum}
 
@@ -185,7 +196,7 @@ then a saturated slackness-producing optimum.%
 \texttt{lem:sdp-uniform-feasible-witness},
 \texttt{lem:sdp-matrix-feasible-bounds},
 \texttt{lem:sdp-matrix-slackness-output}, and \texttt{lem:sdp}.}
-Lean keeps the submeasurement boundary explicit, and PR~\#1708 supplies the
+Lean keeps the submeasurement boundary explicit, and \ghpr{1708} supplies the
 \textbf{producer} for the stronger slackness-carrying statement.%
 \footnote{Representative declarations are \leanid{sdpStrictPrimalSubMeas},
 \leanid{sdpPrimalObjective}, \leanid{sdpComplementarySlacknessEquation}, and
@@ -197,11 +208,10 @@ Lean keeps the submeasurement boundary explicit, and PR~\#1708 supplies the
 \section{Conclusion}
 
 There is a genuine distinction between the unconditional SDP statement used in
-the paper and the conditional dominance bridges retained in Lean.
-The formal declarations with the suffix \leanid{WithDominance} prove correct
-conditional statements: if a canonical optimal pair is supplied with
-$I\preceq Z$, then complementary slackness forces the slack block to vanish and
-the pair yields a complete measurement satisfying the displayed slackness
+the paper and the former conditional dominance bridges.  Those former wrappers
+proved correct conditional statements: if a canonical optimal pair is supplied
+with $I\preceq Z$, then complementary slackness forces the slack block to vanish
+and the pair yields a complete measurement satisfying the displayed slackness
 equations.  This does not by itself prove the unconditional conclusion of
 \texttt{lem:sdp}; the unconditional conclusion is instead proved by the
 canonical strong-duality and saturation route.
