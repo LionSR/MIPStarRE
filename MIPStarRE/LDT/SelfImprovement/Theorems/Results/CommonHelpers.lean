@@ -13,7 +13,7 @@ so they can be reused across the split result-module leaves.
 ## Contents
 
 - **averagedPointOperator_le_one** — the averaged point operator for any
-  polynomial is bounded by 1; used by `sdp` to establish dual feasibility.
+  polynomial is bounded by 1; used by self-improvement fallback estimates.
 - **bipartiteSSCRel_uniform_const** — lift a bipartite SSC from `Unit` to
   any nonempty question type (used by `selfImprovement`).
 - **sddRel_uniform_const** — lift an SDD from `Unit` to any nonempty
@@ -44,9 +44,9 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Reduced theorem wrappers -/
+/-! ## Shared scalar bounds -/
 
-/-- Internal helper: the averaged point operator for any polynomial ≤ 1. Used by `sdp`. -/
+/-- Internal helper: the averaged point operator for any polynomial is bounded by `1`. -/
 lemma averagedPointOperator_le_one
     (params : Parameters)
     [FieldModel params.q]

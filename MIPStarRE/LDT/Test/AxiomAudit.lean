@@ -626,7 +626,6 @@ namespace MIPStarRE.LDT.SelfImprovement
 
 assert_no_sorry_axiom SdpOptimalPairWithSlackness
 assert_no_sorry_axiom SdpOptimalPairWithSlackness.primalMeasurement
-assert_no_sorry_axiom SdpStatement
 assert_no_sorry_axiom SdpStatementWithSlackness
 assert_no_sorry_axiom sdpStrictDualWitness
 assert_no_sorry_axiom sdpStrictDualWitness_nonneg

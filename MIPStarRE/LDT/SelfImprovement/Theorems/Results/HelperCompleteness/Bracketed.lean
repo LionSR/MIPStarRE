@@ -6,8 +6,8 @@ import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 # Helper completeness: bracketed mass identities and reduced reductions
 
 This file contains the exact bracketed reindexing of the helper-stage mass, the
-paper-shaped completeness assemblies, and the reduced `sdp` and `addInU`
-reductions used by the surrounding self-improvement theorem.
+paper-shaped completeness assemblies, and the reduced `addInU` reduction used
+by the surrounding self-improvement theorem.
 
 ## References
 
@@ -489,31 +489,6 @@ theorem helper_completeness_of_self_consistency_helper_slackness_input_consisten
     params strategy G eps delta nu heps hdelta hhelper.toHelperConclusion hssc
     (helper_slackness_eq_of_helper_with_slackness params strategy eps delta hhelper)
     hcons
-
-/-- Reduced version of `lem:sdp`.
-
-This reduced theorem now instantiates the paper's explicit Slater witnesses: the
-primal uses the uniform strict-feasible submeasurement
-`T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`, canonically completed at the zero
-polynomial to fit the downstream `Measurement` interface, and the dual uses
-`Z = 2I`. The paper's strong-duality and complementary-slackness conclusions are
-still omitted from the current Lean statement. -/
-lemma sdp
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι) :
-    SdpStatement params strategy := by
-  let T : Measurement (Polynomial params) ι := sdpPrimalWitness (ι := ι) params
-  let Z : MIPStarRE.Quantum.Op ι := sdpStrictDualWitness (ι := ι)
-  refine ⟨T.toSubMeas, Z, ?_⟩
-  refine
-    { primalTotalOperator := T.total_eq_one
-      dualFeasible := ?_ }
-  intro g
-  simpa [Z, sdpDualSlackOperator] using
-    sub_nonneg.mpr
-      (le_trans (averagedPointOperator_le_one params strategy g)
-        (one_le_sdpStrictDualWitness (ι := ι)))
 
 /-- Paper-origin statement for `lem:sdp` with complementary slackness.
 

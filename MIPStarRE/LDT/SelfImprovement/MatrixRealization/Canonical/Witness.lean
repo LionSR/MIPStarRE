@@ -50,8 +50,8 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
 Matrix-level statement of the strong-duality output for the SDP.
 
 This is the concrete matrix analogue of `SdpStatementWithSlackness`: it does
-not assert that the currently formalized reduced `sdp` witness is optimal.
-Instead it records the kind of optimal witness obtained from the paper's
+not assert that the explicit strict feasible witnesses are optimal.  Instead it
+records the kind of optimal witness obtained from the paper's
 Slater/strong-duality argument.
 
 Grounded by: #1230. -/
