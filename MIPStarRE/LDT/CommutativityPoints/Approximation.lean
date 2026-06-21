@@ -56,6 +56,17 @@ lemma avgOver_uniform_pointNext_decompose
     (MIPStarRE.LDT.avgOver_uniform_equiv_prod_swap
       (e := pointNextEquiv params) (f := f))
 
+/-- Marginalizing a uniform point in `Point params.next` to its height
+coordinate gives the uniform distribution on `Fq params`. -/
+lemma avgOver_uniform_pointNext_height
+    (params : Parameters) [FieldModel params.q]
+    (f : Fq params → Error) :
+    avgOver (uniformDistribution (Point params.next)) (fun u => f (pointHeight params u)) =
+      avgOver (uniformDistribution (Fq params)) f := by
+  simpa [pointNextEquiv] using
+    (MIPStarRE.LDT.avgOver_uniform_equiv_snd
+      (e := pointNextEquiv params) (f := f))
+
 /-- Build an operator family from its outcomes, taking the total to be their sum. -/
 noncomputable def opFamilyOfOutcome {Outcome : Type*} [Fintype Outcome]
     (outcome : Outcome → MIPStarRE.Quantum.Op ι) :

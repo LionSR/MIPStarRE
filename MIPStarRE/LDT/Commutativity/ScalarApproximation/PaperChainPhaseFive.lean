@@ -489,7 +489,7 @@ lemma evaluatedSlice_phaseFivePaper_reindex_to_raw_defect
             avgOver (uniformDistribution (Point params.next)) (fun vy =>
               evaluatedSlicePhaseFivePaperSwappedDefect params strategy family G
                 (appendPoint params u x, vy)))) := by
-          rw [avgOver_uniform_pointNext_decompose params]
+          rw [CommutativityPoints.avgOver_uniform_pointNext_decompose params]
     _ = avgOver (uniformDistribution (Fq params)) (fun x =>
           avgOver (uniformDistribution (Point params)) (fun u =>
             avgOver (uniformDistribution (Point params.next)) (fun vy =>

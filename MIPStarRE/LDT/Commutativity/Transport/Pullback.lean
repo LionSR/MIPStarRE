@@ -60,53 +60,9 @@ lemma sddErrorOp_pullback_fullSliceQuestion_eq
       A B := by
   let e := evaluatedSliceQuestionEquiv params
   unfold sddErrorOp
-  calc
-    avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-        (fun q =>
-          qSDDOp ψ
-            (A (fullSliceQuestionOfEvaluatedSlice params q))
-            (B (fullSliceQuestionOfEvaluatedSlice params q)))
-      =
-        avgOver
-          (uniformDistribution
-            ((Point params × Point params) × FullSliceQuestion params))
-          (fun r => qSDDOp ψ (A r.2) (B r.2)) := by
-            calc
-              avgOver (uniformDistribution (EvaluatedSliceQuestion params))
-                  (fun q =>
-                    qSDDOp ψ
-                      (A (fullSliceQuestionOfEvaluatedSlice params q))
-                      (B (fullSliceQuestionOfEvaluatedSlice params q)))
-                =
-                  avgOver
-                    (uniformDistribution
-                      ((Point params × Point params) × FullSliceQuestion params))
-                    (fun r =>
-                      qSDDOp ψ
-                        (A (fullSliceQuestionOfEvaluatedSlice params (e.symm r)))
-                        (B (fullSliceQuestionOfEvaluatedSlice params (e.symm r)))) :=
-                    avgOver_uniform_equiv e
-                      (fun q =>
-                        qSDDOp ψ
-                          (A (fullSliceQuestionOfEvaluatedSlice params q))
-                          (B (fullSliceQuestionOfEvaluatedSlice params q)))
-              _ =
-                  avgOver
-                    (uniformDistribution
-                      ((Point params × Point params) × FullSliceQuestion params))
-                    (fun r => qSDDOp ψ (A r.2) (B r.2)) := by
-                      apply avgOver_congr
-                      rintro ⟨⟨u, v⟩, x, y⟩
-                      simp [e, evaluatedSliceQuestionEquiv,
-                        fullSliceQuestionOfEvaluatedSlice]
-    _ =
-        avgOver (uniformDistribution (FullSliceQuestion params))
-          (fun xy => qSDDOp ψ (A xy) (B xy)) := by
-            simpa using
-              (avgOver_uniform_snd
-                (α := Point params × Point params)
-                (β := FullSliceQuestion params)
-                (f := fun xy => qSDDOp ψ (A xy) (B xy)))
+  simpa [e, evaluatedSliceQuestionEquiv, fullSliceQuestionOfEvaluatedSlice] using
+    (avgOver_uniform_equiv_snd (e := e)
+      (f := fun xy : FullSliceQuestion params => qSDDOp ψ (A xy) (B xy)))
 
 /-- Any `SDDOpRel` bound proved after pulling back along
 `fullSliceQuestionOfEvaluatedSlice` descends to `FullSliceQuestion`. -/

@@ -167,14 +167,17 @@ lemma avgOver_avgOver_phaseTwo_linear
       rightTensor (ι₁ := ι) (P g v)) * (𝒟Q.weight q * 𝒟V.weight v)
   have hreorder :
       (∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ g : Γ, ∑ a : Aidx, T q v g a) =
-        ∑ g : Γ, ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
+        ∑ g : Γ,
+          ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
     calc
       (∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ g : Γ, ∑ a : Aidx, T q v g a)
-          = ∑ v ∈ 𝒟V.support, ∑ g : Γ, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
+          = ∑ v ∈ 𝒟V.support,
+              ∑ g : Γ, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
             refine Finset.sum_congr rfl ?_
             intro v _
             rw [Finset.sum_comm]
-      _ = ∑ g : Γ, ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
+      _ = ∑ g : Γ,
+            ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := by
             rw [Finset.sum_comm]
   calc
     avgOver 𝒟V (fun v =>
@@ -182,9 +185,11 @@ lemma avgOver_avgOver_phaseTwo_linear
           ∑ g : Γ, ∑ a : Aidx,
             ev ψ (leftTensor (ι₂ := ι) (F q g a * R) *
               rightTensor (ι₁ := ι) (P g v))))
-        = ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ g : Γ, ∑ a : Aidx, T q v g a := by
+        = ∑ v ∈ 𝒟V.support,
+            ∑ q ∈ 𝒟Q.support, ∑ g : Γ, ∑ a : Aidx, T q v g a := by
           simp [avgOver, T, Finset.mul_sum, mul_assoc, mul_comm]
-    _ = ∑ g : Γ, ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := hreorder
+    _ = ∑ g : Γ,
+          ∑ v ∈ 𝒟V.support, ∑ q ∈ 𝒟Q.support, ∑ a : Aidx, T q v g a := hreorder
     _ = ∑ g : Γ,
         ev ψ
           (leftTensor (ι₂ := ι)
@@ -472,7 +477,8 @@ lemma evaluatedSlice_phaseTwo_avg_diff_eq_neg_questionDefect
                   (((evaluatedSliceFirstFactor params family q).outcome a) *
                     ((evaluatedSliceSecondFactor params family q).outcome b) *
                     ((evaluatedSliceFirstFactor params family q).outcome a)) *
-                rightTensor (ι₁ := ι) ((evaluatedSlicePointMeas params strategy q.2).outcome b)))
+                rightTensor (ι₁ := ι)
+                  ((evaluatedSlicePointMeas params strategy q.2).outcome b)))
         = avgOver (uniformDistribution (EvaluatedSliceQuestion params))
             (fun q : EvaluatedSliceQuestion params =>
               (∑ b : Fq params, ∑ a : Fq params,
@@ -605,7 +611,7 @@ lemma evaluatedSlice_phaseTwo_questionDefect_avg_eq_stabilityDefect
           (fun v => avgOver (uniformDistribution (Point params.next))
             (fun q1 => defect (q1, appendPoint params v y)))) := by
     simpa using
-      (avgOver_uniform_pointNext_decompose (params := params)
+      (CommutativityPoints.avgOver_uniform_pointNext_decompose (params := params)
         (f := fun q2 => avgOver (uniformDistribution (Point params.next))
           (fun q1 => defect (q1, q2))))
   have hbody :
