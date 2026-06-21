@@ -124,6 +124,47 @@ theorem map {α β : Type*} [DecidableEq β]
 
 end Distribution.IsProbability
 
+namespace Distribution
+
+/-- The Mathlib probability mass function associated to a project `Distribution`
+whose total mass is one.
+
+The construction sends each nonnegative real weight to `ℝ≥0∞` by
+`ENNReal.ofReal`; the hypotheses of `PMF.ofFinset` are exactly the project
+probability invariant and the stored zero-off-support condition. -/
+noncomputable def toPMF {α : Type*} (𝒟 : Distribution α)
+    (h𝒟 : 𝒟.IsProbability) : PMF α :=
+  PMF.ofFinset (fun a => ENNReal.ofReal (𝒟.weight a)) 𝒟.support
+    (by
+      rw [← ENNReal.ofReal_sum_of_nonneg (fun a _ => 𝒟.nonnegative a),
+        h𝒟.weight_sum_eq_one]
+      simp)
+    (by
+      intro a ha
+      rw [𝒟.outsideSupport a ha]
+      simp)
+
+@[simp]
+theorem toPMF_apply {α : Type*} (𝒟 : Distribution α)
+    (h𝒟 : 𝒟.IsProbability) (a : α) :
+    𝒟.toPMF h𝒟 a = ENNReal.ofReal (𝒟.weight a) := rfl
+
+@[simp]
+theorem toPMF_apply_toReal {α : Type*} (𝒟 : Distribution α)
+    (h𝒟 : 𝒟.IsProbability) (a : α) :
+    (𝒟.toPMF h𝒟 a).toReal = 𝒟.weight a := by
+  rw [toPMF_apply, ENNReal.toReal_ofReal (𝒟.nonnegative a)]
+
+/-- The associated PMF has zero mass outside the stored support of the project
+distribution. -/
+theorem toPMF_apply_of_notMem {α : Type*} (𝒟 : Distribution α)
+    (h𝒟 : 𝒟.IsProbability) {a : α} (ha : a ∉ 𝒟.support) :
+    𝒟.toPMF h𝒟 a = 0 := by
+  rw [toPMF_apply, 𝒟.outsideSupport a ha]
+  simp
+
+end Distribution
+
 /-- Average a scalar function against the stored finite support of a distribution. -/
 def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a * f a
