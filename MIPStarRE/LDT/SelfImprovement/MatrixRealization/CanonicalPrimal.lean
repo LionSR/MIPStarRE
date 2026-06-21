@@ -323,21 +323,12 @@ theorem matrixSdpCanonicalDiagonalBlock_blockDiagonal_mul_left (params : Paramet
   classical
   ext i j
   unfold matrixSdpCanonicalDiagonalBlock
-  simp only [Matrix.mul_apply, matrixSdpCanonicalBlockDiagonal]
+  simp only [Matrix.mul_apply]
   change (∑ y : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
-      (if b = y.1 then B b i y.2 else 0) * X y (b, j)) =
+      matrixSdpCanonicalBlockDiagonal params model B (b, i) y * X y (b, j)) =
     ∑ k : model.space.carrier, B b i k * X (b, k) (b, j)
   rw [Fintype.sum_prod_type]
-  calc
-    ∑ x : MatrixSdpCanonicalBlockIndex params,
-        ∑ y : model.space.carrier, (if b = x then B b i y else 0) * X (x, y) (b, j)
-        = ∑ x : MatrixSdpCanonicalBlockIndex params,
-          (if b = x then ∑ y : model.space.carrier, B b i y * X (x, y) (b, j) else 0) := by
-            refine Finset.sum_congr rfl ?_
-            intro x _
-            by_cases hx : b = x <;> simp [hx]
-    _ = ∑ k : model.space.carrier, B b i k * X (b, k) (b, j) := by
-          simp
+  simp
 
 /-- The trace pairing of a canonical block-diagonal operator with an arbitrary
 canonical matrix depends only on the diagonal blocks of the latter.
@@ -371,24 +362,12 @@ theorem matrixSdpCanonicalDiagonalBlock_mul_blockDiagonal_right (params : Parame
   classical
   ext i j
   unfold matrixSdpCanonicalDiagonalBlock
-  simp only [Matrix.mul_apply, matrixSdpCanonicalBlockDiagonal]
+  simp only [Matrix.mul_apply]
   change (∑ y : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
-      X (b, i) y * (if y.1 = b then B y.1 y.2 j else 0)) =
+      X (b, i) y * matrixSdpCanonicalBlockDiagonal params model B y (b, j)) =
     ∑ k : model.space.carrier, X (b, i) (b, k) * B b k j
   rw [Fintype.sum_prod_type]
-  calc
-    ∑ x : MatrixSdpCanonicalBlockIndex params,
-        ∑ y : model.space.carrier,
-          X (b, i) (x, y) * (if x = b then B x y j else 0)
-        = ∑ x : MatrixSdpCanonicalBlockIndex params,
-          (if x = b then
-            ∑ y : model.space.carrier, X (b, i) (x, y) * B x y j
-          else 0) := by
-            refine Finset.sum_congr rfl ?_
-            intro x _
-            by_cases hx : x = b <;> simp [hx]
-    _ = ∑ k : model.space.carrier, X (b, i) (b, k) * B b k j := by
-          simp
+  simp
 
 /-- The primal slack block `S = I - ∑_g T_g`. -/
 noncomputable def matrixSdpCanonicalSlackOperator (params : Parameters)
