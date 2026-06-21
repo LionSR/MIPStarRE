@@ -32,25 +32,8 @@ private lemma gCommOverlap_avgOver_point
       (fun w => gCommOverlapTerm params strategy G (pointHeight params w)) =
     avgOver (uniformDistribution (Fq params))
       (fun x => gCommOverlapTerm params strategy G x) := by
-  let e := CommutativityPoints.pointNextEquiv params
-  calc
-    avgOver (uniformDistribution (Point params.next))
-        (fun w => gCommOverlapTerm params strategy G (pointHeight params w))
-      = avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => gCommOverlapTerm params strategy G (pointHeight params (e.symm ux))) :=
-          avgOver_uniform_equiv e _
-    _ = avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => gCommOverlapTerm params strategy G ux.2) := by
-          apply avgOver_congr
-          intro ux
-          rcases ux with ⟨u, x⟩
-          simp [e, CommutativityPoints.pointNextEquiv, pointHeight_appendPoint]
-    _ = avgOver (uniformDistribution (Fq params))
-          (fun x => gCommOverlapTerm params strategy G x) := by
-          exact avgOver_uniform_snd
-            (α := Point params)
-            (β := Fq params)
-            (f := fun x => gCommOverlapTerm params strategy G x)
+  exact CommutativityPoints.avgOver_uniform_pointNext_height params
+    (fun x => gCommOverlapTerm params strategy G x)
 
 /-- Averaging the overlap term over evaluated-slice questions through the
 first point coordinate marginalizes to the uniform `x : F_q` average. -/

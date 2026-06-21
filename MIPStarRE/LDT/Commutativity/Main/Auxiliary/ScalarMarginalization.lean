@@ -52,17 +52,6 @@ private lemma abs_sub_le_of_two_step
     |a - c| ≤ e₁ + e₂ :=
   (abs_sub_le a b c).trans (add_le_add hab hbc)
 
-/-- Marginalizing a uniform point in `Point params.next` to its final coordinate
-gives the uniform slice-height distribution. -/
-private lemma avgOver_pointHeight
-    (params : Parameters) [FieldModel params.q]
-    (f : Fq params → Error) :
-    avgOver (uniformDistribution (Point params.next)) (fun u => f (pointHeight params u)) =
-      avgOver (uniformDistribution (Fq params)) f := by
-  simpa [pointNextEquiv] using
-    (MIPStarRE.LDT.avgOver_uniform_equiv_snd
-      (e := pointNextEquiv params) (f := f))
-
 /-- Summing the inner outcome in an `ABA` expectation turns it into the
 submeasurement total. -/
 private lemma sum_ev_leftTensor_sandwich_total
@@ -204,7 +193,7 @@ private lemma evaluatedSliceABAAvg_eq_leftSandwichExpectation
             ((evaluatedPointFamily params family u).outcome a *
               (family.meas y).total *
               (evaluatedPointFamily params family u).outcome a))) := by
-            have h := avgOver_pointHeight params
+            have h := CommutativityPoints.avgOver_uniform_pointNext_height params
               (fun y : Fq params => ev strategy.state (leftTensor (ι₂ := ι)
                 ((evaluatedPointFamily params family u).outcome a *
                   (family.meas y).total *
@@ -272,7 +261,7 @@ private lemma fullSlice_middleSandwichExpectation_eq_evaluated
           _ = avgOver (uniformDistribution (Fq params))
               (fun x => ev strategy.state (leftTensor (ι₂ := ι) G *
                 rightTensor (ι₁ := ι) ((family.meas x).total))) := by
-              exact avgOver_pointHeight params
+              exact CommutativityPoints.avgOver_uniform_pointNext_height params
                 (fun x : Fq params => ev strategy.state (leftTensor (ι₂ := ι) G *
                   rightTensor (ι₁ := ι) ((family.meas x).total)))
     _ = avgOver (uniformDistribution (Point params.next))

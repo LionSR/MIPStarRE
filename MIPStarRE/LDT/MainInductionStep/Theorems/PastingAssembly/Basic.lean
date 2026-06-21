@@ -510,23 +510,10 @@ lemma family_pointConsistencyError_eq_avg
         (IdxPolyFamily.evaluatedAtNextPoint hself.family)
       = avgOver (uniformDistribution (Point params.next)) g := by
           rfl
-    _ = avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) := by
-           simpa [CommutativityPoints.pointNextEquiv] using
-            (MIPStarRE.LDT.avgOver_uniform_equiv
-              (e := CommutativityPoints.pointNextEquiv params)
-              (f := g))
-    _ = avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) := by
-           simpa using
-            (MIPStarRE.LDT.avgOver_uniform_equiv
-              (e := Equiv.prodComm (Point params) (Fq params))
-              (f := fun ux : Point params × Fq params => g (appendPoint params ux.1 ux.2)))
     _ = avgOver (uniformDistribution (Fq params))
           (fun x => avgOver (uniformDistribution (Point params))
             (fun u => g (appendPoint params u x))) := by
-          simpa using
-            (avgOver_uniform_prod (f := fun x u => g (appendPoint params u x)))
+          exact CommutativityPoints.avgOver_uniform_pointNext_decompose params g
     _ = avgOver (uniformDistribution (Fq params))
           (fun x =>
             bipartiteConsError strategy.state (uniformDistribution (Point params))
@@ -564,23 +551,10 @@ lemma family_answerRestrictedPointConsistencyError_eq_avg
         (IdxPolyFamily.evaluatedAtNextPoint family)
       = avgOver (uniformDistribution (Point params.next)) g := by
           rfl
-    _ = avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) := by
-           simpa [CommutativityPoints.pointNextEquiv] using
-            (MIPStarRE.LDT.avgOver_uniform_equiv
-              (e := CommutativityPoints.pointNextEquiv params)
-              (f := g))
-    _ = avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) := by
-           simpa using
-            (MIPStarRE.LDT.avgOver_uniform_equiv
-              (e := Equiv.prodComm (Point params) (Fq params))
-              (f := fun ux : Point params × Fq params => g (appendPoint params ux.1 ux.2)))
     _ = avgOver (uniformDistribution (Fq params))
           (fun x => avgOver (uniformDistribution (Point params))
             (fun u => g (appendPoint params u x))) := by
-          simpa using
-            (avgOver_uniform_prod (f := fun x u => g (appendPoint params u x)))
+          exact CommutativityPoints.avgOver_uniform_pointNext_decompose params g
     _ = avgOver (uniformDistribution (Fq params))
           (fun x =>
             bipartiteConsError strategy.state (uniformDistribution (Point params))
@@ -624,23 +598,10 @@ lemma answer_family_pointConsistencyError_eq_avg
         (IdxPolyFamily.evaluatedAtNextPoint family)
       = avgOver (uniformDistribution (Point params.next)) g := by
           rfl
-    _ = avgOver (uniformDistribution (Point params × Fq params))
-          (fun ux => g (appendPoint params ux.1 ux.2)) := by
-           simpa [CommutativityPoints.pointNextEquiv] using
-            (MIPStarRE.LDT.avgOver_uniform_equiv
-              (e := CommutativityPoints.pointNextEquiv params)
-              (f := g))
-    _ = avgOver (uniformDistribution (Fq params × Point params))
-          (fun xu => g (appendPoint params xu.2 xu.1)) := by
-           simpa using
-            (MIPStarRE.LDT.avgOver_uniform_equiv
-              (e := Equiv.prodComm (Point params) (Fq params))
-              (f := fun ux : Point params × Fq params => g (appendPoint params ux.1 ux.2)))
     _ = avgOver (uniformDistribution (Fq params))
           (fun x => avgOver (uniformDistribution (Point params))
             (fun u => g (appendPoint params u x))) := by
-          simpa using
-            (avgOver_uniform_prod (f := fun x u => g (appendPoint params u x)))
+          exact CommutativityPoints.avgOver_uniform_pointNext_decompose params g
     _ = avgOver (uniformDistribution (Fq params))
           (fun x =>
             bipartiteConsError strategy.state (uniformDistribution (Point params))

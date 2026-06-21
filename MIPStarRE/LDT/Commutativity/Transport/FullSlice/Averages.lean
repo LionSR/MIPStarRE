@@ -380,23 +380,9 @@ lemma avgOver_xEvaluatedQuestion_to_pointNext
     avgOver (uniformDistribution (Point params × FullSliceQuestion params))
         (fun ux => f (appendPoint params ux.1 ux.2.1)) =
       avgOver (uniformDistribution (Point params.next)) f := by
-  let e := xEvaluatedQuestionPointNextEquiv params
-  calc
-    avgOver (uniformDistribution (Point params × FullSliceQuestion params))
-        (fun ux => f (appendPoint params ux.1 ux.2.1))
-      = avgOver (uniformDistribution (Point params.next × Fq params))
-          (fun wy => f (appendPoint params (truncatePoint params wy.1)
-            (pointHeight params wy.1))) := by
-          simpa [e, xEvaluatedQuestionPointNextEquiv] using
-            MIPStarRE.LDT.avgOver_uniform_equiv e
-              (fun ux : Point params × FullSliceQuestion params =>
-                f (appendPoint params ux.1 ux.2.1))
-    _ = avgOver (uniformDistribution (Point params.next × Fq params))
-          (fun wy => f wy.1) := by
-          apply avgOver_congr
-          intro wy
-          simpa [pointNextEquiv] using congrArg f ((pointNextEquiv params).left_inv wy.1)
-    _ = avgOver (uniformDistribution (Point params.next)) f := avgOver_uniform_fst f
+  simpa [xEvaluatedQuestionPointNextEquiv] using
+    (MIPStarRE.LDT.avgOver_uniform_equiv_fst
+      (e := xEvaluatedQuestionPointNextEquiv params) (f := f))
 
 /-- Reindex `xEvaluatedSliceBABAtensorAvg` into the mixed `(u,x,y)` data order. -/
 lemma xEvaluatedSliceBABAtensorAvg_eq_xFullData

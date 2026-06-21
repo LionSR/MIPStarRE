@@ -17,17 +17,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- Decompose the uniform average over a next-level point into a height and prefix average. -/
-lemma avgOver_uniform_pointNext_decompose
-    (params : Parameters) [FieldModel params.q]
-    (f : Point params.next → Error) :
-    avgOver (uniformDistribution (Point params.next)) f =
-      avgOver (uniformDistribution (Fq params))
-        (fun x => avgOver (uniformDistribution (Point params))
-          (fun u => f (appendPoint params u x))) := by
-  simpa using CommutativityPoints.avgOver_uniform_pointNext_decompose params f
-
-
 /-- The evaluated point family has the same total as the underlying slice
 measurement `G` at the sampled height.
 
