@@ -188,20 +188,21 @@ lemma avgOver_distinct_pasted_defect_le_badMass
           hBConsistencyBadMass params strategy family u xs) := by
   classical
   let support : Finset (PointTuple params k) :=
-    Finset.univ.filter fun xs : PointTuple params k => Function.Injective xs
+    distinctTupleSupport params k
   have hsupport : (distinctTupleDistribution params k).support = support := by
-    simp [distinctTupleDistribution, support]
+    simp [support]
   have hweight :
       ∀ xs, (distinctTupleDistribution params k).weight xs =
         if xs ∈ support then 1 / (support.card : Error) else 0 := by
     intro xs
-    simp [distinctTupleDistribution, support]
+    simp [distinctTupleDistribution_weight, support]
   unfold avgOver
   rw [hsupport]
   simp_rw [hweight]
   refine Finset.sum_le_sum ?_
   intro xs hxs
-  have hinj : Function.Injective xs := (Finset.mem_filter.mp hxs).2
+  have hinj : Function.Injective xs := by
+    simpa [support] using hxs
   simp only [hxs, one_div, ite_true]
   exact mul_le_mul_of_nonneg_left
     (pastedInterpolation_verticalLine_defect_le_badMass params strategy family u xs hinj)
