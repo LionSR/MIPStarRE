@@ -1,0 +1,422 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../../.././style.css"></link><link rel="icon" href="../../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.Topology.Algebra.Module.ContinuousLinearMap.RestrictScalars</title><script defer="true" src="../../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../../.././";</script><script>const MODULE_NAME="Mathlib.Topology.Algebra.Module.ContinuousLinearMap.RestrictScalars";</script><script type="module" src="../../../../.././jump-src.js"></script><script type="module" src="../../../../.././search.js"></script><script type="module" src="../../../../.././expand-nav.js"></script><script type="module" src="../../../../.././how-about.js"></script><script type="module" src="../../../../.././instances.js"></script><script type="module" src="../../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">Topology</span>.<span class="name">Algebra</span>.<span class="name">Module</span>.<span class="name">ContinuousLinearMap</span>.<span class="name">RestrictScalars</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../../.././Init.html">Init</a></li><li><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html">Mathlib.Topology.Algebra.Module.ContinuousLinearMap.Basic</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.Topology.Algebra.Module.ContinuousLinearMap.RestrictScalars" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.restrictScalars"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.coe_restrictScalars"><span class="name">ContinuousLinearMap</span>.<span class="name">coe_restrictScalars</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.coe_restrictScalars'"><span class="name">ContinuousLinearMap</span>.<span class="name">coe_restrictScalars'</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.toContinuousAddMonoidHom_restrictScalars"><span class="name">ContinuousLinearMap</span>.<span class="name">toContinuousAddMonoidHom_restrictScalars</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.restrictScalars_zero"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_zero</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.restrictScalars_add"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_add</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.restrictScalars_smul"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_smul</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.restrictScalarsₗ"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalarsₗ</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.coe_restrictScalarsₗ"><span class="name">ContinuousLinearMap</span>.<span class="name">coe_restrictScalarsₗ</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.restrictScalars_sub"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_sub</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.restrictScalars_neg"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_neg</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Restriction-of-scalars-for-continuous-linear-maps" class="markdown-heading">Restriction of scalars for continuous linear maps <a class="hover-link" href="#Restriction-of-scalars-for-continuous-linear-maps">#</a></h1><p>In this file, we define and study <code><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">ContinuousLinearMap.restrictScalars</a></code>, which reinterprets
+a continuous <code>R</code>-linear map as a continuous <code>S</code>-linear map, for suitable <code>R</code> and <code>S</code>.
+This is the continuous version of <code><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.restrictScalars">LinearMap.restrictScalars</a></code>.</p></div><div class="decl" id="ContinuousLinearMap.restrictScalars"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L32-L36">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span></div></div><p>If <code>A</code> is an <code>R</code>-algebra, then a continuous <code>A</code>-linear map can be interpreted as a continuous
+<code>R</code>-linear map. We assume <code><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> M₁ M₂ R A</code> to match assumptions of
+<code><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.map_smul_of_tower">LinearMap.map_smul_of_tower</a></code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">ContinuousLinearMap.restrictScalars</a> <span class="fn">R</span> <span class="fn">f</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.mk">{</a> <span class="fn">toLinearMap</span> := <span class="fn"><span class="fn">↑<span class="fn">R</span></span> <span class="fn">↑<span class="fn">f</span></span></span>, <span class="fn">cont</span> := <span class="fn">⋯</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.mk">}</a></li></ul></details><details id="instances-for-list-ContinuousLinearMap.restrictScalars" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ContinuousLinearMap.coe_restrictScalars"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L38-L40">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.coe_restrictScalars"><span class="name">ContinuousLinearMap</span>.<span class="name">coe_restrictScalars</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">f</span>)</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">↑<span class="fn">R</span></span> <span class="fn">↑<span class="fn">f</span></span></span></div></div></div></div><div class="decl" id="ContinuousLinearMap.coe_restrictScalars'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L42-L43">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.coe_restrictScalars'"><span class="name">ContinuousLinearMap</span>.<span class="name">coe_restrictScalars'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">⇑<span class="fn">(<a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">f</span>)</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">⇑<span class="fn">f</span></span></div></div></div></div><div class="decl" id="ContinuousLinearMap.toContinuousAddMonoidHom_restrictScalars"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L45-L47">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.toContinuousAddMonoidHom_restrictScalars"><span class="name">ContinuousLinearMap</span>.<span class="name">toContinuousAddMonoidHom_restrictScalars</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">f</span>)</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">f</span></span></div></div></div></div><div class="decl" id="ContinuousLinearMap.restrictScalars_zero"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L49-L49">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars_zero"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_zero</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">0</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></div></div></div></div><div class="decl" id="ContinuousLinearMap.restrictScalars_add"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L51-L53">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars_add"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_add</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Monoid/Defs.html#ContinuousAdd">ContinuousAdd</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f </span><span class="fn">g</span> : <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> (<span class="fn">f</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">g</span>)</span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">f</span></span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">g</span></span></div></div></div></div><div class="decl" id="ContinuousLinearMap.restrictScalars_smul"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L57-L60">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars_smul"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_smul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/ConstMulAction.html#ContinuousConstSMul">ContinuousConstSMul</a> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">A</span> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">c</span> : <span class="fn">S</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> (<span class="fn">c</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">f</span>)</span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">c</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">f</span></span></div></div></div></div><div class="decl" id="ContinuousLinearMap.restrictScalarsₗ"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L65-L70">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalarsₗ"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalarsₗ</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S</span> : <a href="../../../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/ConstMulAction.html#ContinuousConstSMul">ContinuousConstSMul</a> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">A</span> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Monoid/Defs.html#ContinuousAdd">ContinuousAdd</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type">(<span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>) <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">S</span><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span></div></div><p><code><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">ContinuousLinearMap.restrictScalars</a></code> as a <code><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">LinearMap</a></code>. See also
+<code><a href="../../../../.././Mathlib/Topology/Algebra/Module/Spaces/ContinuousLinearMap.html#ContinuousLinearMap.restrictScalarsL">ContinuousLinearMap.restrictScalarsL</a></code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalarsₗ">ContinuousLinearMap.restrictScalarsₗ</a> <span class="fn">A</span> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">S</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a>   <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.mk">{</a> <span class="fn">toFun</span> := <span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">ContinuousLinearMap.restrictScalars</a> <span class="fn">R</span></span>, <span class="fn">map_add'</span> := <span class="fn">⋯</span>, <span class="fn">map_smul'</span> := <span class="fn">⋯</span> <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.mk">}</a></li></ul></details><details id="instances-for-list-ContinuousLinearMap.restrictScalarsₗ" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="ContinuousLinearMap.coe_restrictScalarsₗ"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L72-L73">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.coe_restrictScalarsₗ"><span class="name">ContinuousLinearMap</span>.<span class="name">coe_restrictScalarsₗ</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommMonoid">AddCommMonoid</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/ConstMulAction.html#ContinuousConstSMul">ContinuousConstSMul</a> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">A</span> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Monoid/Defs.html#ContinuousAdd">ContinuousAdd</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">⇑<span class="fn">(<a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalarsₗ">restrictScalarsₗ</a> <span class="fn">A</span> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">S</span>)</span></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="ContinuousLinearMap.restrictScalars_sub"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L83-L85">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars_sub"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_sub</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Ring">Ring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Ring">Ring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f </span><span class="fn">g</span> : <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> (<span class="fn">f</span> <a href="../../../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">g</span>)</span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">f</span></span> <a href="../../../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">g</span></span></div></div></div></div><div class="decl" id="ContinuousLinearMap.restrictScalars_neg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.lean#L87-L88">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars_neg"><span class="name">ContinuousLinearMap</span>.<span class="name">restrictScalars_neg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₁</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M₂</span> : <a href="../../../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Ring">Ring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Ring">Ring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">A</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.CompatibleSMul">LinearMap.CompatibleSMul</a> <span class="fn">M₁</span> <span class="fn">M₂</span> <span class="fn">R</span> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">M₂</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">M₁</span> <a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">A</span><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">M₂</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> (<a href="../../../../.././Init/Prelude.html#Neg.neg">-</a><span class="fn">f</span>)</span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <a href="../../../../.././Init/Prelude.html#Neg.neg">-</a><span class="fn"><a href="../../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/RestrictScalars.html#ContinuousLinearMap.restrictScalars">restrictScalars</a> <span class="fn">R</span> <span class="fn">f</span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

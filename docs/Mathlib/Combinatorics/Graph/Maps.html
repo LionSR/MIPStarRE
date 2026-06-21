@@ -1,0 +1,244 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.Combinatorics.Graph.Maps</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.Combinatorics.Graph.Maps";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">Combinatorics</span>.<span class="name">Graph</span>.<span class="name">Maps</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/Combinatorics/Graph/Subgraph.html">Mathlib.Combinatorics.Graph.Subgraph</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.Combinatorics.Graph.Maps" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#Graph.map"><span class="name">Graph</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.map_isLink"><span class="name">Graph</span>.<span class="name">map_isLink</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.vertexSet_map"><span class="name">Graph</span>.<span class="name">vertexSet_map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.edgeSet_map"><span class="name">Graph</span>.<span class="name">edgeSet_map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.IsLink.map"><span class="name">Graph</span>.<span class="name">IsLink</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.map_inc"><span class="name">Graph</span>.<span class="name">map_inc</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.Inc.map"><span class="name">Graph</span>.<span class="name">Inc</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.map_isLoopAt"><span class="name">Graph</span>.<span class="name">map_isLoopAt</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.IsLoopAt.map"><span class="name">Graph</span>.<span class="name">IsLoopAt</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.map_adj"><span class="name">Graph</span>.<span class="name">map_adj</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.Adj.map"><span class="name">Graph</span>.<span class="name">Adj</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.map_id"><span class="name">Graph</span>.<span class="name">map_id</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.map_map"><span class="name">Graph</span>.<span class="name">map_map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.IsSubgraph.map"><span class="name">Graph</span>.<span class="name">IsSubgraph</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.map_mono"><span class="name">Graph</span>.<span class="name">map_mono</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.IsSpanningSubgraph.map"><span class="name">Graph</span>.<span class="name">IsSpanningSubgraph</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#Graph.map_eq_of_eqOn"><span class="name">Graph</span>.<span class="name">map_eq_of_eqOn</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Maps-between-graphs" class="markdown-heading">Maps between graphs <a class="hover-link" href="#Maps-between-graphs">#</a></h1><p>This file defines vertex map between graphs <code><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> α β</code>. Morphisms between graphs will also be
+defined in this file in the future.</p><h2 id="Main-definitions" class="markdown-heading">Main definitions <a class="hover-link" href="#Main-definitions">#</a></h2><ul><li><code><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a></code>: the map on graphs induced by a function on vertices <code>f : α → α'</code></li></ul><h2 id="TODO" class="markdown-heading">TODO <a class="hover-link" href="#TODO">#</a></h2><ul><li>Morphisms between graphs</li></ul></div><div class="decl" id="Graph.map"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L36-L53">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map"><span class="name">Graph</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α'</span> <span class="fn">β</span></span></div></div><p>Map <code>G : <a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> α β</code> to a <code><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> α' β</code> with the same edge set by applying a function <code>f : α → α'</code>
+to each vertex. Edges between identified vertices become loops.</p><details><summary>Equations</summary><ul class="equations"><li class="equation">One or more equations did not get rendered due to their size.</li></ul></details><details id="instances-for-list-Graph.map" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Graph.map_isLink"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L38-L38">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map_isLink"><span class="name">Graph</span>.<span class="name">map_isLink</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">β</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">a✝ </span><span class="fn">a✝¹</span> : <span class="fn">α'</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.IsLink">IsLink</a></span> <span class="fn">e</span> <span class="fn">a✝</span> <span class="fn">a✝¹</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Logic/Relation.html#Relation.Map">Relation.Map</a> <span class="fn">(<span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.IsLink">IsLink</a></span> <span class="fn">e</span>)</span> <span class="fn">f</span> <span class="fn">f</span> <span class="fn">a✝</span> <span class="fn">a✝¹</span></span></div></div></div></div><div class="decl" id="Graph.vertexSet_map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L38-L38">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.vertexSet_map"><span class="name">Graph</span>.<span class="name">vertexSet_map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.vertexSet">vertexSet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.image">''</a> <span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.vertexSet">vertexSet</a></span></div></div></div></div><div class="decl" id="Graph.edgeSet_map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L38-L38">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.edgeSet_map"><span class="name">Graph</span>.<span class="name">edgeSet_map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.edgeSet">edgeSet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.edgeSet">edgeSet</a></span></div></div></div></div><div class="decl" id="Graph.IsLink.map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L55-L56">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.IsLink.map"><span class="name">Graph</span>.<span class="name">IsLink</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">u </span><span class="fn">v</span> : <span class="fn">α</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">e</span> : <span class="fn">β</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.IsLink">IsLink</a></span> <span class="fn">e</span> <span class="fn">u</span> <span class="fn">v</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.IsLink">IsLink</a></span> <span class="fn">e</span> <span class="fn">(<span class="fn">f</span> <span class="fn">u</span>)</span> <span class="fn">(<span class="fn">f</span> <span class="fn">v</span>)</span></span></div></div></div></div><div class="decl" id="Graph.map_inc"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L58-L61">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map_inc"><span class="name">Graph</span>.<span class="name">map_inc</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">e</span> : <span class="fn">β</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x</span> : <span class="fn">α'</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.Inc">Inc</a></span> <span class="fn">e</span> <span class="fn">x</span></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn">∃ (<span class="fn">v</span> : <span class="fn">α</span>), <span class="fn"><span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.Inc">Inc</a></span> <span class="fn">e</span> <span class="fn">v</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">f</span> <span class="fn">v</span></span></span></div></div></div></div><div class="decl" id="Graph.Inc.map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L63-L65">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.Inc.map"><span class="name">Graph</span>.<span class="name">Inc</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">v</span> : <span class="fn">α</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">e</span> : <span class="fn">β</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.Inc">Inc</a></span> <span class="fn">e</span> <span class="fn">v</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.Inc">Inc</a></span> <span class="fn">e</span> <span class="fn">(<span class="fn">f</span> <span class="fn">v</span>)</span></span></div></div></div></div><div class="decl" id="Graph.map_isLoopAt"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L67-L69">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map_isLoopAt"><span class="name">Graph</span>.<span class="name">map_isLoopAt</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">e</span> : <span class="fn">β</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x</span> : <span class="fn">α'</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.IsLoopAt">IsLoopAt</a></span> <span class="fn">e</span> <span class="fn">x</span></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn">∃ (<span class="fn">u</span> : <span class="fn">α</span>) (<span class="fn">v</span> : <span class="fn">α</span>), <span class="fn"><span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.IsLink">IsLink</a></span> <span class="fn">e</span> <span class="fn">u</span> <span class="fn">v</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><span class="fn">f</span> <span class="fn">u</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">x</span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><span class="fn">f</span> <span class="fn">v</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="Graph.IsLoopAt.map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L71-L72">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.IsLoopAt.map"><span class="name">Graph</span>.<span class="name">IsLoopAt</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">v</span> : <span class="fn">α</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">e</span> : <span class="fn">β</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.IsLoopAt">IsLoopAt</a></span> <span class="fn">e</span> <span class="fn">v</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.IsLoopAt">IsLoopAt</a></span> <span class="fn">e</span> <span class="fn">(<span class="fn">f</span> <span class="fn">v</span>)</span></span></div></div></div></div><div class="decl" id="Graph.map_adj"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L74-L77">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map_adj"><span class="name">Graph</span>.<span class="name">map_adj</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn">α'</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.Adj">Adj</a></span> <span class="fn">x</span> <span class="fn">y</span></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><a href="../../.././Mathlib/Logic/Relation.html#Relation.Map">Relation.Map</a> <span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.Adj">Adj</a></span> <span class="fn">f</span> <span class="fn">f</span> <span class="fn">x</span> <span class="fn">y</span></span></div></div></div></div><div class="decl" id="Graph.Adj.map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L79-L81">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.Adj.map"><span class="name">Graph</span>.<span class="name">Adj</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">u </span><span class="fn">v</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.Adj">Adj</a></span> <span class="fn">u</span> <span class="fn">v</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.Adj">Adj</a></span> <span class="fn">(<span class="fn">f</span> <span class="fn">u</span>)</span> <span class="fn">(<span class="fn">f</span> <span class="fn">v</span>)</span></span></div></div></div></div><div class="decl" id="Graph.map_id"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L83-L83">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map_id"><span class="name">Graph</span>.<span class="name">map_id</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <a href="../../.././Init/Prelude.html#id">id</a> <span class="fn">G</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">G</span></div></div></div></div><div class="decl" id="Graph.map_map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L85-L87">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map_map"><span class="name">Graph</span>.<span class="name">map_map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α''</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f'</span> : <span class="fn"><span class="fn">α'</span> → <span class="fn">α''</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f'</span> <span class="fn">(<a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> (<span class="fn">f'</span> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <span class="fn">f</span>) <span class="fn">G</span></span></div></div></div></div><div class="decl" id="Graph.IsSubgraph.map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L89-L92">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.IsSubgraph.map"><span class="name">Graph</span>.<span class="name">IsSubgraph</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G </span><span class="fn">H</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">G</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">H</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">H</span></span></div></div></div></div><div class="decl" id="Graph.map_mono"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L93-L93">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map_mono"><span class="name">Graph</span>.<span class="name">map_mono</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G </span><span class="fn">H</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">G</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">H</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">H</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.IsSubgraph.map">Graph.IsSubgraph.map</a></code>.</p></div></div><div class="decl" id="Graph.IsSpanningSubgraph.map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L95-L98">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.IsSpanningSubgraph.map"><span class="name">Graph</span>.<span class="name">IsSpanningSubgraph</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G </span><span class="fn">H</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hsle</span> : <span class="fn">G</span> <a href="../../.././Mathlib/Combinatorics/Graph/Subgraph.html#Graph.IsSpanningSubgraph">≤s</a> <span class="fn">H</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span></span> <a href="../../.././Mathlib/Combinatorics/Graph/Subgraph.html#Graph.IsSpanningSubgraph">≤s</a> <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">H</span></span></div></div></div></div><div class="decl" id="Graph.map_eq_of_eqOn"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/Combinatorics/Graph/Maps.lean#L100-L103">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map_eq_of_eqOn"><span class="name">Graph</span>.<span class="name">map_eq_of_eqOn</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α'</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph">Graph</a> <span class="fn">α</span> <span class="fn">β</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f </span><span class="fn">g</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">α'</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Operations.html#Set.EqOn">Set.EqOn</a> <span class="fn">f</span> <span class="fn">g</span> <span class="fn"><span class="fn">G</span>.<a href="../../.././Mathlib/Combinatorics/Graph/Basic.html#Graph.vertexSet">vertexSet</a></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">f</span> <span class="fn">G</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Combinatorics/Graph/Maps.html#Graph.map">map</a> <span class="fn">g</span> <span class="fn">G</span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

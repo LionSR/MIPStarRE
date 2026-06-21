@@ -1,0 +1,408 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../.././style.css"></link><link rel="icon" href="../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.CategoryTheory.Localization.DerivabilityStructure.OfLocalizedEquivalences</title><script defer="true" src="../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../.././";</script><script>const MODULE_NAME="Mathlib.CategoryTheory.Localization.DerivabilityStructure.OfLocalizedEquivalences";</script><script type="module" src="../../../.././jump-src.js"></script><script type="module" src="../../../.././search.js"></script><script type="module" src="../../../.././expand-nav.js"></script><script type="module" src="../../../.././how-about.js"></script><script type="module" src="../../../.././instances.js"></script><script type="module" src="../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">CategoryTheory</span>.<span class="name">Localization</span>.<span class="name">DerivabilityStructure</span>.<span class="name">OfLocalizedEquivalences</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../.././Init.html">Init</a></li><li><a href="../../../.././Mathlib/CategoryTheory/GuitartExact/HorizontalComposition.html">Mathlib.CategoryTheory.GuitartExact.HorizontalComposition</a></li><li><a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html">Mathlib.CategoryTheory.Localization.DerivabilityStructure.Basic</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.CategoryTheory.Localization.DerivabilityStructure.OfLocalizedEquivalences" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_of_isLocalizedEquivalence"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isLeftDerivabilityStructure_of_isLocalizedEquivalence</span></a></div><div class="nav_link"><a class="break_within" href="#CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_iff_of_isLocalizedEquivalence"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isLeftDerivabilityStructure_iff_of_isLocalizedEquivalence</span></a></div><div class="nav_link"><a class="break_within" href="#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_of_isLocalizedEquivalence"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isRightDerivabilityStructure_of_isLocalizedEquivalence</span></a></div><div class="nav_link"><a class="break_within" href="#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_iff_of_isLocalizedEquivalence"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isRightDerivabilityStructure_iff_of_isLocalizedEquivalence</span></a></div><div class="nav_link"><a class="break_within" href="#CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_of_equivalences"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isLeftDerivabilityStructure_of_equivalences</span></a></div><div class="nav_link"><a class="break_within" href="#CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_iff_of_equivalences"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isLeftDerivabilityStructure_iff_of_equivalences</span></a></div><div class="nav_link"><a class="break_within" href="#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_iff_of_equivalences"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isRightDerivabilityStructure_iff_of_equivalences</span></a></div><div class="nav_link"><a class="break_within" href="#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_of_equivalences"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isRightDerivabilityStructure_of_equivalences</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Derivability-structures-deduced-from-localized-equivalences" class="markdown-heading">Derivability structures deduced from localized equivalences <a class="hover-link" href="#Derivability-structures-deduced-from-localized-equivalences">#</a></h1><p>Assume that we have a diagram of localizer morphisms, in the
+sense that we have an isomorphism <code>T.functor ⋙ R.functor ≅ L.functor ⋙ B.functor</code>.</p><pre><code>      T
+ W₁  ---&gt; W₂
+ |        |
+L|        |R
+ v        v
+ W₁' ---&gt; W₂'
+      B
+</code></pre><p>In this file, we obtain the lemma
+<code><a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_of_isLocalizedEquivalence">LocalizerMorphism.isRightDerivabilityStructure_of_isLocalizedEquivalence</a></code> which shows
+that if both <code>L</code> and <code>R</code> are localized equivalences (with <code>R.functor</code> essentially surjective),
+then <code>B</code> is a right derivability structure when <code>T</code> is a right derivability structure,
+the <code>2</code>-square above is Guitart exact (and <code>W₂'</code> respects isomorphisms).
+In addition, if we require that <code>L.functor</code> is also essentially surjective,
+that <code>R.functor</code> is full and that <code>W₂</code> is induced by <code>W₂'</code>, then
+<code>B</code> is a right derivability structure iff <code>T</code> is.</p><p>The dual results for left derivability structures are also obtained.</p><p>This will be particularly useful when <code>L.functor</code> and <code>R.functor</code> are functors
+from a category to a quotient category (e.g. functors from categories of homological
+complexes to homotopy categories).</p></div><div class="decl" id="CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_of_isLocalizedEquivalence"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean#L60-L84">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_of_isLocalizedEquivalence"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isLeftDerivabilityStructure_of_isLocalizedEquivalence</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_1, u_1}</a> <span class="fn">C₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_2, u_2}</a> <span class="fn">C₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_3, u_3}</a> <span class="fn">D₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_4, u_4}</a> <span class="fn">D₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₁'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₂</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁'</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsLocalizedEquivalence">IsLocalizedEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsLocalizedEquivalence">IsLocalizedEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/EssentialImage.html#CategoryTheory.Functor.EssSurj">EssSurj</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsLeftDerivabilityStructure">IsLeftDerivabilityStructure</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">iso</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span> <a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/GuitartExact/Basic.html#CategoryTheory.TwoSquare.GuitartExact">TwoSquare.GuitartExact</a> <span class="fn"><span class="fn">iso</span>.<a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso.inv">inv</a></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsLeftDerivabilityStructure">IsLeftDerivabilityStructure</a></span></div></div></div></div><div class="decl" id="CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_iff_of_isLocalizedEquivalence"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean#L87-L116">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_iff_of_isLocalizedEquivalence"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isLeftDerivabilityStructure_iff_of_isLocalizedEquivalence</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_1, u_1}</a> <span class="fn">C₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_2, u_2}</a> <span class="fn">C₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_3, u_3}</a> <span class="fn">D₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_4, u_4}</a> <span class="fn">D₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₁'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₂</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁'</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsLocalizedEquivalence">IsLocalizedEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsLocalizedEquivalence">IsLocalizedEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/EssentialImage.html#CategoryTheory.Functor.EssSurj">EssSurj</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/EssentialImage.html#CategoryTheory.Functor.EssSurj">EssSurj</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/FullyFaithful.html#CategoryTheory.Functor.Full">Full</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">iso</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span> <a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/GuitartExact/Basic.html#CategoryTheory.TwoSquare.GuitartExact">TwoSquare.GuitartExact</a> <span class="fn"><span class="fn">iso</span>.<a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso.inv">inv</a></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsLeftDerivabilityStructure">IsLeftDerivabilityStructure</a></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsLeftDerivabilityStructure">IsLeftDerivabilityStructure</a></span></div></div></div></div><div class="decl" id="CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_of_isLocalizedEquivalence"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean#L118-L127">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_of_isLocalizedEquivalence"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isRightDerivabilityStructure_of_isLocalizedEquivalence</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_1, u_1}</a> <span class="fn">C₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_2, u_2}</a> <span class="fn">C₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_3, u_3}</a> <span class="fn">D₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_4, u_4}</a> <span class="fn">D₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₁'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₂</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁'</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsLocalizedEquivalence">IsLocalizedEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsLocalizedEquivalence">IsLocalizedEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/EssentialImage.html#CategoryTheory.Functor.EssSurj">EssSurj</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsRightDerivabilityStructure">IsRightDerivabilityStructure</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">iso</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span> <a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/GuitartExact/Basic.html#CategoryTheory.TwoSquare.GuitartExact">TwoSquare.GuitartExact</a> <span class="fn"><span class="fn">iso</span>.<a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso.hom">hom</a></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsRightDerivabilityStructure">IsRightDerivabilityStructure</a></span></div></div></div></div><div class="decl" id="CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_iff_of_isLocalizedEquivalence"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean#L129-L138">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_iff_of_isLocalizedEquivalence"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isRightDerivabilityStructure_iff_of_isLocalizedEquivalence</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_1, u_1}</a> <span class="fn">C₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_2, u_2}</a> <span class="fn">C₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_3, u_3}</a> <span class="fn">D₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_4, u_4}</a> <span class="fn">D₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₁'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₂</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁'</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsLocalizedEquivalence">IsLocalizedEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsLocalizedEquivalence">IsLocalizedEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/EssentialImage.html#CategoryTheory.Functor.EssSurj">EssSurj</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/EssentialImage.html#CategoryTheory.Functor.EssSurj">EssSurj</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/FullyFaithful.html#CategoryTheory.Functor.Full">Full</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">iso</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span> <a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/GuitartExact/Basic.html#CategoryTheory.TwoSquare.GuitartExact">TwoSquare.GuitartExact</a> <span class="fn"><span class="fn">iso</span>.<a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso.hom">hom</a></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsRightDerivabilityStructure">IsRightDerivabilityStructure</a></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsRightDerivabilityStructure">IsRightDerivabilityStructure</a></span></div></div></div></div><div class="decl" id="CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_of_equivalences"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean#L146-L152">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_of_equivalences"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isLeftDerivabilityStructure_of_equivalences</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_1, u_1}</a> <span class="fn">C₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_2, u_2}</a> <span class="fn">C₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_3, u_3}</a> <span class="fn">D₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_4, u_4}</a> <span class="fn">D₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₁'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₂</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁'</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Equivalence.html#CategoryTheory.Functor.IsEquivalence">IsEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Equivalence.html#CategoryTheory.Functor.IsEquivalence">IsEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsLeftDerivabilityStructure">IsLeftDerivabilityStructure</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">iso</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span> <a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsLeftDerivabilityStructure">IsLeftDerivabilityStructure</a></span></div></div></div></div><div class="decl" id="CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_iff_of_equivalences"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean#L155-L169">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isLeftDerivabilityStructure_iff_of_equivalences"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isLeftDerivabilityStructure_iff_of_equivalences</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_1, u_1}</a> <span class="fn">C₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_2, u_2}</a> <span class="fn">C₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_3, u_3}</a> <span class="fn">D₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_4, u_4}</a> <span class="fn">D₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₁'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₂</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁'</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Equivalence.html#CategoryTheory.Functor.IsEquivalence">IsEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Equivalence.html#CategoryTheory.Functor.IsEquivalence">IsEquivalence</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">iso</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span> <a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsLeftDerivabilityStructure">IsLeftDerivabilityStructure</a></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsLeftDerivabilityStructure">IsLeftDerivabilityStructure</a></span></div></div></div></div><div class="decl" id="CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_iff_of_equivalences"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean#L171-L176">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_iff_of_equivalences"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isRightDerivabilityStructure_iff_of_equivalences</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_1, u_1}</a> <span class="fn">C₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_2, u_2}</a> <span class="fn">C₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_3, u_3}</a> <span class="fn">D₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_4, u_4}</a> <span class="fn">D₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₁'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₂</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁'</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Equivalence.html#CategoryTheory.Functor.IsEquivalence">IsEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Equivalence.html#CategoryTheory.Functor.IsEquivalence">IsEquivalence</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">iso</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span> <a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsRightDerivabilityStructure">IsRightDerivabilityStructure</a></span> <a href="../../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsRightDerivabilityStructure">IsRightDerivabilityStructure</a></span></div></div></div></div><div class="decl" id="CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_of_equivalences"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.lean#L178-L182">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/OfLocalizedEquivalences.html#CategoryTheory.LocalizerMorphism.isRightDerivabilityStructure_of_equivalences"><span class="name">CategoryTheory</span>.<span class="name">LocalizerMorphism</span>.<span class="name">isRightDerivabilityStructure_of_equivalences</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₁</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">D₂</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_1, u_1}</a> <span class="fn">C₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_2, u_2}</a> <span class="fn">C₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_3, u_3}</a> <span class="fn">D₁</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">Category.{v_4, u_4}</a> <span class="fn">D₂</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₁</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">C₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₂'</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">MorphismProperty</a> <span class="fn">D₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₂</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁</span> <span class="fn">W₁'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₂</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism">LocalizerMorphism</a> <span class="fn">W₁'</span> <span class="fn">W₂'</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂'</span>.<a href="../../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.RespectsIso">RespectsIso</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Equivalence.html#CategoryTheory.Functor.IsEquivalence">IsEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.IsInduced">IsInduced</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Equivalence.html#CategoryTheory.Functor.IsEquivalence">IsEquivalence</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsRightDerivabilityStructure">IsRightDerivabilityStructure</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">iso</span> : <span class="fn"><span class="fn"><span class="fn"><span class="fn">T</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">R</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span> <a href="../../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn"><span class="fn"><span class="fn"><span class="fn">L</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span>.<a href="../../../.././Mathlib/CategoryTheory/Functor/Basic.html#CategoryTheory.Functor.comp">comp</a></span> <span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/LocalizerMorphism.html#CategoryTheory.LocalizerMorphism.functor">functor</a></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">B</span>.<a href="../../../.././Mathlib/CategoryTheory/Localization/DerivabilityStructure/Basic.html#CategoryTheory.LocalizerMorphism.IsRightDerivabilityStructure">IsRightDerivabilityStructure</a></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>
