@@ -193,6 +193,46 @@ theorem averageOperatorOverDistribution_congr {α : Type*}
     averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
   exact Finset.sum_congr rfl fun a _ => by rw [h a]
 
+/-- Averaging against a probabilistic project distribution is the finite sum
+against its associated Mathlib probability mass function. -/
+theorem avgOver_eq_toPMF_sum {α : Type*} [Fintype α]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → Error) :
+    avgOver 𝒟 f = ∑ a : α, (𝒟.toPMF h𝒟 a).toReal * f a := by
+  unfold avgOver
+  rw [← Distribution.sum_univ_eq_sum_support 𝒟
+    (fun a => 𝒟.weight a * f a) ?_]
+  · exact Finset.sum_congr rfl fun a _ => by
+      rw [Distribution.toPMF_apply_toReal]
+  · intro a ha
+    rw [𝒟.outsideSupport a ha, zero_mul]
+
+/-- Averaging against a probabilistic project distribution is integration
+against its associated Mathlib probability mass function. -/
+theorem avgOver_eq_toPMF_integral {α : Type*}
+    [Finite α] [MeasurableSpace α] [MeasurableSingletonClass α]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → Error) :
+    avgOver 𝒟 f = ∫ a, f a ∂(𝒟.toPMF h𝒟).toMeasure := by
+  haveI := Fintype.ofFinite α
+  rw [avgOver_eq_toPMF_sum 𝒟 h𝒟 f, PMF.integral_eq_sum]
+  simp only [smul_eq_mul]
+
+/-- Operator-valued averaging against a probabilistic project distribution is
+the finite sum against its associated Mathlib probability mass function. -/
+theorem averageOperatorOverDistribution_eq_toPMF_sum {α : Type*}
+    [Fintype α]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 f =
+      ∑ a : α, (𝒟.toPMF h𝒟 a).toReal • f a := by
+  unfold averageOperatorOverDistribution
+  rw [← Distribution.sum_univ_eq_sum_support 𝒟
+    (fun a => 𝒟.weight a • f a) ?_]
+  · exact Finset.sum_congr rfl fun a _ => by
+      rw [Distribution.toPMF_apply_toReal]
+  · intro a ha
+    rw [𝒟.outsideSupport a ha, zero_smul]
+
 namespace Distribution.IsProbability
 
 /-- A supportwise upper bound also bounds the average of a probability distribution.
