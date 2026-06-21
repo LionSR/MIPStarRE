@@ -163,6 +163,31 @@ theorem toPMF_apply_of_notMem {α : Type*} (𝒟 : Distribution α)
   rw [toPMF_apply, 𝒟.outsideSupport a ha]
   simp
 
+/-- The project push-forward agrees with Mathlib's push-forward of the
+associated probability mass function. -/
+theorem toPMF_map {α β : Type*} [DecidableEq β]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (e : α → β) :
+    (𝒟.map e).toPMF (h𝒟.map e) = (𝒟.toPMF h𝒟).map e := by
+  classical
+  ext b
+  rw [toPMF_apply, PMF.map_apply, map_weight]
+  rw [ENNReal.ofReal_sum_of_nonneg
+    (s := 𝒟.support.filter (fun a => e a = b))
+    (fun a _ => 𝒟.nonnegative a)]
+  rw [tsum_eq_sum (s := 𝒟.support)]
+  · rw [Finset.sum_filter]
+    refine Finset.sum_congr rfl ?_
+    intro a ha
+    by_cases hea : e a = b
+    · have hba : b = e a := hea.symm
+      rw [if_pos hea, if_pos hba, toPMF_apply]
+    · have hba : b ≠ e a := fun hba => hea hba.symm
+      rw [if_neg hea, if_neg hba]
+  · intro a ha
+    by_cases hba : b = e a
+    · rw [if_pos hba, toPMF_apply_of_notMem 𝒟 h𝒟 ha]
+    · rw [if_neg hba]
+
 end Distribution
 
 /-- Average a scalar function against the stored finite support of a distribution. -/
@@ -377,6 +402,16 @@ theorem uniformOnFinset_weight_eq_pmf_uniformOfFinset_toReal
       ENNReal.toReal_inv, ENNReal.toReal_natCast]
   · simp [uniformOnFinset_weight, PMF.uniformOfFinset_apply, ha]
 
+/-- The project uniform distribution on a nonempty finite support is Mathlib's
+uniform probability mass function on that support. -/
+theorem uniformOnFinset_toPMF
+    {α : Type*} (s : Finset α) (hs : s.Nonempty) :
+    (uniformOnFinset s).toPMF (uniformOnFinset_isProbability s hs) =
+      PMF.uniformOfFinset s hs := by
+  ext a
+  rw [toPMF_apply, uniformOnFinset_weight_eq_pmf_uniformOfFinset_toReal]
+  exact ENNReal.ofReal_toReal ((PMF.uniformOfFinset s hs).apply_ne_top a)
+
 end Distribution
 
 /-- The uniform distribution on a nonempty finite type. -/
@@ -390,12 +425,45 @@ theorem uniformDistribution_support (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] :
     (uniformDistribution α).support = Finset.univ := rfl
 
+/-- The weights of a uniform distribution sum to exactly `1`. -/
+theorem uniformDistribution_weight_sum_eq_one (α : Type*)
+    [Fintype α] [DecidableEq α] [Nonempty α] :
+    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a = 1 := by
+  have h : (uniformDistribution α).IsProbability := by
+    simpa [uniformDistribution] using
+      Distribution.uniformOnFinset_isProbability (Finset.univ : Finset α)
+        Finset.univ_nonempty
+  exact h.weight_sum_eq_one
+
+/-- The uniform distribution is a genuine probability distribution. -/
+theorem uniformDistribution_isProbability (α : Type*)
+    [Fintype α] [DecidableEq α] [Nonempty α] :
+    (uniformDistribution α).IsProbability := by
+  simpa [uniformDistribution] using
+    Distribution.uniformOnFinset_isProbability (Finset.univ : Finset α) Finset.univ_nonempty
+
+/-- The weights of a uniform distribution sum to at most `1`. -/
+theorem uniformDistribution_weight_sum_le_one (α : Type*)
+    [Fintype α] [DecidableEq α] [Nonempty α] :
+    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a ≤ 1 :=
+  le_of_eq (uniformDistribution_weight_sum_eq_one α)
+
 /-- On a finite type, uniform distribution weights agree with Mathlib's uniform PMF. -/
 theorem uniformDistribution_weight_eq_pmf_uniformOfFintype_toReal
     (α : Type*) [Fintype α] [DecidableEq α] [Nonempty α] (a : α) :
     (uniformDistribution α).weight a = (PMF.uniformOfFintype α a).toReal := by
   simp [uniformDistribution, Distribution.uniformOnFinset_weight,
     PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
+
+/-- The project uniform distribution on a nonempty finite type is Mathlib's
+uniform probability mass function on that type. -/
+theorem uniformDistribution_toPMF
+    (α : Type*) [Fintype α] [DecidableEq α] [Nonempty α] :
+    (uniformDistribution α).toPMF (uniformDistribution_isProbability α) =
+      PMF.uniformOfFintype α := by
+  ext a
+  rw [Distribution.toPMF_apply, uniformDistribution_weight_eq_pmf_uniformOfFintype_toReal]
+  exact ENNReal.ofReal_toReal ((PMF.uniformOfFintype α).apply_ne_top a)
 
 /-- Total variation distance between two distributions:
 `TV(μ, ν) = ½ ∑_a |μ(a) - ν(a)|` over the union of supports. -/
