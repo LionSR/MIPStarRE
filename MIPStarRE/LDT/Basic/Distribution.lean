@@ -465,6 +465,39 @@ theorem uniformDistribution_toPMF
   rw [Distribution.toPMF_apply, uniformDistribution_weight_eq_pmf_uniformOfFintype_toReal]
   exact ENNReal.ofReal_toReal ((PMF.uniformOfFintype α).apply_ne_top a)
 
+/-- The project push-forward of a uniform finite distribution is Mathlib's
+push-forward of the corresponding uniform probability mass function. -/
+theorem uniformDistribution_map_toPMF
+    (α β : Type*) [Fintype α] [DecidableEq α] [Nonempty α] [DecidableEq β]
+    (e : α → β) :
+    ((uniformDistribution α).map e).toPMF
+      ((uniformDistribution_isProbability α).map e) =
+        (PMF.uniformOfFintype α).map e := by
+  simpa [uniformDistribution_toPMF] using
+    Distribution.toPMF_map
+      (uniformDistribution α) (uniformDistribution_isProbability α) e
+
+/-- Averaging over the project push-forward of a uniform finite distribution is
+averaging the pulled-back function over the uniform source. -/
+theorem avgOver_uniformDistribution_map
+    (α β : Type*) [Fintype α] [DecidableEq α] [Nonempty α] [DecidableEq β]
+    (e : α → β) (f : β → Error) :
+    avgOver ((uniformDistribution α).map e) f =
+      avgOver (uniformDistribution α) (fun a => f (e a)) := by
+  exact Distribution.avgOver_map (uniformDistribution α) e f
+
+/-- Operator averaging over the project push-forward of a uniform finite
+distribution is operator averaging of the pulled-back family over the uniform
+source. -/
+theorem averageOperatorOverDistribution_uniformDistribution_map
+    (α β : Type*) [Fintype α] [DecidableEq α] [Nonempty α] [DecidableEq β]
+    (e : α → β)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : β → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution ((uniformDistribution α).map e) f =
+      averageOperatorOverDistribution (uniformDistribution α) (fun a => f (e a)) := by
+  exact Distribution.averageOperatorOverDistribution_map (uniformDistribution α) e f
+
 /-- Total variation distance between two distributions:
 `TV(μ, ν) = ½ ∑_a |μ(a) - ν(a)|` over the union of supports. -/
 noncomputable def totalVariationDistance {α : Type*} [DecidableEq α]

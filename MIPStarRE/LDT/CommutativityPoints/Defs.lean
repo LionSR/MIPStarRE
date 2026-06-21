@@ -223,10 +223,9 @@ theorem pointPairSharedDiagonalLineDistribution_toPMF (params : Parameters)
       (pointPairSharedDiagonalLineDistribution_isProbability params) =
         (PMF.uniformOfFintype (PointPairQuestion params × Fq params)).map
           (sharedDiagonalLineQuestionOfPointPair params) := by
-  simpa [pointPairSharedDiagonalLineDistribution, uniformDistribution_toPMF] using
-    Distribution.toPMF_map
-      (uniformDistribution (PointPairQuestion params × Fq params))
-      (uniformDistribution_isProbability (PointPairQuestion params × Fq params))
+  simpa [pointPairSharedDiagonalLineDistribution] using
+    uniformDistribution_map_toPMF
+      (PointPairQuestion params × Fq params) (PointPairDiagonalLineQuestion params)
       (sharedDiagonalLineQuestionOfPointPair params)
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/

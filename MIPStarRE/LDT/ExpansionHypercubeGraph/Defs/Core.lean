@@ -93,9 +93,8 @@ theorem rerandomizeCoord_toPMF (params : Parameters) :
     (rerandomizeCoord params).toPMF (rerandomizeCoord_isProbability params) =
       (PMF.uniformOfFintype (RerandomizeCoordSample params)).map
         (rerandomizeCoordSampleToPair params) := by
-  simpa [rerandomizeCoord, uniformDistribution_toPMF] using
-    Distribution.toPMF_map (uniformDistribution (RerandomizeCoordSample params))
-      (uniformDistribution_isProbability (RerandomizeCoordSample params))
+  simpa [rerandomizeCoord] using
+    uniformDistribution_map_toPMF (RerandomizeCoordSample params) (Point params × Point params)
       (rerandomizeCoordSampleToPair params)
 
 /-- The rerandomized-coordinate edge distribution has total mass one. -/
@@ -110,9 +109,10 @@ theorem avgOver_rerandomizeCoord_eq_uniform_sample (params : Parameters)
     avgOver (rerandomizeCoord params) f =
       avgOver (uniformDistribution (RerandomizeCoordSample params))
         (fun sample => f (rerandomizeCoordSampleToPair params sample)) := by
-  exact Distribution.avgOver_map
-    (uniformDistribution (RerandomizeCoordSample params))
-    (rerandomizeCoordSampleToPair params) f
+  simpa [rerandomizeCoord] using
+    avgOver_uniformDistribution_map
+      (RerandomizeCoordSample params) (Point params × Point params)
+      (rerandomizeCoordSampleToPair params) f
 
 /-- The push-forward presentation of `rerandomizeCoord` has the same averages as
 the explicit counting coefficient `rerandomizeCoordWeight`.
