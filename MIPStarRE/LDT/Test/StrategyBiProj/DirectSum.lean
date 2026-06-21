@@ -623,6 +623,17 @@ private def roleBlockFamily {ιA ιB : Type*}
   | Role.A => A
   | Role.B => B
 
+/-- The role-register block diagonal as a ring homomorphism. -/
+private noncomputable def roleBlockRingHom {ιA ιB : Type*}
+    [Fintype ιA] [Fintype ιB] [DecidableEq ιA] [DecidableEq ιB] :
+    (Role → MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB)) →+*
+      MIPStarRE.Quantum.Op (RoleRegisterLocal ιA ιB) := by
+  classical
+  exact
+    (Matrix.reindexAlgEquiv ℂ ℂ
+      (Equiv.prodComm (LocalCarrierSum ιA ιB) Role)).toRingHom.comp
+        (Matrix.blockDiagonalRingHom (LocalCarrierSum ιA ιB) Role ℂ)
+
 /-- Role-blocked operator on `Role × (ιA ⊕ ιB)`.
 
 The first block is used when the role register is `Role.A`; the second block is
@@ -695,16 +706,13 @@ noncomputable def roleBlock {ιA ιB : Type*}
     (A₁ A₂ B₁ B₂ : MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB)) :
     roleBlock A₁ B₁ * roleBlock A₂ B₂ = roleBlock (A₁ * A₂) (B₁ * B₂) := by
   classical
-  unfold roleBlock
-  let e := Equiv.prodComm (LocalCarrierSum ιA ιB) Role
-  change (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal (roleBlockFamily A₁ B₁)) *
-      (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)) =
-    (Matrix.reindexAlgEquiv ℂ ℂ e)
-      (Matrix.blockDiagonal (roleBlockFamily (A₁ * A₂) (B₁ * B₂)))
-  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)
-    (Matrix.blockDiagonal (roleBlockFamily A₁ B₁))
-    (Matrix.blockDiagonal (roleBlockFamily A₂ B₂)), ← Matrix.blockDiagonal_mul]
-  congr 2
+  change roleBlockRingHom (roleBlockFamily A₁ B₁) *
+      roleBlockRingHom (roleBlockFamily A₂ B₂) =
+    roleBlockRingHom (roleBlockFamily (A₁ * A₂) (B₁ * B₂))
+  rw [← map_mul (roleBlockRingHom :
+    (Role → MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB)) →+*
+      MIPStarRE.Quantum.Op (RoleRegisterLocal ιA ιB))]
+  congr
   ext r
   cases r <;> rfl
 
