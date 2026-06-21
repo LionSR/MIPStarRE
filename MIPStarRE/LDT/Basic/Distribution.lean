@@ -327,12 +327,31 @@ theorem uniformOnFinset_weight_sum_le_one {α : Type*} (s : Finset α) :
   · have hsempty : s = ∅ := Finset.not_nonempty_iff_eq_empty.mp hs
     simp [hsempty]
 
+/-- On a nonempty support, project uniform weights agree with Mathlib's uniform PMF. -/
+theorem uniformOnFinset_weight_eq_pmf_uniformOfFinset_toReal
+    {α : Type*} (s : Finset α) (hs : s.Nonempty) (a : α) :
+    (uniformOnFinset s).weight a = (PMF.uniformOfFinset s hs a).toReal := by
+  classical
+  by_cases ha : a ∈ s
+  · simp [uniformOnFinset_weight, PMF.uniformOfFinset_apply, ha,
+      ENNReal.toReal_inv, ENNReal.toReal_natCast]
+  · simp [uniformOnFinset_weight, PMF.uniformOfFinset_apply, ha]
 end Distribution
 
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α :=
   Distribution.uniformOnFinset Finset.univ
+
+@[simp] theorem uniformDistribution_support (α : Type*)
+    [Fintype α] [DecidableEq α] [Nonempty α] :
+    (uniformDistribution α).support = Finset.univ := rfl
+/-- On a finite type, project uniform weights agree with Mathlib's uniform PMF. -/
+theorem uniformDistribution_weight_eq_pmf_uniformOfFintype_toReal
+    (α : Type*) [Fintype α] [DecidableEq α] [Nonempty α] (a : α) :
+    (uniformDistribution α).weight a = (PMF.uniformOfFintype α a).toReal := by
+  simp [uniformDistribution, Distribution.uniformOnFinset_weight,
+    PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
 
 /-- Total variation distance between two distributions:
 `TV(μ, ν) = ½ ∑_a |μ(a) - ν(a)|` over the union of supports. -/
@@ -562,11 +581,18 @@ theorem avgOver_uniform_eq_pmf_sum {α : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α] (f : α → Error) :
     avgOver (uniformDistribution α) f =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal * f a := by
-  unfold uniformDistribution avgOver
+  unfold avgOver
+  rw [uniformDistribution_support]
+  simp [uniformDistribution_weight_eq_pmf_uniformOfFintype_toReal]
+/-- A finite-support uniform average is the corresponding Mathlib uniform PMF sum. -/
+theorem avgOver_uniformOnFinset_eq_pmf_sum {α : Type*} (s : Finset α)
+    (hs : s.Nonempty) (f : α → Error) :
+    avgOver (Distribution.uniformOnFinset s) f =
+      ∑ a ∈ s, (PMF.uniformOfFinset s hs a).toReal * f a := by
+  unfold avgOver
   rw [Distribution.uniformOnFinset_support]
-  simp [Distribution.uniformOnFinset_weight, PMF.uniformOfFintype_apply,
-    ENNReal.toReal_inv, ENNReal.toReal_natCast]
-
+  exact Finset.sum_congr rfl fun a _ => by
+    rw [Distribution.uniformOnFinset_weight_eq_pmf_uniformOfFinset_toReal s hs a]
 /-- The uniform average with respect to `uniformDistribution` is the finite integral
 with respect to the uniform probability mass function. -/
 theorem avgOver_uniform_eq_pmf_integral {α : Type*}
@@ -585,27 +611,27 @@ theorem avgOver_uniformOnFinset_eq_subtype {α : Type*} [DecidableEq α]
     avgOver (Distribution.uniformOnFinset s) f =
       avgOver (uniformDistribution {a : α // a ∈ s}) (fun a => f a.1) := by
   classical
+  have hs : s.Nonempty := by
+    rcases (inferInstance : Nonempty {a : α // a ∈ s}) with ⟨a⟩
+    exact ⟨a.1, a.2⟩
   have hcard : (s.card : Error) = (Fintype.card {a : α // a ∈ s} : Error) := by
     rw [Fintype.card_coe s]
-  rw [avgOver_uniform_eq_pmf_sum]
-  unfold avgOver
-  rw [Distribution.uniformOnFinset_support]
-  simp_rw [Distribution.uniformOnFinset_weight]
+  rw [avgOver_uniformOnFinset_eq_pmf_sum s hs, avgOver_uniform_eq_pmf_sum]
   simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
   rw [← hcard]
   calc
-    ∑ x ∈ s, (if x ∈ s then 1 / (s.card : Error) else 0) * f x
+    ∑ x ∈ s, (PMF.uniformOfFinset s hs x).toReal * f x
         = ∑ x ∈ s, (s.card : Error)⁻¹ * f x := by
           refine Finset.sum_congr rfl ?_
           intro x hx
-          simp [hx]
+          simp [PMF.uniformOfFinset_apply, hx, ENNReal.toReal_inv,
+            ENNReal.toReal_natCast]
     _ = ∑ x ∈ s.attach, (s.card : Error)⁻¹ * f x.1 := by
           exact
             (Finset.sum_attach s
               (fun x : α => (s.card : Error)⁻¹ * f x)).symm
     _ = ∑ x : {x : α // x ∈ s}, (s.card : Error)⁻¹ * f x.1 := by
           rw [Finset.attach_eq_univ]
-
 /-- The uniform operator average is the finite operator sum weighted by
 `PMF.uniformOfFintype`. -/
 theorem averageOperatorOverDistribution_uniform_eq_pmf_sum {α : Type*}
@@ -614,11 +640,21 @@ theorem averageOperatorOverDistribution_uniform_eq_pmf_sum {α : Type*}
     (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (uniformDistribution α) f =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
-  unfold uniformDistribution averageOperatorOverDistribution
-  rw [Distribution.uniformOnFinset_support]
-  simp [Distribution.uniformOnFinset_weight, PMF.uniformOfFintype_apply,
-    ENNReal.toReal_inv, ENNReal.toReal_natCast]
+  unfold averageOperatorOverDistribution
+  rw [uniformDistribution_support]
+  simp [uniformDistribution_weight_eq_pmf_uniformOfFintype_toReal]
 
+/-- A finite-support uniform operator average is the corresponding Mathlib uniform PMF sum. -/
+theorem averageOperatorOverDistribution_uniformOnFinset_eq_pmf_sum
+    {α : Type*} (s : Finset α) (hs : s.Nonempty)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution (Distribution.uniformOnFinset s) f =
+      ∑ a ∈ s, (PMF.uniformOfFinset s hs a).toReal • f a := by
+  unfold averageOperatorOverDistribution
+  rw [Distribution.uniformOnFinset_support]
+  exact Finset.sum_congr rfl fun a _ => by
+    rw [Distribution.uniformOnFinset_weight_eq_pmf_uniformOfFinset_toReal s hs a]
 /-- Reindexing a uniform operator average along an equivalence preserves its value. -/
 theorem averageOperatorOverDistribution_uniform_equiv
     {α β : Type*}
@@ -648,20 +684,22 @@ theorem averageOperatorOverDistribution_uniformOnFinset_eq_subtype
       averageOperatorOverDistribution (uniformDistribution {a : α // a ∈ s})
         (fun a => f a.1) := by
   classical
+  have hs : s.Nonempty := by
+    rcases (inferInstance : Nonempty {a : α // a ∈ s}) with ⟨a⟩
+    exact ⟨a.1, a.2⟩
   have hcard : (s.card : Error) = (Fintype.card {a : α // a ∈ s} : Error) := by
     rw [Fintype.card_coe s]
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_sum]
-  unfold averageOperatorOverDistribution
-  rw [Distribution.uniformOnFinset_support]
-  simp_rw [Distribution.uniformOnFinset_weight]
+  rw [averageOperatorOverDistribution_uniformOnFinset_eq_pmf_sum s hs,
+    averageOperatorOverDistribution_uniform_eq_pmf_sum]
   simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
   rw [← hcard]
   calc
-    ∑ x ∈ s, (if x ∈ s then 1 / (s.card : Error) else 0) • f x
+    ∑ x ∈ s, (PMF.uniformOfFinset s hs x).toReal • f x
         = ∑ x ∈ s, (s.card : Error)⁻¹ • f x := by
           refine Finset.sum_congr rfl ?_
           intro x hx
-          simp [hx]
+          simp [PMF.uniformOfFinset_apply, hx, ENNReal.toReal_inv,
+            ENNReal.toReal_natCast]
     _ = ∑ x ∈ s.attach, (s.card : Error)⁻¹ • f x.1 := by
           exact
             (Finset.sum_attach s
