@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.DistributionAvg
 import MIPStarRE.LDT.Basic.DistributionUniform
 import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
 
