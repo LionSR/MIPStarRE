@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.DistributionMapAverages
 import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 
 /-!
@@ -85,18 +86,6 @@ private theorem sharedDiagonalLineQuestionOfPointPair_of_line
         ring_nf
         simp
 
-private lemma avgOver_pointPairSharedDiagonalLine_eq_uniform_seed
-    (params : Parameters)
-    [FieldModel params.q]
-    (f : PointPairDiagonalLineQuestion params → Error) :
-    avgOver (pointPairSharedDiagonalLineDistribution params) f =
-      avgOver (uniformDistribution (PointPairQuestion params × Fq params))
-        (fun s => f (sharedDiagonalLineQuestionOfPointPair params s)) := by
-  simpa [pointPairSharedDiagonalLineDistribution] using
-    (avgOver_uniformDistribution_map
-      (PointPairQuestion params × Fq params) (PointPairDiagonalLineQuestion params)
-      (sharedDiagonalLineQuestionOfPointPair params) f)
-
 private noncomputable def pointPairSharedDiagonalLine_ignore_first_equiv
     (params : Parameters)
     [FieldModel params.q] :
@@ -157,15 +146,16 @@ lemma avgOver_pointPairSharedDiagonalLine_ignore_first
   calc
     avgOver (pointPairSharedDiagonalLineDistribution params)
         (fun q => f (q.1, q.2.2))
-      = avgOver (uniformDistribution (PointPairQuestion params × Fq params))
-          (fun s => f ((pointPairSharedDiagonalLine_ignore_first_equiv params) s)) := by
-            simpa [pointPairSharedDiagonalLine_ignore_first_equiv] using
-              avgOver_pointPairSharedDiagonalLine_eq_uniform_seed params
-                (fun q => f (q.1, q.2.2))
-    _ = avgOver (uniformDistribution (PointDiagonalLineQuestion params)) f := by
-          simpa using
-            (avgOver_uniform_equiv (pointPairSharedDiagonalLine_ignore_first_equiv params)
-              (fun s => f ((pointPairSharedDiagonalLine_ignore_first_equiv params) s)))
+      = avgOver (uniformDistribution (PointDiagonalLineQuestion params)) f := by
+          simpa [pointPairSharedDiagonalLineDistribution] using
+            (avgOver_uniform_map_eq_uniform_of_factor_equiv
+              (m := sharedDiagonalLineQuestionOfPointPair params)
+              (g := fun q : PointPairDiagonalLineQuestion params => (q.1, q.2.2))
+              (e := pointPairSharedDiagonalLine_ignore_first_equiv params)
+              (h := by
+                intro s
+                rfl)
+              (f := f))
     _ = avgOver (pointWithDiagonalLineDistribution params) f := by
           simp [pointWithDiagonalLineDistribution]
 
@@ -179,15 +169,16 @@ lemma avgOver_pointPairSharedDiagonalLine_ignore_second
   calc
     avgOver (pointPairSharedDiagonalLineDistribution params)
         (fun q => f (q.1, q.2.1))
-      = avgOver (uniformDistribution (PointPairQuestion params × Fq params))
-          (fun s => f ((pointPairSharedDiagonalLine_ignore_second_equiv params) s)) := by
-            simpa [pointPairSharedDiagonalLine_ignore_second_equiv] using
-              avgOver_pointPairSharedDiagonalLine_eq_uniform_seed params
-                (fun q => f (q.1, q.2.1))
-    _ = avgOver (uniformDistribution (PointDiagonalLineQuestion params)) f := by
-          simpa using
-            (avgOver_uniform_equiv (pointPairSharedDiagonalLine_ignore_second_equiv params)
-              (fun s => f ((pointPairSharedDiagonalLine_ignore_second_equiv params) s)))
+      = avgOver (uniformDistribution (PointDiagonalLineQuestion params)) f := by
+          simpa [pointPairSharedDiagonalLineDistribution] using
+            (avgOver_uniform_map_eq_uniform_of_factor_equiv
+              (m := sharedDiagonalLineQuestionOfPointPair params)
+              (g := fun q : PointPairDiagonalLineQuestion params => (q.1, q.2.1))
+              (e := pointPairSharedDiagonalLine_ignore_second_equiv params)
+              (h := by
+                intro s
+                rfl)
+              (f := f))
     _ = avgOver (pointWithDiagonalLineDistribution params) f := by
           simp [pointWithDiagonalLineDistribution]
 
@@ -198,16 +189,13 @@ lemma avgOver_pointPairSharedDiagonalLine_sampled_pair
     avgOver (pointPairSharedDiagonalLineDistribution params)
       (fun q => f (sampledPointPairFromSharedDiagonalQuestion params q)) =
       avgOver (uniformDistribution (PointPairQuestion params)) f := by
-  calc
-    avgOver (pointPairSharedDiagonalLineDistribution params)
-        (fun q => f (sampledPointPairFromSharedDiagonalQuestion params q))
-      = avgOver (uniformDistribution (PointPairQuestion params × Fq params))
-          (fun s => f s.1) := by
-            simpa [sharedDiagonalLineQuestionOfPointPair_sampledPointPair] using
-              avgOver_pointPairSharedDiagonalLine_eq_uniform_seed params
-                (fun q => f (sampledPointPairFromSharedDiagonalQuestion params q))
-    _ = avgOver (uniformDistribution (PointPairQuestion params)) f := by
-          exact avgOver_uniform_fst f
+  simpa [pointPairSharedDiagonalLineDistribution] using
+    (avgOver_uniform_map_eq_uniform_fst_of_factor_equiv
+      (m := sharedDiagonalLineQuestionOfPointPair params)
+      (g := sampledPointPairFromSharedDiagonalQuestion params)
+      (e := Equiv.refl (PointPairQuestion params × Fq params))
+      (h := sharedDiagonalLineQuestionOfPointPair_sampledPointPair params)
+      (f := f))
 
 lemma pointMeasurementProductAlongSharedLine_outcome
     (params : Parameters)
