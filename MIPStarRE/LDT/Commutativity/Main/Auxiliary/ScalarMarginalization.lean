@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.DistributionAvg
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.Closeness
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessXEval
 import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
@@ -58,17 +59,9 @@ private lemma avgOver_pointHeight
     (f : Fq params → Error) :
     avgOver (uniformDistribution (Point params.next)) (fun u => f (pointHeight params u)) =
       avgOver (uniformDistribution (Fq params)) f := by
-  calc
-    avgOver (uniformDistribution (Point params.next)) (fun u => f (pointHeight params u))
-        = avgOver (uniformDistribution (Point params × Fq params))
-            (fun ux => f (pointHeight params ((pointNextEquiv params).symm ux))) := by
-            exact MIPStarRE.LDT.avgOver_uniform_equiv (pointNextEquiv params)
-              (fun u : Point params.next => f (pointHeight params u))
-    _ = avgOver (uniformDistribution (Point params × Fq params)) (fun ux => f ux.2) := by
-          apply avgOver_congr
-          intro ux
-          simp [pointNextEquiv]
-    _ = avgOver (uniformDistribution (Fq params)) f := avgOver_uniform_snd f
+  simpa [pointNextEquiv] using
+    (MIPStarRE.LDT.avgOver_uniform_equiv_snd
+      (e := pointNextEquiv params) (f := f))
 
 /-- Summing the inner outcome in an `ABA` expectation turns it into the
 submeasurement total. -/
