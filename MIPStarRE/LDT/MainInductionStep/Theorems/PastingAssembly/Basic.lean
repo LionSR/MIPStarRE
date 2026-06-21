@@ -427,47 +427,10 @@ lemma idxPolyFamily_averagedMass_eq_avg
     subMeasMass ψ family.averagedSubMeas.liftLeft =
       avgOver (uniformDistribution (Fq params))
         (fun x => subMeasMass ψ ((family.meas x).toSubMeas.liftLeft)) := by
-  rw [avgOver_uniform_eq_pmf_sum]
-  have htotal :
-      (∑ x ∈ (uniformDistribution (Fq params)).support,
-          (uniformDistribution (Fq params)).weight x •
-            (family.meas x).toSubMeas.total) =
-        ∑ x : Fq params,
-          (PMF.uniformOfFintype (Fq params) x).toReal •
-            (family.meas x).toSubMeas.total := by
-    simpa [averageOperatorOverDistribution] using
-      (averageOperatorOverDistribution_uniform_eq_pmf_sum
-        (α := Fq params) (ι := ι)
-        (fun x => (family.meas x).toSubMeas.total))
   simp only [subMeasMass, IdxPolyFamily.averagedSubMeas, SubMeas.liftLeft,
-    mkLeftPlacedSubMeas_total]
-  rw [htotal]
-  rw [← leftTensor_finset_sum (ι₂ := ι) Finset.univ
-    (fun x : Fq params => (PMF.uniformOfFintype (Fq params) x).toReal •
-      (family.meas x).toSubMeas.total)]
-  rw [ev_sum]
-  refine Finset.sum_congr rfl ?_
-  intro x hx
-  have hsmul :
-      leftTensor (ι₂ := ι)
-          ((PMF.uniformOfFintype (Fq params) x).toReal •
-            (family.meas x).toSubMeas.total) =
-        (PMF.uniformOfFintype (Fq params) x).toReal •
-          leftTensor (ι₂ := ι) ((family.meas x).toSubMeas.total) := by
-    ext i j
-    rcases i with ⟨i₁, i₂⟩
-    rcases j with ⟨j₁, j₂⟩
-    by_cases h₁ : i₁ = j₁ <;> by_cases h₂ : i₂ = j₂ <;>
-      simp [leftTensor, h₁, h₂]
-  rw [hsmul]
-  have hreal_complex :
-      (PMF.uniformOfFintype (Fq params) x).toReal •
-          leftTensor (ι₂ := ι) ((family.meas x).toSubMeas.total) =
-        (((PMF.uniformOfFintype (Fq params) x).toReal : Error) : ℂ) •
-          leftTensor (ι₂ := ι) ((family.meas x).toSubMeas.total) := by
-    ext i j
-    simp
-  rw [hreal_complex, ev_scale]
+    mkLeftPlacedSubMeas_total, averageIdxSubMeas]
+  exact ev_leftTensor_averageOperatorOverDistribution ψ (uniformDistribution (Fq params))
+    (fun x => (family.meas x).toSubMeas.total)
 
 /-- Averaged completeness of a slice-indexed polynomial family from pointwise
 slice completeness.

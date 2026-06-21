@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.SubMeasurementCore
 import MIPStarRE.LDT.Basic.OperatorExpectations
 
@@ -49,6 +50,28 @@ theorem ev_leftTensor_total_eq_sum_outcome {α : Type*} [Fintype α]
       ← leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a : α => A.outcome a),
       ev_finset_sum]
 
+/-- Evaluation of a left-placed operator average is the average of the
+left-placed evaluations. -/
+theorem ev_leftTensor_averageOperatorOverDistribution {α : Type*}
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂)) (𝒟 : Distribution α)
+    (A : α → MIPStarRE.Quantum.Op ι₁) :
+    ev ψ (leftTensor (ι₂ := ι₂) (averageOperatorOverDistribution 𝒟 A)) =
+      avgOver 𝒟 (fun a => ev ψ (leftTensor (ι₂ := ι₂) (A a))) := by
+  unfold averageOperatorOverDistribution avgOver
+  rw [← leftTensor_finset_sum (ι₂ := ι₂) 𝒟.support (fun a => 𝒟.weight a • A a)]
+  rw [ev_finset_sum]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  have hsmul :
+      leftTensor (ι₂ := ι₂) (𝒟.weight a • A a) =
+        𝒟.weight a • leftTensor (ι₂ := ι₂) (A a) := by
+    simpa [leftTensor, opTensor] using
+      (opTensor_smul_left_error
+        (ι₁ := ι₁) (ι₂ := ι₂) (𝒟.weight a) (A a) (1 : MIPStarRE.Quantum.Op ι₂))
+  rw [hsmul]
+  exact ev_real_smul ψ (𝒟.weight a) (leftTensor (ι₂ := ι₂) (A a))
+
 /-- Right tensor placement commutes with finite sums. -/
 theorem rightTensor_finset_sum {α : Type*}
     {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
@@ -62,6 +85,28 @@ theorem rightTensor_finset_sum {α : Type*}
   | insert a s ha ih =>
       rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
       simp [rightTensor, Matrix.kronecker_add]
+
+/-- Evaluation of a right-placed operator average is the average of the
+right-placed evaluations. -/
+theorem ev_rightTensor_averageOperatorOverDistribution {α : Type*}
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂)) (𝒟 : Distribution α)
+    (A : α → MIPStarRE.Quantum.Op ι₂) :
+    ev ψ (rightTensor (ι₁ := ι₁) (averageOperatorOverDistribution 𝒟 A)) =
+      avgOver 𝒟 (fun a => ev ψ (rightTensor (ι₁ := ι₁) (A a))) := by
+  unfold averageOperatorOverDistribution avgOver
+  rw [← rightTensor_finset_sum (ι₁ := ι₁) 𝒟.support (fun a => 𝒟.weight a • A a)]
+  rw [ev_finset_sum]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  have hsmul :
+      rightTensor (ι₁ := ι₁) (𝒟.weight a • A a) =
+        𝒟.weight a • rightTensor (ι₁ := ι₁) (A a) := by
+    simpa [rightTensor, opTensor] using
+      (opTensor_smul_right_error
+        (ι₁ := ι₁) (ι₂ := ι₂) (𝒟.weight a) (1 : MIPStarRE.Quantum.Op ι₁) (A a))
+  rw [hsmul]
+  exact ev_real_smul ψ (𝒟.weight a) (rightTensor (ι₁ := ι₁) (A a))
 
 /-- A complex scalar on the left register factors out of a bipartite tensor product.
 

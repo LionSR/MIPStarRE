@@ -71,41 +71,10 @@ measurements over the uniform distribution on slice heights `x ∈ F_q`. -/
 noncomputable def averagedSubMeas {params : Parameters}
     [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
     (family : IdxPolyFamily params ι) :
-    SubMeas (Polynomial params) ι where
-  outcome := fun g =>
-    let 𝒟 := uniformDistribution (Fq params)
-    ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.outcome g
-  total :=
-    let 𝒟 := uniformDistribution (Fq params)
-    ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.total
-  outcome_pos := by
-    intro g
-    let 𝒟 := uniformDistribution (Fq params)
-    exact Finset.sum_nonneg fun x _ =>
-      smul_nonneg (𝒟.nonnegative x) ((family.meas x).outcome_pos g)
-  sum_eq_total := by
-    classical
-    let 𝒟 := uniformDistribution (Fq params)
-    calc
-      ∑ g, ∑ x ∈ 𝒟.support,
-          𝒟.weight x • (family.meas x).toSubMeas.outcome g
-        = ∑ x ∈ 𝒟.support, ∑ g,
-            𝒟.weight x • (family.meas x).toSubMeas.outcome g := by
-              rw [Finset.sum_comm]
-      _ = ∑ x ∈ 𝒟.support, 𝒟.weight x • ∑ g, (family.meas x).toSubMeas.outcome g := by
-            apply Finset.sum_congr rfl
-            intro x _
-            rw [← Finset.smul_sum]
-      _ = ∑ x ∈ 𝒟.support, 𝒟.weight x • (family.meas x).toSubMeas.total := by
-            apply Finset.sum_congr rfl
-            intro x _
-            rw [(family.meas x).toSubMeas.sum_eq_total]
-  total_le_one := by
-    change averageOperatorOverDistribution (uniformDistribution (Fq params))
-      (fun x => (family.meas x).toSubMeas.total) ≤ 1
-    exact averageOperatorOverDistribution_uniform_le_one
-      (fun x => (family.meas x).toSubMeas.total)
-      (fun x => (family.meas x).toSubMeas.total_le_one)
+    SubMeas (Polynomial params) ι :=
+  averageIdxSubMeas (uniformDistribution (Fq params))
+    (fun x => (family.meas x).toSubMeas)
+    (uniformDistribution_weight_sum_le_one (Fq params))
 
 /-- Evaluate the slice family at a point `(u, x)` in `F_q^{m+1}`. -/
 noncomputable def evaluatedAtNextPoint {params : Parameters} [FieldModel params.q]

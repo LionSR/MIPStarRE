@@ -32,8 +32,7 @@ lemma fromHToG_completePart_average_total_eq
     averageOperatorOverDistribution (uniformDistribution (Fq params))
       (fun x => (completePartSubMeas params family x).total) =
         family.averagedSubMeas.total := by
-  unfold averageOperatorOverDistribution IdxPolyFamily.averagedSubMeas
-  simp [completePartSubMeas_total]
+  simp [IdxPolyFamily.averagedSubMeas, averageIdxSubMeas, completePartSubMeas_total]
 
 /-- The incomplete branch of `\widehat G` averages to `I - G`, matching
 `references/ldt-paper/ld-pasting.tex:1408--1415` for the `τ_ℓ = 0` case. -/
