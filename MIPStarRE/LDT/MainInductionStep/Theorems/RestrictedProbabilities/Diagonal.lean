@@ -186,24 +186,11 @@ private lemma averageRestrictedDiagonalFailure_eq_embeddedDiagonalIndices
                       (fun j => diagonalSliceIndexError params strategy x j) := by
                               simp [avgOver, uniformDistribution, Fintype.card_fin,
                                 diagonalSliceIndexError]
-    _ = avgOver (uniformDistribution (Fq params × Fin params.m))
-          (fun xj => diagonalSliceIndexError params strategy xj.1 xj.2) := by
-            simpa using
-              (avgOver_uniform_prod (α := Fq params) (β := Fin params.m)
-                (f := fun x j => diagonalSliceIndexError params strategy x j)).symm
-    _ = avgOver (uniformDistribution (Fin params.m × Fq params))
-          (fun jx => diagonalSliceIndexError params strategy jx.2 jx.1) := by
-            simpa using
-              (MIPStarRE.LDT.avgOver_uniform_equiv
-                (e := Equiv.prodComm (Fq params) (Fin params.m))
-                (f := fun xj : Fq params × Fin params.m =>
-                  diagonalSliceIndexError params strategy xj.1 xj.2))
     _ = avgOver (uniformDistribution (Fin params.m))
           (fun j => avgOver (uniformDistribution (Fq params))
             (fun x => diagonalSliceIndexError params strategy x j)) := by
-            simpa using
-              (avgOver_uniform_prod (α := Fin params.m) (β := Fq params)
-                (f := fun j x => diagonalSliceIndexError params strategy x j))
+            exact avgOver_uniform_comm
+              (fun x j => diagonalSliceIndexError params strategy x j)
     _ = avgOver (uniformDistribution (Fin params.m))
           (fun j => diagonalIndexError params strategy (embedCoord params j)) := by
             refine avgOver_congr _ _ _ ?_
