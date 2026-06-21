@@ -340,7 +340,6 @@ noncomputable def totalVariationDistance {α : Type*} [DecidableEq α]
     (μ ν : Distribution α) : Error :=
   (1 / 2) * ∑ a ∈ (μ.support ∪ ν.support), |μ.weight a - ν.weight a|
 
-
 /-! ### Averaging infrastructure
 
 Proofs use Mathlib's `Finset.sum` API: `Finset.sum_le_sum`, `Finset.sum_add_distrib`,
