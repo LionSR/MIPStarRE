@@ -146,19 +146,15 @@ theorem matrixSdpCanonicalDualOperator_sub_objectiveOperator
         matrixSdpCanonicalObjectiveOperator params model =
       matrixSdpCanonicalBlockDiagonal params model
         (matrixSdpCanonicalDualSlackBlockFamily params model Z) := by
-  ext x y
-  rcases x with ⟨b, i⟩
-  rcases y with ⟨c, j⟩
-  by_cases hbc : b = c
-  · subst c
-    cases b with
-    | none =>
-        simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator]
-    | some g =>
-        simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
-          matrixSdpDualSlackOperator]
-  · simp [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
-      hbc]
+  rw [matrixSdpCanonicalDualOperator, matrixSdpCanonicalObjectiveOperator,
+    ← matrixSdpCanonicalBlockDiagonal_sub]
+  congr
+  funext b
+  cases b with
+  | none =>
+      simp
+  | some g =>
+      simp [matrixSdpDualSlackOperator]
 
 /-- The canonical dual slack block matrix is positive semidefinite under paper
 dual feasibility.
