@@ -110,56 +110,13 @@ lemma avgOver_axisParallelLineQuestionDistribution
         (fun ℓt => f (ℓt.1, ℓt.1.pointAt ℓt.2)) := by
   classical
   let e := axisParallelLineQuestionParameterEquiv params
-  haveI :
-      Nonempty {qu : AxisParallelLineQuestion params // pointOnLine (params := params) qu} := by
-    exact ⟨e (Classical.choice
-      (inferInstance : Nonempty (AxisParallelLine params × Fq params)))⟩
-  calc
-    avgOver (axisParallelLineQuestionDistribution params) f =
-        avgOver (uniformDistribution
-          {qu : AxisParallelLineQuestion params // pointOnLine (params := params) qu})
-          (fun qu => f qu.1) := by
-          let p : AxisParallelLineQuestion params → Prop := pointOnLine (params := params)
-          let support : Finset (AxisParallelLineQuestion params) := Finset.univ.filter p
-          haveI :
-              Nonempty {qu : AxisParallelLineQuestion params // qu ∈ support} := by
-            rcases (inferInstance :
-                Nonempty {qu : AxisParallelLineQuestion params // p qu}) with ⟨qu⟩
-            exact ⟨⟨qu.1, Finset.mem_filter.mpr ⟨Finset.mem_univ qu.1, qu.2⟩⟩⟩
-          let eSupport :
-              {qu : AxisParallelLineQuestion params // qu ∈ support} ≃
-                {qu : AxisParallelLineQuestion params // p qu} :=
-            { toFun := fun qu => ⟨qu.1, (Finset.mem_filter.mp qu.2).2⟩
-              invFun := fun qu =>
-                ⟨qu.1, Finset.mem_filter.mpr ⟨Finset.mem_univ qu.1, qu.2⟩⟩
-              left_inv := by
-                intro qu
-                rfl
-              right_inv := by
-                intro qu
-                rfl }
-          calc
-            avgOver (axisParallelLineQuestionDistribution params) f =
-                avgOver (uniformDistribution
-                  {qu : AxisParallelLineQuestion params // qu ∈ support})
-                  (fun qu => f qu.1) := by
-                  simpa [axisParallelLineQuestionDistribution, support, p] using
-                    (avgOver_uniformOnFinset_eq_subtype (s := support) (f := f))
-            _ = avgOver (uniformDistribution
-                  {qu : AxisParallelLineQuestion params // p qu})
-                  (fun qu => f qu.1) := by
-                  simpa [eSupport] using
-                    (avgOver_uniform_equiv (e := eSupport)
-                      (f := fun qu :
-                        {qu : AxisParallelLineQuestion params // qu ∈ support} =>
-                          f qu.1))
-    _ = avgOver (uniformDistribution (AxisParallelLine params × Fq params))
-          (fun ℓt => f (ℓt.1, ℓt.1.pointAt ℓt.2)) := by
-          have h := (avgOver_uniform_equiv (e := e.symm)
-            (f := fun qu :
-              {qu : AxisParallelLineQuestion params // pointOnLine (params := params) qu} =>
-                f qu.1))
-          simpa [e, axisParallelLineQuestionParameterEquiv] using h
+  simpa [axisParallelLineQuestionDistribution, e, axisParallelLineQuestionParameterEquiv] using
+    (avgOver_uniformOnFinset_filter_equiv
+      (α := AxisParallelLineQuestion params)
+      (β := AxisParallelLine params × Fq params)
+      (p := pointOnLine (params := params))
+      (e := e)
+      (f := f))
 
 /-- Reindex a line representative and affine parameter by the sampled point on
 that line, keeping the direction and parameter as auxiliary data.
