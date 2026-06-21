@@ -29,17 +29,36 @@ structure MatrixSdpRealization (params : Parameters) [FieldModel params.q] where
   state : PositiveMatrixState space
   pointMeasurement : Point params → MatrixSubmeasurement (Fq params) space
 
+/-- The constant strict primal effects have total mass `(1/2)I` in the concrete
+matrix realization. -/
+private theorem matrixSdpStrictPrimalConstantSum (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    ∑ _ : Polynomial params, sdpStrictPrimalWeight params •
+        (1 : MatrixOperator model.space) =
+      ((1 / 2 : Error) • (1 : MatrixOperator model.space)) := by
+  exact sdpStrictPrimalConstantSum (ι := model.space.carrier) params
+
 /-- The matrix-level strict-feasible primal witness
 `T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`. -/
 noncomputable def matrixSdpStrictPrimalSubmeasurement (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params) :
     MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space where
-  effect := (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).outcome
-  pos := (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).outcome_pos
+  effect := fun _ => sdpStrictPrimalWeight params • (1 : MatrixOperator model.space)
+  pos := by
+    intro _
+    have hweight : 0 ≤ sdpStrictPrimalWeight params := by
+      unfold sdpStrictPrimalWeight
+      positivity
+    exact smul_nonneg hweight
+      (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MatrixOperator model.space))
   sum_le_one := by
-    simpa [(sdpStrictPrimalSubMeas (ι := model.space.carrier) params).sum_eq_total] using
-      (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).total_le_one
+    rw [matrixSdpStrictPrimalConstantSum params model]
+    simpa using
+      (smul_le_smul_of_nonneg_right
+        (show (1 / 2 : Error) ≤ 1 by norm_num)
+        (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MatrixOperator model.space)))
 
 /-- The matrix-level strict-feasible primal witness has total mass
 `(1/2) I`. -/
@@ -49,14 +68,8 @@ theorem matrixSdpStrictPrimalSubmeasurement_sum_effect (params : Parameters)
     ∑ g : Polynomial params,
         (matrixSdpStrictPrimalSubmeasurement params model).effect g =
       ((1 / 2 : Error) • (1 : MatrixOperator model.space)) := by
-  calc
-    ∑ g : Polynomial params,
-        (matrixSdpStrictPrimalSubmeasurement params model).effect g =
-        (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).total := by
-          simpa [matrixSdpStrictPrimalSubmeasurement] using
-            (sdpStrictPrimalSubMeas (ι := model.space.carrier) params).sum_eq_total
-    _ = ((1 / 2 : Error) • (1 : MatrixOperator model.space)) :=
-        sdpStrictPrimalSubMeas_total (ι := model.space.carrier) params
+  simpa [matrixSdpStrictPrimalSubmeasurement] using
+    matrixSdpStrictPrimalConstantSum params model
 
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:168-176`
 (`\label{lem:sdp}` strict feasible dual witness `Z = 2I`);

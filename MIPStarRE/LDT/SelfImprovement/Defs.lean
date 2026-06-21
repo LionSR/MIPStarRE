@@ -39,7 +39,13 @@ noncomputable def sdpStrictPrimalWeight (params : Parameters)
   1 / (2 * (Fintype.card (Polynomial params) : Error))
 
 omit [Fintype ι] in
-private theorem sdpStrictPrimalConstantSum (params : Parameters)
+/-- Paper origin: `references/ldt-paper/self_improvement.tex:168-176`
+(`\label{lem:sdp}` strict feasible primal witness
+`T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`).
+
+The constant strict primal effects have total mass `(1/2)I`.  This is the
+scalar identity behind the paper's strict feasible primal witness. -/
+theorem sdpStrictPrimalConstantSum (params : Parameters)
     [FieldModel params.q] :
     ∑ _ : Polynomial params, sdpStrictPrimalWeight params •
         (1 : MIPStarRE.Quantum.Op ι) =
