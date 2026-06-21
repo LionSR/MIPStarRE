@@ -46,25 +46,6 @@ private lemma oneThirtySecondErrorSum_nonneg
       (Real.rpow_nonneg hzeta_nonneg _))
     (Real.rpow_nonneg hratio_nonneg _)
 
-/-- Evaluate a weighted sum placed on Alice's tensor factor term by term. -/
-private lemma ev_leftTensor_weighted_sum
-    {Question : Type*}
-    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution Question)
-    (A : Question → MIPStarRE.Quantum.Op ι) :
-    ev ψ (leftTensor (ι₂ := ι)
-        (∑ q ∈ 𝒟.support, 𝒟.weight q • A q)) =
-      ∑ q ∈ 𝒟.support, 𝒟.weight q * ev ψ (leftTensor (ι₂ := ι) (A q)) := by
-  rw [← leftTensor_finset_sum (ι₂ := ι) 𝒟.support
-    (fun q => 𝒟.weight q • A q)]
-  rw [ev_finset_sum]
-  refine Finset.sum_congr rfl ?_
-  intro q _
-  rw [show leftTensor (ι₂ := ι) (𝒟.weight q • A q) =
-      (𝒟.weight q : ℂ) • leftTensor (ι₂ := ι) (A q) by
-    ext x y
-    simp [leftTensor, mul_assoc]]
-  rw [ev_scale]
-
 /-- If `k < d+1`, the interpolation-eligible sandwich total vanishes. -/
 private lemma interpolationEligibleSandwich_total_eq_zero_of_not_d_add_one_le
     (params : Parameters) [FieldModel params.q]
@@ -225,8 +206,9 @@ lemma overAllOutcomesPastedMass_eq_avg_distinct_global
           ((restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
             (IsGloballyConsistent params xs)).liftLeft)) := by
   simp only [overAllOutcomesPastedMass, constructedPastedSubMeas, pastedInterpolationFamily,
-    subMeasMass, SubMeas.liftLeft, averageIdxSubMeas, avgOver, postprocess_total]
-  exact ev_leftTensor_weighted_sum strategy.state (distinctTupleDistribution params k)
+    subMeasMass, SubMeas.liftLeft, averageIdxSubMeas, postprocess_total]
+  exact ev_leftTensor_averageOperatorOverDistribution strategy.state
+    (distinctTupleDistribution params k)
     (fun xs =>
       (restrictSubMeas (interpolationEligibleSandwichFamily params family k xs)
         (IsGloballyConsistent params xs)).total)
@@ -242,8 +224,9 @@ lemma overAllOutcomesExpansionMass_eq_avg_uniform_eligible
           ((interpolationEligibleSandwichFamily params family k xs).liftLeft)) := by
   simp only [overAllOutcomesExpansionMass, allOutcomesExpansionFamily,
     averagedEligibleSandwichSubMeas, pastedMeasurementTotal, constSubMeasFamily,
-    subMeasMass, SubMeas.liftLeft, IdxSubMeas.liftLeft, averageIdxSubMeas, avgOver]
-  exact ev_leftTensor_weighted_sum strategy.state (uniformDistribution (PointTuple params k))
+    subMeasMass, SubMeas.liftLeft, IdxSubMeas.liftLeft, averageIdxSubMeas]
+  exact ev_leftTensor_averageOperatorOverDistribution strategy.state
+    (uniformDistribution (PointTuple params k))
     (fun xs => (interpolationEligibleSandwichFamily params family k xs).total)
 
 /-- If there are not enough coordinates to interpolate, both sides of the reverse

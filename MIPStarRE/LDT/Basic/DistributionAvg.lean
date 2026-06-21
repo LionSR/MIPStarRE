@@ -193,6 +193,19 @@ theorem averageOperatorOverDistribution_congr {α : Type*}
     averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
   exact Finset.sum_congr rfl fun a _ => by rw [h a]
 
+/-- Fixed left and right multiplications factor through an operator average. -/
+theorem averageOperatorOverDistribution_mul_left_right {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (L R : MIPStarRE.Quantum.Op ι)
+    (A : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 (fun a => L * A a * R) =
+      L * averageOperatorOverDistribution 𝒟 A * R := by
+  unfold averageOperatorOverDistribution
+  rw [Matrix.mul_sum, Matrix.sum_mul]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  simp [mul_assoc]
+
 /-- Averaging against a probabilistic project distribution is the finite sum
 over its stored support against the associated Mathlib probability mass
 function. -/

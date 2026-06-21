@@ -109,25 +109,11 @@ private lemma avgOver_slice_total_left_sandwich_eq
       ev ψ (leftTensor (ι₂ := ι) A *
         leftTensor (ι₂ := ι) (IdxPolyFamily.averagedSubMeas family).total *
         leftTensor (ι₂ := ι) A) := by
-  unfold avgOver IdxPolyFamily.averagedSubMeas
-  rw [leftTensor_mul_leftTensor]
-  rw [leftTensor_mul_leftTensor]
-  rw [Matrix.mul_sum]
-  rw [Matrix.sum_mul]
-  rw [← leftTensor_finset_sum]
-  rw [ev_finset_sum]
-  apply Finset.sum_congr rfl
-  intro y _
-  have hmatrix :
-      A * (uniformDistribution (Fq params)).weight y • (family.meas y).total * A =
-        (((uniformDistribution (Fq params)).weight y : Error) : ℂ) •
-          (A * (family.meas y).total * A) := by
-    simp [mul_assoc]
-  rw [hmatrix]
-  rw [← leftTensor_smul (ι₂ := ι)
-    (((uniformDistribution (Fq params)).weight y : Error) : ℂ)
-    (A * (family.meas y).total * A)]
-  rw [ev_scale]
+  rw [← ev_leftTensor_averageOperatorOverDistribution ψ (uniformDistribution (Fq params))
+    (fun y => A * (family.meas y).total * A)]
+  rw [averageOperatorOverDistribution_mul_left_right]
+  simp [IdxPolyFamily.averagedSubMeas, averageIdxSubMeas,
+    leftTensor_mul_leftTensor, mul_assoc]
 
 /-- Full-slice cubic first term as the left switch-sandwich expectation. -/
 private lemma fullSliceABAAvg_eq_leftSandwichExpectation
