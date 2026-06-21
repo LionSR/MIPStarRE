@@ -590,6 +590,60 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities
       hRank.projective hRank.sum_eq_total xHat xHat_coisometry xHat_mixed,
       rfl, rfl, rfl⟩
 
+/-- Assemble the canonical sigma-space `Q/X/Xhat/P` layer and record
+coisometry of the sigma embedding `X`.
+
+This is a Lean-only strengthening of
+`exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities`.  The additional
+conclusion follows from the subnormalization hypothesis
+`∑_a Q_a ≤ I`: for a projective family, the finite-enumeration sigma embedding
+has orthonormal rows.  The statement is used by the Section 5 formalization
+near `references/ldt-paper/orthonormalization.tex` lines 862--1194, where the
+paper works with the same canonical `X` and the SVD-derived `Xhat`. -/
+theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities_with_x_coisometry
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    (hsum_le_one :
+      (∑ a : Outcome, qLayer.q.outcome a) ≤ (1 : MIPStarRE.Quantum.Op ι))
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))]
+    (xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (xHat_coisometry : xHat * xHatᴴ =
+      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+    (xHat_mixed :
+      (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
+        CFC.sqrt (QTotal qLayer)) :
+    ∃ data : QXPLayerData Outcome ι,
+      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
+        hq ▸ data.x =
+            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+              sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
+          hq ▸ data.xHat =
+            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from xHat) ∧
+            data.x * data.xᴴ =
+              (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
+  classical
+  let data : QXPLayerData Outcome ι :=
+    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
+      hRank.projective hRank.sum_eq_total xHat xHat_coisometry xHat_mixed
+  have hx_coisometry :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
+    change
+      sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective *
+          (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ =
+        (1 : MIPStarRE.Quantum.Op (ULift.{uι}
+          (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => Matrix.rank (qLayer.q.outcome a)))))
+    exact sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
+      qLayer.q.outcome hRank.projective hsum_le_one
+  exact ⟨data, rfl, rfl, rfl, hx_coisometry⟩
+
 /-- A one-point projective measurement concentrating all mass on the chosen outcome. -/
 noncomputable def pointProjMeas {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]

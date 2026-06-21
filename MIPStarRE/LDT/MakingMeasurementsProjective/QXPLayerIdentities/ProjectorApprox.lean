@@ -452,12 +452,12 @@ lemma pQApprox_ofRankReductionSigmaRangeAndSvdIdentities
           (constOpFamily data.qLayer.q)
           (constOpFamily (PFamily data))
           (30 * zetaQuarterRoot ζ) := by
-  classical
-  let data : QXPLayerData Outcome ι :=
-    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
-      hRank.projective hRank.sum_eq_total xHat xHat_coisometry xHat_mixed
-  refine ⟨data, rfl, rfl, rfl, ?_⟩
-  exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
+  obtain ⟨data, hq, hdata_x, hdata_xHat⟩ :=
+    exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities hRank xHat
+      xHat_coisometry xHat_mixed
+  refine ⟨data, hq, hdata_x, hdata_xHat, ?_⟩
+  exact pQApprox ψ A ζ data hψ hζ hζ_small
+    (hq.symm ▸ hRank.toSigmaRangeQLayer)
 
 /-- Apply `lem:P-Q-approx` to the positive-Gram sigma-space QXP layer.
 
