@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.DistributionUniform
 import MIPStarRE.LDT.Pasting.Statements
 
 /-!
@@ -21,117 +22,22 @@ theorem ldDnoteq
   classical
   let support : Finset (PointTuple params k) :=
     distinctTupleSupport params k
-  let bad : Finset (PointTuple params k) :=
-    { xs ∈ Finset.univ | ¬ Function.Injective xs }
   have hsupport_card : support.card = params.q.descFactorial k := by
     simpa [support] using distinctTupleSupport_card params k
   have hq_ne : (params.q : Error) ≠ 0 := by
     exact_mod_cast (Nat.ne_of_gt params.hq)
-  have hqpow_ne : ((params.q : Error) ^ k) ≠ 0 := by positivity
   by_cases hk : k ≤ params.q
   · have hsupport_nonempty : support.Nonempty := by
       simpa [support] using distinctTupleSupport_nonempty_of_le params k hk
-    have hsupport_card_ne : support.card ≠ 0 := Finset.card_ne_zero.mpr hsupport_nonempty
-    have hsupport_pos : 0 < (support.card : Error) := by
-      exact_mod_cast Nat.pos_of_ne_zero hsupport_card_ne
-    have hsupport_le_pow_nat : support.card ≤ params.q ^ k := by
-      rw [hsupport_card]
-      exact Nat.descFactorial_le_pow _ _
-    have hweight_le :
-        1 / ((params.q : Error) ^ k) ≤ 1 / (support.card : Error) := by
-      exact one_div_le_one_div_of_le hsupport_pos
-        (by exact_mod_cast hsupport_le_pow_nat)
-    have hpartition_card :
-        support.card + bad.card = params.q ^ k := by
-      simpa [support, bad, distinctTupleSupport, PointTuple, Fintype.card_fun,
-        Fintype.card_fin] using
-        (Finset.card_filter_add_card_filter_not
-          (s := (Finset.univ : Finset (PointTuple params k)))
-          (p := fun xs : PointTuple params k => Function.Injective xs))
-    have hpartition_cast :
-        (support.card : Error) + bad.card = (params.q : Error) ^ k := by
-      exact_mod_cast hpartition_card
-    have hgood :
-        ∑ xs ∈ support,
-          |(uniformDistribution (PointTuple params k)).weight xs
-            - (distinctTupleDistribution params k).weight xs|
-          = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
-      have hconst :
-          ∀ xs ∈ support,
-            |(uniformDistribution (PointTuple params k)).weight xs
-              - (distinctTupleDistribution params k).weight xs|
-              = (1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k)) := by
-        intro xs hxs
-        rw [show (uniformDistribution (PointTuple params k)).weight xs =
-            1 / ((params.q : Error) ^ k) by
-              simp [uniformDistribution, PointTuple, Fintype.card_fin]]
-        rw [show (distinctTupleDistribution params k).weight xs =
-            if xs ∈ support then 1 / (support.card : Error) else 0 by
-              simp [distinctTupleDistribution, support]]
-        rw [if_pos hxs]
-        rw [abs_of_nonpos (sub_nonpos.mpr hweight_le)]
-        ring
-      calc
-        ∑ xs ∈ support,
-            |(uniformDistribution (PointTuple params k)).weight xs
-              - (distinctTupleDistribution params k).weight xs|
-            = ∑ xs ∈ support,
-                ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
-                exact Finset.sum_congr rfl hconst
-        _ =
-            (support.card : Error) *
-              ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
-              rw [Finset.sum_const, nsmul_eq_mul]
-        _ = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
-              field_simp [hsupport_card_ne, hqpow_ne]
-    have hbad :
-        ∑ xs ∈ bad,
-          |(uniformDistribution (PointTuple params k)).weight xs
-            - (distinctTupleDistribution params k).weight xs|
-          = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
-      calc
-        ∑ xs ∈ bad,
-            |(uniformDistribution (PointTuple params k)).weight xs
-              - (distinctTupleDistribution params k).weight xs|
-            = ∑ xs ∈ bad, (1 / ((params.q : Error) ^ k)) := by
-                apply Finset.sum_congr rfl
-                intro xs hxs
-                have hnotinj : ¬ Function.Injective xs := (Finset.mem_filter.mp hxs).2
-                rw [show (uniformDistribution (PointTuple params k)).weight xs =
-                    1 / ((params.q : Error) ^ k) by
-                      simp [uniformDistribution, PointTuple, Fintype.card_fin]]
-                rw [show (distinctTupleDistribution params k).weight xs =
-                    if xs ∈ support then 1 / (support.card : Error) else 0 by
-                      simp [distinctTupleDistribution, support]]
-                rw [if_neg (show xs ∉ support from by
-                  intro hmem
-                  exact hnotinj (by simpa [support] using hmem))]
-                simp
-        _ = (bad.card : Error) / ((params.q : Error) ^ k) := by
-              simp [div_eq_mul_inv]
-        _ = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
-              field_simp [hqpow_ne]
-              nlinarith [hpartition_cast]
     have htv_eq :
         totalVariationDistance (uniformDistribution (PointTuple params k))
             (distinctTupleDistribution params k)
           = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
-      rw [totalVariationDistance]
-      have hdisj : Disjoint support bad := by
-        simpa [support, bad, distinctTupleSupport] using
-          (Finset.disjoint_filter_filter_not
-            (Finset.univ : Finset (PointTuple params k))
-            (Finset.univ : Finset (PointTuple params k))
-            (fun xs : PointTuple params k => Function.Injective xs))
-      have hsupp_union :
-          (uniformDistribution (PointTuple params k)).support
-            ∪ (distinctTupleDistribution params k).support
-            = support ∪ bad := by
-        simp [uniformDistribution, distinctTupleDistribution, support, bad,
-          distinctTupleSupport, Finset.filter_union_filter_not_eq]
-      rw [hsupp_union, Finset.sum_union hdisj]
-      simp [hgood, hbad]
-      ring
+      have htv :=
+        totalVariationDistance_uniformDistribution_uniformOnFinset_eq
+          (s := support) hsupport_nonempty
+      simpa [distinctTupleDistribution, support, PointTuple, Fintype.card_fun,
+        Fintype.card_fin] using htv
     have hratio_prod :
         (support.card : Error) / ((params.q : Error) ^ k)
           = ∏ i ∈ Finset.range k, (((params.q - i : ℕ) : Error) / params.q) := by
