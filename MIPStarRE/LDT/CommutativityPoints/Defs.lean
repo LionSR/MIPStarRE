@@ -164,6 +164,24 @@ noncomputable def pointWithDiagonalLineDistribution (params : Parameters)
     Distribution (PointDiagonalLineQuestion params) :=
   uniformDistribution (PointDiagonalLineQuestion params)
 
+/-- The diagonal-line/parameter question distribution is a probability
+distribution. -/
+theorem pointWithDiagonalLineDistribution_isProbability (params : Parameters)
+    [FieldModel params.q] :
+    (pointWithDiagonalLineDistribution params).IsProbability := by
+  simpa [pointWithDiagonalLineDistribution] using
+    uniformDistribution_isProbability (PointDiagonalLineQuestion params)
+
+/-- The diagonal-line/parameter question distribution is Mathlib's uniform PMF
+on its finite question type. -/
+theorem pointWithDiagonalLineDistribution_toPMF (params : Parameters)
+    [FieldModel params.q] :
+    (pointWithDiagonalLineDistribution params).toPMF
+      (pointWithDiagonalLineDistribution_isProbability params) =
+        PMF.uniformOfFintype (PointDiagonalLineQuestion params) := by
+  simpa [pointWithDiagonalLineDistribution] using
+    uniformDistribution_toPMF (PointDiagonalLineQuestion params)
+
 /-- Realize a shared-line sample from a uniformly random point pair and parameter.
 
 The resulting line is parameterized so that the first point is visited at `t` and the
@@ -187,6 +205,29 @@ noncomputable def pointPairSharedDiagonalLineDistribution (params : Parameters)
     Distribution (PointPairDiagonalLineQuestion params) :=
   (uniformDistribution (PointPairQuestion params × Fq params)).map
     (sharedDiagonalLineQuestionOfPointPair params)
+
+/-- The shared diagonal-line question distribution is a probability
+distribution. -/
+theorem pointPairSharedDiagonalLineDistribution_isProbability (params : Parameters)
+    [FieldModel params.q] :
+    (pointPairSharedDiagonalLineDistribution params).IsProbability := by
+  simpa [pointPairSharedDiagonalLineDistribution] using
+    (uniformDistribution_isProbability (PointPairQuestion params × Fq params)).map
+      (sharedDiagonalLineQuestionOfPointPair params)
+
+/-- The shared diagonal-line question distribution is the Mathlib push-forward
+of the uniform PMF on point pairs and the auxiliary line parameter. -/
+theorem pointPairSharedDiagonalLineDistribution_toPMF (params : Parameters)
+    [FieldModel params.q] :
+    (pointPairSharedDiagonalLineDistribution params).toPMF
+      (pointPairSharedDiagonalLineDistribution_isProbability params) =
+        (PMF.uniformOfFintype (PointPairQuestion params × Fq params)).map
+          (sharedDiagonalLineQuestionOfPointPair params) := by
+  simpa [pointPairSharedDiagonalLineDistribution, uniformDistribution_toPMF] using
+    Distribution.toPMF_map
+      (uniformDistribution (PointPairQuestion params × Fq params))
+      (uniformDistribution_isProbability (PointPairQuestion params × Fq params))
+      (sharedDiagonalLineQuestionOfPointPair params)
 
 /-- The point measurement, reindexed by a sampled diagonal line and a parameter on it. -/
 def sampledPointMeasurement (params : Parameters)

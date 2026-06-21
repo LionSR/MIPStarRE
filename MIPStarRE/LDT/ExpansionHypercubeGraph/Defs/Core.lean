@@ -87,6 +87,17 @@ theorem rerandomizeCoord_isProbability (params : Parameters) :
     (uniformDistribution_isProbability (RerandomizeCoordSample params)).map
       (rerandomizeCoordSampleToPair params)
 
+/-- The rerandomized-coordinate distribution is the Mathlib push-forward of the
+uniform PMF on its finite sample space. -/
+theorem rerandomizeCoord_toPMF (params : Parameters) :
+    (rerandomizeCoord params).toPMF (rerandomizeCoord_isProbability params) =
+      (PMF.uniformOfFintype (RerandomizeCoordSample params)).map
+        (rerandomizeCoordSampleToPair params) := by
+  simpa [rerandomizeCoord, uniformDistribution_toPMF] using
+    Distribution.toPMF_map (uniformDistribution (RerandomizeCoordSample params))
+      (uniformDistribution_isProbability (RerandomizeCoordSample params))
+      (rerandomizeCoordSampleToPair params)
+
 /-- The rerandomized-coordinate edge distribution has total mass one. -/
 theorem rerandomizeCoord_mass_eq_one (params : Parameters) :
     ∑ uv ∈ (rerandomizeCoord params).support, (rerandomizeCoord params).weight uv = 1 := by
