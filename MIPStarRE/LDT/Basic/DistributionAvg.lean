@@ -853,6 +853,73 @@ theorem avgOver_uniform_comm
           (fun a => f a b)) := by
           exact avgOver_uniform_prod (α := β) (β := α) (f := fun b a => f a b)
 
+/-- Transport a uniform average through an equivalence whose target is a product,
+then split the product average into iterated uniform averages. -/
+theorem avgOver_uniform_equiv_prod
+    {γ α β : Type*}
+    [Fintype γ] [DecidableEq γ] [Nonempty γ]
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (e : γ ≃ α × β) (f : γ → Error) :
+    avgOver (uniformDistribution γ) f =
+      avgOver (uniformDistribution α)
+        (fun a => avgOver (uniformDistribution β) (fun b => f (e.symm (a, b)))) := by
+  calc
+    avgOver (uniformDistribution γ) f
+        = avgOver (uniformDistribution (α × β)) (fun ab => f (e.symm ab)) := by
+          exact avgOver_uniform_equiv e f
+    _ = avgOver (uniformDistribution α)
+          (fun a => avgOver (uniformDistribution β) (fun b => f (e.symm (a, b)))) := by
+          exact avgOver_uniform_prod (f := fun a b => f (e.symm (a, b)))
+
+/-- Transport a uniform average through an equivalence whose target is a product,
+then split the product average with the second coordinate averaged first. -/
+theorem avgOver_uniform_equiv_prod_swap
+    {γ α β : Type*}
+    [Fintype γ] [DecidableEq γ] [Nonempty γ]
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (e : γ ≃ α × β) (f : γ → Error) :
+    avgOver (uniformDistribution γ) f =
+      avgOver (uniformDistribution β)
+        (fun b => avgOver (uniformDistribution α) (fun a => f (e.symm (a, b)))) := by
+  rw [avgOver_uniform_equiv_prod (e := e) (f := f)]
+  exact avgOver_uniform_comm (fun a b => f (e.symm (a, b)))
+
+/-- A function depending only on the first coordinate of a product equivalence
+has the corresponding first-coordinate uniform marginal. -/
+theorem avgOver_uniform_equiv_fst
+    {γ α β : Type*}
+    [Fintype γ] [DecidableEq γ] [Nonempty γ]
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Finite β] [Nonempty β]
+    (e : γ ≃ α × β) (f : α → Error) :
+    avgOver (uniformDistribution γ) (fun x => f (e x).1) =
+      avgOver (uniformDistribution α) f := by
+  classical
+  haveI := Fintype.ofFinite β
+  rw [avgOver_uniform_equiv_prod (e := e) (f := fun x => f (e x).1)]
+  refine avgOver_congr _ _ _ ?_
+  intro a
+  simpa using (avgOver_uniform_const (α := β) (c := f a))
+
+/-- A function depending only on the second coordinate of a product equivalence
+has the corresponding second-coordinate uniform marginal. -/
+theorem avgOver_uniform_equiv_snd
+    {γ α β : Type*}
+    [Fintype γ] [DecidableEq γ] [Nonempty γ]
+    [Finite α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (e : γ ≃ α × β) (f : β → Error) :
+    avgOver (uniformDistribution γ) (fun x => f (e x).2) =
+      avgOver (uniformDistribution β) f := by
+  classical
+  haveI := Fintype.ofFinite α
+  rw [avgOver_uniform_equiv_prod_swap (e := e) (f := fun x => f (e x).2)]
+  refine avgOver_congr _ _ _ ?_
+  intro b
+  simpa using (avgOver_uniform_const (α := α) (c := f b))
+
 /-- Averaging a function depending only on the first coordinate marginalizes a uniform product. -/
 theorem avgOver_uniform_fst {α β : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]
@@ -860,10 +927,8 @@ theorem avgOver_uniform_fst {α β : Type*}
     (f : α → Error) :
     avgOver (uniformDistribution (α × β)) (fun ab => f ab.1) =
       avgOver (uniformDistribution α) f := by
-  rw [avgOver_uniform_prod (f := fun a : α => fun _ : β => f a)]
-  refine avgOver_congr _ _ _ ?_
-  intro a
-  simpa using (avgOver_uniform_const (α := β) (c := f a))
+  simpa using
+    (avgOver_uniform_equiv_fst (e := Equiv.refl (α × β)) (f := f))
 
 /-- Averaging a function depending only on the second coordinate marginalizes a uniform product. -/
 theorem avgOver_uniform_snd {α β : Type*}
@@ -872,12 +937,7 @@ theorem avgOver_uniform_snd {α β : Type*}
     (f : β → Error) :
     avgOver (uniformDistribution (α × β)) (fun ab => f ab.2) =
       avgOver (uniformDistribution β) f := by
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.2)
-      = avgOver (uniformDistribution (β × α)) (fun ba => f ba.1) := by
-          simpa using
-            (avgOver_uniform_equiv (e := Equiv.prodComm α β)
-              (f := fun ab : α × β => f ab.2))
-    _ = avgOver (uniformDistribution β) f := avgOver_uniform_fst f
+  simpa using
+    (avgOver_uniform_equiv_snd (e := Equiv.refl (α × β)) (f := f))
 
 end MIPStarRE.LDT
