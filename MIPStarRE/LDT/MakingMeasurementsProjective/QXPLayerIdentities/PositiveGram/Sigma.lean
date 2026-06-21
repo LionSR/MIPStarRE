@@ -1,4 +1,5 @@
 import Mathlib.Analysis.InnerProductSpace.GramMatrix
+import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.Sigma
 import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Completion
 
 /-!
@@ -198,21 +199,11 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram_with_x_coisome
                     (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
   obtain ⟨xHat, hxHat_coisometry, hxHat_mixed⟩ :=
     exists_xHat_of_sigmaFinRangeEmbedding_positiveGram hRank
-  let data : QXPLayerData Outcome ι :=
-    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
-      hRank.projective hRank.sum_eq_total xHat hxHat_coisometry hxHat_mixed
-  have hx_coisometry :
-      data.x * data.xᴴ =
-        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
-    change
-      sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective *
-          (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ =
-        (1 : MIPStarRE.Quantum.Op (ULift.{uι}
-          (FiniteHilbertSpace.sigmaFinCarrier
-            (fun a : Outcome => Matrix.rank (qLayer.q.outcome a)))))
-    exact sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
-      qLayer.q.outcome hRank.projective hsum_le_one
-  exact ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl, hx_coisometry⟩
+  obtain ⟨data, hq, hx, hxHat, hx_coisometry⟩ :=
+    exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities_with_x_coisometry
+      hRank hsum_le_one xHat
+      hxHat_coisometry hxHat_mixed
+  exact ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat, hx_coisometry⟩
 
 end
 
