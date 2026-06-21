@@ -135,6 +135,31 @@ noncomputable def surfaceVsPointDistribution (params : Parameters) [FieldModel p
     Distribution (SurfaceVsPointSample params) :=
   Distribution.uniformOnFinset (surfaceVsPointSupport params)
 
+@[simp] theorem surfaceVsPointDistribution_support (params : Parameters)
+    [FieldModel params.q] :
+    (surfaceVsPointDistribution params).support = surfaceVsPointSupport params := by
+  simp [surfaceVsPointDistribution]
+
+/-- On a nonempty two-dimensional surface support, the surface-versus-point
+question distribution is a probability distribution. -/
+theorem surfaceVsPointDistribution_isProbability_of_support_nonempty
+    (params : Parameters) [FieldModel params.q]
+    (hs : (surfaceVsPointSupport params).Nonempty) :
+    (surfaceVsPointDistribution params).IsProbability := by
+  simpa [surfaceVsPointDistribution] using
+    Distribution.uniformOnFinset_isProbability (surfaceVsPointSupport params) hs
+
+/-- On a nonempty two-dimensional surface support, the surface-versus-point
+question distribution is Mathlib's uniform PMF on that support. -/
+theorem surfaceVsPointDistribution_toPMF_of_support_nonempty
+    (params : Parameters) [FieldModel params.q]
+    (hs : (surfaceVsPointSupport params).Nonempty) :
+    (surfaceVsPointDistribution params).toPMF
+      (surfaceVsPointDistribution_isProbability_of_support_nonempty params hs) =
+        PMF.uniformOfFinset (surfaceVsPointSupport params) hs := by
+  simpa [surfaceVsPointDistribution] using
+    Distribution.uniformOnFinset_toPMF (surfaceVsPointSupport params) hs
+
 /-- Deterministic classical answers for the `k = 2` surface-versus-point test:
 Prover A answers point queries, and Prover B answers surface queries. -/
 structure TwoProverClassicalSurfaceVsPointStrategy (params : Parameters)

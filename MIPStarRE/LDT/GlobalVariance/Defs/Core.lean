@@ -105,9 +105,72 @@ noncomputable def axisParallelLineQuestionDistribution (params : Parameters) [Fi
     Finset.univ.filter (pointOnLine (params := params))
   exact Distribution.uniformOnFinset support
 
+/-- The incident axis-line sample space is nonempty: take any point, any
+coordinate direction, and the canonical line through that point. -/
+theorem axisParallelLineQuestionDistribution_support_nonempty (params : Parameters)
+    [FieldModel params.q] :
+    (axisParallelLineQuestionDistribution params).support.Nonempty := by
+  classical
+  let u : Point params := zeroPoint
+  let i : Fin params.m := ⟨0, params.hm⟩
+  let ℓ : AxisParallelLine params := AxisParallelLine.throughPoint (params := params) u i
+  refine ⟨(ℓ, u), ?_⟩
+  refine Finset.mem_filter.mpr ?_
+  constructor
+  · simp
+  · refine ⟨AxisParallelLine.sampleParameter (params := params) u i, ?_⟩
+    simp [ℓ]
+
+/-- The incident axis-line distribution is a probability distribution. -/
+theorem axisParallelLineQuestionDistribution_isProbability (params : Parameters)
+    [FieldModel params.q] :
+    (axisParallelLineQuestionDistribution params).IsProbability := by
+  classical
+  let support : Finset (AxisParallelLineQuestion params) :=
+    Finset.univ.filter (pointOnLine (params := params))
+  change (Distribution.uniformOnFinset support).IsProbability
+  exact Distribution.uniformOnFinset_isProbability support (by
+    simpa [axisParallelLineQuestionDistribution, support] using
+      axisParallelLineQuestionDistribution_support_nonempty params)
+
+/-- The incident axis-line distribution is Mathlib's uniform PMF on its finite
+incident-pair support. -/
+theorem axisParallelLineQuestionDistribution_toPMF (params : Parameters)
+    [FieldModel params.q] :
+    (axisParallelLineQuestionDistribution params).toPMF
+      (axisParallelLineQuestionDistribution_isProbability params) =
+        PMF.uniformOfFinset (axisParallelLineQuestionDistribution params).support
+          (axisParallelLineQuestionDistribution_support_nonempty params) := by
+  ext qu
+  rw [Distribution.toPMF_apply]
+  rw [show (axisParallelLineQuestionDistribution params).weight qu =
+      (PMF.uniformOfFinset (axisParallelLineQuestionDistribution params).support
+        (axisParallelLineQuestionDistribution_support_nonempty params) qu).toReal by
+        simpa [axisParallelLineQuestionDistribution] using
+          Distribution.uniformOnFinset_weight_eq_pmf_uniformOfFinset_toReal
+            (axisParallelLineQuestionDistribution params).support
+            (axisParallelLineQuestionDistribution_support_nonempty params) qu]
+  exact ENNReal.ofReal_toReal
+    ((PMF.uniformOfFinset (axisParallelLineQuestionDistribution params).support
+      (axisParallelLineQuestionDistribution_support_nonempty params)).apply_ne_top qu)
+
 /-- The uniform distribution over bundled low-individual-degree polynomials. -/
 noncomputable def polynomialDistribution (params : Parameters) [FieldModel params.q] :
     Distribution (Polynomial params) :=
   uniformDistribution (Polynomial params)
+
+/-- The polynomial-answer distribution is a probability distribution. -/
+theorem polynomialDistribution_isProbability (params : Parameters) [FieldModel params.q] :
+    (polynomialDistribution params).IsProbability := by
+  simpa [polynomialDistribution] using
+    uniformDistribution_isProbability (Polynomial params)
+
+/-- The polynomial-answer distribution is Mathlib's uniform PMF on the finite
+answer type. -/
+theorem polynomialDistribution_toPMF (params : Parameters) [FieldModel params.q] :
+    (polynomialDistribution params).toPMF (polynomialDistribution_isProbability params) =
+      PMF.uniformOfFintype (Polynomial params) := by
+  simpa [polynomialDistribution] using
+    uniformDistribution_toPMF (Polynomial params)
 
 end MIPStarRE.LDT.GlobalVariance

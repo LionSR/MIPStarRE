@@ -96,6 +96,18 @@ theorem distinctTupleDistribution_isProbability_of_le
     Distribution.uniformOnFinset_isProbability (distinctTupleSupport params k)
       (distinctTupleSupport_nonempty_of_le params k hk)
 
+/-- For `k ≤ q`, the distinct-tuple distribution is Mathlib's uniform PMF on
+the finite support of injective tuples. -/
+theorem distinctTupleDistribution_toPMF_of_le
+    (params : Parameters) (k : ℕ) (hk : k ≤ params.q) :
+    (distinctTupleDistribution params k).toPMF
+      (distinctTupleDistribution_isProbability_of_le params k hk) =
+        PMF.uniformOfFinset (distinctTupleSupport params k)
+          (distinctTupleSupport_nonempty_of_le params k hk) := by
+  simpa [distinctTupleDistribution] using
+    Distribution.uniformOnFinset_toPMF (distinctTupleSupport params k)
+      (distinctTupleSupport_nonempty_of_le params k hk)
+
 /-- For `k ≤ q`, the weights of the distinct-tuple distribution sum to one. -/
 theorem distinctTupleDistribution_weight_sum_eq_one_of_le
     (params : Parameters) (k : ℕ) (hk : k ≤ params.q) :
