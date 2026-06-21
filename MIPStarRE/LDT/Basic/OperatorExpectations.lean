@@ -1,3 +1,4 @@
+import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.QuantumState
 
 /-!
@@ -98,7 +99,8 @@ theorem ev_adjoint_self_nonneg {ι : Type*} [Fintype ι] [DecidableEq ι]
 `0 ≤ Re τ(ρ (D₁ - D₂)ᴴ(D₁ - D₂))` for PSD ρ. -/
 theorem normalizedTrace_diff_sq_nonneg {n : Type*} [Fintype n]
     (ρ D₁ D₂ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
-    0 ≤ Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ - D₂)ᴴ * (D₁ - D₂)))) := by
+    0 ≤ Complex.re
+      (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ - D₂)ᴴ * (D₁ - D₂)))) := by
   unfold MIPStarRE.Quantum.normalizedTrace
   classical
   simp only [Complex.div_natCast_re]
@@ -111,8 +113,10 @@ theorem normalizedTrace_diff_sq_nonneg {n : Type*} [Fintype n]
     exact (Complex.nonneg_iff.mp (Matrix.nonneg_iff_posSemidef.mp hpos).trace_nonneg).1
   · exact Nat.cast_nonneg _
 
-/-- Triangle inequality for normalized trace of PSD-weighted quadratic forms:
-`Re τ(ρ (D₁+D₂)ᴴ(D₁+D₂)) ≤ 2·(Re τ(ρ D₁ᴴD₁) + Re τ(ρ D₂ᴴD₂))` for PSD ρ. -/
+/-- Triangle inequality for normalized trace of PSD-weighted quadratic forms.
+
+For PSD `ρ`, the real part of `τ(ρ (D₁ + D₂)ᴴ(D₁ + D₂))` is bounded by twice
+the sum of the corresponding quadratic forms for `D₁` and `D₂`. -/
 theorem normalizedTrace_triangle {n : Type*} [Fintype n]
     (ρ D₁ D₂ : Matrix n n ℂ) (hρ : ρ.PosSemidef) :
     Complex.re (MIPStarRE.Quantum.normalizedTrace (ρ * ((D₁ + D₂)ᴴ * (D₁ + D₂)))) ≤
@@ -252,6 +256,19 @@ theorem ev_sum {ι : Type*} [Fintype ι] [DecidableEq ι]
     ev ψ (∑ a, f a) = ∑ a, ev ψ (f a) :=
   ev_finset_sum ψ Finset.univ f
 
+/-- Evaluation of an operator average is the average of the evaluations. -/
+theorem ev_averageOperatorOverDistribution {α ι : Type*}
+    [Fintype ι] [DecidableEq ι]
+    (ψ : QuantumState ι) (𝒟 : Distribution α)
+    (A : α → MIPStarRE.Quantum.Op ι) :
+    ev ψ (averageOperatorOverDistribution 𝒟 A) =
+      avgOver 𝒟 (fun a => ev ψ (A a)) := by
+  unfold averageOperatorOverDistribution avgOver
+  rw [ev_finset_sum]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  exact ev_real_smul ψ (𝒟.weight a) (A a)
+
 /-- `ev` of a PSD operator is nonneg. -/
 theorem ev_nonneg_of_psd {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) (hX : 0 ≤ X) :
@@ -366,7 +383,9 @@ theorem ev_cauchy_schwarz {ι : Type*} [Fintype ι] [DecidableEq ι]
       rw [add_mul, mul_add, mul_add]
       rw [ev_add, ev_add, ev_add]
       rw [hscale_l t Aᴴ, hscale_r t A]
-      rw [show (↑t : ℂ) • Bᴴ * ((↑t : ℂ) • B) = (↑t : ℂ) • ((↑t : ℂ) • (Bᴴ * B))
+      rw [show
+          (↑t : ℂ) • Bᴴ * ((↑t : ℂ) • B) =
+            (↑t : ℂ) • ((↑t : ℂ) • (Bᴴ * B))
         from by rw [smul_mul_assoc, mul_smul_comm]]
       rw [ev_scale, ev_scale]
     rw [show ev ψ (Bᴴ * B) * (t * t) + (2 * ev ψ (Aᴴ * B)) * t + ev ψ (Aᴴ * A) =

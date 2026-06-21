@@ -108,6 +108,54 @@ theorem ev_rightTensor_averageOperatorOverDistribution {α : Type*}
   rw [hsmul]
   exact ev_real_smul ψ (𝒟.weight a) (rightTensor (ι₁ := ι₁) (A a))
 
+/-- Tensoring on the right commutes with operator averages in the left factor. -/
+theorem opTensor_averageOperatorOverDistribution_left {α ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (𝒟 : Distribution α)
+    (A : α → MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    opTensor (averageOperatorOverDistribution 𝒟 A) B =
+      averageOperatorOverDistribution 𝒟 (fun a => opTensor (A a) B) := by
+  unfold averageOperatorOverDistribution
+  rw [opTensor_sum_left_finset]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  simpa using opTensor_smul_left_error (c := 𝒟.weight a) (A := A a) (B := B)
+
+/-- Tensoring on the left commutes with operator averages in the right factor. -/
+theorem opTensor_averageOperatorOverDistribution_right {α ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (𝒟 : Distribution α)
+    (A : MIPStarRE.Quantum.Op ι₁) (B : α → MIPStarRE.Quantum.Op ι₂) :
+    opTensor A (averageOperatorOverDistribution 𝒟 B) =
+      averageOperatorOverDistribution 𝒟 (fun a => opTensor A (B a)) := by
+  unfold averageOperatorOverDistribution
+  rw [opTensor_sum_right_finset]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  simpa using opTensor_smul_right_error (c := 𝒟.weight a) (A := A) (B := B a)
+
+/-- Evaluation of an averaged left tensor factor is the average of the
+corresponding tensor expectations. -/
+theorem ev_opTensor_averageOperatorOverDistribution_left {α ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂)) (𝒟 : Distribution α)
+    (A : α → MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
+    ev ψ (opTensor (averageOperatorOverDistribution 𝒟 A) B) =
+      avgOver 𝒟 (fun a => ev ψ (opTensor (A a) B)) := by
+  rw [opTensor_averageOperatorOverDistribution_left]
+  exact ev_averageOperatorOverDistribution ψ 𝒟 (fun a => opTensor (A a) B)
+
+/-- Evaluation of an averaged right tensor factor is the average of the
+corresponding tensor expectations. -/
+theorem ev_opTensor_averageOperatorOverDistribution_right {α ι₁ ι₂ : Type*}
+    [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (ψ : QuantumState (ι₁ × ι₂)) (𝒟 : Distribution α)
+    (A : MIPStarRE.Quantum.Op ι₁) (B : α → MIPStarRE.Quantum.Op ι₂) :
+    ev ψ (opTensor A (averageOperatorOverDistribution 𝒟 B)) =
+      avgOver 𝒟 (fun a => ev ψ (opTensor A (B a))) := by
+  rw [opTensor_averageOperatorOverDistribution_right]
+  exact ev_averageOperatorOverDistribution ψ 𝒟 (fun a => opTensor A (B a))
+
 /-- A complex scalar on the left register factors out of a bipartite tensor product.
 
 This is the tensor-placement version of bilinearity of `opTensor`: placing
