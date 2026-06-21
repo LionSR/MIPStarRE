@@ -18,23 +18,90 @@ variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 def distinctTuples (params : Parameters) (k : ℕ) : Set (PointTuple params k) :=
   { xs | Function.Injective xs }
 
+/-- The finite support of the distinct-tuple distribution. -/
+noncomputable def distinctTupleSupport (params : Parameters) (k : ℕ) :
+    Finset (PointTuple params k) := by
+  classical
+  exact Finset.univ.filter (fun xs : PointTuple params k => Function.Injective xs)
+
+@[simp] theorem mem_distinctTupleSupport (params : Parameters) (k : ℕ)
+    (xs : PointTuple params k) :
+    xs ∈ distinctTupleSupport params k ↔ Function.Injective xs := by
+  classical
+  simp [distinctTupleSupport]
+
+/-- The number of injective `k`-tuples is the falling factorial `q(q-1) ... (q-k+1)`. -/
+theorem distinctTupleSupport_card (params : Parameters) (k : ℕ) :
+    (distinctTupleSupport params k).card = params.q.descFactorial k := by
+  classical
+  rw [← Fintype.card_coe]
+  let e : { xs : PointTuple params k // Function.Injective xs } ≃ (Fin k ↪ Fq params) :=
+    Equiv.subtypeInjectiveEquivEmbedding (Fin k) (Fq params)
+  simpa [distinctTupleSupport, Finset.mem_filter] using
+    (Fintype.card_congr e).trans Fintype.card_embedding_eq
+
+/-- If `k ≤ q`, there exists an injective `k`-tuple. -/
+theorem distinctTupleSupport_nonempty_of_le
+    (params : Parameters) (k : ℕ) (hk : k ≤ params.q) :
+    (distinctTupleSupport params k).Nonempty := by
+  classical
+  refine ⟨fun i => ⟨i.1, Nat.lt_of_lt_of_le i.2 hk⟩, ?_⟩
+  refine Finset.mem_filter.mpr ?_
+  constructor
+  · simp
+  · intro i j hij
+    exact Fin.ext (by simpa using congrArg Fin.val hij)
+
+/-- If `q < k`, no injective `k`-tuple of field elements exists. -/
+theorem distinctTupleSupport_eq_empty_of_lt
+    (params : Parameters) (k : ℕ) (hk : params.q < k) :
+    distinctTupleSupport params k = ∅ := by
+  apply Finset.card_eq_zero.mp
+  rw [distinctTupleSupport_card]
+  exact Nat.descFactorial_eq_zero_iff_lt.mpr hk
+
 /-- Uniform distribution on pairwise-distinct `k`-tuples from `Fq`.
 Support is the set of injective functions `Fin k → Fq params`;
 weight is uniform `1 / |support|` on support, `0` outside. -/
 noncomputable def distinctTupleDistribution (params : Parameters) (k : ℕ) :
-    Distribution (PointTuple params k) := by
-  classical
-  let support := Finset.univ.filter (fun xs : PointTuple params k => Function.Injective xs)
-  exact Distribution.uniformOnFinset support
+    Distribution (PointTuple params k) :=
+  Distribution.uniformOnFinset (distinctTupleSupport params k)
+
+@[simp] theorem distinctTupleDistribution_support (params : Parameters) (k : ℕ) :
+    (distinctTupleDistribution params k).support = distinctTupleSupport params k := by
+  simp [distinctTupleDistribution]
+
+/-- The distinct-tuple distribution has the uniform weight on its finite support. -/
+theorem distinctTupleDistribution_weight
+    (params : Parameters) (k : ℕ) (xs : PointTuple params k) :
+    (distinctTupleDistribution params k).weight xs =
+      if xs ∈ distinctTupleSupport params k then
+        1 / ((distinctTupleSupport params k).card : Error)
+      else
+        0 := by
+  simp [distinctTupleDistribution]
 
 /-- The distinct-tuple distribution has total mass at most `1`. -/
 theorem distinctTupleDistribution_weight_sum_le_one (params : Parameters) (k : ℕ) :
     ∑ xs ∈ (distinctTupleDistribution params k).support,
       (distinctTupleDistribution params k).weight xs ≤ 1 := by
-  classical
-  let support := Finset.univ.filter (fun xs : PointTuple params k => Function.Injective xs)
-  simpa [distinctTupleDistribution, support] using
-    Distribution.uniformOnFinset_weight_sum_le_one support
+  simpa [distinctTupleDistribution] using
+    Distribution.uniformOnFinset_weight_sum_le_one (distinctTupleSupport params k)
+
+/-- For `k ≤ q`, the distinct-tuple distribution is a probability distribution. -/
+theorem distinctTupleDistribution_isProbability_of_le
+    (params : Parameters) (k : ℕ) (hk : k ≤ params.q) :
+    (distinctTupleDistribution params k).IsProbability := by
+  simpa [distinctTupleDistribution] using
+    Distribution.uniformOnFinset_isProbability (distinctTupleSupport params k)
+      (distinctTupleSupport_nonempty_of_le params k hk)
+
+/-- For `k ≤ q`, the weights of the distinct-tuple distribution sum to one. -/
+theorem distinctTupleDistribution_weight_sum_eq_one_of_le
+    (params : Parameters) (k : ℕ) (hk : k ≤ params.q) :
+    ∑ xs ∈ (distinctTupleDistribution params k).support,
+      (distinctTupleDistribution params k).weight xs = 1 :=
+  (distinctTupleDistribution_isProbability_of_le params k hk).weight_sum_eq_one
 
 /-- The outcome type of the completed family `\widehat G`. -/
 abbrev GHatOutcome (params : Parameters) [FieldModel params.q] := Option (Polynomial params)

@@ -20,26 +20,17 @@ theorem ldDnoteq
       ≤ ((k : Error) ^ (2 : ℕ)) / (params.q : Error) := by
   classical
   let support : Finset (PointTuple params k) :=
-    Finset.univ.filter fun xs : PointTuple params k => Function.Injective xs
+    distinctTupleSupport params k
   let bad : Finset (PointTuple params k) :=
     { xs ∈ Finset.univ | ¬ Function.Injective xs }
   have hsupport_card : support.card = params.q.descFactorial k := by
-    rw [← Fintype.card_coe]
-    let e : { xs : PointTuple params k // Function.Injective xs } ≃ (Fin k ↪ Fq params) :=
-      Equiv.subtypeInjectiveEquivEmbedding (Fin k) (Fq params)
-    simpa [support, Finset.mem_filter] using
-      (Fintype.card_congr e).trans (Fintype.card_embedding_eq)
+    simpa [support] using distinctTupleSupport_card params k
   have hq_ne : (params.q : Error) ≠ 0 := by
     exact_mod_cast (Nat.ne_of_gt params.hq)
   have hqpow_ne : ((params.q : Error) ^ k) ≠ 0 := by positivity
   by_cases hk : k ≤ params.q
   · have hsupport_nonempty : support.Nonempty := by
-      refine ⟨fun i => ⟨i.1, Nat.lt_of_lt_of_le i.2 hk⟩, ?_⟩
-      refine Finset.mem_filter.mpr ?_
-      constructor
-      · simp
-      · intro i j hij
-        exact Fin.ext (by simpa using congrArg Fin.val hij)
+      simpa [support] using distinctTupleSupport_nonempty_of_le params k hk
     have hsupport_card_ne : support.card ≠ 0 := Finset.card_ne_zero.mpr hsupport_nonempty
     have hsupport_pos : 0 < (support.card : Error) := by
       exact_mod_cast Nat.pos_of_ne_zero hsupport_card_ne
@@ -52,7 +43,8 @@ theorem ldDnoteq
         (by exact_mod_cast hsupport_le_pow_nat)
     have hpartition_card :
         support.card + bad.card = params.q ^ k := by
-      simpa [support, bad, PointTuple, Fintype.card_fun, Fintype.card_fin] using
+      simpa [support, bad, distinctTupleSupport, PointTuple, Fintype.card_fun,
+        Fintype.card_fin] using
         (Finset.card_filter_add_card_filter_not
           (s := (Finset.univ : Finset (PointTuple params k)))
           (p := fun xs : PointTuple params k => Function.Injective xs))
@@ -83,7 +75,8 @@ theorem ldDnoteq
         ∑ xs ∈ support,
             |(uniformDistribution (PointTuple params k)).weight xs
               - (distinctTupleDistribution params k).weight xs|
-            = ∑ xs ∈ support, ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
+            = ∑ xs ∈ support,
+                ((1 / (support.card : Error)) - (1 / ((params.q : Error) ^ k))) := by
                 exact Finset.sum_congr rfl hconst
         _ =
             (support.card : Error) *
@@ -110,7 +103,9 @@ theorem ldDnoteq
                 rw [show (distinctTupleDistribution params k).weight xs =
                     if xs ∈ support then 1 / (support.card : Error) else 0 by
                       simp [distinctTupleDistribution, support]]
-                rw [if_neg fun hmem => hnotinj ((Finset.mem_filter.mp hmem).2)]
+                rw [if_neg (show xs ∉ support from by
+                  intro hmem
+                  exact hnotinj (by simpa [support] using hmem))]
                 simp
         _ = (bad.card : Error) / ((params.q : Error) ^ k) := by
               simp [div_eq_mul_inv]
@@ -123,7 +118,7 @@ theorem ldDnoteq
           = 1 - (support.card : Error) / ((params.q : Error) ^ k) := by
       rw [totalVariationDistance]
       have hdisj : Disjoint support bad := by
-        simpa [support, bad] using
+        simpa [support, bad, distinctTupleSupport] using
           (Finset.disjoint_filter_filter_not
             (Finset.univ : Finset (PointTuple params k))
             (Finset.univ : Finset (PointTuple params k))
@@ -133,7 +128,7 @@ theorem ldDnoteq
             ∪ (distinctTupleDistribution params k).support
             = support ∪ bad := by
         simp [uniformDistribution, distinctTupleDistribution, support, bad,
-          Finset.filter_union_filter_not_eq]
+          distinctTupleSupport, Finset.filter_union_filter_not_eq]
       rw [hsupp_union, Finset.sum_union hdisj]
       simp [hgood, hbad]
       ring
@@ -233,9 +228,7 @@ theorem ldDnoteq
     exact le_trans hcollision_le (by simpa [hsum_id] using hsum_sq)
   · have hkq : params.q < k := lt_of_not_ge hk
     have hsupport_empty : support = ∅ := by
-      apply Finset.card_eq_zero.mp
-      rw [hsupport_card]
-      exact Nat.descFactorial_eq_zero_iff_lt.mpr hkq
+      simpa [support] using distinctTupleSupport_eq_empty_of_lt params k hkq
     have htv_eq_half :
         totalVariationDistance (uniformDistribution (PointTuple params k))
             (distinctTupleDistribution params k)

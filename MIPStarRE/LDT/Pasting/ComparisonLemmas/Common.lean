@@ -139,22 +139,6 @@ lemma bipartiteConsError_uniform_le_one
     (fun q => qBipartiteConsDefect ψ (A q) (B q)) (1 : Error)
     (fun q => qBipartiteConsDefect_le_one ψ hnorm (A q) (B q))
 
-lemma distinctTupleDistribution_weight_sum_eq_one_of_le
-    (params : Parameters) (k : ℕ) (hk : k ≤ params.q) :
-    ∑ xs ∈ (distinctTupleDistribution params k).support,
-      (distinctTupleDistribution params k).weight xs = 1 := by
-  classical
-  let support := Finset.univ.filter (fun xs : PointTuple params k => Function.Injective xs)
-  have hsupport_nonempty : support.Nonempty := by
-    refine ⟨fun i => ⟨i.1, Nat.lt_of_lt_of_le i.2 hk⟩, ?_⟩
-    refine Finset.mem_filter.mpr ?_
-    constructor
-    · simp
-    · intro i j hij
-      exact Fin.ext (by simpa using congrArg Fin.val hij)
-  simpa [distinctTupleDistribution, support] using
-    (Distribution.uniformOnFinset_isProbability support hsupport_nonempty).weight_sum_eq_one
-
 lemma qBipartiteSSCDefect_le_one
     {Outcome : Type*} [Fintype Outcome]
     (ψ : QuantumState (ι × ι))
