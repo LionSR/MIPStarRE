@@ -600,13 +600,12 @@ lemma pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroupW
           (constOpFamily data.qLayer.q)
           (constOpFamily (PFamily data))
           (30 * zetaQuarterRoot ζ) := by
-  classical
-  let data : QXPLayerData Outcome ι :=
-    QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGroupWithCarrier
-      (q := qLayer.q) hRank.projective hRank.sum_eq_total U V S Iro
-        hIro hx hMiddle_nonneg hMiddle_sq
-  refine ⟨data, rfl, rfl, rfl, ?_⟩
-  exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
+  obtain ⟨data, hq, hdata_x, hdata_xHat⟩ :=
+    exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSqrtWithCarrier
+      hRank U V S Iro hIro hx hMiddle_nonneg hMiddle_sq
+  refine ⟨data, hq, hdata_x, hdata_xHat, ?_⟩
+  exact pQApprox ψ A ζ data hψ hζ hζ_small
+    (hq.symm ▸ hRank.toSigmaRangeQLayer)
 
 /-- Apply `lem:P-Q-approx` to unitary-group rectangular SVD data and the
 positive-square characterization of the middle factor.
