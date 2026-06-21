@@ -23,21 +23,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-lemma opTensor_averageOperatorOverDistribution_left
-    {Question ιA ιB : Type*}
-    [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
-    (𝒟 : Distribution Question)
-    (A : Question → MIPStarRE.Quantum.Op ιA)
-    (B : MIPStarRE.Quantum.Op ιB) :
-    opTensor (averageOperatorOverDistribution 𝒟 A) B =
-      averageOperatorOverDistribution 𝒟 (fun q => opTensor (A q) B) := by
-  classical
-  unfold averageOperatorOverDistribution
-  rw [opTensor_sum_left_finset]
-  refine Finset.sum_congr rfl ?_
-  intro q _
-  simpa using opTensor_smul_left_error (c := 𝒟.weight q) (A := A q) (B := B)
-
 lemma avgOver_distinct_bounded_le_avgOver_uniform_add_tv
     (params : Parameters) [FieldModel params.q]
     (k : ℕ) (hk : k ≤ params.q)

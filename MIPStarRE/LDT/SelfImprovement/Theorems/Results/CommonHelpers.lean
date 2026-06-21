@@ -18,11 +18,6 @@ so they can be reused across the split result-module leaves.
   any nonempty question type (used by `selfImprovement`).
 - **sddRel_uniform_const** — lift an SDD from `Unit` to any nonempty
   question type (used by `selfImprovement`).
-- **ev_opTensor_averageOperatorOverDistribution_left / right** — pull
-  `ev` through `opTensor` with `averageOperatorOverDistribution` on the
-  left or right tensor factor.
-- **ev_averageOperatorOverDistribution** — pull `ev` through a plain
-  `averageOperatorOverDistribution`.
 - **cons_rel_uniform_full_total_match_mass_lower_bound** — from `ConsRel`
   with total-1 families, derive `1 - δ ≤ avgOver matchMass`; used by
   `input_consistency_match_mass_lower_bound`.
@@ -89,48 +84,6 @@ lemma sddRel_uniform_const
   rcases hsdd with ⟨hsdd⟩
   constructor
   simpa [sddError, avgOver, uniformDistribution, constSubMeasFamily] using hsdd
-
-/-- Internal helper: pull `ev` through `opTensor (averageOperatorOverDistribution …) B`. -/
-lemma ev_opTensor_averageOperatorOverDistribution_left {α : Type*}
-    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution α)
-    (A : α → MIPStarRE.Quantum.Op ι) (B : MIPStarRE.Quantum.Op ι) :
-    ev ψ (opTensor (averageOperatorOverDistribution 𝒟 A) B) =
-      avgOver 𝒟 (fun a => ev ψ (opTensor (A a) B)) := by
-  classical
-  unfold averageOperatorOverDistribution avgOver
-  rw [opTensor_sum_left_finset]
-  rw [ev_finset_sum]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  rw [opTensor_smul_left_error]
-  exact ev_real_smul ψ (𝒟.weight a) (opTensor (A a) B)
-
-/-- Internal helper: pull `ev` through `opTensor A (averageOperatorOverDistribution …)`. -/
-lemma ev_opTensor_averageOperatorOverDistribution_right {α : Type*}
-    (ψ : QuantumState (ι × ι)) (𝒟 : Distribution α)
-    (A : MIPStarRE.Quantum.Op ι) (B : α → MIPStarRE.Quantum.Op ι) :
-    ev ψ (opTensor A (averageOperatorOverDistribution 𝒟 B)) =
-      avgOver 𝒟 (fun a => ev ψ (opTensor A (B a))) := by
-  unfold averageOperatorOverDistribution avgOver
-  rw [opTensor_sum_right_finset]
-  rw [ev_finset_sum]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  rw [opTensor_smul_right_error]
-  exact ev_real_smul ψ (𝒟.weight a) (opTensor A (B a))
-
-/-- Internal helper: pull `ev` through `averageOperatorOverDistribution`. -/
-lemma ev_averageOperatorOverDistribution {α κ : Type*}
-    [Fintype κ] [DecidableEq κ]
-    (ψ : QuantumState κ) (𝒟 : Distribution α)
-    (A : α → MIPStarRE.Quantum.Op κ) :
-    ev ψ (averageOperatorOverDistribution 𝒟 A) =
-      avgOver 𝒟 (fun a => ev ψ (A a)) := by
-  unfold averageOperatorOverDistribution avgOver
-  rw [ev_finset_sum]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  exact ev_real_smul ψ (𝒟.weight a) (A a)
 
 /-- Internal helper: from `ConsRel` with total-1 families,
 derive `1 - δ ≤ avgOver matchMass`. Used by `input_consistency_match_mass_lower_bound`. -/
