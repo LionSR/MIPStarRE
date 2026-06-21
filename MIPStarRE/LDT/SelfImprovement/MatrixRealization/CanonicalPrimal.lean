@@ -44,6 +44,22 @@ def matrixSdpCanonicalDiagonalBlock (params : Parameters) [FieldModel params.q]
     (b : MatrixSdpCanonicalBlockIndex params) : MatrixOperator model.space :=
   fun i j => X (b, i) (b, j)
 
+/-- The ring homomorphism underlying the canonical block-diagonal construction.
+
+The canonical SDP indexes its matrix space by `(block, vector)`, while Mathlib's
+`Matrix.blockDiagonalRingHom` uses `(vector, block)`.  This map composes
+Mathlib's block-diagonal ring homomorphism with the canonical reindexing
+equivalence. -/
+noncomputable def matrixSdpCanonicalBlockDiagonalRingHom (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    (MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) →+*
+      MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
+  (Matrix.reindexAlgEquiv ℂ ℂ
+    (Equiv.prodComm model.space.carrier
+      (MatrixSdpCanonicalBlockIndex params))).toRingEquiv.toRingHom.comp
+      (Matrix.blockDiagonalRingHom model.space.carrier (MatrixSdpCanonicalBlockIndex params) ℂ)
+
 /-- The operator-valued canonical equality constraint `∑_b X_{bb} = I`.
 
 The paper states the same constraint as the scalar family
@@ -63,9 +79,7 @@ noncomputable def matrixSdpCanonicalBlockDiagonal (params : Parameters) [FieldMo
     (model : MatrixSdpRealization params)
     (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
     MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) :=
-  (Matrix.reindexAlgEquiv ℂ ℂ
-    (Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params))
-    (Matrix.blockDiagonal B))
+  matrixSdpCanonicalBlockDiagonalRingHom params model B
 
 /-- The canonical SDP block layout is the Mathlib block-diagonal layout after
 commuting the matrix-space index with the block index. -/
@@ -88,12 +102,7 @@ operator. -/
     matrixSdpCanonicalBlockDiagonal params model
         (0 : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) =
       (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) := by
-  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
-  change (Matrix.reindexAlgEquiv ℂ ℂ e)
-      (Matrix.blockDiagonal
-        (0 : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space)) = 0
-  rw [Matrix.blockDiagonal_zero]
-  exact map_zero _
+  exact map_zero (matrixSdpCanonicalBlockDiagonalRingHom params model)
 
 /-- Entrywise form of the canonical block-diagonal matrix.
 
@@ -107,10 +116,11 @@ This is the old case-split presentation, now derived from Mathlib's
     (b c : MatrixSdpCanonicalBlockIndex params) (i j : model.space.carrier) :
     matrixSdpCanonicalBlockDiagonal params model B (b, i) (c, j) =
       if b = c then B b i j else 0 := by
+  rw [matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal]
   by_cases hbc : b = c
   · subst c
-    simp [matrixSdpCanonicalBlockDiagonal]
-  · simpa [matrixSdpCanonicalBlockDiagonal, hbc] using
+    simp
+  · simpa [hbc] using
       (Matrix.blockDiagonal_apply_ne B i j hbc)
 
 /-- The canonical block diagonal with identity on every block is the identity
@@ -122,20 +132,7 @@ operator on the canonical block Hilbert space. -/
         (fun _ : MatrixSdpCanonicalBlockIndex params =>
           (1 : MatrixOperator model.space)) =
       (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) := by
-  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
-  change (Matrix.reindexAlgEquiv ℂ ℂ e)
-      (Matrix.blockDiagonal (fun _ : MatrixSdpCanonicalBlockIndex params =>
-        (1 : MatrixOperator model.space))) = 1
-  have hone :
-      Matrix.blockDiagonal (fun _ : MatrixSdpCanonicalBlockIndex params =>
-          (1 : MatrixOperator model.space)) =
-        (1 : Matrix (model.space.carrier × MatrixSdpCanonicalBlockIndex params)
-          (model.space.carrier × MatrixSdpCanonicalBlockIndex params) ℂ) := by
-    simpa [Pi.one_def] using
-      (Matrix.blockDiagonal_one (o := MatrixSdpCanonicalBlockIndex params)
-        (m := model.space.carrier) (α := ℂ))
-  rw [hone]
-  exact map_one _
+  exact map_one (matrixSdpCanonicalBlockDiagonalRingHom params model)
 
 /-- Addition of canonical block-diagonal operators is blockwise addition. -/
 @[simp] theorem matrixSdpCanonicalBlockDiagonal_add
@@ -145,17 +142,10 @@ operator on the canonical block Hilbert space. -/
     matrixSdpCanonicalBlockDiagonal params model (fun b => B b + D b) =
       matrixSdpCanonicalBlockDiagonal params model B +
         matrixSdpCanonicalBlockDiagonal params model D := by
-  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
-  change (Matrix.reindexAlgEquiv ℂ ℂ e)
-      (Matrix.blockDiagonal (fun b => B b + D b)) =
-    (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B) +
-      (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D)
-  rw [show Matrix.blockDiagonal (fun b => B b + D b) =
-      Matrix.blockDiagonal B + Matrix.blockDiagonal D by
-        change Matrix.blockDiagonal (B + D) =
-          Matrix.blockDiagonal B + Matrix.blockDiagonal D
-        exact Matrix.blockDiagonal_add B D]
-  exact map_add _ (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)
+  change matrixSdpCanonicalBlockDiagonalRingHom params model (B + D) =
+    matrixSdpCanonicalBlockDiagonalRingHom params model B +
+      matrixSdpCanonicalBlockDiagonalRingHom params model D
+  exact map_add (matrixSdpCanonicalBlockDiagonalRingHom params model) B D
 
 /-- Negation of canonical block-diagonal operators is blockwise negation. -/
 @[simp] theorem matrixSdpCanonicalBlockDiagonal_neg
@@ -164,14 +154,9 @@ operator on the canonical block Hilbert space. -/
     (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
     matrixSdpCanonicalBlockDiagonal params model (fun b => -B b) =
       -matrixSdpCanonicalBlockDiagonal params model B := by
-  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
-  change (Matrix.reindexAlgEquiv ℂ ℂ e)
-      (Matrix.blockDiagonal (fun b => -B b)) =
-    -(Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B)
-  rw [show Matrix.blockDiagonal (fun b => -B b) = -Matrix.blockDiagonal B by
-    change Matrix.blockDiagonal (-B) = -Matrix.blockDiagonal B
-    exact Matrix.blockDiagonal_neg B]
-  exact map_neg _ (Matrix.blockDiagonal B)
+  change matrixSdpCanonicalBlockDiagonalRingHom params model (-B) =
+    -matrixSdpCanonicalBlockDiagonalRingHom params model B
+  exact map_neg (matrixSdpCanonicalBlockDiagonalRingHom params model) B
 
 /-- Subtraction of canonical block-diagonal operators is blockwise subtraction. -/
 @[simp] theorem matrixSdpCanonicalBlockDiagonal_sub
@@ -181,17 +166,10 @@ operator on the canonical block Hilbert space. -/
     matrixSdpCanonicalBlockDiagonal params model (fun b => B b - D b) =
       matrixSdpCanonicalBlockDiagonal params model B -
         matrixSdpCanonicalBlockDiagonal params model D := by
-  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
-  change (Matrix.reindexAlgEquiv ℂ ℂ e)
-      (Matrix.blockDiagonal (fun b => B b - D b)) =
-    (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B) -
-      (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D)
-  rw [show Matrix.blockDiagonal (fun b => B b - D b) =
-      Matrix.blockDiagonal B - Matrix.blockDiagonal D by
-        change Matrix.blockDiagonal (B - D) =
-          Matrix.blockDiagonal B - Matrix.blockDiagonal D
-        exact Matrix.blockDiagonal_sub B D]
-  exact map_sub _ (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)
+  change matrixSdpCanonicalBlockDiagonalRingHom params model (B - D) =
+    matrixSdpCanonicalBlockDiagonalRingHom params model B -
+      matrixSdpCanonicalBlockDiagonalRingHom params model D
+  exact map_sub (matrixSdpCanonicalBlockDiagonalRingHom params model) B D
 
 /-- Scalar multiplication of canonical block-diagonal operators is blockwise
 scalar multiplication. -/
@@ -274,7 +252,8 @@ theorem matrixSdpCanonicalBlockDiagonal_nonneg_iff
         (matrixSdpCanonicalBlockDiagonal params model B) b =
       B b := by
   ext i j
-  simp [matrixSdpCanonicalDiagonalBlock, matrixSdpCanonicalBlockDiagonal]
+  rw [matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal]
+  simp [matrixSdpCanonicalDiagonalBlock]
 
 /-- The canonical equality constraint of a block-diagonal matrix is the sum of
 its diagonal blocks. -/
@@ -296,16 +275,10 @@ theorem matrixSdpCanonicalBlockDiagonal_mul (params : Parameters)
     matrixSdpCanonicalBlockDiagonal params model B *
         matrixSdpCanonicalBlockDiagonal params model D =
       matrixSdpCanonicalBlockDiagonal params model (fun b => B b * D b) := by
-  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
-  change
-    (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B) *
-        (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D) =
-      (Matrix.reindexAlgEquiv ℂ ℂ e)
-        (Matrix.blockDiagonal (fun b => B b * D b))
-  rw [← map_mul (Matrix.reindexAlgEquiv ℂ ℂ e)
-    (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)]
-  congr
-  rw [Matrix.blockDiagonal_mul]
+  change matrixSdpCanonicalBlockDiagonalRingHom params model B *
+      matrixSdpCanonicalBlockDiagonalRingHom params model D =
+    matrixSdpCanonicalBlockDiagonalRingHom params model (B * D)
+  exact (map_mul (matrixSdpCanonicalBlockDiagonalRingHom params model) B D).symm
 
 /-- The trace of a canonical block matrix is the sum of the traces of its
 diagonal blocks. -/
