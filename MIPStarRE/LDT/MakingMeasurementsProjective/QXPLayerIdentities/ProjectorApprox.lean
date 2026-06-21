@@ -495,13 +495,11 @@ lemma pQApprox_ofRankReductionSigmaRangePositiveGram
                     (constOpFamily data.qLayer.q)
                     (constOpFamily (PFamily data))
                     (30 * zetaQuarterRoot ζ) := by
-  obtain ⟨xHat, hxHat_coisometry, hxHat_mixed⟩ :=
-    exists_xHat_of_sigmaFinRangeEmbedding_positiveGram hRank
-  let data : QXPLayerData Outcome ι :=
-    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
-      hRank.projective hRank.sum_eq_total xHat hxHat_coisometry hxHat_mixed
-  refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl, ?_⟩
-  exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
+  obtain ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat⟩ :=
+    exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram hRank
+  refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat, ?_⟩
+  exact pQApprox ψ A ζ data hψ hζ hζ_small
+    (hq.symm ▸ hRank.toSigmaRangeQLayer)
 
 /-- Apply `lem:P-Q-approx` to the positive-Gram sigma-space QXP layer, and
 also record coisometry of the original sigma embedding `X`.
@@ -549,25 +547,13 @@ lemma pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
                       (constOpFamily data.qLayer.q)
                       (constOpFamily (PFamily data))
                       (30 * zetaQuarterRoot ζ) := by
-  obtain ⟨xHat, hxHat_coisometry, hxHat_mixed⟩ :=
-    exists_xHat_of_sigmaFinRangeEmbedding_positiveGram hRank
-  let data : QXPLayerData Outcome ι :=
-    QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
-      hRank.projective hRank.sum_eq_total xHat hxHat_coisometry hxHat_mixed
-  have hx_coisometry :
-      data.x * data.xᴴ =
-        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
-    change
-      sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective *
-          (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ =
-        (1 : MIPStarRE.Quantum.Op (ULift.{uι}
-          (FiniteHilbertSpace.sigmaFinCarrier
-            (fun a : Outcome => Matrix.rank (qLayer.q.outcome a)))))
-    exact sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
-      qLayer.q.outcome hRank.projective hsum_le_one
-  refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl,
+  obtain ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat, hx_coisometry⟩ :=
+    exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
+      hRank hsum_le_one
+  refine ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat,
     hx_coisometry, ?_⟩
-  exact pQApprox ψ A ζ data hψ hζ hζ_small hRank.toSigmaRangeQLayer
+  exact pQApprox ψ A ζ data hψ hζ hζ_small
+    (hq.symm ▸ hRank.toSigmaRangeQLayer)
 
 /-- Apply `lem:P-Q-approx` to unitary-group rectangular SVD data and the
 positive-square characterization of the middle factor.

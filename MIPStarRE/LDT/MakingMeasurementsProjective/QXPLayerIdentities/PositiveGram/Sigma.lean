@@ -157,10 +157,62 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram
                     xHat) := by
   obtain ⟨xHat, hxHat_coisometry, hxHat_mixed⟩ :=
     exists_xHat_of_sigmaFinRangeEmbedding_positiveGram hRank
+  obtain ⟨data, hq, hx, hxHat⟩ :=
+    exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities hRank xHat
+      hxHat_coisometry hxHat_mixed
+  exact ⟨xHat, hxHat_coisometry, hxHat_mixed, data, hq, hx, hxHat⟩
+
+/-- Produce the canonical positive-Gram sigma-space QXP layer, and record
+coisometry of the sigma embedding `X`.
+
+The additional hypothesis is the usual subnormalization condition for the
+projective family `Q_a`.  It implies that the finite sigma-range embedding has
+orthonormal rows, so the canonical `X` in the resulting `QXPLayerData` is a
+coisometry. -/
+theorem exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
+    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
+    {qLayer : QLayerData Outcome ι}
+    (hRank : RankReductionWitness ψ A ζ qLayer)
+    (hsum_le_one :
+      (∑ a : Outcome, qLayer.q.outcome a) ≤ (1 : MIPStarRE.Quantum.Op ι))
+    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))] :
+    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ,
+      xHat * xHatᴴ =
+          (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => (qLayer.q.outcome a).rank)))) ∧
+        (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
+            CFC.sqrt (QTotal qLayer) ∧
+          ∃ data : QXPLayerData Outcome ι,
+            ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
+              hq ▸ data.x =
+                  (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+                    sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
+                hq ▸ data.xHat =
+                  (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
+                    xHat) ∧
+                  data.x * data.xᴴ =
+                    (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
+  obtain ⟨xHat, hxHat_coisometry, hxHat_mixed⟩ :=
+    exists_xHat_of_sigmaFinRangeEmbedding_positiveGram hRank
   let data : QXPLayerData Outcome ι :=
     QXPLayerData.ofSigmaRangeAndSvdIdentities (q := qLayer.q)
       hRank.projective hRank.sum_eq_total xHat hxHat_coisometry hxHat_mixed
-  exact ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl⟩
+  have hx_coisometry :
+      data.x * data.xᴴ =
+        (1 : MIPStarRE.Quantum.Op data.qLayer.auxSpace.carrier) := by
+    change
+      sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective *
+          (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ =
+        (1 : MIPStarRE.Quantum.Op (ULift.{uι}
+          (FiniteHilbertSpace.sigmaFinCarrier
+            (fun a : Outcome => Matrix.rank (qLayer.q.outcome a)))))
+    exact sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
+      qLayer.q.outcome hRank.projective hsum_le_one
+  exact ⟨xHat, hxHat_coisometry, hxHat_mixed, data, rfl, rfl, rfl, hx_coisometry⟩
 
 end
 
