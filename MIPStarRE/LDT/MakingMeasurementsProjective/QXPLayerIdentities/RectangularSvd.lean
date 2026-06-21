@@ -58,8 +58,7 @@ theorem rectangularSvd_xHat_coisometry_unitaryGroup
         ((U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ)ᴴ =
       (1 : Matrix μ μ ℂ) :=
   rectangularSvd_xHat_coisometry (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ) Iro
-    (Matrix.mem_unitaryGroup_iff.mp U.property)
-    (Matrix.mem_unitaryGroup_iff'.mp V.property) hIro
+    (Unitary.coe_mul_star_self U) (Unitary.coe_star_mul_self V) hIro
 
 /-- The mixed product obtained by multiplying the rectangular SVD formulae.
 
@@ -98,7 +97,7 @@ theorem rectangularSvd_xHat_mixed_raw_unitaryGroup
     (hx : x = (U : Matrix μ μ ℂ) * S * Vᴴ) :
     xᴴ * ((U : Matrix μ μ ℂ) * Iro * Vᴴ) = V * (Sᴴ * Iro) * Vᴴ :=
   rectangularSvd_xHat_mixed_raw x (U : Matrix μ μ ℂ) V S Iro
-    (Matrix.mem_unitaryGroup_iff'.mp U.property) hx
+    (Unitary.coe_star_mul_self U) hx
 
 /-- The first mixed product obtained from the rectangular SVD formulae.
 
@@ -139,7 +138,7 @@ theorem rectangularSvd_x_mul_xHat_conjTranspose_raw_unitaryGroup
     (hx : x = U * S * (V : Matrix ι ι ℂ)ᴴ) :
     x * (U * Iro * (V : Matrix ι ι ℂ)ᴴ)ᴴ = U * (S * Iroᴴ) * Uᴴ :=
   rectangularSvd_x_mul_xHat_conjTranspose_raw x U (V : Matrix ι ι ℂ) S Iro
-    (Matrix.mem_unitaryGroup_iff'.mp V.property) hx
+    (Unitary.coe_star_mul_self V) hx
 
 /-- A positive operator whose square is `Q` is the CFC square root of `Q`.
 

@@ -214,7 +214,7 @@ theorem transpose_unitaryGroup_mul_rectangular_coisometry
       (1 : Matrix μ μ ℂ) := by
   have hU_right : (U : Matrix μ μ ℂ)ᴴ * (U : Matrix μ μ ℂ) =
       (1 : Matrix μ μ ℂ) :=
-    Matrix.mem_unitaryGroup_iff'.mp U.property
+    Unitary.coe_star_mul_self U
   have hU_transpose :
       (U : Matrix μ μ ℂ)ᵀ * ((U : Matrix μ μ ℂ)ᵀ)ᴴ =
         (1 : Matrix μ μ ℂ) := by
@@ -406,7 +406,7 @@ theorem positive_gram_polar_extension_mixed_eq_sqrt_unitaryGroup
     Xᴴ * ((U : Matrix μ μ ℂ)ᵀ * W) = CFC.sqrt Q := by
   rw [positive_gram_polar_extension_mixed_eq_positive_rows X Q hQ hQ_pos
     hgram e (U : Matrix μ μ ℂ) W
-    (Matrix.mem_unitaryGroup_iff.mp U.property) hU_rows hW_rows]
+    (Unitary.coe_mul_star_self U) hU_rows hW_rows]
   exact positive_gram_spectrum_image_rows_mixed_eq_sqrt X Q hQ hQ_pos hgram
 
 end
