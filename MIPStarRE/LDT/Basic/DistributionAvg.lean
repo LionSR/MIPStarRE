@@ -273,6 +273,148 @@ theorem avgOver_le_of_forall_le_on_support {α : Type*} {𝒟 : Distribution α}
 
 end Distribution.IsProbability
 
+/-- For two probability distributions, total variation is the total positive
+part of the signed weight difference `ν - μ`.
+
+This is the finite-distribution identity
+`(1 / 2) * ∑ |μ(a)-ν(a)| = ∑ max 0 (ν(a)-μ(a))`, written for the
+project `Distribution` representation. -/
+theorem totalVariationDistance_eq_sum_max_sub {α : Type*} [DecidableEq α]
+    (μ ν : Distribution α) (hμ : μ.IsProbability) (hν : ν.IsProbability) :
+    totalVariationDistance μ ν =
+      ∑ a ∈ μ.support ∪ ν.support, max 0 (ν.weight a - μ.weight a) := by
+  classical
+  let u : Finset α := μ.support ∪ ν.support
+  have hμ_union :
+      ∑ a ∈ u, μ.weight a = 1 := by
+    have hsubset : μ.support ⊆ u := by
+      intro a ha
+      exact Finset.mem_union_left ν.support ha
+    have hsum :
+        ∑ a ∈ μ.support, μ.weight a = ∑ a ∈ u, μ.weight a :=
+      Finset.sum_subset hsubset (fun a _ ha => μ.outsideSupport a ha)
+    exact hsum ▸ hμ.weight_sum_eq_one
+  have hν_union :
+      ∑ a ∈ u, ν.weight a = 1 := by
+    have hsubset : ν.support ⊆ u := by
+      intro a ha
+      exact Finset.mem_union_right μ.support ha
+    have hsum :
+        ∑ a ∈ ν.support, ν.weight a = ∑ a ∈ u, ν.weight a :=
+      Finset.sum_subset hsubset (fun a _ ha => ν.outsideSupport a ha)
+    exact hsum ▸ hν.weight_sum_eq_one
+  have hdiff_sum :
+      ∑ a ∈ u, (ν.weight a - μ.weight a) = 0 := by
+    rw [Finset.sum_sub_distrib, hν_union, hμ_union, sub_self]
+  have hmax_abs :
+      ∀ a, max 0 (ν.weight a - μ.weight a) =
+        ((ν.weight a - μ.weight a) + |μ.weight a - ν.weight a|) / 2 := by
+    intro a
+    by_cases hle : ν.weight a - μ.weight a ≤ 0
+    · have hmax : max 0 (ν.weight a - μ.weight a) = 0 := max_eq_left hle
+      have habs : |μ.weight a - ν.weight a| = μ.weight a - ν.weight a := by
+        rw [abs_of_nonneg]
+        linarith
+      rw [hmax, habs]
+      ring
+    · have hnonneg : 0 ≤ ν.weight a - μ.weight a := le_of_not_ge hle
+      have hmax : max 0 (ν.weight a - μ.weight a) =
+          ν.weight a - μ.weight a := max_eq_right hnonneg
+      have habs : |μ.weight a - ν.weight a| = ν.weight a - μ.weight a := by
+        have hμν : μ.weight a ≤ ν.weight a := by linarith
+        rw [abs_of_nonpos (sub_nonpos.mpr hμν)]
+        ring
+      rw [hmax, habs]
+      ring
+  calc
+    totalVariationDistance μ ν
+        = (1 / 2) * ∑ a ∈ u, |μ.weight a - ν.weight a| := by
+            rfl
+    _ = (∑ a ∈ u, (ν.weight a - μ.weight a) +
+          ∑ a ∈ u, |μ.weight a - ν.weight a|) / 2 := by
+            rw [hdiff_sum]
+            ring
+    _ = (∑ a ∈ u,
+          ((ν.weight a - μ.weight a) + |μ.weight a - ν.weight a|)) / 2 := by
+            rw [Finset.sum_add_distrib]
+    _ = ∑ a ∈ u,
+          ((ν.weight a - μ.weight a) + |μ.weight a - ν.weight a|) / 2 := by
+            rw [Finset.sum_div]
+    _ = ∑ a ∈ u, max 0 (ν.weight a - μ.weight a) := by
+            exact Finset.sum_congr rfl fun a _ => (hmax_abs a).symm
+
+/-- A `[0,1]`-valued function has expectations over two probability
+distributions differing by at most their total variation distance.
+
+The statement is oriented for replacement estimates: averaging against `ν` is
+bounded by averaging against `μ`, plus the finite total-variation distance
+between the two distributions. -/
+theorem avgOver_le_avgOver_add_totalVariationDistance {α : Type*} [DecidableEq α]
+    (μ ν : Distribution α) (hμ : μ.IsProbability) (hν : ν.IsProbability)
+    (f : α → Error)
+    (hf_nonneg : ∀ a, 0 ≤ f a)
+    (hf_le_one : ∀ a, f a ≤ 1) :
+    avgOver ν f ≤ avgOver μ f + totalVariationDistance μ ν := by
+  classical
+  let u : Finset α := μ.support ∪ ν.support
+  have hμ_avg :
+      avgOver μ f = ∑ a ∈ u, μ.weight a * f a := by
+    unfold avgOver
+    have hsubset : μ.support ⊆ u := by
+      intro a ha
+      exact Finset.mem_union_left ν.support ha
+    exact Finset.sum_subset hsubset (fun a _ ha => by rw [μ.outsideSupport a ha, zero_mul])
+  have hν_avg :
+      avgOver ν f = ∑ a ∈ u, ν.weight a * f a := by
+    unfold avgOver
+    have hsubset : ν.support ⊆ u := by
+      intro a ha
+      exact Finset.mem_union_right μ.support ha
+    exact Finset.sum_subset hsubset (fun a _ ha => by rw [ν.outsideSupport a ha, zero_mul])
+  have hpoint :
+      ∀ a, ν.weight a * f a ≤ μ.weight a * f a + max 0 (ν.weight a - μ.weight a) := by
+    intro a
+    by_cases hle : ν.weight a ≤ μ.weight a
+    · have hmul : ν.weight a * f a ≤ μ.weight a * f a := by
+        exact mul_le_mul_of_nonneg_right hle (hf_nonneg a)
+      have hmax : max 0 (ν.weight a - μ.weight a) = 0 := by
+        rw [max_eq_left]
+        linarith
+      rw [hmax]
+      linarith
+    · have hμν : μ.weight a ≤ ν.weight a := le_of_not_ge hle
+      have hdiff_nonneg : 0 ≤ ν.weight a - μ.weight a := by linarith
+      have hmul :
+          (ν.weight a - μ.weight a) * f a ≤ ν.weight a - μ.weight a := by
+        have := mul_le_mul_of_nonneg_left (hf_le_one a) hdiff_nonneg
+        simpa [one_mul] using this
+      have hsplit :
+          ν.weight a * f a =
+            μ.weight a * f a + (ν.weight a - μ.weight a) * f a := by
+        ring
+      have hmax : max 0 (ν.weight a - μ.weight a) =
+          ν.weight a - μ.weight a := max_eq_right hdiff_nonneg
+      rw [hsplit, hmax]
+      linarith
+  have hsum :
+      ∑ a ∈ u, ν.weight a * f a ≤
+        ∑ a ∈ u, (μ.weight a * f a + max 0 (ν.weight a - μ.weight a)) :=
+    Finset.sum_le_sum fun a _ => hpoint a
+  have htv :
+      totalVariationDistance μ ν =
+        ∑ a ∈ u, max 0 (ν.weight a - μ.weight a) := by
+    exact totalVariationDistance_eq_sum_max_sub μ ν hμ hν
+  rw [hμ_avg, hν_avg]
+  calc
+    ∑ a ∈ u, ν.weight a * f a
+        ≤ ∑ a ∈ u, (μ.weight a * f a + max 0 (ν.weight a - μ.weight a)) :=
+          hsum
+    _ = ∑ a ∈ u, μ.weight a * f a +
+          ∑ a ∈ u, max 0 (ν.weight a - μ.weight a) := by
+          rw [Finset.sum_add_distrib]
+    _ = ∑ a ∈ u, μ.weight a * f a + totalVariationDistance μ ν := by
+          rw [← htv]
+
 /-- Averaging a constant against the uniform distribution on a nonempty finite type
 returns that constant. -/
 theorem avgOver_uniform_const {α : Type*}

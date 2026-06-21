@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.Distribution
+import MIPStarRE.LDT.Basic.DistributionAvg
 
 /-!
 # Uniform subset estimates
@@ -139,111 +139,11 @@ theorem avgOver_uniformOnFinset_le_uniformDistribution_add_totalVariationDistanc
     avgOver (Distribution.uniformOnFinset s) f
       ≤ avgOver (uniformDistribution α) f
         + totalVariationDistance (uniformDistribution α) (Distribution.uniformOnFinset s) := by
-  classical
-  let outside : Finset α := Finset.univ.filter fun a => a ∉ s
-  have hs_card_ne_nat : s.card ≠ 0 := Finset.card_ne_zero.mpr hs
-  have hs_pos : 0 < (s.card : Error) := by
-    exact_mod_cast Nat.pos_of_ne_zero hs_card_ne_nat
-  have hs_le_univ_nat : s.card ≤ Fintype.card α := by
-    simpa using Finset.card_le_univ s
-  have hweight_le :
-      1 / (Fintype.card α : Error) ≤ 1 / (s.card : Error) := by
-    exact one_div_le_one_div_of_le hs_pos (by exact_mod_cast hs_le_univ_nat)
-  have htv_eq :=
-    totalVariationDistance_uniformDistribution_uniformOnFinset_eq (s := s) hs
-  have hgood :=
-    sum_abs_weight_diff_uniformDistribution_uniformOnFinset_eq (s := s) hs
-  have hsupport_term :
-      avgOver (Distribution.uniformOnFinset s) f ≤
-        ∑ a ∈ s, (uniformDistribution α).weight a * f a
-          + totalVariationDistance (uniformDistribution α) (Distribution.uniformOnFinset s) := by
-    calc
-      avgOver (Distribution.uniformOnFinset s) f
-        = ∑ a ∈ s, (Distribution.uniformOnFinset s).weight a * f a := by
-            simp [avgOver]
-      _ ≤ ∑ a ∈ s,
-            ((uniformDistribution α).weight a * f a +
-              |(uniformDistribution α).weight a - (Distribution.uniformOnFinset s).weight a|) := by
-            refine Finset.sum_le_sum ?_
-            intro a ha
-            have hf_a_le := hf_le_one a
-            have hw :
-                (uniformDistribution α).weight a ≤
-                  (Distribution.uniformOnFinset s).weight a := by
-              rw [show (uniformDistribution α).weight a =
-                  1 / (Fintype.card α : Error) by
-                    simp [uniformDistribution]]
-              rw [show (Distribution.uniformOnFinset s).weight a =
-                  if a ∈ s then 1 / (s.card : Error) else 0 by
-                    simp]
-              rw [if_pos ha]
-              exact hweight_le
-            have habs :
-                |(uniformDistribution α).weight a -
-                    (Distribution.uniformOnFinset s).weight a| =
-                  (Distribution.uniformOnFinset s).weight a -
-                    (uniformDistribution α).weight a := by
-              rw [abs_of_nonpos (sub_nonpos.mpr hw)]
-              ring
-            have hdelta_nonneg :
-                0 ≤
-                  (Distribution.uniformOnFinset s).weight a -
-                    (uniformDistribution α).weight a := by
-              linarith
-            have hmul :
-                ((Distribution.uniformOnFinset s).weight a - (uniformDistribution α).weight a)
-                    * f a
-                  ≤
-                    (Distribution.uniformOnFinset s).weight a -
-                      (uniformDistribution α).weight a := by
-              have := mul_le_mul_of_nonneg_left hf_a_le hdelta_nonneg
-              simpa [one_mul] using this
-            have hsplit :
-                (Distribution.uniformOnFinset s).weight a * f a =
-                  (uniformDistribution α).weight a * f a +
-                    ((Distribution.uniformOnFinset s).weight a -
-                      (uniformDistribution α).weight a) * f a := by
-              ring
-            rw [hsplit, habs]
-            linarith
-      _ = ∑ a ∈ s, (uniformDistribution α).weight a * f a +
-            ∑ a ∈ s,
-              |(uniformDistribution α).weight a - (Distribution.uniformOnFinset s).weight a| := by
-            rw [Finset.sum_add_distrib]
-      _ =
-          ∑ a ∈ s, (uniformDistribution α).weight a * f a
-            + totalVariationDistance (uniformDistribution α) (Distribution.uniformOnFinset s) := by
-          rw [hgood, htv_eq]
-  have hdisj : Disjoint s outside := by
-    rw [Finset.disjoint_left]
-    intro a ha houtside
-    exact (Finset.mem_filter.mp houtside).2 ha
-  have huniform_support : (uniformDistribution α).support = s ∪ outside := by
-    ext a
-    by_cases ha : a ∈ s
-    · simp [uniformDistribution, outside, ha]
-    · simp [uniformDistribution, outside, ha]
-  have hsupport_le_uniform :
-      ∑ a ∈ s, (uniformDistribution α).weight a * f a
-        ≤ avgOver (uniformDistribution α) f := by
-    have hbad_nonneg :
-        0 ≤ ∑ a ∈ outside, (uniformDistribution α).weight a * f a := by
-      exact Finset.sum_nonneg fun a _ =>
-        mul_nonneg ((uniformDistribution α).nonnegative a) (hf_nonneg a)
-    calc
-      ∑ a ∈ s, (uniformDistribution α).weight a * f a
-        ≤ ∑ a ∈ s, (uniformDistribution α).weight a * f a +
-            ∑ a ∈ outside, (uniformDistribution α).weight a * f a := by
-              linarith
-      _ = avgOver (uniformDistribution α) f := by
-            rw [avgOver, huniform_support, Finset.sum_union hdisj]
-  calc
-    avgOver (Distribution.uniformOnFinset s) f
-      ≤ ∑ a ∈ s, (uniformDistribution α).weight a * f a
-          + totalVariationDistance (uniformDistribution α) (Distribution.uniformOnFinset s) :=
-        hsupport_term
-    _ ≤ avgOver (uniformDistribution α) f
-          + totalVariationDistance (uniformDistribution α) (Distribution.uniformOnFinset s) := by
-        linarith [hsupport_le_uniform]
+  exact
+    avgOver_le_avgOver_add_totalVariationDistance
+      (uniformDistribution α) (Distribution.uniformOnFinset s)
+      (uniformDistribution_isProbability α)
+      (Distribution.uniformOnFinset_isProbability s hs)
+      f hf_nonneg hf_le_one
 
 end MIPStarRE.LDT
