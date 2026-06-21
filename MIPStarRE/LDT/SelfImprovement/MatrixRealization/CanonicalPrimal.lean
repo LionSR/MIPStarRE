@@ -99,6 +99,70 @@ This is the old case-split presentation, now derived from Mathlib's
   · simpa [matrixSdpCanonicalBlockDiagonal, hbc] using
       (Matrix.blockDiagonal_apply_ne B i j hbc)
 
+/-- The canonical block diagonal with identity on every block is the identity
+operator on the canonical block Hilbert space. -/
+@[simp] theorem matrixSdpCanonicalBlockDiagonal_one
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    matrixSdpCanonicalBlockDiagonal params model
+        (fun _ : MatrixSdpCanonicalBlockIndex params =>
+          (1 : MatrixOperator model.space)) =
+      (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) := by
+  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
+  rw [matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal]
+  change (Matrix.reindexAlgEquiv ℂ ℂ e)
+      (Matrix.blockDiagonal (fun _ : MatrixSdpCanonicalBlockIndex params =>
+        (1 : MatrixOperator model.space))) = 1
+  have hone :
+      Matrix.blockDiagonal (fun _ : MatrixSdpCanonicalBlockIndex params =>
+          (1 : MatrixOperator model.space)) =
+        (1 : Matrix (model.space.carrier × MatrixSdpCanonicalBlockIndex params)
+          (model.space.carrier × MatrixSdpCanonicalBlockIndex params) ℂ) := by
+    simpa [Pi.one_def] using
+      (Matrix.blockDiagonal_one (o := MatrixSdpCanonicalBlockIndex params)
+        (m := model.space.carrier) (α := ℂ))
+  rw [hone]
+  exact map_one (Matrix.reindexAlgEquiv ℂ ℂ e)
+
+/-- Subtraction of canonical block-diagonal operators is blockwise subtraction. -/
+@[simp] theorem matrixSdpCanonicalBlockDiagonal_sub
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B D : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
+    matrixSdpCanonicalBlockDiagonal params model (fun b => B b - D b) =
+      matrixSdpCanonicalBlockDiagonal params model B -
+        matrixSdpCanonicalBlockDiagonal params model D := by
+  let e := Equiv.prodComm model.space.carrier (MatrixSdpCanonicalBlockIndex params)
+  rw [matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal,
+    matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal,
+    matrixSdpCanonicalBlockDiagonal_eq_reindex_blockDiagonal]
+  change (Matrix.reindexAlgEquiv ℂ ℂ e)
+      (Matrix.blockDiagonal (fun b => B b - D b)) =
+    (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal B) -
+      (Matrix.reindexAlgEquiv ℂ ℂ e) (Matrix.blockDiagonal D)
+  have hsub :
+      Matrix.blockDiagonal (fun b => B b - D b) =
+        Matrix.blockDiagonal B - Matrix.blockDiagonal D := by
+    change Matrix.blockDiagonal (B - D) =
+      Matrix.blockDiagonal B - Matrix.blockDiagonal D
+    exact Matrix.blockDiagonal_sub B D
+  rw [hsub]
+  exact map_sub (Matrix.reindexAlgEquiv ℂ ℂ e)
+    (Matrix.blockDiagonal B) (Matrix.blockDiagonal D)
+
+/-- Subtracting the identity from a canonical block-diagonal operator subtracts
+the identity from each diagonal block. -/
+theorem matrixSdpCanonicalBlockDiagonal_sub_one
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (B : MatrixSdpCanonicalBlockIndex params → MatrixOperator model.space) :
+    matrixSdpCanonicalBlockDiagonal params model B -
+        (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) =
+      matrixSdpCanonicalBlockDiagonal params model
+        (fun b => B b - (1 : MatrixOperator model.space)) := by
+  rw [← matrixSdpCanonicalBlockDiagonal_one params model]
+  rw [← matrixSdpCanonicalBlockDiagonal_sub]
+
 /-- A canonical block-diagonal operator is positive semidefinite when all of its
 diagonal matrix blocks are positive semidefinite. -/
 theorem matrixSdpCanonicalBlockDiagonal_nonneg (params : Parameters) [FieldModel params.q]
