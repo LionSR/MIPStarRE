@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.Distribution
+import MIPStarRE.LDT.Basic.DistributionAvg
 import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 
 /-!

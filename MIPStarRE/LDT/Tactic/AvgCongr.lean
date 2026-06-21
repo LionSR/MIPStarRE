@@ -1,5 +1,5 @@
 import Lean.Elab.Tactic
-import MIPStarRE.LDT.Basic.Distribution
+import MIPStarRE.LDT.Basic.DistributionAvg
 
 /-!
 # Local `avgOver` congruence tactic

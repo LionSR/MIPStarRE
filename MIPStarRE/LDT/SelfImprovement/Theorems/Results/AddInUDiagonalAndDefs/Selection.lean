@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Basic.Distribution
+import MIPStarRE.LDT.Basic.DistributionAvg
 import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
 import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
