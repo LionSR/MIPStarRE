@@ -282,31 +282,7 @@ theorem one_le_matrixSdpCanonicalStrictDualConstraint
   rw [matrixSdpCanonicalDualOperator_sub_objectiveOperator]
   let B :=
     matrixSdpCanonicalDualSlackBlockFamily params model (matrixSdpStrictDualWitness model)
-  have hsub :
-      matrixSdpCanonicalBlockDiagonal params model B -
-          (1 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) =
-        matrixSdpCanonicalBlockDiagonal params model
-          (fun b => B b - (1 : MatrixOperator model.space)) := by
-    ext x y
-    rcases x with ⟨b, i⟩
-    rcases y with ⟨c, j⟩
-    by_cases hbc : b = c
-    · subst c
-      by_cases hij : i = j
-      · subst j
-        change (if b = b then B b i i else 0) -
-            (if (b, i) = (b, i) then (1 : ℂ) else 0) =
-          (if b = b then (B b - (1 : MatrixOperator model.space)) i i else 0)
-        simp [Matrix.sub_apply]
-      · change (if b = b then B b i j else 0) -
-            (if (b, i) = (b, j) then (1 : ℂ) else 0) =
-          (if b = b then (B b - (1 : MatrixOperator model.space)) i j else 0)
-        simp [Matrix.sub_apply, Prod.ext_iff, hij]
-    · change (if b = c then B b i j else 0) -
-          (if (b, i) = (c, j) then (1 : ℂ) else 0) =
-        (if b = c then (B b - (1 : MatrixOperator model.space)) i j else 0)
-      simp [Prod.ext_iff, hbc]
-  rw [hsub]
+  rw [matrixSdpCanonicalBlockDiagonal_sub_one]
   refine matrixSdpCanonicalBlockDiagonal_nonneg params model
     (fun b => B b - (1 : MatrixOperator model.space)) ?_
   intro b
