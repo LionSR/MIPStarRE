@@ -261,6 +261,24 @@ theorem avgOver_uniformOnFinset_eq_pmf_sum {α : Type*} (s : Finset α)
   exact Finset.sum_congr rfl fun a _ => by
     rw [Distribution.uniformOnFinset_weight_eq_pmf_uniformOfFinset_toReal s hs a]
 
+/-- A finite-support uniform average is the finite integral with respect to the
+corresponding Mathlib uniform probability mass function. -/
+theorem avgOver_uniformOnFinset_eq_pmf_integral {α : Type*}
+    [Finite α]
+    [MeasurableSpace α] [MeasurableSingletonClass α]
+    (s : Finset α) (hs : s.Nonempty) (f : α → Error) :
+    avgOver (Distribution.uniformOnFinset s) f =
+      ∫ a, f a ∂(PMF.uniformOfFinset s hs).toMeasure := by
+  haveI := Fintype.ofFinite α
+  rw [avgOver_uniformOnFinset_eq_pmf_sum s hs, PMF.integral_eq_sum]
+  simp only [smul_eq_mul]
+  symm
+  refine Distribution.sum_univ_eq_sum_support (Distribution.uniformOnFinset s)
+    (fun a => (PMF.uniformOfFinset s hs a).toReal * f a) ?_
+  intro a ha
+  rw [Distribution.uniformOnFinset_support] at ha
+  simp [PMF.uniformOfFinset_apply, ha]
+
 /-- The uniform average with respect to `uniformDistribution` is the finite integral
 with respect to the uniform probability mass function. -/
 theorem avgOver_uniform_eq_pmf_integral {α : Type*}
