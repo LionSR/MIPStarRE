@@ -27,36 +27,6 @@ open MIPStarRE.LDT.ExpansionHypercubeGraph
 open MIPStarRE.LDT.CommutativityPoints
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
-/-- Pull a finite outcome sum into a uniform average over the product space. -/
-lemma avgOver_sum_eq_card_mul_avgOver_prod
-    {α β : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [Fintype β] [DecidableEq β] [Nonempty β]
-    (f : α → β → Error) :
-    avgOver (uniformDistribution α) (fun a => ∑ b : β, f a b) =
-      (Fintype.card β : Error) *
-        avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
-  let c : Error := Fintype.card β
-  have hc : c ≠ 0 := by
-    dsimp [c]
-    exact_mod_cast Fintype.card_ne_zero
-  calc
-    avgOver (uniformDistribution α) (fun a => ∑ b : β, f a b)
-      = avgOver (uniformDistribution α)
-          (fun a => c * avgOver (uniformDistribution β) (fun b => f a b)) := by
-            apply avgOver_congr
-            intro a
-            calc
-              ∑ b : β, f a b = c * ((1 / c) * ∑ b : β, f a b) := by
-                  field_simp [hc]
-              _ = c * avgOver (uniformDistribution β) (fun b => f a b) := by
-                  simp [c, avgOver, uniformDistribution, Finset.mul_sum, hc]
-    _ = c * avgOver (uniformDistribution α)
-          (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-            rw [← avgOver_const_mul]
-    _ = c * avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
-            rw [← avgOver_uniform_prod]
-
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
 /-- Swapping the full-slice question and outcome identifies the averaged
@@ -131,7 +101,7 @@ lemma fullSliceCommutation_avg_swap_terms
           (fun q => ∑ gh : O, fullSliceBABTerm params strategy family q gh)
         = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
             (fun z => fullSliceBABTerm params strategy family z.1 z.2) := by
-              exact avgOver_sum_eq_card_mul_avgOver_prod
+              exact avgOver_uniform_sum_eq_card_mul_prod
                 (fun q gh => fullSliceBABTerm params strategy family q gh)
       _ = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
             (fun z => fullSliceABATerm params strategy family z.1 z.2) := by
@@ -139,14 +109,14 @@ lemma fullSliceCommutation_avg_swap_terms
       _ = avgOver (uniformDistribution Q)
             (fun q => ∑ gh : O, fullSliceABATerm params strategy family q gh) := by
               symm
-              exact avgOver_sum_eq_card_mul_avgOver_prod
+              exact avgOver_uniform_sum_eq_card_mul_prod
                 (fun q gh => fullSliceABATerm params strategy family q gh)
   · calc
       avgOver (uniformDistribution Q)
           (fun q => ∑ gh : O, fullSliceBABATerm params strategy family q gh)
         = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
             (fun z => fullSliceBABATerm params strategy family z.1 z.2) := by
-              exact avgOver_sum_eq_card_mul_avgOver_prod
+              exact avgOver_uniform_sum_eq_card_mul_prod
                 (fun q gh => fullSliceBABATerm params strategy family q gh)
       _ = (Fintype.card O : Error) * avgOver (uniformDistribution (Q × O))
             (fun z => fullSliceABABTerm params strategy family z.1 z.2) := by
@@ -154,7 +124,7 @@ lemma fullSliceCommutation_avg_swap_terms
       _ = avgOver (uniformDistribution Q)
             (fun q => ∑ gh : O, fullSliceABABTerm params strategy family q gh) := by
               symm
-              exact avgOver_sum_eq_card_mul_avgOver_prod
+              exact avgOver_uniform_sum_eq_card_mul_prod
                 (fun q gh => fullSliceABABTerm params strategy family q gh)
 
 /-- The zero operator family on the full-slice outcome space. -/

@@ -872,6 +872,39 @@ theorem avgOver_uniform_prod_swap
           (fun b => avgOver (uniformDistribution α) (fun a => f a b)) := by
           exact avgOver_uniform_comm f
 
+/-- Pull a finite sum through a uniform average and express it as a uniform
+average over the product, with the cardinality of the summed type as the
+normalizing factor. -/
+theorem avgOver_uniform_sum_eq_card_mul_prod
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → β → Error) :
+    avgOver (uniformDistribution α) (fun a => ∑ b : β, f a b) =
+      (Fintype.card β : Error) *
+        avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
+  let c : Error := Fintype.card β
+  have hc : c ≠ 0 := by
+    dsimp [c]
+    exact_mod_cast Fintype.card_ne_zero
+  calc
+    avgOver (uniformDistribution α) (fun a => ∑ b : β, f a b)
+        = ∑ b : β, avgOver (uniformDistribution α) (fun a => f a b) := by
+          exact avgOver_sum (uniformDistribution α) f
+    _ = c * avgOver (uniformDistribution β)
+          (fun b => avgOver (uniformDistribution α) (fun a => f a b)) := by
+          symm
+          calc
+            c * avgOver (uniformDistribution β)
+                (fun b => avgOver (uniformDistribution α) (fun a => f a b))
+                = c * ((1 / c) *
+                    ∑ b : β, avgOver (uniformDistribution α) (fun a => f a b)) := by
+                  simp [c, avgOver, uniformDistribution, Finset.mul_sum, hc]
+            _ = ∑ b : β, avgOver (uniformDistribution α) (fun a => f a b) := by
+                field_simp [hc]
+    _ = c * avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
+          rw [← avgOver_uniform_prod_swap]
+
 /-- Transport a uniform average through an equivalence whose target is a product,
 then split the product average into iterated uniform averages. -/
 theorem avgOver_uniform_equiv_prod
