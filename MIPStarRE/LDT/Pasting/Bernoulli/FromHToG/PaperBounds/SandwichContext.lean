@@ -131,18 +131,9 @@ lemma fromHToG_avgOver_head_ev_sandwich
   have havg :
       averageOperatorOverDistribution (uniformDistribution (Fq params)) (fun x => F x * S) =
         averageOperatorOverDistribution (uniformDistribution (Fq params)) F * S := by
-    unfold averageOperatorOverDistribution
-    calc
-      ∑ x ∈ (uniformDistribution (Fq params)).support,
-          (uniformDistribution (Fq params)).weight x • (F x * S)
-        = ∑ x ∈ (uniformDistribution (Fq params)).support,
-            ((uniformDistribution (Fq params)).weight x • F x) * S := by
-              refine Finset.sum_congr rfl ?_
-              intro x _hx
-              rw [smul_mul_assoc]
-      _ = (∑ x ∈ (uniformDistribution (Fq params)).support,
-            (uniformDistribution (Fq params)).weight x • F x) * S := by
-              rw [Finset.sum_mul]
+    simpa using
+      (averageOperatorOverDistribution_mul_left_right
+        (uniformDistribution (Fq params)) (1 : MIPStarRE.Quantum.Op ι) S F)
   calc
     avgOver (uniformDistribution (Fq params)) (fun x =>
       ev ψbi (leftTensor (ι₂ := ι) A * rightTensor (ι₁ := ι) (S * F x * S)))
@@ -236,7 +227,8 @@ lemma fromHToG_sum_averagedSandwichByType_total_eq_one
               (fromHToG_type_filtered_outcome_sum params
                 (fun τ gs => (gHatSandwichFamily params family n xs).outcome gs))
     _ = ∑ xs ∈ (uniformDistribution (PointTuple params n)).support,
-          (uniformDistribution (PointTuple params n)).weight xs • (1 : MIPStarRE.Quantum.Op ι) := by
+          (uniformDistribution (PointTuple params n)).weight xs •
+            (1 : MIPStarRE.Quantum.Op ι) := by
             refine Finset.sum_congr rfl ?_
             intro xs _hxs
             rw [fromHToG_gHatSandwichFamily_sum_eq_one params family n xs]
@@ -374,7 +366,8 @@ lemma fromHToG_SUS_context_avg_le_one
                   gHatTupleType gs = τ,
                 let U := (gHatIdxMeas params family x).outcome g
                 let T := gHatHalfProductOutcomeOperator params family n xs gs
-                ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U * S)))) := by
+                ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                  rightTensor (ι₁ := ι) (S * U * S)))) := by
       refine avgOver_congr _ _ _ ?_
       intro x
       refine avgOver_congr _ _ _ ?_
@@ -403,7 +396,8 @@ lemma fromHToG_SUS_context_avg_le_one
                   rightTensor (ι₁ := ι) ((S * U) * (Uᴴ * Sᴴ)) =
                     opTensor (T * Tᴴ) ((S * U) * (Uᴴ * Sᴴ)) by
                 rw [leftTensor_mul_rightTensor_eq_opTensor]]
-        _ = ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U * S)) := by
+        _ = ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+              rightTensor (ι₁ := ι) (S * U * S)) := by
               have hright : (S * U) * (Uᴴ * Sᴴ) = S * U * S := by
                 calc
                   (S * U) * (Uᴴ * Sᴴ) = S * U * (U * S) := by rw [hUherm, hSherm]
@@ -419,7 +413,8 @@ lemma fromHToG_SUS_context_avg_le_one
                 gHatTupleType gs = τ,
               let U := (gHatIdxMeas params family x).outcome g
               let T := gHatHalfProductOutcomeOperator params family n xs gs
-              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * U * S))))
+              ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                rightTensor (ι₁ := ι) (S * U * S))))
         = avgOver (uniformDistribution (Fq params)) (fun x =>
             avgOver (uniformDistribution (PointTuple params n)) (fun xs =>
               ∑ gs ∈ (Finset.univ : Finset (GHatTupleOutcome params n)) with
@@ -427,7 +422,8 @@ lemma fromHToG_SUS_context_avg_le_one
                 let T := gHatHalfProductOutcomeOperator params family n xs gs
                 let B := if b then (completePartSubMeas params family x).total
                   else (incompletePartSubMeas params family x).total
-                ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) * rightTensor (ι₁ := ι) (S * B * S)))) := by
+                ev ψbi (leftTensor (ι₂ := ι) (T * Tᴴ) *
+                  rightTensor (ι₁ := ι) (S * B * S)))) := by
               refine avgOver_congr _ _ _ ?_
               intro x
               refine avgOver_congr _ _ _ ?_
