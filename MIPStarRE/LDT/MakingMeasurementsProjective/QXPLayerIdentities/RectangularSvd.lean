@@ -17,35 +17,52 @@ universe uOutcome uι
 
 noncomputable section
 
-/-- The row-coisometry identity for the rectangular SVD choice of `Xhat`.
+/-- Left multiplication by a unitary group element preserves rectangular row
+coisometries.
 
-If `U` and `V` are unitary in the directions used below, and if the rectangular
-identity factor `Iro` has orthonormal rows, then the paper's matrix
-`U * Iro * Vᴴ` also has orthonormal rows.  This is the elementary matrix
-calculation behind `lem:X-hat-squared`. -/
-private theorem rectangularSvd_xHat_coisometry
-    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι] [DecidableEq ι]
-    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ)
-    (Iro : Matrix μ ι ℂ)
-    (hU_left : U * Uᴴ = (1 : Matrix μ μ ℂ))
-    (hV_right : Vᴴ * V = (1 : Matrix ι ι ℂ))
-    (hIro : Iro * Iroᴴ = (1 : Matrix μ μ ℂ)) :
-    (U * Iro * Vᴴ) * (U * Iro * Vᴴ)ᴴ = (1 : Matrix μ μ ℂ) := by
+If `W W† = I`, then `(U W)(U W)† = I`.  This is the square-unitary part of
+the paper's calculation of `lem:X-hat-squared`. -/
+theorem unitaryGroup_mul_rectangular_coisometry
+    {μ ι : Type*} [Fintype μ] [DecidableEq μ] [Fintype ι]
+    (U : Matrix.unitaryGroup μ ℂ) (W : Matrix μ ι ℂ)
+    (hW : W * Wᴴ = (1 : Matrix μ μ ℂ)) :
+    ((U : Matrix μ μ ℂ) * W) * ((U : Matrix μ μ ℂ) * W)ᴴ =
+      (1 : Matrix μ μ ℂ) := by
+  have hU : (U : Matrix μ μ ℂ) * (U : Matrix μ μ ℂ)ᴴ = (1 : Matrix μ μ ℂ) := by
+    change (U : Matrix μ μ ℂ) *
+      ((star U : Matrix.unitaryGroup μ ℂ) : Matrix μ μ ℂ) = 1
+    exact Unitary.coe_mul_star_self U
   calc
-    (U * Iro * Vᴴ) * (U * Iro * Vᴴ)ᴴ =
-        U * (Iro * Iroᴴ) * Uᴴ := by
-          rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
-          simp only [Matrix.conjTranspose_conjTranspose]
-          have hVcollapse : Vᴴ * (V * (Iroᴴ * Uᴴ)) = Iroᴴ * Uᴴ := by
-            rw [← Matrix.mul_assoc, hV_right, Matrix.one_mul]
-          calc
-            U * Iro * Vᴴ * (V * (Iroᴴ * Uᴴ)) =
-                U * Iro * (Vᴴ * (V * (Iroᴴ * Uᴴ))) := by
-                  simp [Matrix.mul_assoc]
-            _ = U * Iro * (Iroᴴ * Uᴴ) := by rw [hVcollapse]
-            _ = U * (Iro * Iroᴴ) * Uᴴ := by simp [Matrix.mul_assoc]
-    _ = U * Uᴴ := by rw [hIro, Matrix.mul_one]
-    _ = 1 := hU_left
+    ((U : Matrix μ μ ℂ) * W) * ((U : Matrix μ μ ℂ) * W)ᴴ =
+        (U : Matrix μ μ ℂ) * (W * Wᴴ) * (U : Matrix μ μ ℂ)ᴴ := by
+          rw [Matrix.conjTranspose_mul]
+          simp [Matrix.mul_assoc]
+    _ = (U : Matrix μ μ ℂ) * (U : Matrix μ μ ℂ)ᴴ := by
+          rw [hW, Matrix.mul_one]
+    _ = 1 := hU
+
+/-- Right multiplication by the adjoint of a unitary group element preserves
+rectangular row coisometries.
+
+If `W W† = I`, then `(W V†)(W V†)† = I`.  This is the right-square-unitary
+part of the paper's calculation of `lem:X-hat-squared`. -/
+theorem rectangular_coisometry_mul_conjTranspose_unitaryGroup
+    {μ ι : Type*} [DecidableEq μ] [Fintype ι] [DecidableEq ι]
+    (W : Matrix μ ι ℂ) (V : Matrix.unitaryGroup ι ℂ)
+    (hW : W * Wᴴ = (1 : Matrix μ μ ℂ)) :
+    (W * (V : Matrix ι ι ℂ)ᴴ) * (W * (V : Matrix ι ι ℂ)ᴴ)ᴴ =
+      (1 : Matrix μ μ ℂ) := by
+  have hV : (V : Matrix ι ι ℂ)ᴴ * (V : Matrix ι ι ℂ) = (1 : Matrix ι ι ℂ) := by
+    change (((star V : Matrix.unitaryGroup ι ℂ) : Matrix ι ι ℂ) *
+      (V : Matrix ι ι ℂ)) = 1
+    exact Unitary.coe_star_mul_self V
+  calc
+    (W * (V : Matrix ι ι ℂ)ᴴ) * (W * (V : Matrix ι ι ℂ)ᴴ)ᴴ =
+        W * (((V : Matrix ι ι ℂ)ᴴ * (V : Matrix ι ι ℂ)) * Wᴴ) := by
+          rw [Matrix.conjTranspose_mul]
+          simp [Matrix.mul_assoc]
+    _ = W * Wᴴ := by rw [hV, Matrix.one_mul]
+    _ = 1 := hW
 
 /-- The row-coisometry identity for the rectangular SVD choice of `Xhat`,
 with the square factors represented as unitary group elements. -/
@@ -56,9 +73,11 @@ theorem rectangularSvd_xHat_coisometry_unitaryGroup
     (hIro : Iro * Iroᴴ = (1 : Matrix μ μ ℂ)) :
     ((U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ) *
         ((U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ)ᴴ =
-      (1 : Matrix μ μ ℂ) :=
-  rectangularSvd_xHat_coisometry (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ) Iro
-    (Unitary.coe_mul_star_self U) (Unitary.coe_star_mul_self V) hIro
+      (1 : Matrix μ μ ℂ) := by
+  simpa [Matrix.mul_assoc] using
+    unitaryGroup_mul_rectangular_coisometry U
+      (Iro * (V : Matrix ι ι ℂ)ᴴ)
+      (rectangular_coisometry_mul_conjTranspose_unitaryGroup Iro V hIro)
 
 /-- The mixed product obtained by multiplying the rectangular SVD formulae.
 
