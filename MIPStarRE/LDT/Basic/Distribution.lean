@@ -265,6 +265,48 @@ theorem averageOperatorOverDistribution_map {α β : Type*} [DecidableEq β]
 
 end Distribution
 
+/-- If two operator-valued families agree pointwise, their averages agree. -/
+theorem averageOperatorOverDistribution_congr {α : Type*}
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (𝒟 : Distribution α) (A B : α → MIPStarRE.Quantum.Op ι)
+    (h : ∀ a, A a = B a) :
+    averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
+  exact Finset.sum_congr rfl fun a _ => by rw [h a]
+
+/-- Pull a finite outcome sum through an operator-valued average. -/
+theorem averageOperatorOverDistribution_sum {α β : Type*} [Fintype β]
+    (𝒟 : Distribution α)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → β → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 (fun a => ∑ b : β, f a b) =
+      ∑ b : β, averageOperatorOverDistribution 𝒟 (fun a => f a b) := by
+  unfold averageOperatorOverDistribution
+  calc
+    ∑ a ∈ 𝒟.support, 𝒟.weight a • ∑ b : β, f a b
+        = ∑ a ∈ 𝒟.support, ∑ b : β, 𝒟.weight a • f a b := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.smul_sum]
+    _ = ∑ b : β, ∑ a ∈ 𝒟.support, 𝒟.weight a • f a b := by
+          rw [Finset.sum_comm]
+
+/-- Pull a finite-set outcome sum through an operator-valued average. -/
+theorem averageOperatorOverDistribution_finset_sum {α β : Type*}
+    (𝒟 : Distribution α) (s : Finset β)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → β → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 (fun a => ∑ b ∈ s, f a b) =
+      ∑ b ∈ s, averageOperatorOverDistribution 𝒟 (fun a => f a b) := by
+  unfold averageOperatorOverDistribution
+  calc
+    ∑ a ∈ 𝒟.support, 𝒟.weight a • ∑ b ∈ s, f a b
+        = ∑ a ∈ 𝒟.support, ∑ b ∈ s, 𝒟.weight a • f a b := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [Finset.smul_sum]
+    _ = ∑ b ∈ s, ∑ a ∈ 𝒟.support, 𝒟.weight a • f a b := by
+          rw [Finset.sum_comm]
+
 /-- Operator averages preserve positivity. -/
 theorem averageOperatorOverDistribution_nonneg {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]

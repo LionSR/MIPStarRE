@@ -139,42 +139,21 @@ lemma qBipartiteMatchMass_averageIdxSubMeas_left
     qBipartiteMatchMass ψ (averageIdxSubMeas 𝒟 A h𝒟) B =
       avgOver 𝒟 (fun q => qBipartiteMatchMass ψ (A q) B) := by
   classical
-  unfold qBipartiteMatchMass avgOver averageIdxSubMeas
+  unfold qBipartiteMatchMass averageIdxSubMeas
   calc
     ∑ a,
         ev ψ
           (opTensor (averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a))
             (B.outcome a))
-      = ∑ a,
-          ev ψ
-            (averageOperatorOverDistribution 𝒟
-              (fun q => opTensor ((A q).outcome a) (B.outcome a))) := by
+      = ∑ a, avgOver 𝒟
+          (fun q => ev ψ (opTensor ((A q).outcome a) (B.outcome a))) := by
               refine Finset.sum_congr rfl ?_
               intro a _
-              exact congrArg (ev ψ)
-                (opTensor_averageOperatorOverDistribution_left 𝒟
-                  (fun q => (A q).outcome a) (B.outcome a))
-    _ =
-        ∑ a, ∑ q ∈ 𝒟.support,
-          𝒟.weight q * ev ψ (opTensor ((A q).outcome a) (B.outcome a)) := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          unfold averageOperatorOverDistribution
-          rw [ev_finset_sum]
-          refine Finset.sum_congr rfl ?_
-          intro q _
-          simpa using ev_scale ψ (𝒟.weight q)
-            (opTensor ((A q).outcome a) (B.outcome a))
-    _ =
-        ∑ q ∈ 𝒟.support, ∑ a,
-          𝒟.weight q * ev ψ (opTensor ((A q).outcome a) (B.outcome a)) := by
-          rw [Finset.sum_comm]
-    _ =
-        ∑ q ∈ 𝒟.support,
-          𝒟.weight q * ∑ a, ev ψ (opTensor ((A q).outcome a) (B.outcome a)) := by
-          refine Finset.sum_congr rfl ?_
-          intro q _
-          rw [← Finset.mul_sum]
+              exact ev_opTensor_averageOperatorOverDistribution_left ψ 𝒟
+                (fun q => (A q).outcome a) (B.outcome a)
+    _ = avgOver 𝒟
+          (fun q => ∑ a, ev ψ (opTensor ((A q).outcome a) (B.outcome a))) := by
+          rw [← avgOver_sum]
     _ = avgOver 𝒟 (fun q => qBipartiteMatchMass ψ (A q) B) := by
           simp [avgOver, qBipartiteMatchMass]
 
@@ -189,14 +168,9 @@ lemma ev_opTensor_total_averageIdxSubMeas_left
     ev ψ (opTensor (averageIdxSubMeas 𝒟 A h𝒟).total B.total) =
       avgOver 𝒟 (fun q => ev ψ (opTensor (A q).total B.total)) := by
   classical
-  unfold avgOver averageIdxSubMeas
+  unfold averageIdxSubMeas
   change ev ψ (opTensor (averageOperatorOverDistribution 𝒟 (fun q => (A q).total)) B.total) = _
-  rw [opTensor_averageOperatorOverDistribution_left]
-  unfold averageOperatorOverDistribution
-  rw [ev_finset_sum]
-  refine Finset.sum_congr rfl ?_
-  intro q _
-  simpa using ev_scale ψ (𝒟.weight q) (opTensor (A q).total B.total)
+  exact ev_opTensor_averageOperatorOverDistribution_left ψ 𝒟 (fun q => (A q).total) B.total
 
 lemma qBipartiteConsDefect_averageIdxSubMeas_left_le
     {Question Outcome : Type*}

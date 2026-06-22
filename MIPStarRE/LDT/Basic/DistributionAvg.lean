@@ -185,14 +185,6 @@ theorem avgOver_le_of_weight_sum_le_one {α : Type*} (𝒟 : Distribution α)
     _ ≤ 1 * δ := mul_le_mul_of_nonneg_right h𝒟 hδ_nonneg
     _ = δ := one_mul δ
 
-/-- If two operator-valued families agree pointwise, their averages agree. -/
-theorem averageOperatorOverDistribution_congr {α : Type*}
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (𝒟 : Distribution α) (A B : α → MIPStarRE.Quantum.Op ι)
-    (h : ∀ a, A a = B a) :
-    averageOperatorOverDistribution 𝒟 A = averageOperatorOverDistribution 𝒟 B := by
-  exact Finset.sum_congr rfl fun a _ => by rw [h a]
-
 /-- Fixed left and right multiplications factor through an operator average. -/
 theorem averageOperatorOverDistribution_mul_left_right {α : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
