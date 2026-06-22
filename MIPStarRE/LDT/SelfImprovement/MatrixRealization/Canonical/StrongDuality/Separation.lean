@@ -556,6 +556,42 @@ theorem matrixSdpCanonicalNormalizedSeparatorDualMatrix_dualObjective_lt_of_sep
   rw [matrixSdpCanonicalNormalizedSeparatorFunctional_eq_trace_dualMatrix φ hI] at hlt
   simpa [matrixSdpDualObjective] using hlt
 
+/-- A separating functional above a feasible primal value produces a better
+dual-feasible point.
+
+Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
+(`\label{lem:sdp}`).  This is the normalized-separator step in the proof of
+strong duality for the canonical SDP: separating the point `(I,t)` from the
+closed primal image cone gives, through the real trace-pairing representative
+of the normalized constraint functional, a dual-feasible matrix whose dual
+objective is strictly below `t`.
+
+This lemma is a Lean-only organization of the separation proof.  It does not
+change the paper-facing statement of `lem:sdp`. -/
+theorem matrixSdpCanonicalSeparator_exists_dualFeasible_lt_of_feasible_lt
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
+    {t : ℝ}
+    (hφ : ∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, 0 ≤ φ z)
+    (hsep : φ ((1 : MatrixOperator model.space), t) < 0)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
+    (hXlt : Complex.re (Matrix.trace
+      (matrixSdpCanonicalObjectiveOperator params model * X)) < t) :
+    ∃ W : MatrixOperator model.space,
+      (∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model W g) ∧
+      matrixSdpDualObjective model W < t := by
+  have hcoeff : matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0 :=
+    matrixSdpCanonicalSeparatorObjectiveCoefficient_neg_of_feasible_lt
+      params model φ hφ hsep X hX hXlt
+  refine ⟨matrixSdpCanonicalNormalizedSeparatorDualMatrix φ, ?_, ?_⟩
+  · exact matrixSdpCanonicalNormalizedSeparatorDualMatrix_dualFeasible
+      params model φ hφ hcoeff
+  · exact matrixSdpCanonicalNormalizedSeparatorDualMatrix_dualObjective_lt_of_sep
+      φ hsep hcoeff
+
 /-- The canonical primal objective attains a maximum on the feasible set. -/
 theorem matrixSdpCanonicalPrimalObjective_exists_isMaxOn
     (params : Parameters) [FieldModel params.q]
@@ -648,20 +684,9 @@ theorem matrixSdpCanonicalStrongDuality
       · simpa [p] using hp_lt_t
     obtain ⟨φ, hφ_nonneg, hsep⟩ :=
       matrixSdpCanonicalPrimalImageCone_separation_of_notMem params model hnotMem
-    have hcoeff : matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0 :=
-      matrixSdpCanonicalSeparatorObjectiveCoefficient_neg_of_feasible_lt
+    obtain ⟨W, hWdual, hWobj_lt⟩ :=
+      matrixSdpCanonicalSeparator_exists_dualFeasible_lt_of_feasible_lt
         params model φ hφ_nonneg hsep X hX (by simpa [p] using hp_lt_t)
-    let W := matrixSdpCanonicalNormalizedSeparatorDualMatrix φ
-    have hWdual :
-        ∀ g : Polynomial params,
-          0 ≤ matrixSdpDualSlackOperator params model W g := by
-      simpa [W] using
-        matrixSdpCanonicalNormalizedSeparatorDualMatrix_dualFeasible
-          params model φ hφ_nonneg hcoeff
-    have hWobj_lt : matrixSdpDualObjective model W < t := by
-      simpa [W] using
-        matrixSdpCanonicalNormalizedSeparatorDualMatrix_dualObjective_lt_of_sep
-          φ hsep hcoeff
     have hd_le_W : d ≤ matrixSdpDualObjective model W := by
       simpa [d] using hZmin W hWdual
     nlinarith
