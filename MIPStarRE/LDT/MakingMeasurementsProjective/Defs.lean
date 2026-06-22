@@ -61,6 +61,39 @@ attribute [instance] FiniteHilbertSpace.instNonempty
 abbrev MatrixOperator (H : FiniteHilbertSpace) :=
   MIPStarRE.Quantum.Op H.carrier
 
+namespace MatrixOperator
+
+/-! The SDP separation argument uses the elementwise finite-matrix norm.  These
+instances record that choice once for the project's concrete operator type,
+rather than reintroducing it in each analytic argument. -/
+
+noncomputable instance seminormedAddCommGroup
+    (H : FiniteHilbertSpace) :
+    SeminormedAddCommGroup (MatrixOperator H) :=
+  Matrix.seminormedAddCommGroup
+
+noncomputable instance normedAddCommGroup
+    (H : FiniteHilbertSpace) :
+    NormedAddCommGroup (MatrixOperator H) :=
+  Matrix.normedAddCommGroup
+
+noncomputable instance normedSpace
+    (H : FiniteHilbertSpace) :
+    NormedSpace ℝ (MatrixOperator H) :=
+  Matrix.normedSpace
+
+instance firstCountableTopology
+    (H : FiniteHilbertSpace) :
+    FirstCountableTopology (MatrixOperator H) :=
+  inferInstanceAs (FirstCountableTopology (H.carrier → H.carrier → ℂ))
+
+noncomputable instance locallyConvexSpace
+    (H : FiniteHilbertSpace) :
+    LocallyConvexSpace ℝ (MatrixOperator H) :=
+  NormedSpace.toLocallyConvexSpace
+
+end MatrixOperator
+
 /-- A positive operator used as a possibly unnormalized state witness. -/
 structure PositiveMatrixState (H : FiniteHilbertSpace) where
   matrix : MatrixOperator H
