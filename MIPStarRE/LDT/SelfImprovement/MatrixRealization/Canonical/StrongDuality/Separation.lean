@@ -25,40 +25,6 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open Filter
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.Elementwise Topology
 
-/-- The canonical equality-constraint operator as a continuous real-linear map. -/
-noncomputable def matrixSdpCanonicalConstraintOperatorCLM
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →L[ℝ]
-      MatrixOperator model.space :=
-  ContinuousLinearMap.mk
-    { toFun := matrixSdpCanonicalConstraintOperator params model
-      map_add' := by
-        classical
-        intro X Y
-        ext i j
-        unfold matrixSdpCanonicalConstraintOperator matrixSdpCanonicalDiagonalBlock
-        simp only [Matrix.sum_apply, Matrix.add_apply]
-        exact Finset.sum_add_distrib
-      map_smul' := by
-        classical
-        intro r X
-        ext i j
-        unfold matrixSdpCanonicalConstraintOperator matrixSdpCanonicalDiagonalBlock
-        simp only [Matrix.sum_apply, Matrix.smul_apply]
-        exact (Finset.smul_sum (s := Finset.univ)
-          (f := fun b : MatrixSdpCanonicalBlockIndex params => X (b, i) (b, j))
-          (r := r)).symm }
-    (continuous_matrixSdpCanonicalConstraintOperator params model)
-
-/-- The canonical primal objective as a continuous real-linear functional. -/
-noncomputable def matrixSdpCanonicalPrimalObjectiveCLM
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params) :
-    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →L[ℝ] ℝ :=
-  MIPStarRE.Quantum.realTracePairingCLM
-    (matrixSdpCanonicalObjectiveOperator params model)
-
 /-- The map sending a primal matrix to its constraint image and objective value. -/
 noncomputable def matrixSdpCanonicalPrimalConeMap
     (params : Parameters) [FieldModel params.q]
@@ -75,8 +41,8 @@ theorem matrixSdpCanonicalPrimalConeMap_apply
     (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
     matrixSdpCanonicalPrimalConeMap params model X =
       (matrixSdpCanonicalConstraintOperator params model X,
-        Complex.re (Matrix.trace (matrixSdpCanonicalObjectiveOperator params model * X))) :=
-  rfl
+        Complex.re (Matrix.trace (matrixSdpCanonicalObjectiveOperator params model * X))) := by
+  simp [matrixSdpCanonicalPrimalConeMap, matrixSdpCanonicalPrimalObjectiveCLM]
 
 /-- The closed image cone of positive semidefinite canonical primal matrices under
 the constraint-objective map. -/
@@ -187,7 +153,7 @@ theorem matrixSdpCanonicalPrimalImageCone_identity_mem_iff_exists_feasible_objec
             fun n : ℕ => Complex.re (Matrix.trace ((u n).1)) := by
         funext n
         rw [← hmapCLM n]
-        rfl
+        rw [matrixSdpCanonicalPrimalConeMap_apply]
       rw [htrace_eq]
       simpa [dimR] using htrace_tendsto_u
     have hdim_lt_R : dimR < R := by
