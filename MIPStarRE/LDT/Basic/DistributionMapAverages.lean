@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
+import MIPStarRE.LDT.Basic.DistributionProduct
 
 /-!
 # Uniform push-forward averaging lemmas
@@ -15,6 +15,8 @@ equivalence.
 * `averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv`
 * `avgOver_uniform_map_eq_uniform_fst_of_factor_equiv`
 * `avgOver_uniform_map_eq_uniform_snd_of_factor_equiv`
+* `averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv`
+* `averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv`
 
 ## References
 
@@ -124,5 +126,57 @@ theorem avgOver_uniform_map_eq_uniform_snd_of_factor_equiv
             rw [h a]
     _ = avgOver (uniformDistribution δ) f := by
           exact avgOver_uniform_equiv_snd e f
+
+/-- A uniform push-forward has the first-coordinate uniform operator marginal
+when the observed coordinate factors through a product equivalence of the seed. -/
+theorem averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv
+    {α β γ δ : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [DecidableEq β]
+    [Fintype γ] [DecidableEq γ] [Nonempty γ]
+    [Finite δ] [Nonempty δ]
+    (m : α → β) (g : β → γ) (e : α ≃ γ × δ)
+    (h : ∀ a, g (m a) = (e a).1)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : γ → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b)) =
+      averageOperatorOverDistribution (uniformDistribution γ) A := by
+  calc
+    averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b))
+        = averageOperatorOverDistribution (uniformDistribution α)
+            (fun a => A (g (m a))) := by
+          exact averageOperatorOverDistribution_uniformDistribution_map α β m
+            (fun b => A (g b))
+    _ = averageOperatorOverDistribution (uniformDistribution α) (fun a => A (e a).1) := by
+          exact averageOperatorOverDistribution_congr (uniformDistribution α) _ _ fun a => by
+            rw [h a]
+    _ = averageOperatorOverDistribution (uniformDistribution γ) A := by
+          exact averageOperatorOverDistribution_uniform_equiv_fst e A
+
+/-- A uniform push-forward has the second-coordinate uniform operator marginal
+when the observed coordinate factors through a product equivalence of the seed. -/
+theorem averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv
+    {α β γ δ : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [DecidableEq β]
+    [Finite γ] [Nonempty γ]
+    [Fintype δ] [DecidableEq δ] [Nonempty δ]
+    (m : α → β) (g : β → δ) (e : α ≃ γ × δ)
+    (h : ∀ a, g (m a) = (e a).2)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (A : δ → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b)) =
+      averageOperatorOverDistribution (uniformDistribution δ) A := by
+  calc
+    averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b))
+        = averageOperatorOverDistribution (uniformDistribution α)
+            (fun a => A (g (m a))) := by
+          exact averageOperatorOverDistribution_uniformDistribution_map α β m
+            (fun b => A (g b))
+    _ = averageOperatorOverDistribution (uniformDistribution α) (fun a => A (e a).2) := by
+          exact averageOperatorOverDistribution_congr (uniformDistribution α) _ _ fun a => by
+            rw [h a]
+    _ = averageOperatorOverDistribution (uniformDistribution δ) A := by
+          exact averageOperatorOverDistribution_uniform_equiv_snd e A
 
 end MIPStarRE.LDT

@@ -795,10 +795,6 @@ theorem avgOver_uniform_prod
   rw [avgOver_uniform_eq_pmf_sum (α := α × β)]
   rw [avgOver_uniform_eq_pmf_sum (α := α)]
   simp_rw [avgOver_uniform_eq_pmf_sum (α := β)]
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
   calc
     ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal * f ab.1 ab.2
       = ∑ a : α, ∑ b : β,
@@ -816,9 +812,7 @@ theorem avgOver_uniform_prod
                     (PMF.uniformOfFintype β b).toReal) * f a b := by
                       refine Finset.sum_congr rfl ?_
                       intro b _
-                      simp [PMF.uniformOfFintype_apply, Fintype.card_prod]
-                      field_simp [hα, hβ]
-                      simp
+                      rw [pmf_uniformOfFintype_prod_apply_toReal]
               _ = (PMF.uniformOfFintype α a).toReal *
                     ∑ b : β, (PMF.uniformOfFintype β b).toReal * f a b := by
                       rw [Finset.mul_sum]
