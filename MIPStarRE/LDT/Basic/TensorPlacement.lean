@@ -23,12 +23,24 @@ theorem leftTensor_finset_sum {α : Type*}
     Finset.sum s (fun a => leftTensor (ι₂ := ι₂) (f a)) =
       leftTensor (ι₂ := ι₂) (Finset.sum s f) := by
   classical
-  induction s using Finset.induction_on with
-  | empty =>
-      simp [leftTensor]
-  | insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
-      simp [leftTensor, Matrix.add_kronecker]
+  simpa [leftTensor, opTensor] using
+    (opTensor_sum_left_finset (s := s) (f := f)
+      (B := (1 : MIPStarRE.Quantum.Op ι₂))).symm
+
+/-- Left tensor placement commutes with operator averages. -/
+theorem leftTensor_averageOperatorOverDistribution {α : Type*}
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (𝒟 : Distribution α) (A : α → MIPStarRE.Quantum.Op ι₁) :
+    leftTensor (ι₂ := ι₂) (averageOperatorOverDistribution 𝒟 A) =
+      averageOperatorOverDistribution 𝒟 (fun a => leftTensor (ι₂ := ι₂) (A a)) := by
+  unfold averageOperatorOverDistribution
+  rw [← leftTensor_finset_sum (ι₂ := ι₂) 𝒟.support
+    (fun a => 𝒟.weight a • A a)]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  simpa [leftTensor, opTensor] using
+    (opTensor_smul_left_error
+      (ι₁ := ι₁) (ι₂ := ι₂) (𝒟.weight a) (A a) (1 : MIPStarRE.Quantum.Op ι₂))
 
 /-- Expanding the left-tensor mass of a submeasurement on a bipartite state as
 the sum of per-outcome left-tensor expectations.
@@ -58,19 +70,9 @@ theorem ev_leftTensor_averageOperatorOverDistribution {α : Type*}
     (A : α → MIPStarRE.Quantum.Op ι₁) :
     ev ψ (leftTensor (ι₂ := ι₂) (averageOperatorOverDistribution 𝒟 A)) =
       avgOver 𝒟 (fun a => ev ψ (leftTensor (ι₂ := ι₂) (A a))) := by
-  unfold averageOperatorOverDistribution avgOver
-  rw [← leftTensor_finset_sum (ι₂ := ι₂) 𝒟.support (fun a => 𝒟.weight a • A a)]
-  rw [ev_finset_sum]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  have hsmul :
-      leftTensor (ι₂ := ι₂) (𝒟.weight a • A a) =
-        𝒟.weight a • leftTensor (ι₂ := ι₂) (A a) := by
-    simpa [leftTensor, opTensor] using
-      (opTensor_smul_left_error
-        (ι₁ := ι₁) (ι₂ := ι₂) (𝒟.weight a) (A a) (1 : MIPStarRE.Quantum.Op ι₂))
-  rw [hsmul]
-  exact ev_real_smul ψ (𝒟.weight a) (leftTensor (ι₂ := ι₂) (A a))
+  rw [leftTensor_averageOperatorOverDistribution]
+  exact ev_averageOperatorOverDistribution ψ 𝒟
+    (fun a => leftTensor (ι₂ := ι₂) (A a))
 
 /-- Right tensor placement commutes with finite sums. -/
 theorem rightTensor_finset_sum {α : Type*}
@@ -79,12 +81,24 @@ theorem rightTensor_finset_sum {α : Type*}
     Finset.sum s (fun a => rightTensor (ι₁ := ι₁) (f a)) =
       rightTensor (ι₁ := ι₁) (Finset.sum s f) := by
   classical
-  induction s using Finset.induction_on with
-  | empty =>
-      simp [rightTensor]
-  | insert a s ha ih =>
-      rw [Finset.sum_insert ha, Finset.sum_insert ha, ih]
-      simp [rightTensor, Matrix.kronecker_add]
+  simpa [rightTensor, opTensor] using
+    (opTensor_sum_right_finset (A := (1 : MIPStarRE.Quantum.Op ι₁)) (s := s)
+      (f := f)).symm
+
+/-- Right tensor placement commutes with operator averages. -/
+theorem rightTensor_averageOperatorOverDistribution {α : Type*}
+    {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
+    (𝒟 : Distribution α) (A : α → MIPStarRE.Quantum.Op ι₂) :
+    rightTensor (ι₁ := ι₁) (averageOperatorOverDistribution 𝒟 A) =
+      averageOperatorOverDistribution 𝒟 (fun a => rightTensor (ι₁ := ι₁) (A a)) := by
+  unfold averageOperatorOverDistribution
+  rw [← rightTensor_finset_sum (ι₁ := ι₁) 𝒟.support
+    (fun a => 𝒟.weight a • A a)]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  simpa [rightTensor, opTensor] using
+    (opTensor_smul_right_error
+      (ι₁ := ι₁) (ι₂ := ι₂) (𝒟.weight a) (1 : MIPStarRE.Quantum.Op ι₁) (A a))
 
 /-- Evaluation of a right-placed operator average is the average of the
 right-placed evaluations. -/
@@ -94,19 +108,9 @@ theorem ev_rightTensor_averageOperatorOverDistribution {α : Type*}
     (A : α → MIPStarRE.Quantum.Op ι₂) :
     ev ψ (rightTensor (ι₁ := ι₁) (averageOperatorOverDistribution 𝒟 A)) =
       avgOver 𝒟 (fun a => ev ψ (rightTensor (ι₁ := ι₁) (A a))) := by
-  unfold averageOperatorOverDistribution avgOver
-  rw [← rightTensor_finset_sum (ι₁ := ι₁) 𝒟.support (fun a => 𝒟.weight a • A a)]
-  rw [ev_finset_sum]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  have hsmul :
-      rightTensor (ι₁ := ι₁) (𝒟.weight a • A a) =
-        𝒟.weight a • rightTensor (ι₁ := ι₁) (A a) := by
-    simpa [rightTensor, opTensor] using
-      (opTensor_smul_right_error
-        (ι₁ := ι₁) (ι₂ := ι₂) (𝒟.weight a) (1 : MIPStarRE.Quantum.Op ι₁) (A a))
-  rw [hsmul]
-  exact ev_real_smul ψ (𝒟.weight a) (rightTensor (ι₁ := ι₁) (A a))
+  rw [rightTensor_averageOperatorOverDistribution]
+  exact ev_averageOperatorOverDistribution ψ 𝒟
+    (fun a => rightTensor (ι₁ := ι₁) (A a))
 
 /-- Tensoring on the right commutes with operator averages in the left factor. -/
 theorem opTensor_averageOperatorOverDistribution_left {α ι₁ ι₂ : Type*}
@@ -321,7 +325,7 @@ independent right-register submeasurement is at most one in a normalized state.
 
 The operator under the sum factors as
 `(∑ o, Outer_o * Inner.total * Outer_o) ⊗ Right.total`; the first factor is
-bounded by `1` by the submeasurement axioms and sandwich monotonicity, and the
+bounded by `1` by the submeasurement axioms and sandwich monotonicity.  The
 second factor is also bounded by `1`. -/
 theorem sandwichTensor_residual_sum_le_one
     {α β γ ιA ιB : Type*} [Fintype α] [Fintype β] [Fintype γ]
