@@ -40,7 +40,7 @@ structure MatrixSdpOptimalWitness (params : Parameters) [FieldModel params.q]
     matrixSdpPrimalObjective params model T = matrixSdpDualObjective model Z
   complementarySlackness :
     ∀ g : Polynomial params,
-      matrixSdpComplementarySlacknessDefect params model T Z g = 0
+      T.effect g * Z = T.effect g * matrixAveragedPointOperator params model g
 
 /-- Paper origin: `references/ldt-paper/self_improvement.tex:82-181`
 (`\label{lem:sdp}`), with complementary slackness from
@@ -102,19 +102,15 @@ noncomputable def primalMeasurement {params : Parameters} [FieldModel params.q]
     h.primalMeasurement.effect g = T.effect g :=
   rfl
 
-/-- The defect-zero form of complementary slackness is the equation
-`T_g Z = T_g A_g`. -/
+/-- The stored complementary-slackness equation, expressed through the named
+matrix-level predicate. -/
 theorem complementarySlacknessEquation {params : Parameters} [FieldModel params.q]
     {model : MatrixSdpRealization params}
     {T : MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space}
     {Z : MatrixOperator model.space}
     (h : MatrixSdpOptimalWitness params model T Z) (g : Polynomial params) :
     matrixSdpComplementarySlacknessEquation params model T Z g := by
-  have hzero :
-      T.effect g * Z - T.effect g * matrixAveragedPointOperator params model g = 0 := by
-    simpa [matrixSdpComplementarySlacknessDefect, matrixSdpDualSlackOperator,
-      Matrix.mul_sub] using h.complementarySlackness g
-  exact sub_eq_zero.mp hzero
+  exact h.complementarySlackness g
 
 end MatrixSdpOptimalWitness
 

@@ -356,8 +356,14 @@ theorem matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness
     matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero params model T hSlack
   dualFeasible := hdual
   strongDuality := hstrong
-  complementarySlackness :=
-    matrixSdpComplementarySlacknessDefect_of_canonical params model T Z hcanonical
+  complementarySlackness := by
+    intro g
+    have hzero :
+        matrixSdpComplementarySlacknessDefect params model T Z g = 0 :=
+      matrixSdpComplementarySlacknessDefect_of_canonical params model T Z hcanonical g
+    exact sub_eq_zero.mp (by
+      simpa [matrixSdpComplementarySlacknessDefect, matrixSdpDualSlackOperator,
+        Matrix.mul_sub] using hzero)
 
 /-- Assemble a paper-form optimal witness from an arbitrary feasible canonical
 matrix with zero slack block.
