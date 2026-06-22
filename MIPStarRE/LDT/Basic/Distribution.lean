@@ -546,4 +546,30 @@ noncomputable def totalVariationDistance {α : Type*} [DecidableEq α]
     (μ ν : Distribution α) : Error :=
   (1 / 2) * ∑ a ∈ (μ.support ∪ ν.support), |μ.weight a - ν.weight a|
 
+/-- On a finite ambient type, the local total-variation distance may be summed
+over all points rather than over the union of the stored supports. -/
+theorem totalVariationDistance_eq_univ_sum {α : Type*} [Fintype α] [DecidableEq α]
+    (μ ν : Distribution α) :
+    totalVariationDistance μ ν =
+      (1 / 2) * ∑ a : α, |μ.weight a - ν.weight a| := by
+  unfold totalVariationDistance
+  congr 1
+  exact Finset.sum_subset (Finset.subset_univ (μ.support ∪ ν.support)) (fun a _ ha => by
+    have hμ : a ∉ μ.support := fun h => ha (Finset.mem_union_left ν.support h)
+    have hν : a ∉ ν.support := fun h => ha (Finset.mem_union_right μ.support h)
+    rw [μ.outsideSupport a hμ, ν.outsideSupport a hν, sub_self, abs_zero])
+
+/-- For probability distributions on a finite ambient type, the local
+total-variation distance is the half `L^1` distance between the associated
+Mathlib probability mass functions. -/
+theorem totalVariationDistance_eq_toPMF_sum {α : Type*} [Fintype α] [DecidableEq α]
+    (μ ν : Distribution α) (hμ : μ.IsProbability) (hν : ν.IsProbability) :
+    totalVariationDistance μ ν =
+      (1 / 2) * ∑ a : α, |(μ.toPMF hμ a).toReal - (ν.toPMF hν a).toReal| := by
+  rw [totalVariationDistance_eq_univ_sum]
+  congr 1
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  rw [Distribution.toPMF_apply_toReal, Distribution.toPMF_apply_toReal]
+
 end MIPStarRE.LDT
