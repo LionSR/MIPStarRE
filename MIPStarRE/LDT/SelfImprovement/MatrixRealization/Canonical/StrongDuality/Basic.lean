@@ -95,16 +95,76 @@ theorem matrixSdpCanonicalPrimalFeasible_isBounded
   exact ⟨(Fintype.card model.space.carrier : ℝ), fun X hX =>
     matrixSdpCanonicalPrimalFeasible_norm_le params model X hX⟩
 
+/-- The projection onto one diagonal block of the canonical primal matrix, as a
+continuous real-linear map. -/
+noncomputable def matrixSdpCanonicalDiagonalBlockCLM
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →L[ℝ]
+      MatrixOperator model.space :=
+  ContinuousLinearMap.mk
+    { toFun := fun X => matrixSdpCanonicalDiagonalBlock params model X b
+      map_add' := by
+        intro X Y
+        ext i j
+        rfl
+      map_smul' := by
+        intro r X
+        ext i j
+        rfl }
+    (continuous_matrix fun i j => continuous_apply_apply (b, i) (b, j))
+
+@[simp]
+theorem matrixSdpCanonicalDiagonalBlockCLM_apply
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (b : MatrixSdpCanonicalBlockIndex params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    matrixSdpCanonicalDiagonalBlockCLM params model b X =
+      matrixSdpCanonicalDiagonalBlock params model X b :=
+  rfl
+
+/-- The canonical equality-constraint operator as a continuous real-linear map. -/
+noncomputable def matrixSdpCanonicalConstraintOperatorCLM
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →L[ℝ]
+      MatrixOperator model.space :=
+  ∑ b : MatrixSdpCanonicalBlockIndex params,
+    matrixSdpCanonicalDiagonalBlockCLM params model b
+
+@[simp]
+theorem matrixSdpCanonicalConstraintOperatorCLM_apply
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    matrixSdpCanonicalConstraintOperatorCLM params model X =
+      matrixSdpCanonicalConstraintOperator params model X := by
+  simp [matrixSdpCanonicalConstraintOperatorCLM, matrixSdpCanonicalConstraintOperator]
+
+/-- The canonical primal objective as a continuous real-linear functional. -/
+noncomputable def matrixSdpCanonicalPrimalObjectiveCLM
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →L[ℝ] ℝ :=
+  MIPStarRE.Quantum.realTracePairingCLM
+    (matrixSdpCanonicalObjectiveOperator params model)
+
 /-- The canonical primal equality-constraint operator is continuous. -/
 theorem continuous_matrixSdpCanonicalConstraintOperator
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params) :
     Continuous fun X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) =>
       matrixSdpCanonicalConstraintOperator params model X := by
-  classical
-  unfold matrixSdpCanonicalConstraintOperator matrixSdpCanonicalDiagonalBlock
-  exact continuous_finsetSum Finset.univ fun b _ =>
-    continuous_matrix fun i j => continuous_apply_apply (b, i) (b, j)
+  have h :
+      (fun X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) =>
+        matrixSdpCanonicalConstraintOperator params model X) =
+        fun X => matrixSdpCanonicalConstraintOperatorCLM params model X := by
+    funext X
+    exact (matrixSdpCanonicalConstraintOperatorCLM_apply params model X).symm
+  rw [h]
+  exact (matrixSdpCanonicalConstraintOperatorCLM params model).continuous
 
 /-- A canonical block-diagonal operator is Hermitian when all diagonal blocks are
 Hermitian. -/
