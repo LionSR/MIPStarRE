@@ -77,7 +77,8 @@ lemma answer_weighted_axisParallel_bound
     (hgood : strategy.IsGood eps delta gamma) :
     avgOver (uniformDistribution (Fq params))
         (fun x => sliceTransverseDirectionWeight params *
-          (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤ eps := by
+          (xRestrictedAnswerSymStrat params strategy x).axisParallelFailureProbability) ≤
+      eps := by
   calc
     avgOver (uniformDistribution (Fq params))
         (fun x => sliceTransverseDirectionWeight params *
@@ -495,26 +496,11 @@ private lemma answerSuccessorAverageRestrictedDiagonalFailure_eq_embeddedDiagona
                       (fun j => answerSuccessorDiagonalSliceIndexError params strategy x j) := by
                               simp [avgOver, uniformDistribution, Fintype.card_fin,
                                 answerSuccessorDiagonalSliceIndexError]
-    _ = avgOver (uniformDistribution (Fq params × Fin params.m))
-          (fun xj => answerSuccessorDiagonalSliceIndexError params strategy xj.1 xj.2) := by
-            simpa using
-              (avgOver_uniform_prod (α := Fq params) (β := Fin params.m)
-                (f := fun x j =>
-                  answerSuccessorDiagonalSliceIndexError params strategy x j)).symm
-    _ = avgOver (uniformDistribution (Fin params.m × Fq params))
-          (fun jx => answerSuccessorDiagonalSliceIndexError params strategy jx.2 jx.1) := by
-            simpa using
-              (MIPStarRE.LDT.avgOver_uniform_equiv
-                (e := Equiv.prodComm (Fq params) (Fin params.m))
-                (f := fun xj : Fq params × Fin params.m =>
-                  answerSuccessorDiagonalSliceIndexError params strategy xj.1 xj.2))
     _ = avgOver (uniformDistribution (Fin params.m))
           (fun j => avgOver (uniformDistribution (Fq params))
             (fun x => answerSuccessorDiagonalSliceIndexError params strategy x j)) := by
-            simpa using
-              (avgOver_uniform_prod (α := Fin params.m) (β := Fq params)
-                (f := fun j x =>
-                  answerSuccessorDiagonalSliceIndexError params strategy x j))
+            exact avgOver_uniform_comm
+              (fun x j => answerSuccessorDiagonalSliceIndexError params strategy x j)
     _ = avgOver (uniformDistribution (Fin params.m))
           (fun j => answerSuccessorDiagonalIndexError params strategy (embedCoord params j)) := by
             refine avgOver_congr _ _ _ ?_

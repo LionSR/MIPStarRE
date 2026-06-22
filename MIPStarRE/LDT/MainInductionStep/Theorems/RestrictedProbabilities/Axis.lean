@@ -35,7 +35,8 @@ private lemma restrictedAxisSampleError_eq
       (axisParallelLineAnswerFamily strategy (appendPoint params u x, embedCoord params i)) := by
   let ℓ : AxisParallelLine params := { base := u, direction := i }
   have hpost :
-      postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas) (· zeroCoord) =
+      postprocess ((restrictAxisParallelMeasurement params strategy x ℓ).toSubMeas)
+        (· zeroCoord) =
       postprocess
           ((strategy.axisParallelMeasurement
             (AxisParallelLine.appendAtHeight params ℓ x)).toSubMeas)
@@ -195,24 +196,11 @@ private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
                 _ = avgOver (uniformDistribution (Fin params.m))
                       (fun i => sliceAxisDirectionError params strategy x i) := by
                                 rfl
-    _ = avgOver (uniformDistribution (Fq params × Fin params.m))
-          (fun xi => sliceAxisDirectionError params strategy xi.1 xi.2) := by
-            simpa using
-              (avgOver_uniform_prod (α := Fq params) (β := Fin params.m)
-                (f := fun x i => sliceAxisDirectionError params strategy x i)).symm
-    _ = avgOver (uniformDistribution (Fin params.m × Fq params))
-          (fun ix => sliceAxisDirectionError params strategy ix.2 ix.1) := by
-            simpa using
-              (MIPStarRE.LDT.avgOver_uniform_equiv
-                (e := Equiv.prodComm (Fq params) (Fin params.m))
-                (f := fun xi : Fq params × Fin params.m =>
-                  sliceAxisDirectionError params strategy xi.1 xi.2))
     _ = avgOver (uniformDistribution (Fin params.m))
           (fun i => avgOver (uniformDistribution (Fq params))
             (fun x => sliceAxisDirectionError params strategy x i)) := by
-            simpa using
-              (avgOver_uniform_prod (α := Fin params.m) (β := Fq params)
-                (f := fun i x => sliceAxisDirectionError params strategy x i))
+            exact avgOver_uniform_comm
+              (fun x i => sliceAxisDirectionError params strategy x i)
     _ = avgOver (uniformDistribution (Fin params.m))
           (fun i => axisDirectionError params strategy (embedCoord params i)) := by
             refine avgOver_congr _ _ _ ?_
