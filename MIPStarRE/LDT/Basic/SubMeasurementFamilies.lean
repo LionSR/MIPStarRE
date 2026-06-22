@@ -473,19 +473,15 @@ noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
       (fun q => (A q).outcome a) (fun q => (A q).outcome_pos a)
   sum_eq_total := by
     classical
-    unfold averageOperatorOverDistribution
     calc
-      ∑ a, ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).outcome a
-          = ∑ q ∈ 𝒟.support, ∑ a, 𝒟.weight q • (A q).outcome a := by
-              rw [Finset.sum_comm]
-      _ = ∑ q ∈ 𝒟.support, 𝒟.weight q • ∑ a, (A q).outcome a := by
-            apply Finset.sum_congr rfl
-            intro q _
-            rw [← Finset.smul_sum]
-      _ = ∑ q ∈ 𝒟.support, 𝒟.weight q • (A q).total := by
-            apply Finset.sum_congr rfl
-            intro q _
-            rw [(A q).sum_eq_total]
+      ∑ a, averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
+          = averageOperatorOverDistribution 𝒟
+              (fun q => ∑ a, (A q).outcome a) := by
+            exact (averageOperatorOverDistribution_sum 𝒟
+              (fun q a => (A q).outcome a)).symm
+      _ = averageOperatorOverDistribution 𝒟 (fun q => (A q).total) := by
+            exact averageOperatorOverDistribution_congr 𝒟 _ _
+              (fun q => (A q).sum_eq_total)
   total_le_one := by
     exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟
       (fun q => (A q).total) h𝒟 (fun q => (A q).total_le_one)
