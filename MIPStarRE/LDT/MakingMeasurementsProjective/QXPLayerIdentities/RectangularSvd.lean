@@ -17,6 +17,47 @@ universe uOutcome uι
 
 noncomputable section
 
+/-- The rectangular singular-value reconstruction of `X`.
+
+If `U` and `V` are the square unitary factors and `S` is the rectangular
+diagonal singular-value matrix, this is the matrix
+`U * S * V†` appearing in the paper. -/
+def rectangularSvdX
+    {μ ι : Type*} [Fintype μ] [Fintype ι]
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ) (S : Matrix μ ι ℂ) :
+    Matrix μ ι ℂ :=
+  U * S * Vᴴ
+
+/-- The rectangular-SVD candidate for `Xhat`.
+
+This is the paper's matrix `U * I_{m × d} * V†`, where `Iro` is the rectangular
+row-coisometry replacing the displayed rectangular identity matrix. -/
+def rectangularSvdXHat
+    {μ ι : Type*} [Fintype μ] [Fintype ι]
+    (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ) (Iro : Matrix μ ι ℂ) :
+    Matrix μ ι ℂ :=
+  U * Iro * Vᴴ
+
+/-- The domain-space middle operator in the product `X† * Xhat`.
+
+For rectangular-SVD data this is `V * (S† * Iro) * V†`, the operator on the
+original Hilbert space which is later identified with `sqrt Q`. -/
+def rectangularSvdDomainMiddle
+    {μ ι : Type*} [Fintype μ] [Fintype ι]
+    (V : Matrix ι ι ℂ) (S Iro : Matrix μ ι ℂ) :
+    Matrix ι ι ℂ :=
+  V * (Sᴴ * Iro) * Vᴴ
+
+/-- The row-space middle operator in the product `X * Xhat†`.
+
+For rectangular-SVD data this is `U * (S * Iro†) * U†`, the formal counterpart
+of the square matrix `Σ_{m × m}` in the paper. -/
+def rectangularSvdRangeMiddle
+    {μ ι : Type*} [Fintype μ] [Fintype ι]
+    (U : Matrix μ μ ℂ) (S Iro : Matrix μ ι ℂ) :
+    Matrix μ μ ℂ :=
+  U * (S * Iroᴴ) * Uᴴ
+
 /-- Left multiplication by a unitary group element preserves rectangular row
 coisometries.
 
@@ -74,7 +115,7 @@ theorem rectangularSvd_xHat_coisometry_unitaryGroup
     ((U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ) *
         ((U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ)ᴴ =
       (1 : Matrix μ μ ℂ) := by
-  simpa [Matrix.mul_assoc] using
+  simpa [rectangularSvdXHat, Matrix.mul_assoc] using
     unitaryGroup_mul_rectangular_coisometry U
       (Iro * (V : Matrix ι ι ℂ)ᴴ)
       (rectangular_coisometry_mul_conjTranspose_unitaryGroup Iro V hIro)
@@ -92,10 +133,15 @@ theorem rectangularSvd_xHat_mixed_raw
     (hU_right : Uᴴ * U = (1 : Matrix μ μ ℂ))
     (hx : x = U * S * Vᴴ) :
     xᴴ * (U * Iro * Vᴴ) = V * (Sᴴ * Iro) * Vᴴ := by
+  change xᴴ * rectangularSvdXHat U V Iro =
+    rectangularSvdDomainMiddle V S Iro
+  change x = rectangularSvdX U V S at hx
   calc
-    xᴴ * (U * Iro * Vᴴ) =
-        V * (Sᴴ * Iro) * Vᴴ := by
-          rw [hx, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
+    xᴴ * rectangularSvdXHat U V Iro =
+        rectangularSvdDomainMiddle V S Iro := by
+          rw [hx]
+          simp only [rectangularSvdX, rectangularSvdXHat, rectangularSvdDomainMiddle]
+          rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
           simp only [Matrix.conjTranspose_conjTranspose]
           have hUcollapse : Uᴴ * (U * (Iro * Vᴴ)) = Iro * Vᴴ := by
             rw [← Matrix.mul_assoc, hU_right, Matrix.one_mul]
@@ -133,10 +179,15 @@ theorem rectangularSvd_x_mul_xHat_conjTranspose_raw
     (hV_right : Vᴴ * V = (1 : Matrix ι ι ℂ))
     (hx : x = U * S * Vᴴ) :
     x * (U * Iro * Vᴴ)ᴴ = U * (S * Iroᴴ) * Uᴴ := by
+  change x * (rectangularSvdXHat U V Iro)ᴴ =
+    rectangularSvdRangeMiddle U S Iro
+  change x = rectangularSvdX U V S at hx
   calc
-    x * (U * Iro * Vᴴ)ᴴ =
-        U * (S * Iroᴴ) * Uᴴ := by
-          rw [hx, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
+    x * (rectangularSvdXHat U V Iro)ᴴ =
+        rectangularSvdRangeMiddle U S Iro := by
+          rw [hx]
+          simp only [rectangularSvdX, rectangularSvdXHat, rectangularSvdRangeMiddle]
+          rw [Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]
           simp only [Matrix.conjTranspose_conjTranspose]
           have hVcollapse : Vᴴ * (V * (Iroᴴ * Uᴴ)) = Iroᴴ * Uᴴ := by
             rw [← Matrix.mul_assoc, hV_right, Matrix.one_mul]
@@ -187,7 +238,12 @@ theorem rectangularSvd_middle_eq_sqrt_of_square
     (hMiddle_sq :
       (V * (Sᴴ * Iro) * Vᴴ) * (V * (Sᴴ * Iro) * Vᴴ) = Q) :
     V * (Sᴴ * Iro) * Vᴴ = CFC.sqrt Q := by
-  exact eq_sqrt_of_sq_of_nonneg (V * (Sᴴ * Iro) * Vᴴ) Q hMiddle_nonneg hMiddle_sq
+  change rectangularSvdDomainMiddle V S Iro = CFC.sqrt Q
+  change 0 ≤ rectangularSvdDomainMiddle V S Iro at hMiddle_nonneg
+  change rectangularSvdDomainMiddle V S Iro *
+    rectangularSvdDomainMiddle V S Iro = Q at hMiddle_sq
+  exact eq_sqrt_of_sq_of_nonneg
+    (rectangularSvdDomainMiddle V S Iro) Q hMiddle_nonneg hMiddle_sq
 
 /-- The mixed rectangular SVD identity with the left square factor represented
 as a unitary group element and the target square root supplied as an external
@@ -218,7 +274,7 @@ theorem exists_xHat_of_rectangularSvd_unitaryGroup
       xHat = (U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ ∧
         xHat * xHatᴴ = (1 : Matrix μ μ ℂ) ∧
           xᴴ * xHat = CFC.sqrt Q := by
-  refine ⟨(U : Matrix μ μ ℂ) * Iro * (V : Matrix ι ι ℂ)ᴴ, rfl, ?_, ?_⟩
+  refine ⟨rectangularSvdXHat (U : Matrix μ μ ℂ) (V : Matrix ι ι ℂ) Iro, rfl, ?_, ?_⟩
   · exact rectangularSvd_xHat_coisometry_unitaryGroup U V Iro hIro
   · exact rectangularSvd_xHat_mixed_of_sqrtQ_unitaryGroup x U
       (V : Matrix ι ι ℂ) S Iro Q hx hSqrt
@@ -276,8 +332,9 @@ noncomputable def QXPLayerData.ofRankReductionAndRectangularSvdUnitaryGroup
       CFC.sqrt (QTotal qLayer)) :
     QXPLayerData Outcome ι :=
   QXPLayerData.ofRankReductionAndSvdIdentities hRank x
-    ((U : Matrix qLayer.auxSpace.carrier qLayer.auxSpace.carrier ℂ) *
-      Iro * (V : Matrix ι ι ℂ)ᴴ)
+    (rectangularSvdXHat
+      (U : Matrix qLayer.auxSpace.carrier qLayer.auxSpace.carrier ℂ)
+      (V : Matrix ι ι ℂ) Iro)
     qa_eq
     (rectangularSvd_xHat_coisometry_unitaryGroup U V Iro hIro)
     (rectangularSvd_xHat_mixed_of_sqrtQ_unitaryGroup x U
@@ -342,9 +399,10 @@ noncomputable def QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroupWithCarr
     QXPLayerData Outcome ι :=
   QXPLayerData.ofSigmaRangeAndSvdIdentities (q := q)
     qa_projective q_sum_eq_total
-    ((U : Matrix (sigmaRangeQLayer q).auxSpace.carrier
-      (sigmaRangeQLayer q).auxSpace.carrier ℂ) *
-      Iro * (V : Matrix ι ι ℂ)ᴴ)
+    (rectangularSvdXHat
+      (U : Matrix (sigmaRangeQLayer q).auxSpace.carrier
+        (sigmaRangeQLayer q).auxSpace.carrier ℂ)
+      (V : Matrix ι ι ℂ) Iro)
     (rectangularSvd_xHat_coisometry_unitaryGroup U V Iro hIro)
     (rectangularSvd_xHat_mixed_of_sqrtQ_unitaryGroup
       (sigmaFinRangeEmbedding q.outcome qa_projective) U
