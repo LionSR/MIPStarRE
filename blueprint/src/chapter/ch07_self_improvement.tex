@@ -746,13 +746,12 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   Translating~\eqref{eq:complementary-slackness} back to the variables
   $\{T_g\}$ and~$Z$ yields $T_g(Z-A_g)=0$ for every~$g$ and \(S Z=0\), where
   \(S=I-\sum_gT_g\) is the slack block.
-  The paper then treats this as forcing \(S=0\).  The Lean development now
-  records this saturation as part of the canonical optimal-pair datum for the
-  block SDP.  In the concrete matrix realization, Lean records the defect-zero
-  condition as
-  \texttt{matrixSdpComplementarySlacknessDefect}; the theorem
-  \texttt{MatrixSdpOptimalWitness.complementarySlacknessEquation} translates it
-  to the displayed equation \(T_gZ=T_gA_g\), while
+  The paper then treats this as forcing \(S=0\).  The Lean development records
+  this saturation as part of the canonical optimal-pair datum for the block
+  SDP.  The canonical calculation still uses the auxiliary expression
+  \texttt{matrixSdpComplementarySlacknessDefect} to read off the polynomial
+  blocks of \eqref{eq:complementary-slackness}.  The matrix optimal-witness
+  interface, however, stores the displayed equation \(T_gZ=T_gA_g\) directly;
   \texttt{MatrixSdpOptimalWitness.primalMeasurement} expresses
   \(\sum_g T_g=I\) as a complete measurement.  The statement
   \texttt{MatrixSdpStatementWithSlackness} records this matrix-level
