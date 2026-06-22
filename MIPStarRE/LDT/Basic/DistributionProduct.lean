@@ -4,8 +4,9 @@ import MIPStarRE.LDT.Basic.DistributionAvg
 # Product rules for finite-support distribution averages
 
 This module contains product and marginalization rules for operator-valued
-uniform averages.  The scalar product rules are in
-`MIPStarRE.LDT.Basic.DistributionAvg`.
+uniform averages.  The scalar product rules, together with the common
+PMF-weighted finite-sum identities on which both scalar and operator rules
+depend, are in `MIPStarRE.LDT.Basic.DistributionAvg`.
 
 ## Main definitions / statements
 
@@ -45,31 +46,7 @@ theorem averageOperatorOverDistribution_uniform_prod
   rw [averageOperatorOverDistribution_uniform_eq_pmf_sum (α := α × β)]
   rw [averageOperatorOverDistribution_uniform_eq_pmf_sum (α := α)]
   simp_rw [averageOperatorOverDistribution_uniform_eq_pmf_sum (α := β)]
-  calc
-    ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 ab.2
-        = ∑ a : α, ∑ b : β,
-            (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b := by
-          simpa using
-            (Fintype.sum_prod_type' (f := fun a : α => fun b : β =>
-              (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b))
-    _ = ∑ a : α, (PMF.uniformOfFintype α a).toReal •
-          ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          calc
-            ∑ b : β, (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b
-                = ∑ b : β,
-                    ((PMF.uniformOfFintype α a).toReal *
-                      (PMF.uniformOfFintype β b).toReal) • f a b := by
-                  refine Finset.sum_congr rfl ?_
-                  intro b _
-                  rw [pmf_uniformOfFintype_prod_apply_toReal]
-            _ = ∑ b : β, (PMF.uniformOfFintype α a).toReal •
-                    ((PMF.uniformOfFintype β b).toReal • f a b) := by
-                  simp [smul_smul]
-            _ = (PMF.uniformOfFintype α a).toReal •
-                    ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
-                  rw [Finset.smul_sum]
+  exact pmf_uniformOfFintype_prod_sum_smul f
 
 /-- Swap two nested uniform operator averages over finite nonempty types. -/
 theorem averageOperatorOverDistribution_uniform_comm

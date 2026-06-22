@@ -530,6 +530,53 @@ theorem averageOperatorOverDistribution_uniformOnFinset_eq_pmf_sum
     (Distribution.uniformOnFinset_isProbability s hs)]
   rw [Distribution.uniformOnFinset_support, Distribution.uniformOnFinset_toPMF]
 
+/-- Reindex a finite sum weighted by Mathlib's uniform PMF along an equivalence. -/
+theorem pmf_uniformOfFintype_sum_equiv_smul {α β M : Type*}
+    [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
+    [AddCommMonoid M] [DistribMulAction Error M]
+    (e : α ≃ β) (f : α → M) :
+    ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a =
+      ∑ b : β, (PMF.uniformOfFintype β b).toReal • f (e.symm b) :=
+  Fintype.sum_equiv e
+    (fun a => (PMF.uniformOfFintype α a).toReal • f a)
+    (fun b => (PMF.uniformOfFintype β b).toReal • f (e.symm b))
+    (by intro a; simp [PMF.uniformOfFintype_apply, Fintype.card_congr e])
+
+/-- Split a finite sum weighted by the uniform PMF on a product into iterated
+uniform PMF-weighted sums. -/
+theorem pmf_uniformOfFintype_prod_sum_smul {α β M : Type*}
+    [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
+    [AddCommMonoid M] [DistribMulAction Error M]
+    (f : α → β → M) :
+    ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 ab.2 =
+      ∑ a : α, (PMF.uniformOfFintype α a).toReal •
+        ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
+  calc
+    ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 ab.2
+        = ∑ a : α, ∑ b : β,
+            (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b := by
+          simpa using
+            (Fintype.sum_prod_type' (f := fun a : α => fun b : β =>
+              (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b))
+    _ = ∑ a : α, (PMF.uniformOfFintype α a).toReal •
+          ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          calc
+            ∑ b : β, (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b
+                = ∑ b : β,
+                    ((PMF.uniformOfFintype α a).toReal *
+                      (PMF.uniformOfFintype β b).toReal) • f a b := by
+                  refine Finset.sum_congr rfl ?_
+                  intro b _
+                  rw [pmf_uniformOfFintype_prod_apply_toReal]
+            _ = ∑ b : β, (PMF.uniformOfFintype α a).toReal •
+                    ((PMF.uniformOfFintype β b).toReal • f a b) := by
+                  simp [smul_smul]
+            _ = (PMF.uniformOfFintype α a).toReal •
+                    ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
+                  rw [Finset.smul_sum]
+
 /-- Reindexing a uniform operator average along an equivalence preserves its value. -/
 theorem averageOperatorOverDistribution_uniform_equiv
     {α β : Type*}
@@ -542,11 +589,7 @@ theorem averageOperatorOverDistribution_uniform_equiv
         (fun b => f (e.symm b)) := by
   rw [averageOperatorOverDistribution_uniform_eq_pmf_sum,
     averageOperatorOverDistribution_uniform_eq_pmf_sum]
-  exact Fintype.sum_equiv e
-    (fun a => (PMF.uniformOfFintype α a).toReal • f a)
-    (fun b => (PMF.uniformOfFintype β b).toReal • f (e.symm b)) (by
-      intro a
-      simp [PMF.uniformOfFintype_apply, Fintype.card_congr e])
+  exact pmf_uniformOfFintype_sum_equiv_smul e f
 
 /-- A uniform operator average over a finite support is the same as the uniform
 operator average over the corresponding finite subtype. -/
@@ -705,11 +748,8 @@ theorem avgOver_uniform_equiv
     avgOver (uniformDistribution α) f =
       avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
   rw [avgOver_uniform_eq_pmf_sum, avgOver_uniform_eq_pmf_sum]
-  exact Fintype.sum_equiv e
-    (fun a => (PMF.uniformOfFintype α a).toReal * f a)
-    (fun b => (PMF.uniformOfFintype β b).toReal * f (e.symm b)) (by
-      intro a
-      simp [PMF.uniformOfFintype_apply, Fintype.card_congr e])
+  simpa [smul_eq_mul] using
+    (pmf_uniformOfFintype_sum_equiv_smul (M := Error) e f)
 
 /-- A uniform average over a finite support may be reindexed by any finite type
 equivalent to that support subtype. -/
@@ -795,28 +835,8 @@ theorem avgOver_uniform_prod
   rw [avgOver_uniform_eq_pmf_sum (α := α × β)]
   rw [avgOver_uniform_eq_pmf_sum (α := α)]
   simp_rw [avgOver_uniform_eq_pmf_sum (α := β)]
-  calc
-    ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal * f ab.1 ab.2
-      = ∑ a : α, ∑ b : β,
-          (PMF.uniformOfFintype (α × β) (a, b)).toReal * f a b := by
-            simpa using
-              (Fintype.sum_prod_type' (f := fun a : α => fun b : β =>
-                (PMF.uniformOfFintype (α × β) (a, b)).toReal * f a b))
-    _ = ∑ a : α, (PMF.uniformOfFintype α a).toReal *
-          ∑ b : β, (PMF.uniformOfFintype β b).toReal * f a b := by
-            refine Finset.sum_congr rfl ?_
-            intro a _
-            calc
-              ∑ b : β, (PMF.uniformOfFintype (α × β) (a, b)).toReal * f a b
-                = ∑ b : β, ((PMF.uniformOfFintype α a).toReal *
-                    (PMF.uniformOfFintype β b).toReal) * f a b := by
-                      refine Finset.sum_congr rfl ?_
-                      intro b _
-                      rw [pmf_uniformOfFintype_prod_apply_toReal]
-              _ = (PMF.uniformOfFintype α a).toReal *
-                    ∑ b : β, (PMF.uniformOfFintype β b).toReal * f a b := by
-                      rw [Finset.mul_sum]
-                      simp [mul_assoc]
+  simpa [smul_eq_mul] using
+    (pmf_uniformOfFintype_prod_sum_smul (M := Error) f)
 
 /-- Swap two nested uniform averages over finite nonempty types. -/
 theorem avgOver_uniform_comm
@@ -965,8 +985,7 @@ theorem avgOver_uniform_fst {α β : Type*}
     (f : α → Error) :
     avgOver (uniformDistribution (α × β)) (fun ab => f ab.1) =
       avgOver (uniformDistribution α) f := by
-  simpa using
-    (avgOver_uniform_equiv_fst (e := Equiv.refl (α × β)) (f := f))
+  simpa using (avgOver_uniform_equiv_fst (e := Equiv.refl (α × β)) (f := f))
 
 /-- Averaging a function depending only on the second coordinate marginalizes a uniform product. -/
 theorem avgOver_uniform_snd {α β : Type*}
@@ -975,7 +994,6 @@ theorem avgOver_uniform_snd {α β : Type*}
     (f : β → Error) :
     avgOver (uniformDistribution (α × β)) (fun ab => f ab.2) =
       avgOver (uniformDistribution β) f := by
-  simpa using
-    (avgOver_uniform_equiv_snd (e := Equiv.refl (α × β)) (f := f))
+  simpa using (avgOver_uniform_equiv_snd (e := Equiv.refl (α × β)) (f := f))
 
 end MIPStarRE.LDT
