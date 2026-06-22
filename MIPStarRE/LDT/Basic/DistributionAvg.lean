@@ -540,9 +540,7 @@ theorem pmf_uniformOfFintype_sum_equiv_smul {α β M : Type*}
   Fintype.sum_equiv e
     (fun a => (PMF.uniformOfFintype α a).toReal • f a)
     (fun b => (PMF.uniformOfFintype β b).toReal • f (e.symm b))
-    (by
-      intro a
-      simp [PMF.uniformOfFintype_apply, Fintype.card_congr e])
+    (by intro a; simp [PMF.uniformOfFintype_apply, Fintype.card_congr e])
 
 /-- Split a finite sum weighted by the uniform PMF on a product into iterated
 uniform PMF-weighted sums. -/
@@ -979,6 +977,7 @@ theorem avgOver_uniform_equiv_snd
   refine avgOver_congr _ _ _ ?_
   intro b
   simpa using (avgOver_uniform_const (α := α) (c := f b))
+
 /-- Averaging a function depending only on the first coordinate marginalizes a uniform product. -/
 theorem avgOver_uniform_fst {α β : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]
@@ -986,8 +985,8 @@ theorem avgOver_uniform_fst {α β : Type*}
     (f : α → Error) :
     avgOver (uniformDistribution (α × β)) (fun ab => f ab.1) =
       avgOver (uniformDistribution α) f := by
-  simpa using
-    (avgOver_uniform_equiv_fst (e := Equiv.refl (α × β)) (f := f))
+  simpa using (avgOver_uniform_equiv_fst (e := Equiv.refl (α × β)) (f := f))
+
 /-- Averaging a function depending only on the second coordinate marginalizes a uniform product. -/
 theorem avgOver_uniform_snd {α β : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α]
@@ -995,6 +994,6 @@ theorem avgOver_uniform_snd {α β : Type*}
     (f : β → Error) :
     avgOver (uniformDistribution (α × β)) (fun ab => f ab.2) =
       avgOver (uniformDistribution β) f := by
-  simpa using
-    (avgOver_uniform_equiv_snd (e := Equiv.refl (α × β)) (f := f))
+  simpa using (avgOver_uniform_equiv_snd (e := Equiv.refl (α × β)) (f := f))
+
 end MIPStarRE.LDT
