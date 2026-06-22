@@ -1162,6 +1162,8 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_extending_orthonormal_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_rectangular_coisometry_with_positive_gram_spectrum_right_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.transpose_unitaryGroup_mul_rectangular_coisometry}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.unitaryGroup_mul_rectangular_coisometry}
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangular_coisometry_mul_conjTranspose_unitaryGroup}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.exists_unitaryGroup_with_qxp_positive_gram_spectrum_rows}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.xHat_of_positive_gram_spectrum_unitaryGroup_choices}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.qtotal_isHermitian_of_x_squared}
@@ -1200,8 +1202,12 @@
 		\texttt{exists\_rectangular\_coisometry\_extending\_orthonormal\_rows}
 		records the analogous rectangular completion for prescribed right rows
 		when the dimension bound permits it.  The formal lemma
-		\texttt{rectangularSvd\_xHat\_coisometry\_unitaryGroup} records the corresponding
-		matrix calculation for square factors regarded as unitary group elements.  The
+		\texttt{unitaryGroup\_mul\_rectangular\_coisometry} and its right-multiplication
+		companion
+		\texttt{rectangular\_coisometry\_mul\_conjTranspose\_unitaryGroup} record the
+		two unitary-preservation steps in the paper's multiplication.  The formal
+		lemma \texttt{rectangularSvd\_xHat\_coisometry\_unitaryGroup} applies these
+		preservation steps to the rectangular-SVD expression.  The
 		unconditional positive-Gram route is
 		\texttt{exists\_xHat\_of\_sigmaFinRangeEmbedding\_positiveGram}, which
 		constructs $\widehat X$ from the rank-reduction witness and proves
