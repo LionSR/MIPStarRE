@@ -56,18 +56,8 @@ noncomputable def matrixSdpCanonicalPrimalObjectiveCLM
     (params : Parameters) [FieldModel params.q]
     (model : MatrixSdpRealization params) :
     MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →L[ℝ] ℝ :=
-  ContinuousLinearMap.mk
-    { toFun := fun X =>
-        Complex.re (Matrix.trace (matrixSdpCanonicalObjectiveOperator params model * X))
-      map_add' := by
-        intro X Y
-        rw [Matrix.mul_add, Matrix.trace_add, Complex.add_re]
-      map_smul' := by
-        intro r X
-        rw [Matrix.mul_smul, Matrix.trace_smul]
-        exact Complex.smul_re r
-          (Matrix.trace (matrixSdpCanonicalObjectiveOperator params model * X)) }
-    (continuous_matrixSdpCanonicalPrimalObjective params model)
+  MIPStarRE.Quantum.realTracePairingCLM
+    (matrixSdpCanonicalObjectiveOperator params model)
 
 /-- The map sending a primal matrix to its constraint image and objective value. -/
 noncomputable def matrixSdpCanonicalPrimalConeMap
