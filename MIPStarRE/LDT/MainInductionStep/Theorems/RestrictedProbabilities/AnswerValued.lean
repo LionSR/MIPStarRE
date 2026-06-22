@@ -432,27 +432,7 @@ private lemma answerSuccessorDiagonalSliceIndexErrorAverage_eq_diagonalIndexErro
     _ = avgOver
           (uniformDistribution (RestrictedDiagonalSample params.next (embedCoord params j)))
           g := by
-            let β := Fin (j.val + 1) → Fq params
-            let e := pointAppendProdEquiv params β
-            have h :=
-              (MIPStarRE.LDT.avgOver_uniform_equiv
-                (e := e)
-                (f := fun xs : Fq params × (Point params × β) => g (e xs)))
-            calc
-              avgOver (uniformDistribution (Fq params × RestrictedDiagonalSample params j))
-                  (fun xs => g (appendPoint params xs.2.1 xs.1, xs.2.2))
-                  = avgOver
-                      (uniformDistribution (Point params.next × β))
-                      (fun b => g (e (e.symm b))) := by
-                        exact h
-              _ = avgOver (uniformDistribution (Point params.next × β)) (fun b => g b) := by
-                    apply avgOver_congr
-                    intro b
-                    exact congrArg g (e.right_inv b)
-              _ = avgOver
-                    (uniformDistribution
-                      (RestrictedDiagonalSample params.next (embedCoord params j))) g := by
-                    rfl
+            exact avgOver_uniform_restrictedDiagonalSample_append params j g
     _ = answerSuccessorDiagonalIndexError params strategy (embedCoord params j) := by
             rfl
 

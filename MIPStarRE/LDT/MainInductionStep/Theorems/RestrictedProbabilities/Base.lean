@@ -36,6 +36,58 @@ def pointAppendProdEquiv (params : Parameters) [FieldModel params.q] (β : Type*
     rintro ⟨u, b⟩
     exact Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv u) rfl
 
+/-- Reindex a uniform average over a restriction height and a point, retaining
+an auxiliary finite index, by appending the height as the final coordinate. -/
+lemma avgOver_uniform_pointAppend_prod
+    (params : Parameters)
+    [FieldModel params.q]
+    (β : Type*) [Fintype β] [DecidableEq β] [Nonempty β]
+    (g : Point params.next × β → Error) :
+    avgOver (uniformDistribution (Fq params × (Point params × β)))
+        (fun xs => g (appendPoint params xs.2.1 xs.1, xs.2.2)) =
+      avgOver (uniformDistribution (Point params.next × β)) g := by
+  let e := pointAppendProdEquiv params β
+  have h :=
+    (MIPStarRE.LDT.avgOver_uniform_equiv
+      (e := e)
+      (f := fun xs : Fq params × (Point params × β) => g (e xs)))
+  calc
+    avgOver (uniformDistribution (Fq params × (Point params × β)))
+        (fun xs => g (appendPoint params xs.2.1 xs.1, xs.2.2))
+        = avgOver (uniformDistribution (Point params.next × β))
+            (fun b => g (e (e.symm b))) := by
+              exact h
+    _ = avgOver (uniformDistribution (Point params.next × β)) g := by
+          apply avgOver_congr
+          intro b
+          exact congrArg g (e.right_inv b)
+
+/-- Reindex a restricted diagonal sample together with a restriction height as
+the corresponding embedded restricted diagonal sample in the successor
+dimension. -/
+lemma avgOver_uniform_restrictedDiagonalSample_append
+    (params : Parameters)
+    [FieldModel params.q]
+    (j : Fin params.m)
+    (g : RestrictedDiagonalSample params.next (embedCoord params j) → Error) :
+    avgOver (uniformDistribution (Fq params × RestrictedDiagonalSample params j))
+        (fun xs => g (appendPoint params xs.2.1 xs.1, xs.2.2)) =
+      avgOver (uniformDistribution
+        (RestrictedDiagonalSample params.next (embedCoord params j))) g := by
+  let β := Fin (j.val + 1) → Fq params
+  let g' : Point params.next × β → Error := fun b => g b
+  calc
+    avgOver (uniformDistribution (Fq params × RestrictedDiagonalSample params j))
+        (fun xs => g (appendPoint params xs.2.1 xs.1, xs.2.2))
+        = avgOver (uniformDistribution (Fq params × (Point params × β)))
+            (fun xs => g' (appendPoint params xs.2.1 xs.1, xs.2.2)) := by
+              rfl
+    _ = avgOver (uniformDistribution (Point params.next × β)) g' := by
+          exact avgOver_uniform_pointAppend_prod params β g'
+    _ = avgOver (uniformDistribution
+          (RestrictedDiagonalSample params.next (embedCoord params j))) g := by
+          rfl
+
 /-- Averaging the self-consistency defect over all horizontal restrictions
 recovers the ambient self-consistency defect. -/
 lemma selfConsistencyRestrictedAverage_eq
