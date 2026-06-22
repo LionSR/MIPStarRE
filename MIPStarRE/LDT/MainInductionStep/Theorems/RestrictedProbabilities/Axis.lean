@@ -161,23 +161,7 @@ private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
                           (xRestrictedStrategy params strategy x) s)
                         (RestrictedSymStrat.axisParallelLineAnswerFamily
                           (xRestrictedStrategy params strategy x) s))
-                  = avgOver (uniformDistribution (Fin params.m × Point params))
-                      (fun iu =>
-                        qBipartiteConsDefect strategy.state
-                          (RestrictedSymStrat.axisParallelPointAnswerFamily
-                            (xRestrictedStrategy params strategy x) (iu.2, iu.1))
-                          (RestrictedSymStrat.axisParallelLineAnswerFamily
-                            (xRestrictedStrategy params strategy x) (iu.2, iu.1))) := by
-                              simpa [Prod.swap] using
-                                (MIPStarRE.LDT.avgOver_uniform_equiv
-                                  (e := Equiv.prodComm (Point params) (Fin params.m))
-                                  (f := fun s : Point params × Fin params.m =>
-                                    qBipartiteConsDefect strategy.state
-                                      (RestrictedSymStrat.axisParallelPointAnswerFamily
-                                        (xRestrictedStrategy params strategy x) s)
-                                      (RestrictedSymStrat.axisParallelLineAnswerFamily
-                                        (xRestrictedStrategy params strategy x) s)))
-                _ = avgOver (uniformDistribution (Fin params.m))
+                  = avgOver (uniformDistribution (Fin params.m))
                       (fun i => avgOver (uniformDistribution (Point params))
                         (fun u =>
                           qBipartiteConsDefect strategy.state
@@ -185,14 +169,14 @@ private lemma averageRestrictedAxisFailure_eq_embeddedAxisDirections
                               (xRestrictedStrategy params strategy x) (u, i))
                             (RestrictedSymStrat.axisParallelLineAnswerFamily
                               (xRestrictedStrategy params strategy x) (u, i)))) := by
-                                simpa using
-                                  (avgOver_uniform_prod (α := Fin params.m) (β := Point params)
-                                    (f := fun i u =>
-                                      qBipartiteConsDefect strategy.state
-                                        (RestrictedSymStrat.axisParallelPointAnswerFamily
-                                          (xRestrictedStrategy params strategy x) (u, i))
-                                        (RestrictedSymStrat.axisParallelLineAnswerFamily
-                                          (xRestrictedStrategy params strategy x) (u, i))))
+                                exact avgOver_uniform_prod_swap
+                                  (α := Point params) (β := Fin params.m)
+                                  (f := fun u i =>
+                                    qBipartiteConsDefect strategy.state
+                                      (RestrictedSymStrat.axisParallelPointAnswerFamily
+                                        (xRestrictedStrategy params strategy x) (u, i))
+                                      (RestrictedSymStrat.axisParallelLineAnswerFamily
+                                        (xRestrictedStrategy params strategy x) (u, i)))
                 _ = avgOver (uniformDistribution (Fin params.m))
                       (fun i => sliceAxisDirectionError params strategy x i) := by
                                 rfl
@@ -243,35 +227,20 @@ lemma weighted_axisParallel_bound
               (axisParallelPointAnswerFamily strategy (u, i))
               (axisParallelLineAnswerFamily strategy (u, i)))
     _ = strategy.axisParallelFailureProbability := by
-        let err : Fin params.next.m × Point params.next → Error := fun iu =>
+        let err : Point params.next → Fin params.next.m → Error := fun u i =>
           qBipartiteConsDefect strategy.state
-            (axisParallelPointAnswerFamily strategy (iu.2, iu.1))
-            (axisParallelLineAnswerFamily strategy (iu.2, iu.1))
-        have hprod :
-            avgOver (uniformDistribution (Fin params.next.m))
-                (fun i => avgOver (uniformDistribution (Point params.next))
-                  (fun u => err (i, u))) =
-              avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := by
-          simpa using
-            (avgOver_uniform_prod (α := Fin params.next.m) (β := Point params.next)
-              (f := fun i u => err (i, u))).symm
-        have hswap :
-            avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err =
-              avgOver (uniformDistribution (Point params.next × Fin params.next.m))
-                (fun ui => err (ui.2, ui.1)) := by
-          simpa [Prod.swap] using
-            (MIPStarRE.LDT.avgOver_uniform_equiv
-              (e := Equiv.prodComm (Fin params.next.m) (Point params.next))
-              (f := err))
+            (axisParallelPointAnswerFamily strategy (u, i))
+            (axisParallelLineAnswerFamily strategy (u, i))
         calc
           avgOver (uniformDistribution (Fin params.next.m)) (axisDirectionError params strategy)
             = avgOver (uniformDistribution (Fin params.next.m))
                 (fun i => avgOver (uniformDistribution (Point params.next))
-                  (fun u => err (i, u))) := by
+                  (fun u => err u i)) := by
                     avg_congr
-          _ = avgOver (uniformDistribution (Fin params.next.m × Point params.next)) err := hprod
           _ = avgOver (uniformDistribution (Point params.next × Fin params.next.m))
-                (fun ui => err (ui.2, ui.1)) := hswap
+                (fun ui => err ui.1 ui.2) := by
+                  exact (avgOver_uniform_prod_swap
+                    (α := Point params.next) (β := Fin params.next.m) (f := err)).symm
           _ = strategy.axisParallelFailureProbability := by
                 rfl
     _ ≤ eps := hgood.axisParallelTest

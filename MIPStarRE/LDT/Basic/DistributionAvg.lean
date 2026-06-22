@@ -853,6 +853,25 @@ theorem avgOver_uniform_comm
           (fun a => f a b)) := by
           exact avgOver_uniform_prod (α := β) (β := α) (f := fun b a => f a b)
 
+/-- Split a uniform average over a product into iterated uniform averages, with
+the second coordinate averaged first. -/
+theorem avgOver_uniform_prod_swap
+    {α β : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [Fintype β] [DecidableEq β] [Nonempty β]
+    (f : α → β → Error) :
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
+      avgOver (uniformDistribution β)
+        (fun b => avgOver (uniformDistribution α) (fun a => f a b)) := by
+  calc
+    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2)
+        = avgOver (uniformDistribution α)
+            (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
+          exact avgOver_uniform_prod f
+    _ = avgOver (uniformDistribution β)
+          (fun b => avgOver (uniformDistribution α) (fun a => f a b)) := by
+          exact avgOver_uniform_comm f
+
 /-- Transport a uniform average through an equivalence whose target is a product,
 then split the product average into iterated uniform averages. -/
 theorem avgOver_uniform_equiv_prod
