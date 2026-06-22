@@ -25,31 +25,6 @@ open MIPStarRE.LDT.MakingMeasurementsProjective
 open Filter
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.Elementwise Topology
 
-noncomputable local instance matrixOperatorSeminormedAddCommGroup
-    (H : FiniteHilbertSpace) :
-    SeminormedAddCommGroup (MatrixOperator H) :=
-  Matrix.seminormedAddCommGroup
-
-noncomputable local instance matrixOperatorNormedAddCommGroup
-    (H : FiniteHilbertSpace) :
-    NormedAddCommGroup (MatrixOperator H) :=
-  Matrix.normedAddCommGroup
-
-noncomputable local instance matrixOperatorNormedSpace
-    (H : FiniteHilbertSpace) :
-    NormedSpace ℝ (MatrixOperator H) :=
-  Matrix.normedSpace
-
-local instance matrixOperatorFirstCountableTopology
-    (H : FiniteHilbertSpace) :
-    FirstCountableTopology (MatrixOperator H) :=
-  inferInstanceAs (FirstCountableTopology (H.carrier → H.carrier → ℂ))
-
-noncomputable local instance matrixOperatorLocallyConvexSpace
-    (H : FiniteHilbertSpace) :
-    LocallyConvexSpace ℝ (MatrixOperator H) :=
-  NormedSpace.toLocallyConvexSpace
-
 /-- The canonical equality-constraint operator as a continuous real-linear map. -/
 noncomputable def matrixSdpCanonicalConstraintOperatorCLM
     (params : Parameters) [FieldModel params.q]
