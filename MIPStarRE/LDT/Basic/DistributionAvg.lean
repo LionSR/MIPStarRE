@@ -579,7 +579,7 @@ theorem averageOperatorOverDistribution_uniform_equiv
         (fun b => f (e.symm b)) := by
   rw [averageOperatorOverDistribution_uniform_eq_pmf_sum,
     averageOperatorOverDistribution_uniform_eq_pmf_sum]
-  exact pmf_uniformOfFintype_sum_equiv_smul e f
+  exact PMF.uniformOfFintype_sum_equiv_smul e f
 
 /-- A uniform operator average over a finite support is the same as the uniform
 operator average over the corresponding finite subtype. -/
@@ -739,7 +739,7 @@ theorem avgOver_uniform_equiv
       avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
   rw [avgOver_uniform_eq_pmf_sum, avgOver_uniform_eq_pmf_sum]
   simpa [smul_eq_mul] using
-    (pmf_uniformOfFintype_sum_equiv_smul (M := Error) e f)
+    (PMF.uniformOfFintype_sum_equiv_smul (M := Error) e f)
 
 /-- A uniform average over a finite support may be reindexed by any finite type
 equivalent to that support subtype. -/
@@ -826,7 +826,7 @@ theorem avgOver_uniform_prod
   rw [avgOver_uniform_eq_pmf_sum (α := α)]
   simp_rw [avgOver_uniform_eq_pmf_sum (α := β)]
   simpa [smul_eq_mul] using
-    (pmf_uniformOfFintype_prod_sum_smul (M := Error) f)
+    (PMF.uniformOfFintype_prod_sum_smul (M := Error) f)
 
 /-- Swap two nested uniform averages over finite nonempty types. -/
 theorem avgOver_uniform_comm
