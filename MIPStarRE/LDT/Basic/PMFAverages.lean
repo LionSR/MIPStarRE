@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Basic.Distribution
+import Mathlib.Analysis.MeanInequalitiesPow
 import Mathlib.Probability.ProbabilityMassFunction.Monad
 
 /-!
@@ -16,6 +17,7 @@ low individual degree test averaging layer.
 * `pmf_bind_apply_toReal`
 * `pmf_bind_sum_smul`
 * `pmf_sum_const_smul`
+* `pmf_sum_rpow_one_div_le_rpow_sum`
 * `pmf_uniformOfFintype_map_equiv`
 * `pmf_uniformOfFintype_prod_apply_toReal`
 * `pmf_uniformOfFintype_prod_eq_bind`
@@ -204,6 +206,55 @@ theorem pmf_sum_const_smul {α M : Type*}
           exact (Finset.sum_smul (s := Finset.univ)
             (f := fun a : α => (p a).toReal) (x := x)).symm
     _ = x := by rw [hweight, one_smul]
+
+/-- Jensen's inequality for the concave power `x ↦ x ^ (1 / n)`, stated for a
+finite probability mass function. -/
+theorem pmf_sum_rpow_one_div_le_rpow_sum {α : Type*}
+    [Fintype α]
+    (p : PMF α) (f : α → Error) (n : ℕ)
+    (hn : 1 ≤ n) (hf : ∀ a, 0 ≤ f a) :
+    ∑ a : α, (p a).toReal * Real.rpow (f a) (1 / (n : Error)) ≤
+      Real.rpow (∑ a : α, (p a).toReal * f a) (1 / (n : Error)) := by
+  let z : α → Error := fun a => Real.rpow (f a) (1 / (n : Error))
+  have hw_nonneg : ∀ a ∈ (Finset.univ : Finset α), 0 ≤ (p a).toReal := by
+    intro a _
+    exact ENNReal.toReal_nonneg
+  have hw_sum : ∑ a ∈ (Finset.univ : Finset α), (p a).toReal = 1 := by
+    simpa using (pmf_sum_const_smul (p := p) (x := (1 : Error)))
+  have hz_nonneg : ∀ a ∈ (Finset.univ : Finset α), 0 ≤ z a := by
+    intro a _
+    exact Real.rpow_nonneg (hf a) _
+  have hn_nat_pos : 0 < n := lt_of_lt_of_le (by decide : 0 < 1) hn
+  have hn_pos : 0 < (n : Error) := by
+    exact_mod_cast hn_nat_pos
+  have hp : (1 : Error) ≤ (n : Error) := by
+    exact_mod_cast hn
+  have hzpow : ∀ a, z a ^ (n : Error) = f a := by
+    intro a
+    calc
+      z a ^ (n : Error) =
+          (Real.rpow (f a) (1 / (n : Error))) ^ (n : Error) := by
+          rfl
+      _ = Real.rpow (f a) ((1 / (n : Error)) * (n : Error)) := by
+          symm
+          exact Real.rpow_mul (hf a) _ _
+      _ = Real.rpow (f a) 1 := by
+          congr 1
+          field_simp [hn_pos.ne']
+      _ = f a := by
+          simp
+  have hsum_eq :
+      ∑ a ∈ (Finset.univ : Finset α), (p a).toReal * z a ^ (n : Error) =
+        ∑ a ∈ (Finset.univ : Finset α), (p a).toReal * f a := by
+    refine Finset.sum_congr rfl ?_
+    intro a _
+    rw [hzpow a]
+  have hmean :=
+    Real.arith_mean_le_rpow_mean (s := (Finset.univ : Finset α))
+      (fun a => (p a).toReal) z hw_nonneg hw_sum hz_nonneg
+      (p := (n : Error)) hp
+  rw [hsum_eq] at hmean
+  simpa [z] using hmean
 
 /-- The uniform probability mass function is invariant under transport by an
 equivalence. -/
