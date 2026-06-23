@@ -297,6 +297,72 @@ theorem matrixSdpCanonicalNormalizedSeparatorFunctional_eq_trace_dualMatrix
     MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM_apply_of_isHermitian
       (MIPStarRE.Quantum.conicNormalizedSeparatorFunctional φ) hY
 
+/-- A feasible functional dual bound on the canonical primal image cone gives a
+paper-form dual feasible matrix through the Hermitian trace-pairing
+representation. -/
+theorem matrixSdpCanonicalTracePairingDualMatrix_dualFeasible_of_conicFunctionalDualFeasible
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (ψ : StrongDual ℝ (MatrixOperator model.space))
+    (hψ : ∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, z.2 ≤ ψ z.1) :
+    ∀ g : Polynomial params,
+      0 ≤ matrixSdpDualSlackOperator params model
+        (MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM ψ) g := by
+  let W := MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM ψ
+  refine matrixSdpCanonicalDualConstraint_nonneg_of_trace_pairing_nonneg
+    params model W ?_ ?_
+  · exact matrixSdpCanonicalDualOperator_sub_objectiveOperator_isHermitian
+      params model W (MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM_isHermitian ψ)
+  · intro X hX
+    have hle :
+        Complex.re (Matrix.trace
+            (matrixSdpCanonicalObjectiveOperator params model * X)) ≤
+          Complex.re (Matrix.trace
+            (matrixSdpCanonicalDualOperator params model W * X)) := by
+      have hmem :=
+        matrixSdpCanonicalPrimalImageCone_mem_of_nonnegative params model X hX
+      have hfunctional := hψ
+        (matrixSdpCanonicalConstraintOperator params model X,
+          Complex.re (Matrix.trace
+            (matrixSdpCanonicalObjectiveOperator params model * X))) hmem
+      have hconstraintHerm :
+          (matrixSdpCanonicalConstraintOperator params model X).IsHermitian :=
+        matrixSdpCanonicalConstraintOperator_isHermitian_of_nonnegative params model hX
+      rw [MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM_apply_of_isHermitian
+        ψ hconstraintHerm] at hfunctional
+      rwa [← matrixSdpCanonicalDualOperator_trace_constraint params model X W]
+        at hfunctional
+    rw [Matrix.sub_mul, Matrix.trace_sub, Complex.sub_re]
+    exact sub_nonneg.mpr hle
+
+/-- A paper-form dual minimizer is also minimal among feasible functional dual
+bounds on the canonical primal image cone. -/
+theorem matrixSdpCanonicalFunctionalDualObjective_min_of_matrixDualMin
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (Z : MatrixOperator model.space)
+    (hZmin : ∀ W : MatrixOperator model.space,
+      (∀ g : Polynomial params,
+        0 ≤ matrixSdpDualSlackOperator params model W g) →
+      matrixSdpDualObjective model Z ≤ matrixSdpDualObjective model W) :
+    ∀ ψ : StrongDual ℝ (MatrixOperator model.space),
+      (∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, z.2 ≤ ψ z.1) →
+      matrixSdpDualObjective model Z ≤ ψ (1 : MatrixOperator model.space) := by
+  intro ψ hψ
+  let W := MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM ψ
+  have hWdual :
+      ∀ g : Polynomial params, 0 ≤ matrixSdpDualSlackOperator params model W g := by
+    simpa [W] using
+      matrixSdpCanonicalTracePairingDualMatrix_dualFeasible_of_conicFunctionalDualFeasible
+        params model ψ hψ
+  have hd_le_W := hZmin W hWdual
+  have hI : (1 : MatrixOperator model.space).IsHermitian := Matrix.isHermitian_one
+  have hWobj : matrixSdpDualObjective model W = ψ (1 : MatrixOperator model.space) := by
+    have hψI :=
+      MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM_apply_of_isHermitian ψ hI
+    simpa [matrixSdpDualObjective, W] using hψI.symm
+  simpa [hWobj] using hd_le_W
+
 /-- The normalized separator matrix dominates the canonical objective on every
 positive canonical primal cone point. -/
 theorem matrixSdpCanonicalObjective_le_normalizedSeparatorDualMatrix_on_nonnegative
@@ -482,36 +548,24 @@ theorem matrixSdpCanonicalStrongDuality
   let p : ℝ := Complex.re (Matrix.trace
     (matrixSdpCanonicalObjectiveOperator params model * X))
   let d : ℝ := matrixSdpDualObjective model Z
-  have hd_le_p : d ≤ p := by
-    by_contra hnot
-    have hp_lt_d : p < d := lt_of_not_ge hnot
-    let t : ℝ := (p + d) / 2
-    have hp_lt_t : p < t := by
-      dsimp [t]
-      nlinarith
-    have ht_lt_d : t < d := by
-      dsimp [t]
-      nlinarith
-    have hnotMem :
-        ((1 : MatrixOperator model.space), t) ∉
-          matrixSdpCanonicalPrimalImageCone params model := by
-      refine matrixSdpCanonicalPrimalImageCone_notMem_identity_of_primalMax_lt
-        params model hX ?_ ?_
-      · intro Y hY
-        simpa [p] using hXmax Y hY
-      · simpa [p] using hp_lt_t
-    obtain ⟨φ, hφ_nonneg, hsep⟩ :=
-      matrixSdpCanonicalPrimalImageCone_separation_of_notMem params model hnotMem
-    obtain ⟨W, hWdual, hWobj_lt⟩ :=
-      matrixSdpCanonicalSeparator_exists_dualFeasible_lt_of_feasible_lt
-        params model φ hφ_nonneg hsep X hX (by simpa [p] using hp_lt_t)
-    have hd_le_W : d ≤ matrixSdpDualObjective model W := by
-      simpa [d] using hZmin W hWdual
-    nlinarith
+  have hp_eq_d : p = d := by
+    refine MIPStarRE.Quantum.conic_primalValue_eq_dualValue_of_fiber_max_dual_min
+      (C := matrixSdpCanonicalPrimalImageCone params model)
+      (y := (1 : MatrixOperator model.space)) (p := p) (d := d) ?_ ?_ ?_ ?_
+    · simpa [p] using matrixSdpCanonicalPrimalImageCone_mem_of_feasible params model X hX
+    · intro t hmem
+      obtain ⟨Y, hY, hYobj⟩ :=
+        (matrixSdpCanonicalPrimalImageCone_identity_mem_iff_exists_feasible_objective
+          params model t).mp hmem
+      have ht_le : t ≤ p := by
+        simpa [p, hYobj] using hXmax Y hY
+      exact ht_le
+    · intro ψ hψ
+      simpa [d] using
+        matrixSdpCanonicalFunctionalDualObjective_min_of_matrixDualMin
+          params model Z hZmin ψ hψ
+    · simpa [p, d] using hweak
   refine ⟨X, Z, hX, hZ, ?_⟩
-  have hp_le_d : p ≤ d := by
-    simpa [p, d] using hweak
-  have hp_eq_d : p = d := le_antisymm hp_le_d hd_le_p
   simpa [p, d] using hp_eq_d
 
 end MIPStarRE.LDT.SelfImprovement

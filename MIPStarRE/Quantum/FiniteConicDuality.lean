@@ -131,6 +131,30 @@ theorem conicObjective_le_normalizedSeparator_of_mem
   rw [conicNormalizedSeparatorFunctional_apply]
   exact (le_inv_mul_iff₀' hpositiveCoeff).mpr hmul
 
+/-- The normalized constraint functional associated to a separator is feasible
+for the functional dual problem of the conic image. -/
+theorem conicFunctionalDualFeasible_normalizedSeparator
+    {F : Type*} [TopologicalSpace F] [AddCommMonoid F] [Module ℝ F]
+    {C : Set (F × ℝ)}
+    (φ : StrongDual ℝ (F × ℝ))
+    (hφ : ∀ z ∈ C, 0 ≤ φ z)
+    (hcoeff : conicSeparatorObjectiveCoefficient φ < 0) :
+    ∀ z ∈ C, z.2 ≤ conicNormalizedSeparatorFunctional φ z.1 := by
+  rintro ⟨y, t⟩ hyt
+  have hpositiveCoeff : 0 < -conicSeparatorObjectiveCoefficient φ :=
+    neg_pos.mpr hcoeff
+  have hnonneg := hφ (y, t) hyt
+  have hdecomp :
+      0 ≤ conicSeparatorConstraintFunctional φ y +
+        t * conicSeparatorObjectiveCoefficient φ := by
+    rwa [conicSeparator_decompose] at hnonneg
+  have hmul :
+      t * (-conicSeparatorObjectiveCoefficient φ) ≤
+        conicSeparatorConstraintFunctional φ y := by
+    nlinarith
+  rw [conicNormalizedSeparatorFunctional_apply]
+  exact (le_inv_mul_iff₀' hpositiveCoeff).mpr hmul
+
 /-- If a separator is negative at `(y, t)`, then its normalized
 constraint-coordinate functional is below `t` at `y`. -/
 theorem conicNormalizedSeparatorFunctional_lt_of_sep
@@ -152,5 +176,57 @@ theorem conicNormalizedSeparatorFunctional_lt_of_sep
     nlinarith
   rw [conicNormalizedSeparatorFunctional_apply]
   exact (inv_mul_lt_iff₀ hpositiveCoeff).mpr (by simpa [mul_comm] using hlt)
+
+/-- A functional conic zero-gap theorem.
+
+Let `C` be a closed conic image in `F × ℝ`.  Suppose that, on the fiber over
+`y`, the value `p` lies in `C` and is maximal among all objective coordinates
+in that fiber.  Suppose also that `d` is minimal among all continuous
+real-linear functionals `ψ` satisfying the functional dual inequalities
+`t ≤ ψ y'` for every `(y', t) ∈ C`.  If weak duality gives `p ≤ d`, then the
+attained primal and dual values are equal.
+
+This is the product-space separation argument behind finite-dimensional conic
+duality.  It deliberately records the closed-image fiber condition through the
+maximality hypothesis, rather than assuming that fiber recovery is automatic. -/
+theorem conic_primalValue_eq_dualValue_of_fiber_max_dual_min
+    {F : Type*}
+    [TopologicalSpace F] [AddCommGroup F] [IsTopologicalAddGroup F]
+    [Module ℝ F] [ContinuousSMul ℝ F] [LocallyConvexSpace ℝ F]
+    (C : ProperCone ℝ (F × ℝ))
+    {y : F} {p d : ℝ}
+    (hprimalMem : (y, p) ∈ C)
+    (hprimalMax : ∀ {t : ℝ}, (y, t) ∈ C → t ≤ p)
+    (hdualMin : ∀ ψ : StrongDual ℝ F,
+      (∀ z ∈ C, z.2 ≤ ψ z.1) → d ≤ ψ y)
+    (hweak : p ≤ d) :
+    p = d := by
+  have hd_le_p : d ≤ p := by
+    by_contra hnot
+    have hp_lt_d : p < d := lt_of_not_ge hnot
+    let t : ℝ := (p + d) / 2
+    have hp_lt_t : p < t := by
+      dsimp [t]
+      nlinarith
+    have ht_lt_d : t < d := by
+      dsimp [t]
+      nlinarith
+    have hnotMem : (y, t) ∉ C := by
+      intro hyt
+      exact (not_lt_of_ge (hprimalMax hyt)) hp_lt_t
+    obtain ⟨φ, hφ_nonneg, hsep⟩ := C.hyperplane_separation_point hnotMem
+    have hcoeff : conicSeparatorObjectiveCoefficient φ < 0 :=
+      conicSeparatorObjectiveCoefficient_neg_of_above
+        (C := (C : Set (F × ℝ))) φ hφ_nonneg hprimalMem hsep hp_lt_t
+    let ψ : StrongDual ℝ F := conicNormalizedSeparatorFunctional φ
+    have hψfeasible : ∀ z ∈ C, z.2 ≤ ψ z.1 := by
+      simpa [ψ] using
+        conicFunctionalDualFeasible_normalizedSeparator
+          (C := (C : Set (F × ℝ))) φ hφ_nonneg hcoeff
+    have hd_le_ψ : d ≤ ψ y := hdualMin ψ hψfeasible
+    have hψ_lt_t : ψ y < t :=
+      conicNormalizedSeparatorFunctional_lt_of_sep φ hsep hcoeff
+    nlinarith
+  exact le_antisymm hweak hd_le_p
 
 end MIPStarRE.Quantum
