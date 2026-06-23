@@ -1,13 +1,12 @@
 import MIPStarRE.LDT.Basic.DistributionAvg
 
 /-!
-# PMF expectation adapters for project distributions
+# PMF expectations associated to project distributions
 
-This module contains bridge statements between the project `Distribution`
-averaging notation and the finite expectation `PMF.realWeightedSum` on Mathlib
-probability mass functions.  The statements keep the project-facing averages
-available while allowing later probability arguments to cite the associated
-Mathlib `PMF` object directly.
+This module relates the project `Distribution` averaging notation to the finite
+expectation `PMF.realWeightedSum` on Mathlib probability mass functions.  The
+statements keep the project-facing averages available while allowing later
+probability arguments to cite the associated Mathlib `PMF` object directly.
 
 ## Main declarations
 
