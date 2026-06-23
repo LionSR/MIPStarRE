@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.Distribution
+import MIPStarRE.LDT.Basic.PMFAverages
 import Mathlib.Probability.ProbabilityMassFunction.Integrals
 
 /-!
@@ -546,36 +546,16 @@ theorem pmf_uniformOfFintype_sum_equiv_smul {α β M : Type*}
 uniform PMF-weighted sums. -/
 theorem pmf_uniformOfFintype_prod_sum_smul {α β M : Type*}
     [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
-    [AddCommMonoid M] [DistribMulAction Error M]
+    [AddCommMonoid M] [Module Error M]
     (f : α → β → M) :
     ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 ab.2 =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal •
         ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
-  calc
-    ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 ab.2
-        = ∑ a : α, ∑ b : β,
-            (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b := by
-          simpa using
-            (Fintype.sum_prod_type' (f := fun a : α => fun b : β =>
-              (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b))
-    _ = ∑ a : α, (PMF.uniformOfFintype α a).toReal •
-          ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          calc
-            ∑ b : β, (PMF.uniformOfFintype (α × β) (a, b)).toReal • f a b
-                = ∑ b : β,
-                    ((PMF.uniformOfFintype α a).toReal *
-                      (PMF.uniformOfFintype β b).toReal) • f a b := by
-                  refine Finset.sum_congr rfl ?_
-                  intro b _
-                  rw [pmf_uniformOfFintype_prod_apply_toReal]
-            _ = ∑ b : β, (PMF.uniformOfFintype α a).toReal •
-                    ((PMF.uniformOfFintype β b).toReal • f a b) := by
-                  simp [smul_smul]
-            _ = (PMF.uniformOfFintype α a).toReal •
-                    ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
-                  rw [Finset.smul_sum]
+  rw [pmf_uniformOfFintype_prod_eq_bind]
+  rw [pmf_bind_sum_smul]
+  refine Finset.sum_congr rfl ?_
+  intro a _
+  rw [pmf_map_sum_smul]
 
 /-- Reindexing a uniform operator average along an equivalence preserves its value. -/
 theorem averageOperatorOverDistribution_uniform_equiv
