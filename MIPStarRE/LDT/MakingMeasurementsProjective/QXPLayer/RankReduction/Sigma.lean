@@ -86,17 +86,30 @@ noncomputable abbrev sigmaFinCarrier {Outcome : Type*} [Fintype Outcome]
     (m : Outcome → ℕ) :=
   Σ i : Fin (Fintype.card Outcome), Fin (m ((Fintype.equivFin Outcome).symm i))
 
+/-- The lifted sigma carrier used as the auxiliary Hilbert-space basis for
+`sigmaFin`. -/
+noncomputable abbrev sigmaFinLift {Outcome : Type*} [Fintype Outcome]
+    (m : Outcome → ℕ) : Type uι :=
+  ULift.{uι} (sigmaFinCarrier m)
+
 /-- The finite Hilbert space whose preferred basis is a lifted finite-enumeration
 model of `Σ a, Fin (m a)`. -/
 def sigmaFin {Outcome : Type*} [Fintype Outcome]
     (m : Outcome → ℕ) [Nonempty (sigmaFinCarrier m)] :
     FiniteHilbertSpace.{uι} where
-  carrier := ULift.{uι} (sigmaFinCarrier m)
+  carrier := sigmaFinLift m
   instFintype := inferInstance
   instDecidableEq := inferInstance
   instNonempty := inferInstance
 
 end FiniteHilbertSpace
+
+/-- The lifted sigma carrier associated to the ranks of an operator family. -/
+noncomputable abbrev sigmaRangeCarrier
+    {Outcome : Type uOutcome} [Fintype Outcome]
+    {ι : Type uι} [Fintype ι] [DecidableEq ι]
+    (q : OpFamily Outcome ι) : Type uι :=
+  FiniteHilbertSpace.sigmaFinLift (fun a : Outcome => (q.outcome a).rank)
 
 /-- A finite-enumeration carrier is equivalent to the paper's literal sigma type
 `Σ a, Fin (m a)`. -/
@@ -150,7 +163,7 @@ private noncomputable def finSigmaProjMeas (n : ℕ) (m : Fin n → ℕ) :
 `Σ a, Fin (m a)` selecting the `a`-block. -/
 noncomputable def sigmaFinProjMeas {Outcome : Type*} [Fintype Outcome] [DecidableEq Outcome]
     (m : Outcome → ℕ) :
-    ProjMeas Outcome (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier m)) :=
+    ProjMeas Outcome (FiniteHilbertSpace.sigmaFinLift m) :=
   ProjMeas.transport (Fintype.equivFin Outcome).symm
     (finSigmaProjMeas (n := Fintype.card Outcome)
       (m := fun i => m ((Fintype.equivFin Outcome).symm i)))
@@ -456,8 +469,7 @@ lemma sigmaFinRangeEmbedding_mul_conjTranspose_eq_one_of_sum_le_one
     sigmaFinRangeEmbedding Q hproj *
         (sigmaFinRangeEmbedding Q hproj)ᴴ =
       (1 : MIPStarRE.Quantum.Op
-        (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-          (fun a : Outcome => (Q a).rank)))) := by
+        (FiniteHilbertSpace.sigmaFinLift (fun a : Outcome => (Q a).rank))) := by
   classical
   ext x y
   cases x with
@@ -521,11 +533,9 @@ noncomputable def QXPLayerData.ofSigmaRangeAndSvdIdentities
     (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (q.outcome a).rank))]
-    (xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (q.outcome a).rank))) ι ℂ)
+    (xHat : Matrix (sigmaRangeCarrier q) ι ℂ)
     (xHat_coisometry : xHat * xHatᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier q)))
     (xHat_mixed : (sigmaFinRangeEmbedding q.outcome qa_projective)ᴴ * xHat =
       CFC.sqrt q.total) :
     QXPLayerData Outcome ι := by
@@ -569,11 +579,9 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (xHat : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ)
     (xHat_coisometry : xHat * xHatᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)))
     (xHat_mixed :
       (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
         CFC.sqrt (QTotal qLayer)) :
@@ -610,11 +618,9 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndSvdIdentities_with_x_coi
       (∑ a : Outcome, qLayer.q.outcome a) ≤ (1 : MIPStarRE.Quantum.Op ι))
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (xHat : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ)
     (xHat_coisometry : xHat * xHatᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)))
     (xHat_mixed :
       (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
         CFC.sqrt (QTotal qLayer)) :
@@ -709,8 +715,7 @@ theorem RankReductionWitness.toSigmaRangeQLayer
   totalRank_le := by
     simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
   auxDim_le := by
-    change Fintype.card (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ≤ Fintype.card ι
+    change Fintype.card (sigmaRangeCarrier qLayer.q) ≤ Fintype.card ι
     rw [Fintype.card_ulift]
     exact sigmaFinCard_le_of_sum_le
       (m := fun a : Outcome => (qLayer.q.outcome a).rank)
@@ -728,9 +733,9 @@ theorem exists_sigmaFin_xHat_coisometry_of_card_le
     {ι : Type*} [Fintype ι]
     (m : Outcome → ℕ)
     (hm : Fintype.card (FiniteHilbertSpace.sigmaFinCarrier m) ≤ Fintype.card ι) :
-    ∃ xHat : Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ,
+    ∃ xHat : Matrix (FiniteHilbertSpace.sigmaFinLift m) ι ℂ,
       xHat * xHatᴴ =
-        (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) := by
+        (1 : MIPStarRE.Quantum.Op (FiniteHilbertSpace.sigmaFinLift m)) := by
   classical
   exact Matrix.exists_mul_conjTranspose_eq_one_of_card_le (by
     simpa [Fintype.card_ulift] using hm)
@@ -743,9 +748,9 @@ theorem exists_sigmaFin_xHat_coisometry_of_sum_le
     {ι : Type*} [Fintype ι]
     (m : Outcome → ℕ)
     (hm : ∑ a, m a ≤ Fintype.card ι) :
-    ∃ xHat : Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ,
+    ∃ xHat : Matrix (FiniteHilbertSpace.sigmaFinLift m) ι ℂ,
       xHat * xHatᴴ =
-        (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) := by
+        (1 : MIPStarRE.Quantum.Op (FiniteHilbertSpace.sigmaFinLift m)) := by
   exact exists_sigmaFin_xHat_coisometry_of_card_le m
     (sigmaFinCard_le_of_sum_le (ι := ι) m hm)
 
@@ -756,7 +761,7 @@ noncomputable def sigmaFinXHatCoisometry
     {ι : Type*} [Fintype ι]
     (m : Outcome → ℕ)
     (hm : ∑ a, m a ≤ Fintype.card ι) :
-    Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier m)) ι ℂ :=
+    Matrix (FiniteHilbertSpace.sigmaFinLift m) ι ℂ :=
   Classical.choose (exists_sigmaFin_xHat_coisometry_of_sum_le m hm)
 
 /-- The chosen sigma-space rectangular coisometry has orthonormal rows. -/
@@ -767,7 +772,7 @@ lemma sigmaFinXHatCoisometry_spec
     (hm : ∑ a, m a ≤ Fintype.card ι) :
     sigmaFinXHatCoisometry (ι := ι) m hm *
         (sigmaFinXHatCoisometry (ι := ι) m hm)ᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier m))) :=
+      (1 : MIPStarRE.Quantum.Op (FiniteHilbertSpace.sigmaFinLift m)) :=
   Classical.choose_spec (exists_sigmaFin_xHat_coisometry_of_sum_le m hm)
 
 end
