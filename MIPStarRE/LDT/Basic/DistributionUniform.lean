@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.DistributionPMF
+import MIPStarRE.LDT.Basic.DistributionAvg
 
 /-!
 # Uniform subset estimates

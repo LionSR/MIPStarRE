@@ -257,6 +257,23 @@ lemmas when the statement is naturally about a genuine finite probability law.
   ∑ a : α, (q a).toReal * f a ≤
   ∑ a : α, (p a).toReal * f a + PMF.totalVariationDistance p q`
 
+### Module-valued uniform averages
+
+`MIPStarRE/LDT/Basic/DistributionUniformSums.lean` contains the project-facing
+module-valued finite-sum algebra for uniform distributions.  Scalar averages
+and operator averages are now special cases of these statements.
+
+- `theorem uniformDistribution_sum_smul_equiv`
+- `theorem uniformDistribution_sum_smul_prod`
+- `theorem uniformDistribution_sum_smul_equiv_prod`
+- `theorem uniformDistribution_sum_smul_equiv_fst`
+- `theorem uniformDistribution_sum_smul_equiv_snd`
+- `theorem uniformDistribution_map_sum_smul_eq_uniform_of_factor_equiv`
+- `theorem uniformOnFinset_sum_smul_eq_subtype`
+- `theorem uniformOnFinset_sum_smul_equiv`
+- `theorem uniformOnFinset_filter_sum_smul_eq_subtype`
+- `theorem uniformOnFinset_filter_sum_smul_equiv`
+
 ### Averaging lemmas
 
 - `theorem avgOver_zero (𝒟 : Distribution α) : avgOver 𝒟 (fun _ => 0) = 0`
