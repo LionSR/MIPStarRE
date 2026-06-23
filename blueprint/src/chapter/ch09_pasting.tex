@@ -253,8 +253,9 @@ where
 	\[
 		d_{\mathrm{TV}}(x,y) \le \frac{k^2}{q}.
 	\]
-	\end{proposition}
-	\begin{proof}
+\end{proposition}
+\begin{proof}
+	% `PMF` is a root Lean namespace; these declarations are not under `MIPStarRE.LDT`.
 	\lean{MIPStarRE.LDT.pmf_sum_toReal_eq_one}
 	\lean{PMF.totalVariationDistance}
 	\lean{PMF.totalVariationDistance_eq_sum_max_sub}
@@ -990,6 +991,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	as used in Lemma~\ref{lem:h-b-consistency}.
 \end{lemma}
 \begin{proof}
+	% `PMF` is a root Lean namespace; these declarations are not under `MIPStarRE.LDT`.
 	\lean{MIPStarRE.LDT.totalVariationDistance_eq_univ_sum}
 	\lean{MIPStarRE.LDT.totalVariationDistance_eq_toPMF_sum}
 	\lean{MIPStarRE.LDT.totalVariationDistance_eq_sum_max_sub}
