@@ -39,58 +39,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-- View a matrix submeasurement as the paper-local `SubMeas` structure. -/
-noncomputable def matrixSubmeasurementToSubMeas {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (M : MatrixSubmeasurement Outcome H) : SubMeas Outcome H.carrier where
-  outcome := M.effect
-  total := MIPStarRE.Quantum.Submeasurement.total M
-  outcome_pos := M.pos
-  sum_eq_total := rfl
-  total_le_one := by
-    simpa [MIPStarRE.Quantum.Submeasurement.total] using M.sum_le_one
-
-@[simp] theorem matrixSubmeasurementToSubMeas_outcome {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (M : MatrixSubmeasurement Outcome H) (a : Outcome) :
-    (matrixSubmeasurementToSubMeas M).outcome a = M.effect a :=
-  rfl
-
-@[simp] theorem matrixSubmeasurementToSubMeas_total {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (M : MatrixSubmeasurement Outcome H) :
-    (matrixSubmeasurementToSubMeas M).total =
-      MIPStarRE.Quantum.Submeasurement.total M :=
-  rfl
-
-/-- View a matrix measurement as the paper-local `Measurement` structure. -/
-noncomputable def matrixMeasurementToMeasurement {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (M : MatrixMeasurement Outcome H) : Measurement Outcome H.carrier where
-  toSubMeas := matrixSubmeasurementToSubMeas M.toSubmeasurement
-  total_eq_one := by
-    simpa [matrixSubmeasurementToSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
-      M.sum_eq_one
-
-@[simp] theorem matrixMeasurementToMeasurement_toSubMeas {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (M : MatrixMeasurement Outcome H) :
-    (matrixMeasurementToMeasurement M).toSubMeas =
-      matrixSubmeasurementToSubMeas M.toSubmeasurement :=
-  rfl
-
-@[simp] theorem matrixMeasurementToMeasurement_outcome {Outcome : Type*}
-    [Fintype Outcome] [DecidableEq Outcome]
-    {H : FiniteHilbertSpace}
-    (M : MatrixMeasurement Outcome H) (a : Outcome) :
-    (matrixMeasurementToMeasurement M).outcome a = M.effect a :=
-  rfl
-
 /-- The point-measurement part of the matrix SDP realization associated to a strategy.
 
 The present comparison only uses the point-measurement fields of
@@ -252,7 +200,7 @@ theorem toSdpOptimalPairWithSlackness
     {Z : MIPStarRE.Quantum.Op ι}
     (h : MatrixSdpOptimalWitness params
       (matrixSdpPointRealizationOfStrategy params strategy) T Z) :
-    SdpOptimalPairWithSlackness params strategy (matrixSubmeasurementToSubMeas T) Z where
+    SdpOptimalPairWithSlackness params strategy (MatrixSubmeasurement.toSubMeas T) Z where
   toSdpOptimalPair := {
     primalTotalOperator := by
       change (∑ g : Polynomial params, T.effect g) = (1 : MIPStarRE.Quantum.Op ι)
@@ -264,7 +212,7 @@ theorem toSdpOptimalPairWithSlackness
   }
   complementarySlackness := by
     intro g
-    dsimp [matrixSubmeasurementToSubMeas, sdpComplementarySlacknessEquation,
+    dsimp [MatrixSubmeasurement.toSubMeas, sdpComplementarySlacknessEquation,
       sdpDualSlackOperator, matrixSdpPointRealizationOfStrategy]
     rw [← matrixAveragedPointOperator_ofPointRealization params strategy g]
     exact h.complementarySlacknessEquation g
@@ -289,7 +237,7 @@ theorem toSdpStatementWithSlackness
       MatrixSdpOptimalWitness params
         (matrixSdpPointRealizationOfStrategy params strategy) T Z :=
     Classical.choose_spec hTZ
-  exact ⟨matrixSubmeasurementToSubMeas T, Z,
+  exact ⟨MatrixSubmeasurement.toSubMeas T, Z,
     hopt.toSdpOptimalPairWithSlackness⟩
 
 end MatrixSdpStatementWithSlackness
