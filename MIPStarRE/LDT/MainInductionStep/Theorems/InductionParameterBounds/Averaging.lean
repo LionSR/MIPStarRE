@@ -1,10 +1,11 @@
+import MIPStarRE.LDT.Basic.PMFAverages
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
 
 /-!
 # Section 6 — Induction Parameter Averaging Bounds
 
-This file is one leaf of `InductionParameterBounds`. It contains the uniform
-Jensen estimate used for averaged slice errors, together with the
+This file contains the uniform Jensen estimate used for averaged slice errors,
+together with the
 `sliceConditioningLoss` comparisons which replace the ambient factor `m` by
 `m + 1` in the induction step.
 
@@ -30,49 +31,9 @@ lemma avgOver_uniform_rpow_one_div_le_rpow_avg
     avgOver (uniformDistribution α)
         (fun a => Real.rpow (f a) (1 / (n : Error))) ≤
       Real.rpow (avgOver (uniformDistribution α) f) (1 / (n : Error)) := by
-  let w : α → Error := fun _ => 1 / (Fintype.card α : Error)
-  let z : α → Error := fun a => Real.rpow (f a) (1 / (n : Error))
-  have hw_nonneg : ∀ a ∈ (Finset.univ : Finset α), 0 ≤ w a := by
-    intro a ha
-    simp [w]
-  have hw_sum : ∑ a ∈ (Finset.univ : Finset α), w a = 1 := by
-    simp [w]
-  have hz_nonneg : ∀ a ∈ (Finset.univ : Finset α), 0 ≤ z a := by
-    intro a ha
-    exact Real.rpow_nonneg (hf a) _
-  have hn_nat_pos : 0 < n := lt_of_lt_of_le (by decide : 0 < 1) hn
-  have hn_pos : 0 < (n : Error) := by
-    exact_mod_cast hn_nat_pos
-  have hp : (1 : Error) ≤ (n : Error) := by
-    exact_mod_cast hn
-  have hzpow : ∀ a, (Real.rpow (f a) (1 / (n : Error))) ^ n = f a := by
-    intro a
-    calc
-      (Real.rpow (f a) (1 / (n : Error))) ^ n
-          = (Real.rpow (f a) (1 / (n : Error))) ^ (n : Error) := by
-              rw [← Real.rpow_natCast]
-      _ = Real.rpow (f a) ((1 / (n : Error)) * (n : Error)) := by
-              symm
-              exact Real.rpow_mul (hf a) _ _
-      _ = Real.rpow (f a) 1 := by
-              congr 1
-              field_simp [hn_pos.ne']
-      _ = f a := by simp
-  have hsum_eq :
-      ∑ a ∈ (Finset.univ : Finset α), w a * z a ^ n =
-        ∑ a ∈ (Finset.univ : Finset α), w a * f a := by
-    refine Finset.sum_congr rfl ?_
-    intro a ha
-    rw [hzpow a]
-  have hmean :=
-    (Real.arith_mean_le_rpow_mean (s := (Finset.univ : Finset α)) w z
-      hw_nonneg hw_sum hz_nonneg (p := (n : Error)) hp)
-  have hmean' :
-      avgOver (uniformDistribution α) (fun a => Real.rpow (f a) (1 / (n : Error))) ≤
-        Real.rpow (∑ a ∈ (Finset.univ : Finset α), w a * z a ^ n) (1 / (n : Error)) := by
-    simpa [avgOver, uniformDistribution, w, z] using hmean
-  rw [hsum_eq] at hmean'
-  simpa [avgOver, uniformDistribution, w] using hmean'
+  rw [avgOver_uniform_eq_pmf_sum, avgOver_uniform_eq_pmf_sum]
+  exact pmf_sum_rpow_one_div_le_rpow_sum
+    (p := PMF.uniformOfFintype α) (f := f) (n := n) hn hf
 
 /-- Internal helper: `m · (sliceConditioningLoss · x)^c ≤ m_next · x^c` for `c ≤ 1`.
 
