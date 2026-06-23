@@ -294,53 +294,6 @@ theorem toSdpStatementWithSlackness
 
 end MatrixSdpStatementWithSlackness
 
-/-- A saturated canonical optimal pair gives the abstract Section 9 SDP
-statement with complementary slackness. -/
-theorem sdpStatementWithSlackness_of_canonicalOptimalPair
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
-      (matrixSdpPointRealizationOfStrategy params strategy)))
-    (Z : MIPStarRE.Quantum.Op ι)
-    (h : MatrixSdpCanonicalOptimalPair params
-      (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
-    SdpStatementWithSlackness params strategy :=
-  MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness
-    params strategy h.toMatrixSdpStatementWithSlackness
-
-/-- An existential canonical optimal pair gives the abstract Section 9 SDP
-statement with complementary slackness.
-
-Paper origin: `references/ldt-paper/self_improvement.tex` lines 82--190
-(`\label{lem:sdp}`), documented by
-`docs/paper-gaps/issue-1230-self-improvement-sdp-usage.tex`.
-
-**Source-faithful transport:** This declaration assumes exactly the canonical
-optimal-pair output used in the proof of `lem:sdp` and translates it without
-strengthening the paper hypotheses.
-
-This is the native transport from the canonical block-SDP output appearing in
-the proof of `lem:sdp` to the abstract self-improvement statement.  The
-existential hypothesis is precisely the strong-duality and complementary-slackness
-output: it supplies a feasible canonical primal matrix, a dual-feasible operator
-with equal objective value, canonical complementary slackness, and a vanishing
-slack block. -/
-theorem sdpStatementWithSlackness_of_exists_canonicalOptimalPair
-    (params : Parameters)
-    [FieldModel params.q]
-    (strategy : SymStrat params ι)
-    (h :
-      ∃ X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params
-          (matrixSdpPointRealizationOfStrategy params strategy)),
-        ∃ Z : MIPStarRE.Quantum.Op ι,
-          MatrixSdpCanonicalOptimalPair params
-            (matrixSdpPointRealizationOfStrategy params strategy) X Z) :
-    SdpStatementWithSlackness params strategy := by
-  rcases h with ⟨X, Z, hpair⟩
-  exact sdpStatementWithSlackness_of_canonicalOptimalPair
-    params strategy X Z hpair
-
 /-- Canonical strong-duality and complementary-slackness construction for the
 point-measurement realization of the Section 9 SDP.
 

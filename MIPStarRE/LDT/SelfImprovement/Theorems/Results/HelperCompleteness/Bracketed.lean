@@ -507,8 +507,8 @@ theorem sdp_statement_with_slackness
     [FieldModel params.q]
     (strategy : SymStrat params ι) :
     SdpStatementWithSlackness params strategy := by
-  exact sdpStatementWithSlackness_of_exists_canonicalOptimalPair params strategy
-    (matrixSdpPointRealization_canonicalOptimalPair params strategy)
+  exact MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness params strategy
+    (matrixSdpPointRealization_statementWithSlackness params strategy)
 
 /-- Displayed measurement and complementary-slackness conclusion of `lem:sdp`.
 
