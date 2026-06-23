@@ -16,7 +16,12 @@ low individual degree test averaging layer.
 * `pmf_map_sum_smul`
 * `pmf_bind_apply_toReal`
 * `pmf_bind_sum_smul`
+* `pmf_sum_toReal_eq_one`
 * `pmf_sum_const_smul`
+* `pmfTotalVariationDistance`
+* `pmfTotalVariationDistance_eq_sum_max_sub`
+* `pmfTotalVariationDistance_uniformOfFintype_uniformOfFinset_eq`
+* `pmf_sum_le_sum_add_pmfTotalVariationDistance`
 * `pmf_sum_rpow_one_div_le_rpow_sum`
 * `pmf_uniformOfFintype_map_equiv`
 * `pmf_uniformOfFintype_prod_apply_toReal`
@@ -186,26 +191,217 @@ theorem pmf_uniformOfFintype_prod_eq_bind
     (Or.inl (by exact_mod_cast Fintype.card_ne_zero (α := α)))
     (Or.inl (ENNReal.natCast_ne_top (Fintype.card α)))
 
+/-- The real weights of a finite probability mass function sum to one.
+
+This is a Lean-only normalization lemma for transporting finite probability
+calculations to Mathlib's `PMF` language. -/
+theorem pmf_sum_toReal_eq_one {α : Type*} [Fintype α] (p : PMF α) :
+    ∑ a : α, (p a).toReal = (1 : Error) := by
+  have hweight_enn : (∑ a : α, p a) = (1 : ENNReal) := by
+    rw [← (tsum_fintype (fun a : α => p a) :
+      (∑' a : α, p a) = ∑ a : α, p a)]
+    exact p.tsum_coe
+  rw [← ENNReal.toReal_sum (s := Finset.univ)
+    (f := fun a : α => p a) (fun a _ => p.apply_ne_top a)]
+  rw [hweight_enn]
+  norm_num
+
 /-- The PMF-weighted sum of a constant family is the constant value. -/
 theorem pmf_sum_const_smul {α M : Type*}
     [Fintype α] [AddCommMonoid M] [Module Error M]
     (p : PMF α) (x : M) :
     ∑ a : α, (p a).toReal • x = x := by
-  have hweight_enn : (∑ a : α, p a) = (1 : ENNReal) := by
-    rw [← (tsum_fintype (fun a : α => p a) :
-      (∑' a : α, p a) = ∑ a : α, p a)]
-    exact p.tsum_coe
-  have hweight : (∑ a : α, (p a).toReal) = (1 : Error) := by
-    rw [← ENNReal.toReal_sum (s := Finset.univ)
-      (f := fun a : α => p a) (fun a _ => p.apply_ne_top a)]
-    rw [hweight_enn]
-    norm_num
   calc
     ∑ a : α, (p a).toReal • x =
         (∑ a : α, (p a).toReal) • x := by
           exact (Finset.sum_smul (s := Finset.univ)
             (f := fun a : α => (p a).toReal) (x := x)).symm
-    _ = x := by rw [hweight, one_smul]
+    _ = x := by rw [pmf_sum_toReal_eq_one p, one_smul]
+
+/-- The finite total-variation distance between two probability mass functions,
+written with real weights.
+
+This is the Mathlib definition of the project `Distribution`
+`totalVariationDistance` formula on finite types, expressed in terms of
+probability mass functions and used for the
+`prop:ld-dnoteq` estimate in `references/ldt-paper/ld-pasting.tex`. -/
+noncomputable def pmfTotalVariationDistance {α : Type*} [Fintype α]
+    (p q : PMF α) : Error :=
+  (1 / 2) * ∑ a : α, |(p a).toReal - (q a).toReal|
+
+/-- For finite probability mass functions, total variation is the total positive
+part of the signed weight difference `q - p`.
+
+This is the finite PMF form of the elementary total-variation calculation used
+in Proposition `prop:ld-dnoteq` of `references/ldt-paper/ld-pasting.tex`. -/
+theorem pmfTotalVariationDistance_eq_sum_max_sub {α : Type*}
+    [Fintype α] (p q : PMF α) :
+    pmfTotalVariationDistance p q =
+      ∑ a : α, max 0 ((q a).toReal - (p a).toReal) := by
+  classical
+  have hdiff_sum :
+      ∑ a : α, ((q a).toReal - (p a).toReal) = 0 := by
+    rw [Finset.sum_sub_distrib, pmf_sum_toReal_eq_one q, pmf_sum_toReal_eq_one p,
+      sub_self]
+  have hmax_abs :
+      ∀ a : α, max 0 ((q a).toReal - (p a).toReal) =
+        (((q a).toReal - (p a).toReal) + |(p a).toReal - (q a).toReal|) / 2 := by
+    intro a
+    by_cases hle : (q a).toReal - (p a).toReal ≤ 0
+    · have hmax :
+          max 0 ((q a).toReal - (p a).toReal) = 0 := max_eq_left hle
+      have habs :
+          |(p a).toReal - (q a).toReal| = (p a).toReal - (q a).toReal := by
+        rw [abs_of_nonneg]
+        linarith
+      rw [hmax, habs]
+      ring
+    · have hnonneg : 0 ≤ (q a).toReal - (p a).toReal := le_of_not_ge hle
+      have hmax :
+          max 0 ((q a).toReal - (p a).toReal) =
+            (q a).toReal - (p a).toReal := max_eq_right hnonneg
+      have habs :
+          |(p a).toReal - (q a).toReal| = (q a).toReal - (p a).toReal := by
+        have hpq : (p a).toReal ≤ (q a).toReal := by linarith
+        rw [abs_of_nonpos (sub_nonpos.mpr hpq)]
+        ring
+      rw [hmax, habs]
+      ring
+  calc
+    pmfTotalVariationDistance p q =
+        (1 / 2) * ∑ a : α, |(p a).toReal - (q a).toReal| := by
+          rfl
+    _ = (∑ a : α, ((q a).toReal - (p a).toReal) +
+          ∑ a : α, |(p a).toReal - (q a).toReal|) / 2 := by
+          rw [hdiff_sum]
+          ring
+    _ = (∑ a : α,
+          (((q a).toReal - (p a).toReal) + |(p a).toReal - (q a).toReal|)) /
+          2 := by
+          rw [Finset.sum_add_distrib]
+    _ = ∑ a : α,
+          (((q a).toReal - (p a).toReal) + |(p a).toReal - (q a).toReal|) /
+            2 := by
+          rw [Finset.sum_div]
+    _ = ∑ a : α, max 0 ((q a).toReal - (p a).toReal) := by
+          exact Finset.sum_congr rfl fun a _ => (hmax_abs a).symm
+
+/-- Total variation between the uniform probability mass function on a finite
+ambient type and the uniform probability mass function on a nonempty finite
+subset.
+
+This is the Mathlib PMF version of the uniform-versus-conditioned-uniform
+calculation in Proposition `prop:ld-dnoteq` of
+`references/ldt-paper/ld-pasting.tex`. -/
+theorem pmfTotalVariationDistance_uniformOfFintype_uniformOfFinset_eq
+    {α : Type*} [Fintype α] [Nonempty α]
+    (s : Finset α) (hs : s.Nonempty) :
+    pmfTotalVariationDistance (PMF.uniformOfFintype α) (PMF.uniformOfFinset s hs) =
+      1 - (s.card : Error) / (Fintype.card α : Error) := by
+  classical
+  have hs_card_ne_nat : s.card ≠ 0 := Finset.card_ne_zero.mpr hs
+  have hs_card_ne : (s.card : Error) ≠ 0 := by
+    exact_mod_cast hs_card_ne_nat
+  have hα_card_ne : (Fintype.card α : Error) ≠ 0 := by
+    exact_mod_cast Fintype.card_ne_zero
+  have hs_pos : 0 < (s.card : Error) := by
+    exact_mod_cast Nat.pos_of_ne_zero hs_card_ne_nat
+  have hs_le_univ_nat : s.card ≤ Fintype.card α := by
+    simpa using Finset.card_le_univ s
+  have hweight_le :
+      1 / (Fintype.card α : Error) ≤ 1 / (s.card : Error) := by
+    exact one_div_le_one_div_of_le hs_pos (by exact_mod_cast hs_le_univ_nat)
+  have hweight_inv_le :
+      (Fintype.card α : Error)⁻¹ ≤ (s.card : Error)⁻¹ := by
+    simpa [one_div] using hweight_le
+  let g : α → Error := fun a =>
+    max 0 ((PMF.uniformOfFinset s hs a).toReal - (PMF.uniformOfFintype α a).toReal)
+  have hg_outside : ∀ a, a ∉ s → g a = 0 := by
+    intro a ha
+    simp [g, PMF.uniformOfFintype_apply, PMF.uniformOfFinset_apply, ha,
+      ENNReal.toReal_inv, ENNReal.toReal_natCast]
+  have hg_inside :
+      ∀ a ∈ s, g a = 1 / (s.card : Error) - 1 / (Fintype.card α : Error) := by
+    intro a ha
+    simp [g, PMF.uniformOfFintype_apply, PMF.uniformOfFinset_apply, ha,
+      ENNReal.toReal_inv, ENNReal.toReal_natCast,
+      max_eq_right (sub_nonneg.mpr hweight_inv_le)]
+  calc
+    pmfTotalVariationDistance (PMF.uniformOfFintype α) (PMF.uniformOfFinset s hs)
+        = ∑ a : α, g a := by
+          exact pmfTotalVariationDistance_eq_sum_max_sub
+            (PMF.uniformOfFintype α) (PMF.uniformOfFinset s hs)
+    _ = ∑ a ∈ s, g a := by
+          exact (Finset.sum_subset (Finset.subset_univ s)
+            (fun a _ ha => hg_outside a ha)).symm
+    _ = ∑ _a ∈ s,
+          (1 / (s.card : Error) - 1 / (Fintype.card α : Error)) := by
+          exact Finset.sum_congr rfl hg_inside
+    _ = (s.card : Error) *
+          (1 / (s.card : Error) - 1 / (Fintype.card α : Error)) := by
+          rw [Finset.sum_const, nsmul_eq_mul]
+    _ = 1 - (s.card : Error) / (Fintype.card α : Error) := by
+          field_simp [hs_card_ne, hα_card_ne]
+
+/-- A `[0,1]`-valued function has expectations over two finite probability mass
+functions differing by at most their total-variation distance.
+
+This finite PMF estimate is the probability-theoretic form of the averaging
+comparison used after Proposition `prop:ld-dnoteq` in
+`references/ldt-paper/ld-pasting.tex`. -/
+theorem pmf_sum_le_sum_add_pmfTotalVariationDistance {α : Type*}
+    [Fintype α] (p q : PMF α) (f : α → Error)
+    (hf_nonneg : ∀ a, 0 ≤ f a)
+    (hf_le_one : ∀ a, f a ≤ 1) :
+    ∑ a : α, (q a).toReal * f a ≤
+      ∑ a : α, (p a).toReal * f a + pmfTotalVariationDistance p q := by
+  classical
+  have hpoint :
+      ∀ a : α, (q a).toReal * f a ≤
+        (p a).toReal * f a + max 0 ((q a).toReal - (p a).toReal) := by
+    intro a
+    by_cases hle : (q a).toReal ≤ (p a).toReal
+    · have hmul : (q a).toReal * f a ≤ (p a).toReal * f a := by
+        exact mul_le_mul_of_nonneg_right hle (hf_nonneg a)
+      have hmax : max 0 ((q a).toReal - (p a).toReal) = 0 := by
+        rw [max_eq_left]
+        linarith
+      rw [hmax]
+      linarith
+    · have hpq : (p a).toReal ≤ (q a).toReal := le_of_not_ge hle
+      have hdiff_nonneg : 0 ≤ (q a).toReal - (p a).toReal := by linarith
+      have hmul :
+          ((q a).toReal - (p a).toReal) * f a ≤
+            (q a).toReal - (p a).toReal := by
+        have := mul_le_mul_of_nonneg_left (hf_le_one a) hdiff_nonneg
+        simpa [one_mul] using this
+      have hsplit :
+          (q a).toReal * f a =
+            (p a).toReal * f a + ((q a).toReal - (p a).toReal) * f a := by
+        ring
+      have hmax : max 0 ((q a).toReal - (p a).toReal) =
+          (q a).toReal - (p a).toReal := max_eq_right hdiff_nonneg
+      rw [hsplit, hmax]
+      linarith
+  have hsum :
+      ∑ a : α, (q a).toReal * f a ≤
+        ∑ a : α, ((p a).toReal * f a +
+          max 0 ((q a).toReal - (p a).toReal)) :=
+    Finset.sum_le_sum fun a _ => hpoint a
+  have htv :
+      pmfTotalVariationDistance p q =
+        ∑ a : α, max 0 ((q a).toReal - (p a).toReal) :=
+    pmfTotalVariationDistance_eq_sum_max_sub p q
+  calc
+    ∑ a : α, (q a).toReal * f a
+        ≤ ∑ a : α, ((p a).toReal * f a +
+            max 0 ((q a).toReal - (p a).toReal)) :=
+          hsum
+    _ = ∑ a : α, (p a).toReal * f a +
+          ∑ a : α, max 0 ((q a).toReal - (p a).toReal) := by
+          rw [Finset.sum_add_distrib]
+    _ = ∑ a : α, (p a).toReal * f a + pmfTotalVariationDistance p q := by
+          rw [← htv]
 
 /-- Jensen's inequality for the concave power `x ↦ x ^ (1 / n)`, stated for a
 finite probability mass function. -/

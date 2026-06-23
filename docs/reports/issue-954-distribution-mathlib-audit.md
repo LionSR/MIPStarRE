@@ -330,9 +330,22 @@ A later TV-distance scout may also be useful: check whether the signed-measure
 `totalVariation` API can recover the local finite `totalVariationDistance`
 formula without making the pasting proofs harder.
 
-## Validation for this PR
+Update after issue #2555: the repository now has a targeted finite-`PMF`
+total-variation layer in `MIPStarRE/LDT/Basic/PMFAverages.lean`.  It defines
+`pmfTotalVariationDistance`, proves the positive-part identity
+`pmfTotalVariationDistance_eq_sum_max_sub`, and proves the uniform ambient
+versus uniform finite-subset formula
+`pmfTotalVariationDistance_uniformOfFintype_uniformOfFinset_eq`.  The
+project-level theorem
+`totalVariationDistance_uniformDistribution_uniformOnFinset_eq` is now obtained
+by transporting this PMF statement through `Distribution.toPMF`.  This follows
+the audit recommendation: the live `Distribution` API remains the paper-facing
+finite-support representation, while the concrete probability calculation is
+performed in Mathlib's `PMF` language.
 
-This PR is docs-only.  Validate with:
+## Validation for the original audit PR
+
+The original audit PR was docs-only.  Validate with:
 
 ```text
 git diff --check -- docs/reports/issue-954-distribution-mathlib-audit.md
