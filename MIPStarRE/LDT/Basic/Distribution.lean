@@ -6,8 +6,8 @@ import Mathlib.Probability.Distributions.Uniform
 # Distribution infrastructure for the low individual degree test
 
 Shared distribution definitions: finite-support weighted distributions,
-a probability predicate, push-forward distributions, averaging, uniform
-distribution, and outcome summation.
+a probability predicate, push-forward distributions, weighted-sum linear maps,
+averaging, uniform distribution, and outcome summation.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -222,6 +222,43 @@ def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
 
 namespace Distribution
 
+/-- The module-valued weighted finite sum associated to a finite-support `Distribution`,
+as a linear map in the averaged family.
+
+This packages the finite-support expression underlying both scalar averages and
+operator averages.  It keeps the explicit support carried by `Distribution`,
+while exposing the `Error`-module structure of the weighted sum. -/
+noncomputable def weightedSumLinearMap (M : Type*) [AddCommMonoid M] [Module Error M]
+    {α : Type*} (𝒟 : Distribution α) : (α → M) →ₗ[Error] M where
+  toFun := fun f => ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
+  map_add' := by
+    intro f g
+    simp only [Pi.add_apply, smul_add, Finset.sum_add_distrib]
+  map_smul' := by
+    intro c f
+    simp only [Pi.smul_apply]
+    calc
+      ∑ a ∈ 𝒟.support, 𝒟.weight a • c • f a =
+          ∑ a ∈ 𝒟.support, c • (𝒟.weight a • f a) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            rw [smul_smul, smul_smul, mul_comm]
+      _ = c • ∑ a ∈ 𝒟.support, 𝒟.weight a • f a := by
+            rw [Finset.smul_sum]
+
+@[simp]
+theorem weightedSumLinearMap_apply (M : Type*) [AddCommMonoid M] [Module Error M]
+    {α : Type*} (𝒟 : Distribution α) (f : α → M) :
+    𝒟.weightedSumLinearMap M f = ∑ a ∈ 𝒟.support, 𝒟.weight a • f a :=
+  rfl
+
+/-- The scalar average is the weighted finite-sum linear map applied to a scalar
+family. -/
+theorem avgOver_eq_weightedSumLinearMap {α : Type*}
+    (𝒟 : Distribution α) (f : α → Error) :
+    avgOver 𝒟 f = 𝒟.weightedSumLinearMap Error f := by
+  simp [avgOver, smul_eq_mul]
+
 /-- Averaging against a pushed-forward distribution is averaging the pulled-back
 function against the original distribution. -/
 theorem avgOver_map {α β : Type*} [DecidableEq β]
@@ -244,6 +281,16 @@ noncomputable def averageOperatorOverDistribution {α : Type*}
   ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
 
 namespace Distribution
+
+/-- Operator averaging is the weighted finite-sum linear map applied to an
+operator-valued family. -/
+theorem averageOperatorOverDistribution_eq_weightedSumLinearMap {α : Type*}
+    (𝒟 : Distribution α)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 f =
+      𝒟.weightedSumLinearMap (MIPStarRE.Quantum.Op ι) f :=
+  rfl
 
 /-- Operator-valued averaging against a pushed-forward distribution is
 operator-valued averaging of the pulled-back family against the original
@@ -274,15 +321,10 @@ theorem averageOperatorOverDistribution_sum {α β : Type*} [Fintype β]
     (f : α → β → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution 𝒟 (fun a => ∑ b : β, f a b) =
       ∑ b : β, averageOperatorOverDistribution 𝒟 (fun a => f a b) := by
-  unfold averageOperatorOverDistribution
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a • ∑ b : β, f a b
-        = ∑ a ∈ 𝒟.support, ∑ b : β, 𝒟.weight a • f a b := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.smul_sum]
-    _ = ∑ b : β, ∑ a ∈ 𝒟.support, 𝒟.weight a • f a b := by
-          rw [Finset.sum_comm]
+  rw [show (fun a => ∑ b : β, f a b) = ∑ b : β, fun a => f a b by
+    ext a
+    simp]
+  simp [Distribution.averageOperatorOverDistribution_eq_weightedSumLinearMap]
 
 /-- Pull a finite-set outcome sum through an operator-valued average. -/
 theorem averageOperatorOverDistribution_finset_sum {α β : Type*}
@@ -291,15 +333,10 @@ theorem averageOperatorOverDistribution_finset_sum {α β : Type*}
     (f : α → β → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution 𝒟 (fun a => ∑ b ∈ s, f a b) =
       ∑ b ∈ s, averageOperatorOverDistribution 𝒟 (fun a => f a b) := by
-  unfold averageOperatorOverDistribution
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a • ∑ b ∈ s, f a b
-        = ∑ a ∈ 𝒟.support, ∑ b ∈ s, 𝒟.weight a • f a b := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.smul_sum]
-    _ = ∑ b ∈ s, ∑ a ∈ 𝒟.support, 𝒟.weight a • f a b := by
-          rw [Finset.sum_comm]
+  rw [show (fun a => ∑ b ∈ s, f a b) = ∑ b ∈ s, fun a => f a b by
+    ext a
+    simp]
+  simp [Distribution.averageOperatorOverDistribution_eq_weightedSumLinearMap]
 
 /-- Operator averages preserve positivity. -/
 theorem averageOperatorOverDistribution_nonneg {α : Type*}

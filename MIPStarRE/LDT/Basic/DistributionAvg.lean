@@ -28,12 +28,13 @@ namespace MIPStarRE.LDT
 
 /-! ### Averaging infrastructure
 
-Proofs use Mathlib's `Finset.sum` API: `Finset.sum_le_sum`, `Finset.sum_add_distrib`,
-`Finset.mul_sum`, and `Finset.sum_congr`. -/
+Linearity proofs use `Distribution.weightedSumLinearMap`; order and support
+estimates use Mathlib's `Finset.sum` API. -/
 
 /-- Averaging the zero function gives zero. -/
 theorem avgOver_zero {α : Type*} (𝒟 : Distribution α) :
-    avgOver 𝒟 (fun _ => 0) = 0 := by simp [avgOver]
+    avgOver 𝒟 (fun _ => 0) = 0 := by
+  simp [Distribution.avgOver_eq_weightedSumLinearMap]
 
 /-- Averaging preserves order when weights are nonneg. -/
 theorem avgOver_mono {α : Type*} (𝒟 : Distribution α) (f g : α → Error)
@@ -52,29 +53,25 @@ theorem avgOver_nonneg {α : Type*} (𝒟 : Distribution α) (f : α → Error)
 theorem avgOver_add {α : Type*} (𝒟 : Distribution α) (f g : α → Error) :
     avgOver 𝒟 (fun a => f a + g a) =
       avgOver 𝒟 f + avgOver 𝒟 g := by
-  simp only [avgOver, mul_add, Finset.sum_add_distrib]
+  change avgOver 𝒟 (f + g) = avgOver 𝒟 f + avgOver 𝒟 g
+  simpa [Distribution.avgOver_eq_weightedSumLinearMap] using
+    map_add (𝒟.weightedSumLinearMap Error) f g
 
 /-- Averaging distributes over subtraction. -/
 theorem avgOver_sub {α : Type*} (𝒟 : Distribution α) (f g : α → Error) :
     avgOver 𝒟 (fun a => f a - g a) =
       avgOver 𝒟 f - avgOver 𝒟 g := by
-  simp only [avgOver, mul_sub, Finset.sum_sub_distrib]
+  change avgOver 𝒟 (f - g) = avgOver 𝒟 f - avgOver 𝒟 g
+  simpa [Distribution.avgOver_eq_weightedSumLinearMap] using
+    map_sub (𝒟.weightedSumLinearMap Error) f g
 
 /-- Averaging commutes with scalar multiplication. -/
 theorem avgOver_const_mul {α : Type*} (𝒟 : Distribution α)
     (c : Error) (f : α → Error) :
     avgOver 𝒟 (fun a => c * f a) =
       c * avgOver 𝒟 f := by
-  calc
-    avgOver 𝒟 (fun a => c * f a)
-      = ∑ a ∈ 𝒟.support, c * (𝒟.weight a * f a) := by
-          unfold avgOver
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          ring
-    _ = c * ∑ a ∈ 𝒟.support, 𝒟.weight a * f a := by
-          rw [Finset.mul_sum]
-    _ = c * avgOver 𝒟 f := rfl
+  change avgOver 𝒟 (c • f) = c • avgOver 𝒟 f
+  simp [Distribution.avgOver_eq_weightedSumLinearMap, smul_eq_mul]
 
 /-- Averaging commutes with scalar multiplication on the right. -/
 theorem avgOver_mul_const {α : Type*} (𝒟 : Distribution α)
@@ -95,30 +92,20 @@ theorem avgOver_sum {α β : Type*} [Fintype β]
     (𝒟 : Distribution α) (f : α → β → Error) :
     avgOver 𝒟 (fun a => ∑ b : β, f a b) =
       ∑ b : β, avgOver 𝒟 (fun a => f a b) := by
-  unfold avgOver
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ b : β, f a b
-      = ∑ a ∈ 𝒟.support, ∑ b : β, 𝒟.weight a * f a b := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.mul_sum]
-    _ = ∑ b : β, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
-          rw [Finset.sum_comm]
+  rw [show (fun a => ∑ b : β, f a b) = ∑ b : β, fun a => f a b by
+    ext a
+    simp]
+  simp [Distribution.avgOver_eq_weightedSumLinearMap]
 
 /-- Pull a finite-set sum through an average. -/
 theorem avgOver_finset_sum {α β : Type*}
     (𝒟 : Distribution α) (s : Finset β) (f : α → β → Error) :
     avgOver 𝒟 (fun a => ∑ b ∈ s, f a b) =
       ∑ b ∈ s, avgOver 𝒟 (fun a => f a b) := by
-  unfold avgOver
-  calc
-    ∑ a ∈ 𝒟.support, 𝒟.weight a * ∑ b ∈ s, f a b
-        = ∑ a ∈ 𝒟.support, ∑ b ∈ s, 𝒟.weight a * f a b := by
-          refine Finset.sum_congr rfl ?_
-          intro a _
-          rw [Finset.mul_sum]
-    _ = ∑ b ∈ s, ∑ a ∈ 𝒟.support, 𝒟.weight a * f a b := by
-          rw [Finset.sum_comm]
+  rw [show (fun a => ∑ b ∈ s, f a b) = ∑ b ∈ s, fun a => f a b by
+    ext a
+    simp]
+  simp [Distribution.avgOver_eq_weightedSumLinearMap]
 
 /-- Fubini swap for two nested finite-support distribution averages. -/
 theorem avgOver_comm {α β : Type*} (𝒟α : Distribution α) (𝒟β : Distribution β)

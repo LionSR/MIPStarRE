@@ -211,6 +211,10 @@ This file is scalar-valued, not operator-valued, but it is useful for weighted s
 
 - `def avgOver (𝒟 : Distribution α) (f : α → Error) : Error := ∑ a ∈ 𝒟.support, 𝒟.weight a * f a`
 
+- `noncomputable def Distribution.weightedSumLinearMap (M : Type*) (𝒟 : Distribution α) : (α → M) →ₗ[Error] M`
+  - Module-valued weighted finite sum over the explicit support; use its
+    linearity lemmas for additive and scalar average identities.
+
 - `noncomputable def uniformDistribution (α : Type*) [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α`
 
 - `noncomputable def totalVariationDistance {α : Type*} [DecidableEq α] (μ ν : Distribution α) : Error`
