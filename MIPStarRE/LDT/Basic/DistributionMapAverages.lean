@@ -45,10 +45,9 @@ theorem avgOver_uniform_map_eq_uniform_of_factor_equiv
     (h : ∀ a, g (m a) = e a) (f : γ → Error) :
     avgOver ((uniformDistribution α).map m) (fun b => f (g b)) =
       avgOver (uniformDistribution γ) f := by
-  rw [Distribution.avgOver_map]
-  rw [avgOver_uniform_eq_pmf_realWeightedSum, avgOver_uniform_eq_pmf_realWeightedSum]
-  exact PMF.realWeightedSum_uniformOfFintype_factor_equiv
-    (m := m) (g := g) (e := e) (h := h) (f := f)
+  simpa [avgOver, smul_eq_mul] using
+    uniformDistribution_map_sum_smul_eq_uniform_of_factor_equiv
+      (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- A uniform push-forward has the uniform operator average induced by an
 equivalent observed coordinate.
@@ -67,11 +66,9 @@ theorem averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv
     (A : γ → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b)) =
       averageOperatorOverDistribution (uniformDistribution γ) A := by
-  rw [Distribution.averageOperatorOverDistribution_map]
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum,
-    averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum]
-  exact PMF.realWeightedSum_uniformOfFintype_factor_equiv
-    (m := m) (g := g) (e := e) (h := h) (f := A)
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_map_sum_smul_eq_uniform_of_factor_equiv
+      (m := m) (g := g) (e := e) (h := h) (f := A)
 
 /-- A uniform push-forward has the first-coordinate uniform marginal when the
 observed coordinate factors through a product equivalence of the seed. -/
@@ -85,10 +82,9 @@ theorem avgOver_uniform_map_eq_uniform_fst_of_factor_equiv
     (h : ∀ a, g (m a) = (e a).1) (f : γ → Error) :
     avgOver ((uniformDistribution α).map m) (fun b => f (g b)) =
       avgOver (uniformDistribution γ) f := by
-  rw [Distribution.avgOver_map]
-  rw [avgOver_uniform_eq_pmf_realWeightedSum, avgOver_uniform_eq_pmf_realWeightedSum]
-  exact PMF.realWeightedSum_uniformOfFintype_factor_equiv_fst
-    (m := m) (g := g) (e := e) (h := h) (f := f)
+  simpa [avgOver, smul_eq_mul] using
+    uniformDistribution_map_sum_smul_eq_uniform_fst_of_factor_equiv
+      (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- A uniform push-forward has the second-coordinate uniform marginal when the
 observed coordinate factors through a product equivalence of the seed. -/
@@ -102,10 +98,9 @@ theorem avgOver_uniform_map_eq_uniform_snd_of_factor_equiv
     (h : ∀ a, g (m a) = (e a).2) (f : δ → Error) :
     avgOver ((uniformDistribution α).map m) (fun b => f (g b)) =
       avgOver (uniformDistribution δ) f := by
-  rw [Distribution.avgOver_map]
-  rw [avgOver_uniform_eq_pmf_realWeightedSum, avgOver_uniform_eq_pmf_realWeightedSum]
-  exact PMF.realWeightedSum_uniformOfFintype_factor_equiv_snd
-    (m := m) (g := g) (e := e) (h := h) (f := f)
+  simpa [avgOver, smul_eq_mul] using
+    uniformDistribution_map_sum_smul_eq_uniform_snd_of_factor_equiv
+      (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- A uniform push-forward has the first-coordinate uniform operator marginal
 when the observed coordinate factors through a product equivalence of the seed. -/
@@ -121,11 +116,9 @@ theorem averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equ
     (A : γ → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b)) =
       averageOperatorOverDistribution (uniformDistribution γ) A := by
-  rw [Distribution.averageOperatorOverDistribution_map]
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum,
-    averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum]
-  exact PMF.realWeightedSum_uniformOfFintype_factor_equiv_fst
-    (m := m) (g := g) (e := e) (h := h) (f := A)
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_map_sum_smul_eq_uniform_fst_of_factor_equiv
+      (m := m) (g := g) (e := e) (h := h) (f := A)
 
 /-- A uniform push-forward has the second-coordinate uniform operator marginal
 when the observed coordinate factors through a product equivalence of the seed. -/
@@ -141,10 +134,8 @@ theorem averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equ
     (A : δ → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b)) =
       averageOperatorOverDistribution (uniformDistribution δ) A := by
-  rw [Distribution.averageOperatorOverDistribution_map]
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum,
-    averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum]
-  exact PMF.realWeightedSum_uniformOfFintype_factor_equiv_snd
-    (m := m) (g := g) (e := e) (h := h) (f := A)
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_map_sum_smul_eq_uniform_snd_of_factor_equiv
+      (m := m) (g := g) (e := e) (h := h) (f := A)
 
 end MIPStarRE.LDT
