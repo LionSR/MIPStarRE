@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.PMFAverages
+import MIPStarRE.LDT.Basic.DistributionUniformSums
 import Mathlib.Probability.ProbabilityMassFunction.Integrals
 
 /-!
@@ -11,9 +11,10 @@ distributions, and total variation distance live in
 
 ## Main declarations
 
-The main results are the algebraic rules for `avgOver`, the corresponding
-operator-valued rules for `averageOperatorOverDistribution`, and the comparison
-between finite uniform averages and Mathlib uniform probability mass functions.
+The main results are the algebraic rules for `avgOver`, scalar and
+operator-valued forms of the module-valued finite-sum rules for uniform
+distributions, and the comparison between finite uniform averages and Mathlib
+uniform probability mass functions.
 
 ## References
 
@@ -197,37 +198,6 @@ theorem averageOperatorOverDistribution_mul_left_right {α : Type*}
   refine Finset.sum_congr rfl ?_
   intro a _
   simp [mul_assoc]
-
-namespace Distribution
-
-/-- A module-valued finite weighted sum against a probabilistic project
-distribution may be written with the real weights of the associated Mathlib
-probability mass function, over the stored support. -/
-theorem sum_smul_eq_toPMF_support_sum {α M : Type*}
-    [AddCommMonoid M] [Module Error M]
-    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → M) :
-    ∑ a ∈ 𝒟.support, 𝒟.weight a • f a =
-      ∑ a ∈ 𝒟.support, (𝒟.toPMF h𝒟 a).toReal • f a := by
-  exact Finset.sum_congr rfl fun a _ => by
-    rw [Distribution.toPMF_apply_toReal]
-
-/-- A module-valued finite weighted sum against a probabilistic project
-distribution may be written as a full finite sum with the real weights of the
-associated Mathlib probability mass function. -/
-theorem sum_smul_eq_toPMF_sum {α M : Type*} [Fintype α]
-    [AddCommMonoid M] [Module Error M]
-    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → M) :
-    ∑ a ∈ 𝒟.support, 𝒟.weight a • f a =
-      ∑ a : α, (𝒟.toPMF h𝒟 a).toReal • f a := by
-  rw [Distribution.sum_smul_eq_toPMF_support_sum 𝒟 h𝒟 f]
-  exact (Distribution.sum_univ_eq_sum_support 𝒟
-    (fun a => (𝒟.toPMF h𝒟 a).toReal • f a)
-    (by
-      intro a ha
-      rw [Distribution.toPMF_apply_of_notMem 𝒟 h𝒟 ha]
-      simp)).symm
-
-end Distribution
 
 /-- Averaging against a probabilistic project distribution is the finite sum
 over its stored support against the associated Mathlib probability mass
@@ -447,30 +417,6 @@ theorem avgOver_uniform_const {α : Type*}
   exact avgOver_const_of_isProbability
     (uniformDistribution α) (uniformDistribution_isProbability α) c
 
-/-- Module-valued finite-sum expression for the uniform distribution, stated
-without measurable-space assumptions. -/
-theorem uniformDistribution_sum_smul_eq_pmf_sum {α M : Type*}
-    [Fintype α] [DecidableEq α] [Nonempty α]
-    [AddCommMonoid M] [Module Error M] (f : α → M) :
-    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a • f a =
-      ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
-  rw [Distribution.sum_smul_eq_toPMF_sum
-    (uniformDistribution α) (uniformDistribution_isProbability α)]
-  rw [uniformDistribution_toPMF]
-
-/-- A finite-support uniform weighted sum is the corresponding Mathlib uniform
-PMF-weighted sum. -/
-theorem uniformOnFinset_sum_smul_eq_pmf_sum {α M : Type*}
-    [AddCommMonoid M] [Module Error M]
-    (s : Finset α) (hs : s.Nonempty) (f : α → M) :
-    ∑ a ∈ (Distribution.uniformOnFinset s).support,
-        (Distribution.uniformOnFinset s).weight a • f a =
-      ∑ a ∈ s, (PMF.uniformOfFinset s hs a).toReal • f a := by
-  rw [Distribution.sum_smul_eq_toPMF_support_sum
-    (Distribution.uniformOnFinset s)
-    (Distribution.uniformOnFinset_isProbability s hs)]
-  rw [Distribution.uniformOnFinset_support, Distribution.uniformOnFinset_toPMF]
-
 /-- Finite-sum expression for the uniform average, stated without measurable-space
 assumptions. -/
 theorem avgOver_uniform_eq_pmf_sum {α : Type*}
@@ -523,28 +469,8 @@ theorem avgOver_uniformOnFinset_eq_subtype {α : Type*} [DecidableEq α]
     (s : Finset α) [Nonempty {a : α // a ∈ s}] (f : α → Error) :
     avgOver (Distribution.uniformOnFinset s) f =
       avgOver (uniformDistribution {a : α // a ∈ s}) (fun a => f a.1) := by
-  classical
-  have hs : s.Nonempty := by
-    rcases (inferInstance : Nonempty {a : α // a ∈ s}) with ⟨a⟩
-    exact ⟨a.1, a.2⟩
-  have hcard : (s.card : Error) = (Fintype.card {a : α // a ∈ s} : Error) := by
-    rw [Fintype.card_coe s]
-  rw [avgOver_uniformOnFinset_eq_pmf_sum s hs, avgOver_uniform_eq_pmf_sum]
-  simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
-  rw [← hcard]
-  calc
-    ∑ x ∈ s, (PMF.uniformOfFinset s hs x).toReal * f x
-        = ∑ x ∈ s, (s.card : Error)⁻¹ * f x := by
-          refine Finset.sum_congr rfl ?_
-          intro x hx
-          simp [PMF.uniformOfFinset_apply, hx, ENNReal.toReal_inv,
-            ENNReal.toReal_natCast]
-    _ = ∑ x ∈ s.attach, (s.card : Error)⁻¹ * f x.1 := by
-          exact
-            (Finset.sum_attach s
-              (fun x : α => (s.card : Error)⁻¹ * f x)).symm
-    _ = ∑ x : {x : α // x ∈ s}, (s.card : Error)⁻¹ * f x.1 := by
-          rw [Finset.attach_eq_univ]
+  simpa [avgOver, smul_eq_mul] using
+    uniformOnFinset_sum_smul_eq_subtype (s := s) f
 
 /-- The uniform operator average is the finite operator sum weighted by
 `PMF.uniformOfFintype`. -/
@@ -577,9 +503,8 @@ theorem averageOperatorOverDistribution_uniform_equiv
     averageOperatorOverDistribution (uniformDistribution α) f =
       averageOperatorOverDistribution (uniformDistribution β)
         (fun b => f (e.symm b)) := by
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_sum,
-    averageOperatorOverDistribution_uniform_eq_pmf_sum]
-  exact PMF.uniformOfFintype_sum_equiv_smul e f
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_equiv (e := e) (f := f)
 
 /-- A uniform operator average over a finite support is the same as the uniform
 operator average over the corresponding finite subtype. -/
@@ -591,29 +516,8 @@ theorem averageOperatorOverDistribution_uniformOnFinset_eq_subtype
     averageOperatorOverDistribution (Distribution.uniformOnFinset s) f =
       averageOperatorOverDistribution (uniformDistribution {a : α // a ∈ s})
         (fun a => f a.1) := by
-  classical
-  have hs : s.Nonempty := by
-    rcases (inferInstance : Nonempty {a : α // a ∈ s}) with ⟨a⟩
-    exact ⟨a.1, a.2⟩
-  have hcard : (s.card : Error) = (Fintype.card {a : α // a ∈ s} : Error) := by
-    rw [Fintype.card_coe s]
-  rw [averageOperatorOverDistribution_uniformOnFinset_eq_pmf_sum s hs,
-    averageOperatorOverDistribution_uniform_eq_pmf_sum]
-  simp only [PMF.uniformOfFintype_apply, ENNReal.toReal_inv, ENNReal.toReal_natCast]
-  rw [← hcard]
-  calc
-    ∑ x ∈ s, (PMF.uniformOfFinset s hs x).toReal • f x
-        = ∑ x ∈ s, (s.card : Error)⁻¹ • f x := by
-          refine Finset.sum_congr rfl ?_
-          intro x hx
-          simp [PMF.uniformOfFinset_apply, hx, ENNReal.toReal_inv,
-            ENNReal.toReal_natCast]
-    _ = ∑ x ∈ s.attach, (s.card : Error)⁻¹ • f x.1 := by
-          exact
-            (Finset.sum_attach s
-              (fun x : α => (s.card : Error)⁻¹ • f x)).symm
-    _ = ∑ x : {x : α // x ∈ s}, (s.card : Error)⁻¹ • f x.1 := by
-          rw [Finset.attach_eq_univ]
+  simpa [averageOperatorOverDistribution] using
+    uniformOnFinset_sum_smul_eq_subtype (s := s) f
 
 /-- A uniform operator average over a finite support may be reindexed by any
 finite type equivalent to that support subtype. -/
@@ -625,18 +529,8 @@ theorem averageOperatorOverDistribution_uniformOnFinset_equiv
     (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (Distribution.uniformOnFinset s) f =
       averageOperatorOverDistribution (uniformDistribution β) (fun b => f (e b).1) := by
-  classical
-  haveI : Nonempty {a : α // a ∈ s} :=
-    ⟨e (Classical.choice (inferInstance : Nonempty β))⟩
-  calc
-    averageOperatorOverDistribution (Distribution.uniformOnFinset s) f =
-        averageOperatorOverDistribution (uniformDistribution {a : α // a ∈ s})
-          (fun a => f a.1) := by
-          exact averageOperatorOverDistribution_uniformOnFinset_eq_subtype s f
-    _ = averageOperatorOverDistribution (uniformDistribution β) (fun b => f (e b).1) := by
-          simpa using
-            (averageOperatorOverDistribution_uniform_equiv (e := e.symm)
-              (f := fun a : {a : α // a ∈ s} => f a.1))
+  simpa [averageOperatorOverDistribution] using
+    uniformOnFinset_sum_smul_equiv (s := s) (e := e) f
 
 /-- A uniform operator average over a filtered finite support is the uniform
 operator average over the finite subtype satisfying the predicate. -/
@@ -649,34 +543,8 @@ theorem averageOperatorOverDistribution_uniformOnFinset_filter_eq_subtype
         (Distribution.uniformOnFinset (Finset.univ.filter p)) f =
       averageOperatorOverDistribution (uniformDistribution {a : α // p a})
         (fun a => f a.1) := by
-  classical
-  let support : Finset α := Finset.univ.filter p
-  let e : {a : α // a ∈ support} ≃ {a : α // p a} :=
-    { toFun := fun a => ⟨a.1, (Finset.mem_filter.mp a.2).2⟩
-      invFun := fun a =>
-        ⟨a.1, Finset.mem_filter.mpr ⟨Finset.mem_univ a.1, a.2⟩⟩
-      left_inv := by
-        intro a
-        rfl
-      right_inv := by
-        intro a
-        rfl }
-  haveI : Nonempty {a : α // a ∈ support} := by
-    rcases (inferInstance : Nonempty {a : α // p a}) with ⟨a⟩
-    exact ⟨⟨a.1, Finset.mem_filter.mpr ⟨Finset.mem_univ a.1, a.2⟩⟩⟩
-  calc
-    averageOperatorOverDistribution
-        (Distribution.uniformOnFinset (Finset.univ.filter p)) f =
-        averageOperatorOverDistribution (Distribution.uniformOnFinset support) f := by
-          rfl
-    _ = averageOperatorOverDistribution (uniformDistribution {a : α // a ∈ support})
-          (fun a => f a.1) := by
-          exact averageOperatorOverDistribution_uniformOnFinset_eq_subtype support f
-    _ = averageOperatorOverDistribution (uniformDistribution {a : α // p a})
-          (fun a => f a.1) := by
-          simpa [e] using
-            (averageOperatorOverDistribution_uniform_equiv (e := e)
-              (f := fun a : {a : α // a ∈ support} => f a.1))
+  simpa [averageOperatorOverDistribution] using
+    uniformOnFinset_filter_sum_smul_eq_subtype (p := p) f
 
 /-- A uniform operator average over a filtered finite type may be reindexed by
 any finite seed type equivalent to the predicate subtype. -/
@@ -690,19 +558,8 @@ theorem averageOperatorOverDistribution_uniformOnFinset_filter_equiv
     averageOperatorOverDistribution
         (Distribution.uniformOnFinset (Finset.univ.filter p)) f =
       averageOperatorOverDistribution (uniformDistribution β) (fun b => f (e b).1) := by
-  classical
-  haveI : Nonempty {a : α // p a} :=
-    ⟨e (Classical.choice (inferInstance : Nonempty β))⟩
-  calc
-    averageOperatorOverDistribution
-        (Distribution.uniformOnFinset (Finset.univ.filter p)) f =
-        averageOperatorOverDistribution (uniformDistribution {a : α // p a})
-          (fun a => f a.1) := by
-          exact averageOperatorOverDistribution_uniformOnFinset_filter_eq_subtype p f
-    _ = averageOperatorOverDistribution (uniformDistribution β) (fun b => f (e b).1) := by
-          simpa using
-            (averageOperatorOverDistribution_uniform_equiv (e := e.symm)
-              (f := fun a : {a : α // p a} => f a.1))
+  simpa [averageOperatorOverDistribution] using
+    uniformOnFinset_filter_sum_smul_equiv (p := p) (e := e) f
 
 /-- A uniform average of effects is again bounded above by the identity operator. -/
 theorem averageOperatorOverDistribution_uniform_le_one {α : Type*}
@@ -737,9 +594,8 @@ theorem avgOver_uniform_equiv
     (e : α ≃ β) (f : α → Error) :
     avgOver (uniformDistribution α) f =
       avgOver (uniformDistribution β) (fun b => f (e.symm b)) := by
-  rw [avgOver_uniform_eq_pmf_sum, avgOver_uniform_eq_pmf_sum]
-  simpa [smul_eq_mul] using
-    (PMF.uniformOfFintype_sum_equiv_smul (M := Error) e f)
+  simpa [avgOver, smul_eq_mul] using
+    (uniformDistribution_sum_smul_equiv (M := Error) (e := e) (f := f))
 
 /-- A uniform average over a finite support may be reindexed by any finite type
 equivalent to that support subtype. -/
@@ -748,17 +604,8 @@ theorem avgOver_uniformOnFinset_equiv {α β : Type*}
     (s : Finset α) (e : β ≃ {a : α // a ∈ s}) (f : α → Error) :
     avgOver (Distribution.uniformOnFinset s) f =
       avgOver (uniformDistribution β) (fun b => f (e b).1) := by
-  classical
-  haveI : Nonempty {a : α // a ∈ s} :=
-    ⟨e (Classical.choice (inferInstance : Nonempty β))⟩
-  calc
-    avgOver (Distribution.uniformOnFinset s) f =
-        avgOver (uniformDistribution {a : α // a ∈ s}) (fun a => f a.1) := by
-          exact avgOver_uniformOnFinset_eq_subtype s f
-    _ = avgOver (uniformDistribution β) (fun b => f (e b).1) := by
-          simpa using
-            (avgOver_uniform_equiv (e := e.symm)
-              (f := fun a : {a : α // a ∈ s} => f a.1))
+  simpa [avgOver, smul_eq_mul] using
+    uniformOnFinset_sum_smul_equiv (s := s) (e := e) f
 
 /-- A uniform average over a finite filtered support is the uniform average over
 the finite subtype satisfying the predicate. -/
@@ -767,31 +614,8 @@ theorem avgOver_uniformOnFinset_filter_eq_subtype {α : Type*}
     [Nonempty {a : α // p a}] (f : α → Error) :
     avgOver (Distribution.uniformOnFinset (Finset.univ.filter p)) f =
       avgOver (uniformDistribution {a : α // p a}) (fun a => f a.1) := by
-  classical
-  let support : Finset α := Finset.univ.filter p
-  let e : {a : α // a ∈ support} ≃ {a : α // p a} :=
-    { toFun := fun a => ⟨a.1, (Finset.mem_filter.mp a.2).2⟩
-      invFun := fun a =>
-        ⟨a.1, Finset.mem_filter.mpr ⟨Finset.mem_univ a.1, a.2⟩⟩
-      left_inv := by
-        intro a
-        rfl
-      right_inv := by
-        intro a
-        rfl }
-  haveI : Nonempty {a : α // a ∈ support} := by
-    rcases (inferInstance : Nonempty {a : α // p a}) with ⟨a⟩
-    exact ⟨⟨a.1, Finset.mem_filter.mpr ⟨Finset.mem_univ a.1, a.2⟩⟩⟩
-  calc
-    avgOver (Distribution.uniformOnFinset (Finset.univ.filter p)) f =
-        avgOver (Distribution.uniformOnFinset support) f := by
-          rfl
-    _ = avgOver (uniformDistribution {a : α // a ∈ support}) (fun a => f a.1) := by
-          exact avgOver_uniformOnFinset_eq_subtype support f
-    _ = avgOver (uniformDistribution {a : α // p a}) (fun a => f a.1) := by
-          simpa [e] using
-            (avgOver_uniform_equiv (e := e)
-              (f := fun a : {a : α // a ∈ support} => f a.1))
+  simpa [avgOver, smul_eq_mul] using
+    uniformOnFinset_filter_sum_smul_eq_subtype (p := p) f
 
 /-- A uniform average over a filtered finite type may be reindexed by any finite
 seed type equivalent to the predicate subtype. -/
@@ -801,17 +625,8 @@ theorem avgOver_uniformOnFinset_filter_equiv {α β : Type*}
     (e : β ≃ {a : α // p a}) (f : α → Error) :
     avgOver (Distribution.uniformOnFinset (Finset.univ.filter p)) f =
       avgOver (uniformDistribution β) (fun b => f (e b).1) := by
-  classical
-  haveI : Nonempty {a : α // p a} :=
-    ⟨e (Classical.choice (inferInstance : Nonempty β))⟩
-  calc
-    avgOver (Distribution.uniformOnFinset (Finset.univ.filter p)) f =
-        avgOver (uniformDistribution {a : α // p a}) (fun a => f a.1) := by
-          exact avgOver_uniformOnFinset_filter_eq_subtype p f
-    _ = avgOver (uniformDistribution β) (fun b => f (e b).1) := by
-          simpa using
-            (avgOver_uniform_equiv (e := e.symm)
-              (f := fun a : {a : α // p a} => f a.1))
+  simpa [avgOver, smul_eq_mul] using
+    uniformOnFinset_filter_sum_smul_equiv (p := p) (e := e) f
 
 /-- Split a uniform average over a product into iterated uniform averages. -/
 theorem avgOver_uniform_prod
@@ -822,11 +637,8 @@ theorem avgOver_uniform_prod
     avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
       avgOver (uniformDistribution α)
         (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-  rw [avgOver_uniform_eq_pmf_sum (α := α × β)]
-  rw [avgOver_uniform_eq_pmf_sum (α := α)]
-  simp_rw [avgOver_uniform_eq_pmf_sum (α := β)]
-  simpa [smul_eq_mul] using
-    (PMF.uniformOfFintype_prod_sum_smul (M := Error) f)
+  simpa [avgOver, smul_eq_mul] using
+    (uniformDistribution_sum_smul_prod (M := Error) (f := f))
 
 /-- Swap two nested uniform averages over finite nonempty types. -/
 theorem avgOver_uniform_comm
@@ -837,17 +649,8 @@ theorem avgOver_uniform_comm
     avgOver (uniformDistribution α) (fun a => avgOver (uniformDistribution β) (f a)) =
       avgOver (uniformDistribution β) (fun b => avgOver (uniformDistribution α)
         (fun a => f a b)) := by
-  calc
-    avgOver (uniformDistribution α) (fun a => avgOver (uniformDistribution β) (f a))
-        = avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) := by
-          exact (avgOver_uniform_prod (α := α) (β := β) (f := f)).symm
-    _ = avgOver (uniformDistribution (β × α)) (fun ba => f ba.2 ba.1) := by
-          simpa using
-            (avgOver_uniform_equiv (e := Equiv.prodComm α β)
-              (f := fun ab : α × β => f ab.1 ab.2))
-    _ = avgOver (uniformDistribution β) (fun b => avgOver (uniformDistribution α)
-          (fun a => f a b)) := by
-          exact avgOver_uniform_prod (α := β) (β := α) (f := fun b a => f a b)
+  simpa [avgOver, smul_eq_mul] using
+    (uniformDistribution_sum_smul_comm (M := Error) (f := f))
 
 /-- Split a uniform average over a product into iterated uniform averages, with
 the second coordinate averaged first. -/
@@ -859,14 +662,8 @@ theorem avgOver_uniform_prod_swap
     avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2) =
       avgOver (uniformDistribution β)
         (fun b => avgOver (uniformDistribution α) (fun a => f a b)) := by
-  calc
-    avgOver (uniformDistribution (α × β)) (fun ab => f ab.1 ab.2)
-        = avgOver (uniformDistribution α)
-            (fun a => avgOver (uniformDistribution β) (fun b => f a b)) := by
-          exact avgOver_uniform_prod f
-    _ = avgOver (uniformDistribution β)
-          (fun b => avgOver (uniformDistribution α) (fun a => f a b)) := by
-          exact avgOver_uniform_comm f
+  simpa [avgOver, smul_eq_mul] using
+    (uniformDistribution_sum_smul_prod_swap (M := Error) (f := f))
 
 /-- Pull a finite sum through a uniform average and express it as a uniform
 average over the product, with the cardinality of the summed type as the
@@ -912,13 +709,8 @@ theorem avgOver_uniform_equiv_prod
     avgOver (uniformDistribution γ) f =
       avgOver (uniformDistribution α)
         (fun a => avgOver (uniformDistribution β) (fun b => f (e.symm (a, b)))) := by
-  calc
-    avgOver (uniformDistribution γ) f
-        = avgOver (uniformDistribution (α × β)) (fun ab => f (e.symm ab)) := by
-          exact avgOver_uniform_equiv e f
-    _ = avgOver (uniformDistribution α)
-          (fun a => avgOver (uniformDistribution β) (fun b => f (e.symm (a, b)))) := by
-          exact avgOver_uniform_prod (f := fun a b => f (e.symm (a, b)))
+  simpa [avgOver, smul_eq_mul] using
+    (uniformDistribution_sum_smul_equiv_prod (M := Error) (e := e) (f := f))
 
 /-- Transport a uniform average through an equivalence whose target is a product,
 then split the product average with the second coordinate averaged first. -/
@@ -931,8 +723,8 @@ theorem avgOver_uniform_equiv_prod_swap
     avgOver (uniformDistribution γ) f =
       avgOver (uniformDistribution β)
         (fun b => avgOver (uniformDistribution α) (fun a => f (e.symm (a, b)))) := by
-  rw [avgOver_uniform_equiv_prod (e := e) (f := f)]
-  exact avgOver_uniform_comm (fun a b => f (e.symm (a, b)))
+  simpa [avgOver, smul_eq_mul] using
+    (uniformDistribution_sum_smul_equiv_prod_swap (M := Error) (e := e) (f := f))
 
 /-- A function depending only on the first coordinate of a product equivalence
 has the corresponding first-coordinate uniform marginal. -/
@@ -944,12 +736,8 @@ theorem avgOver_uniform_equiv_fst
     (e : γ ≃ α × β) (f : α → Error) :
     avgOver (uniformDistribution γ) (fun x => f (e x).1) =
       avgOver (uniformDistribution α) f := by
-  classical
-  haveI := Fintype.ofFinite β
-  rw [avgOver_uniform_equiv_prod (e := e) (f := fun x => f (e x).1)]
-  refine avgOver_congr _ _ _ ?_
-  intro a
-  simpa using (avgOver_uniform_const (α := β) (c := f a))
+  simpa [avgOver, smul_eq_mul] using
+    (uniformDistribution_sum_smul_equiv_fst (M := Error) (e := e) (f := f))
 
 /-- A function depending only on the second coordinate of a product equivalence
 has the corresponding second-coordinate uniform marginal. -/
@@ -961,12 +749,8 @@ theorem avgOver_uniform_equiv_snd
     (e : γ ≃ α × β) (f : β → Error) :
     avgOver (uniformDistribution γ) (fun x => f (e x).2) =
       avgOver (uniformDistribution β) f := by
-  classical
-  haveI := Fintype.ofFinite α
-  rw [avgOver_uniform_equiv_prod_swap (e := e) (f := fun x => f (e x).2)]
-  refine avgOver_congr _ _ _ ?_
-  intro b
-  simpa using (avgOver_uniform_const (α := α) (c := f b))
+  simpa [avgOver, smul_eq_mul] using
+    (uniformDistribution_sum_smul_equiv_snd (M := Error) (e := e) (f := f))
 
 /-- Averaging a function depending only on the first coordinate marginalizes a uniform product. -/
 theorem avgOver_uniform_fst {α β : Type*}
