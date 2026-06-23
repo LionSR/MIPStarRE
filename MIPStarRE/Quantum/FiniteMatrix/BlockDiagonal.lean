@@ -32,6 +32,25 @@ theorem blockDiagonal_eq_sum_kronecker_diagonal {o m : Type*}
     simp [Matrix.blockDiagonal_apply, Matrix.kronecker, Matrix.kroneckerMap_apply]
   · simp [Matrix.blockDiagonal_apply, Matrix.kronecker, Matrix.kroneckerMap_apply, hxy]
 
+/-- `Matrix.blockDiagonal` as a linear map.
+
+Mathlib provides `Matrix.blockDiagonalAddMonoidHom` and
+`Matrix.blockDiagonal_smul`; this declaration packages these two facts in the
+linear form needed by finite-dimensional block SDP arguments. -/
+def blockDiagonalLinearMap (R : Type*) (m n o α : Type*)
+    [Semiring R] [DecidableEq o] [AddCommMonoid α] [Module R α] :
+    (o → Matrix m n α) →ₗ[R] Matrix (m × o) (n × o) α where
+  toFun := Matrix.blockDiagonal
+  map_add' := Matrix.blockDiagonal_add
+  map_smul' := Matrix.blockDiagonal_smul
+
+@[simp]
+theorem blockDiagonalLinearMap_apply (R : Type*) (m n o α : Type*)
+    [Semiring R] [DecidableEq o] [AddCommMonoid α] [Module R α]
+    (B : o → Matrix m n α) :
+    Matrix.blockDiagonalLinearMap R m n o α B = Matrix.blockDiagonal B :=
+  rfl
+
 /-- A block-diagonal complex matrix is positive semidefinite when all of its
 diagonal blocks are positive semidefinite. -/
 theorem blockDiagonal_nonneg {o m : Type*}
