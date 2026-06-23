@@ -6,7 +6,8 @@ import MIPStarRE.LDT.Basic.DistributionAvg
 This module contains product and marginalization rules for operator-valued
 uniform averages.  The scalar product rules, together with the common
 PMF-weighted finite-sum identities on which both scalar and operator rules
-depend, are in `MIPStarRE.LDT.Basic.DistributionAvg`.
+depend, are in `MIPStarRE.LDT.Basic.DistributionAvg` and
+`MIPStarRE.LDT.Basic.PMFAverages`.
 
 ## Main definitions / statements
 

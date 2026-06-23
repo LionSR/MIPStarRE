@@ -507,21 +507,6 @@ theorem uniformDistribution_toPMF
   rw [Distribution.toPMF_apply, uniformDistribution_weight_eq_pmf_uniformOfFintype_toReal]
   exact ENNReal.ofReal_toReal ((PMF.uniformOfFintype α).apply_ne_top a)
 
-/-- The uniform probability mass on a product is the product of the two
-coordinate uniform masses, after coercion to real weights. -/
-theorem pmf_uniformOfFintype_prod_apply_toReal
-    {α β : Type*} [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
-    (a : α) (b : β) :
-    (PMF.uniformOfFintype (α × β) (a, b)).toReal =
-      (PMF.uniformOfFintype α a).toReal *
-        (PMF.uniformOfFintype β b).toReal := by
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
-    exact_mod_cast Fintype.card_ne_zero
-  simp [PMF.uniformOfFintype_apply, Fintype.card_prod]
-  field_simp [hα, hβ]
-
 /-- The project push-forward of a uniform finite distribution is Mathlib's
 push-forward of the corresponding uniform probability mass function. -/
 theorem uniformDistribution_map_toPMF
