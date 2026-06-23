@@ -519,8 +519,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_canonicalOptimalPair}
   \lean{MIPStarRE.LDT.SelfImprovement.sdpStatementWithSlackness_of_exists_canonicalOptimalPair}
-  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_canonicalOptimalPair}
-  \lean{MIPStarRE.LDT.SelfImprovement.sdpMeasurementWitness_of_exists_canonicalOptimalPair}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
   \leanok
   From a matrix-level strong-duality witness with complementary slackness of the
   shape asserted by Lemma~\ref{lem:sdp}, one obtains a complete measurement
@@ -529,10 +528,11 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   the saturated canonical optimal-pair output required from strong duality: a
   feasible canonical primal matrix, a dual-feasible operator with equal
   objective value, canonical complementary slackness, and vanishing of the
-  extra canonical slack block.  This datum gives both the abstract
-  slackness-carrying SDP statement and the displayed measurement witness without
-  assuming \(I \le Z\).  The canonical saturation datum is now the only
-  matrix-level input used to pass from strong duality to the abstract SDP
+  extra canonical slack block.  This datum gives the abstract
+  slackness-carrying SDP statement without assuming \(I \le Z\); the displayed
+  measurement witness is then extracted from that abstract statement.  The
+  canonical saturation datum is now the only matrix-level input used to pass
+  from strong duality to the abstract SDP
   statement.  The paper-facing self-improvement helper consumes the resulting
   abstract SDP statement.
 \end{lemma}

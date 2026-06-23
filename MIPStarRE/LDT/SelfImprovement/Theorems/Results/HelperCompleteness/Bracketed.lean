@@ -529,8 +529,7 @@ theorem sdp_slackness_measurement
         (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
         ∀ g : Polynomial params,
           sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g :=
-  sdpMeasurementWitness_of_exists_canonicalOptimalPair params strategy
-    (matrixSdpPointRealization_canonicalOptimalPair params strategy)
+  (sdp_statement_with_slackness params strategy).exists_measurement_witness
 
 -- The reduced add-in-u lemma invokes the global-variance transport record and
 -- checks the full polynomial-indexed variance family.
