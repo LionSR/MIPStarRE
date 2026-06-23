@@ -224,20 +224,21 @@ lemmas when the statement is naturally about a genuine finite probability law.
 
 - `theorem pmf_sum_toReal_eq_one (p : PMF α) : ∑ a : α, (p a).toReal = 1`
 
-- `noncomputable def pmfTotalVariationDistance (p q : PMF α) : Error`
+- `noncomputable def PMF.totalVariationDistance (p q : PMF α) : Error`
 
-- `theorem pmfTotalVariationDistance_eq_sum_max_sub (p q : PMF α) :
-  pmfTotalVariationDistance p q = ∑ a : α, max 0 ((q a).toReal - (p a).toReal)`
+- `theorem PMF.totalVariationDistance_eq_sum_max_sub (p q : PMF α) :
+  PMF.totalVariationDistance p q =
+    ∑ a : α, max 0 ((q a).toReal - (p a).toReal)`
 
-- `theorem pmfTotalVariationDistance_uniformOfFintype_uniformOfFinset_eq
+- `theorem PMF.totalVariationDistance_uniformOfFintype_uniformOfFinset_eq
   (s : Finset α) (hs : s.Nonempty) :
-  pmfTotalVariationDistance (PMF.uniformOfFintype α) (PMF.uniformOfFinset s hs)
+  PMF.totalVariationDistance (PMF.uniformOfFintype α) (PMF.uniformOfFinset s hs)
     = 1 - (s.card : Error) / (Fintype.card α : Error)`
 
-- `theorem pmf_sum_le_sum_add_pmfTotalVariationDistance (p q : PMF α)
+- `theorem PMF.sum_le_sum_add_totalVariationDistance (p q : PMF α)
   (f : α → Error) (hf_nonneg : ∀ a, 0 ≤ f a) (hf_le_one : ∀ a, f a ≤ 1) :
   ∑ a : α, (q a).toReal * f a ≤
-  ∑ a : α, (p a).toReal * f a + pmfTotalVariationDistance p q`
+  ∑ a : α, (p a).toReal * f a + PMF.totalVariationDistance p q`
 
 ### Averaging lemmas
 
