@@ -253,12 +253,12 @@ where
 	\[
 		d_{\mathrm{TV}}(x,y) \le \frac{k^2}{q}.
 	\]
-\end{proposition}
-\begin{proof}
+	\end{proposition}
+	\begin{proof}
 	\lean{MIPStarRE.LDT.pmf_sum_toReal_eq_one}
-	\lean{MIPStarRE.LDT.pmfTotalVariationDistance}
-	\lean{MIPStarRE.LDT.pmfTotalVariationDistance_eq_sum_max_sub}
-	\lean{MIPStarRE.LDT.pmfTotalVariationDistance_uniformOfFintype_uniformOfFinset_eq}
+	\lean{PMF.totalVariationDistance}
+	\lean{PMF.totalVariationDistance_eq_sum_max_sub}
+	\lean{PMF.totalVariationDistance_uniformOfFintype_uniformOfFinset_eq}
 	\lean{MIPStarRE.LDT.totalVariationDistance_uniformDistribution_uniformOnFinset_eq}
 	\leanok
 	The total variation distance is exactly the probability mass of the collision
@@ -993,7 +993,7 @@ The remaining comparison between $G$ and $G^{d+1}$ is then reduced to a scalar i
 	\lean{MIPStarRE.LDT.totalVariationDistance_eq_univ_sum}
 	\lean{MIPStarRE.LDT.totalVariationDistance_eq_toPMF_sum}
 	\lean{MIPStarRE.LDT.totalVariationDistance_eq_sum_max_sub}
-	\lean{MIPStarRE.LDT.pmf_sum_le_sum_add_pmfTotalVariationDistance}
+	\lean{PMF.sum_le_sum_add_totalVariationDistance}
 	\lean{MIPStarRE.LDT.avgOver_le_avgOver_add_totalVariationDistance}
 	\lean{MIPStarRE.LDT.Pasting.avgOver_distinct_bounded_le_avgOver_uniform_add_tv}
 	\lean{MIPStarRE.LDT.Pasting.qBipartiteMatchMass_averageIdxSubMeas_left}
