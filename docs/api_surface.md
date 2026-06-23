@@ -37,7 +37,8 @@ dependencies, use the mathematical leaves:
     real-linear functionals, weak-duality positivity, and complementary
     slackness algebra.
 - `MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal`
-  - block-diagonal positivity and the corresponding block trace identity.
+  - the linear-map form of `Matrix.blockDiagonal`, block-diagonal positivity,
+    and the corresponding block trace identity.
 - `MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace`
   - normalized trace, `tauNormSq`, projections, and spectral truncation.
 
