@@ -295,7 +295,7 @@
         
         <ul class="uses">
           
-          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SelfImprovement.selfImprovementHelper" class="lean_decl">MIPStarRE.LDT.SelfImprovement.selfImprovementHelper</a></li>
+          <li><a href="https://LionSR.github.io/MIPStarRE/docs/find/#doc/MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness" class="lean_decl">MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness</a></li>
           
         </ul>
     
@@ -306,7 +306,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>   Let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement with the following property: </p>
+  <p>    Let \(G \in \mathrm{PolyMeas}(m,q,d)\) be a measurement with the following property: </p>
 <ol class="enumerate">
   <li><p>(Consistency with&#160;\(A\)):  On average over \(u \sim \mathbb {F}_q^{m}\), </p>
 <div class="displaymath" id="a0000000318">
@@ -848,7 +848,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>                       From a matrix-level strong-duality witness with complementary slackness of the shape asserted by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>, one obtains a complete measurement \(\{ T_g\} \), a feasible dual operator \(Z\), equality of the primal and dual objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\). Lean isolates the saturated canonical optimal-pair output required from strong duality: a feasible canonical primal matrix, a dual-feasible operator with equal objective value, canonical complementary slackness, and vanishing of the extra canonical slack block. This datum gives the matrix-level slackness-carrying SDP statement, which is then transported to the abstract Section&#160;9 statement without assuming \(I \le Z\). The displayed measurement witness is extracted from that abstract statement. The canonical saturation datum is now the only matrix-level input used to pass from strong duality to the abstract SDP statement. The paper-facing self-improvement helper consumes the resulting abstract SDP statement. </p>
+  <p>                        From a matrix-level strong-duality witness with complementary slackness of the shape asserted by Lemma&#160;<a href="chap-self-improvement.html#lem:sdp">7.8</a>, one obtains a complete measurement \(\{ T_g\} \), a feasible dual operator \(Z\), equality of the primal and dual objectives, and the equations \(T_gZ=T_gA_g\) for all \(g\). Lean isolates the saturated canonical optimal-pair output required from strong duality: a feasible canonical primal matrix, a dual-feasible operator with equal objective value, canonical complementary slackness, and vanishing of the extra canonical slack block. This datum gives the matrix-level slackness-carrying SDP statement, whose witness is already a complete matrix measurement, and is then transported to the abstract Section&#160;9 statement without assuming \(I \le Z\). The displayed measurement witness is read directly from that abstract statement. The canonical saturation datum is now the only matrix-level input used to pass from strong duality to the abstract SDP statement. The paper-facing self-improvement helper consumes the resulting abstract SDP statement. </p>
 
   </div>
 </div>
@@ -860,7 +860,7 @@
     <span class="expand-proof">▶</span>
   </div>
   <div class="proof_content">
-  <p>The identity \(\sum _gT_g=I\) turns the optimal primal submeasurement into a measurement. The zero-defect form \(T_g(Z-A_g)=0\) is equivalent, by distributivity, to the displayed equation \(T_gZ=T_gA_g\). </p>
+  <p>The identity \(\sum _gT_g=I\) turns the optimal primal submeasurement into a measurement; Lean performs this completion before storing the matrix and abstract slackness statements. The zero-defect form \(T_g(Z-A_g)=0\) is equivalent, by distributivity, to the displayed equation \(T_gZ=T_gA_g\). </p>
 
   </div>
 </div>
@@ -953,7 +953,7 @@
         </div>
   </div>
   <div class="lemma_thmcontent">
-  <p>                                                                                                    Let </p>
+  <p>                                                                                                       Let </p>
 <div class="displaymath" id="a0000000352">
   \[  A_g = \mathbb {E}_{u \sim \mathbb {F}_q^m} A^u_{g(u)}.  \]
 </div>
