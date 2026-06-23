@@ -4,6 +4,7 @@ import MIPStarRE.Quantum.FiniteMatrix.Order
 import MIPStarRE.Quantum.FiniteMatrix.TracePairing
 import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
 import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
+import MIPStarRE.Quantum.FiniteConicDuality
 import MIPStarRE.Quantum.ProjectorONB
 import MIPStarRE.Quantum.Measurement
 

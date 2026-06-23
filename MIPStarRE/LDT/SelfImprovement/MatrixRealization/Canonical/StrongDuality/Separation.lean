@@ -3,6 +3,7 @@ import Mathlib.Analysis.LocallyConvex.WithSeminorms
 import Mathlib.Analysis.Matrix.Normed
 import Mathlib.Topology.Bases
 import Mathlib.Topology.Instances.Matrix
+import MIPStarRE.Quantum.FiniteConicDuality
 import MIPStarRE.Quantum.FiniteMatrix.Order
 import MIPStarRE.Quantum.FiniteMatrix.TracePairing
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Basic
@@ -252,209 +253,16 @@ theorem matrixSdpCanonicalPrimalImageCone_separation_of_notMem
       (∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, 0 ≤ f z) ∧ f y < 0 :=
   (matrixSdpCanonicalPrimalImageCone params model).hyperplane_separation_point hy
 
-/-- The constraint-coordinate part of a separator on the product space.
+/-- Section 9 notation for the objective-coordinate coefficient of a separator.
 
-This is only product-functional decomposition through the left product
-inclusion.  It does not represent the matrix-coordinate functional by a
-trace-pairing matrix. -/
-noncomputable def matrixSdpCanonicalSeparatorConstraintFunctional
-    {params : Parameters} [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ)) :
-    StrongDual ℝ (MatrixOperator model.space) :=
-  φ.comp (ContinuousLinearMap.inl ℝ (MatrixOperator model.space) ℝ)
-
-/-- The scalar objective-coordinate coefficient of a separator on the product space.
-
-This is only product-functional decomposition through the right product
-inclusion.  It does not represent the matrix-coordinate functional by a
-trace-pairing matrix. -/
-noncomputable def matrixSdpCanonicalSeparatorObjectiveCoefficient
+The calculation is supplied by the shared conic-separation layer in
+`MIPStarRE.Quantum.FiniteConicDuality`; this abbreviation preserves the
+matrix-SDP statement surface used by the source-labelled Section 9 lemmas. -/
+noncomputable abbrev matrixSdpCanonicalSeparatorObjectiveCoefficient
     {params : Parameters} [FieldModel params.q]
     {model : MatrixSdpRealization params}
     (φ : StrongDual ℝ (MatrixOperator model.space × ℝ)) : ℝ :=
-  (φ.comp (ContinuousLinearMap.inr ℝ (MatrixOperator model.space) ℝ)) (1 : ℝ)
-
-/-- A separator on the constraint-objective product is the sum of its two
-product-coordinate components.
-
-This is only product-functional decomposition.  It does not represent the
-matrix-coordinate functional by a trace-pairing matrix. -/
-theorem matrixSdpCanonicalSeparator_decompose
-    {params : Parameters} [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
-    (Y : MatrixOperator model.space) (t : ℝ) :
-    φ (Y, t) =
-      matrixSdpCanonicalSeparatorConstraintFunctional φ Y +
-        t * matrixSdpCanonicalSeparatorObjectiveCoefficient φ := by
-  rw [← ContinuousLinearMap.comp_inl_add_comp_inr φ (Y, t)]
-  simp only [matrixSdpCanonicalSeparatorConstraintFunctional,
-    matrixSdpCanonicalSeparatorObjectiveCoefficient]
-  congr 1
-  simpa using
-    ((φ.comp (ContinuousLinearMap.inr ℝ (MatrixOperator model.space) ℝ)).map_smul
-      t (1 : ℝ))
-
-/-- Nonnegativity of a separator on the primal image cone, evaluated on the
-constraint-objective image of a positive canonical primal matrix.
-
-This uses only product-functional decomposition of the separator.  It does not
-represent the matrix-coordinate functional by a trace-pairing matrix. -/
-theorem matrixSdpCanonicalSeparator_nonneg_on_primalConeMap
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
-    (hφ : ∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, 0 ≤ φ z)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (hX : 0 ≤ X) :
-    0 ≤
-      matrixSdpCanonicalSeparatorConstraintFunctional φ
-        (matrixSdpCanonicalConstraintOperator params model X) +
-      Complex.re (Matrix.trace
-        (matrixSdpCanonicalObjectiveOperator params model * X)) *
-        matrixSdpCanonicalSeparatorObjectiveCoefficient φ := by
-  have hmem := matrixSdpCanonicalPrimalImageCone_mem_of_nonnegative params model X hX
-  have hnonneg := hφ _ hmem
-  rwa [matrixSdpCanonicalSeparator_decompose] at hnonneg
-
-/-- If a separator is nonnegative on a cone point but negative at a point with
-the same constraint coordinate and larger objective coordinate, then its
-objective coefficient is negative.
-
-This is only product-functional decomposition of the separator.  It does not
-represent the matrix-coordinate functional by a trace-pairing matrix. -/
-theorem matrixSdpCanonicalSeparatorObjectiveCoefficient_neg_of_above
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
-    {Y : MatrixOperator model.space} {s t : ℝ}
-    (hφ : ∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, 0 ≤ φ z)
-    (hYs : (Y, s) ∈ matrixSdpCanonicalPrimalImageCone params model)
-    (hYt : φ (Y, t) < 0)
-    (hst : s < t) :
-    matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0 := by
-  have hs_nonneg :
-      0 ≤
-        matrixSdpCanonicalSeparatorConstraintFunctional φ Y +
-          s * matrixSdpCanonicalSeparatorObjectiveCoefficient φ := by
-    have hnonneg := hφ (Y, s) hYs
-    rwa [matrixSdpCanonicalSeparator_decompose] at hnonneg
-  have ht_neg :
-      matrixSdpCanonicalSeparatorConstraintFunctional φ Y +
-          t * matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0 := by
-    rwa [matrixSdpCanonicalSeparator_decompose] at hYt
-  by_contra hnot
-  have hcoeff_nonneg : 0 ≤ matrixSdpCanonicalSeparatorObjectiveCoefficient φ :=
-    le_of_not_gt hnot
-  have hmul :
-      s * matrixSdpCanonicalSeparatorObjectiveCoefficient φ ≤
-        t * matrixSdpCanonicalSeparatorObjectiveCoefficient φ :=
-    mul_le_mul_of_nonneg_right (le_of_lt hst) hcoeff_nonneg
-  nlinarith
-
-/-- A feasible primal matrix whose objective value lies strictly below the
-separated product point forces the separator objective coefficient to be
-negative.
-
-This is only product-functional decomposition of the separator.  It does not
-represent the matrix-coordinate functional by a trace-pairing matrix. -/
-theorem matrixSdpCanonicalSeparatorObjectiveCoefficient_neg_of_feasible_lt
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
-    {t : ℝ}
-    (hφ : ∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, 0 ≤ φ z)
-    (hsep : φ ((1 : MatrixOperator model.space), t) < 0)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (hX : MatrixSdpCanonicalPrimalFeasible params model X)
-    (hXlt : Complex.re (Matrix.trace
-      (matrixSdpCanonicalObjectiveOperator params model * X)) < t) :
-    matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0 :=
-  matrixSdpCanonicalSeparatorObjectiveCoefficient_neg_of_above params model φ hφ
-    (matrixSdpCanonicalPrimalImageCone_mem_of_feasible params model X hX) hsep hXlt
-
-/-- The constraint-coordinate separator normalized by a negative objective coefficient.
-
-This is only a continuous real-linear functional on the constraint-operator
-space.  It does not represent the functional by a trace-pairing matrix. -/
-noncomputable def matrixSdpCanonicalNormalizedSeparatorFunctional
-    {params : Parameters} [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ)) :
-    StrongDual ℝ (MatrixOperator model.space) :=
-  ((-matrixSdpCanonicalSeparatorObjectiveCoefficient φ)⁻¹) •
-    matrixSdpCanonicalSeparatorConstraintFunctional φ
-
-@[simp]
-theorem matrixSdpCanonicalNormalizedSeparatorFunctional_apply
-    {params : Parameters} [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
-    (Y : MatrixOperator model.space) :
-    matrixSdpCanonicalNormalizedSeparatorFunctional φ Y =
-      ((-matrixSdpCanonicalSeparatorObjectiveCoefficient φ)⁻¹) *
-        matrixSdpCanonicalSeparatorConstraintFunctional φ Y := by
-  rfl
-
-/-- A separator whose objective-coordinate coefficient is negative gives a
-normalized continuous real-linear functional dominating the canonical objective
-on every positive semidefinite primal cone point.
-
-This remains a functional-level statement.  It does not represent the
-normalized separator by a trace-pairing matrix. -/
-theorem matrixSdpCanonicalObjective_le_normalizedSeparator_on_primalConeMap
-    (params : Parameters) [FieldModel params.q]
-    (model : MatrixSdpRealization params)
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
-    (hφ : ∀ z ∈ matrixSdpCanonicalPrimalImageCone params model, 0 ≤ φ z)
-    (hcoeff : matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0)
-    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
-    (hX : 0 ≤ X) :
-    Complex.re (Matrix.trace
-        (matrixSdpCanonicalObjectiveOperator params model * X)) ≤
-      matrixSdpCanonicalNormalizedSeparatorFunctional φ
-        (matrixSdpCanonicalConstraintOperator params model X) := by
-  have hpositiveCoeff : 0 < -matrixSdpCanonicalSeparatorObjectiveCoefficient φ :=
-    neg_pos.mpr hcoeff
-  have hnonneg :=
-    matrixSdpCanonicalSeparator_nonneg_on_primalConeMap params model φ hφ X hX
-  have hmul :
-      Complex.re (Matrix.trace
-          (matrixSdpCanonicalObjectiveOperator params model * X)) *
-          (-matrixSdpCanonicalSeparatorObjectiveCoefficient φ) ≤
-        matrixSdpCanonicalSeparatorConstraintFunctional φ
-          (matrixSdpCanonicalConstraintOperator params model X) := by
-    nlinarith
-  rw [matrixSdpCanonicalNormalizedSeparatorFunctional_apply]
-  exact (le_inv_mul_iff₀' hpositiveCoeff).mpr hmul
-
-/-- A separator negative at `(1, t)` places its normalized constraint-coordinate
-functional below `t` at the identity.
-
-This is only a continuous real-linear functional inequality.  It does not
-represent the normalized separator by a trace-pairing matrix. -/
-theorem matrixSdpCanonicalNormalizedSeparatorFunctional_lt_of_sep
-    {params : Parameters} [FieldModel params.q]
-    {model : MatrixSdpRealization params}
-    (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
-    {t : ℝ}
-    (hsep : φ ((1 : MatrixOperator model.space), t) < 0)
-    (hcoeff : matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0) :
-    matrixSdpCanonicalNormalizedSeparatorFunctional φ
-      (1 : MatrixOperator model.space) < t := by
-  have hpositiveCoeff : 0 < -matrixSdpCanonicalSeparatorObjectiveCoefficient φ :=
-    neg_pos.mpr hcoeff
-  have hsepDecomposed :
-      matrixSdpCanonicalSeparatorConstraintFunctional φ (1 : MatrixOperator model.space) +
-          t * matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0 := by
-    rwa [matrixSdpCanonicalSeparator_decompose] at hsep
-  have hlt :
-      matrixSdpCanonicalSeparatorConstraintFunctional φ (1 : MatrixOperator model.space) <
-        t * (-matrixSdpCanonicalSeparatorObjectiveCoefficient φ) := by
-    nlinarith
-  rw [matrixSdpCanonicalNormalizedSeparatorFunctional_apply]
-  exact (inv_mul_lt_iff₀ hpositiveCoeff).mpr (by simpa [mul_comm] using hlt)
+  MIPStarRE.Quantum.conicSeparatorObjectiveCoefficient φ
 
 /-- The Hermitian matrix representing the normalized separator functional under
 the real trace pairing. -/
@@ -464,7 +272,7 @@ noncomputable def matrixSdpCanonicalNormalizedSeparatorDualMatrix
     (φ : StrongDual ℝ (MatrixOperator model.space × ℝ)) :
     MatrixOperator model.space :=
   MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM
-    (matrixSdpCanonicalNormalizedSeparatorFunctional φ)
+    (MIPStarRE.Quantum.conicNormalizedSeparatorFunctional φ)
 
 /-- The matrix representing the normalized separator is Hermitian. -/
 theorem matrixSdpCanonicalNormalizedSeparatorDualMatrix_isHermitian
@@ -473,7 +281,7 @@ theorem matrixSdpCanonicalNormalizedSeparatorDualMatrix_isHermitian
     (φ : StrongDual ℝ (MatrixOperator model.space × ℝ)) :
     (matrixSdpCanonicalNormalizedSeparatorDualMatrix φ).IsHermitian :=
   MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM_isHermitian
-    (matrixSdpCanonicalNormalizedSeparatorFunctional φ)
+    (MIPStarRE.Quantum.conicNormalizedSeparatorFunctional φ)
 
 /-- On Hermitian inputs, the normalized separator functional is the real trace
 pairing against its Hermitian representing matrix. -/
@@ -482,12 +290,12 @@ theorem matrixSdpCanonicalNormalizedSeparatorFunctional_eq_trace_dualMatrix
     {model : MatrixSdpRealization params}
     (φ : StrongDual ℝ (MatrixOperator model.space × ℝ))
     {Y : MatrixOperator model.space} (hY : Y.IsHermitian) :
-    matrixSdpCanonicalNormalizedSeparatorFunctional φ Y =
+    MIPStarRE.Quantum.conicNormalizedSeparatorFunctional φ Y =
       Complex.re (Matrix.trace
         (matrixSdpCanonicalNormalizedSeparatorDualMatrix φ * Y)) := by
   simpa [matrixSdpCanonicalNormalizedSeparatorDualMatrix] using
     MIPStarRE.Quantum.hermitianTracePairingMatrixOfRealCLM_apply_of_isHermitian
-      (matrixSdpCanonicalNormalizedSeparatorFunctional φ) hY
+      (MIPStarRE.Quantum.conicNormalizedSeparatorFunctional φ) hY
 
 /-- The normalized separator matrix dominates the canonical objective on every
 positive canonical primal cone point. -/
@@ -505,11 +313,18 @@ theorem matrixSdpCanonicalObjective_le_normalizedSeparatorDualMatrix_on_nonnegat
         (matrixSdpCanonicalDualOperator params model
           (matrixSdpCanonicalNormalizedSeparatorDualMatrix φ) * X)) := by
   have hle :=
-    matrixSdpCanonicalObjective_le_normalizedSeparator_on_primalConeMap
-      params model φ hφ hcoeff X hX
+    MIPStarRE.Quantum.conicObjective_le_normalizedSeparator_of_mem
+      (matrixSdpCanonicalConstraintOperatorCLM params model)
+      (matrixSdpCanonicalPrimalObjectiveCLM params model)
+      (C := matrixSdpCanonicalPrimalImageCone params model) φ hφ hcoeff X
+      (by
+        simpa [matrixSdpCanonicalPrimalObjectiveCLM] using
+          matrixSdpCanonicalPrimalImageCone_mem_of_nonnegative params model X hX)
   have hconstraintHerm :
       (matrixSdpCanonicalConstraintOperator params model X).IsHermitian :=
     matrixSdpCanonicalConstraintOperator_isHermitian_of_nonnegative params model hX
+  simp only [matrixSdpCanonicalConstraintOperatorCLM_apply,
+    matrixSdpCanonicalPrimalObjectiveCLM] at hle
   rw [matrixSdpCanonicalNormalizedSeparatorFunctional_eq_trace_dualMatrix
     φ hconstraintHerm] at hle
   rwa [matrixSdpCanonicalDualOperator_trace_constraint]
@@ -553,7 +368,7 @@ theorem matrixSdpCanonicalNormalizedSeparatorDualMatrix_dualObjective_lt_of_sep
     matrixSdpDualObjective model
         (matrixSdpCanonicalNormalizedSeparatorDualMatrix φ) < t := by
   have hlt :=
-    matrixSdpCanonicalNormalizedSeparatorFunctional_lt_of_sep φ hsep hcoeff
+    MIPStarRE.Quantum.conicNormalizedSeparatorFunctional_lt_of_sep φ hsep hcoeff
   have hI : (1 : MatrixOperator model.space).IsHermitian := Matrix.isHermitian_one
   rw [matrixSdpCanonicalNormalizedSeparatorFunctional_eq_trace_dualMatrix φ hI] at hlt
   simpa [matrixSdpDualObjective] using hlt
@@ -586,8 +401,9 @@ theorem matrixSdpCanonicalSeparator_exists_dualFeasible_lt_of_feasible_lt
         0 ≤ matrixSdpDualSlackOperator params model W g) ∧
       matrixSdpDualObjective model W < t := by
   have hcoeff : matrixSdpCanonicalSeparatorObjectiveCoefficient φ < 0 :=
-    matrixSdpCanonicalSeparatorObjectiveCoefficient_neg_of_feasible_lt
-      params model φ hφ hsep X hX hXlt
+    MIPStarRE.Quantum.conicSeparatorObjectiveCoefficient_neg_of_above
+      (C := matrixSdpCanonicalPrimalImageCone params model) φ hφ
+      (matrixSdpCanonicalPrimalImageCone_mem_of_feasible params model X hX) hsep hXlt
   refine ⟨matrixSdpCanonicalNormalizedSeparatorDualMatrix φ, ?_, ?_⟩
   · exact matrixSdpCanonicalNormalizedSeparatorDualMatrix_dualFeasible
       params model φ hφ hcoeff
