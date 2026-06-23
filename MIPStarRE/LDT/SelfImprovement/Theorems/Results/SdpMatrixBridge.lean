@@ -230,15 +230,9 @@ theorem toSdpStatementWithSlackness
     (h : MatrixSdpStatementWithSlackness params
       (matrixSdpPointRealizationOfStrategy params strategy)) :
     SdpStatementWithSlackness params strategy := by
-  let T := Classical.choose h.witness
-  let hTZ := Classical.choose_spec h.witness
-  let Z := Classical.choose hTZ
-  have hopt :
-      MatrixSdpOptimalWitness params
-        (matrixSdpPointRealizationOfStrategy params strategy) T Z :=
-    Classical.choose_spec hTZ
-  exact ⟨MatrixSubmeasurement.toSubMeas T, Z,
-    hopt.toSdpOptimalPairWithSlackness⟩
+  obtain ⟨T, Z, hopt⟩ := h.witness
+  exact ⟨MatrixMeasurement.toMeasurement T, Z, by
+    simpa [MatrixMeasurement.toMeasurement] using hopt.toSdpOptimalPairWithSlackness⟩
 
 end MatrixSdpStatementWithSlackness
 

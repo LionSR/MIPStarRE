@@ -97,10 +97,40 @@ complementary-slackness equations. -/
 structure SdpStatementWithSlackness (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params ι) : Prop where
   witness :
-    ∃ T : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SdpOptimalPairWithSlackness params strategy T Z
+    ∃ T : Measurement (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SdpOptimalPairWithSlackness params strategy T.toSubMeas Z
 
 namespace SdpOptimalPairWithSlackness
+
+/-- The primal total of a slackness-carrying SDP pair is the identity. -/
+theorem primal_total_operator {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι}
+    {T : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (h : SdpOptimalPairWithSlackness params strategy T Z) :
+    T.total = 1 :=
+  h.toSdpOptimalPair.primalTotalOperator
+
+/-- The dual operator in a slackness-carrying SDP pair is positive
+semidefinite. -/
+theorem dual_positive {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι}
+    {T : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (h : SdpOptimalPairWithSlackness params strategy T Z) :
+    0 ≤ Z :=
+  h.toSdpOptimalPair.dualPositive
+
+/-- The dual slack operators in a slackness-carrying SDP pair are positive
+semidefinite. -/
+theorem dual_feasible {params : Parameters} [FieldModel params.q]
+    {strategy : SymStrat params ι}
+    {T : SubMeas (Polynomial params) ι}
+    {Z : MIPStarRE.Quantum.Op ι}
+    (h : SdpOptimalPairWithSlackness params strategy T Z) :
+    ∀ g : Polynomial params,
+      0 ≤ sdpDualSlackOperator params strategy Z g :=
+  h.toSdpOptimalPair.dualFeasible
 
 /-- The primal submeasurement in a slackness-carrying SDP pair is a
 measurement. -/
@@ -141,9 +171,8 @@ theorem exists_measurement_witness {params : Parameters} [FieldModel params.q]
         (∀ g : Polynomial params, 0 ≤ sdpDualSlackOperator params strategy Z g) ∧
         ∀ g : Polynomial params,
           sdpComplementarySlacknessEquation params strategy T.toSubMeas Z g := by
-  obtain ⟨Tsub, Z, hpair⟩ := h.witness
-  exact ⟨hpair.primalMeasurement, Z, hpair.toSdpOptimalPair.dualPositive,
-    hpair.toSdpOptimalPair.dualFeasible, hpair.complementarySlackness⟩
+  obtain ⟨T, Z, hpair⟩ := h.witness
+  exact ⟨T, Z, hpair.dual_positive, hpair.dual_feasible, hpair.complementarySlackness⟩
 
 end SdpStatementWithSlackness
 

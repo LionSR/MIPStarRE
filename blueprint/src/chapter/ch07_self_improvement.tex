@@ -21,6 +21,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
 
 \begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
   \lean{MIPStarRE.LDT.SelfImprovement.selfImprovementHelper}
+  \lean{MIPStarRE.LDT.SelfImprovement.self_improvement_helper_with_slackness_of_sdp_statement_with_slackness}
   \leanok
   \uses{def:polymeasurements, def:simeq, def:strong-self-consistency}
   Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
@@ -517,6 +518,7 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealizationOfStrategy}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixAveragedPointOperator_ofPointRealization}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpDualSlackOperator_ofPointRealization}
+  \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.exists_measurement_witness}
   \lean{MIPStarRE.LDT.SelfImprovement.MatrixSdpStatementWithSlackness.toSdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.matrixSdpPointRealization_statementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness.exists_measurement_witness}
@@ -529,18 +531,20 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   feasible canonical primal matrix, a dual-feasible operator with equal
   objective value, canonical complementary slackness, and vanishing of the
   extra canonical slack block.  This datum gives the matrix-level
-  slackness-carrying SDP statement, which is then transported to the abstract
-  Section~9 statement without assuming \(I \le Z\).  The displayed measurement
-  witness is extracted from that abstract statement.  The canonical saturation
-  datum is now the only matrix-level input used to pass from strong duality to
-  the abstract SDP statement.  The paper-facing self-improvement helper consumes
-  the resulting abstract SDP statement.
+  slackness-carrying SDP statement, whose witness is already a complete matrix
+  measurement, and is then transported to the abstract Section~9 statement
+  without assuming \(I \le Z\).  The displayed measurement witness is read
+  directly from that abstract statement.  The canonical saturation datum is now
+  the only matrix-level input used to pass from strong duality to the abstract
+  SDP statement.  The paper-facing self-improvement helper consumes the
+  resulting abstract SDP statement.
 \end{lemma}
 \begin{proof}
   \leanok
   The identity \(\sum_gT_g=I\) turns the optimal primal submeasurement into a
-  measurement.  The zero-defect form \(T_g(Z-A_g)=0\) is equivalent, by
-  distributivity, to the displayed equation \(T_gZ=T_gA_g\).
+  measurement; Lean performs this completion before storing the matrix and
+  abstract slackness statements.  The zero-defect form \(T_g(Z-A_g)=0\) is
+  equivalent, by distributivity, to the displayed equation \(T_gZ=T_gA_g\).
 \end{proof}
 
 \begin{remark}[Removed residual-dominating construction theorems]\label{rem:sdp-matrix-residual-domination-assembly}
@@ -568,6 +572,9 @@ terms of an auxiliary operator~$Z$, and produces a much smaller error parameter.
   \lean{MIPStarRE.LDT.SelfImprovement.sdpDualPositive_of_dualFeasible}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPair.dualPositive}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primal_total_operator}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.dual_positive}
+  \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.dual_feasible}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness.primalMeasurement}
   \lean{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness}
   \lean{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness}
