@@ -10,6 +10,7 @@ import MIPStarRE.LDT.Basic.OperatorExpectations
 import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.PMFAverages
 import MIPStarRE.LDT.Basic.DistributionAvg
+import MIPStarRE.LDT.Basic.DistributionPMF
 import MIPStarRE.LDT.Basic.DistributionProduct
 import MIPStarRE.LDT.Basic.DistributionMapAverages
 import MIPStarRE.LDT.Basic.DistributionUniform

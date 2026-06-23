@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
+import MIPStarRE.LDT.Basic.DistributionPMF
 
 /-!
 # Uniform subset estimates
@@ -26,13 +26,13 @@ theorem totalVariationDistance_uniformDistribution_uniformOnFinset_eq
     totalVariationDistance (uniformDistribution α) (Distribution.uniformOnFinset s) =
       1 - (s.card : Error) / (Fintype.card α : Error) := by
   rw [totalVariationDistance_eq_toPMF_sum]
-  change pmfTotalVariationDistance
+  change PMF.totalVariationDistance
       ((uniformDistribution α).toPMF (uniformDistribution_isProbability α))
       ((Distribution.uniformOnFinset s).toPMF
         (Distribution.uniformOnFinset_isProbability s hs)) =
     1 - (s.card : Error) / (Fintype.card α : Error)
   rw [uniformDistribution_toPMF, Distribution.uniformOnFinset_toPMF]
-  exact pmfTotalVariationDistance_uniformOfFintype_uniformOfFinset_eq s hs
+  exact PMF.totalVariationDistance_uniformOfFintype_uniformOfFinset_eq s hs
 
 /-- A `[0,1]`-valued function averaged over a nonempty finite subset is bounded
 by its ambient uniform average plus the total variation distance between the

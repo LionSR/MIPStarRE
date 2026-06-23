@@ -1,0 +1,80 @@
+import MIPStarRE.LDT.Basic.DistributionAvg
+
+/-!
+# PMF expectations associated to project distributions
+
+This module relates the project `Distribution` averaging notation to the finite
+expectation `PMF.realWeightedSum` on Mathlib probability mass functions.  The
+statements keep the project-facing averages available while allowing later
+probability arguments to cite the associated Mathlib `PMF` object directly.
+
+## Main declarations
+
+* `avgOver_eq_toPMF_realWeightedSum`
+* `averageOperatorOverDistribution_eq_toPMF_realWeightedSum`
+* `uniformDistribution_sum_smul_eq_pmf_realWeightedSum`
+* `avgOver_uniform_eq_pmf_realWeightedSum`
+* `averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum`
+
+## References
+
+These are formalization-internal finite probability lemmas for the low
+individual degree test development.
+-/
+
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+namespace MIPStarRE.LDT
+
+/-- Averaging against a probabilistic project distribution is the finite
+expectation against its associated Mathlib probability mass function. -/
+theorem avgOver_eq_toPMF_realWeightedSum {α : Type*} [Fintype α]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → Error) :
+    avgOver 𝒟 f = PMF.realWeightedSum (𝒟.toPMF h𝒟) f := by
+  simpa [PMF.realWeightedSum, smul_eq_mul] using
+    avgOver_eq_toPMF_sum 𝒟 h𝒟 f
+
+/-- Operator-valued averaging against a probabilistic project distribution is
+the finite expectation against its associated Mathlib probability mass
+function. -/
+theorem averageOperatorOverDistribution_eq_toPMF_realWeightedSum {α : Type*}
+    [Fintype α]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability)
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution 𝒟 f =
+      PMF.realWeightedSum (𝒟.toPMF h𝒟) f := by
+  simpa [PMF.realWeightedSum] using
+    averageOperatorOverDistribution_eq_toPMF_sum 𝒟 h𝒟 f
+
+/-- Module-valued finite expectation for the uniform distribution, stated
+directly in terms of Mathlib's uniform probability mass function. -/
+theorem uniformDistribution_sum_smul_eq_pmf_realWeightedSum {α M : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [AddCommMonoid M] [Module Error M] (f : α → M) :
+    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a • f a =
+      PMF.realWeightedSum (PMF.uniformOfFintype α) f := by
+  simpa [PMF.realWeightedSum] using
+    uniformDistribution_sum_smul_eq_pmf_sum (α := α) (f := f)
+
+/-- The uniform average is the finite expectation against Mathlib's uniform
+probability mass function. -/
+theorem avgOver_uniform_eq_pmf_realWeightedSum {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α] (f : α → Error) :
+    avgOver (uniformDistribution α) f =
+      PMF.realWeightedSum (PMF.uniformOfFintype α) f := by
+  simpa [PMF.realWeightedSum, smul_eq_mul] using
+    avgOver_uniform_eq_pmf_sum (α := α) f
+
+/-- The uniform operator average is the finite expectation against Mathlib's
+uniform probability mass function. -/
+theorem averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum {α : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    {ι : Type*} [Fintype ι] [DecidableEq ι]
+    (f : α → MIPStarRE.Quantum.Op ι) :
+    averageOperatorOverDistribution (uniformDistribution α) f =
+      PMF.realWeightedSum (PMF.uniformOfFintype α) f := by
+  simpa [PMF.realWeightedSum] using
+    averageOperatorOverDistribution_uniform_eq_pmf_sum (α := α) f
+
+end MIPStarRE.LDT
