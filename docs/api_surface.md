@@ -193,6 +193,30 @@ This file is scalar-valued, not operator-valued, but it is useful for weighted s
 - `noncomputable def totalVariationDistance {α : Type*} [DecidableEq α] (μ ν : Distribution α) : Error`
   - Not directly about `SubMeas` obligations, but part of the file’s public API.
 
+### PMF adapters
+
+`MIPStarRE/LDT/Basic/PMFAverages.lean` contains the finite probability layer
+based on Mathlib PMFs.  The project keeps `Distribution` for paper notation and
+explicit finite supports, but probability identities should use these PMF
+lemmas when the statement is naturally about a genuine finite probability law.
+
+- `theorem pmf_sum_toReal_eq_one (p : PMF α) : ∑ a : α, (p a).toReal = 1`
+
+- `noncomputable def pmfTotalVariationDistance (p q : PMF α) : Error`
+
+- `theorem pmfTotalVariationDistance_eq_sum_max_sub (p q : PMF α) :
+  pmfTotalVariationDistance p q = ∑ a : α, max 0 ((q a).toReal - (p a).toReal)`
+
+- `theorem pmfTotalVariationDistance_uniformOfFintype_uniformOfFinset_eq
+  (s : Finset α) (hs : s.Nonempty) :
+  pmfTotalVariationDistance (PMF.uniformOfFintype α) (PMF.uniformOfFinset s hs)
+    = 1 - (s.card : Error) / (Fintype.card α : Error)`
+
+- `theorem pmf_sum_le_sum_add_pmfTotalVariationDistance (p q : PMF α)
+  (f : α → Error) (hf_nonneg : ∀ a, 0 ≤ f a) (hf_le_one : ∀ a, f a ≤ 1) :
+  ∑ a : α, (q a).toReal * f a ≤
+  ∑ a : α, (p a).toReal * f a + pmfTotalVariationDistance p q`
+
 ### Averaging lemmas
 
 - `theorem avgOver_zero (𝒟 : Distribution α) : avgOver 𝒟 (fun _ => 0) = 0`
