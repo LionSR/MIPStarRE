@@ -93,8 +93,9 @@ theorem rerandomizeCoord_toPMF (params : Parameters) :
     (rerandomizeCoord params).toPMF (rerandomizeCoord_isProbability params) =
       (PMF.uniformOfFintype (RerandomizeCoordSample params)).map
         (rerandomizeCoordSampleToPair params) := by
-  simpa [rerandomizeCoord] using
-    uniformDistribution_map_toPMF (RerandomizeCoordSample params) (Point params × Point params)
+  simpa [rerandomizeCoord, uniformDistribution_toPMF] using
+    Distribution.toPMF_map (uniformDistribution (RerandomizeCoordSample params))
+      (uniformDistribution_isProbability (RerandomizeCoordSample params))
       (rerandomizeCoordSampleToPair params)
 
 /-- The rerandomized-coordinate edge distribution has total mass one. -/

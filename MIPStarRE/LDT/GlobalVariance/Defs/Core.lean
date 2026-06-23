@@ -141,18 +141,14 @@ theorem axisParallelLineQuestionDistribution_toPMF (params : Parameters)
       (axisParallelLineQuestionDistribution_isProbability params) =
         PMF.uniformOfFinset (axisParallelLineQuestionDistribution params).support
           (axisParallelLineQuestionDistribution_support_nonempty params) := by
-  ext qu
-  rw [Distribution.toPMF_apply]
-  rw [show (axisParallelLineQuestionDistribution params).weight qu =
-      (PMF.uniformOfFinset (axisParallelLineQuestionDistribution params).support
-        (axisParallelLineQuestionDistribution_support_nonempty params) qu).toReal by
-        simpa [axisParallelLineQuestionDistribution] using
-          Distribution.uniformOnFinset_weight_eq_pmf_uniformOfFinset_toReal
-            (axisParallelLineQuestionDistribution params).support
-            (axisParallelLineQuestionDistribution_support_nonempty params) qu]
-  exact ENNReal.ofReal_toReal
-    ((PMF.uniformOfFinset (axisParallelLineQuestionDistribution params).support
-      (axisParallelLineQuestionDistribution_support_nonempty params)).apply_ne_top qu)
+  classical
+  let support : Finset (AxisParallelLineQuestion params) :=
+    Finset.univ.filter (pointOnLine (params := params))
+  simpa [axisParallelLineQuestionDistribution, support] using
+    Distribution.uniformOnFinset_toPMF support
+      (by
+        simpa [axisParallelLineQuestionDistribution, support] using
+          axisParallelLineQuestionDistribution_support_nonempty params)
 
 /-- The uniform distribution over bundled low-individual-degree polynomials. -/
 noncomputable def polynomialDistribution (params : Parameters) [FieldModel params.q] :
