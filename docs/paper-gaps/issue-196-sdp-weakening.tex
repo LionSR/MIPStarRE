@@ -173,23 +173,23 @@ blueprint.
 281--304.}
 
 At the statement layer, the active source-facing route exposes the primal
-witness as a submeasurement inside
-\leanid{SdpStatementWithSlackness.witness}. The associated witness record still
-contains a field \path{primalTotalOperator} asserting $T$'s total is $I$, but
-this is the paper's saturated-optimum conclusion, not a definition of primal
-feasibility.
+witness as a measurement inside
+\leanid{SdpStatementWithSlackness.witness}. The associated witness record is
+indexed by the underlying submeasurement and still contains a field
+\path{primalTotalOperator} asserting that this total is $I$; this is the
+paper's saturated-optimum conclusion, not a definition of primal feasibility.
 \footnote{See
 \leanid{MIPStarRE.LDT.SelfImprovement.SdpOptimalPairWithSlackness} and
 \leanid{MIPStarRE.LDT.SelfImprovement.SdpStatementWithSlackness} in
-\path{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}, lines 61--104.
+\path{MIPStarRE/LDT/SelfImprovement/Theorems/Statements.lean}, lines 61--134.
 The source-facing theorem is
 \leanid{MIPStarRE.LDT.SelfImprovement.sdp_statement_with_slackness} in
 \path{MIPStarRE/LDT/SelfImprovement/Theorems/Results/HelperCompleteness/Bracketed.lean},
 lines 493--510, using the canonical block-SDP transport from
 \path{MIPStarRE/LDT/SelfImprovement/Theorems/Results/SdpMatrixBridge.lean}.}
 The matrix-level realization follows the same convention: primal variables are
-matrix submeasurements, while the optimal-witness record stores the additional
-identity-total conclusion.
+matrix submeasurements, while the slackness statement stores the completed
+matrix measurement obtained from the identity-total conclusion.
 \footnote{The matrix-level primal-side declarations
 \path{matrixSdpPrimalContributionOperator}, \path{matrixSdpPrimalObjective},
 \path{matrixSdpComplementarySlacknessDefect}, and \path{MatrixSdpOptimalWitness}
@@ -206,11 +206,10 @@ primal variable as a measurement and thereby excluded the paper's strict-feasibl
 Slater witness $T_g=(2|\cP|)^{-1}I$.
 
 The mismatch is now resolved at the SDP-interface level. The formal objective,
-complementary-slackness relation, strict primal witness, sandwiched-family
-construction, and slackness-carrying SDP statement all expose the primal
-variable as a submeasurement. Saturation is recorded only for the selected
-optimal witness and is extracted as a measurement by
-\leanid{sdp_slackness_measurement}.
+complementary-slackness relation, strict primal witness, and sandwiched-family
+construction all expose the feasible primal variable as a submeasurement.
+Saturation is recorded only for the selected optimal witness, and the
+slackness-carrying SDP statement stores that saturated witness as a measurement.
 
 The former reduced interface has been retired: \ghpr{2430} removed
 \leanid{sdpPrimalWitness}, the reduced \leanid{SdpStatement} structure, the theorem

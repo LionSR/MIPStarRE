@@ -62,10 +62,7 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
     ∃ T : Measurement (Polynomial params) ι,
       ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
         SelfImprovementHelperConclusionWithSlackness params strategy T H Z eps delta := by
-  obtain ⟨Tsub, Z, hsdpPair⟩ := hsdp.witness
-  let T : Measurement (Polynomial params) ι :=
-    { toSubMeas := Tsub
-      total_eq_one := hsdpPair.toSdpOptimalPair.primalTotalOperator }
+  obtain ⟨T, Z, hsdpPair⟩ := hsdp.witness
   let Hhat : SubMeas (Polynomial params) ι :=
     averagedSandwichedPolynomialSubMeas params strategy T.toSubMeas
   refine ⟨T, Hhat, Z, ?_⟩
@@ -76,10 +73,10 @@ lemma self_improvement_helper_with_slackness_of_sdp_statement_with_slackness
       { sdpWitness := ?_
         averagedConstruction := rfl
         addInUVarianceBound := ?_ }
-    · simpa [T] using hsdpPair.toSdpOptimalPair
+    · exact hsdpPair.toSdpOptimalPair
     · exact addInU (ι := ι) params strategy eps delta gamma hgood T
   · intro g
-    simpa [T] using hsdpPair.complementarySlackness g
+    exact hsdpPair.complementarySlackness g
 
 /-- Helper lemma driven by the Section 9 SDP statement with complementary
 slackness.

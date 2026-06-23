@@ -433,10 +433,13 @@ theorem matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackn
         0)
     (hSlack : matrixSdpCanonicalSlackOperator params model T = 0) :
     MatrixSdpStatementWithSlackness params model where
-  witness :=
-    ⟨T, Z,
+  witness := by
+    let hopt :=
       matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness
-        params model T Z hdual hstrong hcanonical hSlack⟩
+        params model T Z hdual hstrong hcanonical hSlack
+    exact ⟨hopt.primalMeasurement, Z, by
+      simpa [MatrixSdpOptimalWitness.primalMeasurement,
+        MIPStarRE.Quantum.Measurement.ofSumEqOne] using hopt⟩
 
 /-- Assemble the canonical block-SDP conclusions as the matrix-level statement
 with zero slack block.
@@ -465,9 +468,12 @@ theorem matrixSdpStatementWithSlackness_of_canonicalFeasibleSaturatedComplementa
         0)
     (hSlack : matrixSdpCanonicalDiagonalBlock params model X none = 0) :
     MatrixSdpStatementWithSlackness params model where
-  witness :=
-    ⟨matrixSdpCanonicalExtractedPrimalSubmeasurement params model X hX, Z,
+  witness := by
+    let hopt :=
       matrixSdpOptimalWitness_of_canonicalFeasibleSaturatedComplementarySlackness
-        params model X hX Z hdual hstrong hcanonical hSlack⟩
+        params model X hX Z hdual hstrong hcanonical hSlack
+    exact ⟨hopt.primalMeasurement, Z, by
+      simpa [MatrixSdpOptimalWitness.primalMeasurement,
+        MIPStarRE.Quantum.Measurement.ofSumEqOne] using hopt⟩
 
 end MIPStarRE.LDT.SelfImprovement

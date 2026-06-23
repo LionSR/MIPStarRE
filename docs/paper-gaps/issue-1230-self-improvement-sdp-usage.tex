@@ -194,8 +194,10 @@ then a saturated slackness-producing optimum.%
 \texttt{lem:sdp-uniform-feasible-witness},
 \texttt{lem:sdp-matrix-feasible-bounds},
 \texttt{lem:sdp-matrix-slackness-output}, and \texttt{lem:sdp}.}
-Lean keeps the submeasurement boundary explicit, and \ghpr{1708} supplies the
-\textbf{producer} for the stronger slackness-carrying statement.%
+Lean keeps the feasible primal boundary explicit as a submeasurement, while the
+selected saturated optimum is exposed to the slackness-carrying statement as a
+measurement.  The construction supplied by \ghpr{1708} is the \textbf{producer}
+for this stronger statement.%
 \footnote{Representative declarations are \leanid{sdpStrictPrimalSubMeas},
 \leanid{sdpPrimalObjective}, \leanid{sdpComplementarySlacknessEquation}, and
 \leanid{averagedSandwichedPolynomialSubMeas} in
