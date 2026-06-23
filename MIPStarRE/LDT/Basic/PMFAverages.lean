@@ -13,31 +13,31 @@ low individual degree test averaging layer.
 
 ## Main declarations
 
-* `pmf_map_apply_toReal`
+* `PMF.map_apply_toReal`
 * `PMF.realWeightedSum`
 * `PMF.realWeightedSum_map`
 * `PMF.realWeightedSum_bind`
-* `pmf_map_sum_smul`
-* `pmf_bind_apply_toReal`
-* `pmf_bind_sum_smul`
-* `pmf_sum_toReal_eq_one`
-* `pmf_sum_const_smul`
+* `PMF.map_sum_smul`
+* `PMF.bind_apply_toReal`
+* `PMF.bind_sum_smul`
+* `PMF.sum_toReal_eq_one`
+* `PMF.sum_const_smul`
 * `PMF.totalVariationDistance`
 * `PMF.totalVariationDistance_eq_sum_max_sub`
 * `PMF.totalVariationDistance_uniformOfFintype_uniformOfFinset_eq`
 * `PMF.sum_le_sum_add_totalVariationDistance`
-* `pmf_sum_rpow_one_div_le_rpow_sum`
+* `PMF.sum_rpow_one_div_le_rpow_sum`
 * `PMF.realWeightedSum_rpow_one_div_le_rpow`
-* `pmf_uniformOfFintype_map_equiv`
-* `pmf_uniformOfFintype_prod_apply_toReal`
-* `pmf_uniformOfFintype_prod_eq_bind`
-* `pmf_uniformOfFintype_sum_equiv_smul`
-* `pmf_uniformOfFintype_prod_sum_smul`
-* `pmf_uniformOfFintype_sum_equiv_fst_smul`
-* `pmf_uniformOfFintype_sum_equiv_snd_smul`
-* `pmf_uniformOfFintype_sum_factor_equiv_smul`
-* `pmf_uniformOfFintype_sum_factor_equiv_fst_smul`
-* `pmf_uniformOfFintype_sum_factor_equiv_snd_smul`
+* `PMF.uniformOfFintype_map_equiv`
+* `PMF.uniformOfFintype_prod_apply_toReal`
+* `PMF.uniformOfFintype_prod_eq_bind`
+* `PMF.uniformOfFintype_sum_equiv_smul`
+* `PMF.uniformOfFintype_prod_sum_smul`
+* `PMF.uniformOfFintype_sum_equiv_fst_smul`
+* `PMF.uniformOfFintype_sum_equiv_snd_smul`
+* `PMF.uniformOfFintype_sum_factor_equiv_smul`
+* `PMF.uniformOfFintype_sum_factor_equiv_fst_smul`
+* `PMF.uniformOfFintype_sum_factor_equiv_snd_smul`
 
 ## References
 
@@ -68,12 +68,12 @@ noncomputable def totalVariationDistance {α : Type*} [Fintype α]
 
 end PMF
 
-namespace MIPStarRE.LDT
+namespace PMF
 
 open Classical in
 /-- Pointwise real-weight formula for a finite push-forward probability mass
 function.  This is the finite real-valued form of `PMF.map_apply`. -/
-theorem pmf_map_apply_toReal {α β : Type*} [Fintype α]
+theorem map_apply_toReal {α β : Type*} [Fintype α]
     (p : PMF α) (e : α → β) (b : β) :
     ((p.map e) b).toReal = ∑ a : α, (if b = e a then (p a).toReal else 0) := by
   rw [PMF.map_apply]
@@ -92,9 +92,9 @@ theorem pmf_map_apply_toReal {α β : Type*} [Fintype α]
 
 /-- A finite PMF-weighted sum against a push-forward is the corresponding
 PMF-weighted sum of the pulled-back family. -/
-theorem pmf_map_sum_smul {α β M : Type*}
+theorem map_sum_smul {α β M : Type*}
     [Fintype α] [Fintype β]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (p : PMF α) (e : α → β) (f : β → M) :
     ∑ b : β, ((p.map e) b).toReal • f b =
       ∑ a : α, (p a).toReal • f (e a) := by
@@ -104,7 +104,7 @@ theorem pmf_map_sum_smul {α β M : Type*}
         = ∑ b : β, (∑ a : α, if b = e a then (p a).toReal else 0) • f b := by
           refine Finset.sum_congr rfl ?_
           intro b _
-          rw [pmf_map_apply_toReal]
+          rw [map_apply_toReal]
     _ = ∑ b : β, ∑ a : α, (if b = e a then (p a).toReal else 0) • f b := by
           refine Finset.sum_congr rfl ?_
           intro b _
@@ -122,7 +122,7 @@ theorem pmf_map_sum_smul {α β M : Type*}
 /-- Pointwise real-weight formula for a finite monadic composition of
 probability mass functions.  This is the finite real-valued form of
 `PMF.bind_apply`. -/
-theorem pmf_bind_apply_toReal {α β : Type*} [Fintype α]
+theorem bind_apply_toReal {α β : Type*} [Fintype α]
     (p : PMF α) (q : α → PMF β) (b : β) :
     ((p.bind q) b).toReal = ∑ a : α, (p a).toReal * (q a b).toReal := by
   rw [PMF.bind_apply]
@@ -136,9 +136,9 @@ theorem pmf_bind_apply_toReal {α β : Type*} [Fintype α]
 
 /-- A finite PMF-weighted sum against a monadic composition is the iterated
 PMF-weighted sum. -/
-theorem pmf_bind_sum_smul {α β M : Type*}
+theorem bind_sum_smul {α β M : Type*}
     [Fintype α] [Fintype β]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (p : PMF α) (q : α → PMF β) (f : β → M) :
     ∑ b : β, ((p.bind q) b).toReal • f b =
       ∑ a : α, (p a).toReal • ∑ b : β, (q a b).toReal • f b := by
@@ -147,7 +147,7 @@ theorem pmf_bind_sum_smul {α β M : Type*}
         = ∑ b : β, (∑ a : α, (p a).toReal * (q a b).toReal) • f b := by
           refine Finset.sum_congr rfl ?_
           intro b _
-          rw [pmf_bind_apply_toReal]
+          rw [bind_apply_toReal]
     _ = ∑ b : β, ∑ a : α, ((p a).toReal * (q a b).toReal) • f b := by
           refine Finset.sum_congr rfl ?_
           intro b _
@@ -167,22 +167,22 @@ theorem pmf_bind_sum_smul {α β M : Type*}
 
 /-- The uniform probability mass on a product is the product of the two
 coordinate uniform masses, after coercion to real weights. -/
-theorem pmf_uniformOfFintype_prod_apply_toReal
+theorem uniformOfFintype_prod_apply_toReal
     {α β : Type*} [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
     (a : α) (b : β) :
     (PMF.uniformOfFintype (α × β) (a, b)).toReal =
       (PMF.uniformOfFintype α a).toReal *
         (PMF.uniformOfFintype β b).toReal := by
-  have hα : ((Fintype.card α : ℕ) : Error) ≠ 0 := by
+  have hα : ((Fintype.card α : ℕ) : MIPStarRE.LDT.Error) ≠ 0 := by
     exact_mod_cast Fintype.card_ne_zero
-  have hβ : ((Fintype.card β : ℕ) : Error) ≠ 0 := by
+  have hβ : ((Fintype.card β : ℕ) : MIPStarRE.LDT.Error) ≠ 0 := by
     exact_mod_cast Fintype.card_ne_zero
   simp [PMF.uniformOfFintype_apply, Fintype.card_prod]
   field_simp [hα, hβ]
 
 /-- The uniform probability mass function on a product is the monadic
 composition of the two coordinate-uniform probability mass functions. -/
-theorem pmf_uniformOfFintype_prod_eq_bind
+theorem uniformOfFintype_prod_eq_bind
     {α β : Type*} [Fintype α] [Nonempty α] [Fintype β] [Nonempty β] :
     PMF.uniformOfFintype (α × β) =
       (PMF.uniformOfFintype α).bind
@@ -221,8 +221,8 @@ theorem pmf_uniformOfFintype_prod_eq_bind
 
 This is a Lean-only normalization lemma for transporting finite probability
 calculations to Mathlib's `PMF` language. -/
-theorem pmf_sum_toReal_eq_one {α : Type*} [Fintype α] (p : PMF α) :
-    ∑ a : α, (p a).toReal = (1 : Error) := by
+theorem sum_toReal_eq_one {α : Type*} [Fintype α] (p : PMF α) :
+    ∑ a : α, (p a).toReal = (1 : MIPStarRE.LDT.Error) := by
   have hweight_enn : (∑ a : α, p a) = (1 : ENNReal) := by
     rw [← (tsum_fintype (fun a : α => p a) :
       (∑' a : α, p a) = ∑ a : α, p a)]
@@ -233,8 +233,8 @@ theorem pmf_sum_toReal_eq_one {α : Type*} [Fintype α] (p : PMF α) :
   norm_num
 
 /-- The PMF-weighted sum of a constant family is the constant value. -/
-theorem pmf_sum_const_smul {α M : Type*}
-    [Fintype α] [AddCommMonoid M] [Module Error M]
+theorem sum_const_smul {α M : Type*}
+    [Fintype α] [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (p : PMF α) (x : M) :
     ∑ a : α, (p a).toReal • x = x := by
   calc
@@ -242,37 +242,38 @@ theorem pmf_sum_const_smul {α M : Type*}
         (∑ a : α, (p a).toReal) • x := by
           exact (Finset.sum_smul (s := Finset.univ)
             (f := fun a : α => (p a).toReal) (x := x)).symm
-    _ = x := by rw [pmf_sum_toReal_eq_one p, one_smul]
+    _ = x := by rw [sum_toReal_eq_one p, one_smul]
 
 /-- Jensen's inequality for the concave power `x ↦ x ^ (1 / n)`, stated for a
 finite probability mass function. -/
-theorem pmf_sum_rpow_one_div_le_rpow_sum {α : Type*}
+theorem sum_rpow_one_div_le_rpow_sum {α : Type*}
     [Fintype α]
-    (p : PMF α) (f : α → Error) (n : ℕ)
+    (p : PMF α) (f : α → MIPStarRE.LDT.Error) (n : ℕ)
     (hn : 1 ≤ n) (hf : ∀ a, 0 ≤ f a) :
-    ∑ a : α, (p a).toReal * Real.rpow (f a) (1 / (n : Error)) ≤
-      Real.rpow (∑ a : α, (p a).toReal * f a) (1 / (n : Error)) := by
-  let z : α → Error := fun a => Real.rpow (f a) (1 / (n : Error))
+    ∑ a : α, (p a).toReal * Real.rpow (f a) (1 / (n : MIPStarRE.LDT.Error)) ≤
+      Real.rpow (∑ a : α, (p a).toReal * f a) (1 / (n : MIPStarRE.LDT.Error)) := by
+  let z : α → MIPStarRE.LDT.Error :=
+    fun a => Real.rpow (f a) (1 / (n : MIPStarRE.LDT.Error))
   have hw_nonneg : ∀ a ∈ (Finset.univ : Finset α), 0 ≤ (p a).toReal := by
     intro a _
     exact ENNReal.toReal_nonneg
   have hw_sum : ∑ a ∈ (Finset.univ : Finset α), (p a).toReal = 1 := by
-    simpa using (pmf_sum_const_smul (p := p) (x := (1 : Error)))
+    simpa using (sum_const_smul (p := p) (x := (1 : MIPStarRE.LDT.Error)))
   have hz_nonneg : ∀ a ∈ (Finset.univ : Finset α), 0 ≤ z a := by
     intro a _
     exact Real.rpow_nonneg (hf a) _
   have hn_nat_pos : 0 < n := lt_of_lt_of_le (by decide : 0 < 1) hn
-  have hn_pos : 0 < (n : Error) := by
+  have hn_pos : 0 < (n : MIPStarRE.LDT.Error) := by
     exact_mod_cast hn_nat_pos
-  have hp : (1 : Error) ≤ (n : Error) := by
+  have hp : (1 : MIPStarRE.LDT.Error) ≤ (n : MIPStarRE.LDT.Error) := by
     exact_mod_cast hn
-  have hzpow : ∀ a, z a ^ (n : Error) = f a := by
+  have hzpow : ∀ a, z a ^ (n : MIPStarRE.LDT.Error) = f a := by
     intro a
     calc
-      z a ^ (n : Error) =
-          (Real.rpow (f a) (1 / (n : Error))) ^ (n : Error) := by
+      z a ^ (n : MIPStarRE.LDT.Error) =
+          (Real.rpow (f a) (1 / (n : MIPStarRE.LDT.Error))) ^ (n : MIPStarRE.LDT.Error) := by
           rfl
-      _ = Real.rpow (f a) ((1 / (n : Error)) * (n : Error)) := by
+      _ = Real.rpow (f a) ((1 / (n : MIPStarRE.LDT.Error)) * (n : MIPStarRE.LDT.Error)) := by
           symm
           exact Real.rpow_mul (hf a) _ _
       _ = Real.rpow (f a) 1 := by
@@ -281,7 +282,7 @@ theorem pmf_sum_rpow_one_div_le_rpow_sum {α : Type*}
       _ = f a := by
           simp
   have hsum_eq :
-      ∑ a ∈ (Finset.univ : Finset α), (p a).toReal * z a ^ (n : Error) =
+      ∑ a ∈ (Finset.univ : Finset α), (p a).toReal * z a ^ (n : MIPStarRE.LDT.Error) =
         ∑ a ∈ (Finset.univ : Finset α), (p a).toReal * f a := by
     refine Finset.sum_congr rfl ?_
     intro a _
@@ -289,13 +290,13 @@ theorem pmf_sum_rpow_one_div_le_rpow_sum {α : Type*}
   have hmean :=
     Real.arith_mean_le_rpow_mean (s := (Finset.univ : Finset α))
       (fun a => (p a).toReal) z hw_nonneg hw_sum hz_nonneg
-      (p := (n : Error)) hp
+      (p := (n : MIPStarRE.LDT.Error)) hp
   rw [hsum_eq] at hmean
   simpa [z] using hmean
 
 /-- The uniform probability mass function is invariant under transport by an
 equivalence. -/
-theorem pmf_uniformOfFintype_map_equiv
+theorem uniformOfFintype_map_equiv
     {α β : Type*} [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
     (e : α ≃ β) :
     (PMF.uniformOfFintype α).map e = PMF.uniformOfFintype β := by
@@ -313,9 +314,9 @@ theorem pmf_uniformOfFintype_map_equiv
         _ = e.symm b := by rw [← hb])
 
 /-- Reindex a finite sum weighted by Mathlib's uniform PMF along an equivalence. -/
-theorem pmf_uniformOfFintype_sum_equiv_smul {α β M : Type*}
+theorem uniformOfFintype_sum_equiv_smul {α β M : Type*}
     [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (e : α ≃ β) (f : α → M) :
     ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a =
       ∑ b : β, (PMF.uniformOfFintype β b).toReal • f (e.symm b) := by
@@ -323,34 +324,34 @@ theorem pmf_uniformOfFintype_sum_equiv_smul {α β M : Type*}
     ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a =
         ∑ b : β, (((PMF.uniformOfFintype α).map e) b).toReal • f (e.symm b) := by
           simpa using
-            (pmf_map_sum_smul
+            (map_sum_smul
               (p := PMF.uniformOfFintype α) (e := e)
               (f := fun b : β => f (e.symm b))).symm
     _ = ∑ b : β, (PMF.uniformOfFintype β b).toReal • f (e.symm b) := by
-          rw [pmf_uniformOfFintype_map_equiv e]
+          rw [uniformOfFintype_map_equiv e]
 
 /-- Split a finite sum weighted by the uniform PMF on a product into iterated
 uniform PMF-weighted sums. -/
-theorem pmf_uniformOfFintype_prod_sum_smul {α β M : Type*}
+theorem uniformOfFintype_prod_sum_smul {α β M : Type*}
     [Fintype α] [Nonempty α] [Fintype β] [Nonempty β]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (f : α → β → M) :
     ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 ab.2 =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal •
         ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b := by
-  rw [pmf_uniformOfFintype_prod_eq_bind]
-  rw [pmf_bind_sum_smul]
+  rw [uniformOfFintype_prod_eq_bind]
+  rw [bind_sum_smul]
   refine Finset.sum_congr rfl ?_
   intro a _
-  rw [pmf_map_sum_smul]
+  rw [map_sum_smul]
 
 /-- Marginalize a uniform PMF-weighted sum along the first coordinate of a
 product equivalence. -/
-theorem pmf_uniformOfFintype_sum_equiv_fst_smul {γ α β M : Type*}
+theorem uniformOfFintype_sum_equiv_fst_smul {γ α β M : Type*}
     [Fintype γ] [Nonempty γ]
     [Fintype α] [Nonempty α]
     [Finite β] [Nonempty β]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (e : γ ≃ α × β) (f : α → M) :
     ∑ x : γ, (PMF.uniformOfFintype γ x).toReal • f (e x).1 =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
@@ -361,38 +362,38 @@ theorem pmf_uniformOfFintype_sum_equiv_fst_smul {γ α β M : Type*}
         = ∑ ab : α × β,
             (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 := by
           simpa using
-            (pmf_uniformOfFintype_sum_equiv_smul
+            (uniformOfFintype_sum_equiv_smul
               (e := e) (f := fun x : γ => f (e x).1))
     _ = ∑ a : α, (PMF.uniformOfFintype α a).toReal •
           ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a := by
-          exact pmf_uniformOfFintype_prod_sum_smul (fun a (_ : β) => f a)
+          exact uniformOfFintype_prod_sum_smul (fun a (_ : β) => f a)
     _ = ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
           refine Finset.sum_congr rfl ?_
           intro a _
-          rw [pmf_sum_const_smul]
+          rw [sum_const_smul]
 
 /-- Marginalize a uniform PMF-weighted sum along the second coordinate of a
 product equivalence. -/
-theorem pmf_uniformOfFintype_sum_equiv_snd_smul {γ α β M : Type*}
+theorem uniformOfFintype_sum_equiv_snd_smul {γ α β M : Type*}
     [Fintype γ] [Nonempty γ]
     [Finite α] [Nonempty α]
     [Fintype β] [Nonempty β]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (e : γ ≃ α × β) (f : β → M) :
     ∑ x : γ, (PMF.uniformOfFintype γ x).toReal • f (e x).2 =
       ∑ b : β, (PMF.uniformOfFintype β b).toReal • f b := by
   classical
   haveI := Fintype.ofFinite α
   simpa using
-    (pmf_uniformOfFintype_sum_equiv_fst_smul
+    (uniformOfFintype_sum_equiv_fst_smul
       (e := e.trans (Equiv.prodComm α β)) (f := f))
 
 /-- A uniform PMF-weighted sum pushed forward through a map has the uniform
 average of an equivalent observed coordinate. -/
-theorem pmf_uniformOfFintype_sum_factor_equiv_smul {α β γ M : Type*}
+theorem uniformOfFintype_sum_factor_equiv_smul {α β γ M : Type*}
     [Fintype α] [Nonempty α]
     [Fintype γ] [Nonempty γ]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (m : α → β) (g : β → γ) (e : α ≃ γ)
     (h : ∀ a, g (m a) = e a) (f : γ → M) :
     ∑ a : α, (PMF.uniformOfFintype α a).toReal • f (g (m a)) =
@@ -405,16 +406,16 @@ theorem pmf_uniformOfFintype_sum_factor_equiv_smul {α β γ M : Type*}
           rw [h a]
     _ = ∑ c : γ, (PMF.uniformOfFintype γ c).toReal • f c := by
           simpa using
-            (pmf_uniformOfFintype_sum_equiv_smul
+            (uniformOfFintype_sum_equiv_smul
               (e := e) (f := fun a : α => f (e a)))
 
 /-- A uniform PMF-weighted sum pushed forward through a map has the first
 coordinate uniform marginal when the seed is equivalent to a product. -/
-theorem pmf_uniformOfFintype_sum_factor_equiv_fst_smul {α β γ δ M : Type*}
+theorem uniformOfFintype_sum_factor_equiv_fst_smul {α β γ δ M : Type*}
     [Fintype α] [Nonempty α]
     [Fintype γ] [Nonempty γ]
     [Finite δ] [Nonempty δ]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (m : α → β) (g : β → γ) (e : α ≃ γ × δ)
     (h : ∀ a, g (m a) = (e a).1) (f : γ → M) :
     ∑ a : α, (PMF.uniformOfFintype α a).toReal • f (g (m a)) =
@@ -426,15 +427,15 @@ theorem pmf_uniformOfFintype_sum_factor_equiv_fst_smul {α β γ δ M : Type*}
           intro a _
           rw [h a]
     _ = ∑ c : γ, (PMF.uniformOfFintype γ c).toReal • f c := by
-          exact pmf_uniformOfFintype_sum_equiv_fst_smul (e := e) (f := f)
+          exact uniformOfFintype_sum_equiv_fst_smul (e := e) (f := f)
 
 /-- A uniform PMF-weighted sum pushed forward through a map has the second
 coordinate uniform marginal when the seed is equivalent to a product. -/
-theorem pmf_uniformOfFintype_sum_factor_equiv_snd_smul {α β γ δ M : Type*}
+theorem uniformOfFintype_sum_factor_equiv_snd_smul {α β γ δ M : Type*}
     [Fintype α] [Nonempty α]
     [Finite γ] [Nonempty γ]
     [Fintype δ] [Nonempty δ]
-    [AddCommMonoid M] [Module Error M]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (m : α → β) (g : β → δ) (e : α ≃ γ × δ)
     (h : ∀ a, g (m a) = (e a).2) (f : δ → M) :
     ∑ a : α, (PMF.uniformOfFintype α a).toReal • f (g (m a)) =
@@ -446,9 +447,9 @@ theorem pmf_uniformOfFintype_sum_factor_equiv_snd_smul {α β γ δ M : Type*}
           intro a _
           rw [h a]
     _ = ∑ d : δ, (PMF.uniformOfFintype δ d).toReal • f d := by
-          exact pmf_uniformOfFintype_sum_equiv_snd_smul (e := e) (f := f)
+          exact uniformOfFintype_sum_equiv_snd_smul (e := e) (f := f)
 
-end MIPStarRE.LDT
+end PMF
 
 namespace PMF
 
@@ -460,7 +461,7 @@ theorem realWeightedSum_map {α β M : Type*}
     (p : PMF α) (e : α → β) (f : β → M) :
     realWeightedSum (p.map e) f = realWeightedSum p (fun a => f (e a)) := by
   simpa [realWeightedSum] using
-    MIPStarRE.LDT.pmf_map_sum_smul (p := p) (e := e) (f := f)
+    map_sum_smul (p := p) (e := e) (f := f)
 
 /-- A finite PMF-weighted sum against a monadic composition is the corresponding
 iterated PMF-weighted sum. -/
@@ -471,7 +472,7 @@ theorem realWeightedSum_bind {α β M : Type*}
     realWeightedSum (p.bind q) f =
       realWeightedSum p (fun a => realWeightedSum (q a) f) := by
   simpa [realWeightedSum] using
-    MIPStarRE.LDT.pmf_bind_sum_smul (p := p) (q := q) (f := f)
+    bind_sum_smul (p := p) (q := q) (f := f)
 
 /-- The finite PMF-weighted sum of a constant family is the constant value. -/
 theorem realWeightedSum_const {α M : Type*}
@@ -479,7 +480,7 @@ theorem realWeightedSum_const {α M : Type*}
     (p : PMF α) (x : M) :
     realWeightedSum p (fun _ : α => x) = x := by
   simpa [realWeightedSum] using
-    MIPStarRE.LDT.pmf_sum_const_smul (p := p) (x := x)
+    sum_const_smul (p := p) (x := x)
 
 /-- The scalar finite PMF-weighted sum agrees with the Mathlib integral against
 the measure associated to the probability mass function. -/
@@ -499,7 +500,7 @@ theorem realWeightedSum_uniformOfFintype_equiv {α β M : Type*}
     realWeightedSum (PMF.uniformOfFintype α) f =
       realWeightedSum (PMF.uniformOfFintype β) (fun b => f (e.symm b)) := by
   simpa [realWeightedSum] using
-    MIPStarRE.LDT.pmf_uniformOfFintype_sum_equiv_smul (e := e) (f := f)
+    uniformOfFintype_sum_equiv_smul (e := e) (f := f)
 
 /-- Split a finite expectation against the uniform PMF on a product into
 iterated finite expectations against the coordinate-uniform PMFs. -/
@@ -511,7 +512,7 @@ theorem realWeightedSum_uniformOfFintype_prod {α β M : Type*}
       realWeightedSum (PMF.uniformOfFintype α)
         (fun a => realWeightedSum (PMF.uniformOfFintype β) (fun b => f a b)) := by
   simpa [realWeightedSum] using
-    MIPStarRE.LDT.pmf_uniformOfFintype_prod_sum_smul (f := f)
+    uniformOfFintype_prod_sum_smul (f := f)
 
 /-- A uniform finite expectation pushed forward through a map has the uniform
 expectation of an equivalent observed coordinate. -/
@@ -524,7 +525,7 @@ theorem realWeightedSum_uniformOfFintype_factor_equiv {α β γ M : Type*}
     realWeightedSum (PMF.uniformOfFintype α) (fun a => f (g (m a))) =
       realWeightedSum (PMF.uniformOfFintype γ) f := by
   simpa [realWeightedSum] using
-    MIPStarRE.LDT.pmf_uniformOfFintype_sum_factor_equiv_smul
+    uniformOfFintype_sum_factor_equiv_smul
       (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- A uniform finite expectation pushed forward through a map has the first
@@ -539,7 +540,7 @@ theorem realWeightedSum_uniformOfFintype_factor_equiv_fst {α β γ δ M : Type*
     realWeightedSum (PMF.uniformOfFintype α) (fun a => f (g (m a))) =
       realWeightedSum (PMF.uniformOfFintype γ) f := by
   simpa [realWeightedSum] using
-    MIPStarRE.LDT.pmf_uniformOfFintype_sum_factor_equiv_fst_smul
+    uniformOfFintype_sum_factor_equiv_fst_smul
       (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- A uniform finite expectation pushed forward through a map has the second
@@ -554,7 +555,7 @@ theorem realWeightedSum_uniformOfFintype_factor_equiv_snd {α β γ δ M : Type*
     realWeightedSum (PMF.uniformOfFintype α) (fun a => f (g (m a))) =
       realWeightedSum (PMF.uniformOfFintype δ) f := by
   simpa [realWeightedSum] using
-    MIPStarRE.LDT.pmf_uniformOfFintype_sum_factor_equiv_snd_smul
+    uniformOfFintype_sum_factor_equiv_snd_smul
       (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- For finite probability mass functions, total variation is the total positive
@@ -569,8 +570,7 @@ theorem totalVariationDistance_eq_sum_max_sub {α : Type*}
   classical
   have hdiff_sum :
       ∑ a : α, ((q a).toReal - (p a).toReal) = 0 := by
-    rw [Finset.sum_sub_distrib, MIPStarRE.LDT.pmf_sum_toReal_eq_one q,
-      MIPStarRE.LDT.pmf_sum_toReal_eq_one p, sub_self]
+    rw [Finset.sum_sub_distrib, sum_toReal_eq_one q, sum_toReal_eq_one p, sub_self]
   have hmax_abs :
       ∀ a : α, max 0 ((q a).toReal - (p a).toReal) =
         (((q a).toReal - (p a).toReal) + |(p a).toReal - (q a).toReal|) / 2 := by
@@ -745,7 +745,7 @@ theorem realWeightedSum_rpow_one_div_le_rpow {α : Type*}
     realWeightedSum p (fun a => Real.rpow (f a) (1 / (n : MIPStarRE.LDT.Error))) ≤
       Real.rpow (realWeightedSum p f) (1 / (n : MIPStarRE.LDT.Error)) := by
   simpa [realWeightedSum, smul_eq_mul] using
-    MIPStarRE.LDT.pmf_sum_rpow_one_div_le_rpow_sum
+    sum_rpow_one_div_le_rpow_sum
       (p := p) (f := f) (n := n) hn hf
 
 end PMF

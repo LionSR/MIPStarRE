@@ -222,7 +222,24 @@ based on Mathlib PMFs.  The project keeps `Distribution` for paper notation and
 explicit finite supports, but probability identities should use these PMF
 lemmas when the statement is naturally about a genuine finite probability law.
 
-- `theorem pmf_sum_toReal_eq_one (p : PMF α) : ∑ a : α, (p a).toReal = 1`
+- `theorem PMF.sum_toReal_eq_one (p : PMF α) : ∑ a : α, (p a).toReal = 1`
+
+- `theorem PMF.map_sum_smul (p : PMF α) (e : α → β) (f : β → M) :
+  ∑ b : β, ((p.map e) b).toReal • f b =
+    ∑ a : α, (p a).toReal • f (e a)`
+
+- `theorem PMF.bind_sum_smul (p : PMF α) (q : α → PMF β) (f : β → M) :
+  ∑ b : β, ((p.bind q) b).toReal • f b =
+    ∑ a : α, (p a).toReal • ∑ b : β, (q a b).toReal • f b`
+
+- `theorem PMF.uniformOfFintype_sum_equiv_smul (e : α ≃ β) (f : α → M) :
+  ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a =
+    ∑ b : β, (PMF.uniformOfFintype β b).toReal • f (e.symm b)`
+
+- `theorem PMF.uniformOfFintype_prod_sum_smul (f : α → β → M) :
+  ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 ab.2 =
+    ∑ a : α, (PMF.uniformOfFintype α a).toReal •
+      ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b`
 
 - `noncomputable def PMF.totalVariationDistance (p q : PMF α) : Error`
 
