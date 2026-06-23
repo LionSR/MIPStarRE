@@ -44,10 +44,8 @@ theorem averageOperatorOverDistribution_uniform_prod
       averageOperatorOverDistribution (uniformDistribution α)
         (fun a => averageOperatorOverDistribution (uniformDistribution β)
           (fun b => f a b)) := by
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum (α := α × β)]
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum (α := α)]
-  simp_rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum (α := β)]
-  exact PMF.realWeightedSum_uniformOfFintype_prod f
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_prod (f := f)
 
 /-- Swap two nested uniform operator averages over finite nonempty types. -/
 theorem averageOperatorOverDistribution_uniform_comm
@@ -61,23 +59,8 @@ theorem averageOperatorOverDistribution_uniform_comm
       averageOperatorOverDistribution (uniformDistribution β)
         (fun b => averageOperatorOverDistribution (uniformDistribution α)
           (fun a => f a b)) := by
-  calc
-    averageOperatorOverDistribution (uniformDistribution α)
-        (fun a => averageOperatorOverDistribution (uniformDistribution β) (f a))
-        = averageOperatorOverDistribution (uniformDistribution (α × β))
-            (fun ab => f ab.1 ab.2) := by
-          exact (averageOperatorOverDistribution_uniform_prod
-            (α := α) (β := β) (f := f)).symm
-    _ = averageOperatorOverDistribution (uniformDistribution (β × α))
-          (fun ba => f ba.2 ba.1) := by
-          simpa using
-            (averageOperatorOverDistribution_uniform_equiv (e := Equiv.prodComm α β)
-              (f := fun ab : α × β => f ab.1 ab.2))
-    _ = averageOperatorOverDistribution (uniformDistribution β)
-          (fun b => averageOperatorOverDistribution (uniformDistribution α)
-            (fun a => f a b)) := by
-          exact averageOperatorOverDistribution_uniform_prod
-            (α := β) (β := α) (f := fun b a => f a b)
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_comm (f := f)
 
 /-- Split a uniform operator average over a product into iterated uniform
 operator averages, with the second coordinate averaged first. -/
@@ -92,17 +75,8 @@ theorem averageOperatorOverDistribution_uniform_prod_swap
       averageOperatorOverDistribution (uniformDistribution β)
         (fun b => averageOperatorOverDistribution (uniformDistribution α)
           (fun a => f a b)) := by
-  calc
-    averageOperatorOverDistribution (uniformDistribution (α × β))
-        (fun ab => f ab.1 ab.2)
-        = averageOperatorOverDistribution (uniformDistribution α)
-            (fun a => averageOperatorOverDistribution (uniformDistribution β)
-              (fun b => f a b)) := by
-          exact averageOperatorOverDistribution_uniform_prod f
-    _ = averageOperatorOverDistribution (uniformDistribution β)
-          (fun b => averageOperatorOverDistribution (uniformDistribution α)
-            (fun a => f a b)) := by
-          exact averageOperatorOverDistribution_uniform_comm f
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_prod_swap (f := f)
 
 /-- Operator averaging of a family depending only on the first coordinate
 marginalizes a uniform product. -/
@@ -114,20 +88,9 @@ theorem averageOperatorOverDistribution_uniform_fst
     (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (uniformDistribution (α × β)) (fun ab => f ab.1) =
       averageOperatorOverDistribution (uniformDistribution α) f := by
-  calc
-    averageOperatorOverDistribution (uniformDistribution (α × β)) (fun ab => f ab.1)
-        = averageOperatorOverDistribution (uniformDistribution (α × β))
-            (fun ab => (fun a (_ : β) => f a) ab.1 ab.2) := rfl
-    _ = averageOperatorOverDistribution (uniformDistribution α)
-          (fun a => averageOperatorOverDistribution (uniformDistribution β)
-            (fun _ : β => f a)) := by
-          exact averageOperatorOverDistribution_uniform_prod
-            (α := α) (β := β) (f := fun a (_ : β) => f a)
-    _ = averageOperatorOverDistribution (uniformDistribution α) f := by
-          refine averageOperatorOverDistribution_congr _ _ _ ?_
-          intro a
-          exact averageOperatorOverDistribution_const_of_isProbability
-            (uniformDistribution β) (uniformDistribution_isProbability β) (f a)
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_equiv_fst
+      (e := Equiv.refl (α × β)) (f := f)
 
 /-- Operator averaging of a family depending only on the second coordinate
 marginalizes a uniform product. -/
@@ -139,20 +102,9 @@ theorem averageOperatorOverDistribution_uniform_snd
     (f : β → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (uniformDistribution (α × β)) (fun ab => f ab.2) =
       averageOperatorOverDistribution (uniformDistribution β) f := by
-  calc
-    averageOperatorOverDistribution (uniformDistribution (α × β)) (fun ab => f ab.2)
-        = averageOperatorOverDistribution (uniformDistribution (α × β))
-            (fun ab => (fun (_ : α) b => f b) ab.1 ab.2) := rfl
-    _ = averageOperatorOverDistribution (uniformDistribution β)
-          (fun b => averageOperatorOverDistribution (uniformDistribution α)
-            (fun _ : α => f b)) := by
-          exact averageOperatorOverDistribution_uniform_prod_swap
-            (α := α) (β := β) (f := fun (_ : α) b => f b)
-    _ = averageOperatorOverDistribution (uniformDistribution β) f := by
-          refine averageOperatorOverDistribution_congr _ _ _ ?_
-          intro b
-          exact averageOperatorOverDistribution_const_of_isProbability
-            (uniformDistribution α) (uniformDistribution_isProbability α) (f b)
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_equiv_snd
+      (e := Equiv.refl (α × β)) (f := f)
 
 /-- Transport a uniform operator average through an equivalence whose target is
 a product, then split the product average into iterated uniform averages. -/
@@ -167,16 +119,8 @@ theorem averageOperatorOverDistribution_uniform_equiv_prod
       averageOperatorOverDistribution (uniformDistribution α)
         (fun a => averageOperatorOverDistribution (uniformDistribution β)
           (fun b => f (e.symm (a, b)))) := by
-  calc
-    averageOperatorOverDistribution (uniformDistribution γ) f
-        = averageOperatorOverDistribution (uniformDistribution (α × β))
-            (fun ab => f (e.symm ab)) := by
-          exact averageOperatorOverDistribution_uniform_equiv e f
-    _ = averageOperatorOverDistribution (uniformDistribution α)
-          (fun a => averageOperatorOverDistribution (uniformDistribution β)
-            (fun b => f (e.symm (a, b)))) := by
-          exact averageOperatorOverDistribution_uniform_prod
-            (f := fun a b => f (e.symm (a, b)))
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_equiv_prod (e := e) (f := f)
 
 /-- Transport a uniform operator average through an equivalence whose target is
 a product, then split the product average with the second coordinate averaged
@@ -192,9 +136,8 @@ theorem averageOperatorOverDistribution_uniform_equiv_prod_swap
       averageOperatorOverDistribution (uniformDistribution β)
         (fun b => averageOperatorOverDistribution (uniformDistribution α)
           (fun a => f (e.symm (a, b)))) := by
-  rw [averageOperatorOverDistribution_uniform_equiv_prod (e := e) (f := f)]
-  exact averageOperatorOverDistribution_uniform_comm
-    (fun a b => f (e.symm (a, b)))
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_equiv_prod_swap (e := e) (f := f)
 
 /-- A function depending only on the first coordinate of a product equivalence
 has the corresponding first-coordinate uniform operator marginal. -/
@@ -207,15 +150,8 @@ theorem averageOperatorOverDistribution_uniform_equiv_fst
     (e : γ ≃ α × β) (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (uniformDistribution γ) (fun x => f (e x).1) =
       averageOperatorOverDistribution (uniformDistribution α) f := by
-  classical
-  haveI := Fintype.ofFinite β
-  rw [averageOperatorOverDistribution_uniform_equiv_prod
-    (e := e) (f := fun x => f (e x).1)]
-  refine averageOperatorOverDistribution_congr _ _ _ ?_
-  intro a
-  simpa using
-    (averageOperatorOverDistribution_const_of_isProbability
-      (uniformDistribution β) (uniformDistribution_isProbability β) (f a))
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_equiv_fst (e := e) (f := f)
 
 /-- A function depending only on the second coordinate of a product equivalence
 has the corresponding second-coordinate uniform operator marginal. -/
@@ -228,14 +164,7 @@ theorem averageOperatorOverDistribution_uniform_equiv_snd
     (e : γ ≃ α × β) (f : β → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (uniformDistribution γ) (fun x => f (e x).2) =
       averageOperatorOverDistribution (uniformDistribution β) f := by
-  classical
-  haveI := Fintype.ofFinite α
-  rw [averageOperatorOverDistribution_uniform_equiv_prod_swap
-    (e := e) (f := fun x => f (e x).2)]
-  refine averageOperatorOverDistribution_congr _ _ _ ?_
-  intro b
-  simpa using
-    (averageOperatorOverDistribution_const_of_isProbability
-      (uniformDistribution α) (uniformDistribution_isProbability α) (f b))
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_equiv_snd (e := e) (f := f)
 
 end MIPStarRE.LDT
