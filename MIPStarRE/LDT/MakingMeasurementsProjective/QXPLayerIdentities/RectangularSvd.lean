@@ -377,41 +377,6 @@ noncomputable def QXPLayerData.ofRankReductionAndRectangularSvdSquareRootUnitary
 data whose square factors are `Matrix.unitaryGroup` elements.
 
 The unitarity hypotheses for `U` and `V` are carried by their types. -/
-noncomputable def QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroupWithCarrier
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (q : OpFamily Outcome ι)
-    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (q.outcome a))
-    (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total)
-    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (sigmaRangeQLayer q).auxSpace.carrier ℂ)
-    (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (sigmaRangeQLayer q).auxSpace.carrier ι ℂ)
-    (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (sigmaRangeQLayer q).auxSpace.carrier))
-    (hx : sigmaFinRangeEmbedding q.outcome qa_projective =
-      (U : Matrix (sigmaRangeQLayer q).auxSpace.carrier
-        (sigmaRangeQLayer q).auxSpace.carrier ℂ) *
-      S * (V : Matrix ι ι ℂ)ᴴ)
-    (hSqrt : (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ =
-      CFC.sqrt q.total) :
-    QXPLayerData Outcome ι :=
-  QXPLayerData.ofSigmaRangeAndSvdIdentities (q := q)
-    qa_projective q_sum_eq_total
-    (rectangularSvdXHat
-      (U : Matrix (sigmaRangeQLayer q).auxSpace.carrier
-        (sigmaRangeQLayer q).auxSpace.carrier ℂ)
-      (V : Matrix ι ι ℂ) Iro)
-    (rectangularSvd_xHat_coisometry_unitaryGroup U V Iro hIro)
-    (rectangularSvd_xHat_mixed_of_sqrtQ_unitaryGroup
-      (sigmaFinRangeEmbedding q.outcome qa_projective) U
-      (V : Matrix ι ι ℂ) S Iro q.total hx hSqrt)
-
-/-- Assemble the canonical sigma-space `Q/X/Xhat/P` layer from rectangular SVD
-data whose square factors are `Matrix.unitaryGroup` elements.
-
-The unitarity hypotheses for `U` and `V` are carried by their types. -/
 noncomputable def QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroup
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
@@ -420,56 +385,26 @@ noncomputable def QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroup
     (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (q.outcome a).rank))) ℂ)
+    (U : Matrix.unitaryGroup (sigmaRangeCarrier q) ℂ)
     (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (q.outcome a).rank))) ι ℂ)
+    (S Iro : Matrix (sigmaRangeCarrier q) ι ℂ)
     (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier q)))
     (hx : sigmaFinRangeEmbedding q.outcome qa_projective =
-      (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (q.outcome a).rank)))
-        (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-          (fun a : Outcome => (q.outcome a).rank))) ℂ) *
+      (U : Matrix (sigmaRangeCarrier q) (sigmaRangeCarrier q) ℂ) *
       S * (V : Matrix ι ι ℂ)ᴴ)
     (hSqrt : (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ =
       CFC.sqrt q.total) :
     QXPLayerData Outcome ι :=
-  QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroupWithCarrier (q := q)
-    qa_projective q_sum_eq_total U V S Iro hIro hx hSqrt
-
-/-- Assemble the canonical sigma-space `Q/X/Xhat/P` layer from unitary-group
-rectangular SVD data whose middle factor is characterized as a positive square
-root. -/
-noncomputable def QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGroupWithCarrier
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (q : OpFamily Outcome ι)
-    (qa_projective : ∀ a : Outcome, MIPStarRE.Quantum.IsProj (q.outcome a))
-    (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total)
-    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (sigmaRangeQLayer q).auxSpace.carrier ℂ)
-    (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (sigmaRangeQLayer q).auxSpace.carrier ι ℂ)
-    (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (sigmaRangeQLayer q).auxSpace.carrier))
-    (hx : sigmaFinRangeEmbedding q.outcome qa_projective =
-      (U : Matrix (sigmaRangeQLayer q).auxSpace.carrier
-        (sigmaRangeQLayer q).auxSpace.carrier ℂ) *
-      S * (V : Matrix ι ι ℂ)ᴴ)
-    (hMiddle_nonneg :
-      0 ≤ (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ)
-    (hMiddle_sq :
-      ((V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ) *
-        ((V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ) = q.total) :
-    QXPLayerData Outcome ι :=
-  QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroupWithCarrier (q := q)
-    qa_projective q_sum_eq_total U V S Iro hIro hx
-      (rectangularSvd_middle_eq_sqrt_of_square (V : Matrix ι ι ℂ) S Iro q.total
-        hMiddle_nonneg hMiddle_sq)
+  QXPLayerData.ofSigmaRangeAndSvdIdentities (q := q)
+    qa_projective q_sum_eq_total
+    (rectangularSvdXHat
+      (U : Matrix (sigmaRangeCarrier q) (sigmaRangeCarrier q) ℂ)
+      (V : Matrix ι ι ℂ) Iro)
+    (rectangularSvd_xHat_coisometry_unitaryGroup U V Iro hIro)
+    (rectangularSvd_xHat_mixed_of_sqrtQ_unitaryGroup
+      (sigmaFinRangeEmbedding q.outcome qa_projective) U
+      (V : Matrix ι ι ℂ) S Iro q.total hx hSqrt)
 
 /-- Assemble the canonical sigma-space `Q/X/Xhat/P` layer from unitary-group
 rectangular SVD data whose middle factor is characterized as a positive square
@@ -482,19 +417,13 @@ noncomputable def QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGro
     (q_sum_eq_total : ∑ a : Outcome, q.outcome a = q.total)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (q.outcome a).rank))) ℂ)
+    (U : Matrix.unitaryGroup (sigmaRangeCarrier q) ℂ)
     (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (q.outcome a).rank))) ι ℂ)
+    (S Iro : Matrix (sigmaRangeCarrier q) ι ℂ)
     (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier q)))
     (hx : sigmaFinRangeEmbedding q.outcome qa_projective =
-      (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (q.outcome a).rank)))
-        (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-          (fun a : Outcome => (q.outcome a).rank))) ℂ) *
+      (U : Matrix (sigmaRangeCarrier q) (sigmaRangeCarrier q) ℂ) *
       S * (V : Matrix ι ι ℂ)ᴴ)
     (hMiddle_nonneg :
       0 ≤ (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ)
@@ -502,46 +431,10 @@ noncomputable def QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGro
       ((V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ) *
         ((V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ) = q.total) :
     QXPLayerData Outcome ι :=
-  QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGroupWithCarrier
-    (q := q) qa_projective q_sum_eq_total U V S Iro
-      hIro hx hMiddle_nonneg hMiddle_sq
-
-/-- Rank-reduction existence form for the canonical sigma-space QXP layer from
-unitary-group rectangular SVD data. -/
-theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGroupWithCarrier
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
-    {qLayer : QLayerData Outcome ι}
-    (hRank : RankReductionWitness ψ A ζ qLayer)
-    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ)
-    (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ)
-    (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (sigmaRangeQLayer qLayer.q).auxSpace.carrier))
-    (hx : sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective =
-      (U : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier
-        (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ) *
-      S * (V : Matrix ι ι ℂ)ᴴ)
-    (hSqrt : (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ =
-      CFC.sqrt (QTotal qLayer)) :
-    ∃ data : QXPLayerData Outcome ι,
-      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
-        hq ▸ data.x =
-            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-              sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
-          hq ▸ data.xHat =
-            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-              (U : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier
-                (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ) *
-              Iro * (V : Matrix ι ι ℂ)ᴴ) := by
-  classical
-  exact
-    ⟨QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroupWithCarrier (q := qLayer.q)
-      hRank.projective hRank.sum_eq_total U V S Iro hIro hx hSqrt,
-      rfl, rfl, rfl⟩
+  QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroup (q := q)
+    qa_projective q_sum_eq_total U V S Iro hIro hx
+      (rectangularSvd_middle_eq_sqrt_of_square (V : Matrix ι ι ℂ) S Iro q.total
+        hMiddle_nonneg hMiddle_sq)
 
 /-- Rank-reduction existence form for the canonical sigma-space QXP layer from
 unitary-group rectangular SVD data. -/
@@ -553,19 +446,13 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGro
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ)
+    (U : Matrix.unitaryGroup (sigmaRangeCarrier qLayer.q) ℂ)
     (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (S Iro : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ)
     (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)))
     (hx : sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective =
-      (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))
-        (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-          (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ) *
+      (U : Matrix (sigmaRangeCarrier qLayer.q) (sigmaRangeCarrier qLayer.q) ℂ) *
       S * (V : Matrix ι ι ℂ)ᴴ)
     (hSqrt : (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ =
       CFC.sqrt (QTotal qLayer)) :
@@ -576,55 +463,12 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGro
               sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
           hq ▸ data.xHat =
             (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-              (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-                (fun a : Outcome => (qLayer.q.outcome a).rank)))
-                (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-                  (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ) *
-              Iro * (V : Matrix ι ι ℂ)ᴴ) :=
-  exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdUnitaryGroupWithCarrier
-    hRank U V S Iro hIro hx hSqrt
-
-/-- Rank-reduction existence form for the canonical sigma-space QXP layer from
-unitary-group rectangular SVD data whose middle factor is characterized as a
-positive square root. -/
-theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSqrtWithCarrier
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
-    {qLayer : QLayerData Outcome ι}
-    (hRank : RankReductionWitness ψ A ζ qLayer)
-    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ)
-    (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ)
-    (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (sigmaRangeQLayer qLayer.q).auxSpace.carrier))
-    (hx : sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective =
-      (U : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier
-        (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ) *
-      S * (V : Matrix ι ι ℂ)ᴴ)
-    (hMiddle_nonneg :
-      0 ≤ (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ)
-    (hMiddle_sq :
-      ((V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ) *
-        ((V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ) =
-          QTotal qLayer) :
-    ∃ data : QXPLayerData Outcome ι,
-      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
-        hq ▸ data.x =
-            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-              sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
-          hq ▸ data.xHat =
-            (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-              (U : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier
-                (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ) *
+              (U : Matrix (sigmaRangeCarrier qLayer.q) (sigmaRangeCarrier qLayer.q) ℂ) *
               Iro * (V : Matrix ι ι ℂ)ᴴ) := by
   classical
   exact
-    ⟨QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGroupWithCarrier
-      (q := qLayer.q) hRank.projective hRank.sum_eq_total U V S Iro
-        hIro hx hMiddle_nonneg hMiddle_sq,
+    ⟨QXPLayerData.ofSigmaRangeAndRectangularSvdUnitaryGroup (q := qLayer.q)
+      hRank.projective hRank.sum_eq_total U V S Iro hIro hx hSqrt,
       rfl, rfl, rfl⟩
 
 /-- Rank-reduction existence form for the canonical sigma-space QXP layer from
@@ -638,19 +482,13 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ)
+    (U : Matrix.unitaryGroup (sigmaRangeCarrier qLayer.q) ℂ)
     (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (S Iro : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ)
     (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)))
     (hx : sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective =
-      (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))
-        (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-          (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ) *
+      (U : Matrix (sigmaRangeCarrier qLayer.q) (sigmaRangeCarrier qLayer.q) ℂ) *
       S * (V : Matrix ι ι ℂ)ᴴ)
     (hMiddle_nonneg :
       0 ≤ (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ)
@@ -665,13 +503,14 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRoot
               sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
           hq ▸ data.xHat =
             (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-              (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-                (fun a : Outcome => (qLayer.q.outcome a).rank)))
-                (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-                  (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ) *
-              Iro * (V : Matrix ι ι ℂ)ᴴ) :=
-  exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSqrtWithCarrier
-    hRank U V S Iro hIro hx hMiddle_nonneg hMiddle_sq
+              (U : Matrix (sigmaRangeCarrier qLayer.q) (sigmaRangeCarrier qLayer.q) ℂ) *
+              Iro * (V : Matrix ι ι ℂ)ᴴ) := by
+  classical
+  exact
+    ⟨QXPLayerData.ofSigmaRangeAndRectangularSvdSquareRootUnitaryGroup
+      (q := qLayer.q) hRank.projective hRank.sum_eq_total U V S Iro
+        hIro hx hMiddle_nonneg hMiddle_sq,
+      rfl, rfl, rfl⟩
 
 end
 

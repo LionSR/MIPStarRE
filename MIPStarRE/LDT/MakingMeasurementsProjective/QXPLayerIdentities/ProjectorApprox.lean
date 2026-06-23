@@ -431,11 +431,9 @@ lemma pQApprox_ofRankReductionSigmaRangeAndSvdIdentities
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (xHat : Matrix (ULift (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (xHat : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ)
     (xHat_coisometry : xHat * xHatᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)))
     (xHat_mixed :
       (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
         CFC.sqrt (QTotal qLayer))
@@ -476,11 +474,9 @@ lemma pQApprox_ofRankReductionSigmaRangePositiveGram
       (fun a : Outcome => (qLayer.q.outcome a).rank))]
     (hψ : ψ.IsNormalized)
     (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
-    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ,
+    ∃ xHat : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ,
       xHat * xHatᴴ =
-          (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-            (fun a : Outcome => (qLayer.q.outcome a).rank)))) ∧
+          (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)) ∧
         (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
             CFC.sqrt (QTotal qLayer) ∧
           ∃ data : QXPLayerData Outcome ι,
@@ -526,11 +522,9 @@ lemma pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry
       (fun a : Outcome => (qLayer.q.outcome a).rank))]
     (hψ : ψ.IsNormalized)
     (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
-    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ,
+    ∃ xHat : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ,
       xHat * xHatᴴ =
-          (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-            (fun a : Outcome => (qLayer.q.outcome a).rank)))) ∧
+          (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)) ∧
         (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
             CFC.sqrt (QTotal qLayer) ∧
           ∃ data : QXPLayerData Outcome ι,
@@ -560,58 +554,6 @@ positive-square characterization of the middle factor.
 
 The square SVD factors are represented as elements of `Matrix.unitaryGroup`;
 hence the unitarity laws are not separate hypotheses. -/
-lemma pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroupWithCarrier
-    {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
-    {ι : Type uι} [Fintype ι] [DecidableEq ι]
-    (ψ : QuantumState ι)
-    (A : Measurement Outcome ι) (ζ : Error)
-    {qLayer : QLayerData Outcome ι}
-    (hRank : RankReductionWitness ψ A ζ qLayer)
-    [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ)
-    (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ)
-    (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (sigmaRangeQLayer qLayer.q).auxSpace.carrier))
-    (hx : sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective =
-      (U : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier
-        (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ) *
-      S * (V : Matrix ι ι ℂ)ᴴ)
-    (hMiddle_nonneg :
-      0 ≤ (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ)
-    (hMiddle_sq :
-      ((V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ) *
-        ((V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ) =
-          QTotal qLayer)
-    (hψ : ψ.IsNormalized)
-    (hζ : 0 ≤ ζ) (hζ_small : ζ ≤ 1 / (4 : Error)) :
-    ∃ data : QXPLayerData Outcome ι,
-      ∃ hq : data.qLayer = sigmaRangeQLayer qLayer.q,
-        hq ▸ data.x =
-          (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-            sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
-        hq ▸ data.xHat =
-          (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-            (U : Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier
-              (sigmaRangeQLayer qLayer.q).auxSpace.carrier ℂ) *
-            Iro * (V : Matrix ι ι ℂ)ᴴ) ∧
-        SDDOpRel ψ (uniformDistribution Unit)
-          (constOpFamily data.qLayer.q)
-          (constOpFamily (PFamily data))
-          (30 * zetaQuarterRoot ζ) := by
-  obtain ⟨data, hq, hdata_x, hdata_xHat⟩ :=
-    exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSqrtWithCarrier
-      hRank U V S Iro hIro hx hMiddle_nonneg hMiddle_sq
-  refine ⟨data, hq, hdata_x, hdata_xHat, ?_⟩
-  exact pQApprox ψ A ζ data hψ hζ hζ_small
-    (hq.symm ▸ hRank.toSigmaRangeQLayer)
-
-/-- Apply `lem:P-Q-approx` to unitary-group rectangular SVD data and the
-positive-square characterization of the middle factor.
-
-The square SVD factors are represented as elements of `Matrix.unitaryGroup`;
-hence the unitarity laws are not separate hypotheses. -/
 lemma pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup
     {Outcome : Type uOutcome} [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
@@ -621,19 +563,13 @@ lemma pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))]
-    (U : Matrix.unitaryGroup (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ)
+    (U : Matrix.unitaryGroup (sigmaRangeCarrier qLayer.q) ℂ)
     (V : Matrix.unitaryGroup ι ℂ)
-    (S Iro : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ)
+    (S Iro : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ)
     (hIro : Iro * Iroᴴ =
-      (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))))
+      (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)))
     (hx : sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective =
-      (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank)))
-        (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-          (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ) *
+      (U : Matrix (sigmaRangeCarrier qLayer.q) (sigmaRangeCarrier qLayer.q) ℂ) *
       S * (V : Matrix ι ι ℂ)ᴴ)
     (hMiddle_nonneg :
       0 ≤ (V : Matrix ι ι ℂ) * (Sᴴ * Iro) * (V : Matrix ι ι ℂ)ᴴ)
@@ -650,17 +586,18 @@ lemma pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup
             sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective) ∧
         hq ▸ data.xHat =
           (show Matrix (sigmaRangeQLayer qLayer.q).auxSpace.carrier ι ℂ from
-            (U : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-              (fun a : Outcome => (qLayer.q.outcome a).rank)))
-              (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-                (fun a : Outcome => (qLayer.q.outcome a).rank))) ℂ) *
+            (U : Matrix (sigmaRangeCarrier qLayer.q) (sigmaRangeCarrier qLayer.q) ℂ) *
             Iro * (V : Matrix ι ι ℂ)ᴴ) ∧
         SDDOpRel ψ (uniformDistribution Unit)
           (constOpFamily data.qLayer.q)
           (constOpFamily (PFamily data))
-          (30 * zetaQuarterRoot ζ) :=
-  pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroupWithCarrier
-    ψ A ζ hRank U V S Iro hIro hx hMiddle_nonneg hMiddle_sq hψ hζ hζ_small
+          (30 * zetaQuarterRoot ζ) := by
+  obtain ⟨data, hq, hdata_x, hdata_xHat⟩ :=
+    exists_qxpLayerData_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup
+      hRank U V S Iro hIro hx hMiddle_nonneg hMiddle_sq
+  refine ⟨data, hq, hdata_x, hdata_xHat, ?_⟩
+  exact pQApprox ψ A ζ data hψ hζ hζ_small
+    (hq.symm ▸ hRank.toSigmaRangeQLayer)
 
 end
 

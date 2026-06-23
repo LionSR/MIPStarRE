@@ -921,6 +921,8 @@
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.rectangularSvdRangeMiddle}
 		\leanok
+		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.sigmaRangeCarrier}
+		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofRankReductionAndSvdIdentities}
 		\leanok
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerData.ofSigmaRangeAndSvdIdentities}
@@ -964,7 +966,10 @@
 		\(X^\dagger\widehat X\), and the restatement of the \(Q_a\)'s.  The
 		unitary-group constructors are the same rectangular-SVD calculation, with
 		the square factors taken as elements of the relevant unitary groups
-		rather than as matrices accompanied by separate unitarity equations.
+		rather than as matrices accompanied by separate unitarity equations.  In
+		the sigma-range specialization, the auxiliary row space is the lifted
+		finite-enumeration carrier associated to the ranks of the \(Q_a\)'s, which
+		is definitionally the carrier of the canonical sigma-range \(Q\)-layer.
 	\end{proof}
 
 	\begin{remark}[Formalization support for orthogonal projector families]\label{rem:motivation-for-P}
@@ -1348,7 +1353,6 @@
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndSvdIdentities}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangePositiveGram_with_x_coisometry}
-		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroupWithCarrier}
 		\lean{MIPStarRE.LDT.MakingMeasurementsProjective.pQApprox_ofRankReductionSigmaRangeAndRectangularSvdSquareRootUnitaryGroup}
 		\leanok
 		\begin{equation*}

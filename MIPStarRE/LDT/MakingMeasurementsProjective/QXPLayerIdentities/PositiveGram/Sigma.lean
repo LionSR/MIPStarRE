@@ -95,16 +95,13 @@ theorem exists_xHat_of_sigmaFinRangeEmbedding_positiveGram
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))] :
-    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ,
+    ∃ xHat : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ,
       xHat * xHatᴴ =
-        (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-          (fun a : Outcome => (qLayer.q.outcome a).rank)))) ∧
+        (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)) ∧
         (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
           CFC.sqrt (QTotal qLayer) := by
   classical
-  let X : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ :=
+  let X : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ :=
     sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective
   have hgram : Xᴴ * X = QTotal qLayer := by
     simpa [X, QTotal] using
@@ -120,8 +117,7 @@ theorem exists_xHat_of_sigmaFinRangeEmbedding_positiveGram
     exact Matrix.posSemidef_gram ℂ _
   have hQ : (QTotal qLayer).IsHermitian := hQ_pos.isHermitian
   have hcard :
-      Fintype.card (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-        (fun a : Outcome => (qLayer.q.outcome a).rank))) ≤ Fintype.card ι := by
+      Fintype.card (sigmaRangeCarrier qLayer.q) ≤ Fintype.card ι := by
     exact hRank.toSigmaRangeQLayer.auxDim_le
   simpa [X] using
     exists_xHat_of_positive_gram_spectrum X (QTotal qLayer) hQ hQ_pos hgram hcard
@@ -141,11 +137,9 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))] :
-    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ,
+    ∃ xHat : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ,
       xHat * xHatᴴ =
-          (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-            (fun a : Outcome => (qLayer.q.outcome a).rank)))) ∧
+          (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)) ∧
         (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
             CFC.sqrt (QTotal qLayer) ∧
           ∃ data : QXPLayerData Outcome ι,
@@ -180,11 +174,9 @@ theorem exists_qxpLayerData_ofRankReductionSigmaRangePositiveGram_with_x_coisome
       (∑ a : Outcome, qLayer.q.outcome a) ≤ (1 : MIPStarRE.Quantum.Op ι))
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))] :
-    ∃ xHat : Matrix (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-      (fun a : Outcome => (qLayer.q.outcome a).rank))) ι ℂ,
+    ∃ xHat : Matrix (sigmaRangeCarrier qLayer.q) ι ℂ,
       xHat * xHatᴴ =
-          (1 : MIPStarRE.Quantum.Op (ULift.{uι} (FiniteHilbertSpace.sigmaFinCarrier
-            (fun a : Outcome => (qLayer.q.outcome a).rank)))) ∧
+          (1 : MIPStarRE.Quantum.Op (sigmaRangeCarrier qLayer.q)) ∧
         (sigmaFinRangeEmbedding qLayer.q.outcome hRank.projective)ᴴ * xHat =
             CFC.sqrt (QTotal qLayer) ∧
           ∃ data : QXPLayerData Outcome ι,
