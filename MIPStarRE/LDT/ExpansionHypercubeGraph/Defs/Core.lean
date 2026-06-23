@@ -111,8 +111,8 @@ theorem avgOver_rerandomizeCoord_eq_uniform_sample (params : Parameters)
       avgOver (uniformDistribution (RerandomizeCoordSample params))
         (fun sample => f (rerandomizeCoordSampleToPair params sample)) := by
   simpa [rerandomizeCoord] using
-    avgOver_uniformDistribution_map
-      (RerandomizeCoordSample params) (Point params × Point params)
+    Distribution.avgOver_map
+      (uniformDistribution (RerandomizeCoordSample params))
       (rerandomizeCoordSampleToPair params) f
 
 /-- The push-forward presentation of `rerandomizeCoord` has the same averages as

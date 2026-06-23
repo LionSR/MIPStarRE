@@ -198,28 +198,53 @@ theorem averageOperatorOverDistribution_mul_left_right {α : Type*}
   intro a _
   simp [mul_assoc]
 
+namespace Distribution
+
+/-- A module-valued finite weighted sum against a probabilistic project
+distribution may be written with the real weights of the associated Mathlib
+probability mass function, over the stored support. -/
+theorem sum_smul_eq_toPMF_support_sum {α M : Type*}
+    [AddCommMonoid M] [Module Error M]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → M) :
+    ∑ a ∈ 𝒟.support, 𝒟.weight a • f a =
+      ∑ a ∈ 𝒟.support, (𝒟.toPMF h𝒟 a).toReal • f a := by
+  exact Finset.sum_congr rfl fun a _ => by
+    rw [Distribution.toPMF_apply_toReal]
+
+/-- A module-valued finite weighted sum against a probabilistic project
+distribution may be written as a full finite sum with the real weights of the
+associated Mathlib probability mass function. -/
+theorem sum_smul_eq_toPMF_sum {α M : Type*} [Fintype α]
+    [AddCommMonoid M] [Module Error M]
+    (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → M) :
+    ∑ a ∈ 𝒟.support, 𝒟.weight a • f a =
+      ∑ a : α, (𝒟.toPMF h𝒟 a).toReal • f a := by
+  rw [Distribution.sum_smul_eq_toPMF_support_sum 𝒟 h𝒟 f]
+  exact (Distribution.sum_univ_eq_sum_support 𝒟
+    (fun a => (𝒟.toPMF h𝒟 a).toReal • f a)
+    (by
+      intro a ha
+      rw [Distribution.toPMF_apply_of_notMem 𝒟 h𝒟 ha]
+      simp)).symm
+
+end Distribution
+
 /-- Averaging against a probabilistic project distribution is the finite sum
 over its stored support against the associated Mathlib probability mass
 function. -/
 theorem avgOver_eq_toPMF_support_sum {α : Type*}
     (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → Error) :
     avgOver 𝒟 f = ∑ a ∈ 𝒟.support, (𝒟.toPMF h𝒟 a).toReal * f a := by
-  unfold avgOver
-  exact Finset.sum_congr rfl fun a _ => by
-    rw [Distribution.toPMF_apply_toReal]
+  simpa [avgOver, smul_eq_mul] using
+    Distribution.sum_smul_eq_toPMF_support_sum 𝒟 h𝒟 f
 
 /-- Averaging against a probabilistic project distribution is the finite sum
 against its associated Mathlib probability mass function. -/
 theorem avgOver_eq_toPMF_sum {α : Type*} [Fintype α]
     (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → Error) :
     avgOver 𝒟 f = ∑ a : α, (𝒟.toPMF h𝒟 a).toReal * f a := by
-  rw [avgOver_eq_toPMF_support_sum]
-  exact (Distribution.sum_univ_eq_sum_support 𝒟
-    (fun a => (𝒟.toPMF h𝒟 a).toReal * f a)
-    (by
-      intro a ha
-      rw [Distribution.toPMF_apply_of_notMem 𝒟 h𝒟 ha]
-      simp)).symm
+  simpa [avgOver, smul_eq_mul] using
+    Distribution.sum_smul_eq_toPMF_sum 𝒟 h𝒟 f
 
 /-- Averaging against a probabilistic project distribution is integration
 against its associated Mathlib probability mass function. -/
@@ -240,9 +265,8 @@ theorem averageOperatorOverDistribution_eq_toPMF_support_sum {α : Type*}
     (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution 𝒟 f =
       ∑ a ∈ 𝒟.support, (𝒟.toPMF h𝒟 a).toReal • f a := by
-  unfold averageOperatorOverDistribution
-  exact Finset.sum_congr rfl fun a _ => by
-    rw [Distribution.toPMF_apply_toReal]
+  simpa [averageOperatorOverDistribution] using
+    Distribution.sum_smul_eq_toPMF_support_sum 𝒟 h𝒟 f
 
 /-- Operator-valued averaging against a probabilistic project distribution is
 the finite sum against its associated Mathlib probability mass function. -/
@@ -253,13 +277,8 @@ theorem averageOperatorOverDistribution_eq_toPMF_sum {α : Type*}
     (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution 𝒟 f =
       ∑ a : α, (𝒟.toPMF h𝒟 a).toReal • f a := by
-  rw [averageOperatorOverDistribution_eq_toPMF_support_sum]
-  exact (Distribution.sum_univ_eq_sum_support 𝒟
-    (fun a => (𝒟.toPMF h𝒟 a).toReal • f a)
-    (by
-      intro a ha
-      rw [Distribution.toPMF_apply_of_notMem 𝒟 h𝒟 ha]
-      simp)).symm
+  simpa [averageOperatorOverDistribution] using
+    Distribution.sum_smul_eq_toPMF_sum 𝒟 h𝒟 f
 
 namespace Distribution.IsProbability
 
@@ -428,25 +447,46 @@ theorem avgOver_uniform_const {α : Type*}
   exact avgOver_const_of_isProbability
     (uniformDistribution α) (uniformDistribution_isProbability α) c
 
+/-- Module-valued finite-sum expression for the uniform distribution, stated
+without measurable-space assumptions. -/
+theorem uniformDistribution_sum_smul_eq_pmf_sum {α M : Type*}
+    [Fintype α] [DecidableEq α] [Nonempty α]
+    [AddCommMonoid M] [Module Error M] (f : α → M) :
+    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a • f a =
+      ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
+  rw [Distribution.sum_smul_eq_toPMF_sum
+    (uniformDistribution α) (uniformDistribution_isProbability α)]
+  rw [uniformDistribution_toPMF]
+
+/-- A finite-support uniform weighted sum is the corresponding Mathlib uniform
+PMF-weighted sum. -/
+theorem uniformOnFinset_sum_smul_eq_pmf_sum {α M : Type*}
+    [AddCommMonoid M] [Module Error M]
+    (s : Finset α) (hs : s.Nonempty) (f : α → M) :
+    ∑ a ∈ (Distribution.uniformOnFinset s).support,
+        (Distribution.uniformOnFinset s).weight a • f a =
+      ∑ a ∈ s, (PMF.uniformOfFinset s hs a).toReal • f a := by
+  rw [Distribution.sum_smul_eq_toPMF_support_sum
+    (Distribution.uniformOnFinset s)
+    (Distribution.uniformOnFinset_isProbability s hs)]
+  rw [Distribution.uniformOnFinset_support, Distribution.uniformOnFinset_toPMF]
+
 /-- Finite-sum expression for the uniform average, stated without measurable-space
 assumptions. -/
 theorem avgOver_uniform_eq_pmf_sum {α : Type*}
     [Fintype α] [DecidableEq α] [Nonempty α] (f : α → Error) :
     avgOver (uniformDistribution α) f =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal * f a := by
-  rw [avgOver_eq_toPMF_sum
-    (uniformDistribution α) (uniformDistribution_isProbability α)]
-  rw [uniformDistribution_toPMF]
+  simpa [avgOver, smul_eq_mul] using
+    uniformDistribution_sum_smul_eq_pmf_sum (α := α) (f := f)
 
 /-- A finite-support uniform average is the corresponding Mathlib uniform PMF sum. -/
 theorem avgOver_uniformOnFinset_eq_pmf_sum {α : Type*} (s : Finset α)
     (hs : s.Nonempty) (f : α → Error) :
     avgOver (Distribution.uniformOnFinset s) f =
       ∑ a ∈ s, (PMF.uniformOfFinset s hs a).toReal * f a := by
-  rw [avgOver_eq_toPMF_support_sum
-    (Distribution.uniformOnFinset s)
-    (Distribution.uniformOnFinset_isProbability s hs)]
-  rw [Distribution.uniformOnFinset_support, Distribution.uniformOnFinset_toPMF]
+  simpa [avgOver, smul_eq_mul] using
+    uniformOnFinset_sum_smul_eq_pmf_sum (s := s) hs f
 
 /-- A finite-support uniform average is the finite integral with respect to the
 corresponding Mathlib uniform probability mass function. -/
@@ -514,9 +554,8 @@ theorem averageOperatorOverDistribution_uniform_eq_pmf_sum {α : Type*}
     (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (uniformDistribution α) f =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
-  rw [averageOperatorOverDistribution_eq_toPMF_sum
-    (uniformDistribution α) (uniformDistribution_isProbability α)]
-  rw [uniformDistribution_toPMF]
+  simpa [averageOperatorOverDistribution] using
+    uniformDistribution_sum_smul_eq_pmf_sum (α := α) (f := f)
 
 /-- A finite-support uniform operator average is the corresponding Mathlib uniform PMF sum. -/
 theorem averageOperatorOverDistribution_uniformOnFinset_eq_pmf_sum
@@ -525,10 +564,8 @@ theorem averageOperatorOverDistribution_uniformOnFinset_eq_pmf_sum
     (f : α → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (Distribution.uniformOnFinset s) f =
       ∑ a ∈ s, (PMF.uniformOfFinset s hs a).toReal • f a := by
-  rw [averageOperatorOverDistribution_eq_toPMF_support_sum
-    (Distribution.uniformOnFinset s)
-    (Distribution.uniformOnFinset_isProbability s hs)]
-  rw [Distribution.uniformOnFinset_support, Distribution.uniformOnFinset_toPMF]
+  simpa [averageOperatorOverDistribution] using
+    uniformOnFinset_sum_smul_eq_pmf_sum (s := s) hs f
 
 /-- Reindexing a uniform operator average along an equivalence preserves its value. -/
 theorem averageOperatorOverDistribution_uniform_equiv

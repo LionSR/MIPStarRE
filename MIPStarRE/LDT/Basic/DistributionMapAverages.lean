@@ -45,7 +45,7 @@ theorem avgOver_uniform_map_eq_uniform_of_factor_equiv
     (h : ∀ a, g (m a) = e a) (f : γ → Error) :
     avgOver ((uniformDistribution α).map m) (fun b => f (g b)) =
       avgOver (uniformDistribution γ) f := by
-  rw [avgOver_uniformDistribution_map]
+  rw [Distribution.avgOver_map]
   rw [avgOver_uniform_eq_pmf_sum, avgOver_uniform_eq_pmf_sum]
   simpa [smul_eq_mul] using
     (pmf_uniformOfFintype_sum_factor_equiv_smul
@@ -68,7 +68,7 @@ theorem averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv
     (A : γ → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b)) =
       averageOperatorOverDistribution (uniformDistribution γ) A := by
-  rw [averageOperatorOverDistribution_uniformDistribution_map]
+  rw [Distribution.averageOperatorOverDistribution_map]
   rw [averageOperatorOverDistribution_uniform_eq_pmf_sum,
     averageOperatorOverDistribution_uniform_eq_pmf_sum]
   exact pmf_uniformOfFintype_sum_factor_equiv_smul
@@ -86,7 +86,7 @@ theorem avgOver_uniform_map_eq_uniform_fst_of_factor_equiv
     (h : ∀ a, g (m a) = (e a).1) (f : γ → Error) :
     avgOver ((uniformDistribution α).map m) (fun b => f (g b)) =
       avgOver (uniformDistribution γ) f := by
-  rw [avgOver_uniformDistribution_map]
+  rw [Distribution.avgOver_map]
   rw [avgOver_uniform_eq_pmf_sum, avgOver_uniform_eq_pmf_sum]
   simpa [smul_eq_mul] using
     (pmf_uniformOfFintype_sum_factor_equiv_fst_smul
@@ -104,7 +104,7 @@ theorem avgOver_uniform_map_eq_uniform_snd_of_factor_equiv
     (h : ∀ a, g (m a) = (e a).2) (f : δ → Error) :
     avgOver ((uniformDistribution α).map m) (fun b => f (g b)) =
       avgOver (uniformDistribution δ) f := by
-  rw [avgOver_uniformDistribution_map]
+  rw [Distribution.avgOver_map]
   rw [avgOver_uniform_eq_pmf_sum, avgOver_uniform_eq_pmf_sum]
   simpa [smul_eq_mul] using
     (pmf_uniformOfFintype_sum_factor_equiv_snd_smul
@@ -124,7 +124,7 @@ theorem averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equ
     (A : γ → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b)) =
       averageOperatorOverDistribution (uniformDistribution γ) A := by
-  rw [averageOperatorOverDistribution_uniformDistribution_map]
+  rw [Distribution.averageOperatorOverDistribution_map]
   rw [averageOperatorOverDistribution_uniform_eq_pmf_sum,
     averageOperatorOverDistribution_uniform_eq_pmf_sum]
   exact pmf_uniformOfFintype_sum_factor_equiv_fst_smul
@@ -144,7 +144,7 @@ theorem averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equ
     (A : δ → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution ((uniformDistribution α).map m) (fun b => A (g b)) =
       averageOperatorOverDistribution (uniformDistribution δ) A := by
-  rw [averageOperatorOverDistribution_uniformDistribution_map]
+  rw [Distribution.averageOperatorOverDistribution_map]
   rw [averageOperatorOverDistribution_uniform_eq_pmf_sum,
     averageOperatorOverDistribution_uniform_eq_pmf_sum]
   exact pmf_uniformOfFintype_sum_factor_equiv_snd_smul

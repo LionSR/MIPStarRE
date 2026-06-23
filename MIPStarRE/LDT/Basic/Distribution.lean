@@ -72,6 +72,32 @@ theorem map_totalWeight {α β : Type*} [DecidableEq β]
       (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
       (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩) 𝒟.weight)
 
+/-- A finite weighted sum over a push-forward distribution is the corresponding
+weighted sum of the pulled-back family.  This is the `Distribution` analogue of
+the finite-sum form of `PMF.map`. -/
+theorem map_sum_smul {α β M : Type*} [DecidableEq β]
+    [AddCommMonoid M] [Module Error M]
+    (𝒟 : Distribution α) (e : α → β) (f : β → M) :
+    ∑ b ∈ (𝒟.map e).support, (𝒟.map e).weight b • f b =
+      ∑ a ∈ 𝒟.support, 𝒟.weight a • f (e a) := by
+  classical
+  calc
+    ∑ b ∈ 𝒟.support.image e,
+        (∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a) • f b
+        = ∑ b ∈ 𝒟.support.image e,
+            ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a • f (e a) := by
+          refine Finset.sum_congr rfl ?_
+          intro b _
+          rw [Finset.sum_smul]
+          refine Finset.sum_congr rfl ?_
+          intro a ha
+          exact congrArg (fun x => 𝒟.weight a • f x) (Finset.mem_filter.mp ha).2.symm
+    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a • f (e a) := by
+          exact Finset.sum_fiberwise_of_maps_to
+            (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
+            (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩)
+            (fun a => 𝒟.weight a • f (e a))
+
 end Distribution
 
 /-- On a finite ambient type, a summand that vanishes outside a distribution's
@@ -201,24 +227,8 @@ function against the original distribution. -/
 theorem avgOver_map {α β : Type*} [DecidableEq β]
     (𝒟 : Distribution α) (e : α → β) (f : β → Error) :
     avgOver (𝒟.map e) f = avgOver 𝒟 (fun a => f (e a)) := by
-  classical
-  unfold avgOver Distribution.map
-  calc
-    ∑ b ∈ 𝒟.support.image e,
-        (∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a) * f b
-        = ∑ b ∈ 𝒟.support.image e,
-            ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a * f (e a) := by
-          refine Finset.sum_congr rfl ?_
-          intro b _
-          rw [Finset.sum_mul]
-          refine Finset.sum_congr rfl ?_
-          intro a ha
-          exact congrArg (fun x => 𝒟.weight a * f x) (Finset.mem_filter.mp ha).2.symm
-    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a * f (e a) := by
-          exact Finset.sum_fiberwise_of_maps_to
-            (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
-            (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩)
-            (fun a => 𝒟.weight a * f (e a))
+  simpa [avgOver, smul_eq_mul] using
+    Distribution.map_sum_smul (𝒟 := 𝒟) e f
 
 end Distribution
 
@@ -244,24 +254,8 @@ theorem averageOperatorOverDistribution_map {α β : Type*} [DecidableEq β]
     (f : β → MIPStarRE.Quantum.Op ι) :
     averageOperatorOverDistribution (𝒟.map e) f =
       averageOperatorOverDistribution 𝒟 (fun a => f (e a)) := by
-  classical
-  unfold averageOperatorOverDistribution Distribution.map
-  calc
-    ∑ b ∈ 𝒟.support.image e,
-        (∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a) • f b
-        = ∑ b ∈ 𝒟.support.image e,
-            ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a • f (e a) := by
-          refine Finset.sum_congr rfl ?_
-          intro b _
-          rw [Finset.sum_smul]
-          refine Finset.sum_congr rfl ?_
-          intro a ha
-          exact congrArg (fun x => 𝒟.weight a • f x) (Finset.mem_filter.mp ha).2.symm
-    _ = ∑ a ∈ 𝒟.support, 𝒟.weight a • f (e a) := by
-          exact Finset.sum_fiberwise_of_maps_to
-            (s := 𝒟.support) (t := 𝒟.support.image e) (g := e)
-            (fun a ha => Finset.mem_image.mpr ⟨a, ha, rfl⟩)
-            (fun a => 𝒟.weight a • f (e a))
+  simpa [averageOperatorOverDistribution] using
+    Distribution.map_sum_smul (𝒟 := 𝒟) e f
 
 end Distribution
 
@@ -495,27 +489,6 @@ theorem uniformDistribution_toPMF
       PMF.uniformOfFintype α := by
   simpa [uniformDistribution, PMF.uniformOfFintype] using
     Distribution.uniformOnFinset_toPMF (Finset.univ : Finset α) Finset.univ_nonempty
-
-/-- Averaging over the project push-forward of a uniform finite distribution is
-averaging the pulled-back function over the uniform source. -/
-theorem avgOver_uniformDistribution_map
-    (α β : Type*) [Fintype α] [DecidableEq α] [Nonempty α] [DecidableEq β]
-    (e : α → β) (f : β → Error) :
-    avgOver ((uniformDistribution α).map e) f =
-      avgOver (uniformDistribution α) (fun a => f (e a)) := by
-  exact Distribution.avgOver_map (uniformDistribution α) e f
-
-/-- Operator averaging over the project push-forward of a uniform finite
-distribution is operator averaging of the pulled-back family over the uniform
-source. -/
-theorem averageOperatorOverDistribution_uniformDistribution_map
-    (α β : Type*) [Fintype α] [DecidableEq α] [Nonempty α] [DecidableEq β]
-    (e : α → β)
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (f : β → MIPStarRE.Quantum.Op ι) :
-    averageOperatorOverDistribution ((uniformDistribution α).map e) f =
-      averageOperatorOverDistribution (uniformDistribution α) (fun a => f (e a)) := by
-  exact Distribution.averageOperatorOverDistribution_map (uniformDistribution α) e f
 
 /-- Total variation distance between two distributions:
 `TV(μ, ν) = ½ ∑_a |μ(a) - ν(a)|` over the union of supports. -/
