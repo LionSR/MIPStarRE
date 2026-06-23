@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
+import MIPStarRE.LDT.Basic.DistributionPMF
 
 /-!
 # Product rules for finite-support distribution averages
@@ -44,10 +44,10 @@ theorem averageOperatorOverDistribution_uniform_prod
       averageOperatorOverDistribution (uniformDistribution α)
         (fun a => averageOperatorOverDistribution (uniformDistribution β)
           (fun b => f a b)) := by
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_sum (α := α × β)]
-  rw [averageOperatorOverDistribution_uniform_eq_pmf_sum (α := α)]
-  simp_rw [averageOperatorOverDistribution_uniform_eq_pmf_sum (α := β)]
-  exact pmf_uniformOfFintype_prod_sum_smul f
+  rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum (α := α × β)]
+  rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum (α := α)]
+  simp_rw [averageOperatorOverDistribution_uniform_eq_pmf_realWeightedSum (α := β)]
+  exact PMF.realWeightedSum_uniformOfFintype_prod f
 
 /-- Swap two nested uniform operator averages over finite nonempty types. -/
 theorem averageOperatorOverDistribution_uniform_comm

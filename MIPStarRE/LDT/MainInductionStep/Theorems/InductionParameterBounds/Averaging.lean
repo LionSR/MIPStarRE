@@ -1,4 +1,4 @@
-import MIPStarRE.LDT.Basic.PMFAverages
+import MIPStarRE.LDT.Basic.DistributionPMF
 import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
 
 /-!
@@ -31,8 +31,8 @@ lemma avgOver_uniform_rpow_one_div_le_rpow_avg
     avgOver (uniformDistribution α)
         (fun a => Real.rpow (f a) (1 / (n : Error))) ≤
       Real.rpow (avgOver (uniformDistribution α) f) (1 / (n : Error)) := by
-  rw [avgOver_uniform_eq_pmf_sum, avgOver_uniform_eq_pmf_sum]
-  exact pmf_sum_rpow_one_div_le_rpow_sum
+  rw [avgOver_uniform_eq_pmf_realWeightedSum, avgOver_uniform_eq_pmf_realWeightedSum]
+  exact PMF.realWeightedSum_rpow_one_div_le_rpow
     (p := PMF.uniformOfFintype α) (f := f) (n := n) hn hf
 
 /-- Internal helper: `m · (sliceConditioningLoss · x)^c ≤ m_next · x^c` for `c ≤ 1`.
