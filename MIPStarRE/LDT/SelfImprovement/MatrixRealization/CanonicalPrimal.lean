@@ -1,3 +1,4 @@
+import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Base
 
 /-!

@@ -219,6 +219,15 @@ location, probably under `MIPStarRE/Quantum/`.  The first candidates are:
 This would reduce the Section 9 file to the canonical SDP argument itself while
 keeping the Mathlib cone and separation machinery visible.
 
+Status update, 2026-06-23: issue #2557 implemented the module-boundary part of
+this recommendation.  `MIPStarRE.Quantum.FiniteMatrix` now re-exports concrete
+leaves for basic operator facts, positive-semidefinite order and cones, real
+trace-pairing representation, block-diagonal order facts, and normalized
+trace/projector material.  The Section 9 canonical SDP files import the relevant
+order, trace-pairing, and block-diagonal leaves directly.  This did not change
+the statement of `lem:sdp`; it only records the finite-dimensional analytic
+ingredients at the shared quantum-matrix boundary.
+
 A later theorem-building issue may extract a reusable finite-dimensional SDP
 zero-duality-gap theorem from the Section 9 proof.  That should be treated as
 mathematical theorem work, not as a local refactor.  The theorem would need to

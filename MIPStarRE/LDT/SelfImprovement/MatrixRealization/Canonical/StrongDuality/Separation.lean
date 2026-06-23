@@ -3,6 +3,8 @@ import Mathlib.Analysis.LocallyConvex.WithSeminorms
 import Mathlib.Analysis.Matrix.Normed
 import Mathlib.Topology.Bases
 import Mathlib.Topology.Instances.Matrix
+import MIPStarRE.Quantum.FiniteMatrix.Order
+import MIPStarRE.Quantum.FiniteMatrix.TracePairing
 import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Basic
 
 /-!

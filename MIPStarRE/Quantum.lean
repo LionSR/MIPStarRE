@@ -1,5 +1,9 @@
 import MIPStarRE.Quantum.FiniteHilbert
-import MIPStarRE.Quantum.FiniteMatrix
+import MIPStarRE.Quantum.FiniteMatrix.Basic
+import MIPStarRE.Quantum.FiniteMatrix.Order
+import MIPStarRE.Quantum.FiniteMatrix.TracePairing
+import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
+import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
 import MIPStarRE.Quantum.ProjectorONB
 import MIPStarRE.Quantum.Measurement
 
