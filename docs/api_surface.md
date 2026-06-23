@@ -11,13 +11,35 @@ Focused on the declarations that help prove the usual `SubMeas` goals:
 `Quantum.lean` itself defines no declarations. It is a re-export file:
 
 ```lean
-import MIPStarRE.Quantum.FiniteMatrix
+import MIPStarRE.Quantum.FiniteMatrix.Basic
+import MIPStarRE.Quantum.FiniteMatrix.Order
+import MIPStarRE.Quantum.FiniteMatrix.TracePairing
+import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
+import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
 import MIPStarRE.Quantum.Measurement
 ```
 
 Relevant re-exported API:
 
 ### From `MIPStarRE.Quantum.FiniteMatrix`
+
+`MIPStarRE.Quantum.FiniteMatrix` is now an aggregate import.  For direct
+dependencies, use the mathematical leaves:
+
+- `MIPStarRE.Quantum.FiniteMatrix.Basic`
+  - `Op`, trace reindexing, and elementary Kronecker bookkeeping.
+- `MIPStarRE.Quantum.FiniteMatrix.Order`
+  - positive-semidefinite order, the closed PSD cone, trace norm control,
+    sandwich monotonicity, `sq_le_self`, Kronecker monotonicity, and reindexing
+    positivity.
+- `MIPStarRE.Quantum.FiniteMatrix.TracePairing`
+  - continuous real trace pairings, Hermitian representatives of continuous
+    real-linear functionals, weak-duality positivity, and complementary
+    slackness algebra.
+- `MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal`
+  - block-diagonal positivity and the corresponding block trace identity.
+- `MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace`
+  - normalized trace, `tauNormSq`, projections, and spectral truncation.
 
 - `abbrev MIPStarRE.Quantum.Op (d : Type*) := Matrix d d ℂ`
   - The operator type used everywhere in `SubMeas`.

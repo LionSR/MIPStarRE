@@ -1,4 +1,4 @@
-import MIPStarRE.Quantum.FiniteMatrix
+import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
 import Mathlib.Analysis.Matrix.Spectrum
 
 /-!

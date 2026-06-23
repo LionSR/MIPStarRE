@@ -1,4 +1,4 @@
-import MIPStarRE.Quantum.FiniteMatrix
+import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
 
 /-!
 # Matrix-valued measurements for the MIP*=RE project
@@ -17,8 +17,8 @@ This file provides the matrix-valued measurement layer used by the LDT formaliza
 ## References
 
 This file builds the project's finite-dimensional measurement layer on top of
-`MIPStarRE/Quantum/FiniteMatrix.lean` for the quantum formalization in
-`references/ldt-paper/`.
+the normalized-trace and positive-operator facts in `MIPStarRE.Quantum.FiniteMatrix`
+for the quantum formalization in `references/ldt-paper/`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
