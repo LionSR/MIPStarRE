@@ -15,6 +15,12 @@ low individual degree test averaging layer.
 
 * `PMF.map_apply_toReal`
 * `PMF.realWeightedSum`
+* `PMF.realWeightedSumLinearMap`
+* `PMF.realWeightedSum_zero`
+* `PMF.realWeightedSum_add`
+* `PMF.realWeightedSum_sub`
+* `PMF.realWeightedSum_smul`
+* `PMF.realWeightedSum_sum`
 * `PMF.realWeightedSum_map`
 * `PMF.realWeightedSum_bind`
 * `PMF.map_sum_smul`
@@ -56,6 +62,36 @@ noncomputable def realWeightedSum {α M : Type*} [Fintype α]
     [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
     (p : PMF α) (f : α → M) : M :=
   ∑ a : α, (p a).toReal • f a
+
+/-- The finite PMF-weighted expectation as a linear map in the averaged family.
+
+This is the linear form of `PMF.realWeightedSum`; it records that the
+probability weights are fixed and the averaged object varies linearly. -/
+noncomputable def realWeightedSumLinearMap {α M : Type*} [Fintype α]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
+    (p : PMF α) : (α → M) →ₗ[MIPStarRE.LDT.Error] M where
+  toFun := fun f => realWeightedSum p f
+  map_add' := by
+    intro f g
+    simp only [realWeightedSum, Pi.add_apply, smul_add, Finset.sum_add_distrib]
+  map_smul' := by
+    intro c f
+    simp only [realWeightedSum, Pi.smul_apply]
+    calc
+      ∑ a : α, (p a).toReal • c • f a =
+          ∑ a : α, c • ((p a).toReal • f a) := by
+            refine Finset.sum_congr rfl ?_
+            intro a _
+            rw [smul_smul, smul_smul, mul_comm]
+      _ = c • ∑ a : α, (p a).toReal • f a := by
+            rw [Finset.smul_sum]
+
+@[simp]
+theorem realWeightedSumLinearMap_apply {α M : Type*} [Fintype α]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
+    (p : PMF α) (f : α → M) :
+    realWeightedSumLinearMap p f = realWeightedSum p f :=
+  rfl
 
 /-- The finite total-variation distance between two probability mass functions,
 written as half the `L^1` distance between their real weights.
@@ -243,6 +279,71 @@ theorem sum_const_smul {α M : Type*}
           exact (Finset.sum_smul (s := Finset.univ)
             (f := fun a : α => (p a).toReal) (x := x)).symm
     _ = x := by rw [sum_toReal_eq_one p, one_smul]
+
+/-- The PMF-weighted sum of the zero family is zero. -/
+theorem realWeightedSum_zero {α M : Type*}
+    [Fintype α] [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
+    (p : PMF α) :
+    realWeightedSum p (fun _ : α => (0 : M)) = 0 := by
+  change realWeightedSum p (0 : α → M) = 0
+  simpa using map_zero (realWeightedSumLinearMap (M := M) p)
+
+/-- The PMF-weighted sum is additive in the averaged family. -/
+theorem realWeightedSum_add {α M : Type*}
+    [Fintype α] [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
+    (p : PMF α) (f g : α → M) :
+    realWeightedSum p (fun a => f a + g a) =
+      realWeightedSum p f + realWeightedSum p g := by
+  change realWeightedSum p (f + g) = realWeightedSum p f + realWeightedSum p g
+  simpa using map_add (realWeightedSumLinearMap (M := M) p) f g
+
+/-- The PMF-weighted sum commutes with subtraction in the averaged family. -/
+theorem realWeightedSum_sub {α M : Type*}
+    [Fintype α] [AddCommGroup M] [Module MIPStarRE.LDT.Error M]
+    (p : PMF α) (f g : α → M) :
+    realWeightedSum p (fun a => f a - g a) =
+      realWeightedSum p f - realWeightedSum p g := by
+  change realWeightedSum p (f - g) = realWeightedSum p f - realWeightedSum p g
+  simpa using map_sub (realWeightedSumLinearMap (M := M) p) f g
+
+/-- The PMF-weighted sum commutes with scalar multiplication in the averaged
+family. -/
+theorem realWeightedSum_smul {α M : Type*}
+    [Fintype α] [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
+    (p : PMF α) (c : MIPStarRE.LDT.Error) (f : α → M) :
+    realWeightedSum p (fun a => c • f a) = c • realWeightedSum p f := by
+  change realWeightedSumLinearMap (M := M) p (c • f) =
+    c • realWeightedSumLinearMap (M := M) p f
+  exact LinearMap.map_smul (realWeightedSumLinearMap (M := M) p) c f
+
+/-- Pull a finite sum through the PMF-weighted expectation. -/
+theorem realWeightedSum_sum {α β M : Type*}
+    [Fintype α] [Fintype β]
+    [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
+    (p : PMF α) (f : α → β → M) :
+    realWeightedSum p (fun a => ∑ b : β, f a b) =
+      ∑ b : β, realWeightedSum p (fun a => f a b) := by
+  rw [show (fun a => ∑ b : β, f a b) = ∑ b : β, fun a => f a b by
+    ext a
+    simp]
+  change realWeightedSumLinearMap (M := M) p (∑ b : β, fun a => f a b) =
+    ∑ b : β, realWeightedSumLinearMap (M := M) p (fun a => f a b)
+  exact map_sum (realWeightedSumLinearMap (M := M) p)
+    (fun b : β => fun a => f a b) Finset.univ
+
+/-- Pull a finite-set sum through the PMF-weighted expectation. -/
+theorem realWeightedSum_finset_sum {α β M : Type*}
+    [Fintype α] [AddCommMonoid M] [Module MIPStarRE.LDT.Error M]
+    (p : PMF α) (s : Finset β) (f : α → β → M) :
+    realWeightedSum p (fun a => ∑ b ∈ s, f a b) =
+      ∑ b ∈ s, realWeightedSum p (fun a => f a b) := by
+  rw [show (fun a => ∑ b ∈ s, f a b) = ∑ b ∈ s, fun a => f a b by
+    ext a
+    simp]
+  change realWeightedSumLinearMap (M := M) p (∑ b ∈ s, fun a => f a b) =
+    ∑ b ∈ s, realWeightedSumLinearMap (M := M) p (fun a => f a b)
+  exact map_sum (realWeightedSumLinearMap (M := M) p)
+    (fun b : β => fun a => f a b) s
 
 /-- Jensen's inequality for the concave power `x ↦ x ^ (1 / n)`, stated for a
 finite probability mass function. -/

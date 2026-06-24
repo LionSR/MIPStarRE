@@ -227,6 +227,22 @@ based on Mathlib PMFs.  The project keeps `Distribution` for paper notation and
 explicit finite supports, but probability identities should use these PMF
 lemmas when the statement is naturally about a genuine finite probability law.
 
+- `noncomputable def PMF.realWeightedSum (p : PMF α) (f : α → M) : M`
+  - Finite expectation of a module-valued family against the real weights of a
+    finite probability mass function.
+
+- `noncomputable def PMF.realWeightedSumLinearMap (p : PMF α) :
+  (α → M) →ₗ[Error] M`
+  - Linear-map form of `PMF.realWeightedSum`; use `map_add`, `map_sub`,
+    `map_smul`, and `map_sum` for expectation algebra.
+
+- `theorem PMF.realWeightedSum_zero`
+- `theorem PMF.realWeightedSum_add`
+- `theorem PMF.realWeightedSum_sub`
+- `theorem PMF.realWeightedSum_smul`
+- `theorem PMF.realWeightedSum_sum`
+- `theorem PMF.realWeightedSum_finset_sum`
+
 - `theorem PMF.sum_toReal_eq_one (p : PMF α) : ∑ a : α, (p a).toReal = 1`
 
 - `theorem PMF.map_sum_smul (p : PMF α) (e : α → β) (f : β → M) :
@@ -261,6 +277,20 @@ lemmas when the statement is naturally about a genuine finite probability law.
   (f : α → Error) (hf_nonneg : ∀ a, 0 ≤ f a) (hf_le_one : ∀ a, f a ≤ 1) :
   ∑ a : α, (q a).toReal * f a ≤
   ∑ a : α, (p a).toReal * f a + PMF.totalVariationDistance p q`
+
+`MIPStarRE/LDT/Basic/DistributionPMF.lean` contains the comparison between
+`Distribution` notation and this PMF expectation layer.
+
+- `theorem Distribution.weightedSumLinearMap_eq_toPMF_realWeightedSum`
+  - Module-valued comparison between a probabilistic `Distribution` and its
+    associated `PMF`.
+
+- `theorem Distribution.weightedSumLinearMap_eq_toPMF_realWeightedSumLinearMap`
+  - Linear-map equality between `Distribution.weightedSumLinearMap` and the
+    PMF expectation linear map.
+
+- `theorem avgOver_eq_toPMF_realWeightedSum`
+- `theorem averageOperatorOverDistribution_eq_toPMF_realWeightedSum`
 
 ### Module-valued uniform averages
 
