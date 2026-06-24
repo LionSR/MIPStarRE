@@ -9,6 +9,7 @@ import MIPStarRE.LDT.Basic.QuantumState
 import MIPStarRE.LDT.Basic.OperatorExpectations
 import MIPStarRE.LDT.Basic.Distribution
 import MIPStarRE.LDT.Basic.PMFAverages
+import MIPStarRE.LDT.Basic.PMFUniformAverages
 import MIPStarRE.LDT.Basic.DistributionUniformSums
 import MIPStarRE.LDT.Basic.DistributionAvg
 import MIPStarRE.LDT.Basic.DistributionPMF

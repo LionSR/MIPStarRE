@@ -249,6 +249,8 @@ lemmas when the statement is naturally about a genuine finite probability law.
 - `theorem PMF.realWeightedSum_smul`
 - `theorem PMF.realWeightedSum_sum`
 - `theorem PMF.realWeightedSum_finset_sum`
+- `theorem PMF.realWeightedSum_map`
+- `theorem PMF.realWeightedSum_bind`
 
 - `theorem PMF.sum_toReal_eq_one (p : PMF α) : ∑ a : α, (p a).toReal = 1`
 
@@ -268,6 +270,24 @@ lemmas when the statement is naturally about a genuine finite probability law.
   ∑ ab : α × β, (PMF.uniformOfFintype (α × β) ab).toReal • f ab.1 ab.2 =
     ∑ a : α, (PMF.uniformOfFintype α a).toReal •
       ∑ b : β, (PMF.uniformOfFintype β b).toReal • f a b`
+
+- `theorem PMF.realWeightedSum_uniformOfFintype_equiv`
+- `theorem PMF.realWeightedSum_uniformOfFintype_prod`
+
+`MIPStarRE/LDT/Basic/PMFUniformAverages.lean` contains the corresponding
+high-level finite-expectation identities for uniform PMFs.
+
+- `theorem PMF.realWeightedSum_uniformOfFintype_comm`
+- `theorem PMF.realWeightedSum_uniformOfFintype_prod_swap`
+- `theorem PMF.realWeightedSum_uniformOfFintype_equiv_prod`
+- `theorem PMF.realWeightedSum_uniformOfFintype_equiv_prod_swap`
+- `theorem PMF.realWeightedSum_uniformOfFintype_equiv_fst`
+- `theorem PMF.realWeightedSum_uniformOfFintype_equiv_snd`
+- `theorem PMF.realWeightedSum_uniformOfFintype_fst`
+- `theorem PMF.realWeightedSum_uniformOfFintype_snd`
+- `theorem PMF.realWeightedSum_map_uniformOfFintype_factor_equiv`
+- `theorem PMF.realWeightedSum_map_uniformOfFintype_factor_equiv_fst`
+- `theorem PMF.realWeightedSum_map_uniformOfFintype_factor_equiv_snd`
 
 - `noncomputable def PMF.totalVariationDistance (p q : PMF α) : Error`
 
@@ -303,7 +323,10 @@ lemmas when the statement is naturally about a genuine finite probability law.
 
 `MIPStarRE/LDT/Basic/DistributionUniformSums.lean` contains the project-facing
 module-valued finite-sum algebra for uniform distributions.  Scalar averages
-and operator averages are now special cases of these statements.
+and operator averages are now special cases of these statements.  For finite
+ambient probability laws, use the corresponding `PMF.realWeightedSum_*`
+statement as the mathematical probability lemma; use these distribution lemmas
+to return to the paper-facing `uniformDistribution` notation.
 
 - `theorem uniformDistribution_sum_smul_equiv`
 - `theorem uniformDistribution_sum_smul_prod`
