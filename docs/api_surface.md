@@ -27,7 +27,8 @@ Relevant re-exported API:
 dependencies, use the mathematical leaves:
 
 - `MIPStarRE.Quantum.FiniteMatrix.Basic`
-  - `Op`, trace reindexing, and elementary Kronecker bookkeeping.
+  - `Op`, trace reindexing, `Matrix.submatrixLinearMap`, and elementary
+    Kronecker bookkeeping.
 - `MIPStarRE.Quantum.FiniteMatrix.Order`
   - positive-semidefinite order, the closed PSD cone, trace norm control,
     sandwich monotonicity, `sq_le_self`, Kronecker monotonicity, and reindexing
@@ -44,6 +45,12 @@ dependencies, use the mathematical leaves:
 
 - `abbrev MIPStarRE.Quantum.Op (d : Type*) := Matrix d d ℂ`
   - The operator type used everywhere in `SubMeas`.
+
+- `def Matrix.submatrixLinearMap (R : Type*) (row : m' → m) (col : n' → n) :
+  Matrix m n α →ₗ[R] Matrix m' n' α`
+  - The linear-map form of `Matrix.submatrix`; use this for diagonal-block
+    projections and other coordinate restrictions instead of reproving
+    additivity entry by entry.
 
 - `theorem sandwich_nonneg {M P : Op d} (hP : 0 ≤ P) (hMH : Mᴴ = M) : 0 ≤ M * P * M`
   - PSD is preserved under Hermitian sandwiching.
@@ -345,3 +352,27 @@ If you only want the most useful items to try first, they are:
 - `SubMeas.liftLeft`, `leftPlacedSubMeas`, `rightPlacedSubMeas`
 - `MIPStarRE.Quantum.sq_le_self`
 - `avgOver_mono`, `avgOver_nonneg`, `avgOver_add`, `avgOver_congr`
+
+## `MIPStarRE/LDT/SelfImprovement/MatrixRealization/CanonicalPrimal.lean`
+
+The canonical SDP block layer now exposes both block insertion and block
+extraction as linear maps.  This keeps Section 9 arguments close to the usual
+finite-dimensional linear-algebra formulation of an SDP.
+
+- `matrixSdpCanonicalBlockDiagonalLinearMap`
+  - The complex-linear map sending a family of diagonal blocks to the
+    corresponding canonical block-diagonal operator.
+
+- `matrixSdpCanonicalDiagonalBlockLinearMap`
+  - The complex-linear projection onto one diagonal block of a canonical primal
+    matrix.
+
+- `matrixSdpCanonicalConstraintOperatorLinearMap`
+  - The complex-linear equality-constraint operator
+    `X ↦ ∑_b X_{bb}`.
+
+- `matrixSdpCanonicalDiagonalBlock_zero`, `_add`, `_neg`, `_sub`, `_smul`
+  - Linearity lemmas for diagonal-block extraction.
+
+- `matrixSdpCanonicalConstraintOperator_zero`, `_add`, `_neg`, `_sub`, `_smul`
+  - Linearity lemmas for the canonical equality-constraint operator.
