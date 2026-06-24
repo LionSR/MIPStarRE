@@ -106,15 +106,7 @@ noncomputable def matrixSdpCanonicalDiagonalBlockCLM
     MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →L[ℝ]
       MatrixOperator model.space :=
   ContinuousLinearMap.mk
-    { toFun := fun X => matrixSdpCanonicalDiagonalBlock params model X b
-      map_add' := by
-        intro X Y
-        ext i j
-        rfl
-      map_smul' := by
-        intro r X
-        ext i j
-        rfl }
+    ((matrixSdpCanonicalDiagonalBlockLinearMap params model b).restrictScalars ℝ)
     (continuous_matrix fun i j => continuous_apply_apply (b, i) (b, j))
 
 @[simp]

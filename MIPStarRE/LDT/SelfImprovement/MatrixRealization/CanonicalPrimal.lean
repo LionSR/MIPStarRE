@@ -45,6 +45,85 @@ def matrixSdpCanonicalDiagonalBlock (params : Parameters) [FieldModel params.q]
     (b : MatrixSdpCanonicalBlockIndex params) : MatrixOperator model.space :=
   fun i j => X (b, i) (b, j)
 
+/-- Projection onto one diagonal block of a canonical primal matrix, as a
+complex-linear map in the ambient block matrix. -/
+noncomputable def matrixSdpCanonicalDiagonalBlockLinearMap (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →ₗ[ℂ]
+      MatrixOperator model.space :=
+  Matrix.submatrixLinearMap ℂ
+    (fun i : model.space.carrier => (b, i))
+    (fun i : model.space.carrier => (b, i))
+
+@[simp] theorem matrixSdpCanonicalDiagonalBlockLinearMap_apply (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (b : MatrixSdpCanonicalBlockIndex params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    matrixSdpCanonicalDiagonalBlockLinearMap params model b X =
+      matrixSdpCanonicalDiagonalBlock params model X b :=
+  rfl
+
+/-- The diagonal-block projection sends the zero canonical matrix to zero. -/
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_zero (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model
+        (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) b =
+      (0 : MatrixOperator model.space) := by
+  simpa only [matrixSdpCanonicalDiagonalBlockLinearMap_apply] using
+    map_zero (matrixSdpCanonicalDiagonalBlockLinearMap params model b)
+
+/-- The diagonal-block projection preserves addition. -/
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_add (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X Y : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model (X + Y) b =
+      matrixSdpCanonicalDiagonalBlock params model X b +
+        matrixSdpCanonicalDiagonalBlock params model Y b := by
+  simpa only [matrixSdpCanonicalDiagonalBlockLinearMap_apply] using
+    map_add (matrixSdpCanonicalDiagonalBlockLinearMap params model b) X Y
+
+/-- The diagonal-block projection preserves negation. -/
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_neg (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model (-X) b =
+      -matrixSdpCanonicalDiagonalBlock params model X b := by
+  simpa only [matrixSdpCanonicalDiagonalBlockLinearMap_apply] using
+    map_neg (matrixSdpCanonicalDiagonalBlockLinearMap params model b) X
+
+/-- The diagonal-block projection preserves subtraction. -/
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_sub (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X Y : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model (X - Y) b =
+      matrixSdpCanonicalDiagonalBlock params model X b -
+        matrixSdpCanonicalDiagonalBlock params model Y b := by
+  simpa only [matrixSdpCanonicalDiagonalBlockLinearMap_apply] using
+    map_sub (matrixSdpCanonicalDiagonalBlockLinearMap params model b) X Y
+
+/-- The diagonal-block projection preserves complex scalar multiplication. -/
+@[simp] theorem matrixSdpCanonicalDiagonalBlock_smul (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (c : ℂ)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
+    (b : MatrixSdpCanonicalBlockIndex params) :
+    matrixSdpCanonicalDiagonalBlock params model (c • X) b =
+      c • matrixSdpCanonicalDiagonalBlock params model X b := by
+  simpa only [matrixSdpCanonicalDiagonalBlockLinearMap_apply] using
+    map_smul (matrixSdpCanonicalDiagonalBlockLinearMap params model b) c X
+
 /-- The ring homomorphism underlying the canonical block-diagonal construction.
 
 The canonical SDP indexes its matrix space by `(block, vector)`, while Mathlib's
@@ -90,6 +169,77 @@ noncomputable def matrixSdpCanonicalConstraintOperator (params : Parameters)
     MatrixOperator model.space :=
   ∑ b : MatrixSdpCanonicalBlockIndex params,
     matrixSdpCanonicalDiagonalBlock params model X b
+
+/-- The canonical equality-constraint operator as a complex-linear map. -/
+noncomputable def matrixSdpCanonicalConstraintOperatorLinearMap (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model) →ₗ[ℂ]
+      MatrixOperator model.space :=
+  ∑ b : MatrixSdpCanonicalBlockIndex params,
+    matrixSdpCanonicalDiagonalBlockLinearMap params model b
+
+@[simp] theorem matrixSdpCanonicalConstraintOperatorLinearMap_apply
+    (params : Parameters) [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    matrixSdpCanonicalConstraintOperatorLinearMap params model X =
+      matrixSdpCanonicalConstraintOperator params model X := by
+  simp [matrixSdpCanonicalConstraintOperatorLinearMap, matrixSdpCanonicalConstraintOperator]
+
+/-- The canonical equality-constraint operator sends zero to zero. -/
+@[simp] theorem matrixSdpCanonicalConstraintOperator_zero (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params) :
+    matrixSdpCanonicalConstraintOperator params model
+        (0 : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) =
+      (0 : MatrixOperator model.space) := by
+  simpa only [matrixSdpCanonicalConstraintOperatorLinearMap_apply] using
+    map_zero (matrixSdpCanonicalConstraintOperatorLinearMap params model)
+
+/-- The canonical equality-constraint operator preserves addition. -/
+@[simp] theorem matrixSdpCanonicalConstraintOperator_add (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X Y : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    matrixSdpCanonicalConstraintOperator params model (X + Y) =
+      matrixSdpCanonicalConstraintOperator params model X +
+        matrixSdpCanonicalConstraintOperator params model Y := by
+  simpa only [matrixSdpCanonicalConstraintOperatorLinearMap_apply] using
+    map_add (matrixSdpCanonicalConstraintOperatorLinearMap params model) X Y
+
+/-- The canonical equality-constraint operator preserves negation. -/
+@[simp] theorem matrixSdpCanonicalConstraintOperator_neg (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    matrixSdpCanonicalConstraintOperator params model (-X) =
+      -matrixSdpCanonicalConstraintOperator params model X := by
+  simpa only [matrixSdpCanonicalConstraintOperatorLinearMap_apply] using
+    map_neg (matrixSdpCanonicalConstraintOperatorLinearMap params model) X
+
+/-- The canonical equality-constraint operator preserves subtraction. -/
+@[simp] theorem matrixSdpCanonicalConstraintOperator_sub (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (X Y : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    matrixSdpCanonicalConstraintOperator params model (X - Y) =
+      matrixSdpCanonicalConstraintOperator params model X -
+        matrixSdpCanonicalConstraintOperator params model Y := by
+  simpa only [matrixSdpCanonicalConstraintOperatorLinearMap_apply] using
+    map_sub (matrixSdpCanonicalConstraintOperatorLinearMap params model) X Y
+
+/-- The canonical equality-constraint operator preserves complex scalar
+multiplication. -/
+@[simp] theorem matrixSdpCanonicalConstraintOperator_smul (params : Parameters)
+    [FieldModel params.q]
+    (model : MatrixSdpRealization params)
+    (c : ℂ)
+    (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model)) :
+    matrixSdpCanonicalConstraintOperator params model (c • X) =
+      c • matrixSdpCanonicalConstraintOperator params model X := by
+  simpa only [matrixSdpCanonicalConstraintOperatorLinearMap_apply] using
+    map_smul (matrixSdpCanonicalConstraintOperatorLinearMap params model) c X
 
 /-- The block-diagonal matrix with prescribed diagonal blocks. -/
 noncomputable def matrixSdpCanonicalBlockDiagonal (params : Parameters) [FieldModel params.q]

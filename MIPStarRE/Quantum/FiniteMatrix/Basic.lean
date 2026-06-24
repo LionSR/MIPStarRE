@@ -33,6 +33,33 @@ theorem trace_reindex {α β R : Type*} [Fintype α] [Fintype β]
   rw [← e.symm.sum_comp (fun i : α => M i i)]
   rfl
 
+/-! ### Linear matrix maps -/
+
+/-- Taking a submatrix is linear in the ambient matrix.
+
+This packages the entrywise linearity of `Matrix.submatrix` in the same style
+as Mathlib's block-diagonal additive and linear maps. -/
+def submatrixLinearMap (R : Type*) {m n m' n' α : Type*}
+    [Semiring R] [AddCommMonoid α] [Module R α]
+    (row : m' → m) (col : n' → n) :
+    Matrix m n α →ₗ[R] Matrix m' n' α where
+  toFun := fun A => Matrix.submatrix A row col
+  map_add' := by
+    intro A B
+    ext i j
+    rfl
+  map_smul' := by
+    intro c A
+    ext i j
+    rfl
+
+@[simp]
+theorem submatrixLinearMap_apply (R : Type*) {m n m' n' α : Type*}
+    [Semiring R] [AddCommMonoid α] [Module R α]
+    (row : m' → m) (col : n' → n) (A : Matrix m n α) :
+    Matrix.submatrixLinearMap R row col A = Matrix.submatrix A row col :=
+  rfl
+
 /-- The trace pairing of two block-diagonal matrices is the sum of the trace
 pairings of the corresponding diagonal blocks. -/
 theorem trace_blockDiagonal_mul {o m R : Type*}
