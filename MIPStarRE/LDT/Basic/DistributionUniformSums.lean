@@ -1,5 +1,5 @@
 import MIPStarRE.LDT.Basic.Distribution
-import MIPStarRE.LDT.Basic.PMFAverages
+import MIPStarRE.LDT.Basic.PMFUniformAverages
 
 /-!
 # Module-valued uniform finite sums for project distributions
@@ -7,7 +7,8 @@ import MIPStarRE.LDT.Basic.PMFAverages
 This module contains the module-valued finite-sum algebra for the project
 `Distribution` type.  The statements keep the paper-facing
 `uniformDistribution` notation, but their proofs reduce the probability
-calculation to Mathlib probability mass functions.
+calculation to the finite-expectation API for Mathlib probability mass
+functions.
 
 ## Main declarations
 
@@ -16,6 +17,11 @@ calculation to Mathlib probability mass functions.
 * `uniformDistribution_sum_smul_eq_pmf_sum`
 * `uniformDistribution_sum_smul_equiv`
 * `uniformDistribution_sum_smul_prod`
+* `uniformDistribution_sum_smul_comm`
+* `uniformDistribution_sum_smul_prod_swap`
+* `uniformDistribution_sum_smul_equiv_prod`
+* `uniformDistribution_sum_smul_equiv_fst`
+* `uniformDistribution_sum_smul_equiv_snd`
 * `uniformDistribution_map_sum_smul_eq_uniform_of_factor_equiv`
 * `uniformOnFinset_sum_smul_eq_subtype`
 * `uniformOnFinset_filter_sum_smul_equiv`
@@ -105,7 +111,8 @@ theorem uniformDistribution_sum_smul_equiv {α β M : Type*}
         (uniformDistribution β).weight b • f (e.symm b) := by
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := β)]
-  exact PMF.uniformOfFintype_sum_equiv_smul e f
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_equiv (e := e) (f := f)
 
 /-- Split a uniform module-valued average over a product into iterated uniform
 module-valued averages. -/
@@ -122,7 +129,8 @@ theorem uniformDistribution_sum_smul_prod {α β M : Type*}
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α × β)]
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
   simp_rw [uniformDistribution_sum_smul_eq_pmf_sum (α := β)]
-  exact PMF.uniformOfFintype_prod_sum_smul f
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_prod (f := f)
 
 /-- Swap two nested uniform module-valued averages over finite nonempty types. -/
 theorem uniformDistribution_sum_smul_comm {α β M : Type*}
@@ -135,21 +143,11 @@ theorem uniformDistribution_sum_smul_comm {α β M : Type*}
       ∑ b ∈ (uniformDistribution β).support, (uniformDistribution β).weight b •
         ∑ a ∈ (uniformDistribution α).support,
           (uniformDistribution α).weight a • f a b := by
-  calc
-    ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a •
-        ∑ b ∈ (uniformDistribution β).support, (uniformDistribution β).weight b • f a b
-        = ∑ ab ∈ (uniformDistribution (α × β)).support,
-            (uniformDistribution (α × β)).weight ab • f ab.1 ab.2 := by
-          exact (uniformDistribution_sum_smul_prod (f := f)).symm
-    _ = ∑ ba ∈ (uniformDistribution (β × α)).support,
-          (uniformDistribution (β × α)).weight ba • f ba.2 ba.1 := by
-          exact uniformDistribution_sum_smul_equiv
-            (e := Equiv.prodComm α β) (f := fun ab : α × β => f ab.1 ab.2)
-    _ = ∑ b ∈ (uniformDistribution β).support, (uniformDistribution β).weight b •
-          ∑ a ∈ (uniformDistribution α).support,
-            (uniformDistribution α).weight a • f a b := by
-          exact uniformDistribution_sum_smul_prod
-            (α := β) (β := α) (f := fun b a => f a b)
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
+  simp_rw [uniformDistribution_sum_smul_eq_pmf_sum (α := β)]
+  simp_rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_comm (f := f)
 
 /-- Split a uniform module-valued average over a product into iterated uniform
 module-valued averages, with the second coordinate averaged first. -/
@@ -163,8 +161,11 @@ theorem uniformDistribution_sum_smul_prod_swap {α β M : Type*}
       ∑ b ∈ (uniformDistribution β).support, (uniformDistribution β).weight b •
         ∑ a ∈ (uniformDistribution α).support,
           (uniformDistribution α).weight a • f a b := by
-  rw [uniformDistribution_sum_smul_prod (f := f)]
-  exact uniformDistribution_sum_smul_comm f
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α × β)]
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := β)]
+  simp_rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_prod_swap (f := f)
 
 /-- Transport a uniform module-valued average through an equivalence whose
 target is a product, then split the product average. -/
@@ -178,16 +179,11 @@ theorem uniformDistribution_sum_smul_equiv_prod {γ α β M : Type*}
       ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a •
         ∑ b ∈ (uniformDistribution β).support,
           (uniformDistribution β).weight b • f (e.symm (a, b)) := by
-  calc
-    ∑ x ∈ (uniformDistribution γ).support, (uniformDistribution γ).weight x • f x
-        = ∑ ab ∈ (uniformDistribution (α × β)).support,
-            (uniformDistribution (α × β)).weight ab • f (e.symm ab) := by
-          exact uniformDistribution_sum_smul_equiv e f
-    _ = ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a •
-          ∑ b ∈ (uniformDistribution β).support,
-            (uniformDistribution β).weight b • f (e.symm (a, b)) := by
-          exact uniformDistribution_sum_smul_prod
-            (f := fun a b => f (e.symm (a, b)))
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := γ)]
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
+  simp_rw [uniformDistribution_sum_smul_eq_pmf_sum (α := β)]
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_equiv_prod (e := e) (f := f)
 
 /-- Transport a uniform module-valued average through an equivalence whose
 target is a product, then split the product average in the other order. -/
@@ -201,8 +197,11 @@ theorem uniformDistribution_sum_smul_equiv_prod_swap {γ α β M : Type*}
       ∑ b ∈ (uniformDistribution β).support, (uniformDistribution β).weight b •
         ∑ a ∈ (uniformDistribution α).support,
           (uniformDistribution α).weight a • f (e.symm (a, b)) := by
-  rw [uniformDistribution_sum_smul_equiv_prod (e := e) (f := f)]
-  exact uniformDistribution_sum_smul_comm (fun a b => f (e.symm (a, b)))
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := γ)]
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := β)]
+  simp_rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_equiv_prod_swap (e := e) (f := f)
 
 /-- A function depending only on the first coordinate of a product equivalence
 has the first-coordinate uniform module-valued marginal. -/
@@ -217,14 +216,10 @@ theorem uniformDistribution_sum_smul_equiv_fst {γ α β M : Type*}
       ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a • f a := by
   classical
   haveI := Fintype.ofFinite β
-  rw [uniformDistribution_sum_smul_equiv_prod (e := e) (f := fun x => f (e x).1)]
-  refine Finset.sum_congr rfl ?_
-  intro a _
-  have hconst :
-      ∑ b ∈ (uniformDistribution β).support,
-          (uniformDistribution β).weight b • f (e (e.symm (a, b))).1 = f a := by
-    simpa using uniformDistribution_sum_smul_const (α := β) (x := f a)
-  rw [hconst]
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := γ)]
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_equiv_fst (e := e) (f := f)
 
 /-- A function depending only on the second coordinate of a product equivalence
 has the second-coordinate uniform module-valued marginal. -/
@@ -239,14 +234,10 @@ theorem uniformDistribution_sum_smul_equiv_snd {γ α β M : Type*}
       ∑ b ∈ (uniformDistribution β).support, (uniformDistribution β).weight b • f b := by
   classical
   haveI := Fintype.ofFinite α
-  rw [uniformDistribution_sum_smul_equiv_prod_swap (e := e) (f := fun x => f (e x).2)]
-  refine Finset.sum_congr rfl ?_
-  intro b _
-  have hconst :
-      ∑ a ∈ (uniformDistribution α).support,
-          (uniformDistribution α).weight a • f (e (e.symm (a, b))).2 = f b := by
-    simpa using uniformDistribution_sum_smul_const (α := α) (x := f b)
-  rw [hconst]
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := γ)]
+  rw [uniformDistribution_sum_smul_eq_pmf_sum (α := β)]
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_equiv_snd (e := e) (f := f)
 
 /-- A uniformly sampled seed has the uniform module-valued average of an
 equivalent observed coordinate. -/
@@ -261,8 +252,9 @@ theorem uniformDistribution_sum_smul_factor_equiv {α β γ M : Type*}
       ∑ c ∈ (uniformDistribution γ).support, (uniformDistribution γ).weight c • f c := by
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := γ)]
-  exact PMF.uniformOfFintype_sum_factor_equiv_smul
-    (m := m) (g := g) (e := e) (h := h) (f := f)
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_factor_equiv
+      (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- A uniformly sampled seed has the first-coordinate uniform module-valued
 marginal when the observed coordinate factors through a product equivalence. -/
@@ -278,8 +270,9 @@ theorem uniformDistribution_sum_smul_factor_equiv_fst {α β γ δ M : Type*}
       ∑ c ∈ (uniformDistribution γ).support, (uniformDistribution γ).weight c • f c := by
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := γ)]
-  exact PMF.uniformOfFintype_sum_factor_equiv_fst_smul
-    (m := m) (g := g) (e := e) (h := h) (f := f)
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_factor_equiv_fst
+      (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- A uniformly sampled seed has the second-coordinate uniform module-valued
 marginal when the observed coordinate factors through a product equivalence. -/
@@ -295,8 +288,9 @@ theorem uniformDistribution_sum_smul_factor_equiv_snd {α β γ δ M : Type*}
       ∑ d ∈ (uniformDistribution δ).support, (uniformDistribution δ).weight d • f d := by
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := δ)]
-  exact PMF.uniformOfFintype_sum_factor_equiv_snd_smul
-    (m := m) (g := g) (e := e) (h := h) (f := f)
+  simpa [PMF.realWeightedSum] using
+    PMF.realWeightedSum_uniformOfFintype_factor_equiv_snd
+      (m := m) (g := g) (e := e) (h := h) (f := f)
 
 /-- A uniform push-forward has the uniform module-valued average induced by an
 equivalent observed coordinate. -/
