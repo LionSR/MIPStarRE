@@ -1,0 +1,246 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>MIPStarRE.LDT.Basic.DistributionMapAverages</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="MIPStarRE.LDT.Basic.DistributionMapAverages";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">Basic</span>.<span class="name">DistributionMapAverages</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/LionSR/MIPStarRE/blob/b39705bfd36b8f7208f58d8c75e6c42a1624e06c/MIPStarRE/LDT/Basic/DistributionMapAverages.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././MIPStarRE/LDT/Basic/DistributionAvg.html">MIPStarRE.LDT.Basic.DistributionAvg</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-MIPStarRE.LDT.Basic.DistributionMapAverages" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">avgOver_uniform_map_eq_uniform_of_factor_equiv</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_fst_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">avgOver_uniform_map_eq_uniform_fst_of_factor_equiv</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_snd_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">avgOver_uniform_map_eq_uniform_snd_of_factor_equiv</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv</span></a></div><div class="nav_link"><a class="break_within" href="#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Uniform-push-forward-averaging-lemmas" class="markdown-heading">Uniform push-forward averaging lemmas <a class="hover-link" href="#Uniform-push-forward-averaging-lemmas">#</a></h1><p>This file contains shared averaging lemmas for uniformly sampled finite seeds
+that are pushed forward to a question distribution.  The main use case is a
+random seed <code>a : α</code>, a pushed-forward value <code>m a : β</code>, and an observed
+coordinate <code>g (m a)</code> which is identified with a uniform coordinate by an
+equivalence.</p><h2 id="Main-declarations" class="markdown-heading">Main declarations <a class="hover-link" href="#Main-declarations">#</a></h2><ul><li><code><a href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_of_factor_equiv">avgOver_uniform_map_eq_uniform_of_factor_equiv</a></code></li><li><code><a href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv">averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv</a></code></li><li><code><a href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_fst_of_factor_equiv">avgOver_uniform_map_eq_uniform_fst_of_factor_equiv</a></code></li><li><code><a href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_snd_of_factor_equiv">avgOver_uniform_map_eq_uniform_snd_of_factor_equiv</a></code></li><li><code><a href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv">averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv</a></code></li><li><code><a href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv">averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv</a></code></li></ul><h2 id="References" class="markdown-heading">References <a class="hover-link" href="#References">#</a></h2><p>These are formalization-internal finite probability lemmas for the low
+individual degree test development.</p></div><div class="mod_doc"><h3 id="Project-distribution-map-averages" class="markdown-heading">Project-distribution map averages <a class="hover-link" href="#Project-distribution-map-averages">#</a></h3></div><div class="decl" id="MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_of_factor_equiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/b39705bfd36b8f7208f58d8c75e6c42a1624e06c/MIPStarRE/LDT/Basic/DistributionMapAverages.lean#L33-L50">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">avgOver_uniform_map_eq_uniform_of_factor_equiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">γ</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn">β</span> → <span class="fn">γ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">α</span> <a href="../../.././Mathlib/Logic/Equiv/Defs.html#Equiv">≃</a> <span class="fn">γ</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ (<span class="fn">a</span> : <span class="fn">α</span>), <span class="fn"><span class="fn">g</span> <span class="fn">(<span class="fn">m</span> <span class="fn">a</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">e</span> <span class="fn">a</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">γ</span> → <a href="../../.././MIPStarRE/LDT/Basic/ParametersBase.html#MIPStarRE.LDT.Error">Error</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.avgOver">avgOver</a> <span class="fn">(<span class="fn"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">α</span>)</span>.<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.Distribution.map">map</a></span> <span class="fn">m</span>)</span> <span class="fn">fun (<span class="fn">b</span> : <span class="fn">β</span>) =&gt; <span class="fn"><span class="fn">f</span> <span class="fn">(<span class="fn">g</span> <span class="fn">b</span>)</span></span></span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.avgOver">avgOver</a> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">γ</span>)</span> <span class="fn">f</span></span></div></div><p>A uniform push-forward has the uniform average induced by an equivalent
+observed coordinate.</p><p>The map <code>m</code> is the finite random seed map, <code>g</code> is the observed coordinate on
+the pushed-forward value, and <code>e</code> records that this observed coordinate is
+equivalent to a uniform sample of <code>γ</code>.</p></div></div><div class="decl" id="MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/b39705bfd36b8f7208f58d8c75e6c42a1624e06c/MIPStarRE/LDT/Basic/DistributionMapAverages.lean#L52-L71">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">averageOperatorOverDistribution_uniform_map_eq_uniform_of_factor_equiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">γ</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn">β</span> → <span class="fn">γ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">α</span> <a href="../../.././Mathlib/Logic/Equiv/Defs.html#Equiv">≃</a> <span class="fn">γ</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ (<span class="fn">a</span> : <span class="fn">α</span>), <span class="fn"><span class="fn">g</span> <span class="fn">(<span class="fn">m</span> <span class="fn">a</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">e</span> <span class="fn">a</span></span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><span class="fn">γ</span> → <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix/Basic.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.averageOperatorOverDistribution">averageOperatorOverDistribution</a> <span class="fn">(<span class="fn"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">α</span>)</span>.<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.Distribution.map">map</a></span> <span class="fn">m</span>)</span> <span class="fn">fun (<span class="fn">b</span> : <span class="fn">β</span>) =&gt; <span class="fn"><span class="fn">A</span> <span class="fn">(<span class="fn">g</span> <span class="fn">b</span>)</span></span></span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.averageOperatorOverDistribution">averageOperatorOverDistribution</a> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">γ</span>)</span> <span class="fn">A</span></span></div></div><p>A uniform push-forward has the uniform operator average induced by an
+equivalent observed coordinate.</p><p>The map <code>m</code> is the finite random seed map, <code>g</code> is the observed coordinate on
+the pushed-forward value, and <code>e</code> records that this observed coordinate is
+equivalent to a uniform sample of <code>γ</code>.</p></div></div><div class="decl" id="MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_fst_of_factor_equiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/b39705bfd36b8f7208f58d8c75e6c42a1624e06c/MIPStarRE/LDT/Basic/DistributionMapAverages.lean#L73-L87">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_fst_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">avgOver_uniform_map_eq_uniform_fst_of_factor_equiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">γ</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">δ</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn">β</span> → <span class="fn">γ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">α</span> <a href="../../.././Mathlib/Logic/Equiv/Defs.html#Equiv">≃</a> <span class="fn">γ</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">δ</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ (<span class="fn">a</span> : <span class="fn">α</span>), <span class="fn"><span class="fn">g</span> <span class="fn">(<span class="fn">m</span> <span class="fn">a</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<span class="fn">e</span> <span class="fn">a</span>)</span>.1</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">γ</span> → <a href="../../.././MIPStarRE/LDT/Basic/ParametersBase.html#MIPStarRE.LDT.Error">Error</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.avgOver">avgOver</a> <span class="fn">(<span class="fn"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">α</span>)</span>.<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.Distribution.map">map</a></span> <span class="fn">m</span>)</span> <span class="fn">fun (<span class="fn">b</span> : <span class="fn">β</span>) =&gt; <span class="fn"><span class="fn">f</span> <span class="fn">(<span class="fn">g</span> <span class="fn">b</span>)</span></span></span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.avgOver">avgOver</a> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">γ</span>)</span> <span class="fn">f</span></span></div></div><p>A uniform push-forward has the first-coordinate uniform marginal when the
+observed coordinate factors through a product equivalence of the seed.</p></div></div><div class="decl" id="MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_snd_of_factor_equiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/b39705bfd36b8f7208f58d8c75e6c42a1624e06c/MIPStarRE/LDT/Basic/DistributionMapAverages.lean#L89-L103">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.avgOver_uniform_map_eq_uniform_snd_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">avgOver_uniform_map_eq_uniform_snd_of_factor_equiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">γ</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">δ</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn">β</span> → <span class="fn">δ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">α</span> <a href="../../.././Mathlib/Logic/Equiv/Defs.html#Equiv">≃</a> <span class="fn">γ</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">δ</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ (<span class="fn">a</span> : <span class="fn">α</span>), <span class="fn"><span class="fn">g</span> <span class="fn">(<span class="fn">m</span> <span class="fn">a</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<span class="fn">e</span> <span class="fn">a</span>)</span>.2</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">δ</span> → <a href="../../.././MIPStarRE/LDT/Basic/ParametersBase.html#MIPStarRE.LDT.Error">Error</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.avgOver">avgOver</a> <span class="fn">(<span class="fn"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">α</span>)</span>.<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.Distribution.map">map</a></span> <span class="fn">m</span>)</span> <span class="fn">fun (<span class="fn">b</span> : <span class="fn">β</span>) =&gt; <span class="fn"><span class="fn">f</span> <span class="fn">(<span class="fn">g</span> <span class="fn">b</span>)</span></span></span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.avgOver">avgOver</a> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">δ</span>)</span> <span class="fn">f</span></span></div></div><p>A uniform push-forward has the second-coordinate uniform marginal when the
+observed coordinate factors through a product equivalence of the seed.</p></div></div><div class="decl" id="MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/b39705bfd36b8f7208f58d8c75e6c42a1624e06c/MIPStarRE/LDT/Basic/DistributionMapAverages.lean#L105-L121">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">averageOperatorOverDistribution_uniform_map_eq_uniform_fst_of_factor_equiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">γ</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">δ</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn">β</span> → <span class="fn">γ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">α</span> <a href="../../.././Mathlib/Logic/Equiv/Defs.html#Equiv">≃</a> <span class="fn">γ</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">δ</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ (<span class="fn">a</span> : <span class="fn">α</span>), <span class="fn"><span class="fn">g</span> <span class="fn">(<span class="fn">m</span> <span class="fn">a</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<span class="fn">e</span> <span class="fn">a</span>)</span>.1</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><span class="fn">γ</span> → <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix/Basic.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.averageOperatorOverDistribution">averageOperatorOverDistribution</a> <span class="fn">(<span class="fn"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">α</span>)</span>.<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.Distribution.map">map</a></span> <span class="fn">m</span>)</span> <span class="fn">fun (<span class="fn">b</span> : <span class="fn">β</span>) =&gt; <span class="fn"><span class="fn">A</span> <span class="fn">(<span class="fn">g</span> <span class="fn">b</span>)</span></span></span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.averageOperatorOverDistribution">averageOperatorOverDistribution</a> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">γ</span>)</span> <span class="fn">A</span></span></div></div><p>A uniform push-forward has the first-coordinate uniform operator marginal
+when the observed coordinate factors through a product equivalence of the seed.</p></div></div><div class="decl" id="MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/LionSR/MIPStarRE/blob/b39705bfd36b8f7208f58d8c75e6c42a1624e06c/MIPStarRE/LDT/Basic/DistributionMapAverages.lean#L123-L139">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././MIPStarRE/LDT/Basic/DistributionMapAverages.html#MIPStarRE.LDT.averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv"><span class="name">MIPStarRE</span>.<span class="name">LDT</span>.<span class="name">averageOperatorOverDistribution_uniform_map_eq_uniform_snd_of_factor_equiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">γ</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">δ</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">γ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">δ</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">m</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">β</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn"><span class="fn">β</span> → <span class="fn">δ</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">α</span> <a href="../../.././Mathlib/Logic/Equiv/Defs.html#Equiv">≃</a> <span class="fn">γ</span> <a href="../../.././Init/Prelude.html#Prod">×</a> <span class="fn">δ</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ (<span class="fn">a</span> : <span class="fn">α</span>), <span class="fn"><span class="fn">g</span> <span class="fn">(<span class="fn">m</span> <span class="fn">a</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<span class="fn">e</span> <span class="fn">a</span>)</span>.2</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><span class="fn">δ</span> → <span class="fn"><a href="../../.././MIPStarRE/Quantum/FiniteMatrix/Basic.html#MIPStarRE.Quantum.Op">Quantum.Op</a> <span class="fn">ι</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.averageOperatorOverDistribution">averageOperatorOverDistribution</a> <span class="fn">(<span class="fn"><span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">α</span>)</span>.<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.Distribution.map">map</a></span> <span class="fn">m</span>)</span> <span class="fn">fun (<span class="fn">b</span> : <span class="fn">β</span>) =&gt; <span class="fn"><span class="fn">A</span> <span class="fn">(<span class="fn">g</span> <span class="fn">b</span>)</span></span></span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.averageOperatorOverDistribution">averageOperatorOverDistribution</a> <span class="fn">(<a href="../../.././MIPStarRE/LDT/Basic/Distribution.html#MIPStarRE.LDT.uniformDistribution">uniformDistribution</a> <span class="fn">δ</span>)</span> <span class="fn">A</span></span></div></div><p>A uniform push-forward has the second-coordinate uniform operator marginal
+when the observed coordinate factors through a product equivalence of the seed.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>
