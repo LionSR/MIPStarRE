@@ -24,7 +24,7 @@ open MvPolynomial
 
 /-- `\polyfunc{m}{q}{d}` from the paper's definition of low-individual-degree
 polynomials. This is Mathlib's `MvPolynomial.restrictDegree` submodule. -/
-abbrev polyFunc (m : ℕ) (K : Type*) [CommSemiring K] (d : ℕ) :
+noncomputable abbrev polyFunc (m : ℕ) (K : Type*) [CommSemiring K] (d : ℕ) :
     Submodule K (MvPolynomial (Fin m) K) :=
   MvPolynomial.restrictDegree (Fin m) K d
 

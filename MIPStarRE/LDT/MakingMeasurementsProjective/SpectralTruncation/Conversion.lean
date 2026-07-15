@@ -55,11 +55,12 @@ with `2√ζ` closeness and `(1+2√ζ)·I` total bound).
 Convert a spectral-truncation statement back to the rounded-projector
 witness consumed by the QXP rank-reduction layer.
 
-The conversion is structural.  It does not recover the source almost-projective
+**Source:** This is a source-faithful structural conversion of the rounded-family
+conclusion of the cited lemma. It does not recover the source almost-projective
 estimate, because that estimate is not a field of `SpectralTruncationStatement`;
 rank-reduction constructors which need it therefore keep it as a separate
 hypothesis. -/
-noncomputable def toRoundingToProjectorsWitness {Outcome : Type uOutcome}
+theorem toRoundingToProjectorsWitness {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     {ψ : QuantumState ι} {A : Measurement Outcome ι} {ζ : Error}
