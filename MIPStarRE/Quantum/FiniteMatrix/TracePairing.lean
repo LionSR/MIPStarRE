@@ -118,23 +118,11 @@ theorem realTracePairingCLM_tracePairingMatrixOfRealCLM
     _ = ψ X := by
           rw [← Matrix.matrix_eq_sum_single X]
 
-/-- Hermitian part of a matrix for the real trace pairing. -/
-noncomputable def tracePairingHermitianPart {d : Type*} [Fintype d] [DecidableEq d]
-    (Z : Op d) : Op d :=
-  (1 / 2 : ℝ) • (Z + Zᴴ)
-
-/-- The Hermitian part is Hermitian. -/
-theorem tracePairingHermitianPart_isHermitian
-    {d : Type*} [Fintype d] [DecidableEq d]
-    (Z : Op d) :
-    (tracePairingHermitianPart Z).IsHermitian := by
-  exact (Matrix.isHermitian_add_transpose_self Z).smul (IsSelfAdjoint.all _)
-
 /-- On Hermitian inputs, the Hermitian part has the same real trace pairing. -/
-theorem realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
+theorem realTracePairingCLM_selfAdjointPart_apply_of_isHermitian
     {d : Type*} [Fintype d] [DecidableEq d]
     (Z : Op d) {X : Op d} (hX : X.IsHermitian) :
-    realTracePairingCLM (tracePairingHermitianPart Z) X =
+    realTracePairingCLM (selfAdjointPart ℝ Z) X =
       realTracePairingCLM Z X := by
   rw [realTracePairingCLM_apply, realTracePairingCLM_apply]
   have hZX : Complex.re (Matrix.trace (Zᴴ * X)) =
@@ -145,9 +133,10 @@ theorem realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
         rw [Matrix.conjTranspose_mul, hX.eq]
         rw [Matrix.trace_mul_comm]
       simpa [Complex.star_def, Complex.conj_re] using congrArg Complex.re hstar.symm
-  rw [tracePairingHermitianPart, smul_mul_assoc, Matrix.add_mul]
-  rw [show Matrix.trace ((1 / 2 : ℝ) • (Z * X + Zᴴ * X)) =
-      (1 / 2 : ℝ) • Matrix.trace (Z * X + Zᴴ * X) by
+  rw [selfAdjointPart_apply_coe, invOf_eq_inv, smul_mul_assoc, Matrix.add_mul]
+  change Complex.re (Matrix.trace ((2 : ℝ)⁻¹ • (Z * X + Zᴴ * X))) = _
+  rw [show Matrix.trace ((2 : ℝ)⁻¹ • (Z * X + Zᴴ * X)) =
+      (2 : ℝ)⁻¹ • Matrix.trace (Z * X + Zᴴ * X) by
         rw [Matrix.trace_smul]]
   rw [Matrix.trace_add, Complex.smul_re, Complex.add_re]
   rw [hZX]
@@ -157,14 +146,14 @@ theorem realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
 noncomputable def hermitianTracePairingMatrixOfRealCLM
     {d : Type*} [Fintype d] [DecidableEq d]
     (ψ : StrongDual ℝ (Op d)) : Op d :=
-  tracePairingHermitianPart (tracePairingMatrixOfRealCLM ψ)
+  selfAdjointPart ℝ (tracePairingMatrixOfRealCLM ψ)
 
 /-- The Hermitian representative is Hermitian. -/
 theorem hermitianTracePairingMatrixOfRealCLM_isHermitian
     {d : Type*} [Fintype d] [DecidableEq d]
     (ψ : StrongDual ℝ (Op d)) :
     (hermitianTracePairingMatrixOfRealCLM ψ).IsHermitian :=
-  tracePairingHermitianPart_isHermitian (tracePairingMatrixOfRealCLM ψ)
+  (selfAdjointPart ℝ (tracePairingMatrixOfRealCLM ψ)).property
 
 /-- On Hermitian inputs, the Hermitian representative gives the same functional. -/
 theorem hermitianTracePairingMatrixOfRealCLM_apply_of_isHermitian
@@ -177,7 +166,7 @@ theorem hermitianTracePairingMatrixOfRealCLM_apply_of_isHermitian
       rw [realTracePairingCLM_tracePairingMatrixOfRealCLM ψ]
     _ = realTracePairingCLM (hermitianTracePairingMatrixOfRealCLM ψ) X := by
       simpa [hermitianTracePairingMatrixOfRealCLM] using
-        (realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
+        (realTracePairingCLM_selfAdjointPart_apply_of_isHermitian
           (tracePairingMatrixOfRealCLM ψ) hX).symm
     _ = Complex.re (Matrix.trace (hermitianTracePairingMatrixOfRealCLM ψ * X)) := by
       rfl
