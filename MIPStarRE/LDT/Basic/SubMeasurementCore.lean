@@ -302,14 +302,14 @@ theorem ProjSubMeas.outcome_mul_total_eq_outcome {α : Type*} {ι : Type*}
     simpa [R, Pa] using
       sub_le_sub_left (P.outcome_le_total a) (1 : MIPStarRE.Quantum.Op ι)
   have hPaRPa_nonneg : 0 ≤ Pa * R * Pa := by
-    exact MIPStarRE.Quantum.sandwich_nonneg hR_nonneg hPa_herm
+    exact IsSelfAdjoint.conjugate_nonneg hR_nonneg hPa_herm
   have hPa_one_sub_Pa : Pa * (1 - Pa) * Pa = 0 := by
     rw [hPa_star.mul_one_sub_self, zero_mul]
   have hPaRPa_eq_zero : Pa * R * Pa = 0 := by
     apply le_antisymm
     · calc
         Pa * R * Pa ≤ Pa * (1 - Pa) * Pa := by
-          exact MIPStarRE.Quantum.sandwich_mono hPa_herm hR_le_self
+          exact IsSelfAdjoint.conjugate_le_conjugate hR_le_self hPa_herm
         _ = 0 := hPa_one_sub_Pa
     · simpa using hPaRPa_nonneg
   have hP_total_herm : P.totalᴴ = P.total := by
@@ -331,10 +331,10 @@ theorem ProjSubMeas.outcome_mul_total_eq_outcome {α : Type*} {ι : Type*}
     apply le_antisymm
     · calc
         Pa * (R * R) * Pa ≤ Pa * R * Pa := by
-          exact MIPStarRE.Quantum.sandwich_mono hPa_herm hR_sq_le
+          exact IsSelfAdjoint.conjugate_le_conjugate hR_sq_le hPa_herm
         _ = 0 := hPaRPa_eq_zero
     · have hnonneg : 0 ≤ Pa * (R * R) * Pa := by
-        exact MIPStarRE.Quantum.sandwich_nonneg
+        exact IsSelfAdjoint.conjugate_nonneg
           (show 0 ≤ R * R by
             exact Commute.mul_nonneg hR_nonneg hR_nonneg (Commute.refl R))
           hPa_herm
@@ -396,14 +396,14 @@ theorem ProjSubMeas.outcome_orthogonal {α : Type*}
       { isHermitian := (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a)).isHermitian
         idempotent := by simpa [Pa] using P.proj a }
   have hPaPbPa_nonneg : 0 ≤ Pa * Pb * Pa :=
-    MIPStarRE.Quantum.sandwich_nonneg (P.outcome_pos b) hPa_herm
+    IsSelfAdjoint.conjugate_nonneg (P.outcome_pos b) hPa_herm
   have hPa_idem : Pa * (1 - Pa) * Pa = 0 := by
     rw [hPa_star.mul_one_sub_self, zero_mul]
   have hPaPbPa_eq_zero : Pa * Pb * Pa = 0 := by
     apply le_antisymm
     · calc
         Pa * Pb * Pa ≤ Pa * (1 - Pa) * Pa :=
-          MIPStarRE.Quantum.sandwich_mono hPa_herm hPb_le
+          IsSelfAdjoint.conjugate_le_conjugate hPb_le hPa_herm
         _ = 0 := hPa_idem
     · exact hPaPbPa_nonneg
   have hPbPa_eq_zero : Pb * Pa = 0 := by

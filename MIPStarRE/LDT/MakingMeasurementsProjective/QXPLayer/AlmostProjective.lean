@@ -43,7 +43,7 @@ lemma qAlmostProjective {Outcome : Type*}
       _ ≤ Qa data a *
             ((((1 : Error) + 2 * ε) : ℂ) • (1 : MIPStarRE.Quantum.Op ι)) *
             Qa data a := by
-              exact MIPStarRE.Quantum.sandwich_mono (M := Qa data a) hQa_herm hRank.total_le
+              exact IsSelfAdjoint.conjugate_le_conjugate hRank.total_le hQa_herm
       _ = (((1 : Error) + 2 * ε) : ℂ) • Qa data a := by
             simp [hQa_sq]
   have hsum_le :

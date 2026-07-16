@@ -168,7 +168,7 @@ private lemma addInU_selected_step1_C_contraction
     rw [hexpand]
     calc
       Pa a * (K a * K a) * Pa a
-          ≤ Pa a * 1 * Pa a := MIPStarRE.Quantum.sandwich_mono (hPa_herm a) (hK_sq_le_one a)
+          ≤ Pa a * 1 * Pa a := IsSelfAdjoint.conjugate_le_conjugate (hK_sq_le_one a) (hPa_herm a)
       _ = Pa a * Pa a := by simp
       _ = Pa a := hPa_proj a
   have hsum_Pa : ∑ a : Fq params, Pa a = (1 : MIPStarRE.Quantum.Op (ι × ι)) := by
@@ -289,7 +289,7 @@ private lemma addInU_selected_step2_C_contraction
     rw [hexpand]
     calc
       Pa a * (K a * K a) * Pa a
-          ≤ Pa a * 1 * Pa a := MIPStarRE.Quantum.sandwich_mono (hPa_herm a) (hK_sq_le_one a)
+          ≤ Pa a * 1 * Pa a := IsSelfAdjoint.conjugate_le_conjugate (hK_sq_le_one a) (hPa_herm a)
       _ = Pa a * Pa a := by simp
       _ = Pa a := hPa_proj a
   have hsum_Pa : ∑ a : Fq params, Pa a = (1 : MIPStarRE.Quantum.Op (ι × ι)) := by

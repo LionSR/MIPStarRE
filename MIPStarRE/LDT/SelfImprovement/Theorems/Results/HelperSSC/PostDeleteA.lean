@@ -52,7 +52,7 @@ private lemma helper_pair_sandwich_operator_sum_le
           refine Finset.sum_le_sum ?_
           intro h _
           exact opTensor_mono_left
-            (MIPStarRE.Quantum.sandwich_mono (hX_herm h) H.total_le_one)
+            (IsSelfAdjoint.conjugate_le_conjugate H.total_le_one (hX_herm h))
             (T.outcome_pos h)
     _ = ∑ h : Polynomial params, opTensor (X h * X h) (T.outcome h) := by
           simp

@@ -113,7 +113,7 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_right
       _ ≤ leftTensor (ι₂ := ι) (X g * X g) := by
             simpa [leftTensor, opTensor, mul_assoc] using
               (opTensor_mono_left (ι₂ := ι) (B := (1 : MIPStarRE.Quantum.Op ι))
-                (MIPStarRE.Quantum.sandwich_mono (hXherm g) hGle)
+                (IsSelfAdjoint.conjugate_le_conjugate hGle (hXherm g))
                 (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
       _ ≤ leftTensor (ι₂ := ι) (X g) := by
             simpa [leftTensor, opTensor] using

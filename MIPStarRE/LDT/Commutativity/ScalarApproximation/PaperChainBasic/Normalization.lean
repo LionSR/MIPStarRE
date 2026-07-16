@@ -146,11 +146,11 @@ lemma leftRightTensor_prefix_pointMeasurement_normalization
         have hleft1 :
             A.outcome a * (B.outcome b * B.outcome b) * A.outcome a ≤
               A.outcome a * B.outcome b * A.outcome a := by
-          exact MIPStarRE.Quantum.sandwich_mono (A.outcome_hermitian a) hBsq
+          exact IsSelfAdjoint.conjugate_le_conjugate hBsq (A.outcome_hermitian a)
         have hleft2 :
             A.outcome a * B.outcome b * A.outcome a ≤
               A.outcome a * (1 : MIPStarRE.Quantum.Op ι) * A.outcome a := by
-          exact MIPStarRE.Quantum.sandwich_mono (A.outcome_hermitian a) (B.outcome_le_one b)
+          exact IsSelfAdjoint.conjugate_le_conjugate (B.outcome_le_one b) (A.outcome_hermitian a)
         have hleft3 :
             A.outcome a * (1 : MIPStarRE.Quantum.Op ι) * A.outcome a ≤
               A.outcome a := by
@@ -337,7 +337,7 @@ lemma leftRightTensor_prefix_pointMeasurement_adjoint_normalization
           = B.outcome b * (∑ a : α, A.outcome a * A.outcome a) * B.outcome b := by
             rw [← Matrix.sum_mul, ← Matrix.mul_sum]
       _ ≤ B.outcome b * (1 : MIPStarRE.Quantum.Op ι) * B.outcome b := by
-            exact MIPStarRE.Quantum.sandwich_mono (B.outcome_hermitian b) hsum_sq_le_one
+            exact IsSelfAdjoint.conjugate_le_conjugate hsum_sq_le_one (B.outcome_hermitian b)
       _ = B.outcome b * B.outcome b := by simp
       _ ≤ B.outcome b :=
             MIPStarRE.Quantum.sq_le_self (B.outcome_pos b) (B.outcome_le_one b)
@@ -408,12 +408,13 @@ lemma leftTensor_pair_prefix_normalization
             simp only [mul_assoc]
       _ ≤ ∑ b : β, A.total * B.outcome b * A.total := by
             exact Finset.sum_le_sum fun b _ =>
-              MIPStarRE.Quantum.sandwich_mono hAtotal_herm
+              IsSelfAdjoint.conjugate_le_conjugate
                 (MIPStarRE.Quantum.sq_le_self (B.outcome_pos b) (B.outcome_le_one b))
+                hAtotal_herm
       _ = A.total * B.total * A.total := by
             rw [← Matrix.sum_mul, ← Matrix.mul_sum, B.sum_eq_total]
       _ ≤ A.total * (1 : MIPStarRE.Quantum.Op ι) * A.total := by
-            exact MIPStarRE.Quantum.sandwich_mono hAtotal_herm B.total_le_one
+            exact IsSelfAdjoint.conjugate_le_conjugate B.total_le_one hAtotal_herm
       _ = A.total * A.total := by simp
       _ ≤ A.total := MIPStarRE.Quantum.sq_le_self A.total_nonneg A.total_le_one
       _ ≤ 1 := A.total_le_one
@@ -462,7 +463,7 @@ lemma leftTensor_pair_prefix_adjoint_normalization
             simp only [mul_assoc]
       _ ≤ ∑ b : β, B.outcome b * (1 : MIPStarRE.Quantum.Op ι) * B.outcome b := by
             exact Finset.sum_le_sum fun b _ =>
-              MIPStarRE.Quantum.sandwich_mono (B.outcome_hermitian b) hAtotal_sq_le_one
+              IsSelfAdjoint.conjugate_le_conjugate hAtotal_sq_le_one (B.outcome_hermitian b)
       _ = ∑ b : β, B.outcome b * B.outcome b := by simp
       _ ≤ ∑ b : β, B.outcome b := by
             exact Finset.sum_le_sum fun b _ =>
@@ -529,13 +530,13 @@ lemma leftTensor_prefix_total_normalization
     have hB_sandwich :
         B.outcome b * (T * T) * B.outcome b ≤
           B.outcome b * (1 : MIPStarRE.Quantum.Op ι) * B.outcome b :=
-      MIPStarRE.Quantum.sandwich_mono (B.outcome_hermitian b) hT_sq_le_one
+      IsSelfAdjoint.conjugate_le_conjugate hT_sq_le_one (B.outcome_hermitian b)
     have hA_sandwich :
         A.outcome a * (B.outcome b * (T * T) * B.outcome b) * A.outcome a ≤
           A.outcome a *
             (B.outcome b * (1 : MIPStarRE.Quantum.Op ι) * B.outcome b) *
             A.outcome a :=
-      MIPStarRE.Quantum.sandwich_mono (A.outcome_hermitian a) hB_sandwich
+      IsSelfAdjoint.conjugate_le_conjugate hB_sandwich (A.outcome_hermitian a)
     calc
       X (a, b) * (X (a, b))ᴴ
           = A.outcome a * (B.outcome b * (T * T) * B.outcome b) * A.outcome a := by
@@ -565,9 +566,9 @@ lemma leftTensor_prefix_total_normalization
       _ = A.outcome a * (∑ b : β, B.outcome b * B.outcome b) * A.outcome a := by
             rw [← Matrix.sum_mul, ← Matrix.mul_sum]
       _ ≤ A.outcome a * B.total * A.outcome a := by
-            exact MIPStarRE.Quantum.sandwich_mono (A.outcome_hermitian a) hBsq_sum
+            exact IsSelfAdjoint.conjugate_le_conjugate hBsq_sum (A.outcome_hermitian a)
       _ ≤ A.outcome a * (1 : MIPStarRE.Quantum.Op ι) * A.outcome a := by
-            exact MIPStarRE.Quantum.sandwich_mono (A.outcome_hermitian a) B.total_le_one
+            exact IsSelfAdjoint.conjugate_le_conjugate B.total_le_one (A.outcome_hermitian a)
       _ = A.outcome a * A.outcome a := by simp
       _ ≤ A.outcome a :=
             MIPStarRE.Quantum.sq_le_self (A.outcome_pos a) (A.outcome_le_one a)

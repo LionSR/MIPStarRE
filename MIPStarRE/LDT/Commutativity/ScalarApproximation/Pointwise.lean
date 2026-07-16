@@ -300,7 +300,7 @@ lemma gCommStability_pointwise_sum_bound_core
             ev_mono ψ _ _ <| by
               simpa [leftTensor_mul_rightTensor_eq_opTensor] using
                 opTensor_mono_left
-                  (MIPStarRE.Quantum.sandwich_mono hTc_herm A.total_le_one)
+                  (IsSelfAdjoint.conjugate_le_conjugate A.total_le_one hTc_herm)
                   B.total_nonneg
     _ = ev ψ
           (leftTensor (ι₂ := ι) (1 - T) * rightTensor (ι₁ := ι) T) := by
@@ -373,18 +373,18 @@ private lemma gCommStability_pointwise_summand_bound
             rfl
       _ ≤ A.outcome ah.1 * 1 * A.outcome ah.1 := by
             exact
-              MIPStarRE.Quantum.sandwich_mono
-                (A.outcome_hermitian ah.1)
+              IsSelfAdjoint.conjugate_le_conjugate
                 ((evaluatedPointFamily params family q.2).outcome_le_one
                   (ah.2 (truncatePoint params q.2)))
+                (A.outcome_hermitian ah.1)
       _ = A.outcome ah.1 := by
             simp [A, evaluatedPointFamily_outcome_proj params family q.1 ah.1]
   have hleft :
       (1 - T) * (Sᴴ * S) * (1 - T) ≤
         (1 - T) * A.outcome ah.1 * (1 - T) := by
     exact le_trans
-      (MIPStarRE.Quantum.sandwich_mono hTc_herm hS_sq_le)
-      (MIPStarRE.Quantum.sandwich_mono hTc_herm hS_le_A)
+      (IsSelfAdjoint.conjugate_le_conjugate hS_sq_le hTc_herm)
+      (IsSelfAdjoint.conjugate_le_conjugate hS_le_A hTc_herm)
   exact
     ev_mono strategy.state _ _ <| by
       simpa [y, T, A, S, leftTensor_mul_rightTensor_eq_opTensor] using

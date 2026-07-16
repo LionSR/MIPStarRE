@@ -252,7 +252,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
                 rw [leftTensor_mul_rightTensor_eq_opTensor,
                   leftTensor_mul_rightTensor_eq_opTensor]
                 exact MIPStarRE.LDT.opTensor_mono_right
-                  (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
+                  (IsSelfAdjoint.conjugate_nonneg (R.outcome_pos g) hTc_herm)
                   (averagedSlicePointEvaluationOperator_sq_le_self params strategy x g)
       _ ≤ ∑ g : Polynomial params,
             ev strategy.state
@@ -264,7 +264,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
                 rw [leftTensor_mul_rightTensor_eq_opTensor,
                   leftTensor_mul_rightTensor_eq_opTensor]
                 exact MIPStarRE.LDT.opTensor_mono_right
-                  (MIPStarRE.Quantum.sandwich_nonneg (R.outcome_pos g) hTc_herm)
+                  (IsSelfAdjoint.conjugate_nonneg (R.outcome_pos g) hTc_herm)
                   (hbound.averagedPoint_le_witness x g)
       _ = ev strategy.state
             (leftTensor (ι₂ := ι) (((1 - T) * R.total * (1 - T))) *
@@ -279,7 +279,7 @@ lemma scalar_pointwise_cauchy_schwarz_bound
               (by
                 calc
                   ((1 - T) * R.total * (1 - T)) ≤ (1 - T) * 1 * (1 - T) := by
-                    exact MIPStarRE.Quantum.sandwich_mono hTc_herm R.total_le_one
+                    exact IsSelfAdjoint.conjugate_le_conjugate R.total_le_one hTc_herm
                   _ = 1 - T := by
                     calc
                       (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) := by simp

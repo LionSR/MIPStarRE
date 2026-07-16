@@ -217,9 +217,9 @@ lemma fromHToGAdjacentStage_paperMoveChain
                   rw [htail_herm]
                   simp [mul_assoc, U]
             _ ≤ leftTensor (ι₂ := ι) U * tailBlock g * leftTensor (ι₂ := ι) U := by
-                  exact MIPStarRE.Quantum.sandwich_mono hU_herm (htail_sq_le_self g)
+                  exact IsSelfAdjoint.conjugate_le_conjugate (htail_sq_le_self g) hU_herm
             _ ≤ leftTensor (ι₂ := ι) U * 1 * leftTensor (ι₂ := ι) U := by
-                  exact MIPStarRE.Quantum.sandwich_mono hU_herm (htail_le_one g)
+                  exact IsSelfAdjoint.conjugate_le_conjugate (htail_le_one g) hU_herm
             _ ≤ leftTensor (ι₂ := ι) U := by
                   calc
                     leftTensor (ι₂ := ι) U * 1 * leftTensor (ι₂ := ι) U
@@ -388,7 +388,7 @@ lemma fromHToGAdjacentStage_paperMoveChain
               (S * U)ᴴ * (S * U) = U * (S * S) * U := by
                 simp [Matrix.conjTranspose_mul, hUherm, S, U, mul_assoc,
                   fromHToGRecurrenceWeight_isHermitian]
-              _ ≤ U * 1 * U := MIPStarRE.Quantum.sandwich_mono hUherm hSsq
+              _ ≤ U * 1 * U := IsSelfAdjoint.conjugate_le_conjugate hSsq hUherm
               _ ≤ U := by
                 have hUpos : 0 ≤ U := (gHatIdxMeas params family q.1).outcome_pos ogs.1
                 have hUle : U ≤ 1 := (gHatIdxMeas params family q.1).outcome_le_one ogs.1

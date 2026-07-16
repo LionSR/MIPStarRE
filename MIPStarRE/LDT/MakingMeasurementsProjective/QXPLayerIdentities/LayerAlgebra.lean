@@ -518,7 +518,7 @@ lemma squaredDifference {Outcome : Type*}
   have h_main :
       (Y - 1) * (Y - 1) ≤ (Y - 1) * ((Y + 1) * (Y + 1)) * (Y - 1) := by
     simpa [Matrix.mul_assoc] using
-      MIPStarRE.Quantum.sandwich_mono (M := Y - 1) hYm1_herm h_one_le_sq
+      IsSelfAdjoint.conjugate_le_conjugate h_one_le_sq hYm1_herm
   have h_comm_pm : Commute (Y - 1) (Y + 1) := by
     change (Y - 1) * (Y + 1) = (Y + 1) * (Y - 1)
     simp [sub_eq_add_neg, mul_add, add_mul, add_assoc, add_left_comm, add_comm]

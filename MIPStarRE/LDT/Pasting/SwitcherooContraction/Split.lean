@@ -104,7 +104,7 @@ lemma switcherooAggregateFourthTermX_nonneg
   unfold switcherooAggregateFourthTermX
   refine Finset.sum_nonneg ?_
   intro o _
-  exact MIPStarRE.Quantum.sandwich_nonneg ((family.meas q.1).outcome_pos g)
+  exact IsSelfAdjoint.conjugate_nonneg ((family.meas q.1).outcome_pos g)
     (switcherooMeasuredOutcome_hermitian params M q o)
 
 /-- The shared `X_g` sandwich family is bounded by the identity pointwise. -/
@@ -272,7 +272,7 @@ private lemma switcherooAggregateFourthTerm_split_contraction
   have hsandwich_le : G * (∑ o : Outcome, Mo o * G * Mo o) * G ≤ G := by
     calc
       G * (∑ o : Outcome, Mo o * G * Mo o) * G ≤ G * 1 * G := by
-        exact MIPStarRE.Quantum.sandwich_mono hGherm hmid_le
+        exact IsSelfAdjoint.conjugate_le_conjugate hmid_le hGherm
       _ = G := by simp [hGsq]
   calc
     (∑ go : Polynomial params × Outcome,
@@ -471,7 +471,7 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
     intro g _
     simpa [leftTensor, opTensor] using
       (opTensor_mono_left (ι₂ := ι) (B := (1 : MIPStarRE.Quantum.Op ι))
-        (by simpa [mul_assoc] using MIPStarRE.Quantum.sandwich_mono hGherm (hXsq_le g))
+        (by simpa [mul_assoc] using IsSelfAdjoint.conjugate_le_conjugate (hXsq_le g) hGherm)
         (show (0 : MIPStarRE.Quantum.Op ι) ≤ 1 by exact zero_le_one))
   have hsumX : ∑ g : Polynomial params, X g = ∑ o : Outcome, Mo o * G * Mo o := by
     simpa [X, G, Mo] using switcherooAggregateFourthTermX_sum params family M q
@@ -480,7 +480,7 @@ lemma switcherooAggregateFourthTerm_once_commuted_contraction_left
   have hsandwich_le : G * (∑ g : Polynomial params, X g) * G ≤ G := by
     calc
       G * (∑ g : Polynomial params, X g) * G ≤ G * 1 * G := by
-        exact MIPStarRE.Quantum.sandwich_mono hGherm (by simpa [hsumX] using hmid_le)
+        exact IsSelfAdjoint.conjugate_le_conjugate (by simpa [hsumX] using hmid_le) hGherm
       _ = G := by simp [hGsq]
   calc
     (∑ g : Polynomial params,

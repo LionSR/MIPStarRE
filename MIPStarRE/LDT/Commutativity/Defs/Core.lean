@@ -90,9 +90,9 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype �
   outcome_pos := by
     rintro ⟨a, b⟩
     simpa using
-      sandwich_nonneg
-        (M := A.outcome a)
-        (P := B.outcome b)
+      IsSelfAdjoint.conjugate_nonneg
+        (c := A.outcome a)
+        (a := B.outcome b)
         (B.outcome_pos b)
         (A.outcome_hermitian a)
   sum_eq_total := by
@@ -113,10 +113,10 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype �
             exact le_trans
                 (by
                   simpa using
-                  sandwich_mono
-                    (M := A.outcome a)
-                    (hMH := A.outcome_hermitian a)
-                    (hPQ := B.total_le_one))
+                  IsSelfAdjoint.conjugate_le_conjugate
+                    (c := A.outcome a)
+                    B.total_le_one
+                    (A.outcome_hermitian a))
               (by
                 simpa using
                   sq_le_self

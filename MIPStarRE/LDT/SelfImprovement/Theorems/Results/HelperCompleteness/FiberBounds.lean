@@ -302,7 +302,7 @@ theorem helper_first_move_second_factor_operator_le_one
       calc
         Au * (Tfiber * Tfiber) * Au
             ≤ Au * 1 * Au :=
-              MIPStarRE.Quantum.sandwich_mono hAu_herm hT_sq_le_one
+              IsSelfAdjoint.conjugate_le_conjugate hT_sq_le_one hAu_herm
         _ = Au := by simp [hAu_proj]
     simpa [leftTensor, opTensor] using
       (opTensor_mono_left (ι₂ := ι)

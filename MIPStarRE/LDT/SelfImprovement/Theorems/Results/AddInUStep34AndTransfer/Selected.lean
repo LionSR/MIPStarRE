@@ -363,7 +363,7 @@ private lemma addInU_selected_sandwich_tensor_if_sum_le
     refine Finset.sum_le_sum ?_
     intro h _
     have hleft_le : X h * (M u).total * X h ≤ X h * 1 * X h :=
-      MIPStarRE.Quantum.sandwich_mono (hX_herm h) (M u).total_le_one
+      IsSelfAdjoint.conjugate_le_conjugate (M u).total_le_one (hX_herm h)
     simpa using opTensor_mono_left hleft_le (T.outcome_pos h)
   calc
     (∑ ah : Outcome × Polynomial params,

@@ -238,7 +238,7 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     outcome_pos := by
       intro h
       simp only [sandwichedPolynomialOutcomeOperatorAt, pointConditionedOutcomeOperatorAtPolynomial]
-      exact sandwich_nonneg (T.outcome_pos h)
+      exact IsSelfAdjoint.conjugate_nonneg (T.outcome_pos h)
         (SubMeas.outcome_hermitian (strategy.pointMeasurement u).toSubMeas (h u))
     sum_eq_total := by
       rfl
@@ -287,10 +287,10 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
                   _ = T.total := T.sum_eq_total
                   _ ≤ 1 := T.total_le_one
               simpa [Au.proj a] using
-                sandwich_mono
-                  (M := Au.toSubMeas.outcome a)
-                  (hMH := Au.outcome_hermitian a)
-                  (hPQ := hfilt_le_one)
+                IsSelfAdjoint.conjugate_le_conjugate
+                  (c := Au.toSubMeas.outcome a)
+                  hfilt_le_one
+                  (Au.outcome_hermitian a)
         _ = Au.toSubMeas.total := by
               rw [Au.toSubMeas.sum_eq_total]
         _ = 1 := by
