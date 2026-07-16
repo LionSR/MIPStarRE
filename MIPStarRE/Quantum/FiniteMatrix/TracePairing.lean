@@ -119,7 +119,7 @@ theorem realTracePairingCLM_tracePairingMatrixOfRealCLM
           rw [← Matrix.matrix_eq_sum_single X]
 
 /-- On Hermitian inputs, the Hermitian part has the same real trace pairing. -/
-theorem realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
+theorem realTracePairingCLM_selfAdjointPart_apply_of_isHermitian
     {d : Type*} [Fintype d] [DecidableEq d]
     (Z : Op d) {X : Op d} (hX : X.IsHermitian) :
     realTracePairingCLM (selfAdjointPart ℝ Z) X =
@@ -166,7 +166,7 @@ theorem hermitianTracePairingMatrixOfRealCLM_apply_of_isHermitian
       rw [realTracePairingCLM_tracePairingMatrixOfRealCLM ψ]
     _ = realTracePairingCLM (hermitianTracePairingMatrixOfRealCLM ψ) X := by
       simpa [hermitianTracePairingMatrixOfRealCLM] using
-        (realTracePairingCLM_tracePairingHermitianPart_apply_of_isHermitian
+        (realTracePairingCLM_selfAdjointPart_apply_of_isHermitian
           (tracePairingMatrixOfRealCLM ψ) hX).symm
     _ = Complex.re (Matrix.trace (hermitianTracePairingMatrixOfRealCLM ψ * X)) := by
       rfl
