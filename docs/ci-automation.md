@@ -11,9 +11,9 @@ This repository uses [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
 - [Workflow Reference](#workflow-reference)
   - [Claude Code Review](#claude-code-review-claude-code-reviewyml)
   - [CI Failure Auto-Fix](#ci-failure-auto-fix-ci-failure-auto-fixyml)
-  - [Lean Linter-Warning Sweep](#lean-linter-warning-sweep-lean-linter-warning-sweepyml)
+  - [Lean Linter-Warning Sweep](#lean-linter-warning-sweep-housekeepingyml-linter-sweep-job)
   - [Lean Linter-Warning Auto-Fix](#lean-linter-warning-auto-fix-lean-linter-warning-autofixyml)
-  - [README Freshness Audit](#readme-freshness-audit-readme-freshness-audityml)
+  - [README Freshness Audit](#readme-freshness-audit-housekeepingyml-readme-freshness-job)
   - [Oversized Lean File Guard](#oversized-lean-file-guard-oversized-lean-filesyml)
   - [Blueprint Auto-Fix](#blueprint-auto-fix-blueprint-auto-fixyml)
   - [Review Comment Auto-Fix](#review-comment-auto-fix-auto-fixyml)
@@ -176,7 +176,7 @@ Here is exactly what happens:
 
 ---
 
-### Lean Linter-Warning Sweep (`lean-linter-warning-sweep.yml`)
+### Lean Linter-Warning Sweep (`housekeeping.yml`, `linter-sweep` job)
 
 **What it does**: Runs a weekly report-only Lean build that captures compiler
 and linter warnings before they accumulate into a large cleanup PR. The workflow
@@ -277,7 +277,7 @@ Until those conditions are explicitly approved in a later PR, the Monday
 schedule remains report-only with `contents: read`, and the only write-capable
 linter-warning path is the manual `workflow_dispatch` wrapper described above.
 
-### README Freshness Audit (`readme-freshness-audit.yml`)
+### README Freshness Audit (`housekeeping.yml`, `readme-freshness` job)
 
 **What it does**: Runs a weekly report-only audit of `README.md` so the
 repository overview does not drift from the current layout. The audit checks
@@ -750,7 +750,7 @@ All workflows use `claude-opus-4-6`, configured via `--model` in the `claude_arg
 ### Linter-warning sweep cadence and categories
 
 The weekly Lean linter-warning sweep cadence is configured in
-`.github/workflows/lean-linter-warning-sweep.yml` with a Monday 09:00 UTC cron.
+the `linter-sweep` job of `.github/workflows/housekeeping.yml` with a Monday 09:00 UTC cron.
 If Lean adds new warning families worth highlighting, extend the
 `known_linter_names` list in that workflow's summary step; unknown warning lines
 are still reported under `other`.

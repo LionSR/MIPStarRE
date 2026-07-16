@@ -209,7 +209,7 @@ Use the **Tracking Issue** template (`.github/ISSUE_TEMPLATE/tracking-issue.yml`
 Label with `tracking`; add `chapter-tracking` for the long-lived chapter
 overview trackers. A tracking issue should begin by naming the mathematical
 objective and citing the paper or blueprint labels that the child issues cover.
-The `tracking-issue-sync` workflow will automatically:
+The `issue-automation` workflow will automatically:
 
 - Rely on GitHub's native sub-issue progress instead of editing body checkboxes.
 - Post progress comments on linked issues when PRs merge.
@@ -545,12 +545,12 @@ The following workflows run automatically:
 |----------|---------|-------------|
 | **Lean CI** (`lean_action_ci.yml`) | Push to `main`, PRs touching `.lean`/`lakefile.toml`/`lean-toolchain` | Runs `lake build` with Mathlib cache |
 | **Claude Code Review** (`claude-code-review.yml`) | PR opened/synced/ready-for-review/reopened touching Lean files, blueprint `.tex` files, `docs/paper-gaps/`, `lakefile.toml`, or `lean-toolchain` | Automated review for proof integrity, Mathlib style, type safety, performance, modularity, mathematical exposition, and documentation |
-| **Issue Tracker** (`tracking-issue-sync.yml`) | Issue closed/reopened; PR merged/opened | Uses native sub-issue progress for tracking status, posts progress comments on linked issues when PRs merge, scans merged PRs for genuine deferred mathematical obligations, and creates `follow-up` issues when needed |
+| **Issue Automation** (`issue-automation.yml`) | Issue opened/labeled/closed/reopened; PR opened/merged | Classifies new issues, posts Mathlib scouting reports, keeps tracking issues current via a deterministic script (progress comments, sub-issue counts, `all-resolved`), and scans merged PRs for genuine deferred mathematical obligations, filing `follow-up` issues |
 | **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Builds `leanblueprint pdf` / `web` to catch broken labels, undefined macros, and plasTeX errors, then runs the blueprint ↔ Lean sync checks. The LaTeX convention scan and the `scripts/tests` helper unit tests both run locally in the pre-commit hook. |
 | **Blueprint Sync & Prose Review** (`blueprint-prose-review.yml`) | PRs touching Lean files, blueprint source, selected proof-integrity documents, or prompt files | Reviews blueprint synchronization, source-faithfulness, and mathematical prose for formalization changes. |
-| **README Freshness Audit** (`readme-freshness-audit.yml`) | Weekly + manual dispatch | Report-only audit for README local paths, LDT submodule count, and hard-coded Lean/Mathlib versions |
+| **README Freshness Audit** (`housekeeping.yml`, `readme-freshness` job) | Weekly + manual dispatch | Report-only audit for README local paths, LDT submodule count, and hard-coded Lean/Mathlib versions |
 | **PR Mathematical Description** (`pr-cleanup.yml`) | PR opened from `claude/*` or `codex/*` branches | Normalizes title to `type(scope): desc`, rewrites the PR body as a self-contained mathematical note, preserves source citations from the linked issue, copies labels, adds `Addresses #N`, and comments on the issue |
-| **Mathlib Scout** (`mathlib-scout.yml`) | Formalization issue opened/labeled | Scouts Mathlib for relevant lemmas and posts a scouting report |
+| **Mathlib Scout** (`issue-automation.yml`, `scout` job) | Formalization issue opened/labeled | Scouts Mathlib for relevant lemmas and posts a scouting report |
 
 ### What CI checks before merge
 

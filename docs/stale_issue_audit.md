@@ -46,7 +46,7 @@ GitHub directly.  That keeps the audit easy to run locally, easy to test
 without credentials, and safe to wrap in automation.
 
 The weekly GitHub Actions wrapper
-[`.github/workflows/stale-issue-audit.yml`](../.github/workflows/stale-issue-audit.yml)
+the `stale-audit` job of [`.github/workflows/housekeeping.yml`](../.github/workflows/housekeeping.yml)
 automates exactly that documented export-and-audit sequence: it lists open
 issues with `gh issue list`, writes a JSON audit report, and uploads the
 report as an artifact only when at least one stale citation is flagged.  The
