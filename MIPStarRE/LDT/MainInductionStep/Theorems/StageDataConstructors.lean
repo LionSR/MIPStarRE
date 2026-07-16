@@ -91,19 +91,17 @@ noncomputable def SliceRestrictionData.ofAnswer
     { axisParallel := answerPkg.profile.axisParallel
       selfConsistency := answerPkg.profile.selfConsistency
       diagonal := answerPkg.profile.diagonal
-      restrictedGood := by
-        intro x
-        have hgood := answerPkg.profile.restrictedGood x
-        exact
-          { axisParallelTest := by
-              simpa [answerRestricted_axisParallelFailureProbability_eq params strategy x]
-                using hgood.axisParallelTest
-            selfConsistencyTest := by
-              simpa [answerRestricted_selfConsistencyFailureProbability_eq params strategy x]
-                using hgood.selfConsistencyTest
-            diagonalLineTest := by
-              simpa [answerRestricted_diagonalFailureProbability_eq params strategy x]
-                using hgood.diagonalLineTest } }
+      restrictedGood := fun x =>
+        let hgood := answerPkg.profile.restrictedGood x
+        { axisParallelTest := by
+            simpa [answerRestricted_axisParallelFailureProbability_eq params strategy x]
+              using hgood.axisParallelTest
+          selfConsistencyTest := by
+            simpa [answerRestricted_selfConsistencyFailureProbability_eq params strategy x]
+              using hgood.selfConsistencyTest
+          diagonalLineTest := by
+            simpa [answerRestricted_diagonalFailureProbability_eq params strategy x]
+              using hgood.diagonalLineTest } }
   axisAverageBound := by
     simpa [averageRestrictedAxisParallelError, averageAnswerRestrictedAxisParallelError]
       using answerPkg.axisAverageBound
@@ -274,6 +272,16 @@ noncomputable def AnswerPerSliceInductionData.ofMainInductionHypothesis
         (restrictionPkg.profile.diagonal x)
         k (restrictionPkg.profile.restrictedGood x) hk_pos hk
 
+/-- Forgetting outcomes identifies the point measurements of the two restricted strategies. -/
+private theorem restrictedPointSubMeasurement_eq_answer
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params.next ι)
+    (x : Fq params) :
+    IdxProjMeas.toIdxSubMeas (xRestrictedStrategy params strategy x).pointMeasurement =
+      IdxProjMeas.toIdxSubMeas
+        (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
+  funext u
+  rfl
+
 /-- View a per-slice induction data record over an answer-forgotten restriction
 data record as an answer-valued data record.
 
@@ -293,19 +301,10 @@ noncomputable def AnswerPerSliceInductionData.ofPerSliceInductionData
     AnswerPerSliceInductionData params strategy eps delta gamma restrictionPkg k where
   sliceError := perSliceInduction.sliceError
   sliceMeasurement := perSliceInduction.sliceMeasurement
-  pointConsistency := by
-    intro x
-    have hpoint_eq :
-        IdxProjMeas.toIdxSubMeas
-            (xRestrictedStrategy params strategy x).pointMeasurement =
-          IdxProjMeas.toIdxSubMeas
-            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
-      funext u
-      rfl
-    rw [← hpoint_eq]
+  pointConsistency := fun x => by
+    rw [← restrictedPointSubMeasurement_eq_answer params strategy x]
     exact perSliceInduction.pointConsistency x
-  error_le := by
-    intro x
+  error_le := fun x => by
     simpa [SliceRestrictionData.ofAnswer] using perSliceInduction.error_le x
 
 /-- View answer-valued recursive slice-wise induction witnesses as ordinary
@@ -329,19 +328,10 @@ noncomputable def PerSliceInductionData.ofAnswer
       (SliceRestrictionData.ofAnswer params strategy eps delta gamma restrictionPkg) k where
   sliceError := answerInduction.sliceError
   sliceMeasurement := answerInduction.sliceMeasurement
-  pointConsistency := by
-    intro x
-    have hpoint_eq :
-        IdxProjMeas.toIdxSubMeas
-            (xRestrictedStrategy params strategy x).pointMeasurement =
-          IdxProjMeas.toIdxSubMeas
-            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
-      funext u
-      rfl
-    rw [hpoint_eq]
+  pointConsistency := fun x => by
+    rw [restrictedPointSubMeasurement_eq_answer params strategy x]
     exact answerInduction.pointConsistency x
-  error_le := by
-    intro x
+  error_le := fun x => by
     simpa [SliceRestrictionData.ofAnswer] using answerInduction.error_le x
 
 /-- Forget an answer-valued self-improvement data record when the target
@@ -369,36 +359,24 @@ noncomputable def SelfImprovementData.ofAnswerForPerSliceInductionData
       perSliceInduction where
   sliceProj := answerSelf.sliceProj
   sliceWitness := answerSelf.sliceWitness
-  completeness := by
-    intro x
+  completeness := fun x => by
     simpa [AnswerPerSliceInductionData.ofPerSliceInductionData, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.completeness x
-  pointConsistency := by
-    intro x
-    have hpoint_eq :
-        IdxProjMeas.toIdxSubMeas
-            (xRestrictedStrategy params strategy x).pointMeasurement =
-          IdxProjMeas.toIdxSubMeas
-            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
-      funext u
-      rfl
-    rw [hpoint_eq]
+  pointConsistency := fun x => by
+    rw [restrictedPointSubMeasurement_eq_answer params strategy x]
     simpa [AnswerPerSliceInductionData.ofPerSliceInductionData, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.pointConsistency x
-  strongSelfConsistency := by
-    intro x
+  strongSelfConsistency := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.strongSelfConsistency x
-  selfCloseness := by
-    intro x
+  selfCloseness := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.selfCloseness x
-  bounded := by
-    intro x
+  bounded := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.bounded x
@@ -431,36 +409,24 @@ noncomputable def SelfImprovementData.ofAnswer
         restrictionPkg answerInduction) where
   sliceProj := answerSelf.sliceProj
   sliceWitness := answerSelf.sliceWitness
-  completeness := by
-    intro x
+  completeness := fun x => by
     simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.completeness x
-  pointConsistency := by
-    intro x
-    have hpoint_eq :
-        IdxProjMeas.toIdxSubMeas
-            (xRestrictedStrategy params strategy x).pointMeasurement =
-          IdxProjMeas.toIdxSubMeas
-            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
-      funext u
-      rfl
-    rw [hpoint_eq]
+  pointConsistency := fun x => by
+    rw [restrictedPointSubMeasurement_eq_answer params strategy x]
     simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using answerSelf.pointConsistency x
-  strongSelfConsistency := by
-    intro x
+  strongSelfConsistency := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.strongSelfConsistency x
-  selfCloseness := by
-    intro x
+  selfCloseness := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.selfCloseness x
-  bounded := by
-    intro x
+  bounded := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using answerSelf.bounded x
@@ -495,36 +461,24 @@ noncomputable def AnswerSelfImprovementData.ofSelfImprovementData
       answerInduction where
   sliceProj := selfImprovement.sliceProj
   sliceWitness := selfImprovement.sliceWitness
-  completeness := by
-    intro x
+  completeness := fun x => by
     simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using selfImprovement.completeness x
-  pointConsistency := by
-    intro x
-    have hpoint_eq :
-        IdxProjMeas.toIdxSubMeas
-            (xRestrictedStrategy params strategy x).pointMeasurement =
-          IdxProjMeas.toIdxSubMeas
-            (xRestrictedAnswerSymStrat params strategy x).pointMeasurement := by
-      funext u
-      rfl
-    rw [← hpoint_eq]
+  pointConsistency := fun x => by
+    rw [← restrictedPointSubMeasurement_eq_answer params strategy x]
     simpa [PerSliceInductionData.ofAnswer, SliceRestrictionData.ofAnswer,
       sliceSelfImprovementError, answerSliceSelfImprovementError]
       using selfImprovement.pointConsistency x
-  strongSelfConsistency := by
-    intro x
+  strongSelfConsistency := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using selfImprovement.strongSelfConsistency x
-  selfCloseness := by
-    intro x
+  selfCloseness := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using selfImprovement.selfCloseness x
-  bounded := by
-    intro x
+  bounded := fun x => by
     simpa [SliceRestrictionData.ofAnswer, sliceSelfImprovementError,
       answerSliceSelfImprovementError]
       using selfImprovement.bounded x
