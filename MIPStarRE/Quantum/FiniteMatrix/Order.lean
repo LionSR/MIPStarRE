@@ -120,18 +120,6 @@ noncomputable def opNonnegativeProperCone (d : Type*) [Fintype d] [DecidableEq d
     change IsClosed ({A : Op d | 0 ≤ A} : Set (Op d))
     exact isClosed_op_nonnegative (ι := d)
 
-/-- Sandwiching a PSD operator by a Hermitian operator preserves positivity. -/
-theorem sandwich_nonneg {M P : Op d} (hP : 0 ≤ P) (hMH : Mᴴ = M) :
-    0 ≤ M * P * M := by
-  simpa [Matrix.star_eq_conjTranspose, hMH] using star_right_conjugate_nonneg hP M
-
-/-- Sandwiching is monotone in the middle factor for a fixed Hermitian outer operator. -/
-theorem sandwich_mono {M P Q : Op d} (hMH : Mᴴ = M) (hPQ : P ≤ Q) :
-    M * P * M ≤ M * Q * M := by
-  exact sub_nonneg.mp <| by
-    simpa [mul_sub, sub_mul] using
-      sandwich_nonneg (M := M) (P := Q - P) (sub_nonneg.mpr hPQ) hMH
-
 /-! ### Kronecker product order lemmas -/
 
 /-- Kronecker products preserve positivity. -/

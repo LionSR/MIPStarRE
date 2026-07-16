@@ -65,7 +65,7 @@ lemma sum_ev_mul_leftBounded_le_of_leftHermitian
           · exact Real.sqrt_le_sqrt <| Finset.sum_le_sum fun a _ => by
               have hsand :
                   Y a * (LB * LB) * Y a ≤ Y a * 1 * Y a := by
-                exact MIPStarRE.Quantum.sandwich_mono (hYherm a) hLB_sq_le_one
+                exact IsSelfAdjoint.conjugate_le_conjugate hLB_sq_le_one (hYherm a)
               have hev := ev_mono ψ _ _ hsand
               simpa [hLB_herm, hYherm a, Matrix.conjTranspose_mul, mul_assoc] using hev
           · exact Real.sqrt_nonneg _

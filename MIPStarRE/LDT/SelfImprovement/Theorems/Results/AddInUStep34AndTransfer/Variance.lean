@@ -247,8 +247,9 @@ lemma add_in_u_cs_chain_q2_q3_variance_factor_le_globalVarianceDeviation_sum
       rw [Matrix.conjTranspose_sub, hAv_herm, hAu_herm]
     have hleft_le :
         (Av - Au) * Mh * (Av - Au) ≤ (Av - Au) * 1 * (Av - Au) := by
-      exact MIPStarRE.Quantum.sandwich_mono hdiff_herm
+      exact IsSelfAdjoint.conjugate_le_conjugate
         ((sandwichedPolynomialSubMeasAt params strategy T uv.1).outcome_le_one h)
+        hdiff_herm
     have hright_eq :
         (Av - Au) * 1 * (Av - Au) = ((Au - Av)ᴴ) * (Au - Av) := by
       rw [Matrix.conjTranspose_sub, hAu_herm, hAv_herm]

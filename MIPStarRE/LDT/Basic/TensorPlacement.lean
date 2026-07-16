@@ -316,7 +316,7 @@ theorem sandwichTensorSummand_nonneg
   rw [leftTensor_mul_rightTensor_eq_opTensor]
   exact ev_nonneg_of_psd ψ _ <|
     opTensor_nonneg
-      (MIPStarRE.Quantum.sandwich_nonneg
+      (IsSelfAdjoint.conjugate_nonneg
         (Inner.outcome_pos i) (Outer.outcome_hermitian o))
       (Right.outcome_pos r)
 
@@ -341,7 +341,7 @@ theorem sandwichTensor_residual_sum_le_one
     ∑ o : β, Outer.outcome o * Inner.total * Outer.outcome o
   have hsandwichTotal_nonneg : 0 ≤ sandwichTotal := by
     exact Finset.sum_nonneg fun o _ =>
-      MIPStarRE.Quantum.sandwich_nonneg
+      IsSelfAdjoint.conjugate_nonneg
         (SubMeas.total_nonneg Inner) (Outer.outcome_hermitian o)
   have hsandwichTotal_le_one : sandwichTotal ≤ 1 := by
     calc
@@ -350,8 +350,8 @@ theorem sandwichTensor_residual_sum_le_one
             refine Finset.sum_le_sum ?_
             intro o _
             exact le_trans
-              (MIPStarRE.Quantum.sandwich_mono
-                (Outer.outcome_hermitian o) Inner.total_le_one)
+              (IsSelfAdjoint.conjugate_le_conjugate
+                Inner.total_le_one (Outer.outcome_hermitian o))
               (by
                 simpa using
                   MIPStarRE.Quantum.sq_le_self

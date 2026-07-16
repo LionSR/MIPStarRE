@@ -44,9 +44,9 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
       outcome_pos := by
         intro b
         simpa [normalizationConditionSandwichedOperator] using
-          sandwich_nonneg
-            (M := Q.outcome b)
-            (P := P.outcome a)
+          IsSelfAdjoint.conjugate_nonneg
+            (c := Q.outcome b)
+            (a := P.outcome a)
             (P.outcome_pos a)
             (Q.outcome_hermitian b)
       sum_eq_total := by
@@ -58,10 +58,10 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
                 refine Finset.sum_le_sum ?_
                 intro b hb
                 simpa [normalizationConditionSandwichedOperator, Q.proj b] using
-                  sandwich_mono
-                    (M := Q.outcome b)
-                    (hMH := Q.outcome_hermitian b)
-                    (hPQ := SubMeas.outcome_le_one P a)
+                  IsSelfAdjoint.conjugate_le_conjugate
+                    (c := Q.outcome b)
+                    (SubMeas.outcome_le_one P a)
+                    (Q.outcome_hermitian b)
           _ = Q.total := by
               rw [Q.sum_eq_total]
           _ ≤ 1 := Q.total_le_one }
@@ -114,10 +114,10 @@ private theorem normalizationConditionSandwichedTotalSum_le_one
           refine Finset.sum_le_sum ?_
           intro b hb
           simpa [Q.proj b] using
-            sandwich_mono
-              (M := Q.outcome b)
-              (hMH := Q.outcome_hermitian b)
-              (hPQ := P.total_le_one)
+            IsSelfAdjoint.conjugate_le_conjugate
+              (c := Q.outcome b)
+              P.total_le_one
+              (Q.outcome_hermitian b)
     _ = Q.total := by
           rw [Q.sum_eq_total]
     _ ≤ 1 := Q.total_le_one

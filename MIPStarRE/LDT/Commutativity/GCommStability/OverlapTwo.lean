@@ -144,15 +144,15 @@ private lemma gCommStabilityTwo_pointwise_summand_bound
                     simp [hAproj, mul_assoc]
       _ ≤ B.outcome gb.2 * 1 * B.outcome gb.2 := by
             exact
-              MIPStarRE.Quantum.sandwich_mono
-                (B.outcome_hermitian gb.2)
+              IsSelfAdjoint.conjugate_le_conjugate
                 (A.outcome_le_one a)
+                (B.outcome_hermitian gb.2)
       _ = B.outcome gb.2 := by
             simp [B, evaluatedPointFamily_outcome_proj params family q.2 gb.2]
   have hleft :
       (1 - T) * (Sᴴ * S) * (1 - T) ≤
         (1 - T) * B.outcome gb.2 * (1 - T) := by
-    exact MIPStarRE.Quantum.sandwich_mono hTc_herm hS_sq_le_B
+    exact IsSelfAdjoint.conjugate_le_conjugate hS_sq_le_B hTc_herm
   exact
     ev_mono strategy.state _ _ <| by
       simpa [x, T, B, S, leftTensor_mul_rightTensor_eq_opTensor] using

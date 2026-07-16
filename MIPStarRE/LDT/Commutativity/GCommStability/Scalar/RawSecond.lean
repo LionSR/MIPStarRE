@@ -178,8 +178,8 @@ private lemma gCommStabilityTwo_raw_left_sum_le
           intro b _
           calc
             B.outcome b * T * B.outcome b ≤ B.outcome b * 1 * B.outcome b := by
-              exact MIPStarRE.Quantum.sandwich_mono
-                (B.outcome_hermitian b) (G x).total_le_one
+              exact IsSelfAdjoint.conjugate_le_conjugate
+                (G x).total_le_one (B.outcome_hermitian b)
             _ = B.outcome b := by
               simp [B, evaluatedPointFamily_outcome_proj params family vy b]
       _ = B.total := B.sum_eq_total
@@ -197,7 +197,7 @@ private lemma gCommStabilityTwo_raw_left_sum_le
           (1 - T) := by
         simp [B, T, Matrix.mul_sum, Finset.sum_mul, mul_assoc]
     _ ≤ (1 - T) * 1 * (1 - T) := by
-        exact MIPStarRE.Quantum.sandwich_mono hTc_herm hinner_le
+        exact IsSelfAdjoint.conjugate_le_conjugate hinner_le hTc_herm
     _ = 1 - T := by
         calc
           (1 - T) * 1 * (1 - T) = (1 - T) * (1 - T) := by simp
@@ -389,8 +389,8 @@ private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
               rw [leftTensor_mul_rightTensor_eq_opTensor]
     have hleft_pos : 0 ≤ (1 - T) * (B * Gg * B) * (1 - T) := by
       have hBGpos : 0 ≤ B * Gg * B := by
-        exact MIPStarRE.Quantum.sandwich_nonneg (by simpa [Gg] using (G x).outcome_pos gb.1) hB_herm
-      exact MIPStarRE.Quantum.sandwich_nonneg hBGpos hTc_herm
+        exact IsSelfAdjoint.conjugate_nonneg (by simpa [Gg] using (G x).outcome_pos gb.1) hB_herm
+      exact IsSelfAdjoint.conjugate_nonneg hBGpos hTc_herm
     have hWsq_le : Wg * Wg ≤ family.witness x := by
       calc
         Wg * Wg ≤ Wg := by
@@ -463,8 +463,8 @@ private lemma gCommStabilityTwo_raw_scalar_pointwise_bound
       simpa [B] using (evaluatedPointFamily params family vy).outcome_hermitian gb.2
     have hleft_pos : 0 ≤ (1 - T) * (B * Gg * B) * (1 - T) := by
       have hBGpos : 0 ≤ B * Gg * B := by
-        exact MIPStarRE.Quantum.sandwich_nonneg (by simpa [Gg] using (G x).outcome_pos gb.1) hB_herm
-      exact MIPStarRE.Quantum.sandwich_nonneg hBGpos hTc_herm
+        exact IsSelfAdjoint.conjugate_nonneg (by simpa [Gg] using (G x).outcome_pos gb.1) hB_herm
+      exact IsSelfAdjoint.conjugate_nonneg hBGpos hTc_herm
     unfold yDiag
     apply ev_nonneg_of_psd
     rw [leftTensor_mul_rightTensor_eq_opTensor]

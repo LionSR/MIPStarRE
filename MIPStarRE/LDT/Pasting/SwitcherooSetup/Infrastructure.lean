@@ -151,7 +151,7 @@ lemma projSubMeas_sandwich_sum_le_one
       ≤ ∑ a : Outcome, A.outcome a * 1 * A.outcome a := by
           refine Finset.sum_le_sum ?_
           intro a _
-          exact MIPStarRE.Quantum.sandwich_mono (A.outcome_hermitian a) hB
+          exact IsSelfAdjoint.conjugate_le_conjugate hB (A.outcome_hermitian a)
     _ = ∑ a : Outcome, A.outcome a := by
           refine Finset.sum_congr rfl ?_
           intro a _

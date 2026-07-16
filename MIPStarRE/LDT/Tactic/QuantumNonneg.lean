@@ -28,7 +28,7 @@ It is meant for goals built from:
   `ev_nonneg_of_psd`),
 * tensor positivity (`opTensor_nonneg`, `leftTensor_nonneg`,
   `rightTensor_nonneg`),
-* Hermitian sandwich positivity (`MIPStarRE.Quantum.sandwich_nonneg`),
+* Hermitian sandwich positivity (`IsSelfAdjoint.conjugate_nonneg`),
 * finite sums and nonnegative scalar multiples, and
 * scalar leaves discharged by `positivity`/`nlinarith`.
 
@@ -50,7 +50,7 @@ macro_rules
     | apply _root_.MIPStarRE.LDT.opTensor_nonneg <;> quantum_nonneg
     | apply _root_.MIPStarRE.LDT.leftTensor_nonneg; quantum_nonneg
     | apply _root_.MIPStarRE.LDT.rightTensor_nonneg; quantum_nonneg
-    | apply _root_.MIPStarRE.Quantum.sandwich_nonneg
+    | apply _root_.IsSelfAdjoint.conjugate_nonneg
       · quantum_nonneg
       · first
         | assumption
