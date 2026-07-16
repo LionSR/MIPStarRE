@@ -7,7 +7,7 @@ name: Issue Automation
 #   scout      Mathlib scouting report for formalization issues; ordered
 #              after classify so the labels it reads are settled
 #   track      deterministic tracking-issue bookkeeping (sub-issue counts,
-#              all-resolved label, progress comments) — no LLM
+#              completion notices, progress comments) — no LLM
 #   followups  scan merged PRs for genuine follow-up work (LLM)
 #
 # classify-trusted/classify-outside/scout previously lived in
@@ -224,9 +224,8 @@ jobs:
     # labeling by a human.
     needs: [classify-trusted, classify-outside]
     if: |
-      !cancelled() && github.event_name == 'issues' && (
+      always() && !cancelled() && github.event_name == 'issues' && (
         (github.event.action == 'opened' &&
-         needs['classify-trusted'].result != 'cancelled' &&
          (contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association) ||
           contains(github.event.issue.labels.*.name, 'scout'))) ||
         (github.event.action == 'labeled' &&
@@ -343,6 +342,9 @@ jobs:
        (github.event.action == 'opened' ||
         (github.event.action == 'closed' && github.event.pull_request.merged == true)))
     runs-on: ubuntu-latest
+    concurrency:
+      group: issue-automation-track-${{ github.event_name }}-${{ github.event.issue.number || github.event.pull_request.number }}
+      cancel-in-progress: false
     permissions:
       issues: write
       pull-requests: read
@@ -374,23 +376,37 @@ jobs:
             }
 
             async function subIssueCounts(parentNumber) {
-              const q = `query($owner:String!,$repo:String!,$n:Int!){
+              const q = `query($owner:String!,$repo:String!,$n:Int!,$after:String){
                 repository(owner:$owner,name:$repo){
-                  issue(number:$n){ subIssues(first:100){ totalCount nodes { state } } }
+                  issue(number:$n){
+                    subIssues(first:100, after:$after){
+                      totalCount
+                      nodes { state }
+                      pageInfo { hasNextPage endCursor }
+                    }
+                  }
                 }}`;
-              const r = await github.graphql(q, { owner, repo, n: parentNumber });
-              const sub = r.repository.issue.subIssues;
-              const closed = sub.nodes.filter((x) => x.state === 'CLOSED').length;
-              return { closed, total: sub.totalCount };
+              let after = null;
+              let closed = 0;
+              let total = 0;
+              for (;;) {
+                const r = await github.graphql(q, { owner, repo, n: parentNumber, after });
+                const sub = r.repository.issue.subIssues;
+                total = sub.totalCount;
+                closed += sub.nodes.filter((x) => x.state === 'CLOSED').length;
+                if (!sub.pageInfo.hasNextPage) break;
+                after = sub.pageInfo.endCursor;
+              }
+              return { closed, total };
             }
 
-            // Post at most once: skip when a recent comment already contains
-            // the marker (guards against redelivered events and re-runs).
+            // Post at most once: skip when any existing comment contains the
+            // marker (guards against redelivered events and re-runs).
             async function commentOnce(issueNumber, marker, body) {
-              const { data: comments } = await github.rest.issues.listComments({
-                owner, repo, issue_number: issueNumber, per_page: 15,
-                sort: 'created', direction: 'desc',
-              });
+              const comments = await github.paginate(
+                github.rest.issues.listComments,
+                { owner, repo, issue_number: issueNumber, per_page: 100 },
+              );
               if (comments.some((c) => (c.body || '').includes(marker))) {
                 core.info(`Skipping duplicate comment on #${issueNumber}`);
                 return;
@@ -400,22 +416,34 @@ jobs:
               });
             }
 
-            async function syncAllResolved(parent, closed, total) {
-              const hasLabel = parent.labels.nodes.some((l) => l.name === 'all-resolved');
+            async function noteIfAllResolved(parent, closed, total) {
               if (total > 0 && closed === total) {
-                if (!hasLabel) {
-                  await github.rest.issues.addLabels({
-                    owner, repo, issue_number: parent.number, labels: ['all-resolved'],
-                  });
-                  await commentOnce(parent.number,
-                    'ready to close',
-                    'All sub-issues in this tracking issue are complete; the mathematical scope described here is ready to close.');
-                }
-              } else if (hasLabel) {
-                await github.rest.issues
-                  .removeLabel({ owner, repo, issue_number: parent.number, name: 'all-resolved' })
-                  .catch(() => {});
+                await commentOnce(parent.number,
+                  'ready to close',
+                  'All sub-issues in this tracking issue are complete; the mathematical scope described here is ready to close.');
               }
+            }
+
+            function prReferencePattern(prNumber) {
+              const escaped = String(prNumber).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+              return new RegExp(
+                `(?:^|[^0-9])(?:#${escaped}|pull/${escaped})(?:$|[^0-9])`,
+                'i',
+              );
+            }
+
+            async function trackingIssuesReferencingPR(prNumber) {
+              const issues = await github.paginate(
+                github.rest.issues.listForRepo,
+                {
+                  owner, repo, state: 'open', labels: 'tracking',
+                  per_page: 100,
+                },
+              );
+              const re = prReferencePattern(prNumber);
+              return issues.filter((issue) =>
+                !issue.pull_request &&
+                re.test(`${issue.title || ''}\n${issue.body || ''}`));
             }
 
             // PR-to-issue links from the body keywords and the branch name.
@@ -441,6 +469,19 @@ jobs:
               return { keepOpen: [...keepOpen], autoClose: [...autoClose] };
             }
 
+            function skipPrOpenedAnnouncement(pr) {
+              return /^(claude|codex)\//.test(pr.head?.ref || '');
+            }
+
+            function addTrackingTarget(targets, parent, linkedIssueNumber = null) {
+              if (!targets.has(parent.number)) {
+                targets.set(parent.number, { parent, linkedIssues: new Set() });
+              }
+              if (linkedIssueNumber !== null) {
+                targets.get(parent.number).linkedIssues.add(linkedIssueNumber);
+              }
+            }
+
             if (context.eventName === 'issues') {
               const issue = context.payload.issue;
               const parent = await getParent(issue.number);
@@ -449,7 +490,7 @@ jobs:
                 return;
               }
               const { closed, total } = await subIssueCounts(parent.number);
-              await syncAllResolved(parent, closed, total);
+              await noteIfAllResolved(parent, closed, total);
               if (parent.state !== 'OPEN') return;
               if (context.payload.action === 'closed') {
                 await commentOnce(parent.number,
@@ -466,38 +507,64 @@ jobs:
             // pull_request events
             const pr = context.payload.pull_request;
             const { keepOpen, autoClose } = linkedIssues(pr);
-            if (keepOpen.length === 0 && autoClose.length === 0) {
+            const prReferencedTrackingIssues = await trackingIssuesReferencingPR(pr.number);
+            if (
+              keepOpen.length === 0 &&
+              autoClose.length === 0 &&
+              prReferencedTrackingIssues.length === 0
+            ) {
               core.info('No linked issues found; nothing to do.');
               return;
             }
 
             if (context.payload.action === 'opened') {
-              // Announce on the tracking parents of every linked issue.
-              const announced = new Set();
+              if (skipPrOpenedAnnouncement(pr)) {
+                core.info('PR cleanup handles announcements for claude/ and codex/ branches.');
+                return;
+              }
+
+              const targets = new Map();
               for (const n of [...keepOpen, ...autoClose]) {
                 const parent = await getParent(n);
-                if (!parent || parent.state !== 'OPEN' || announced.has(parent.number)) continue;
-                announced.add(parent.number);
+                if (parent && parent.state === 'OPEN') addTrackingTarget(targets, parent, n);
+              }
+              for (const issue of prReferencedTrackingIssues) {
+                addTrackingTarget(targets, { number: issue.number, title: issue.title, state: 'OPEN' });
+              }
+
+              for (const { parent, linkedIssues } of targets.values()) {
+                const linked = [...linkedIssues][0];
+                const suffix = linked ? ` to address #${linked}` : '';
                 await commentOnce(parent.number,
                   `PR #${pr.number} has been opened`,
-                  `PR #${pr.number} (*${pr.title}*) has been opened to address #${n}.`);
+                  `PR #${pr.number} (*${pr.title}*) has been opened${suffix}.`);
               }
               return;
             }
 
             // Merged PR: progress comments on kept-open linked issues and
             // their tracking parents.
+            const targets = new Map();
             for (const n of keepOpen) {
               await commentOnce(n,
                 `PR #${pr.number} (*${pr.title}*) has been merged`,
                 `PR #${pr.number} (*${pr.title}*) addressing this issue has been merged. See the pull request for what was accomplished and what remains.`);
               const parent = await getParent(n);
               if (!parent || parent.state !== 'OPEN') continue;
+              addTrackingTarget(targets, parent, n);
+            }
+            for (const issue of prReferencedTrackingIssues) {
+              addTrackingTarget(targets, { number: issue.number, title: issue.title, state: 'OPEN' });
+            }
+
+            for (const { parent, linkedIssues } of targets.values()) {
               const { closed, total } = await subIssueCounts(parent.number);
-              await syncAllResolved(parent, closed, total);
+              await noteIfAllResolved(parent, closed, total);
+              const linked = [...linkedIssues][0];
+              const progress = linked ? `, making progress on #${linked}` : '';
               await commentOnce(parent.number,
                 `PR #${pr.number} (*${pr.title}*) has been merged`,
-                `PR #${pr.number} (*${pr.title}*) has been merged, making progress on #${n}. [${closed}/${total} sub-issues closed]`);
+                `PR #${pr.number} (*${pr.title}*) has been merged${progress}. [${closed}/${total} sub-issues closed]`);
             }
 
   # ──────────────────────────────────────────────────────────────
