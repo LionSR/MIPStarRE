@@ -1,13 +1,14 @@
--- This module contributes declarations to the comparator statement closure of
--- `mainFormal`, which must elaborate in the same environment as the
--- Mathlib-only `Challenge.lean`.  Keep the full `import Mathlib`; do not narrow.
--- See docs/comparator.md, "Environment alignment".
 import Mathlib
 
 /-!
 # Basic parameters and scalar infrastructure for the low individual degree test
 
 Core parameter data, finite-field models, and coordinate arithmetic.
+
+Note: this module contributes declarations to the comparator statement closure
+of `mainFormal`, which must elaborate in the same environment as the
+Mathlib-only `Challenge.lean`.  Keep the full `import Mathlib`; do not narrow
+it.  See `docs/comparator.md`, "Environment alignment".
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder

@@ -1,4 +1,22 @@
 import MIPStarRE.LDT.Test.MainTheorem.MainFormal
+
+/-!
+# Comparator closure extractor for `mainFormal`
+
+Computes the transitive closure of repository-local constants referenced by
+the statement of `MIPStarRE.LDT.Test.mainFormal`, mirroring comparator's
+`runForUsedConsts` traversal (types, definition bodies, inductive
+constructors, and recursor rules; theorem proof bodies are traversed for the
+constants they use).  Auto-generated auxiliaries (`_proof_`, `match_`,
+`_autoParam`, constructors, projections) are collapsed into their parent
+declarations.
+
+Output: one TSV row per declaration — name, module path, start line, end
+line (`NORANGE` for compiler-generated declarations without a source range)
+— consumed by `assemble_challenge.py`.  See README.md in this directory for
+the full regeneration pipeline.
+-/
+
 open Lean
 
 def isLocal (env : Environment) (n : Name) : Bool :=

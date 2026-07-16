@@ -1,6 +1,3 @@
--- Comparator requires this module to elaborate in the same environment as the
--- Mathlib-only Challenge.lean: keep the full `import Mathlib`; do not narrow.
--- See docs/comparator.md, "Environment alignment".
 import Mathlib
 import MIPStarRE.LDT.Basic.LinePolynomials
 
@@ -8,6 +5,11 @@ import MIPStarRE.LDT.Basic.LinePolynomials
 # Low-individual-degree polynomials for the low individual degree test
 
 Multivariate low-degree polynomial objects and their restrictions.
+
+Note: this module contributes declarations to the comparator statement closure
+of `mainFormal`, which must elaborate in the same environment as the
+Mathlib-only `Challenge.lean`.  Keep the full `import Mathlib`; do not narrow
+it.  See `docs/comparator.md`, "Environment alignment".
 -/
 
 namespace MIPStarRE.LDT
