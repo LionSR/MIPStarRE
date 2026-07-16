@@ -26,6 +26,7 @@ on:
       # still produces the PR CI completion event that starts PR Review;
       # every heavy job skips via the changes filter.
       - '.github/prompts/**'
+      - 'AGENTS.md'
       - 'docs/*.md'
       - 'docs/paper-gaps/**'
       - '**.lean'

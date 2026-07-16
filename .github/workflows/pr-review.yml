@@ -24,19 +24,44 @@ jobs:
   # repository, and skip bot auto-fix commits to avoid the
   # review → fix → review ping-pong cascade.
   gate:
-    if: |
-      vars.CLAUDE_REVIEW_ENABLED != 'false' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.conclusion == 'success' &&
-      github.event.workflow_run.pull_requests[0] &&
-      github.event.workflow_run.head_repository.full_name == github.repository
     runs-on: ubuntu-latest
     outputs:
-      skip: ${{ steps.bot-check.outputs.skip }}
-      pr_number: ${{ github.event.workflow_run.pull_requests[0].number }}
-      head_sha: ${{ github.event.workflow_run.head_sha }}
+      skip: ${{ steps.preflight.outputs.skip || steps.bot-check.outputs.skip || 'false' }}
+      pr_number: ${{ steps.preflight.outputs.pr_number }}
+      head_sha: ${{ steps.preflight.outputs.head_sha }}
     steps:
+      - name: Check review preconditions
+        id: preflight
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const wr = context.payload.workflow_run;
+            const pr = wr.pull_requests?.[0];
+            core.setOutput('skip', 'false');
+            core.setOutput('head_sha', wr.head_sha || '');
+            core.setOutput('pr_number', pr ? String(pr.number) : '');
+
+            if ('${{ vars.CLAUDE_REVIEW_ENABLED }}' === 'false') {
+              core.notice('Skipping PR Review: CLAUDE_REVIEW_ENABLED=false');
+              core.setOutput('skip', 'true');
+              return;
+            }
+            if (wr.event !== 'pull_request' || !pr) {
+              core.notice(`Skipping PR Review for non-PR workflow_run event: ${wr.event}`);
+              core.setOutput('skip', 'true');
+              return;
+            }
+            if (wr.head_repository.full_name !== context.repo.owner + '/' + context.repo.repo) {
+              core.notice(`Skipping PR Review for forked repository: ${wr.head_repository.full_name}`);
+              core.setOutput('skip', 'true');
+              return;
+            }
+            if (wr.conclusion !== 'success') {
+              core.setFailed(`PR CI concluded ${wr.conclusion}; PR Review must not report success without a review.`);
+            }
+
       - name: Check if head commit is a bot auto-fix
+        if: steps.preflight.outputs.skip != 'true'
         id: bot-check
         uses: actions/github-script@v8
         with:
@@ -101,8 +126,8 @@ jobs:
           if [ -n "$provider_token" ]; then
             echo "skip=false" >> "$GITHUB_OUTPUT"
           else
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "reason=$REVIEW_PROVIDER token is not configured" >> "$GITHUB_OUTPUT"
+            echo "::error::$REVIEW_PROVIDER token is not configured"
+            exit 1
           fi
 
       - name: Checkout repository under review
@@ -169,13 +194,39 @@ jobs:
       CLAUDE_OPUS_MODEL: ${{ vars.CLAUDE_OPUS_MODEL }}
       CLAUDE_SONNET_MODEL: ${{ vars.CLAUDE_SONNET_MODEL }}
     steps:
+      - name: Check review provider token
+        id: provider-token
+        env:
+          CLAUDE_CODE_PROVIDER: ${{ env.CLAUDE_CODE_PROVIDER }}
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          set -euo pipefail
+          case "$CLAUDE_CODE_PROVIDER" in
+            anthropic) provider_token="$CLAUDE_CODE_OAUTH_TOKEN" ;;
+            deepseek) provider_token="$DEEPSEEK_API_KEY" ;;
+            *)
+              echo "::error::Unsupported review provider: $CLAUDE_CODE_PROVIDER"
+              exit 1
+              ;;
+          esac
+          if [ -n "$provider_token" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "reason=$CLAUDE_CODE_PROVIDER token is not configured" >> "$GITHUB_OUTPUT"
+            echo "::notice::Skipping prose review: $CLAUDE_CODE_PROVIDER token is not configured"
+          fi
+
       - name: Checkout repository
+        if: steps.provider-token.outputs.skip != 'true'
         uses: actions/checkout@v6
         with:
           ref: ${{ needs.gate.outputs.head_sha }}
           fetch-depth: 1
 
       - name: Checkout trusted automation
+        if: steps.provider-token.outputs.skip != 'true'
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.repository.default_branch }}
@@ -183,6 +234,7 @@ jobs:
           fetch-depth: 1
 
       - name: Run Blueprint Sync & Prose Review
+        if: steps.provider-token.outputs.skip != 'true'
         id: blueprint-prose-review
         uses: LionSR/agent-ci-actions@v1
         with:
