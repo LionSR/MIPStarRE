@@ -22,6 +22,12 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
+      # The prompts and docs paths exist only so a docs-only pull request
+      # still produces the PR CI completion event that starts PR Review;
+      # every heavy job skips via the changes filter.
+      - '.github/prompts/**'
+      - 'docs/*.md'
+      - 'docs/paper-gaps/**'
       - '**.lean'
       - 'lakefile.*'
       - 'lean-toolchain'

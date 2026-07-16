@@ -53,10 +53,11 @@ When you push to a PR branch, several things happen in parallel:
   You push to a PR branch
   │
   │  ┌──────────────────────────────────────────────────────────────┐
-  │  │ Runs on every PR push to Lean, blueprint, or paper-gap files │
+  │  │ Runs after PR CI completes successfully                      │
   ├──┤                                                              │
-  │  │  Claude Code Review (claude-code-review.yml)                 │
-  │  │  Reviews code for correctness, style, and completeness.      │
+  │  │  PR Review (pr-review.yml)                                   │
+  │  │  Reviews code for correctness, style, and completeness       │
+  │  │  (one job per provider), and blueprint/prose quality.        │
   │  │  Posts inline comments and a summary on the PR.              │
   │  │                                                              │
   │  └───────────┬──────────────────────────────────────────────────┘
@@ -137,11 +138,11 @@ Here is exactly what happens:
 
 ## Workflow Reference
 
-### Claude Code Review (`claude-code-review.yml`)
+### PR Review (`pr-review.yml`)
 
-**What it does**: Automatically reviews PR changes for proof correctness, Mathlib style, type safety, performance, mathematical exposition, and documentation.
+**What it does**: Automatically reviews PR changes for proof correctness, Mathlib style, type safety, performance, mathematical exposition, and documentation (`code-review` jobs, one per configured provider), and reviews blueprint sync and mathematical prose (`prose-review` job).
 
-**When it runs**: On every `pull_request` event (`opened`, `synchronize`, `ready_for_review`, `reopened`) that touches Lean source files (`MIPStarRE/**/*.lean`, `MIPStarRE.lean`, `lakefile.toml`, `lean-toolchain`), blueprint files (`blueprint/src/**/*.tex`), or paper-gap notes and bibliographies (`docs/paper-gaps/**/*.tex`, `docs/paper-gaps/**/*.bib`).
+**When it runs**: After a "PR CI" run for a same-repository pull request completes **successfully**. Reviewing after CI spends review effort on code that compiles, and an auto-fix no longer rewrites code while it is being reviewed. Head commits authored by the auto-fix bot are skipped. Note that marking a draft ready for review does not by itself start a review — push a commit or re-run PR CI.
 
 **What it checks**:
 - Are there any `sorry`s introduced?
@@ -152,9 +153,9 @@ Here is exactly what happens:
 - Do new definitions and theorems have docstrings?
 - Do paper-gap notes give a self-contained mathematical account, faithful citations, comparison with the blueprint and Lean statement when relevant, and a clear verdict?
 
-**Thread management**: When triggered by a new push (`synchronize`), the review checks its own previous comments. If a previous bot comment has been addressed by the new commits, it resolves that thread automatically. It never resolves threads authored by humans.
+**Thread management**: On a re-review, the review checks its own previous comments. If a previous bot comment has been addressed by the new commits, it resolves that thread automatically. It never resolves threads authored by humans.
 
-**Concurrency**: Only one review runs per PR at a time. If a new push arrives while a review is in progress, the old review is cancelled.
+**Concurrency**: One review pipeline per PR at a time; later completions queue rather than cancel a review in progress.
 
 ---
 

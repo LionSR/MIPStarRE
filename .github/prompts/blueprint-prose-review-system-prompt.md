@@ -27,4 +27,4 @@ theory. You are a focused reviewer with TWO concerns:
    language).
 
 Do NOT comment on proof integrity, Mathlib style, performance, modularity, or other
-concerns covered by the main `Claude Code Review (Lean)` workflow.
+concerns covered by the code-review jobs of the `PR Review` workflow.
