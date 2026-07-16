@@ -47,20 +47,10 @@ abbrev DegreeBoundedLineAnswer (params : Parameters) [FieldModel params.q] :=
   AxisLinePolynomial params
 
 /-- Axis-parallel lines are finitely enumerable via their base point and direction. -/
-noncomputable instance (params : Parameters) : Fintype (AxisParallelLine params) := by
-  classical
-  let e : AxisParallelLine params ≃ Point params × Fin params.m :=
-    { toFun := fun ℓ => (ℓ.base, ℓ.direction)
-      invFun := fun bd => { base := bd.1, direction := bd.2 }
-      left_inv := by
-        intro ℓ
-        cases ℓ
-        rfl
-      right_inv := by
-        intro bd
-        cases bd
-        rfl }
-  exact Fintype.ofEquiv (Point params × Fin params.m) e.symm
+noncomputable instance (params : Parameters) : Fintype (AxisParallelLine params) :=
+  Fintype.ofInjective
+    (fun ℓ : AxisParallelLine params => (ℓ.base, ℓ.direction))
+    fun _ _ h => congrArg₂ AxisParallelLine.mk (congrArg Prod.fst h) (congrArg Prod.snd h)
 
 /-- A default low-degree polynomial witnessing nonemptiness of the finite
 polynomial answer type. -/

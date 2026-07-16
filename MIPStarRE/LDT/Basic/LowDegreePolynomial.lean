@@ -54,9 +54,7 @@ theorem hasLowIndividualDegree {params : Parameters} [FieldModel params.q]
 noncomputable def const (params : Parameters) [FieldModel params.q] (a : Fq params) :
     Polynomial params where
   poly := MvPolynomial.C (decodeScalar a)
-  lowIndividualDegree := by
-    intro i
-    simp [MvPolynomial.degreeOf_C]
+  lowIndividualDegree := fun i => (MvPolynomial.degreeOf_C _ i).trans_le (Nat.zero_le _)
 
 noncomputable instance {params : Parameters} [FieldModel params.q] :
     Inhabited (Polynomial params) :=
@@ -104,28 +102,35 @@ theorem apply_eq_apply_of_degree_zero (params : Parameters) [FieldModel params.q
   rw [eq_C_coeff_zero_of_degree_zero params g hd]
   simp
 
+/-- Renaming a low-degree polynomial along the coordinate embedding preserves the
+low-individual-degree bound in `m + 1` variables. -/
+theorem degreeOf_rename_embedCoord_le (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (i : Fin params.next.m) :
+    MvPolynomial.degreeOf i
+      (MvPolynomial.rename (embedCoord params) g.poly : PolynomialModel params.next) ≤
+      params.d := by
+  have hinj : Function.Injective (embedCoord params) := embedCoord_injective params
+  by_cases h : i.val < params.m
+  · -- i is in the range of embedCoord: transfer the degree bound
+    have hi : embedCoord params ⟨i.val, h⟩ = i := by
+      ext; simp [embedCoord]
+    rw [← hi, MvPolynomial.degreeOf_rename_of_injective hinj]
+    exact g.lowIndividualDegree _
+  · -- i is not in range: degreeOf = 0
+    have hi_last : i = lastCoord params := by
+      apply Fin.ext
+      have hle : params.m ≤ i.val := Nat.le_of_not_gt h
+      have hlt : i.val < params.m + 1 := by
+        simpa [Parameters.next] using i.isLt
+      exact le_antisymm (Nat.le_of_lt_succ hlt) hle
+    rw [hi_last, degreeOf_rename_embedCoord_lastCoord]
+    omega
+
 /-- Extend a global polynomial to the slice at height `x` by ignoring the new variable. -/
 noncomputable def appendAtHeight (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (_x : Fq params) : Polynomial params.next where
   poly := MvPolynomial.rename (embedCoord params) g.poly
-  lowIndividualDegree := by
-    intro i
-    have hinj : Function.Injective (embedCoord params) := embedCoord_injective params
-    by_cases h : i.val < params.m
-    · -- i is in the range of embedCoord: transfer the degree bound
-      have hi : embedCoord params ⟨i.val, h⟩ = i := by
-        ext; simp [embedCoord]
-      rw [← hi, MvPolynomial.degreeOf_rename_of_injective hinj]
-      exact g.lowIndividualDegree _
-    · -- i is not in range: degreeOf = 0
-      have hi_last : i = lastCoord params := by
-        apply Fin.ext
-        have hle : params.m ≤ i.val := Nat.le_of_not_gt h
-        have hlt : i.val < params.m + 1 := by
-          simpa [Parameters.next] using i.isLt
-        exact le_antisymm (Nat.le_of_lt_succ hlt) hle
-      rw [hi_last, degreeOf_rename_embedCoord_lastCoord]
-      omega
+  lowIndividualDegree := degreeOf_rename_embedCoord_le params g
 
 /-- Evaluating an old polynomial after appending a new coordinate ignores the
 appended coordinate. -/
@@ -187,12 +192,14 @@ private theorem degreeOf_restrictAtHeightCoordinateMap_le
         simp [hne', hji]
     · simp [restrictAtHeightCoordinateMap, hj, MvPolynomial.degreeOf_C, hji]
 
-/-- Restrict a global polynomial in `m + 1` variables to the slice at height `x`. -/
-noncomputable def restrictAtHeight (params : Parameters) [FieldModel params.q]
-    (g : Polynomial params.next) (x : Fq params) : Polynomial params where
-  poly := MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x) g.poly
-  lowIndividualDegree := by
-    intro i
+/-- Restricting a polynomial to a coordinate slice via `eval₂Hom` preserves the
+low-individual-degree bound: each variable's degree stays at most `d`. -/
+theorem degreeOf_eval₂Hom_restrictAtHeightCoordinateMap_le
+    (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params.next) (x : Fq params) (i : Fin params.m) :
+    MvPolynomial.degreeOf i
+      (MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x) g.poly) ≤
+      params.d := by
     classical
     let p : MvPolynomial (Fin params.next.m) (Scalar params) := g.poly
     change MvPolynomial.degreeOf i
@@ -266,6 +273,12 @@ noncomputable def restrictAtHeight (params : Parameters) [FieldModel params.q]
               (MvPolynomial.degreeOf_le_iff.mp
                 (g.lowIndividualDegree (embedCoord params i))) n hn
 
+/-- Restrict a global polynomial in `m + 1` variables to the slice at height `x`. -/
+noncomputable def restrictAtHeight (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params.next) (x : Fq params) : Polynomial params where
+  poly := MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x) g.poly
+  lowIndividualDegree := degreeOf_eval₂Hom_restrictAtHeightCoordinateMap_le params g x
+
 /-- Coordinate polynomial for restricting to an axis-parallel affine line. -/
 noncomputable def axisCoordinatePolynomial (params : Parameters) [FieldModel params.q]
     (ℓ : AxisParallelLine params) :
@@ -290,11 +303,13 @@ private theorem natDegree_axisCoordinatePolynomial_le (params : Parameters) [Fie
       simp [axisCoordinatePolynomial, add_comm]
   · simp [axisCoordinatePolynomial, hi, Polynomial.natDegree_C]
 
-/-- Restrict a global polynomial to an axis-parallel line. -/
-noncomputable def restrictToAxisParallelLine (params : Parameters) [FieldModel params.q]
-    (g : Polynomial params) (ℓ : AxisParallelLine params) : AxisLinePolynomial params where
-  poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (axisCoordinatePolynomial params ℓ) g.poly
-  degreeBounded := by
+/-- Restricting a low-degree polynomial to an axis-parallel line via `eval₂Hom` yields a
+univariate polynomial whose natural degree is at most `d`. -/
+theorem natDegree_eval₂Hom_axisCoordinatePolynomial_le
+    (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (ℓ : AxisParallelLine params) :
+    (MvPolynomial.eval₂Hom _root_.Polynomial.C (axisCoordinatePolynomial params ℓ)
+      g.poly).natDegree ≤ params.d := by
     classical
     rw [g.poly.as_sum, map_sum]
     refine Polynomial.natDegree_sum_le_of_forall_le
@@ -339,6 +354,12 @@ noncomputable def restrictToAxisParallelLine (params : Parameters) [FieldModel p
             · simp [h]
       _ ≤ params.d := by
         exact (MvPolynomial.degreeOf_le_iff.mp (g.lowIndividualDegree ℓ.direction)) n hn
+
+/-- Restrict a global polynomial to an axis-parallel line. -/
+noncomputable def restrictToAxisParallelLine (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (ℓ : AxisParallelLine params) : AxisLinePolynomial params where
+  poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (axisCoordinatePolynomial params ℓ) g.poly
+  degreeBounded := natDegree_eval₂Hom_axisCoordinatePolynomial_le params g ℓ
 
 /-- Evaluating an axis-parallel restriction agrees with evaluating the original
 polynomial at the corresponding point on the line. -/
@@ -408,11 +429,13 @@ private theorem natDegree_diagonalCoordinatePolynomial_le (params : Parameters)
             Polynomial.natDegree_X.le
       _ = 1 := by simp
 
-/-- Restrict a global polynomial to a diagonal line. -/
-noncomputable def restrictToDiagonalLine (params : Parameters) [FieldModel params.q]
-    (g : Polynomial params) (ℓ : DiagonalLine params) : DiagonalLinePolynomial params where
-  poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (diagonalCoordinatePolynomial params ℓ) g.poly
-  degreeBounded := by
+/-- Restricting a low-degree polynomial to a diagonal line via `eval₂Hom` yields a
+univariate polynomial whose natural degree is at most `m · d`. -/
+theorem natDegree_eval₂Hom_diagonalCoordinatePolynomial_le
+    (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (ℓ : DiagonalLine params) :
+    (MvPolynomial.eval₂Hom _root_.Polynomial.C (diagonalCoordinatePolynomial params ℓ)
+      g.poly).natDegree ≤ params.m * params.d := by
     classical
     rw [g.poly.as_sum, map_sum]
     refine Polynomial.natDegree_sum_le_of_forall_le
@@ -448,6 +471,12 @@ noncomputable def restrictToDiagonalLine (params : Parameters) [FieldModel param
             (MvPolynomial.degreeOf_le_iff.mp (g.lowIndividualDegree j)) n hn)
       _ = params.m * params.d := by
         simp [Fintype.card_fin]
+
+/-- Restrict a global polynomial to a diagonal line. -/
+noncomputable def restrictToDiagonalLine (params : Parameters) [FieldModel params.q]
+    (g : Polynomial params) (ℓ : DiagonalLine params) : DiagonalLinePolynomial params where
+  poly := MvPolynomial.eval₂Hom _root_.Polynomial.C (diagonalCoordinatePolynomial params ℓ) g.poly
+  degreeBounded := natDegree_eval₂Hom_diagonalCoordinatePolynomial_le params g ℓ
 
 end Polynomial
 

@@ -12,7 +12,7 @@ Following community practice
 ([lamplighter-comparator](https://github.com/vidick/lamplighter-comparator),
 [erdos-unit-distance-comparator](https://github.com/kim-em/erdos-unit-distance-comparator)),
 the challenge lives in a separate repository —
-**[MIPStarRE-comparator](https://github.com/LionSR/MIPStarRE-comparator)** —
+**[LDT-comparator](https://github.com/LionSR/LDT-comparator)** —
 which requires this library as a lake dependency pinned by commit:
 
 - `Challenge.lean` there imports **only Mathlib** and re-declares, verbatim
@@ -42,7 +42,7 @@ which requires this library as a lake dependency pinned by commit:
    extractor (a Lean metaprogram mirroring comparator's `runForUsedConsts`)
    and the assembler that produce `Challenge.lean`.  After changing any
    definition in the closure: regenerate per `scripts/comparator/README.md`,
-   copy the result into MIPStarRE-comparator, and bump its library pin.
+   copy the result into LDT-comparator, and bump its library pin.
 
 ## Checklist against the official *Validating Proofs* guide
 

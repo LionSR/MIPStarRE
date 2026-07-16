@@ -27,6 +27,16 @@ structure Measurement (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decid
     extends SubMeas α ι where
   total_eq_one : total = 1
 
+set_option linter.unusedFintypeInType false in
+open scoped Classical in
+/-- For a trivial distinguished-outcome measurement, every outcome operator is
+positive semidefinite: `0 ≤ if a = a₀ then 1 else 0`. -/
+private theorem Measurement.trivialDistinguishedOutcome_outcome_pos
+    {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] (a₀ a : α) :
+    (0 : MIPStarRE.Quantum.Op ι) ≤ if a = a₀ then 1 else 0 := by
+  by_cases h : a = a₀ <;> simp [h]
+
+open scoped Classical in
 /-- ⚠️ DEGENERATE — Construct a trivial measurement where only the distinguished
 outcome `a₀` is the identity and all other outcomes are zero.
 
@@ -41,20 +51,16 @@ existential statements without displaying the selected outcome. -/
 noncomputable def Measurement.trivialDistinguishedOutcome
     {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
-    (a₀ : α) : Measurement α ι := by
-  classical
-  refine
-    { toSubMeas := {
-        outcome := fun a => if a = a₀ then 1 else 0
-        total := 1
-        outcome_pos := by
-          intro a
-          by_cases h : a = a₀ <;> simp [h]
-        sum_eq_total := by
-          simp
-        total_le_one := le_rfl
-      }
-      total_eq_one := rfl }
+    (a₀ : α) : Measurement α ι where
+  toSubMeas := {
+    outcome := fun a => if a = a₀ then 1 else 0
+    total := 1
+    outcome_pos := fun a => Measurement.trivialDistinguishedOutcome_outcome_pos a₀ a
+    sum_eq_total :=
+      (Finset.sum_ite_eq' Finset.univ a₀ fun _ => 1).trans (if_pos (Finset.mem_univ a₀))
+    total_le_one := le_rfl
+  }
+  total_eq_one := rfl
 
 /-- A paper-local projective submeasurement (each effect is idempotent).
 
@@ -69,6 +75,16 @@ structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decidabl
     extends Measurement α ι where
   proj : ∀ a, outcome a * outcome a = outcome a
 
+/-- For a trivial distinguished-outcome projective measurement, every outcome operator
+is idempotent. -/
+private theorem ProjMeas.trivialDistinguishedOutcome_proj
+    {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] (a₀ a : α) :
+    (Measurement.trivialDistinguishedOutcome (ι := ι) a₀).outcome a *
+        (Measurement.trivialDistinguishedOutcome (ι := ι) a₀).outcome a =
+      (Measurement.trivialDistinguishedOutcome (ι := ι) a₀).outcome a := by
+  classical
+  by_cases h : a = a₀ <;> simp [Measurement.trivialDistinguishedOutcome, h]
+
 /-- ⚠️ DEGENERATE — Construct a trivial projective measurement where only the
 distinguished outcome `a₀` is the identity and all other outcomes are zero.
 
@@ -80,24 +96,9 @@ explicitly (with a chosen outcome) rather than relying on the ambient
 noncomputable def ProjMeas.trivialDistinguishedOutcome
     {α : Type*} {ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
-    (a₀ : α) : ProjMeas α ι := by
-  classical
-  have hproj : ∀ a : α,
-      (if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0) *
-        (if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0) =
-      (if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0) := by
-    intro a
-    by_cases h : a = a₀ <;> simp [h]
-  have h_outcome (a : α) :
-      (Measurement.trivialDistinguishedOutcome a₀).outcome a =
-        if a = a₀ then (1 : MIPStarRE.Quantum.Op ι) else 0 := by
-    simp [Measurement.trivialDistinguishedOutcome]
-  refine
-    { toMeasurement := Measurement.trivialDistinguishedOutcome a₀
-      proj := by
-        intro a
-        rw [h_outcome a]
-        exact hproj a }
+    (a₀ : α) : ProjMeas α ι where
+  toMeasurement := Measurement.trivialDistinguishedOutcome a₀
+  proj := ProjMeas.trivialDistinguishedOutcome_proj a₀
 
 /-! ### Derived properties -/
 
@@ -170,11 +171,8 @@ def SubMeas.singleOutcome {ι : Type*} [Fintype ι] [DecidableEq ι]
     SubMeas Unit ι where
   outcome := fun _ => A
   total := A
-  outcome_pos := by
-    intro _
-    exact hA_pos
-  sum_eq_total := by
-    simp
+  outcome_pos := fun _ => hA_pos
+  sum_eq_total := Fintype.sum_unique fun _ => A
   total_le_one := hA_le_one
 
 @[simp] theorem SubMeas.singleOutcome_outcome {ι : Type*} [Fintype ι] [DecidableEq ι]

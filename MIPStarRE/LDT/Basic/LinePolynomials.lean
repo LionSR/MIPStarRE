@@ -48,7 +48,7 @@ structure AxisLinePolynomial (params : Parameters) [FieldModel params.q] where
 noncomputable instance {params : Parameters} [FieldModel params.q] :
     Inhabited (AxisLinePolynomial params) :=
   ⟨{ poly := 0
-     degreeBounded := by simp }⟩
+     degreeBounded := _root_.Polynomial.natDegree_zero.trans_le (Nat.zero_le _) }⟩
 
 namespace AxisLinePolynomial
 
@@ -140,12 +140,10 @@ noncomputable def reparamAtEquiv {params : Parameters} [FieldModel params.q]
     (t : Fq params) : AxisLinePolynomial params ≃ AxisLinePolynomial params where
   toFun := fun f => reparamAt f t
   invFun := fun f => reparamAt f (subCoord zeroCoord t)
-  left_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f t (subCoord zeroCoord t)
-  right_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f (subCoord zeroCoord t) t
+  left_inv := fun f => (reparamAt_reparamAt f t (subCoord zeroCoord t)).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_right zeroCoord t)).trans (reparamAt_zero f))
+  right_inv := fun f => (reparamAt_reparamAt f (subCoord zeroCoord t) t).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_left zeroCoord t)).trans (reparamAt_zero f))
 
 /-- The stored polynomial really witnesses the advertised degree bound. -/
 theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]
@@ -159,9 +157,7 @@ theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]
 def appendAtHeight (params : Parameters) [FieldModel params.q]
     (f : AxisLinePolynomial params) (_x : Fq params) : AxisLinePolynomial params.next where
   poly := f.poly
-  degreeBounded := by
-    change f.poly.natDegree ≤ params.d
-    exact f.degreeBounded
+  degreeBounded := f.degreeBounded
 
 @[simp] theorem appendAtHeight_apply {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) (x t : Fq params) :
@@ -191,9 +187,7 @@ axis-line answers. -/
 def restrictAtHeight (params : Parameters) [FieldModel params.q]
     (f : AxisLinePolynomial params.next) (_x : Fq params) : AxisLinePolynomial params where
   poly := f.poly
-  degreeBounded := by
-    change f.poly.natDegree ≤ params.d
-    exact f.degreeBounded
+  degreeBounded := f.degreeBounded
 
 end AxisLinePolynomial
 
@@ -205,7 +199,7 @@ structure DiagonalLinePolynomial (params : Parameters) [FieldModel params.q] whe
 noncomputable instance {params : Parameters} [FieldModel params.q] :
     Inhabited (DiagonalLinePolynomial params) :=
   ⟨{ poly := 0
-     degreeBounded := by simp }⟩
+     degreeBounded := _root_.Polynomial.natDegree_zero.trans_le (Nat.zero_le _) }⟩
 
 namespace DiagonalLinePolynomial
 
@@ -287,12 +281,10 @@ noncomputable def reparamAtEquiv {params : Parameters} [FieldModel params.q]
     (t : Fq params) : DiagonalLinePolynomial params ≃ DiagonalLinePolynomial params where
   toFun := fun f => reparamAt f t
   invFun := fun f => reparamAt f (subCoord zeroCoord t)
-  left_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f t (subCoord zeroCoord t)
-  right_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f (subCoord zeroCoord t) t
+  left_inv := fun f => (reparamAt_reparamAt f t (subCoord zeroCoord t)).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_right zeroCoord t)).trans (reparamAt_zero f))
+  right_inv := fun f => (reparamAt_reparamAt f (subCoord zeroCoord t) t).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_left zeroCoord t)).trans (reparamAt_zero f))
 
 /-- The stored polynomial really witnesses the advertised degree bound. -/
 theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]
@@ -306,8 +298,7 @@ theorem hasUnivariateDegreeAtMost {params : Parameters} [FieldModel params.q]
 def appendAtHeight (params : Parameters) [FieldModel params.q]
     (f : DiagonalLinePolynomial params) (_x : Fq params) : DiagonalLinePolynomial params.next where
   poly := f.poly
-  degreeBounded := by
-    exact le_trans f.degreeBounded (Nat.mul_le_mul_right _ (Nat.le_succ _))
+  degreeBounded := le_trans f.degreeBounded (Nat.mul_le_mul_right _ (Nat.le_succ _))
 
 /-- Slice extension commutes with translating the line parameter on diagonal-line answers. -/
 @[simp] theorem appendAtHeight_reparamAt {params : Parameters} [FieldModel params.q]
@@ -378,12 +369,10 @@ def reparamAtEquiv {params : Parameters} [FieldModel params.q]
     (t : Fq params) : DiagonalLineAnswer params ≃ DiagonalLineAnswer params where
   toFun := fun f => reparamAt f t
   invFun := fun f => reparamAt f (subCoord zeroCoord t)
-  left_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f t (subCoord zeroCoord t)
-  right_inv := by
-    intro f
-    simpa using reparamAt_reparamAt f (subCoord zeroCoord t) t
+  left_inv := fun f => (reparamAt_reparamAt f t (subCoord zeroCoord t)).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_right zeroCoord t)).trans (reparamAt_zero f))
+  right_inv := fun f => (reparamAt_reparamAt f (subCoord zeroCoord t) t).trans
+    ((congrArg (reparamAt f) (addCoord_subCoord_left zeroCoord t)).trans (reparamAt_zero f))
 
 /-- Extend a paper-level diagonal-line answer to the slice at height `x`. -/
 def appendAtHeight (params : Parameters) (f : DiagonalLineAnswer params)

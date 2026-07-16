@@ -2,7 +2,7 @@
 
 This directory generates the self-contained statement file `Challenge.lean`
 used by the companion repository
-[MIPStarRE-comparator](https://github.com/LionSR/MIPStarRE-comparator) to
+[LDT-comparator](https://github.com/LionSR/LDT-comparator) to
 verify, with the official
 [leanprover/comparator](https://github.com/leanprover/comparator), that this
 library proves the main theorem `MIPStarRE.LDT.Test.mainFormal`.  Background
@@ -29,7 +29,7 @@ cat scripts/comparator/challenge_header.lean draft.lean \
     scripts/comparator/challenge_footer.lean > Challenge.lean
 ```
 
-Then copy `Challenge.lean` into the MIPStarRE-comparator repository, bump the
+Then copy `Challenge.lean` into the LDT-comparator repository, bump the
 `rev` pin in its `lakefile.toml` to the library commit it was generated from,
 and run its `./verify.sh` (its CI also runs on every push).
 
