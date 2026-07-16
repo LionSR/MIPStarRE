@@ -54,7 +54,7 @@ diff --git a/blueprint/src/chapter/ch09_pasting.tex b/blueprint/src/chapter/ch09
         )
 
     def test_workflow_or_audit_script_change_requires_heavy_audit(self) -> None:
-        self.assertTrue(needs_axiom_audit_for_paths([".github/workflows/blueprint-sync.yml"]))
+        self.assertTrue(needs_axiom_audit_for_paths([".github/workflows/pr-ci.yml"]))
         self.assertTrue(needs_axiom_audit_for_paths(["scripts/blueprint_leanok_axioms.py"]))
 
     def test_plain_blueprint_prose_skips_heavy_audit(self) -> None:

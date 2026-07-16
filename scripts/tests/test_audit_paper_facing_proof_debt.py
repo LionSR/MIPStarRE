@@ -28,8 +28,9 @@ def _write_repo(root: Path, lean_source: str, tex_source: str) -> None:
 
 class PaperFacingProofDebtAuditTests(unittest.TestCase):
     def test_github_workflow_runs_audit_as_blocking_guard(self) -> None:
-        workflow = SCRIPT_DIR.parent / ".github" / "workflows" / "paper-facing-proof-debt-audit.yml"
+        workflow = SCRIPT_DIR.parent / ".github" / "workflows" / "pr-ci.yml"
         text = workflow.read_text(encoding="utf-8")
+        self.assertIn("proof-debt:", text)
         self.assertIn("scripts/audit_paper_facing_proof_debt.py", text)
         self.assertIn("--ci", text)
         self.assertNotIn("--warn-only", text)

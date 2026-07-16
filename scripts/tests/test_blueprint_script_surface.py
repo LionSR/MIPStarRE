@@ -12,18 +12,15 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 BLUEPRINT_SUPPORT_SCRIPTS = {
     "scripts/blueprint_lean_sync.py": {
         "tests": {"scripts/tests/test_blueprint_lean_sync.py"},
-        "workflows": {
-            ".github/workflows/blueprint-sync.yml",
-            ".github/workflows/lint-blueprint.yml",
-        },
+        "workflows": {".github/workflows/pr-ci.yml"},
     },
     "scripts/blueprint_leanok_axioms.py": {
         "tests": {"scripts/tests/test_blueprint_leanok_axioms.py"},
-        "workflows": {".github/workflows/blueprint-sync.yml"},
+        "workflows": {".github/workflows/pr-ci.yml"},
     },
     "scripts/blueprint_axiom_audit_needed.py": {
         "tests": {"scripts/tests/test_blueprint_axiom_audit_needed.py"},
-        "workflows": {".github/workflows/blueprint-sync.yml"},
+        "workflows": {".github/workflows/pr-ci.yml"},
     },
     "scripts/audit_blueprint_high_risk_links.py": {
         "tests": {"scripts/tests/test_audit_blueprint_high_risk_links.py"},
@@ -44,26 +41,15 @@ BLUEPRINT_SUPPORT_SCRIPTS = {
             "scripts/tests/test_blueprint_lean_sync.py",
             "scripts/tests/test_check_blueprint_latex.py",
         },
-        "workflows": {
-            ".github/workflows/blueprint-sync.yml",
-            ".github/workflows/lint-blueprint.yml",
-        },
+        "workflows": {".github/workflows/pr-ci.yml"},
     },
 }
 
 WORKFLOW_REQUIRED_PATHS = {
-    ".github/workflows/blueprint-sync.yml": {
-        "scripts/blueprint_lean_sync.py",
-        "scripts/blueprint_axiom_audit_needed.py",
-        "scripts/blueprint_leanok_axioms.py",
-        "scripts/tex_utils.py",
-        "scripts/tests/**",
-        ".github/workflows/blueprint-sync.yml",
-    },
-    ".github/workflows/lint-blueprint.yml": {
-        "scripts/blueprint_lean_sync.py",
-        "scripts/tex_utils.py",
-        ".github/workflows/lint-blueprint.yml",
+    ".github/workflows/pr-ci.yml": {
+        "blueprint/**",
+        "scripts/**",
+        ".github/workflows/pr-ci.yml",
     },
 }
 
