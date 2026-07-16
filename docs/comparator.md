@@ -17,7 +17,7 @@ which requires this library as a lake dependency pinned by commit:
 
 - `Challenge.lean` there imports **only Mathlib** and re-declares, verbatim
   and in dependency order, every declaration in the comparator-relevant
-  closure of the statement of `mainFormal` (111 declarations, ~1170 lines),
+  closure of the statement of `mainFormal` (111 declarations, ~1200 lines),
   then states the theorem with `sorry`.  It is the entire human audit
   surface.
 - `Solution.lean` there imports this library, which proves the theorem under
