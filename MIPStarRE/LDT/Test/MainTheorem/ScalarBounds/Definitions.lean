@@ -1,4 +1,4 @@
-import Mathlib.Analysis.Complex.ExponentialBounds
+import Mathlib
 import MIPStarRE.LDT.Basic.SqrtBounds
 
 /-!
@@ -8,6 +8,11 @@ This module defines the central error quantities `mainFormalError`,
 `mainFormalEnvelope`, the cascade variables `σ`, `ζ₁`, `ζ₂`, `ζ₃`, `ζ₄`,
 and the `CascadeHypotheses` numeric regime used throughout the error-cascade
 bookkeeping for Step 8 of `mainFormal`.
+
+Note: this module contributes declarations to the comparator statement closure
+of `mainFormal`, which must elaborate in the same environment as the
+Mathlib-only `Challenge.lean`.  Keep the full `import Mathlib`; do not narrow
+it.  See `docs/comparator.md`, "Environment alignment".
 
 ## References
 

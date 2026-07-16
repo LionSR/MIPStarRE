@@ -30,6 +30,16 @@ def HasUnivariateDegreeAtMost (params : Parameters) [FieldModel params.q]
     p.natDegree ≤ bound ∧
       f = evalLinePolynomialModel params p
 
+/-- Composing with the degree-one translation `C a + X` preserves `natDegree`
+bounds.  Shared degree bookkeeping for the `reparamAt` reparametrizations
+below. -/
+theorem natDegree_comp_C_add_X_le {params : Parameters} [FieldModel params.q]
+    (p : LinePolynomialModel params) (a : Scalar params) {n : ℕ}
+    (hp : p.natDegree ≤ n) :
+    (p.comp (_root_.Polynomial.C a + _root_.Polynomial.X)).natDegree ≤ n :=
+  le_trans (_root_.Polynomial.natDegree_comp_le)
+    (by rw [add_comm, _root_.Polynomial.natDegree_X_add_C, Nat.mul_one]; exact hp)
+
 /-- Axis-parallel line answers are genuine univariate degree-`d` polynomials. -/
 structure AxisLinePolynomial (params : Parameters) [FieldModel params.q] where
   poly : LinePolynomialModel params
@@ -86,15 +96,7 @@ theorem apply_eq_apply_of_degree_zero {params : Parameters} [FieldModel params.q
 noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) (t : Fq params) : AxisLinePolynomial params where
   poly := f.poly.comp (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)
-  degreeBounded := by
-    refine le_trans
-      (_root_.Polynomial.natDegree_comp_le
-        (p := f.poly)
-        (q := _root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)) ?_
-    have hdegq : (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X).natDegree = 1 := by
-      simp
-    rw [hdegq, Nat.mul_one]
-    exact f.degreeBounded
+  degreeBounded := natDegree_comp_C_add_X_le f.poly (decodeScalar t) f.degreeBounded
 
 @[simp] theorem reparamAt_apply {params : Parameters} [FieldModel params.q]
     (f : AxisLinePolynomial params) (t s : Fq params) :
@@ -241,15 +243,7 @@ parameter `t`: the old parameter `addCoord t s` becomes the new parameter `s`. -
 noncomputable def reparamAt {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) (t : Fq params) : DiagonalLinePolynomial params where
   poly := f.poly.comp (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)
-  degreeBounded := by
-    refine le_trans
-      (_root_.Polynomial.natDegree_comp_le
-        (p := f.poly)
-        (q := _root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X)) ?_
-    have hdegq : (_root_.Polynomial.C (decodeScalar t) + _root_.Polynomial.X).natDegree = 1 := by
-      simp
-    rw [hdegq, Nat.mul_one]
-    exact f.degreeBounded
+  degreeBounded := natDegree_comp_C_add_X_le f.poly (decodeScalar t) f.degreeBounded
 
 @[simp] theorem reparamAt_apply {params : Parameters} [FieldModel params.q]
     (f : DiagonalLinePolynomial params) (t s : Fq params) :

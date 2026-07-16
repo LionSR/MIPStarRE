@@ -1,6 +1,6 @@
 import MIPStarRE.LDT.Basic.ParametersBase
 import MIPStarRE.Quantum.FiniteMatrix
-import Mathlib.Probability.Distributions.Uniform
+import Mathlib
 
 /-!
 # Distribution infrastructure for the low individual degree test
@@ -8,6 +8,11 @@ import Mathlib.Probability.Distributions.Uniform
 Shared distribution definitions: finite-support weighted distributions,
 a probability predicate, push-forward distributions, weighted-sum linear maps,
 averaging, uniform distribution, and outcome summation.
+
+Note: this module contributes declarations to the comparator statement closure
+of `mainFormal`, which must elaborate in the same environment as the
+Mathlib-only `Challenge.lean`.  Keep the full `import Mathlib`; do not narrow
+it.  See `docs/comparator.md`, "Environment alignment".
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
