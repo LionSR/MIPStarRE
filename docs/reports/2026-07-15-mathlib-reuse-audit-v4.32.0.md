@@ -32,13 +32,18 @@ A candidate is called an **exact replacement** only when its mathematical statem
 
 ### Phase 1 — Lean/Mathlib v4.32.0 upgrade
 
-The current upgrade work on `chore/bump-toolchain-v4.32.0` is Phase 1. Its purpose is to establish the v4.32.0 toolchain and Mathlib baseline before reuse refactors. This report does not assert that an upgrade PR is currently open.
-
-Reuse batches below should be based on the completed Phase 1 baseline so that changes are not mixed with toolchain-manifest churn.
+The upgrade work on `chore/bump-toolchain-v4.32.0` establishes the v4.32.0 baseline in [PR #2583](https://github.com/LionSR/MIPStarRE/pull/2583). Reuse refactors are kept out of that focused toolchain PR.
 
 ### Phase 2 and later — focused reuse PRs
 
-Apply only the high-confidence replacements in small subsystem-specific batches. Retained candidates should not be repeatedly proposed without a new Mathlib API or a change in project representation.
+The high-confidence replacements were split into small subsystem-specific PRs:
+
+- [PR #2585](https://github.com/LionSR/MIPStarRE/pull/2585): replace the local Hermitian-part construction with `selfAdjointPart`;
+- [PR #2586](https://github.com/LionSR/MIPStarRE/pull/2586): remove unused PMF expectation wrappers in favor of generic linear-map laws and `PMF.integral_eq_sum`;
+- [PR #2587](https://github.com/LionSR/MIPStarRE/pull/2587): replace local sandwich-order wrappers with `IsSelfAdjoint.conjugate_nonneg` and `IsSelfAdjoint.conjugate_le_conjugate`;
+- [PR #2588](https://github.com/LionSR/MIPStarRE/pull/2588): migrate the project-facing `IsProj` name to a compatibility abbreviation over `IsStarProjection` (stacked on #2587).
+
+Retained candidates should not be repeatedly proposed without a new Mathlib API or a change in project representation.
 
 ## Accepted replacements
 
