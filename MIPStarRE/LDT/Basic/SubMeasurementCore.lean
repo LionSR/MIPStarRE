@@ -29,8 +29,8 @@ structure Measurement (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decid
 
 set_option linter.unusedFintypeInType false in
 open scoped Classical in
-/-- Discharges the `outcome_pos` obligation of `Measurement.trivialDistinguishedOutcome`.
-The `Fintype ι` hypothesis is used by the matrix positivity proof, not the type. -/
+/-- For a trivial distinguished-outcome measurement, every outcome operator is
+positive semidefinite: `0 ≤ if a = a₀ then 1 else 0`. -/
 private theorem Measurement.trivialDistinguishedOutcome_outcome_pos
     {α : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι] (a₀ a : α) :
     (0 : MIPStarRE.Quantum.Op ι) ≤ if a = a₀ then 1 else 0 := by
@@ -75,7 +75,8 @@ structure ProjMeas (α : Type*) (ι : Type*) [Fintype α] [Fintype ι] [Decidabl
     extends Measurement α ι where
   proj : ∀ a, outcome a * outcome a = outcome a
 
-/-- Discharges the `proj` obligation of `ProjMeas.trivialDistinguishedOutcome`. -/
+/-- For a trivial distinguished-outcome projective measurement, every outcome operator
+is idempotent. -/
 private theorem ProjMeas.trivialDistinguishedOutcome_proj
     {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι] (a₀ a : α) :
     (Measurement.trivialDistinguishedOutcome (ι := ι) a₀).outcome a *

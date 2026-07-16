@@ -102,7 +102,8 @@ theorem apply_eq_apply_of_degree_zero (params : Parameters) [FieldModel params.q
   rw [eq_C_coeff_zero_of_degree_zero params g hd]
   simp
 
-/-- Discharges the `lowIndividualDegree` obligation of `Polynomial.appendAtHeight`. -/
+/-- Renaming a low-degree polynomial along the coordinate embedding preserves the
+low-individual-degree bound in `m + 1` variables. -/
 theorem degreeOf_rename_embedCoord_le (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (i : Fin params.next.m) :
     MvPolynomial.degreeOf i
@@ -191,7 +192,8 @@ private theorem degreeOf_restrictAtHeightCoordinateMap_le
         simp [hne', hji]
     · simp [restrictAtHeightCoordinateMap, hj, MvPolynomial.degreeOf_C, hji]
 
-/-- Discharges the `lowIndividualDegree` obligation of `Polynomial.restrictAtHeight`. -/
+/-- Restricting a polynomial to a coordinate slice via `eval₂Hom` preserves the
+low-individual-degree bound: each variable's degree stays at most `d`. -/
 theorem degreeOf_eval₂Hom_restrictAtHeightCoordinateMap_le
     (params : Parameters) [FieldModel params.q]
     (g : Polynomial params.next) (x : Fq params) (i : Fin params.m) :
@@ -301,7 +303,8 @@ private theorem natDegree_axisCoordinatePolynomial_le (params : Parameters) [Fie
       simp [axisCoordinatePolynomial, add_comm]
   · simp [axisCoordinatePolynomial, hi, Polynomial.natDegree_C]
 
-/-- Discharges the `degreeBounded` obligation of `Polynomial.restrictToAxisParallelLine`. -/
+/-- Restricting a low-degree polynomial to an axis-parallel line via `eval₂Hom` yields a
+univariate polynomial whose natural degree is at most `d`. -/
 theorem natDegree_eval₂Hom_axisCoordinatePolynomial_le
     (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (ℓ : AxisParallelLine params) :
@@ -426,7 +429,8 @@ private theorem natDegree_diagonalCoordinatePolynomial_le (params : Parameters)
             Polynomial.natDegree_X.le
       _ = 1 := by simp
 
-/-- Discharges the `degreeBounded` obligation of `Polynomial.restrictToDiagonalLine`. -/
+/-- Restricting a low-degree polynomial to a diagonal line via `eval₂Hom` yields a
+univariate polynomial whose natural degree is at most `m · d`. -/
 theorem natDegree_eval₂Hom_diagonalCoordinatePolynomial_le
     (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (ℓ : DiagonalLine params) :
