@@ -73,25 +73,19 @@ def toIdxSubMeas {Question Outcome : Type*} {ι : Type*}
 
 end IdxProjMeas
 
+open scoped Classical in
 /-- Post-process the outcomes of a submeasurement. The processed operator at `b` is the
 sum of the operators of all `a` with `f a = b`. -/
 noncomputable def postprocess {α β : Type*} {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype α] [Fintype β]
     (A : SubMeas α ι) (f : α → β) :
-    SubMeas β ι := by
-  classical
-  exact {
-    outcome := fun b =>
-      ∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a
-    total := A.total
-    outcome_pos := by
-      intro b
-      exact Finset.sum_nonneg fun a _ => A.outcome_pos a
-    sum_eq_total := by
-      rw [← A.sum_eq_total]
-      simpa using Finset.sum_fiberwise Finset.univ f A.outcome
-    total_le_one := A.total_le_one
-  }
+    SubMeas β ι where
+  outcome := fun b =>
+    ∑ a ∈ Finset.univ.filter (fun a => f a = b), A.outcome a
+  total := A.total
+  outcome_pos := fun _ => Finset.sum_nonneg fun a _ => A.outcome_pos a
+  sum_eq_total := (Finset.sum_fiberwise Finset.univ f A.outcome).trans A.sum_eq_total
+  total_le_one := A.total_le_one
 
 namespace SubMeas
 
@@ -133,16 +127,8 @@ noncomputable def transport {α β : Type*} {ι : Type*}
     SubMeas β ι where
   outcome := fun b => A.outcome (e.symm b)
   total := A.total
-  outcome_pos := by
-    intro b
-    exact A.outcome_pos (e.symm b)
-  sum_eq_total := by
-    classical
-    calc
-      ∑ b : β, A.outcome (e.symm b)
-          = ∑ a : α, A.outcome a := by
-              simpa using (Equiv.sum_comp e (fun b => A.outcome (e.symm b))).symm
-      _ = A.total := A.sum_eq_total
+  outcome_pos := fun b => A.outcome_pos (e.symm b)
+  sum_eq_total := (Equiv.sum_comp e.symm A.outcome).trans A.sum_eq_total
   total_le_one := A.total_le_one
 
 @[simp] theorem transport_outcome {α β : Type*} {ι : Type*}
@@ -301,9 +287,7 @@ noncomputable def transport {α β : Type*} {ι : Type*}
     (e : α ≃ β) (A : ProjSubMeas α ι) :
     ProjSubMeas β ι where
   toSubMeas := SubMeas.transport e A.toSubMeas
-  proj := by
-    intro b
-    simpa using A.proj (e.symm b)
+  proj := fun b => A.proj (e.symm b)
 
 /-- Postprocessing a projective submeasurement preserves outcome projectivity. -/
 theorem postprocess_outcome_proj {α β : Type*} {ι : Type*}
@@ -347,9 +331,7 @@ noncomputable def transport {α β : Type*} {ι : Type*}
     (e : α ≃ β) (A : ProjMeas α ι) :
     ProjMeas β ι where
   toMeasurement := Measurement.transport e A.toMeasurement
-  proj := by
-    intro b
-    simpa [Measurement.transport, SubMeas.transport] using A.proj (e.symm b)
+  proj := fun b => A.proj (e.symm b)
 
 @[simp] theorem transport_trivialDistinguishedOutcome {α ι : Type*}
     [Fintype α] [Fintype ι] [DecidableEq ι]
@@ -386,15 +368,9 @@ noncomputable def postprocess {α β : Type*} {ι : Type*}
     ProjMeas β ι where
   toMeasurement := {
     toSubMeas := MIPStarRE.LDT.postprocess A.toSubMeas f
-    total_eq_one := by
-      simpa [MIPStarRE.LDT.postprocess] using A.total_eq_one
+    total_eq_one := A.total_eq_one
   }
-  proj := by
-    let P : ProjSubMeas α ι :=
-      { toSubMeas := A.toSubMeas
-        proj := A.proj }
-    intro b
-    simpa [P] using ProjSubMeas.postprocess_outcome_proj P f b
+  proj := fun b => ProjSubMeas.postprocess_outcome_proj ⟨A.toSubMeas, A.proj⟩ f b
 
 @[simp] theorem postprocess_toSubMeas {α β : Type*} {ι : Type*}
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
@@ -432,18 +408,12 @@ noncomputable def completeSubMeas {α : Type*} {ι : Type*}
       | some a => A.outcome a
       | none => 1 - A.total
     total := 1
-    outcome_pos := by
-      intro a
-      cases a with
-      | none =>
-          exact sub_nonneg.mpr A.total_le_one
-      | some a =>
-          exact A.outcome_pos a
-    sum_eq_total := by
-      classical
-      simp [A.sum_eq_total, add_comm, sub_eq_add_neg]
-    total_le_one := by
-      exact le_rfl
+    outcome_pos := fun
+      | some a => A.outcome_pos a
+      | none => sub_nonneg.mpr A.total_le_one
+    sum_eq_total := (Fintype.sum_option _).trans <|
+      (congrArg (1 - A.total + ·) A.sum_eq_total).trans (sub_add_cancel 1 A.total)
+    total_le_one := le_rfl
   }
   total_eq_one := rfl
 
@@ -467,23 +437,14 @@ noncomputable def averageIdxSubMeas {Question Outcome : Type*} [Fintype Outcome]
     averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
   total :=
     averageOperatorOverDistribution 𝒟 (fun q => (A q).total)
-  outcome_pos := by
-    intro a
-    exact averageOperatorOverDistribution_nonneg 𝒟
+  outcome_pos := fun a =>
+    averageOperatorOverDistribution_nonneg 𝒟
       (fun q => (A q).outcome a) (fun q => (A q).outcome_pos a)
-  sum_eq_total := by
-    classical
-    calc
-      ∑ a, averageOperatorOverDistribution 𝒟 (fun q => (A q).outcome a)
-          = averageOperatorOverDistribution 𝒟
-              (fun q => ∑ a, (A q).outcome a) := by
-            exact (averageOperatorOverDistribution_sum 𝒟
-              (fun q a => (A q).outcome a)).symm
-      _ = averageOperatorOverDistribution 𝒟 (fun q => (A q).total) := by
-            exact averageOperatorOverDistribution_congr 𝒟 _ _
-              (fun q => (A q).sum_eq_total)
-  total_le_one := by
-    exact averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟
+  sum_eq_total :=
+    (averageOperatorOverDistribution_sum 𝒟 (fun q a => (A q).outcome a)).symm.trans
+      (averageOperatorOverDistribution_congr 𝒟 _ _ fun q => (A q).sum_eq_total)
+  total_le_one :=
+    averageOperatorOverDistribution_le_one_of_weight_sum_le_one 𝒟
       (fun q => (A q).total) h𝒟 (fun q => (A q).total_le_one)
 
 
@@ -495,13 +456,10 @@ private def mkLeftPlacedSubMeas {α : Type*}
     SubMeas α (ιA × ιB) where
   outcome := fun a => leftTensor (ι₂ := ιB) (A.outcome a)
   total := leftTensor (ι₂ := ιB) A.total
-  outcome_pos := by
-    intro a
-    exact leftTensor_nonneg (ι₂ := ιB) (A.outcome_pos a)
-  sum_eq_total := by
-    rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome, A.sum_eq_total]
-  total_le_one := by
-    exact leftTensor_le_one (ι₂ := ιB) A.total_le_one
+  outcome_pos := fun a => leftTensor_nonneg (ι₂ := ιB) (A.outcome_pos a)
+  sum_eq_total := (leftTensor_finset_sum (ι₂ := ιB) Finset.univ A.outcome).trans
+    (congrArg (leftTensor (ι₂ := ιB)) A.sum_eq_total)
+  total_le_one := leftTensor_le_one (ι₂ := ιB) A.total_le_one
 
 private def mkRightPlacedSubMeas {α : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -509,13 +467,10 @@ private def mkRightPlacedSubMeas {α : Type*}
     SubMeas α (ιA × ιB) where
   outcome := fun a => rightTensor (ι₁ := ιA) (A.outcome a)
   total := rightTensor (ι₁ := ιA) A.total
-  outcome_pos := by
-    intro a
-    exact rightTensor_nonneg (ι₁ := ιA) (A.outcome_pos a)
-  sum_eq_total := by
-    rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ A.outcome, A.sum_eq_total]
-  total_le_one := by
-    exact rightTensor_le_one (ι₁ := ιA) A.total_le_one
+  outcome_pos := fun a => rightTensor_nonneg (ι₁ := ιA) (A.outcome_pos a)
+  sum_eq_total := (rightTensor_finset_sum (ι₁ := ιA) Finset.univ A.outcome).trans
+    (congrArg (rightTensor (ι₁ := ιA)) A.sum_eq_total)
+  total_le_one := rightTensor_le_one (ι₁ := ιA) A.total_le_one
 
 /-- Helper-level projection equation for left-placed outcomes. -/
 @[simp] theorem mkLeftPlacedSubMeas_outcome {α : Type*}
@@ -568,11 +523,8 @@ space `ι × ι`. -/
 def ProjSubMeas.liftLeft {α : Type*} {ι : Type*} [Fintype α] [Fintype ι] [DecidableEq ι]
     (A : ProjSubMeas α ι) : ProjSubMeas α (ι × ι) :=
   { toSubMeas := A.toSubMeas.liftLeft
-    proj := by
-      intro a
-      change leftTensor (ι₂ := ι) (A.outcome a) * leftTensor (ι₂ := ι) (A.outcome a) =
-        leftTensor (ι₂ := ι) (A.outcome a)
-      simpa [leftTensor_mul_leftTensor] using congrArg (leftTensor (ι₂ := ι)) (A.proj a) }
+    proj := fun a => (leftTensor_mul_leftTensor (A.outcome a) (A.outcome a)).trans
+      (congrArg (leftTensor (ι₂ := ι)) (A.proj a)) }
 
 /-- Lift a submeasurement to the right tensor factor of a bipartite space `ι × ι`.
 Each outcome operator `A_a : Op ι` becomes `I ⊗ A_a : Op (ι × ι)`. -/

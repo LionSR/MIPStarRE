@@ -27,18 +27,15 @@ noncomputable def localDirectSumMeasurement {Outcome ιA ιB : Type*}
   ({ outcome := fun a => localDirectSumBlock (MA.outcome a) (MB.outcome a)
      total := localDirectSumBlock MA.total MB.total
      outcome_pos := fun a => localDirectSumBlock_nonneg (MA.outcome_pos a) (MB.outcome_pos a)
-     sum_eq_total := by
-       calc
-         ∑ a, localDirectSumBlock (MA.outcome a) (MB.outcome a)
-             = localDirectSumBlock (∑ a, MA.outcome a) (∑ a, MB.outcome a) := by
-               simpa using localDirectSumBlock_finset_sum (Finset.univ)
-                 (fun a => MA.outcome a) (fun a => MB.outcome a)
-         _ = localDirectSumBlock MA.total MB.total := by
-               rw [MA.sum_eq_total, MB.sum_eq_total]
-     total_le_one := by
-       simp [MA.total_eq_one, MB.total_eq_one] } :
-    SubMeas Outcome (LocalCarrierSum ιA ιB)).toMeasurement (by
-      simp [MA.total_eq_one, MB.total_eq_one])
+     sum_eq_total :=
+       (localDirectSumBlock_finset_sum Finset.univ MA.outcome MB.outcome).trans
+         (congrArg₂ localDirectSumBlock MA.sum_eq_total MB.sum_eq_total)
+     total_le_one :=
+       ((congrArg₂ localDirectSumBlock MA.total_eq_one MB.total_eq_one).trans
+         localDirectSumBlock_one).le } :
+    SubMeas Outcome (LocalCarrierSum ιA ιB)).toMeasurement
+    ((congrArg₂ localDirectSumBlock MA.total_eq_one MB.total_eq_one).trans
+      localDirectSumBlock_one)
 
 @[simp] theorem localDirectSumMeasurement_outcome {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -60,9 +57,9 @@ noncomputable def localDirectSumProjMeas {Outcome ιA ιB : Type*}
     (MA : ProjMeas Outcome ιA) (MB : ProjMeas Outcome ιB) :
     ProjMeas Outcome (LocalCarrierSum ιA ιB) where
   toMeasurement := localDirectSumMeasurement MA.toMeasurement MB.toMeasurement
-  proj := by
-    intro a
-    simp [localDirectSumBlock_mul, MA.proj a, MB.proj a]
+  proj := fun a =>
+    (localDirectSumBlock_mul _ _ _ _).trans
+      (congrArg₂ localDirectSumBlock (MA.proj a) (MB.proj a))
 
 @[simp] theorem localDirectSumProjMeas_outcome {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -80,18 +77,13 @@ noncomputable def roleBlockMeasurement {Outcome ιA ιB : Type*}
   ({ outcome := fun a => roleBlock (MA.outcome a) (MB.outcome a)
      total := roleBlock MA.total MB.total
      outcome_pos := fun a => roleBlock_nonneg (MA.outcome_pos a) (MB.outcome_pos a)
-     sum_eq_total := by
-       calc
-         ∑ a, roleBlock (MA.outcome a) (MB.outcome a)
-             = roleBlock (∑ a, MA.outcome a) (∑ a, MB.outcome a) := by
-               simpa using roleBlock_finset_sum (Finset.univ)
-                 (fun a => MA.outcome a) (fun a => MB.outcome a)
-         _ = roleBlock MA.total MB.total := by
-               rw [MA.sum_eq_total, MB.sum_eq_total]
-     total_le_one := by
-       simp [MA.total_eq_one, MB.total_eq_one] } :
-    SubMeas Outcome (RoleRegisterLocal ιA ιB)).toMeasurement (by
-      simp [MA.total_eq_one, MB.total_eq_one])
+     sum_eq_total :=
+       (roleBlock_finset_sum Finset.univ MA.outcome MB.outcome).trans
+         (congrArg₂ roleBlock MA.sum_eq_total MB.sum_eq_total)
+     total_le_one :=
+       ((congrArg₂ roleBlock MA.total_eq_one MB.total_eq_one).trans roleBlock_one).le } :
+    SubMeas Outcome (RoleRegisterLocal ιA ιB)).toMeasurement
+    ((congrArg₂ roleBlock MA.total_eq_one MB.total_eq_one).trans roleBlock_one)
 
 @[simp] theorem roleBlockMeasurement_outcome {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -112,9 +104,8 @@ noncomputable def roleBlockProjMeas {Outcome ιA ιB : Type*}
     (MA MB : ProjMeas Outcome (LocalCarrierSum ιA ιB)) :
     ProjMeas Outcome (RoleRegisterLocal ιA ιB) where
   toMeasurement := roleBlockMeasurement MA.toMeasurement MB.toMeasurement
-  proj := by
-    intro a
-    simp [roleBlock_mul, MA.proj a, MB.proj a]
+  proj := fun a =>
+    (roleBlock_mul _ _ _ _).trans (congrArg₂ roleBlock (MA.proj a) (MB.proj a))
 
 @[simp] theorem roleBlockProjMeas_outcome {Outcome ιA ιB : Type*}
     [Fintype Outcome] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]

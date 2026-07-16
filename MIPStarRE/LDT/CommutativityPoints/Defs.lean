@@ -36,19 +36,10 @@ abbrev PointPairDiagonalLineQuestion (params : Parameters) :=
 -- leftPlacedSubMeas / rightPlacedSubMeas are defined in Basic/SubMeasurementFamilies.lean
 
 /-- Diagonal lines form a finite type via their base point and direction vector. -/
-noncomputable instance (params : Parameters) : Fintype (DiagonalLine params) := by
-  let e : DiagonalLine params ≃ Point params × Point params :=
-    { toFun := fun ℓ => (ℓ.base, ℓ.direction)
-      invFun := fun bd => { base := bd.1, direction := bd.2 }
-      left_inv := by
-        intro ℓ
-        cases ℓ
-        rfl
-      right_inv := by
-        intro bd
-        cases bd
-        rfl }
-  exact Fintype.ofEquiv (Point params × Point params) e.symm
+noncomputable instance (params : Parameters) : Fintype (DiagonalLine params) :=
+  Fintype.ofInjective
+    (fun ℓ : DiagonalLine params => (ℓ.base, ℓ.direction))
+    fun _ _ h => congrArg₂ DiagonalLine.mk (congrArg Prod.fst h) (congrArg Prod.snd h)
 
 /-- Ordered product of two submeasurements viewed as a raw operator family. -/
 noncomputable def orderedProductOpFamily {α β : Type*} [Fintype α] [Fintype β]
@@ -64,6 +55,32 @@ noncomputable def reversedProductOpFamily {α β : Type*} [Fintype α] [Fintype 
   outcome := fun | (a, b) => B.outcome b * A.outcome a
   total := B.total * A.total
 
+/-- The outcome effects of `tensorProductSubMeas` sum to its total effect. -/
+theorem tensorProductSubMeas_sum_outcome {α β : Type*} [Fintype α] [Fintype β]
+    (A : SubMeas α ι) (B : SubMeas β ι) :
+    ∑ ab : α × β,
+        leftTensor (ι₂ := ι) (A.outcome ab.1) * rightTensor (ι₁ := ι) (B.outcome ab.2) =
+      leftTensor (ι₂ := ι) A.total * rightTensor (ι₁ := ι) B.total := by
+  calc
+    ∑ ab : α × β,
+        leftTensor (ι₂ := ι) (A.outcome ab.1) * rightTensor (ι₁ := ι) (B.outcome ab.2)
+        = ∑ a : α,
+            ∑ b : β,
+              leftTensor (ι₂ := ι) (A.outcome a) *
+                rightTensor (ι₁ := ι) (B.outcome b) := by
+                simpa using
+                  (Fintype.sum_prod_type' (f := fun a b =>
+                    leftTensor (ι₂ := ι) (A.outcome a) *
+                      rightTensor (ι₁ := ι) (B.outcome b)))
+    _ =
+        (∑ a : α, leftTensor (ι₂ := ι) (A.outcome a)) *
+          ∑ b : β, rightTensor (ι₁ := ι) (B.outcome b) := by
+            rw [← Fintype.sum_mul_sum]
+    _ = leftTensor (ι₂ := ι) A.total * rightTensor (ι₁ := ι) B.total := by
+          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ A.outcome]
+          rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ B.outcome]
+          rw [A.sum_eq_total, B.sum_eq_total]
+
 /-- Tensor-product bridge `A_a ⊗ B_b` on the bipartite space `ι × ι`. -/
 noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
     (A : SubMeas α ι) (B : SubMeas β ι) :
@@ -75,54 +92,14 @@ noncomputable def tensorProductSubMeas {α β : Type*} [Fintype α] [Fintype β]
           rightTensor (ι₁ := ι) (B.outcome b)
   total := leftTensor (ι₂ := ι) A.total *
              rightTensor (ι₁ := ι) B.total
-  outcome_pos := by
-    rintro ⟨a, b⟩
-    change (0 : MIPStarRE.Quantum.Op (ι × ι)) ≤
-      (leftTensor (ι₂ := ι) (A.outcome a) * rightTensor (ι₁ := ι) (B.outcome b))
-    rw [show leftTensor (ι₂ := ι) (A.outcome a) * rightTensor (ι₁ := ι) (B.outcome b) =
-        opTensor (A.outcome a) (B.outcome b) by
-          simpa [leftTensor, rightTensor, opTensor] using
-            (Matrix.mul_kronecker_mul
-              (A.outcome a) (1 : MIPStarRE.Quantum.Op ι)
-              (1 : MIPStarRE.Quantum.Op ι) (B.outcome b)).symm]
-    exact
-      (Matrix.PosSemidef.kronecker
-        (Matrix.nonneg_iff_posSemidef.mp (A.outcome_pos a))
-        (Matrix.nonneg_iff_posSemidef.mp (B.outcome_pos b))).nonneg
-  sum_eq_total := by
-    calc
-      ∑ ab : α × β,
-          leftTensor (ι₂ := ι) (A.outcome ab.1) * rightTensor (ι₁ := ι) (B.outcome ab.2)
-          = ∑ a : α,
-              ∑ b : β,
-                leftTensor (ι₂ := ι) (A.outcome a) *
-                  rightTensor (ι₁ := ι) (B.outcome b) := by
-                  simpa using
-                    (Fintype.sum_prod_type' (f := fun a b =>
-                      leftTensor (ι₂ := ι) (A.outcome a) *
-                        rightTensor (ι₁ := ι) (B.outcome b)))
-      _ =
-          (∑ a : α, leftTensor (ι₂ := ι) (A.outcome a)) *
-            ∑ b : β, rightTensor (ι₁ := ι) (B.outcome b) := by
-              rw [← Fintype.sum_mul_sum]
-      _ = leftTensor (ι₂ := ι) A.total * rightTensor (ι₁ := ι) B.total := by
-            rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ A.outcome]
-            rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ B.outcome]
-            rw [A.sum_eq_total, B.sum_eq_total]
-  total_le_one := by
-    calc
-      leftTensor (ι₂ := ι) A.total * rightTensor (ι₁ := ι) B.total
-          = opTensor A.total B.total := by
-              simpa [leftTensor, rightTensor, opTensor] using
-                (Matrix.mul_kronecker_mul
-                  A.total (1 : MIPStarRE.Quantum.Op ι)
-                  (1 : MIPStarRE.Quantum.Op ι) B.total).symm
-      _ ≤ leftTensor (ι₂ := ι) A.total :=
-            MIPStarRE.LDT.opTensor_le_leftTensor
-              (ι₂ := ι)
-              (SubMeas.total_nonneg A)
-              B.total_le_one
-      _ ≤ 1 := leftTensor_le_one (ι₂ := ι) A.total_le_one
+  outcome_pos := fun ab =>
+    (opTensor_nonneg (A.outcome_pos ab.1) (B.outcome_pos ab.2)).trans_eq
+      (leftTensor_mul_rightTensor_eq_opTensor (A.outcome ab.1) (B.outcome ab.2)).symm
+  sum_eq_total := tensorProductSubMeas_sum_outcome A B
+  total_le_one :=
+    (leftTensor_mul_rightTensor_eq_opTensor A.total B.total).trans_le
+      ((opTensor_le_leftTensor (SubMeas.total_nonneg A) B.total_le_one).trans
+        (leftTensor_le_one (ι₂ := ι) A.total_le_one))
 
 /-- Recover the sampled point from a diagonal-line/parameter sample. -/
 def sampledPointFromDiagonalQuestion (params : Parameters)
@@ -190,13 +167,13 @@ some diagonal line containing both. -/
 noncomputable def sharedDiagonalLineQuestionOfPointPair (params : Parameters)
     [FieldModel params.q]
     (s : PointPairQuestion params × Fq params) :
-    PointPairDiagonalLineQuestion params := by
+    PointPairDiagonalLineQuestion params :=
   let u := s.1.1
   let v := s.1.2
   let t := s.2
   let direction : Point params := fun i => subCoord (v i) (u i)
   let base : Point params := fun i => subCoord (u i) (mulCoord t (direction i))
-  exact ({ base := base, direction := direction }, (t, addCoord t (encodeScalar 1)))
+  ({ base := base, direction := direction }, (t, addCoord t (encodeScalar 1)))
 
 /-- Distribution obtained by sampling a uniform point pair and then packaging it as a
 shared diagonal-line question. -/
