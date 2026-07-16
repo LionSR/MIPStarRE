@@ -99,6 +99,19 @@ MODULE_PRELUDES: dict[str, tuple[list[str], list[str]]] = {
 Entry = tuple[str, str, int, int, list[str]]
 
 
+def source_range_with_context(
+    lines: list[str], start: int, end: int
+) -> tuple[int, list[str]]:
+    """Extend a declaration range to include adjacent scoped context commands."""
+    # Lean's source range starts at a declaration's docstring and can omit a
+    # declaration-scoped command immediately before it.  Preserve that command:
+    # dropping `open scoped Classical in`, for example, removes the local
+    # decidability instances needed to re-elaborate the definition body.
+    if start > 1 and re.fullmatch(r"open\s+scoped\s+.+\s+in", lines[start - 2].strip()):
+        start -= 1
+    return start, lines[start - 1 : end]
+
+
 class Assembler:
     def __init__(self, repo_root: Path) -> None:
         self.repo_root = repo_root
@@ -235,7 +248,8 @@ def main() -> int:
             generated.append((name, path))
             continue
         start, end = int(a), int(b)
-        entries.append((name, path, start, end, asm.get_lines(path)[start - 1 : end]))
+        start, source = source_range_with_context(asm.get_lines(path), start, end)
+        entries.append((name, path, start, end, source))
 
     rank = asm.module_ranks({e[1] for e in entries})
     entries.sort(key=lambda e: (rank.get(e[1], 999), e[2]))
