@@ -73,7 +73,7 @@ When you push to a PR branch, several things happen in parallel:
   │  ┌──────────────────────────────────────────────────────────────┐
   │  │ Runs on every PR push                                        │
   ├──┤                                                              │
-  │  │  Lean Action CI                                              │
+  │  │  PR CI — build job                                           │
   │  │  Runs `lake build` to check that the code compiles.          │
   │  │                                                              │
   │  └───────────┬──────────────────────────────────────────────────┘
@@ -162,7 +162,7 @@ Here is exactly what happens:
 
 **What it does**: When the Lean CI build fails on a PR, this workflow reads the error logs and asks Claude to fix the code.
 
-**When it runs**: Automatically after the "Lean Action CI" workflow completes with a failure status. Runs on any PR from the same repository (not forks).
+**When it runs**: Automatically after a "PR CI" run completes with the `build` job failed. Runs on any PR from the same repository (not forks).
 
 **What Claude does**:
 - Reads the last 10,000 characters of each failed job's logs
@@ -300,7 +300,7 @@ focused documentation PR after human review.
 python3 scripts/audit_readme_freshness.py --root . --readme README.md
 ```
 
-### Oversized Lean File Guard (`oversized-lean-files.yml`)
+### Oversized Lean File Guard (`pr-ci.yml`, `file-length` job)
 
 **What it does**: A hard gate that fails if any ``.lean`` file exceeds 1000 lines.  This is a lightweight Python-only check (no Lake/Lean build).
 
@@ -318,7 +318,7 @@ python3 scripts/check_oversized_lean_files.py --root .
 
 **What it does**: When the blueprint linter fails on a PR, this workflow reads the error logs and asks Claude to fix the LaTeX.
 
-**When it runs**: Automatically after the "Lint blueprint" workflow completes with a failure status. Runs on any PR from the same repository (not forks).
+**When it runs**: Automatically after a "PR CI" run completes with the blueprint render job (`Check blueprint compiles without errors`) failed. Runs on any PR from the same repository (not forks).
 
 **What Claude does**:
 - Reads the blueprint compilation error logs
@@ -540,24 +540,24 @@ remains the authoritative merge gate.  The responsibilities are:
 |---|---|---|---|
 | Whitespace in staged patches | `pre-commit`: `git diff --cached --check` | ordinary PR review / workflow logs | Fast local-only guard. |
 | Changed paper-gap notes follow the local note structure | `pre-commit` and relevant `pre-push`: `check_paper_gap_note_style.py --ci` | review prompts and ordinary PR review | Diff-scoped local guard.  It checks the template-level structure and traceability macros before a reviewer sees the note. |
-| Statement-like declarations cite paper origin | `pre-commit` and relevant `pre-push`: `check_statement_paper_origin.py` | `statement-paper-origin.yml` | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
+| Statement-like declarations cite paper origin | `pre-commit` and relevant `pre-push`: `check_statement_paper_origin.py` | `pr-ci.yml` (`statement-origin` job) | Blocking CI, path-filtered to LDT Lean files and the guard implementation. |
 | New proof-obligation declarations carry role metadata | `pre-commit`: `audit_new_proof_obligation_metadata.py --staged --ci`; relevant `pre-push`: `audit_new_proof_obligation_metadata.py --base origin/main --changed-files ... --ci` | proof-debt review prompts and local hook policy | Local blocking guard for issue #1579.  It is diff-based and complements the global paper-origin audit. |
-| Lean files stay below the oversized-file limit | `pre-push`: `check_oversized_lean_files.py` for Lean changes | `oversized-lean-files.yml` | Path-filtered to Lean files and the guard implementation. |
-| Paper-facing theorem headers avoid bridge-debt vocabulary | `pre-commit` and relevant `pre-push`: `audit_paper_facing_proof_debt.py --ci` | `paper-facing-proof-debt-audit.yml` | Blocking CI for Lean and blueprint statement surfaces. |
-| Conclusion-shaped hypotheses are rejected | `pre-commit` and relevant `pre-push`: `audit_conclusion_shaped_hypotheses.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
-| `**Unfaithful:**` markers carry citations and an elimination plan | `pre-commit` and relevant `pre-push`: `audit_unfaithful_markers.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI. |
-| Explicit `axiom` and `constant` declarations stay out of the LDT tree | `pre-commit` and relevant `pre-push`: `audit_lean_axiom_declarations.py --ci` | `proof-evasion-helper-audits.yml` | Blocking CI; ordinary `sorry` sites are tracked separately by their `sorryAx` closure. |
+| Lean files stay below the oversized-file limit | `pre-push`: `check_oversized_lean_files.py` for Lean changes | `pr-ci.yml` (`file-length` job) | Path-filtered to Lean files and the guard implementation. |
+| Paper-facing theorem headers avoid bridge-debt vocabulary | `pre-commit` and relevant `pre-push`: `audit_paper_facing_proof_debt.py --ci` | `pr-ci.yml` (`proof-debt` job) | Blocking CI for Lean and blueprint statement surfaces. |
+| Conclusion-shaped hypotheses are rejected | `pre-commit` and relevant `pre-push`: `audit_conclusion_shaped_hypotheses.py --ci` | `pr-ci.yml` (`proof-evasion` job) | Blocking CI. |
+| `**Unfaithful:**` markers carry citations and an elimination plan | `pre-commit` and relevant `pre-push`: `audit_unfaithful_markers.py --ci` | `pr-ci.yml` (`proof-evasion` job) | Blocking CI. |
+| Explicit `axiom` and `constant` declarations stay out of the LDT tree | `pre-commit` and relevant `pre-push`: `audit_lean_axiom_declarations.py --ci` | `pr-ci.yml` (`proof-evasion` job) | Blocking CI; ordinary `sorry` sites are tracked separately by their `sorryAx` closure. |
 | Source-labelled Lean declaration headers do not change silently | `pre-push`: `check_source_statement_changes.py --base origin/main` for changed LDT Lean files | Paper-facing proof-debt audit and review prompts | Local blocking guard for issue #1578.  Intentional paper-realignment changes should carry a statement-integrity audit in the PR. |
-| Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `lean_action_ci.yml` | CI remains the full repository authority. |
-| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, rebuild changed Lean modules, `checkdecls` | `blueprint-sync.yml`; best-effort checks in `lint-blueprint.yml` | The PR workflow is the authoritative check; the reverse coverage step is a local warning.  The local rebuild prevents stale `.olean` files from making an existing declaration look missing. |
-| Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `blueprint-sync.yml` | The axiom audit needs compiled local `.olean` artifacts on a cold runner.  The workflow therefore keeps one explicit `lake build` before the audit, but only when `blueprint_axiom_audit_needed.py` sees Lean source, Lean-facing project metadata, the audit implementation, or blueprint `\lean{}` / `\leanok` / `\notready` / `\proves{}` marker changes. |
-| Whole-project Lean compilation | `pre-push` full mode: `lake build` | `lean_action_ci.yml` | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
-| Blueprint and audit helper unit tests still pass | `pre-commit`: `python3 -m unittest discover -s scripts/tests` when any `scripts/*.py` or `scripts/tests/**` file is staged | `blueprint-sync.yml` runs the helper unit-test discovery. | The pre-commit hook is the fast local gate; blueprint-sync is the CI backstop for test regressions. |
+| Edited Lean files type-check | `pre-push`: `lake env lean` on changed Lean files | `pr-ci.yml` (`build` job) | CI remains the full repository authority. |
+| Blueprint declarations and `blueprint/lean_decls` stay synchronized | `pre-push`: regenerate, diff, `blueprint_lean_sync.py --ci`, reverse coverage warning for changed Lean declarations, rebuild changed Lean modules, `checkdecls` | `pr-ci.yml` (`blueprint-sync` job); best-effort checks in `pr-ci.yml` (`blueprint-render` job) | The PR workflow is the authoritative check; the reverse coverage step is a local warning.  The local rebuild prevents stale `.olean` files from making an existing declaration look missing. |
+| Proof-level `\leanok` entries do not depend on `sorryAx` | `pre-push` full mode: `blueprint_leanok_axioms.py --ci` | `pr-ci.yml` (`blueprint-sync` job) | The axiom audit needs compiled local `.olean` artifacts on a cold runner.  The workflow therefore keeps one explicit `lake build` before the audit, but only when `blueprint_axiom_audit_needed.py` sees Lean source, Lean-facing project metadata, the audit implementation, or blueprint `\lean{}` / `\leanok` / `\notready` / `\proves{}` marker changes. |
+| Whole-project Lean compilation | `pre-push` full mode: `lake build` | `pr-ci.yml` (`build` job) | Lean CI remains the merge authority for compilation; the blueprint-sync build is the proof-status audit prerequisite. |
+| Blueprint and audit helper unit tests still pass | `pre-commit`: `python3 -m unittest discover -s scripts/tests` when any `scripts/*.py` or `scripts/tests/**` file is staged | `pr-ci.yml` (`blueprint-sync` job) runs the helper unit-test discovery. | The pre-commit hook is the fast local gate; blueprint-sync is the CI backstop for test regressions. |
 | Blueprint LaTeX convention lint (no active `cleveref` / `\Cref`) | `pre-commit`: `check_blueprint_latex.py --root blueprint/src` when blueprint sources or the lint script change | No dedicated CI convention gate. `leanblueprint web/pdf` catches undefined macro errors while the blueprint preamble continues not to load `cleveref`; it is not a replacement for the convention scan if `cleveref` is later introduced. | The pre-commit hook is the active scan. Bypass it with `MIPSTARRE_SKIP_HOOKS=1` only to recover from a local tooling problem. |
-| Blueprint LaTeX/PDF/web build | `pre-push`: `leanblueprint web` for `blueprint/src/` changes; full mode reruns it only if the default smoke tier did not run | `lint-blueprint.yml` and `blueprint.yml` | Local warm smoke check measured about 8 seconds on 2026-05-14; CI remains the render authority. |
+| Blueprint LaTeX/PDF/web build | `pre-push`: `leanblueprint web` for `blueprint/src/` changes; full mode reruns it only if the default smoke tier did not run | `pr-ci.yml` (`blueprint-render` job) and `blueprint.yml` | Local warm smoke check measured about 8 seconds on 2026-05-14; CI remains the render authority. |
 
 This split keeps the proof-status audit separate from ordinary compilation.
-`blueprint-sync.yml` still runs the surface synchronization check for every
+`pr-ci.yml` (`blueprint-sync` job) still runs the surface synchronization check for every
 matching blueprint change, but it skips the full Lean build for metadata-only
 blueprint edits such as adding `\uses{...}` edges.  It builds the repository
 only when the diff may change the set of blueprint declarations whose proof

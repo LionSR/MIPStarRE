@@ -1,0 +1,425 @@
+name: PR CI
+
+# The pull-request pipeline, formerly lean_action_ci.yml, lint-blueprint.yml,
+# blueprint-sync.yml, oversized-lean-files.yml,
+# paper-facing-proof-debt-audit.yml, proof-evasion-helper-audits.yml, and
+# statement-paper-origin.yml. One workflow means one completion event for the
+# auto-fix dispatcher and per-job change gating: Lean-only changes skip the
+# TeX render, and blueprint-only changes skip the Lean build and the audits.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.lean'
+      - 'lakefile.*'
+      - 'lean-toolchain'
+      - 'lake-manifest.json'
+      - 'blueprint/**'
+      - 'scripts/**'
+      - '.github/workflows/pr-ci.yml'
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - '**.lean'
+      - 'lakefile.*'
+      - 'lean-toolchain'
+      - 'lake-manifest.json'
+      - 'blueprint/**'
+      - 'scripts/**'
+      - '.github/workflows/pr-ci.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  # Do not cancel main-branch runs: they seed the build cache.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+# Build-cache policy: the cache is saved only from main and restored
+# everywhere; see the comment in the build job. Mathlib and its dependencies
+# come from `lake exe cache get` inside lean-action.
+
+jobs:
+  # Per-job change gating. Push and dispatch runs skip this and run
+  # the build and blueprint jobs.
+  changes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      lean: ${{ steps.filter.outputs.lean }}
+      mip_lean: ${{ steps.filter.outputs.mip_lean }}
+      ldt_lean: ${{ steps.filter.outputs.ldt_lean }}
+      blueprint: ${{ steps.filter.outputs.blueprint }}
+      blueprint_src: ${{ steps.filter.outputs.blueprint_src }}
+      tex_chapter: ${{ steps.filter.outputs.tex_chapter }}
+      scripts: ${{ steps.filter.outputs.scripts }}
+      workflow: ${{ steps.filter.outputs.workflow }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            lean:
+              - '**.lean'
+              - 'lakefile.*'
+              - 'lean-toolchain'
+              - 'lake-manifest.json'
+            mip_lean:
+              - 'MIPStarRE/**/*.lean'
+            ldt_lean:
+              - 'MIPStarRE/LDT/**/*.lean'
+            blueprint:
+              - 'blueprint/**'
+            blueprint_src:
+              - 'blueprint/src/**'
+            tex_chapter:
+              - 'blueprint/src/chapter/**/*.tex'
+            scripts:
+              - 'scripts/**'
+            workflow:
+              - '.github/workflows/pr-ci.yml'
+
+  build:
+    needs: changes
+    if: |
+      !cancelled() && (
+        github.event_name != 'pull_request' ||
+        needs.changes.outputs.lean == 'true' ||
+        needs.changes.outputs.workflow == 'true'
+      )
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+      - name: Free disk space before Lean setup
+        run: |
+          df -h
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /usr/local/share/boost
+          if [ -n "${AGENT_TOOLSDIRECTORY:-}" ]; then
+            sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          fi
+          df -h
+
+      # The cache is saved only from main and restored everywhere.
+      # lean-action's built-in GitHub cache is disabled because it saved a
+      # ~2.6 GB entry per PR run; those entries cycle through the 10 GB
+      # repository cache budget and evict the main-branch entry, so no run
+      # ever restored usable MIPStarRE oleans and every run rebuilt the
+      # whole library.
+      - name: Restore Lean build cache
+        uses: actions/cache/restore@v4
+        with:
+          path: .lake/build
+          key: mipstarre-build-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.toml') }}-${{ github.sha }}
+          restore-keys: |
+            mipstarre-build-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.toml') }}-
+
+      - uses: leanprover/lean-action@v1
+        with:
+          use-github-cache: false
+
+      - name: Build axiom audit regression checks
+        run: lake build MIPStarRE.LDT.Test.AxiomAudit
+
+      # Save even when the build failed: a partial cache still spares the
+      # next run the modules that did compile.
+      - name: Save Lean build cache (main only)
+        if: always() && github.ref == 'refs/heads/main'
+        uses: actions/cache/save@v4
+        with:
+          path: .lake/build
+          key: mipstarre-build-${{ hashFiles('lean-toolchain', 'lake-manifest.json', 'lakefile.toml') }}-${{ github.sha }}
+
+  # TeX render check. Runs only when blueprint sources changed: Lean-only
+  # changes cannot break the LaTeX render, and the Lean-facing sync checks
+  # live in the blueprint-sync job below.
+  blueprint-render:
+    name: Check blueprint compiles without errors
+    needs: changes
+    if: |
+      !cancelled() && (
+        github.event_name != 'pull_request' ||
+        needs.changes.outputs.blueprint_src == 'true' ||
+        needs.changes.outputs.workflow == 'true'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            graphviz libgraphviz-dev \
+            texlive-xetex \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-science \
+            latexmk
+
+      - name: Install leanblueprint
+        run: |
+          pip install leanblueprint
+          pip install plastex
+
+      - name: Run leanblueprint pdf (catches undefined macros and LaTeX errors)
+        working-directory: blueprint
+        run: |
+          leanblueprint pdf
+
+          if [ ! -s print/print.pdf ]; then
+            echo "::error::leanblueprint pdf produced no output"
+            exit 1
+          fi
+
+      - name: Run leanblueprint web and check for errors
+        working-directory: blueprint
+        run: |
+          set -o pipefail
+          tmp_output_file="$(mktemp)"
+
+          # Run leanblueprint, streaming output to the log and capturing it to a file
+          set +o pipefail
+          leanblueprint web 2>&1 | tee "$tmp_output_file"
+          cmd_status=${PIPESTATUS[0]}
+          set -o pipefail
+
+          # Check for blueprint ERROR lines in the captured output
+          if grep -q "^ERROR:" "$tmp_output_file"; then
+            echo "::error::Blueprint has unresolved labels (see ERROR lines above)"
+            exit 1
+          fi
+          if grep -q "WARNING: File not found:" "$tmp_output_file"; then
+            echo "::warning::Blueprint has missing file references (see WARNING lines above)"
+          fi
+
+          # If leanblueprint itself failed, propagate its exit status
+          if [ "$cmd_status" -ne 0 ]; then
+            exit "$cmd_status"
+          fi
+
+  blueprint-sync:
+    name: Check blueprint ↔ Lean surface sync
+    needs: changes
+    if: |
+      !cancelled() && github.event_name == 'pull_request' && (
+        needs.changes.outputs.lean == 'true' ||
+        needs.changes.outputs.blueprint == 'true' ||
+        needs.changes.outputs.scripts == 'true' ||
+        needs.changes.outputs.workflow == 'true'
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Run blueprint sync unit tests
+        run: python3 -m unittest discover -s scripts/tests -p 'test_*.py'
+
+      - name: Regenerate blueprint/lean_decls
+        run: python3 scripts/blueprint_lean_sync.py --root . --update-lean-decls
+
+      - name: Check blueprint ↔ Lean surface sync
+        run: python3 scripts/blueprint_lean_sync.py --root . --ci
+
+      - name: Decide whether the axiom audit is needed
+        id: axiom-audit-needed
+        env:
+          BASE_REF: origin/${{ github.base_ref || 'main' }}
+        run: python3 scripts/blueprint_axiom_audit_needed.py --base-ref "$BASE_REF" --github-output
+
+      - name: Report \leanok axiom audit status
+        env:
+          NEEDS_AXIOM_AUDIT: ${{ steps.axiom-audit-needed.outputs.needs_axiom_audit }}
+        run: |
+          if [ "$NEEDS_AXIOM_AUDIT" = "true" ]; then
+            echo "::notice title=Blueprint axiom audit::Run python3 scripts/blueprint_leanok_axioms.py --ci in a Lean environment. This pull-request surface-sync job avoids Lean setup after repeated runner disk exhaustion."
+          else
+            echo "No proof-level \\leanok axiom audit is required for this diff."
+          fi
+
+  file-length:
+    name: Check Lean file lengths
+    needs: changes
+    if: |
+      !cancelled() && github.event_name == 'pull_request' && (
+        needs.changes.outputs.mip_lean == 'true' ||
+        needs.changes.outputs.scripts == 'true' ||
+        needs.changes.outputs.workflow == 'true'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      # New oversized files (any Lean file over 1000 lines) fail the check.
+      - name: Run oversized-file guard
+        run: python3 scripts/check_oversized_lean_files.py --root .
+
+  proof-debt:
+    name: Paper-facing proof-debt audit
+    needs: changes
+    if: |
+      !cancelled() && github.event_name == 'pull_request' && (
+        needs.changes.outputs.mip_lean == 'true' ||
+        needs.changes.outputs.tex_chapter == 'true' ||
+        needs.changes.outputs.scripts == 'true' ||
+        needs.changes.outputs.workflow == 'true'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Run script regression tests
+        run: python3 -m unittest scripts/tests/test_audit_paper_facing_proof_debt.py
+
+      - name: Run paper-facing proof-debt audit
+        run: |
+          set -o pipefail
+          python3 scripts/audit_paper_facing_proof_debt.py \
+            --root . \
+            --ci \
+            2>&1 | tee "$RUNNER_TEMP/paper-facing-proof-debt-audit.log"
+
+      - name: Surface findings in step summary
+        if: always()
+        run: |
+          {
+            echo "### Paper-facing proof-debt audit"
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/paper-facing-proof-debt-audit.log"
+            echo '```'
+            echo
+            echo 'This check is blocking: new bridge, residual, repair,'
+            echo 'package, producer, input, or visibly conditional theorem links'
+            echo 'on paper-facing declarations must be repaired before merge.'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  proof-evasion:
+    name: Report proof-evasion helper audits
+    needs: changes
+    if: |
+      !cancelled() && github.event_name == 'pull_request' && (
+        needs.changes.outputs.mip_lean == 'true' ||
+        needs.changes.outputs.scripts == 'true' ||
+        needs.changes.outputs.workflow == 'true'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Run script regression tests
+        run: |
+          python3 -m unittest scripts/tests/test_check_duplicate_private_helpers.py
+          python3 -m unittest scripts/tests/test_audit_conclusion_shaped_hypotheses.py
+          python3 -m unittest scripts/tests/test_audit_lean_axiom_declarations.py
+          python3 -m unittest scripts/tests/test_audit_unfaithful_markers.py
+
+      - name: Run explicit axiom declaration audit
+        run: |
+          python3 scripts/audit_lean_axiom_declarations.py \
+            --root . \
+            --ci
+
+      - name: Run conclusion-shaped hypothesis audit
+        run: |
+          python3 scripts/audit_conclusion_shaped_hypotheses.py \
+            --root . \
+            --ci
+
+      - name: Run unfaithful-marker audit
+        run: |
+          python3 scripts/audit_unfaithful_markers.py \
+            --root . \
+            --ci
+
+      - name: Run duplicate private-helper audit
+        run: |
+          set +e
+          python3 scripts/check_duplicate_private_helpers.py \
+            --root . \
+            --github-annotations \
+            --ci
+          audit_status=$?
+          set -e
+          if [ "$audit_status" -eq 1 ]; then
+            echo "Duplicate private-helper candidates were reported; this audit is advisory."
+            exit 0
+          fi
+          exit "$audit_status"
+
+  statement-origin:
+    name: Paper-origin citations for statement-like declarations
+    needs: changes
+    if: |
+      !cancelled() && github.event_name == 'pull_request' && (
+        needs.changes.outputs.ldt_lean == 'true' ||
+        needs.changes.outputs.scripts == 'true' ||
+        needs.changes.outputs.workflow == 'true'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Run statement paper-origin guard
+        run: |
+          set -o pipefail
+          python3 scripts/check_statement_paper_origin.py \
+            --root . \
+            2>&1 | tee "$RUNNER_TEMP/statement-paper-origin.log"
+
+      - name: Surface violations in step summary
+        if: always()
+        run: |
+          # shellcheck disable=SC2016
+          {
+            echo "### Statement-like paper-origin guard"
+            echo
+            echo '```text'
+            cat "$RUNNER_TEMP/statement-paper-origin.log"
+            echo '```'
+            echo
+            echo 'This is a blocking check. New statement-like declarations'
+            echo 'must cite `references/ldt-paper/`, a paper `\label{...}`,'
+            echo 'or a documented paper gap at their definition site.'
+          } >> "$GITHUB_STEP_SUMMARY"
