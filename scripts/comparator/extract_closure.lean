@@ -24,23 +24,42 @@ def isLocal (env : Environment) (n : Name) : Bool :=
   | some idx => (`MIPStarRE).isPrefixOf env.header.moduleNames[idx.toNat]!
   | none => true
 
+/-- Name tails of compiler-generated companions of an inductive/structure
+declaration; occurrences are collapsed into the parent so the assembler emits
+each structure's source exactly once. -/
+def generatedTails : List String :=
+  ["casesOn", "rec", "recOn", "brecOn", "below", "ibelow", "binductionOn",
+   "noConfusion", "noConfusionType", "injEq", "sizeOf_spec",
+   "mk.inj", "mk.injEq", "mk.noConfusion", "mk.sizeOf_spec"]
+
 def canon (env : Environment) (closure : NameSet) (n : Name) : Name :=
   let s := n.toString
   let s := (s.splitOn "._proof_").head!
   let s := (s.splitOn ".match_").head!
   let s := (s.splitOn "._autoParam").head!
   let c := s.toName
-  -- collapse only genuine structure-generated declarations into their parent
-  let structural :=
-    match env.find? c with
-    | some (.ctorInfo v) => some v.induct
-    | some (.recInfo v) => v.all.head?
-    | _ =>
-      if (env.getProjectionFnInfo? c).isSome then some c.getPrefix
-      else none
-  match structural with
-  | some parent => if closure.contains parent then parent else c
-  | none => c
+  -- collapse compiler-generated companions into their parent inductive
+  let byTail := generatedTails.findSome? fun tail =>
+    if s.endsWith ("." ++ tail) then
+      let parent := (s.dropRight (tail.length + 1)).toName
+      match env.find? parent with
+      | some (.inductInfo _) => if closure.contains parent then some parent else none
+      | _ => none
+    else none
+  match byTail with
+  | some parent => parent
+  | none =>
+    -- collapse constructors, recursors, and projections likewise
+    let structural :=
+      match env.find? c with
+      | some (.ctorInfo v) => some v.induct
+      | some (.recInfo v) => v.all.head?
+      | _ =>
+        if (env.getProjectionFnInfo? c).isSome then some c.getPrefix
+        else none
+    match structural with
+    | some parent => if closure.contains parent then parent else c
+    | none => c
 
 /-- All local constants referenced by declaration `n`.
 Mirrors comparator's `runForUsedConsts`: type + value (incl. theorem proofs)
