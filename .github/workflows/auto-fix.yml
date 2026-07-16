@@ -201,6 +201,8 @@ jobs:
       workflow_run_id: ${{ fromJSON(needs.setup.outputs.ci_run_id) }}
       pr_number: ${{ fromJSON(needs.setup.outputs.pr_number) }}
       setup_lean: true
+      # See lean_action_ci.yml: per-run lake caches evict the main build cache.
+      use_github_cache: false
       plugin_marketplaces: 'https://github.com/leanprover/skills.git'
       plugins: 'lean@leanprover'
       claude-prompt-file: .github/prompts/auto-fix-ci-prompt.md
@@ -322,6 +324,11 @@ jobs:
           steps.guard.outputs.skip != 'true' &&
           steps.review_payload.outputs.skip != 'true'
         uses: texra-ai/lean-env-action@6a03d2aa517a2ee67f71be460210310b3d48d70e
+        with:
+          # Do not save a GitHub cache of .lake: per-run ~2.6 GB entries
+          # evict the main-branch build cache from the 10 GB repository
+          # budget. Mathlib comes from `lake exe cache get`.
+          use-github-cache: false
 
       - name: Fix review comments with Claude
         if: |
