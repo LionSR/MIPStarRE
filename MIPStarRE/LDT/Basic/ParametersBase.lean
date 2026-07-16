@@ -1,9 +1,8 @@
-import Mathlib.FieldTheory.Finite.GaloisField
-import Mathlib.RingTheory.MvPolynomial.Basic
-import Mathlib.Algebra.MvPolynomial.Eval
-import Mathlib.RingTheory.Polynomial.Basic
-import Mathlib.Analysis.Matrix.Order
-import Mathlib.Analysis.Complex.Order
+-- This module contributes declarations to the comparator statement closure of
+-- `mainFormal`, which must elaborate in the same environment as the
+-- Mathlib-only `Challenge.lean`.  Keep the full `import Mathlib`; do not narrow.
+-- See docs/comparator.md, "Environment alignment".
+import Mathlib
 
 /-!
 # Basic parameters and scalar infrastructure for the low individual degree test

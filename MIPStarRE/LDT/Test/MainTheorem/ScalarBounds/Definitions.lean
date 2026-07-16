@@ -1,4 +1,7 @@
-import Mathlib.Analysis.Complex.ExponentialBounds
+-- Comparator requires this module to elaborate in the same environment as the
+-- Mathlib-only Challenge.lean: keep the full `import Mathlib`; do not narrow.
+-- See docs/comparator.md, "Environment alignment".
+import Mathlib
 import MIPStarRE.LDT.Basic.SqrtBounds
 
 /-!

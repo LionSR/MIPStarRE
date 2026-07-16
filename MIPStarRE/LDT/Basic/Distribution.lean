@@ -1,6 +1,9 @@
 import MIPStarRE.LDT.Basic.ParametersBase
 import MIPStarRE.Quantum.FiniteMatrix
-import Mathlib.Probability.Distributions.Uniform
+-- Comparator requires this module to elaborate in the same environment as the
+-- Mathlib-only Challenge.lean: keep the full `import Mathlib`; do not narrow.
+-- See docs/comparator.md, "Environment alignment".
+import Mathlib
 
 /-!
 # Distribution infrastructure for the low individual degree test
