@@ -34,14 +34,12 @@ noncomputable def completeAtOutcomeProj {Outcome : Type*}
       simpa [T] using projSubMeas_total_proj P
     have hPaT : Pa * T = Pa := by
       simpa [Pa, T] using projSubMeas_outcome_mul_total_eq_outcome P a0
-    have hPa_star : IsStarProjection Pa := by
-      exact MIPStarRE.Quantum.IsProj.isStarProjection
-        { isHermitian := (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a0)).isHermitian
-          idempotent := by simpa [Pa] using P.proj a0 }
-    have hT_star : IsStarProjection T := by
-      exact MIPStarRE.Quantum.IsProj.isStarProjection
-        { isHermitian := (Matrix.nonneg_iff_posSemidef.mp P.total_nonneg).isHermitian
-          idempotent := hTT }
+    have hPa_star : IsStarProjection Pa :=
+      isStarProjection_iff'.2 ⟨by simpa [Pa] using P.proj a0,
+        (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a0)).isHermitian.eq⟩
+    have hT_star : IsStarProjection T :=
+      isStarProjection_iff'.2 ⟨hTT,
+        (Matrix.nonneg_iff_posSemidef.mp P.total_nonneg).isHermitian.eq⟩
     have hR_star : IsStarProjection R := by
       simpa [R] using hT_star.one_sub
     have hPaR : Pa * R = 0 := by

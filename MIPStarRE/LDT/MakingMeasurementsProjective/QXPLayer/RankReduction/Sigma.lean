@@ -405,10 +405,10 @@ lemma projectorFamily_mul_eq_zero_of_ne_of_sum_le_one {Outcome : Type uOutcome}
     { toSubMeas := {
         outcome := Q
         total := ∑ a : Outcome, Q a
-        outcome_pos := fun a => MIPStarRE.Quantum.IsProj.nonneg (Q a) (hproj a)
+        outcome_pos := fun a => (hproj a).nonneg
         sum_eq_total := rfl
         total_le_one := hsum_le_one }
-      proj := fun a => (hproj a).idempotent }
+      proj := fun a => (hproj a).isIdempotentElem.eq }
   simpa [P] using P.outcome_orthogonal a b hab
 
 /-- Distinct projectors in a subnormalized projective family have orthogonal
@@ -446,7 +446,7 @@ lemma projectorFamily_rangeONB_dotProduct_eq_zero_of_ne_of_sum_le_one
   have hrow :
       Matrix.vecMul (star ((onb a).vec i)) (Q a) = star ((onb a).vec i) := by
     have hstar := congrArg star hfixa
-    rw [Matrix.star_mulVec, (hproj a).isHermitian.eq] at hstar
+    rw [Matrix.star_mulVec, (hproj a).isSelfAdjoint.isHermitian.eq] at hstar
     exact hstar
   calc
     star ((onb a).vec i) ⬝ᵥ (onb b).vec j =

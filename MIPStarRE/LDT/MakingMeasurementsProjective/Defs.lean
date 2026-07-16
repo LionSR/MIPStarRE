@@ -219,7 +219,7 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
   For outcome `none`, this is the projector for the "missing mass". -/
   liftedEffect : Option α → MIPStarRE.Quantum.Op (d × Option α)
   /-- Each lifted effect is a genuine orthogonal projection. Positivity follows
-  from `MIPStarRE.Quantum.IsProj.nonneg`. -/
+  from `IsStarProjection.nonneg`. -/
   lifted_isProj : ∀ a, MIPStarRE.Quantum.IsProj (liftedEffect a)
   /-- The lifted projections sum to at most identity (which together with
   `lifted_isProj` implies mutual orthogonality). -/
@@ -238,12 +238,12 @@ structure OneMeasNaimarkData (α : Type*) [Fintype α] [DecidableEq α]
 
 Lean-only consequence of the one-measurement Naimark data: the paper records
 the lifted effects as projections, and positivity is supplied here by the
-Mathlib star-projection order theorem through `MIPStarRE.Quantum.IsProj.nonneg`. -/
+Mathlib star-projection order theorem through `IsStarProjection.nonneg`. -/
 theorem OneMeasNaimarkData.lifted_pos {α : Type*} [Fintype α] [DecidableEq α]
     {d : Type*} [Fintype d] [DecidableEq d]
     (data : OneMeasNaimarkData α d) (a : Option α) :
     0 ≤ data.liftedEffect a :=
-  MIPStarRE.Quantum.IsProj.nonneg (data.liftedEffect a) (data.lifted_isProj a)
+  (data.lifted_isProj a).nonneg
 
 /-! ### Questionwise Naimark data
 
