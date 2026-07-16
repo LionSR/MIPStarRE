@@ -162,13 +162,17 @@ jobs:
               }
 
               const prCiRunId = await findFailedRun('pr-ci.yml');
+              let shouldRunCiFix = false;
+              let shouldRunBlueprintFix = false;
               if (prCiRunId) {
                 const failedJobs = await failedJobNames(prCiRunId);
                 if (failedJobs.some((n) => n === 'build')) {
+                  shouldRunCiFix = true;
                   core.setOutput('run_ci_fix', 'true');
                   core.setOutput('ci_run_id', String(prCiRunId));
                 }
                 if (failedJobs.some((n) => n.includes('blueprint compiles'))) {
+                  shouldRunBlueprintFix = true;
                   core.setOutput('run_blueprint_fix', 'true');
                   core.setOutput('blueprint_run_id', String(prCiRunId));
                 }
@@ -203,7 +207,7 @@ jobs:
                 core.setOutput('run_review_fix', 'true');
               }
 
-              core.notice(`Label trigger — CI fix: ${!!ciRunId}, Blueprint fix: ${!!blueprintRunId}, Review fix: ${hasUnresolvedReviews}`);
+              core.notice(`Label trigger — CI fix: ${shouldRunCiFix}, Blueprint fix: ${shouldRunBlueprintFix}, Review fix: ${hasUnresolvedReviews}`);
             }
 
   # ──────────────────────────────────────────────────────
