@@ -357,10 +357,10 @@ lemma pQApprox {Outcome : Type*}
               refine Finset.sum_congr rfl ?_
               intro a _
               have hQaH : (Qa data.qLayer a)ᴴ = Qa data.qLayer a :=
-                (hRank.projective a).isHermitian.eq
+                (hRank.projective a).isSelfAdjoint.isHermitian.eq
               have hPaH : (Pa data a)ᴴ = Pa data a := pa_hermitian data a
               have hQaSq : Qa data.qLayer a * Qa data.qLayer a = Qa data.qLayer a :=
-                (hRank.projective a).idempotent
+                (hRank.projective a).isIdempotentElem.eq
               have hPaSq : Pa data a * Pa data a = Pa data a := pa_idempotent data a
               calc
                 ev ψ (((data.qLayer.q.outcome a - (PFamily data).outcome a)ᴴ) *

@@ -220,7 +220,7 @@ lemma xExpressionToQExpression {Outcome : Type*}
       Qa data.qLayer a * QTotal data.qLayer * Qa data.qLayer a -
         Qa data.qLayer a := by
   have hQaSq : Qa data.qLayer a * Qa data.qLayer a = Qa data.qLayer a := by
-    exact (data.qa_projective a).idempotent
+    exact (data.qa_projective a).isIdempotentElem.eq
   have hQaXa : (Xa data a)ᴴ * Xa data a = Qa data.qLayer a := by
     exact (qaRestated data a).1.symm
   have hQaLeft : (Xa data a)ᴴ * data.x = Qa data.qLayer a := by
@@ -593,10 +593,10 @@ lemma pProjectivity {Outcome : Type*}
       dsimp [X]
       simp [Matrix.conjTranspose_mul]
     have hX_proj : MIPStarRE.Quantum.IsProj X :=
-      { isHermitian := hX_herm
-        idempotent := hX_sq }
+      { isIdempotentElem := hX_sq
+        isSelfAdjoint := hX_herm }
     have h_one_sub_X_nonneg : 0 ≤ 1 - X := by
-      exact hX_proj.isStarProjection.one_sub_nonneg
+      exact hX_proj.one_sub_nonneg
     have hsum :
         (∑ a, Pa data a) = X := by
       simpa [X] using sum_pa_eq_xHat_adjoint_mul_xHat data

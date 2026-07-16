@@ -88,8 +88,7 @@ private lemma roundedProjectorFamily_projective {Outcome : Type uOutcome}
     {ι : Type uι} [Fintype ι] [DecidableEq ι]
     (A : Measurement Outcome ι) (δ : Error) (a : Outcome) :
     MIPStarRE.Quantum.IsProj ((roundedProjectorFamily A δ).outcome a) := by
-  refine ⟨?_, ?_⟩
-  · exact (cfc_predicate (R := ℝ) (truncationCutoff δ) (A.outcome a)).isHermitian
+  refine { isIdempotentElem := ?_, isSelfAdjoint := ?_ }
   · change cfc (truncationCutoff δ) (A.outcome a) * cfc (truncationCutoff δ) (A.outcome a) =
       cfc (truncationCutoff δ) (A.outcome a)
     calc
@@ -103,6 +102,7 @@ private lemma roundedProjectorFamily_projective {Outcome : Type uOutcome}
             apply cfc_congr
             intro x _hx
             by_cases h : 1 - δ ≤ x <;> simp [truncationCutoff, h]
+  · exact cfc_predicate (R := ℝ) (truncationCutoff δ) (A.outcome a)
 
 private lemma roundedProjectorFamily_outcome_le_scale {Outcome : Type uOutcome}
     [Fintype Outcome] [DecidableEq Outcome]
@@ -234,7 +234,7 @@ private lemma roundedProjectorFamily_outcome_qSDD_bound {Outcome : Type uOutcome
   have hdiff_herm :
       (A.outcome a - (roundedProjectorFamily A δ).outcome a).IsHermitian := by
     exact (show (A.outcome a).IsHermitian from A.outcome_hermitian a).sub
-      (roundedProjectorFamily_projective A δ a).isHermitian
+      (roundedProjectorFamily_projective A δ a).isSelfAdjoint.isHermitian
   have hmain :
       (A.outcome a - (roundedProjectorFamily A δ).outcome a) *
           (A.outcome a - (roundedProjectorFamily A δ).outcome a) ≤
@@ -578,7 +578,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
         have hdiff_herm :
             (A.outcome a - (roundedProjectorFamily A 0).outcome a).IsHermitian := by
           exact (show (A.outcome a).IsHermitian from A.outcome_hermitian a).sub
-            (roundedProjectorFamily_projective A 0 a).isHermitian
+            (roundedProjectorFamily_projective A 0 a).isSelfAdjoint.isHermitian
         have hmain :
             (A.outcome a - (roundedProjectorFamily A 0).outcome a) *
                 (A.outcome a - (roundedProjectorFamily A 0).outcome a) ≤
@@ -633,9 +633,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_large
   refine ⟨Z, ?_⟩
   refine ⟨?_, ?_, ?_, ?_⟩
   · intro a
-    refine ⟨?_, ?_⟩
-    · simp [Z, zeroProjSubMeas, SubMeas.toOpFamily]
-    · simp [Z, zeroProjSubMeas, SubMeas.toOpFamily]
+    simp [Z, zeroProjSubMeas, SubMeas.toOpFamily]
   · constructor
     have hq1 :
         qSDDOp ψ (A.toSubMeas : OpFamily Outcome ι)

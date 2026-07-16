@@ -36,8 +36,8 @@ lemma qAlmostProjective {Outcome : Type*}
   have hsandwiched_le :
       ∀ a : Outcome, sandwiched a ≤ (((1 : Error) + 2 * ε) : ℂ) • Qa data a := by
     intro a
-    have hQa_herm : (Qa data a)ᴴ = Qa data a := (hRank.projective a).isHermitian.eq
-    have hQa_sq : Qa data a * Qa data a = Qa data a := (hRank.projective a).idempotent
+    have hQa_herm : (Qa data a)ᴴ = Qa data a := (hRank.projective a).isSelfAdjoint.isHermitian.eq
+    have hQa_sq : Qa data a * Qa data a = Qa data a := (hRank.projective a).isIdempotentElem.eq
     calc
       sandwiched a = Qa data a * QTotal data * Qa data a := rfl
       _ ≤ Qa data a *

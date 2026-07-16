@@ -21,11 +21,11 @@ lemma optionBasisProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
     (oa : Option α) :
     MIPStarRE.Quantum.IsProj
       (Matrix.single oa oa (1 : ℂ) : MIPStarRE.Quantum.Op (Option α)) := by
-  refine ⟨?_, ?_⟩
-  · refine Matrix.IsHermitian.ext fun i j => ?_
-    by_cases hio : oa = i <;> by_cases hjo : oa = j <;>
-      simp [Matrix.single, hio, hjo, and_comm]
-  · simp
+  refine { isIdempotentElem := ?_, isSelfAdjoint := ?_ }
+  · exact isIdempotentElem_iff.mpr (by simp)
+  · exact (Matrix.IsHermitian.ext fun i j => by
+      by_cases hio : oa = i <;> by_cases hjo : oa = j <;>
+        simp [Matrix.single, hio, hjo, and_comm]).isSelfAdjoint
 
 /-- The `Option` basis projectors sum to the identity. -/
 lemma optionBasisProj_sum_eq_one {α : Type*} [Fintype α] [DecidableEq α] :
@@ -61,18 +61,19 @@ lemma isProj_kronecker {d₁ d₂ : Type*}
     {A : MIPStarRE.Quantum.Op d₁} {B : MIPStarRE.Quantum.Op d₂}
     (hA : MIPStarRE.Quantum.IsProj A) (hB : MIPStarRE.Quantum.IsProj B) :
     MIPStarRE.Quantum.IsProj (Matrix.kronecker A B) := by
-  refine ⟨?_, ?_⟩
-  · refine Matrix.IsHermitian.ext fun i j => ?_
-    cases i with
-    | mk i₁ i₂ =>
-        cases j with
-        | mk j₁ j₂ =>
-            simp [Matrix.kronecker, hA.isHermitian.apply, hB.isHermitian.apply]
+  refine { isIdempotentElem := ?_, isSelfAdjoint := ?_ }
   · calc
       Matrix.kronecker A B * Matrix.kronecker A B
           = Matrix.kronecker (A * A) (B * B) := by
               simpa using (Matrix.mul_kronecker_mul A A B B).symm
-      _ = Matrix.kronecker A B := by rw [hA.idempotent, hB.idempotent]
+      _ = Matrix.kronecker A B := by rw [hA.isIdempotentElem.eq, hB.isIdempotentElem.eq]
+  · exact (Matrix.IsHermitian.ext fun i j => by
+      cases i with
+      | mk i₁ i₂ =>
+          cases j with
+          | mk j₁ j₂ =>
+              simp [Matrix.kronecker, hA.isSelfAdjoint.isHermitian.apply,
+                hB.isSelfAdjoint.isHermitian.apply]).isSelfAdjoint
 
 /-- Unitary conjugation preserves projectivity. -/
 lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
@@ -80,13 +81,7 @@ lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
     (hP : MIPStarRE.Quantum.IsProj P) :
     MIPStarRE.Quantum.IsProj
       (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)) := by
-  refine ⟨?_, ?_⟩
-  · calc
-      ((((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)))ᴴ
-          = (U : MIPStarRE.Quantum.Op n)ᴴ * Pᴴ * (U : MIPStarRE.Quantum.Op n) := by
-              simp [mul_assoc]
-      _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n) := by
-            rw [hP.isHermitian.eq]
+  refine { isIdempotentElem := ?_, isSelfAdjoint := ?_ }
   · calc
       (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)) *
       (((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n))
@@ -103,7 +98,13 @@ lemma isProj_unitary_conj {n : Type*} [Fintype n] [DecidableEq n]
       _ = (U : MIPStarRE.Quantum.Op n)ᴴ * (P * P) * (U : MIPStarRE.Quantum.Op n) := by
             simp [mul_assoc]
       _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n) := by
-            rw [hP.idempotent]
+            rw [hP.isIdempotentElem.eq]
+  · calc
+      ((((U : MIPStarRE.Quantum.Op n)ᴴ) * P * (U : MIPStarRE.Quantum.Op n)))ᴴ
+          = (U : MIPStarRE.Quantum.Op n)ᴴ * Pᴴ * (U : MIPStarRE.Quantum.Op n) := by
+              simp [mul_assoc]
+      _ = (U : MIPStarRE.Quantum.Op n)ᴴ * P * (U : MIPStarRE.Quantum.Op n) := by
+            rw [hP.isSelfAdjoint.isHermitian.eq]
 
 /-- Unitary conjugation preserves identity decompositions. -/
 lemma unitary_conj_sum_eq_one {β n : Type*} [Fintype β] [Fintype n] [DecidableEq n]
@@ -256,7 +257,7 @@ lemma oneMeasNaimarkInputProj_isProj {α : Type*} [Fintype α] [DecidableEq α]
     MIPStarRE.Quantum.IsProj
       (oneMeasNaimarkInputProj (α := α) (d := d)) :=
   isProj_kronecker
-    (MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _))
+    ((IsStarProjection.one _))
     (optionBasisProj_isProj (α := α) none)
 
 /-- **Isometry property of the Naimark column**: `V†V = P`.
@@ -347,7 +348,7 @@ lemma oneMeasNaimarkCompression
   have hP_proj : MIPStarRE.Quantum.IsProj P := by
     dsimp [P, oneMeasNaimarkOutcomeProj]
     exact isProj_kronecker
-      (MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _))
+      ((IsStarProjection.one _))
       (optionBasisProj_isProj (α := α) (some a))
   have hsqrt : (CFC.sqrt (M.effect a))ᴴ = CFC.sqrt (M.effect a) := by
     simpa using (CFC.sqrt_nonneg (M.effect a)).isHermitian.eq
@@ -360,9 +361,9 @@ lemma oneMeasNaimarkCompression
   calc
     (oneMeasNaimarkColumn M)ᴴ * P * oneMeasNaimarkColumn M
         = (oneMeasNaimarkColumn M)ᴴ * (P * P) * oneMeasNaimarkColumn M := by
-            rw [hP_proj.idempotent]
+            rw [hP_proj.isIdempotentElem.eq]
     _ = (oneMeasNaimarkColumn M)ᴴ * Pᴴ * (P * oneMeasNaimarkColumn M) := by
-          rw [hP_proj.isHermitian.eq]
+          rw [hP_proj.isSelfAdjoint.isHermitian.eq]
           simp [mul_assoc]
     _ = (P * oneMeasNaimarkColumn M)ᴴ * (P * oneMeasNaimarkColumn M) := by
           simp [Matrix.conjTranspose_mul, mul_assoc]

@@ -292,10 +292,8 @@ theorem ProjSubMeas.outcome_mul_total_eq_outcome {α : Type*} {ι : Type*}
   let R : MIPStarRE.Quantum.Op ι := 1 - P.total
   have hPa_herm : Paᴴ = Pa := by
     simpa [Pa] using P.outcome_hermitian a
-  have hPa_star : IsStarProjection Pa := by
-    exact MIPStarRE.Quantum.IsProj.isStarProjection
-      { isHermitian := (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a)).isHermitian
-        idempotent := by simpa [Pa] using P.proj a }
+  have hPa_star : IsStarProjection Pa :=
+    isStarProjection_iff'.2 ⟨by simpa [Pa] using P.proj a, hPa_herm⟩
   have hR_nonneg : 0 ≤ R := by
     simpa [R] using sub_nonneg.mpr P.total_le_one
   have hR_le_self : R ≤ 1 - Pa := by
@@ -391,10 +389,8 @@ theorem ProjSubMeas.outcome_orthogonal {α : Type*}
           exact sub_le_sub_right P.total_le_one Pa
   have hPa_herm : Paᴴ = Pa := P.outcome_hermitian a
   have hPb_herm : Pbᴴ = Pb := P.outcome_hermitian b
-  have hPa_star : IsStarProjection Pa := by
-    exact MIPStarRE.Quantum.IsProj.isStarProjection
-      { isHermitian := (Matrix.nonneg_iff_posSemidef.mp (P.outcome_pos a)).isHermitian
-        idempotent := by simpa [Pa] using P.proj a }
+  have hPa_star : IsStarProjection Pa :=
+    isStarProjection_iff'.2 ⟨by simpa [Pa] using P.proj a, hPa_herm⟩
   have hPaPbPa_nonneg : 0 ≤ Pa * Pb * Pa :=
     IsSelfAdjoint.conjugate_nonneg (P.outcome_pos b) hPa_herm
   have hPa_idem : Pa * (1 - Pa) * Pa = 0 := by

@@ -96,7 +96,7 @@ lemma qCompleteness {Outcome : Type*}
           = ∑ a : Outcome, ev ψ (Qa data a) := by
               refine Finset.sum_congr rfl ?_
               intro a _
-              rw [(hRank.projective a).idempotent]
+              rw [(hRank.projective a).isIdempotentElem.eq]
       _ = ev ψ (QTotal data) := by
             rw [← ev_sum ψ (Qa data), hRank.sum_eq_total]
   have hoverlap_le : overlap ≤ Real.sqrt diagA * Real.sqrt qMass := by
@@ -114,7 +114,7 @@ lemma qCompleteness {Outcome : Type*}
               refine Finset.sum_le_sum ?_
               intro a _
               simpa [Measurement.outcome_hermitian,
-                (hRank.projective a).isHermitian.eq] using
+                (hRank.projective a).isSelfAdjoint.isHermitian.eq] using
                 ev_abs_mul_le_sqrt ψ (A.outcome a) (Qa data a)
         _ ≤ Real.sqrt diagA *
               Real.sqrt (∑ a : Outcome, ev ψ (Qa data a * Qa data a)) := by
@@ -126,7 +126,7 @@ lemma qCompleteness {Outcome : Type*}
                     simpa [Measurement.outcome_hermitian] using
                       ev_adjoint_self_nonneg ψ (A.outcome a))
                   (fun a => by
-                    simpa [(hRank.projective a).isHermitian.eq] using
+                    simpa [(hRank.projective a).isSelfAdjoint.isHermitian.eq] using
                       ev_adjoint_self_nonneg ψ (Qa data a))
         _ = Real.sqrt diagA * Real.sqrt qMass := by rw [hdiagQ_eq]
     exact (abs_le.mp hoverlap_abs).2
@@ -153,7 +153,7 @@ lemma qCompleteness {Outcome : Type*}
                           Qa data a * Qa data a)) := by
                           congr 1
                           simp [sub_mul, mul_sub, Measurement.outcome_hermitian,
-                            (hRank.projective a).isHermitian.eq]
+                            (hRank.projective a).isSelfAdjoint.isHermitian.eq]
                           abel
                 _ = ev ψ (A.outcome a * A.outcome a) -
                       ev ψ (A.outcome a * Qa data a) -

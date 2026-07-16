@@ -100,7 +100,7 @@ lemma projectiveLowRankSum_of_projectors {Outcome : Type uOutcome}
   · intro a
     have hproj := hR.projective a
     change 0 ≤ R.outcome a
-    exact hproj.isStarProjection.nonneg
+    exact hproj.nonneg
   · simpa [Qa, QTotal, data] using hR.sum_eq_total
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)
@@ -149,7 +149,7 @@ lemma projectiveLowRankSum_of_rank_bound {Outcome : Type uOutcome}
   · intro a
     have hproj := hR.projective a
     change 0 ≤ R.outcome a
-    exact hproj.isStarProjection.nonneg
+    exact hproj.nonneg
   · simpa [Qa, QTotal, data] using hR.sum_eq_total
   · exact MIPStarRE.LDT.Preliminaries.sddOpRel_mono ψ (uniformDistribution Unit)
       (constOpFamily (A.toSubMeas : OpFamily Outcome ι)) (constOpFamily R)
@@ -234,7 +234,7 @@ private lemma projectiveLowRankSum_qSDD_truncation_eq_compl_overlap
           rw [show R.outcome a - (onb a).subprojector (fiber a) =
               (onb a).subprojector ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)) by
                 simpa using hdiff]
-          simp [hproj_sub.isHermitian.eq, hproj_sub.idempotent]
+          simp [hproj_sub.isSelfAdjoint.isHermitian.eq, hproj_sub.isIdempotentElem.eq]
     _ = ∑ a : Outcome, ∑ i ∈ ((fiber a)ᶜ : Finset (Fin (R.outcome a).rank)),
           ev ψ ((onb a).rankOne i) := by
           refine Finset.sum_congr rfl ?_
@@ -430,7 +430,7 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
     · intro a
       have hproj : MIPStarRE.Quantum.IsProj (Q.outcome a) := by
         simpa [Q] using (onb a).subprojector_isProj (fiber a)
-      simpa [Qa, data] using hproj.isStarProjection.nonneg
+      simpa [Qa, data] using hproj.nonneg
     · simp [Qa, QTotal, data, Q]
     · simpa [data] using hAQ
     · simpa [QTotal, data] using hQtotal_le

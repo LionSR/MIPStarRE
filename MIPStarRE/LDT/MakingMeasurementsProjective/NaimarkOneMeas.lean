@@ -90,7 +90,7 @@ private lemma partialIsometry_to_unitary
     calc
       Pₗ (Pₗ y) = (Pₗ.comp Pₗ) y := rfl
       _ = Matrix.toEuclideanLin (P * P) y := by rw [toEuclideanLin_mul]
-      _ = Pₗ y := by rw [hP.idempotent]
+      _ = Pₗ y := by rw [hP.isIdempotentElem.eq]
   have hVP_lin : Vₗ.comp Pₗ = Vₗ := by
     calc
       Vₗ.comp Pₗ = Matrix.toEuclideanLin (V * P) := by rw [toEuclideanLin_mul]
@@ -274,7 +274,7 @@ theorem oneMeasNaimark {α : Type*} [Fintype α] [DecidableEq α]
       Matrix.kronecker (1 : MIPStarRE.Quantum.Op d) (auxProj oa)
     have hPproj : MIPStarRE.Quantum.IsProj P := by
       exact isProj_kronecker
-        (MIPStarRE.Quantum.IsProj.of_isStarProjection (IsStarProjection.one _))
+        ((IsStarProjection.one _))
         (optionBasisProj_isProj oa)
     simpa [Umat, P] using isProj_unitary_conj U hPproj
   · /-
@@ -488,7 +488,7 @@ noncomputable def OneMeasNaimarkData.toProjSubMeasOption {α : Type*}
     sum_eq_total := rfl
     total_le_one := data.lifted_sum_le_one
   }
-  proj := fun oa => (data.lifted_isProj oa).idempotent
+  proj := fun oa => (data.lifted_isProj oa).isIdempotentElem.eq
 
 /-- Restrict the completed one-measurement Naimark dilation to the original
 outcomes.

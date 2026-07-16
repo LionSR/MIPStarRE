@@ -4,7 +4,7 @@ import MIPStarRE.Quantum.FiniteMatrix.Basic
 # Normalized trace, projectors, and spectral truncation
 
 This module contains the normalized trace `τ`, the squared `τ`-norm, the
-local orthogonal-projection predicate, and the spectral-truncation witness used
+paper-facing orthogonal-projection name, and the spectral-truncation witness used
 in the low individual degree test formalization.
 -/
 
@@ -79,27 +79,8 @@ noncomputable def tauNormSq (A : Op d) : ℂ :=
 
 /-! ### Projector predicate -/
 
-/-- A matrix is an orthogonal projection when it is Hermitian and idempotent. -/
-structure IsProj (P : Op d) : Prop where
-  /-- The projection is Hermitian. -/
-  isHermitian : P.IsHermitian
-  /-- The projection is idempotent. -/
-  idempotent : P * P = P
-
-/-- A projective operator in the local matrix sense is a Mathlib star projection. -/
-lemma IsProj.isStarProjection {P : Op d} (hP : IsProj P) : IsStarProjection P where
-  isIdempotentElem := hP.idempotent
-  isSelfAdjoint := hP.isHermitian.isSelfAdjoint
-
-/-- A Mathlib star projection is a projective operator in the local matrix sense. -/
-lemma IsProj.of_isStarProjection {P : Op d} (hP : IsStarProjection P) : IsProj P where
-  isHermitian := hP.isSelfAdjoint.isHermitian
-  idempotent := hP.isIdempotentElem
-
-/-- Orthogonal projections are positive semidefinite operators. -/
-lemma IsProj.nonneg (P : Op d) (hP : IsProj P) :
-    0 ≤ P := by
-  exact hP.isStarProjection.nonneg
+/-- Paper-facing name for Mathlib's predicate that a matrix is a self-adjoint idempotent. -/
+abbrev IsProj (P : Op d) : Prop := IsStarProjection P
 
 /-! ### Spectral truncation -/
 

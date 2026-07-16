@@ -46,34 +46,36 @@ lemma hermitian_eq_sum_eigenvalues_vecMulVec (A : Op ι) (hA : A.IsHermitian) :
 
 /-- For a Hermitian idempotent matrix, every eigenvalue is either `0` or `1`. -/
 lemma IsProj.eigenvalues_zero_or_one (P : Op ι) (hP : IsProj P) (i : ι) :
-    hP.isHermitian.eigenvalues i = 0 ∨ hP.isHermitian.eigenvalues i = 1 := by
-  let v : ι → ℂ := (hP.isHermitian.eigenvectorBasis i).ofLp
+    hP.isSelfAdjoint.isHermitian.eigenvalues i = 0 ∨
+      hP.isSelfAdjoint.isHermitian.eigenvalues i = 1 := by
+  let hPHerm := hP.isSelfAdjoint.isHermitian
+  let v : ι → ℂ := (hPHerm.eigenvectorBasis i).ofLp
   have hv_ne : v ≠ 0 := by
-    change (hP.isHermitian.eigenvectorBasis i).ofLp ≠ 0
-    simpa using hP.isHermitian.eigenvectorBasis.orthonormal.ne_zero i
-  have hmul1 : P *ᵥ v = hP.isHermitian.eigenvalues i • v := by
-    simpa [v] using hP.isHermitian.mulVec_eigenvectorBasis i
+    change (hPHerm.eigenvectorBasis i).ofLp ≠ 0
+    simpa using hPHerm.eigenvectorBasis.orthonormal.ne_zero i
+  have hmul1 : P *ᵥ v = hPHerm.eigenvalues i • v := by
+    simpa [v] using hPHerm.mulVec_eigenvectorBasis i
   have hmul2 : P *ᵥ (P *ᵥ v) = P *ᵥ v := by
-    simp [v, hP.idempotent]
-  have hscalar : hP.isHermitian.eigenvalues i * hP.isHermitian.eigenvalues i =
-      hP.isHermitian.eigenvalues i := by
-    have htmp : (hP.isHermitian.eigenvalues i * hP.isHermitian.eigenvalues i) • v =
-        hP.isHermitian.eigenvalues i • v := by
+    simp [v, hP.isIdempotentElem.eq]
+  have hscalar : hPHerm.eigenvalues i * hPHerm.eigenvalues i =
+      hPHerm.eigenvalues i := by
+    have htmp : (hPHerm.eigenvalues i * hPHerm.eigenvalues i) • v =
+        hPHerm.eigenvalues i • v := by
       calc
-        (hP.isHermitian.eigenvalues i * hP.isHermitian.eigenvalues i) • v
-            = hP.isHermitian.eigenvalues i •
-                (hP.isHermitian.eigenvalues i • v) := by
-              exact (smul_smul (hP.isHermitian.eigenvalues i)
-                (hP.isHermitian.eigenvalues i) v).symm
-        _ = hP.isHermitian.eigenvalues i • (P *ᵥ v) := by rw [hmul1]
-        _ = P *ᵥ (hP.isHermitian.eigenvalues i • v) := by
-              exact (Matrix.mulVec_smul P (hP.isHermitian.eigenvalues i) v).symm
+        (hPHerm.eigenvalues i * hPHerm.eigenvalues i) • v
+            = hPHerm.eigenvalues i •
+                (hPHerm.eigenvalues i • v) := by
+              exact (smul_smul (hPHerm.eigenvalues i)
+                (hPHerm.eigenvalues i) v).symm
+        _ = hPHerm.eigenvalues i • (P *ᵥ v) := by rw [hmul1]
+        _ = P *ᵥ (hPHerm.eigenvalues i • v) := by
+              exact (Matrix.mulVec_smul P (hPHerm.eigenvalues i) v).symm
         _ = P *ᵥ (P *ᵥ v) := by rw [hmul1]
         _ = P *ᵥ v := hmul2
-        _ = hP.isHermitian.eigenvalues i • v := hmul1
+        _ = hPHerm.eigenvalues i • v := hmul1
     exact (smul_left_injective ℝ hv_ne) htmp
   have hfactor :
-      hP.isHermitian.eigenvalues i * (hP.isHermitian.eigenvalues i - 1) = 0 := by
+      hPHerm.eigenvalues i * (hPHerm.eigenvalues i - 1) = 0 := by
     nlinarith [hscalar]
   rcases mul_eq_zero.mp hfactor with hzero | hone
   · exact Or.inl hzero
@@ -83,17 +85,17 @@ lemma IsProj.eigenvalues_zero_or_one (P : Op ι) (hP : IsProj P) (i : ι) :
 /-- A projector is the sum of the rank-one projectors onto the eigenvectors with
 nonzero eigenvalue. For a projector these are exactly the `1`-eigenvectors. -/
 lemma IsProj.eq_sum_nonzero_eigenvector_projectors (P : Op ι) (hP : IsProj P) :
-    P = ∑ i : {i // hP.isHermitian.eigenvalues i ≠ 0},
-      Matrix.vecMulVec ((hP.isHermitian.eigenvectorBasis i.1).ofLp)
-        (star ((hP.isHermitian.eigenvectorBasis i.1).ofLp)) := by
+    P = ∑ i : {i // hP.isSelfAdjoint.isHermitian.eigenvalues i ≠ 0},
+      Matrix.vecMulVec ((hP.isSelfAdjoint.isHermitian.eigenvectorBasis i.1).ofLp)
+        (star ((hP.isSelfAdjoint.isHermitian.eigenvectorBasis i.1).ofLp)) := by
   classical
-  let p : ι → Prop := fun i => hP.isHermitian.eigenvalues i ≠ 0
+  let p : ι → Prop := fun i => hP.isSelfAdjoint.isHermitian.eigenvalues i ≠ 0
   let E : ι → Op ι := fun i =>
-    Matrix.vecMulVec ((hP.isHermitian.eigenvectorBasis i).ofLp)
-      (star ((hP.isHermitian.eigenvectorBasis i).ofLp))
+    Matrix.vecMulVec ((hP.isSelfAdjoint.isHermitian.eigenvectorBasis i).ofLp)
+      (star ((hP.isSelfAdjoint.isHermitian.eigenvectorBasis i).ofLp))
   calc
-    P = ∑ i : ι, ((hP.isHermitian.eigenvalues i : ℂ) • E i) := by
-          simpa [E] using hermitian_eq_sum_eigenvalues_vecMulVec P hP.isHermitian
+    P = ∑ i : ι, ((hP.isSelfAdjoint.isHermitian.eigenvalues i : ℂ) • E i) := by
+          simpa [E] using hermitian_eq_sum_eigenvalues_vecMulVec P hP.isSelfAdjoint.isHermitian
     _ = ∑ i : ι, if p i then E i else 0 := by
           refine Finset.sum_congr rfl ?_
           intro i _
@@ -110,28 +112,28 @@ omit [DecidableEq ι] in
 lemma IsProj.trace_eq_rank (Q : Op ι) (hQ : IsProj Q) :
     Q.trace = (Q.rank : ℂ) := by
   classical
-  let p : ι → Prop := fun i => hQ.isHermitian.eigenvalues i ≠ 0
+  let p : ι → Prop := fun i => hQ.isSelfAdjoint.isHermitian.eigenvalues i ≠ 0
   let indicator : ι → ℕ := fun i => if p i then 1 else 0
   have hp_nat : Fintype.card {i // p i} = ∑ i, indicator i := by
     rw [Fintype.card_subtype p]
     simpa [p, indicator] using Finset.card_filter p (Finset.univ : Finset ι)
   have hp_complex : (Fintype.card {i // p i} : ℂ) = ∑ i, (indicator i : ℂ) := by
     exact_mod_cast hp_nat
-  have h_indicator : ∀ i, (indicator i : ℂ) = (hQ.isHermitian.eigenvalues i : ℂ) := by
+  have h_indicator : ∀ i, (indicator i : ℂ) = (hQ.isSelfAdjoint.isHermitian.eigenvalues i : ℂ) := by
     intro i
     rcases hQ.eigenvalues_zero_or_one Q i with hzero | hone
     · simp [p, indicator, hzero]
     · simp [p, indicator, hone]
   calc
-    Q.trace = ∑ i, (hQ.isHermitian.eigenvalues i : ℂ) :=
-      hQ.isHermitian.trace_eq_sum_eigenvalues
+    Q.trace = ∑ i, (hQ.isSelfAdjoint.isHermitian.eigenvalues i : ℂ) :=
+      hQ.isSelfAdjoint.isHermitian.trace_eq_sum_eigenvalues
     _ = ∑ i, (indicator i : ℂ) := by
           refine Finset.sum_congr rfl ?_
           intro i _
           symm
           exact h_indicator i
     _ = Fintype.card {i // p i} := by symm; exact hp_complex
-    _ = (Q.rank : ℂ) := by rw [hQ.isHermitian.rank_eq_card_non_zero_eigs]
+    _ = (Q.rank : ℂ) := by rw [hQ.isSelfAdjoint.isHermitian.rank_eq_card_non_zero_eigs]
 
 /-- A rank-indexed orthonormal basis of the range of a projector, packaged with
 the corresponding rank-one decomposition. -/
@@ -255,8 +257,8 @@ omit [DecidableEq ι] in
 /-- A selected sum of orthonormal rank-one projectors is a projector. -/
 lemma subprojector_isProj (S : Finset (Fin P.rank)) :
     IsProj (b.subprojector S) where
-  isHermitian := b.subprojector_isHermitian S
-  idempotent := b.subprojector_idempotent S
+  isIdempotentElem := b.subprojector_idempotent S
+  isSelfAdjoint := (b.subprojector_isHermitian S).isSelfAdjoint
 
 omit [DecidableEq ι] in
 /-- The partial projector's trace is the number of selected vectors. -/
@@ -314,15 +316,15 @@ lemma subprojector_le (S : Finset (Fin P.rank)) :
     b.subprojector S ≤ P := by
   rw [← sub_nonneg]
   rw [b.subprojector_diff_eq_compl S]
-  exact (b.subprojector_isProj (Sᶜ : Finset (Fin P.rank))).isStarProjection.nonneg
+  exact (b.subprojector_isProj (Sᶜ : Finset (Fin P.rank))).nonneg
 
 end ProjectorRangeONB
 
 /-- The nonzero-eigenvalue index set of a projector has cardinality equal to its
 matrix rank. -/
 private noncomputable def IsProj.nonzeroEigenEquivFinRank (P : Op ι) (hP : IsProj P) :
-    {i : ι // hP.isHermitian.eigenvalues i ≠ 0} ≃ Fin P.rank :=
-  Fintype.equivFinOfCardEq hP.isHermitian.rank_eq_card_non_zero_eigs.symm
+    {i : ι // hP.isSelfAdjoint.isHermitian.eigenvalues i ≠ 0} ≃ Fin P.rank :=
+  Fintype.equivFinOfCardEq hP.isSelfAdjoint.isHermitian.rank_eq_card_non_zero_eigs.symm
 
 /-- Choose an orthonormal basis of the range of a projector using Mathlib's
 Hermitian spectral theorem. -/
@@ -331,7 +333,7 @@ noncomputable def IsProj.rangeONB (P : Op ι) (hP : IsProj P) :
   classical
   let e := hP.nonzeroEigenEquivFinRank P
   let vec : Fin P.rank → ι → ℂ := fun i =>
-    (hP.isHermitian.eigenvectorBasis (e.symm i).1).ofLp
+    (hP.isSelfAdjoint.isHermitian.eigenvectorBasis (e.symm i).1).ofLp
   refine
     { vec := vec
       orthonormal := ?_
@@ -343,7 +345,7 @@ noncomputable def IsProj.rangeONB (P : Op ι) (hP : IsProj P) :
         exact (EquivLike.injective e.symm) (Subtype.ext h)
       · intro h
         simp [h]
-    have horth := orthonormal_iff_ite.mp hP.isHermitian.eigenvectorBasis.orthonormal
+    have horth := orthonormal_iff_ite.mp hP.isSelfAdjoint.isHermitian.eigenvectorBasis.orthonormal
       (e.symm i).1 (e.symm j).1
     simpa [vec, EuclideanSpace.inner_eq_star_dotProduct, dotProduct_comm, hindex] using
       horth
@@ -351,9 +353,9 @@ noncomputable def IsProj.rangeONB (P : Op ι) (hP : IsProj P) :
     simpa [vec, e] using
       (hdecomp.trans
         ((e.symm.sum_comp
-          fun i : {i : ι // hP.isHermitian.eigenvalues i ≠ 0} =>
-            Matrix.vecMulVec ((hP.isHermitian.eigenvectorBasis i.1).ofLp)
-              (star ((hP.isHermitian.eigenvectorBasis i.1).ofLp))).symm))
+          fun i : {i : ι // hP.isSelfAdjoint.isHermitian.eigenvalues i ≠ 0} =>
+            Matrix.vecMulVec ((hP.isSelfAdjoint.isHermitian.eigenvectorBasis i.1).ofLp)
+              (star ((hP.isSelfAdjoint.isHermitian.eigenvectorBasis i.1).ofLp))).symm))
 
 end
 
