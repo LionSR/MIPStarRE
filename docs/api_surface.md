@@ -243,12 +243,6 @@ lemmas when the statement is naturally about a genuine finite probability law.
   - Linear-map form of `PMF.realWeightedSum`; use `map_add`, `map_sub`,
     `map_smul`, and `map_sum` for expectation algebra.
 
-- `theorem PMF.realWeightedSum_zero`
-- `theorem PMF.realWeightedSum_add`
-- `theorem PMF.realWeightedSum_sub`
-- `theorem PMF.realWeightedSum_smul`
-- `theorem PMF.realWeightedSum_sum`
-- `theorem PMF.realWeightedSum_finset_sum`
 - `theorem PMF.realWeightedSum_map`
 - `theorem PMF.realWeightedSum_bind`
 
