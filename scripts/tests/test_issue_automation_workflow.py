@@ -39,6 +39,15 @@ class IssueAutomationWorkflowTests(unittest.TestCase):
         self.assertIn("/^(claude|codex)\\//", self.text)
         self.assertIn("if (skipPrOpenedAnnouncement(pr))", self.text)
 
+    def test_pr_comment_markers_are_substrings_of_posted_bodies(self) -> None:
+        self.assertIn(
+            "`PR #${pr.number} (*${pr.title}*) has been opened`,", self.text
+        )
+        self.assertIn(
+            "`PR #${pr.number} (*${pr.title}*) addressing this issue has been merged`,",
+            self.text,
+        )
+
     def test_scout_runs_after_classification_failure(self) -> None:
         scout_if = re.search(r"  scout:\n(?P<body>[\s\S]*?)\n    runs-on:", self.text)
         self.assertIsNotNone(scout_if)
