@@ -64,6 +64,48 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
+/-- A diagonal sandwich family has total operator at most the identity. -/
+private theorem diagonalSandwichFamily_total_le_one {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome] (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxMeas Question Outcome ιB) (q : Question) :
+    (∑ a : Outcome,
+      leftTensor (ι₂ := ιB) ((A q).outcome a) *
+        rightTensor (ι₁ := ιA) ((B q).outcome a)) ≤ 1 := by
+  calc
+    ∑ a : Outcome,
+        leftTensor (ι₂ := ιB) ((A q).outcome a) *
+          rightTensor (ι₁ := ιA) ((B q).outcome a)
+      ≤ ∑ a : Outcome, leftTensor (ι₂ := ιB) ((A q).outcome a) := by
+          refine Finset.sum_le_sum ?_
+          intro a _ha
+          rw [leftTensor_mul_rightTensor_eq_opTensor]
+          exact opTensor_le_leftTensor
+            ((A q).outcome_pos a) (Measurement.outcome_le_one (B q) a)
+    _ = leftTensor (ι₂ := ιB) ((A q).total) := by
+      rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ (fun a => (A q).outcome a)]
+      rw [(A q).sum_eq_total]
+    _ ≤ 1 := leftTensor_le_one (ι₂ := ιB) (A q).total_le_one
+
+/-- A total sandwich family has total operator at most the identity. -/
+private theorem totalSandwichFamily_total_le_one {Question Outcome : Type*}
+    {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
+    [Fintype Outcome] (A : IdxSubMeas Question Outcome ιA)
+    (B : IdxMeas Question Outcome ιB) (q : Question) :
+    (∑ a : Outcome,
+      leftTensor (ι₂ := ιB) ((A q).total) *
+        rightTensor (ι₁ := ιA) ((B q).outcome a)) ≤ 1 := by
+  calc
+    ∑ a : Outcome,
+        leftTensor (ι₂ := ιB) ((A q).total) *
+          rightTensor (ι₁ := ιA) ((B q).outcome a)
+      = leftTensor (ι₂ := ιB) ((A q).total) := by
+          rw [← Finset.mul_sum]
+          rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ (fun a => (B q).outcome a)]
+          rw [(B q).sum_eq]
+          simp [leftTensor, rightTensor]
+    _ ≤ 1 := leftTensor_le_one (ι₂ := ιB) (A q).total_le_one
+
 /-- `A_a ⊗ B_a`, the diagonal bipartite family from `prop:cons-sub-meas`.
 
 This same-space version is the specialization used by the existing
@@ -82,66 +124,11 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
     total := ∑ a : Outcome,
       leftTensor (ι₂ := ι) ((A q).outcome a) *
         rightTensor (ι₁ := ι) ((B q).outcome a)
-    outcome_pos := by
-      intro a
+    outcome_pos := fun a => by
       rw [leftTensor_mul_rightTensor_eq_opTensor]
       quantum_nonneg
-    sum_eq_total := by
-      rfl
-    total_le_one := by
-      calc
-        ∑ a : Outcome,
-            leftTensor (ι₂ := ι) ((A q).outcome a) *
-              rightTensor (ι₁ := ι) ((B q).outcome a)
-          ≤ ∑ a : Outcome, leftTensor (ι₂ := ι) ((A q).outcome a) := by
-              refine Finset.sum_le_sum ?_
-              intro a ha
-              have hopTensor_le :
-                  opTensor ((A q).outcome a) ((B q).outcome a) ≤
-                    leftTensor (ι₂ := ι) ((A q).outcome a) := by
-                change
-                  (leftTensor (ι₂ := ι) ((A q).outcome a) -
-                    opTensor ((A q).outcome a) ((B q).outcome a)).PosSemidef
-                have hrewrite :
-                    leftTensor (ι₂ := ι) ((A q).outcome a) -
-                      opTensor ((A q).outcome a) ((B q).outcome a) =
-                    opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
-                  have hneg :
-                      Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) =
-                        -Matrix.kronecker ((A q).outcome a) ((B q).outcome a) := by
-                    simpa using
-                      (Matrix.kronecker_smul (-1 : ℂ) ((A q).outcome a) ((B q).outcome a))
-                  calc
-                    leftTensor (ι₂ := ι) ((A q).outcome a) -
-                        opTensor ((A q).outcome a) ((B q).outcome a)
-                      =
-                        Matrix.kronecker ((A q).outcome a) 1 +
-                          Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) := by
-                            rw [hneg]
-                            simp [leftTensor, opTensor, sub_eq_add_neg]
-                    _ = Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a) := by
-                          simpa [sub_eq_add_neg] using
-                            (Matrix.kronecker_add ((A q).outcome a) 1 (-((B q).outcome a))).symm
-                    _ = opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
-                          simp [opTensor]
-                have hpsd :
-                    Matrix.PosSemidef
-                      (opTensor ((A q).outcome a) (1 - (B q).outcome a)) := by
-                  change
-                    Matrix.PosSemidef
-                      (Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a))
-                  exact
-                    Matrix.PosSemidef.kronecker
-                      (Matrix.nonneg_iff_posSemidef.mp ((A q).outcome_pos a))
-                      (Matrix.nonneg_iff_posSemidef.mp
-                        (sub_nonneg.mpr (Measurement.outcome_le_one (B q) a)))
-                rwa [hrewrite]
-              rw [leftTensor_mul_rightTensor_eq_opTensor]
-              exact hopTensor_le
-        _ = leftTensor (ι₂ := ι) ((A q).total) := by
-          rw [leftTensor_finset_sum (ι₂ := ι) Finset.univ (fun a => (A q).outcome a)]
-          rw [(A q).sum_eq_total]
-        _ ≤ 1 := leftTensor_le_one (ι₂ := ι) (A q).total_le_one
+    sum_eq_total := rfl
+    total_le_one := diagonalSandwichFamily_total_le_one A B q
   }
 
 /-- `A ⊗ B_a`, the total bipartite family from `prop:cons-sub-meas`.
@@ -162,23 +149,11 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
     total := ∑ a : Outcome,
       leftTensor (ι₂ := ι) ((A q).total) *
         rightTensor (ι₁ := ι) ((B q).outcome a)
-    outcome_pos := by
-      intro a
+    outcome_pos := fun a => by
       rw [leftTensor_mul_rightTensor_eq_opTensor]
       quantum_nonneg
-    sum_eq_total := by
-      rfl
-    total_le_one := by
-      calc
-        ∑ a : Outcome,
-            leftTensor (ι₂ := ι) ((A q).total) *
-              rightTensor (ι₁ := ι) ((B q).outcome a)
-          = leftTensor (ι₂ := ι) ((A q).total) := by
-              rw [← Finset.mul_sum]
-              rw [rightTensor_finset_sum (ι₁ := ι) Finset.univ (fun a => (B q).outcome a)]
-              rw [(B q).sum_eq]
-              simp [leftTensor, rightTensor]
-        _ ≤ 1 := leftTensor_le_one (ι₂ := ι) (A q).total_le_one
+    sum_eq_total := rfl
+    total_le_one := totalSandwichFamily_total_le_one A B q
   }
 
 /-- `A_a ⊗ B_a` for the two-space statement of `prop:cons-sub-meas`.
@@ -199,66 +174,11 @@ noncomputable def heterogeneousDiagonalSandwichFamily {Question Outcome : Type*}
     total := ∑ a : Outcome,
       leftTensor (ι₂ := ιB) ((A q).outcome a) *
         rightTensor (ι₁ := ιA) ((B q).outcome a)
-    outcome_pos := by
-      intro a
+    outcome_pos := fun a => by
       rw [leftTensor_mul_rightTensor_eq_opTensor]
       quantum_nonneg
-    sum_eq_total := by
-      rfl
-    total_le_one := by
-      calc
-        ∑ a : Outcome,
-            leftTensor (ι₂ := ιB) ((A q).outcome a) *
-              rightTensor (ι₁ := ιA) ((B q).outcome a)
-          ≤ ∑ a : Outcome, leftTensor (ι₂ := ιB) ((A q).outcome a) := by
-              refine Finset.sum_le_sum ?_
-              intro a ha
-              have hopTensor_le :
-                  opTensor ((A q).outcome a) ((B q).outcome a) ≤
-                    leftTensor (ι₂ := ιB) ((A q).outcome a) := by
-                change
-                  (leftTensor (ι₂ := ιB) ((A q).outcome a) -
-                    opTensor ((A q).outcome a) ((B q).outcome a)).PosSemidef
-                have hrewrite :
-                    leftTensor (ι₂ := ιB) ((A q).outcome a) -
-                      opTensor ((A q).outcome a) ((B q).outcome a) =
-                    opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
-                  have hneg :
-                      Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) =
-                        -Matrix.kronecker ((A q).outcome a) ((B q).outcome a) := by
-                    simpa using
-                      (Matrix.kronecker_smul (-1 : ℂ) ((A q).outcome a) ((B q).outcome a))
-                  calc
-                    leftTensor (ι₂ := ιB) ((A q).outcome a) -
-                        opTensor ((A q).outcome a) ((B q).outcome a)
-                      =
-                        Matrix.kronecker ((A q).outcome a) 1 +
-                          Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) := by
-                            rw [hneg]
-                            simp [leftTensor, opTensor, sub_eq_add_neg]
-                    _ = Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a) := by
-                          simpa [sub_eq_add_neg] using
-                            (Matrix.kronecker_add ((A q).outcome a) 1 (-((B q).outcome a))).symm
-                    _ = opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
-                          simp [opTensor]
-                have hpsd :
-                    Matrix.PosSemidef
-                      (opTensor ((A q).outcome a) (1 - (B q).outcome a)) := by
-                  change
-                    Matrix.PosSemidef
-                      (Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a))
-                  exact
-                    Matrix.PosSemidef.kronecker
-                      (Matrix.nonneg_iff_posSemidef.mp ((A q).outcome_pos a))
-                      (Matrix.nonneg_iff_posSemidef.mp
-                        (sub_nonneg.mpr (Measurement.outcome_le_one (B q) a)))
-                rwa [hrewrite]
-              rw [leftTensor_mul_rightTensor_eq_opTensor]
-              exact hopTensor_le
-        _ = leftTensor (ι₂ := ιB) ((A q).total) := by
-          rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ (fun a => (A q).outcome a)]
-          rw [(A q).sum_eq_total]
-        _ ≤ 1 := leftTensor_le_one (ι₂ := ιB) (A q).total_le_one
+    sum_eq_total := rfl
+    total_le_one := diagonalSandwichFamily_total_le_one A B q
   }
 
 /-- `A ⊗ B_a` for the two-space statement of `prop:cons-sub-meas`.
@@ -278,24 +198,11 @@ noncomputable def heterogeneousTotalSandwichFamily {Question Outcome : Type*}
     total := ∑ a : Outcome,
       leftTensor (ι₂ := ιB) ((A q).total) *
         rightTensor (ι₁ := ιA) ((B q).outcome a)
-    outcome_pos := by
-      intro a
+    outcome_pos := fun a => by
       rw [leftTensor_mul_rightTensor_eq_opTensor]
       quantum_nonneg
-    sum_eq_total := by
-      rfl
-    total_le_one := by
-      calc
-        ∑ a : Outcome,
-            leftTensor (ι₂ := ιB) ((A q).total) *
-              rightTensor (ι₁ := ιA) ((B q).outcome a)
-          = leftTensor (ι₂ := ιB) ((A q).total) := by
-              rw [← Finset.mul_sum]
-              rw [rightTensor_finset_sum (ι₁ := ιA) Finset.univ
-                (fun a => (B q).outcome a)]
-              rw [(B q).sum_eq]
-              simp [leftTensor, rightTensor]
-        _ ≤ 1 := leftTensor_le_one (ι₂ := ιB) (A q).total_le_one
+    sum_eq_total := rfl
+    total_le_one := totalSandwichFamily_total_le_one A B q
   }
 
 /-- Same-space output statement for `prop:cons-sub-meas`.
@@ -404,6 +311,24 @@ structure CompTransferStmt {Question Outcome : Type*}
 
 /-! ## Completion -/
 
+/-- The completed outcomes sum to the identity. -/
+private theorem completeAtOutcome_sum_eq_one {Outcome : Type*}
+    {ι : Type*} [Fintype Outcome] [DecidableEq Outcome] [Fintype ι] [DecidableEq ι]
+    (B : SubMeas Outcome ι) (a0 : Outcome) :
+    (∑ a : Outcome,
+      if a = a0 then B.outcome a + (1 - B.total) else B.outcome a) = 1 := by
+  have hsingle :
+      (∑ x : Outcome, if x = a0 then 1 - B.total else 0) = 1 - B.total := by
+    simp
+  have hrewrite :
+      (∑ a : Outcome, if a = a0 then B.outcome a + (1 - B.total) else B.outcome a) =
+        ∑ a : Outcome, (B.outcome a + if a = a0 then 1 - B.total else 0) := by
+    apply Finset.sum_congr rfl
+    intro a _
+    by_cases h : a = a0 <;> simp [h]
+  rw [hrewrite, Finset.sum_add_distrib, B.sum_eq_total, hsingle]
+  simp
+
 /-- Canonical completion of `B` by adjoining the residual `I - Σ_a B_a`
 to the distinguished outcome `a0`. -/
 noncomputable def completeAtOutcome {Outcome : Type*}
@@ -419,24 +344,12 @@ noncomputable def completeAtOutcome {Outcome : Type*}
         else
           B.outcome a
       total := 1
-      outcome_pos := by
-        intro a
+      outcome_pos := fun a => by
         by_cases h : a = a0
         · simpa [h, residual] using
             add_nonneg (B.outcome_pos a0) (sub_nonneg.mpr B.total_le_one)
         · simp [h, B.outcome_pos a]
-      sum_eq_total := by
-        have hsingle :
-            (∑ x : Outcome, if x = a0 then residual else 0) = residual := by
-          simp
-        have hrewrite :
-            (∑ a : Outcome, if h : a = a0 then B.outcome a + residual else B.outcome a) =
-              ∑ a : Outcome, (B.outcome a + if a = a0 then residual else 0) := by
-          apply Finset.sum_congr rfl
-          intro a _
-          by_cases h : a = a0 <;> simp [h]
-        rw [hrewrite, Finset.sum_add_distrib, B.sum_eq_total, hsingle]
-        simp [residual]
+      sum_eq_total := completeAtOutcome_sum_eq_one B a0
       total_le_one := le_rfl
     }
     total_eq_one := rfl
