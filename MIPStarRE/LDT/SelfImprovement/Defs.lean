@@ -77,20 +77,14 @@ noncomputable def sdpStrictPrimalSubMeas (params : Parameters)
   { outcome := fun _ => sdpStrictPrimalWeight params • (1 : MIPStarRE.Quantum.Op ι)
     total := ∑ g : Polynomial params,
       sdpStrictPrimalWeight params • (1 : MIPStarRE.Quantum.Op ι)
-    outcome_pos := by
-      intro _
-      have hweight : 0 ≤ sdpStrictPrimalWeight params := by
-        unfold sdpStrictPrimalWeight
-        positivity
-      exact smul_nonneg hweight
-        (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
+    outcome_pos := fun _ => smul_nonneg (by
+      unfold sdpStrictPrimalWeight
+      positivity) (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))
     sum_eq_total := rfl
-    total_le_one := by
-      rw [sdpStrictPrimalConstantSum (ι := ι) params]
-      simpa using
-        (smul_le_smul_of_nonneg_right
-          (show (1 / 2 : Error) ≤ 1 by norm_num)
-          (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))) }
+    total_le_one := (le_of_eq (sdpStrictPrimalConstantSum (ι := ι) params)).trans (by
+      simpa using smul_le_smul_of_nonneg_right
+        (show (1 / 2 : Error) ≤ 1 by norm_num)
+        (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MIPStarRE.Quantum.Op ι))) }
 
 /-- The paper's uniform strict-feasible primal witness has total mass
 `(1 / 2) • I`. -/
@@ -226,6 +220,61 @@ noncomputable def sandwichedPolynomialOutcomeOperatorAt (params : Parameters)
   let Au := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
   Au * (T.outcome h) * Au
 
+/-- The sum of the pointwise sandwiched operators is bounded above by the identity. -/
+private theorem sandwichedPolynomialOutcomeOperatorAt_sum_le_one (params : Parameters)
+    [FieldModel params.q] (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) (u : Point params) :
+    ∑ h : Polynomial params, sandwichedPolynomialOutcomeOperatorAt params strategy T u h ≤ 1 := by
+  let Au := strategy.pointMeasurement u
+  -- Regroup by evaluation value a = h(u).
+  calc
+    ∑ h : Polynomial params, sandwichedPolynomialOutcomeOperatorAt params strategy T u h
+      = ∑ a : Fq params,
+          ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+            Au.toSubMeas.outcome a * T.outcome h * Au.toSubMeas.outcome a := by
+          rw [show ∑ h : Polynomial params,
+                sandwichedPolynomialOutcomeOperatorAt params strategy T u h =
+              ∑ a : Fq params,
+                ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+                  sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
+            exact polynomial_sum_fiberwise params u
+              (sandwichedPolynomialOutcomeOperatorAt params strategy T u)]
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          refine Finset.sum_congr rfl ?_
+          intro h hh
+          simp only [sandwichedPolynomialOutcomeOperatorAt,
+            pointConditionedOutcomeOperatorAtPolynomial]
+          simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
+          simp [Au, hh]
+    _ = ∑ a : Fq params,
+          Au.toSubMeas.outcome a *
+            (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
+              T.outcome h) *
+            Au.toSubMeas.outcome a := by
+          refine Finset.sum_congr rfl ?_
+          intro a _
+          rw [← Matrix.sum_mul, ← Matrix.mul_sum]
+    _ ≤ ∑ a : Fq params, Au.toSubMeas.outcome a := by
+          refine Finset.sum_le_sum ?_
+          intro a _
+          have hfilt_le_one : ∑ h ∈ Finset.univ.filter
+              (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 :=
+            calc
+              ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a), T.outcome h
+                ≤ ∑ h : Polynomial params, T.outcome h :=
+                  Finset.sum_le_sum_of_subset_of_nonneg
+                    (Finset.filter_subset _ _) (fun h _ _ => T.outcome_pos h)
+              _ = T.total := T.sum_eq_total
+              _ ≤ 1 := T.total_le_one
+          simpa [Au.proj a] using
+            IsSelfAdjoint.conjugate_le_conjugate
+              (c := Au.toSubMeas.outcome a) hfilt_le_one (Au.outcome_hermitian a)
+    _ = Au.toSubMeas.total := by
+          rw [Au.toSubMeas.sum_eq_total]
+    _ = 1 := by
+          simpa using Au.total_eq_one
+
 /-- The pointwise sandwiched submeasurement `H^u = {H^u_h}`. -/
 noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     [FieldModel params.q]
@@ -235,66 +284,39 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
   { outcome := sandwichedPolynomialOutcomeOperatorAt params strategy T u
     total := ∑ h : Polynomial params,
       sandwichedPolynomialOutcomeOperatorAt params strategy T u h
-    outcome_pos := by
-      intro h
+    outcome_pos := fun h => by
       simp only [sandwichedPolynomialOutcomeOperatorAt, pointConditionedOutcomeOperatorAtPolynomial]
       exact IsSelfAdjoint.conjugate_nonneg (T.outcome_pos h)
         (SubMeas.outcome_hermitian (strategy.pointMeasurement u).toSubMeas (h u))
-    sum_eq_total := by
-      rfl
-    total_le_one := by
-      let Au := (strategy.pointMeasurement u)
-      -- Regroup by evaluation value a = h(u)
-      calc
-        ∑ h : Polynomial params, sandwichedPolynomialOutcomeOperatorAt params strategy T u h
-          = ∑ a : Fq params,
-              ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-                Au.toSubMeas.outcome a * T.outcome h * Au.toSubMeas.outcome a := by
-              rw [show ∑ h : Polynomial params,
-                    sandwichedPolynomialOutcomeOperatorAt params strategy T u h =
-                  ∑ a : Fq params,
-                    ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-                      sandwichedPolynomialOutcomeOperatorAt params strategy T u h from by
-                exact polynomial_sum_fiberwise params u
-                  (sandwichedPolynomialOutcomeOperatorAt params strategy T u)]
-              refine Finset.sum_congr rfl ?_
-              intro a _
-              refine Finset.sum_congr rfl ?_
-              intro h hh
-              simp only [sandwichedPolynomialOutcomeOperatorAt,
-                pointConditionedOutcomeOperatorAtPolynomial]
-              simp only [Finset.mem_filter, Finset.mem_univ, true_and] at hh
-              simp [Au, hh]
-        _ = ∑ a : Fq params,
-              Au.toSubMeas.outcome a *
-                (∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-                  T.outcome h) *
-                Au.toSubMeas.outcome a := by
-              refine Finset.sum_congr rfl ?_
-              intro a _
-              rw [← Matrix.sum_mul, ← Matrix.mul_sum]
-        _ ≤ ∑ a : Fq params, Au.toSubMeas.outcome a := by
-              refine Finset.sum_le_sum ?_
-              intro a _
-              have hfilt_le_one : ∑ h ∈ Finset.univ.filter
-                  (fun h : Polynomial params => h u = a), T.outcome h ≤ 1 :=
-                calc
-                  ∑ h ∈ Finset.univ.filter (fun h : Polynomial params => h u = a),
-                      T.outcome h
-                    ≤ ∑ h : Polynomial params, T.outcome h :=
-                      Finset.sum_le_sum_of_subset_of_nonneg
-                        (Finset.filter_subset _ _) (fun h _ _ => T.outcome_pos h)
-                  _ = T.total := T.sum_eq_total
-                  _ ≤ 1 := T.total_le_one
-              simpa [Au.proj a] using
-                IsSelfAdjoint.conjugate_le_conjugate
-                  (c := Au.toSubMeas.outcome a)
-                  hfilt_le_one
-                  (Au.outcome_hermitian a)
-        _ = Au.toSubMeas.total := by
-              rw [Au.toSubMeas.sum_eq_total]
-        _ = 1 := by
-              simpa using Au.total_eq_one }
+    sum_eq_total := rfl
+    total_le_one := sandwichedPolynomialOutcomeOperatorAt_sum_le_one params strategy T u }
+
+/-- The average of the total pointwise sandwiched operators is bounded by the identity. -/
+private theorem averagedSandwichedPolynomialSubMeasAt_total_le_one (params : Parameters)
+    [FieldModel params.q] (strategy : SymStrat params ι)
+    (T : SubMeas (Polynomial params) ι) :
+    ∑ h : Polynomial params,
+      averageOperatorOverDistribution (uniformDistribution (Point params))
+        (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h) ≤ 1 := by
+  let 𝒟 := uniformDistribution (Point params)
+  calc
+    ∑ h : Polynomial params,
+        averageOperatorOverDistribution 𝒟
+          (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
+      = averageOperatorOverDistribution 𝒟
+          (fun u => ∑ h : Polynomial params,
+            sandwichedPolynomialOutcomeOperatorAt params strategy T u h) := by
+            exact (averageOperatorOverDistribution_sum 𝒟
+              (fun u h => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)).symm
+    _ = averageOperatorOverDistribution 𝒟
+          (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total) := by
+            exact averageOperatorOverDistribution_congr 𝒟 _ _ fun u => by
+              simp [sandwichedPolynomialSubMeasAt]
+    _ ≤ 1 := by
+          simpa [𝒟] using
+            averageOperatorOverDistribution_uniform_le_one
+              (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total)
+              (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total_le_one)
 
 /-- The averaged sandwiched submeasurement `H_h = E_u H^u_h`. -/
 noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
@@ -307,34 +329,12 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
     total := ∑ h : Polynomial params,
       averageOperatorOverDistribution (uniformDistribution (Point params))
         (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
-    outcome_pos := by
-      intro h
-      exact averageOperatorOverDistribution_nonneg (uniformDistribution (Point params))
-        (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
-        (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).outcome_pos h)
-    sum_eq_total := by
-      rfl
-    total_le_one := by
-      let 𝒟 := uniformDistribution (Point params)
-      calc
-        ∑ h : Polynomial params,
-            averageOperatorOverDistribution 𝒟
-              (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
-          = averageOperatorOverDistribution 𝒟
-              (fun u =>
-                ∑ h : Polynomial params,
-                  sandwichedPolynomialOutcomeOperatorAt params strategy T u h) := by
-                exact (averageOperatorOverDistribution_sum 𝒟
-                  (fun u h => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)).symm
-        _ = averageOperatorOverDistribution 𝒟
-              (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total) := by
-                exact averageOperatorOverDistribution_congr 𝒟 _ _ fun u => by
-                  simp [sandwichedPolynomialSubMeasAt]
-        _ ≤ 1 := by
-              simpa [𝒟] using
-                averageOperatorOverDistribution_uniform_le_one
-                  (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total)
-                  (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).total_le_one) }
+    outcome_pos := fun h => averageOperatorOverDistribution_nonneg
+      (uniformDistribution (Point params))
+      (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
+      (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).outcome_pos h)
+    sum_eq_total := rfl
+    total_le_one := averagedSandwichedPolynomialSubMeasAt_total_le_one params strategy T }
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)
