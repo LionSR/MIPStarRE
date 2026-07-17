@@ -634,46 +634,6 @@ def DiagonalMeasurementReparamInvariant (params : Parameters)
     (M (ℓ.rebaseAt t)).outcome (DiagonalLinePolynomial.reparamAt f t) =
       (M ℓ).outcome f
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:518-525  (MIPStarRE.LDT.AxisParallelTestSample)
-/-- Encoded samples `(u, i)` for the axis-parallel lines test.
-The paper samples a random point `u ∈ F_q^m` and a coordinate
-`i ∈ {1, …, m}`. In Lean, `Fin params.m` represents the 0-indexed
-coordinates `{0, …, m - 1}`, corresponding to the paper's 1-indexed
-choice. The sample forms the axis-parallel line through `u` in that
-coordinate direction. -/
-abbrev AxisParallelTestSample (params : Parameters) :=
-  Point params × Fin params.m
-
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:527-539  (MIPStarRE.LDT.extendRestrictedDirection)
-/-- Extend restricted direction coordinates to a full direction vector.
-For restriction index `j` (0-indexed), the first `j + 1` coordinates
-are the given free coordinates and the remaining are zero.
-This matches the paper's convention that `v` has its last `m − i`
-coordinates zero, where `i = j + 1`. -/
-def extendRestrictedDirection {params : Parameters}
-    [FieldModel params.q] (j : Fin params.m)
-    (freeCoords : Fin (j.val + 1) → Fq params) :
-    Point params :=
-  fun k =>
-    if h : k.val ≤ j.val then
-      freeCoords ⟨k.val, Nat.lt_succ_of_le h⟩
-    else zeroCoord
-
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:541-547  (MIPStarRE.LDT.RestrictedDiagonalSample)
-/-- Encoded samples `(u, freeCoords)` for the `j`-restricted diagonal
-lines test. The base point `u ∈ F_q^m` and the free coordinates of
-the restricted direction (first `j + 1` coordinates; rest are zero).
-The full diagonal test averages over `j ∈ {0, …, m − 1}`. -/
-abbrev RestrictedDiagonalSample (params : Parameters)
-    (j : Fin params.m) :=
-  Point params × (Fin (j.val + 1) → Fq params)
-
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:549-552  (MIPStarRE.LDT.restrictedDiagonalSampleNonempty)
-/-- The restricted diagonal sample space is nonempty. -/
-instance restrictedDiagonalSampleNonempty (params : Parameters) (j : Fin params.m) :
-    Nonempty (RestrictedDiagonalSample params j) :=
-  inferInstance
-
 -- source: MIPStarRE/LDT/Test/StrategyCore.lean:761-808  (MIPStarRE.LDT.ProjStrat)
 /-- Paper-faithful two-space projective strategy data.
 
@@ -732,185 +692,72 @@ variable {params : Parameters} [FieldModel params.q]
 variable {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
 variable {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:310-315  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyA)
-/-- Alice's point answers in the axis-parallel branch: Alice receives `u`,
-the base point of the sampled line, and answers with `A^{A,u}`. -/
-noncomputable def axisParallelPointAnswerFamilyA
-    (strategy : ProjStrat params ιA ιB) :
-    IdxSubMeas (AxisParallelTestSample params) (Fq params) ιA :=
-  fun s => (strategy.pointMeasurementA s.1).toSubMeas
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:317-322  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyB)
-/-- Bob's point answers in the axis-parallel branch: Bob receives `u`,
-the base point of the sampled line, and answers with `A^{B,u}`. -/
-noncomputable def axisParallelPointAnswerFamilyB
-    (strategy : ProjStrat params ιA ιB) :
-    IdxSubMeas (AxisParallelTestSample params) (Fq params) ιB :=
-  fun s => (strategy.pointMeasurementB s.1).toSubMeas
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:324-335  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyA)
-/-- Alice's axis-parallel-line answers: Alice receives `ℓ`, answers with
-`B^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
-point. -/
-noncomputable def axisParallelLineAnswerFamilyA
-    (strategy : ProjStrat params ιA ιB) :
-    IdxSubMeas (AxisParallelTestSample params) (Fq params) ιA :=
-  fun s =>
-    let ℓ : AxisParallelLine params :=
-      { base := s.1, direction := s.2 }
-    postprocess
-      ((strategy.axisParallelMeasurementA ℓ).toSubMeas)
-      (· zeroCoord)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:337-348  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyB)
-/-- Bob's axis-parallel-line answers: Bob receives `ℓ`, answers with
-`B^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
-point. -/
-noncomputable def axisParallelLineAnswerFamilyB
-    (strategy : ProjStrat params ιA ιB) :
-    IdxSubMeas (AxisParallelTestSample params) (Fq params) ιB :=
-  fun s =>
-    let ℓ : AxisParallelLine params :=
-      { base := s.1, direction := s.2 }
-    postprocess
-      ((strategy.axisParallelMeasurementB ℓ).toSubMeas)
-      (· zeroCoord)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:350-355  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyA)
-/-- Alice's point answers in the restricted diagonal branch: Alice receives the
-sampled base point `u` and answers with `A^{A,u}`. -/
-noncomputable def diagonalPointAnswerFamilyA
-    (strategy : ProjStrat params ιA ιB) (j : Fin params.m) :
-    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιA :=
-  fun s => (strategy.pointMeasurementA s.1).toSubMeas
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:357-362  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyB)
-/-- Bob's point answers in the restricted diagonal branch: Bob receives the
-sampled base point `u` and answers with `A^{B,u}`. -/
-noncomputable def diagonalPointAnswerFamilyB
-    (strategy : ProjStrat params ιA ιB) (j : Fin params.m) :
-    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιB :=
-  fun s => (strategy.pointMeasurementB s.1).toSubMeas
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:364-376  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyA)
-/-- Alice's restricted diagonal-line answers: Alice receives `ℓ`, answers with
-`L^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
-point. -/
-noncomputable def diagonalLineAnswerFamilyA
-    (strategy : ProjStrat params ιA ιB) (j : Fin params.m) :
-    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιA :=
-  fun s =>
-    let v := extendRestrictedDirection j s.2
-    let ℓ : DiagonalLine params :=
-      { base := s.1, direction := v }
-    postprocess
-      ((strategy.diagonalMeasurementA ℓ).toSubMeas)
-      (· zeroCoord)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:378-390  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyB)
-/-- Bob's restricted diagonal-line answers: Bob receives `ℓ`, answers with
-`L^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
-point. -/
-noncomputable def diagonalLineAnswerFamilyB
-    (strategy : ProjStrat params ιA ιB) (j : Fin params.m) :
-    IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιB :=
-  fun s =>
-    let v := extendRestrictedDirection j s.2
-    let ℓ : DiagonalLine params :=
-      { base := s.1, direction := v }
-    postprocess
-      ((strategy.diagonalMeasurementB ℓ).toSubMeas)
-      (· zeroCoord)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:392-399  (MIPStarRE.LDT.ProjStrat.axisParallelLineLeftPointRightFailureProbability)
-/-- Axis-parallel branch component where Alice receives the sampled line and Bob
-receives its base point. -/
-noncomputable def axisParallelLineLeftPointRightFailureProbability
-    (strategy : ProjStrat params ιA ιB) : Error :=
-  bipartiteConsError strategy.state
-    (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelLineAnswerFamilyA strategy)
-    (axisParallelPointAnswerFamilyB strategy)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:401-408  (MIPStarRE.LDT.ProjStrat.axisParallelPointLeftLineRightFailureProbability)
-/-- Axis-parallel branch component where Alice receives the sampled base point
-and Bob receives the sampled line. -/
-noncomputable def axisParallelPointLeftLineRightFailureProbability
-    (strategy : ProjStrat params ιA ιB) : Error :=
-  bipartiteConsError strategy.state
-    (uniformDistribution (AxisParallelTestSample params))
-    (axisParallelPointAnswerFamilyA strategy)
-    (axisParallelLineAnswerFamilyB strategy)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:410-415  (MIPStarRE.LDT.ProjStrat.axisParallelRoleAverage)
-/-- The paper's axis-parallel branch for a two-space general strategy, averaged
-over the two role choices. -/
-noncomputable def axisParallelRoleAverage
-    (strategy : ProjStrat params ιA ιB) : Error :=
-  (axisParallelLineLeftPointRightFailureProbability strategy +
-    axisParallelPointLeftLineRightFailureProbability strategy) / 2
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:417-424  (MIPStarRE.LDT.ProjStrat.pointAgreementFailureProbability)
-/-- Point-agreement branch: both provers receive the same point and the verifier
-checks equality of their field answers. -/
-noncomputable def pointAgreementFailureProbability
-    (strategy : ProjStrat params ιA ιB) : Error :=
-  bipartiteConsError strategy.state
-    (uniformDistribution (Point params))
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
-    (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:426-435  (MIPStarRE.LDT.ProjStrat.diagonalLineLeftPointRightFailureProbability)
-/-- Diagonal branch component where Alice receives the sampled diagonal line and
-Bob receives its base point. -/
-noncomputable def diagonalLineLeftPointRightFailureProbability
-    (strategy : ProjStrat params ιA ιB) : Error :=
-  (1 / (params.m : Error)) *
-    ∑ j : Fin params.m,
-      bipartiteConsError strategy.state
-        (uniformDistribution (RestrictedDiagonalSample params j))
-        (diagonalLineAnswerFamilyA strategy j)
-        (diagonalPointAnswerFamilyB strategy j)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:437-446  (MIPStarRE.LDT.ProjStrat.diagonalPointLeftLineRightFailureProbability)
-/-- Diagonal branch component where Alice receives the sampled base point and
-Bob receives the sampled diagonal line. -/
-noncomputable def diagonalPointLeftLineRightFailureProbability
-    (strategy : ProjStrat params ιA ιB) : Error :=
-  (1 / (params.m : Error)) *
-    ∑ j : Fin params.m,
-      bipartiteConsError strategy.state
-        (uniformDistribution (RestrictedDiagonalSample params j))
-        (diagonalPointAnswerFamilyA strategy j)
-        (diagonalLineAnswerFamilyB strategy j)
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:448-453  (MIPStarRE.LDT.ProjStrat.diagonalRoleAverage)
-/-- The paper's diagonal branch for a two-space general strategy, averaged over
-the two role choices and the restricted diagonal samples. -/
-noncomputable def diagonalRoleAverage
-    (strategy : ProjStrat params ιA ιB) : Error :=
-  (diagonalLineLeftPointRightFailureProbability strategy +
-    diagonalPointLeftLineRightFailureProbability strategy) / 2
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:455-465  (MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:455-519  (MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability)
 /-- Trace-based failure surrogate for the full low-individual-degree test for a
 paper-faithful two-space projective strategy.
 
-This is the paper-faithful two-space failure surrogate: axis-parallel
-consistency, point agreement, and diagonal consistency are averaged with weights
-`1 / 3`, while the line branches are themselves averaged over the two role
-choices. -/
+The three outer summands are respectively axis-parallel consistency, point
+agreement, and restricted-diagonal consistency, with outer weight `1 / 3`.
+Each line branch averages the two prover-role orderings with weight `1 / 2`, and
+the restricted-diagonal branch also averages its restriction index with weight
+`1 / m`.  Line answers are evaluated at `zeroCoord`, the parameter value of the
+sampled base point. -/
 noncomputable def lowIndividualDegreeFailureProbability
     (strategy : ProjStrat params ιA ιB) : Error :=
-  (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
-    strategy.diagonalRoleAverage) / 3
-
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:467-471  (MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest)
-/-- Passing the full low-individual-degree test with error `ε`, for the
-paper-faithful two-space strategy container. -/
-structure PassesLowIndividualDegreeTest
-    (strategy : ProjStrat params ιA ιB) (eps : Error) : Prop where
-  soundnessHypothesis : strategy.lowIndividualDegreeFailureProbability ≤ eps
+  let axisPointA : IdxSubMeas (Point params × Fin params.m) (Fq params) ιA :=
+    fun s => (strategy.pointMeasurementA s.1).toSubMeas
+  let axisPointB : IdxSubMeas (Point params × Fin params.m) (Fq params) ιB :=
+    fun s => (strategy.pointMeasurementB s.1).toSubMeas
+  let axisLineA : IdxSubMeas (Point params × Fin params.m) (Fq params) ιA :=
+    fun s =>
+      let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+      postprocess ((strategy.axisParallelMeasurementA ℓ).toSubMeas) (· zeroCoord)
+  let axisLineB : IdxSubMeas (Point params × Fin params.m) (Fq params) ιB :=
+    fun s =>
+      let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+      postprocess ((strategy.axisParallelMeasurementB ℓ).toSubMeas) (· zeroCoord)
+  let extendDirection (j : Fin params.m)
+      (freeCoords : Fin (j.val + 1) → Fq params) : Point params :=
+    fun k =>
+      if h : k.val ≤ j.val then
+        freeCoords ⟨k.val, Nat.lt_succ_of_le h⟩
+      else zeroCoord
+  let diagonalPointA (j : Fin params.m) :
+      IdxSubMeas (Point params × (Fin (j.val + 1) → Fq params)) (Fq params) ιA :=
+    fun s => (strategy.pointMeasurementA s.1).toSubMeas
+  let diagonalPointB (j : Fin params.m) :
+      IdxSubMeas (Point params × (Fin (j.val + 1) → Fq params)) (Fq params) ιB :=
+    fun s => (strategy.pointMeasurementB s.1).toSubMeas
+  let diagonalLineA (j : Fin params.m) :
+      IdxSubMeas (Point params × (Fin (j.val + 1) → Fq params)) (Fq params) ιA :=
+    fun s =>
+      let ℓ : DiagonalLine params := { base := s.1, direction := extendDirection j s.2 }
+      postprocess ((strategy.diagonalMeasurementA ℓ).toSubMeas) (· zeroCoord)
+  let diagonalLineB (j : Fin params.m) :
+      IdxSubMeas (Point params × (Fin (j.val + 1) → Fq params)) (Fq params) ιB :=
+    fun s =>
+      let ℓ : DiagonalLine params := { base := s.1, direction := extendDirection j s.2 }
+      postprocess ((strategy.diagonalMeasurementB ℓ).toSubMeas) (· zeroCoord)
+  ((bipartiteConsError strategy.state
+        (@uniformDistribution (Point params × Fin params.m) _ _
+          ⟨(fun _ => zeroCoord, default)⟩) axisLineA axisPointB +
+      bipartiteConsError strategy.state
+        (@uniformDistribution (Point params × Fin params.m) _ _
+          ⟨(fun _ => zeroCoord, default)⟩) axisPointA axisLineB) / ((2 : ℕ) : Error) +
+    bipartiteConsError strategy.state
+      (@uniformDistribution (Point params) _ _ ⟨fun _ => zeroCoord⟩)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) +
+    ((1 / (params.m : Error)) * ∑ j : Fin params.m,
+        bipartiteConsError strategy.state
+          (@uniformDistribution (Point params × (Fin (j.val + 1) → Fq params)) _ _
+            ⟨(fun _ => zeroCoord, fun _ => zeroCoord)⟩)
+          (diagonalLineA j) (diagonalPointB j) +
+      (1 / (params.m : Error)) * ∑ j : Fin params.m,
+        bipartiteConsError strategy.state
+          (@uniformDistribution (Point params × (Fin (j.val + 1) → Fq params)) _ _
+            ⟨(fun _ => zeroCoord, fun _ => zeroCoord)⟩)
+          (diagonalPointA j) (diagonalLineB j)) / ((2 : ℕ) : Error)) / 3
 end  -- module scope
 end ProjStrat
 end MIPStarRE.LDT
@@ -918,7 +765,7 @@ end MIPStarRE.LDT
 namespace MIPStarRE.LDT
 namespace Test
 
--- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:288-326  (MIPStarRE.LDT.Test.mainFormal)
+-- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:288-327  (MIPStarRE.LDT.Test.mainFormal)
 /--
 Corrected source statement of `thm:main-formal`.
 
@@ -939,7 +786,7 @@ theorem mainFormal
     [Fintype ιB] [DecidableEq ιB]
     (strategy : ProjStrat params ιA ιB)
     (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k) :

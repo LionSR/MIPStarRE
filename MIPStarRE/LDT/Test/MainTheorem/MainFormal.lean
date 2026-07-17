@@ -305,7 +305,7 @@ theorem mainFormal
     [Fintype ιB] [DecidableEq ιB]
     (strategy : ProjStrat params ιA ιB)
     (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k) :
@@ -323,7 +323,8 @@ theorem mainFormal
             (constSubMeasFamily G_A.toSubMeas)
             (constSubMeasFamily G_B.toSubMeas)
             (mainFormalError params k eps) := by
-  exact mainFormalConclusion params strategy eps hpass k hk hk0
+  let hpasses : strategy.PassesLowIndividualDegreeTest eps := ⟨hpass⟩
+  exact mainFormalConclusion params strategy eps hpasses k hk hk0
 
 end Test
 
