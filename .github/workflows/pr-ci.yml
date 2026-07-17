@@ -66,6 +66,7 @@ jobs:
       blueprint_src: ${{ steps.filter.outputs.blueprint_src }}
       tex_chapter: ${{ steps.filter.outputs.tex_chapter }}
       scripts: ${{ steps.filter.outputs.scripts }}
+      comparator: ${{ steps.filter.outputs.comparator }}
       workflow: ${{ steps.filter.outputs.workflow }}
     steps:
       - uses: dorny/paths-filter@v3
@@ -89,6 +90,8 @@ jobs:
               - 'blueprint/src/chapter/**/*.tex'
             scripts:
               - 'scripts/**'
+            comparator:
+              - 'scripts/comparator/**'
             workflow:
               - '.github/workflows/pr-ci.yml'
 
@@ -98,6 +101,7 @@ jobs:
       !cancelled() && (
         github.event_name != 'pull_request' ||
         needs.changes.outputs.lean == 'true' ||
+        needs.changes.outputs.comparator == 'true' ||
         needs.changes.outputs.workflow == 'true'
       )
     runs-on: ubuntu-latest
@@ -133,6 +137,9 @@ jobs:
 
       - name: Build axiom audit regression checks
         run: lake build MIPStarRE.LDT.Test.AxiomAudit
+
+      - name: Check comparator challenge regeneration drift
+        run: python3 scripts/comparator/check_challenge_drift.py --root .
 
       # Save even when the build failed: a partial cache still spares the
       # next run the modules that did compile.
