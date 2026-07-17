@@ -64,7 +64,7 @@ structure ConsAgreement {Question Outcome : Type*} {ι : Type*} [Fintype ι] [De
     (A B : IdxMeas Question Outcome ι) (δ : Error) : Prop where
   agreementLowerBound : agreementProbability ψ 𝒟 A B ≥ 1 - δ
 
-/-- Verifies the total-operator bound for diagonal sandwich families. -/
+/-- A diagonal sandwich family has total operator at most the identity. -/
 private theorem diagonalSandwichFamily_total_le_one {Question Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] (A : IdxSubMeas Question Outcome ιA)
@@ -87,7 +87,7 @@ private theorem diagonalSandwichFamily_total_le_one {Question Outcome : Type*}
       rw [(A q).sum_eq_total]
     _ ≤ 1 := leftTensor_le_one (ι₂ := ιB) (A q).total_le_one
 
-/-- Verifies the total-operator bound for total sandwich families. -/
+/-- A total sandwich family has total operator at most the identity. -/
 private theorem totalSandwichFamily_total_le_one {Question Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     [Fintype Outcome] (A : IdxSubMeas Question Outcome ιA)
