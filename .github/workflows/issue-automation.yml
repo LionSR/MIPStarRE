@@ -536,7 +536,7 @@ jobs:
                 const linked = [...linkedIssues][0];
                 const suffix = linked ? ` to address #${linked}` : '';
                 await commentOnce(parent.number,
-                  `PR #${pr.number} has been opened`,
+                  `PR #${pr.number} (*${pr.title}*) has been opened`,
                   `PR #${pr.number} (*${pr.title}*) has been opened${suffix}.`);
               }
               return;
@@ -547,7 +547,7 @@ jobs:
             const targets = new Map();
             for (const n of keepOpen) {
               await commentOnce(n,
-                `PR #${pr.number} (*${pr.title}*) has been merged`,
+                `PR #${pr.number} (*${pr.title}*) addressing this issue has been merged`,
                 `PR #${pr.number} (*${pr.title}*) addressing this issue has been merged. See the pull request for what was accomplished and what remains.`);
               const parent = await getParent(n);
               if (!parent || parent.state !== 'OPEN') continue;
