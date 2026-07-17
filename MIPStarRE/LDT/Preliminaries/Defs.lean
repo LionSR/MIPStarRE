@@ -350,7 +350,7 @@ structure CompTransferStmt {Question Outcome : Type*}
 
 /-! ## Completion -/
 
-/-- Verifies the sum obligation for completion at a distinguished outcome. -/
+/-- The completed outcomes sum to the identity. -/
 private theorem completeAtOutcome_sum_eq_one {Outcome : Type*}
     {ι : Type*} [Fintype Outcome] [DecidableEq Outcome] [Fintype ι] [DecidableEq ι]
     (B : SubMeas Outcome ι) (a0 : Outcome) :
