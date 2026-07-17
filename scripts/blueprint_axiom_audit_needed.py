@@ -59,7 +59,7 @@ def _is_axiom_audit_implementation(path: str) -> bool:
         "scripts/blueprint_lean_sync.py",
         "scripts/blueprint_leanok_axioms.py",
         "scripts/tex_utils.py",
-        ".github/workflows/blueprint-sync.yml",
+        ".github/workflows/pr-ci.yml",
     }
 
 

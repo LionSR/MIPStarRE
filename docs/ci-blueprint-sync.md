@@ -1,6 +1,6 @@
 # Blueprint ↔ Lean sync check
 
-The [`blueprint-sync.yml`](../.github/workflows/blueprint-sync.yml) workflow
+The the `blueprint-sync` job of [`pr-ci.yml`](../.github/workflows/pr-ci.yml) workflow
 defends against drift between the LaTeX blueprint and the Lean source tree.  It
 always runs the name-level surface check on matching pull requests.  It also
 defends the **axiom** level when the pull request can affect proof-status
@@ -97,7 +97,7 @@ axioms`, `depends on axioms: […]`) is performed case-insensitively so both Lea
 
 ## Reverse-coverage checks for changed Lean declarations
 
-The `Lint blueprint` workflow also runs a reverse-coverage check on pull
+The `blueprint-render` job of `PR CI` also runs a reverse-coverage check on pull
 requests after the Lean setup step succeeds. It diffs the PR against its base
 ref, restricts attention to changed `MIPStarRE/**/*.lean` files, and runs:
 
