@@ -207,19 +207,29 @@ theorem roleRegisterAxisParallelTransportInvariant
   intro ℓ t
   ext a
   have hA :
-      (strategy.axisParallelMeasurementA.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+      (strategy.axisParallelMeasurementA (ℓ.rebaseAt t)).outcome a =
         (AxisParallelLine.transportMeasurement
-          (params := params) (strategy.axisParallelMeasurementA.toIdxProjMeas ℓ) t).outcome a := by
-    simpa using
-      congrArg (fun N => N.outcome a)
-        (strategy.axisParallelMeasurementA.transportInvariant ℓ t)
+          (params := params) (strategy.axisParallelMeasurementA ℓ) t).outcome a := by
+    obtain ⟨f, rfl⟩ :=
+      (AxisLinePolynomial.reparamAtEquiv (params := params) t).surjective a
+    change
+      (strategy.axisParallelMeasurementA (ℓ.rebaseAt t)).outcome
+          (AxisLinePolynomial.reparamAt f t) = _
+    rw [strategy.axisParallelReparamInvariantA ℓ t f]
+    simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport]
   have hB :
-      (strategy.axisParallelMeasurementB.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+      (strategy.axisParallelMeasurementB (ℓ.rebaseAt t)).outcome a =
         (AxisParallelLine.transportMeasurement
-          (params := params) (strategy.axisParallelMeasurementB.toIdxProjMeas ℓ) t).outcome a := by
-    simpa using
-      congrArg (fun N => N.outcome a)
-        (strategy.axisParallelMeasurementB.transportInvariant ℓ t)
+          (params := params) (strategy.axisParallelMeasurementB ℓ) t).outcome a := by
+    obtain ⟨f, rfl⟩ :=
+      (AxisLinePolynomial.reparamAtEquiv (params := params) t).surjective a
+    change
+      (strategy.axisParallelMeasurementB (ℓ.rebaseAt t)).outcome
+          (AxisLinePolynomial.reparamAt f t) = _
+    rw [strategy.axisParallelReparamInvariantB ℓ t f]
+    simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport]
   have hFillA :
       (ProjMeas.trivialDistinguishedOutcome (ι := ιA)
           (default : AxisLinePolynomial params)).outcome a =
@@ -257,19 +267,29 @@ theorem roleRegisterDiagonalTransportInvariant
   intro ℓ t
   ext a
   have hA :
-      (strategy.diagonalMeasurementA.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+      (strategy.diagonalMeasurementA (ℓ.rebaseAt t)).outcome a =
         (DiagonalLine.transportMeasurement
-          (params := params) (strategy.diagonalMeasurementA.toIdxProjMeas ℓ) t).outcome a := by
-    simpa using
-      congrArg (fun N => N.outcome a)
-        (strategy.diagonalMeasurementA.transportInvariant ℓ t)
+          (params := params) (strategy.diagonalMeasurementA ℓ) t).outcome a := by
+    obtain ⟨f, rfl⟩ :=
+      (DiagonalLinePolynomial.reparamAtEquiv (params := params) t).surjective a
+    change
+      (strategy.diagonalMeasurementA (ℓ.rebaseAt t)).outcome
+          (DiagonalLinePolynomial.reparamAt f t) = _
+    rw [strategy.diagonalReparamInvariantA ℓ t f]
+    simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport]
   have hB :
-      (strategy.diagonalMeasurementB.toIdxProjMeas (ℓ.rebaseAt t)).outcome a =
+      (strategy.diagonalMeasurementB (ℓ.rebaseAt t)).outcome a =
         (DiagonalLine.transportMeasurement
-          (params := params) (strategy.diagonalMeasurementB.toIdxProjMeas ℓ) t).outcome a := by
-    simpa using
-      congrArg (fun N => N.outcome a)
-        (strategy.diagonalMeasurementB.transportInvariant ℓ t)
+          (params := params) (strategy.diagonalMeasurementB ℓ) t).outcome a := by
+    obtain ⟨f, rfl⟩ :=
+      (DiagonalLinePolynomial.reparamAtEquiv (params := params) t).surjective a
+    change
+      (strategy.diagonalMeasurementB (ℓ.rebaseAt t)).outcome
+          (DiagonalLinePolynomial.reparamAt f t) = _
+    rw [strategy.diagonalReparamInvariantB ℓ t f]
+    simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
+      Measurement.transport, SubMeas.transport]
   have hFillA :
       (ProjMeas.trivialDistinguishedOutcome (ι := ιA)
           (default : DiagonalLinePolynomial params)).outcome a =
