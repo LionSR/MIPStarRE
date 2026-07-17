@@ -106,7 +106,7 @@ Rewrite the body to match this template, extracting info from the original:
 <!-- What was verified and how. -->
 
 - <extract from original body — look for mentions of `lake build`, tests, etc.>
-- <if nothing mentioned, write: Relies on Lean CI (`lean_action_ci.yml`) to validate build.>
+- <if nothing mentioned, write: Relies on Lean CI (`pr-ci.yml`) to validate build.>
 
 ---
 Addresses #<N>

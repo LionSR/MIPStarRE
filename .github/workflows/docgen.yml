@@ -73,7 +73,7 @@ jobs:
         uses: leanprover/lean-action@v1
         with:
           build: true
-          # See lean_action_ci.yml: per-run lake caches evict the main
+          # See pr-ci.yml: per-run lake caches evict the main
           # build cache from the repository cache budget.
           use-github-cache: false
 
