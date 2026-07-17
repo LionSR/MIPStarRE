@@ -31,8 +31,8 @@ inside them.
      `auto-fix-claude`, `codex`, `standup`
    - Standard labels such as `bug`, `enhancement`, `question`,
      `help wanted`, `good first issue` only when clearly warranted
-3. Never apply `auto-fix-claude`, `auto-fix-codex`, or `scout` to
-   an issue. The first two labels control pull-request workflows
+3. Never apply `auto-fix-claude` or `scout` to
+   an issue. The first label controls pull-request workflows
    only; `scout` is a maintainer-reviewed request for a Mathlib
    scouting report.
 4. If the issue requests a theorem, definition, lemma, proof, or

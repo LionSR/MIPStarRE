@@ -549,7 +549,6 @@ The following workflows run automatically:
 | **Blueprint Lint** (`lint-blueprint.yml`) | PRs touching blueprint files | Builds `leanblueprint pdf` / `web` to catch broken labels, undefined macros, and plasTeX errors, then runs the blueprint ↔ Lean sync checks. The LaTeX convention scan and the `scripts/tests` helper unit tests both run locally in the pre-commit hook. |
 | **Blueprint Sync & Prose Review** (`blueprint-prose-review.yml`) | PRs touching Lean files, blueprint source, selected proof-integrity documents, or prompt files | Reviews blueprint synchronization, source-faithfulness, and mathematical prose for formalization changes. |
 | **README Freshness Audit** (`readme-freshness-audit.yml`) | Weekly + manual dispatch | Report-only audit for README local paths, LDT submodule count, and hard-coded Lean/Mathlib versions |
-| **Lean Audit** (`lean-audit.yml`) | On demand | Audits Lean code for style and correctness |
 | **PR Mathematical Description** (`pr-cleanup.yml`) | PR opened from `claude/*` or `codex/*` branches | Normalizes title to `type(scope): desc`, rewrites the PR body as a self-contained mathematical note, preserves source citations from the linked issue, copies labels, adds `Addresses #N`, and comments on the issue |
 | **Mathlib Scout** (`mathlib-scout.yml`) | Formalization issue opened/labeled | Scouts Mathlib for relevant lemmas and posts a scouting report |
 
