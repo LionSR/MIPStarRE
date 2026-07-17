@@ -32,6 +32,24 @@ noncomputable def normalizationConditionSandwichedOperator {OutcomeA OutcomeB : 
     (a : OutcomeA) (b : OutcomeB) : MIPStarRE.Quantum.Op ι :=
   Q.outcome b * P.outcome a * Q.outcome b
 
+/-- The sandwiched operators sum to at most the identity. -/
+private theorem normalizationConditionSandwichedOperator_sum_le_one
+    {OutcomeA OutcomeB : Type*} [Fintype OutcomeA] [Fintype OutcomeB]
+    (P : SubMeas OutcomeA ι) (Q : ProjSubMeas OutcomeB ι) (a : OutcomeA) :
+    ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b ≤ 1 := by
+  calc
+    ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b
+      ≤ ∑ b : OutcomeB, Q.outcome b := by
+          refine Finset.sum_le_sum ?_
+          intro b hb
+          simpa [normalizationConditionSandwichedOperator, Q.proj b] using
+            IsSelfAdjoint.conjugate_le_conjugate
+              (c := Q.outcome b)
+              (SubMeas.outcome_le_one P a)
+              (Q.outcome_hermitian b)
+    _ = Q.total := by rw [Q.sum_eq_total]
+    _ ≤ 1 := Q.total_le_one
+
 /-- The sandwiched family `b ↦ Q_b P_a Q_b`. -/
 noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Type*}
     [Fintype OutcomeA] [Fintype OutcomeB]
@@ -41,30 +59,15 @@ noncomputable def normalizationConditionSandwichedFamily {OutcomeA OutcomeB : Ty
     { outcome := fun b => normalizationConditionSandwichedOperator P Q a b
       total :=
         ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b
-      outcome_pos := by
-        intro b
+      outcome_pos := fun b => by
         simpa [normalizationConditionSandwichedOperator] using
           IsSelfAdjoint.conjugate_nonneg
             (c := Q.outcome b)
             (a := P.outcome a)
             (P.outcome_pos a)
             (Q.outcome_hermitian b)
-      sum_eq_total := by
-        rfl
-      total_le_one := by
-        calc
-          ∑ b : OutcomeB, normalizationConditionSandwichedOperator P Q a b
-            ≤ ∑ b : OutcomeB, Q.outcome b := by
-                refine Finset.sum_le_sum ?_
-                intro b hb
-                simpa [normalizationConditionSandwichedOperator, Q.proj b] using
-                  IsSelfAdjoint.conjugate_le_conjugate
-                    (c := Q.outcome b)
-                    (SubMeas.outcome_le_one P a)
-                    (Q.outcome_hermitian b)
-          _ = Q.total := by
-              rw [Q.sum_eq_total]
-          _ ≤ 1 := Q.total_le_one }
+      sum_eq_total := rfl
+      total_le_one := normalizationConditionSandwichedOperator_sum_le_one P Q a }
 
 /-- The total family `a ↦ ∑_b C_{a,b}` from `lem:normalization-condition`. -/
 noncomputable def normalizationConditionSandwichedTotalFamily {OutcomeA OutcomeB : Type*}
@@ -160,16 +163,11 @@ noncomputable def normalizationConditionSquareFamily {OutcomeA OutcomeB : Type*}
     ∑ a : OutcomeA,
       normalizationConditionSandwichedTotalOperator P Q a *
         (normalizationConditionSandwichedTotalOperator P Q a)ᴴ
-  outcome_pos := by
-    intro a
-    simpa using
-      (Matrix.posSemidef_self_mul_conjTranspose
-        (normalizationConditionSandwichedTotalOperator P Q a)).nonneg
-  sum_eq_total := by
-    rfl
-  total_le_one := by
-    refine normalizationConditionSandwichedTotalSum_le_one P Q ?_
-    intro a
+  outcome_pos := fun a =>
+    (Matrix.posSemidef_self_mul_conjTranspose
+      (normalizationConditionSandwichedTotalOperator P Q a)).nonneg
+  sum_eq_total := rfl
+  total_le_one := normalizationConditionSandwichedTotalSum_le_one P Q fun a => by
     simpa [normalizationConditionSandwichedTotalOperator_hermitian P Q a] using
       normCondSandwichedTotal_sq_le P Q a
 
@@ -185,16 +183,11 @@ noncomputable def normalizationConditionAdjointSquareFamily {OutcomeA OutcomeB :
     ∑ a : OutcomeA,
       (normalizationConditionSandwichedTotalOperator P Q a)ᴴ *
         normalizationConditionSandwichedTotalOperator P Q a
-  outcome_pos := by
-    intro a
-    simpa using
-      (Matrix.posSemidef_conjTranspose_mul_self
-        (normalizationConditionSandwichedTotalOperator P Q a)).nonneg
-  sum_eq_total := by
-    rfl
-  total_le_one := by
-    refine normalizationConditionSandwichedTotalSum_le_one P Q ?_
-    intro a
+  outcome_pos := fun a =>
+    (Matrix.posSemidef_conjTranspose_mul_self
+      (normalizationConditionSandwichedTotalOperator P Q a)).nonneg
+  sum_eq_total := rfl
+  total_le_one := normalizationConditionSandwichedTotalSum_le_one P Q fun a => by
     simpa [normalizationConditionSandwichedTotalOperator_hermitian P Q a] using
       normCondSandwichedTotal_sq_le P Q a
 
