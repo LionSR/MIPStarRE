@@ -112,7 +112,7 @@ theorem lowIndividualDegreeFailureProbability_nonneg
     pointAgreementFailureProbability_nonneg strategy
   have hdiag : 0 ≤ strategy.diagonalRoleAverage :=
     diagonalRoleAverage_nonneg strategy
-  unfold ProjStrat.lowIndividualDegreeFailureProbability
+  rw [lowIndividualDegreeFailureProbability_eq_role_averages]
   nlinarith
 
 /-- Any passing two-space projective strategy has a nonnegative error
@@ -145,7 +145,7 @@ theorem roleRegisterSymmStrategy_is_good_three_mul
   have hmain :
       (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
         strategy.diagonalRoleAverage) / 3 ≤ eps := by
-    simpa [ProjStrat.lowIndividualDegreeFailureProbability] using
+    simpa only [lowIndividualDegreeFailureProbability_eq_role_averages] using
       hpass.soundnessHypothesis
   have haxis : strategy.axisParallelRoleAverage ≤ 3 * eps :=
     (MIPStarRE.LDT.three_summand_bounds_of_average_le

@@ -2,7 +2,7 @@
 namespace MIPStarRE.LDT
 namespace Test
 
--- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:288-326  (MIPStarRE.LDT.Test.mainFormal)
+-- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:288-327  (MIPStarRE.LDT.Test.mainFormal)
 /--
 Corrected source statement of `thm:main-formal`.
 
@@ -23,7 +23,7 @@ theorem mainFormal
     [Fintype ιB] [DecidableEq ιB]
     (strategy : ProjStrat params ιA ιB)
     (eps : Error)
-    (hpass : strategy.PassesLowIndividualDegreeTest eps)
+    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps)
     (k : ℕ)
     (hk : 400 * params.m * params.d ≤ k)
     (hk0 : 0 < k) :
