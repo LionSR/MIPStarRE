@@ -455,14 +455,78 @@ noncomputable def diagonalRoleAverage
 /-- Trace-based failure surrogate for the full low-individual-degree test for a
 paper-faithful two-space projective strategy.
 
-This is the paper-faithful two-space failure surrogate: axis-parallel
-consistency, point agreement, and diagonal consistency are averaged with weights
-`1 / 3`, while the line branches are themselves averaged over the two role
-choices. -/
+The three outer summands are respectively axis-parallel consistency, point
+agreement, and restricted-diagonal consistency, with outer weight `1 / 3`.
+Each line branch averages the two prover-role orderings with weight `1 / 2`, and
+the restricted-diagonal branch also averages its restriction index with weight
+`1 / m`.  Line answers are evaluated at `zeroCoord`, the parameter value of the
+sampled base point. -/
 noncomputable def lowIndividualDegreeFailureProbability
     (strategy : ProjStrat params ιA ιB) : Error :=
-  (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
-    strategy.diagonalRoleAverage) / 3
+  let axisPointA : IdxSubMeas (Point params × Fin params.m) (Fq params) ιA :=
+    fun s => (strategy.pointMeasurementA s.1).toSubMeas
+  let axisPointB : IdxSubMeas (Point params × Fin params.m) (Fq params) ιB :=
+    fun s => (strategy.pointMeasurementB s.1).toSubMeas
+  let axisLineA : IdxSubMeas (Point params × Fin params.m) (Fq params) ιA :=
+    fun s =>
+      let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+      postprocess ((strategy.axisParallelMeasurementA ℓ).toSubMeas) (· zeroCoord)
+  let axisLineB : IdxSubMeas (Point params × Fin params.m) (Fq params) ιB :=
+    fun s =>
+      let ℓ : AxisParallelLine params := { base := s.1, direction := s.2 }
+      postprocess ((strategy.axisParallelMeasurementB ℓ).toSubMeas) (· zeroCoord)
+  let extendDirection (j : Fin params.m)
+      (freeCoords : Fin (j.val + 1) → Fq params) : Point params :=
+    fun k =>
+      if h : k.val ≤ j.val then
+        freeCoords ⟨k.val, Nat.lt_succ_of_le h⟩
+      else zeroCoord
+  let diagonalPointA (j : Fin params.m) :
+      IdxSubMeas (Point params × (Fin (j.val + 1) → Fq params)) (Fq params) ιA :=
+    fun s => (strategy.pointMeasurementA s.1).toSubMeas
+  let diagonalPointB (j : Fin params.m) :
+      IdxSubMeas (Point params × (Fin (j.val + 1) → Fq params)) (Fq params) ιB :=
+    fun s => (strategy.pointMeasurementB s.1).toSubMeas
+  let diagonalLineA (j : Fin params.m) :
+      IdxSubMeas (Point params × (Fin (j.val + 1) → Fq params)) (Fq params) ιA :=
+    fun s =>
+      let ℓ : DiagonalLine params := { base := s.1, direction := extendDirection j s.2 }
+      postprocess ((strategy.diagonalMeasurementA ℓ).toSubMeas) (· zeroCoord)
+  let diagonalLineB (j : Fin params.m) :
+      IdxSubMeas (Point params × (Fin (j.val + 1) → Fq params)) (Fq params) ιB :=
+    fun s =>
+      let ℓ : DiagonalLine params := { base := s.1, direction := extendDirection j s.2 }
+      postprocess ((strategy.diagonalMeasurementB ℓ).toSubMeas) (· zeroCoord)
+  ((bipartiteConsError strategy.state
+        (@uniformDistribution (Point params × Fin params.m) _ _
+          ⟨(fun _ => zeroCoord, default)⟩) axisLineA axisPointB +
+      bipartiteConsError strategy.state
+        (@uniformDistribution (Point params × Fin params.m) _ _
+          ⟨(fun _ => zeroCoord, default)⟩) axisPointA axisLineB) / ((2 : ℕ) : Error) +
+    bipartiteConsError strategy.state
+      (@uniformDistribution (Point params) _ _ ⟨fun _ => zeroCoord⟩)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB) +
+    ((1 / (params.m : Error)) * ∑ j : Fin params.m,
+        bipartiteConsError strategy.state
+          (@uniformDistribution (Point params × (Fin (j.val + 1) → Fq params)) _ _
+            ⟨(fun _ => zeroCoord, fun _ => zeroCoord)⟩)
+          (diagonalLineA j) (diagonalPointB j) +
+      (1 / (params.m : Error)) * ∑ j : Fin params.m,
+        bipartiteConsError strategy.state
+          (@uniformDistribution (Point params × (Fin (j.val + 1) → Fq params)) _ _
+            ⟨(fun _ => zeroCoord, fun _ => zeroCoord)⟩)
+          (diagonalPointA j) (diagonalLineB j)) / ((2 : ℕ) : Error)) / 3
+
+/-- The direct low-individual-degree score agrees with its decomposition into
+axis-parallel, point-agreement, and restricted-diagonal role averages. -/
+theorem lowIndividualDegreeFailureProbability_eq_role_averages
+    (strategy : ProjStrat params ιA ιB) :
+    strategy.lowIndividualDegreeFailureProbability =
+      (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
+        strategy.diagonalRoleAverage) / 3 := by
+  rfl
+
 
 /-- Passing the full low-individual-degree test with error `ε`, for the
 paper-faithful two-space strategy container. -/

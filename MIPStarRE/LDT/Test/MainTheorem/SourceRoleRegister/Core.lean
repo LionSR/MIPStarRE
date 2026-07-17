@@ -254,7 +254,7 @@ theorem pointAgreementFailureProbability_le_three_mul
   have hmain :
       (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
         strategy.diagonalRoleAverage) / 3 ≤ eps := by
-    simpa [ProjStrat.lowIndividualDegreeFailureProbability] using
+    simpa only [lowIndividualDegreeFailureProbability_eq_role_averages] using
       hpass.soundnessHypothesis
   linarith
 
