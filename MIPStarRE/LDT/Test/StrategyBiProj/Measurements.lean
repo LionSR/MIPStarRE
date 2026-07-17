@@ -206,30 +206,10 @@ theorem roleRegisterAxisParallelTransportInvariant
       (roleRegisterAxisParallelMeasurement strategy) := by
   intro ℓ t
   ext a
-  have hA :
-      (strategy.axisParallelMeasurementA (ℓ.rebaseAt t)).outcome a =
-        (AxisParallelLine.transportMeasurement
-          (params := params) (strategy.axisParallelMeasurementA ℓ) t).outcome a := by
-    obtain ⟨f, rfl⟩ :=
-      (AxisLinePolynomial.reparamAtEquiv (params := params) t).surjective a
-    change
-      (strategy.axisParallelMeasurementA (ℓ.rebaseAt t)).outcome
-          (AxisLinePolynomial.reparamAt f t) = _
-    rw [strategy.axisParallelReparamInvariantA ℓ t f]
-    simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
-      Measurement.transport, SubMeas.transport]
-  have hB :
-      (strategy.axisParallelMeasurementB (ℓ.rebaseAt t)).outcome a =
-        (AxisParallelLine.transportMeasurement
-          (params := params) (strategy.axisParallelMeasurementB ℓ) t).outcome a := by
-    obtain ⟨f, rfl⟩ :=
-      (AxisLinePolynomial.reparamAtEquiv (params := params) t).surjective a
-    change
-      (strategy.axisParallelMeasurementB (ℓ.rebaseAt t)).outcome
-          (AxisLinePolynomial.reparamAt f t) = _
-    rw [strategy.axisParallelReparamInvariantB ℓ t f]
-    simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
-      Measurement.transport, SubMeas.transport]
+  have hA := congrArg (fun N => N.outcome a)
+    (strategy.axisParallelReparamInvariantA.toTransportInvariant ℓ t)
+  have hB := congrArg (fun N => N.outcome a)
+    (strategy.axisParallelReparamInvariantB.toTransportInvariant ℓ t)
   have hFillA :
       (ProjMeas.trivialDistinguishedOutcome (ι := ιA)
           (default : AxisLinePolynomial params)).outcome a =
@@ -266,30 +246,10 @@ theorem roleRegisterDiagonalTransportInvariant
       (roleRegisterDiagonalMeasurement strategy) := by
   intro ℓ t
   ext a
-  have hA :
-      (strategy.diagonalMeasurementA (ℓ.rebaseAt t)).outcome a =
-        (DiagonalLine.transportMeasurement
-          (params := params) (strategy.diagonalMeasurementA ℓ) t).outcome a := by
-    obtain ⟨f, rfl⟩ :=
-      (DiagonalLinePolynomial.reparamAtEquiv (params := params) t).surjective a
-    change
-      (strategy.diagonalMeasurementA (ℓ.rebaseAt t)).outcome
-          (DiagonalLinePolynomial.reparamAt f t) = _
-    rw [strategy.diagonalReparamInvariantA ℓ t f]
-    simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
-      Measurement.transport, SubMeas.transport]
-  have hB :
-      (strategy.diagonalMeasurementB (ℓ.rebaseAt t)).outcome a =
-        (DiagonalLine.transportMeasurement
-          (params := params) (strategy.diagonalMeasurementB ℓ) t).outcome a := by
-    obtain ⟨f, rfl⟩ :=
-      (DiagonalLinePolynomial.reparamAtEquiv (params := params) t).surjective a
-    change
-      (strategy.diagonalMeasurementB (ℓ.rebaseAt t)).outcome
-          (DiagonalLinePolynomial.reparamAt f t) = _
-    rw [strategy.diagonalReparamInvariantB ℓ t f]
-    simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
-      Measurement.transport, SubMeas.transport]
+  have hA := congrArg (fun N => N.outcome a)
+    (strategy.diagonalReparamInvariantA.toTransportInvariant ℓ t)
+  have hB := congrArg (fun N => N.outcome a)
+    (strategy.diagonalReparamInvariantB.toTransportInvariant ℓ t)
   have hFillA :
       (ProjMeas.trivialDistinguishedOutcome (ι := ιA)
           (default : DiagonalLinePolynomial params)).outcome a =

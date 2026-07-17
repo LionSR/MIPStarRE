@@ -314,6 +314,56 @@ theorem DiagonalMeasurementTransportInvariant.toMeasurementReparamInvariant
   simpa only [DiagonalLine.transportMeasurement, ProjMeas.transport,
     Measurement.transport, SubMeas.transport, Equiv.symm_apply_apply] using h
 
+/-- Direct axis-parallel outcome covariance implies transport-level covariance. -/
+theorem AxisParallelMeasurementReparamInvariant.toTransportInvariant
+    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι}
+    (hM : AxisParallelMeasurementReparamInvariant params M) :
+    AxisParallelMeasurementTransportInvariant params M := by
+  intro ℓ t
+  ext a : 1
+  obtain ⟨f, rfl⟩ :=
+    (AxisLinePolynomial.reparamAtEquiv (params := params) t).surjective a
+  change (M (ℓ.rebaseAt t)).outcome (AxisLinePolynomial.reparamAt f t) = _
+  rw [hM ℓ t f]
+  simp [AxisParallelLine.transportMeasurement, ProjMeas.transport,
+    Measurement.transport, SubMeas.transport]
+
+/-- Direct diagonal outcome covariance implies transport-level covariance. -/
+theorem DiagonalMeasurementReparamInvariant.toTransportInvariant
+    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι}
+    (hM : DiagonalMeasurementReparamInvariant params M) :
+    DiagonalMeasurementTransportInvariant params M := by
+  intro ℓ t
+  ext a : 1
+  obtain ⟨f, rfl⟩ :=
+    (DiagonalLinePolynomial.reparamAtEquiv (params := params) t).surjective a
+  change (M (ℓ.rebaseAt t)).outcome (DiagonalLinePolynomial.reparamAt f t) = _
+  rw [hM ℓ t f]
+  simp [DiagonalLine.transportMeasurement, ProjMeas.transport,
+    Measurement.transport, SubMeas.transport]
+
+/-- Direct outcome covariance and transport-level covariance are equivalent for
+axis-parallel-line projective measurements. -/
+theorem axisParallelMeasurementReparamInvariant_iff_transportInvariant
+    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M : IdxProjMeas (AxisParallelLine params) (AxisLinePolynomial params) ι} :
+    AxisParallelMeasurementReparamInvariant params M ↔
+      AxisParallelMeasurementTransportInvariant params M :=
+  ⟨AxisParallelMeasurementReparamInvariant.toTransportInvariant,
+    AxisParallelMeasurementTransportInvariant.toMeasurementReparamInvariant⟩
+
+/-- Direct outcome covariance and transport-level covariance are equivalent for
+diagonal-line projective measurements. -/
+theorem diagonalMeasurementReparamInvariant_iff_transportInvariant
+    {params : Parameters} [FieldModel params.q] {ι : Type*} [Fintype ι] [DecidableEq ι]
+    {M : IdxProjMeas (DiagonalLine params) (DiagonalLinePolynomial params) ι} :
+    DiagonalMeasurementReparamInvariant params M ↔
+      DiagonalMeasurementTransportInvariant params M :=
+  ⟨DiagonalMeasurementReparamInvariant.toTransportInvariant,
+    DiagonalMeasurementTransportInvariant.toMeasurementReparamInvariant⟩
+
 /-- The stronger transport-level axis-parallel compatibility implies the older
 outcome-level reparametrization invariant predicate. -/
 theorem AxisParallelMeasurementTransportInvariant.toEvaluationReparamInvariant
@@ -355,13 +405,6 @@ instance {params : Parameters} [FieldModel params.q] {ι : Type*}
 
 namespace AxisParallelCovariantMeasurement
 
-/-- A covariant wrapper satisfies direct outcome-level rebasing covariance. -/
-theorem outcomeReparamInvariant {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (M : AxisParallelCovariantMeasurement params ι) :
-    AxisParallelMeasurementReparamInvariant params M.toIdxProjMeas :=
-  M.transportInvariant.toMeasurementReparamInvariant
-
 /-- A covariant wrapper automatically satisfies the older evaluation-level
 rebasing invariant. -/
 theorem reparamInvariant {params : Parameters} [FieldModel params.q]
@@ -388,13 +431,6 @@ instance {params : Parameters} [FieldModel params.q] {ι : Type*}
   coe M := M.toIdxProjMeas
 
 namespace DiagonalCovariantMeasurement
-
-/-- A covariant wrapper satisfies direct outcome-level rebasing covariance. -/
-theorem outcomeReparamInvariant {params : Parameters} [FieldModel params.q]
-    {ι : Type*} [Fintype ι] [DecidableEq ι]
-    (M : DiagonalCovariantMeasurement params ι) :
-    DiagonalMeasurementReparamInvariant params M.toIdxProjMeas :=
-  M.transportInvariant.toMeasurementReparamInvariant
 
 /-- A covariant wrapper automatically satisfies the older evaluation-level
 rebasing invariant. -/
@@ -730,7 +766,11 @@ separate local carriers `ιA` and `ιB`, and the bipartite state lives on
 `ιA × ιB` without a built-in swap symmetry.
 
 The `isNormalized` field records that the bipartite state's density operator
-has normalized trace `1`. -/
+has normalized trace `1`.
+
+The four covariance conditions express that the line-indexed projectors
+descend from chosen affine parametrizations to geometric lines; transport and
+zero-coordinate evaluation are equivalent consequences. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ιA : Type*) [Fintype ιA] [DecidableEq ιA]
     (ιB : Type*) [Fintype ιB] [DecidableEq ιB] where

@@ -634,7 +634,7 @@ def DiagonalMeasurementReparamInvariant (params : Parameters)
     (M (ℓ.rebaseAt t)).outcome (DiagonalLinePolynomial.reparamAt f t) =
       (M ℓ).outcome f
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:482-489  (MIPStarRE.LDT.AxisParallelTestSample)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:518-525  (MIPStarRE.LDT.AxisParallelTestSample)
 /-- Encoded samples `(u, i)` for the axis-parallel lines test.
 The paper samples a random point `u ∈ F_q^m` and a coordinate
 `i ∈ {1, …, m}`. In Lean, `Fin params.m` represents the 0-indexed
@@ -644,7 +644,7 @@ coordinate direction. -/
 abbrev AxisParallelTestSample (params : Parameters) :=
   Point params × Fin params.m
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:491-503  (MIPStarRE.LDT.extendRestrictedDirection)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:527-539  (MIPStarRE.LDT.extendRestrictedDirection)
 /-- Extend restricted direction coordinates to a full direction vector.
 For restriction index `j` (0-indexed), the first `j + 1` coordinates
 are the given free coordinates and the remaining are zero.
@@ -659,7 +659,7 @@ def extendRestrictedDirection {params : Parameters}
       freeCoords ⟨k.val, Nat.lt_succ_of_le h⟩
     else zeroCoord
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:505-511  (MIPStarRE.LDT.RestrictedDiagonalSample)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:541-547  (MIPStarRE.LDT.RestrictedDiagonalSample)
 /-- Encoded samples `(u, freeCoords)` for the `j`-restricted diagonal
 lines test. The base point `u ∈ F_q^m` and the free coordinates of
 the restricted direction (first `j + 1` coordinates; rest are zero).
@@ -668,13 +668,13 @@ abbrev RestrictedDiagonalSample (params : Parameters)
     (j : Fin params.m) :=
   Point params × (Fin (j.val + 1) → Fq params)
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:513-516  (MIPStarRE.LDT.restrictedDiagonalSampleNonempty)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:549-552  (MIPStarRE.LDT.restrictedDiagonalSampleNonempty)
 /-- The restricted diagonal sample space is nonempty. -/
 instance restrictedDiagonalSampleNonempty (params : Parameters) (j : Fin params.m) :
     Nonempty (RestrictedDiagonalSample params j) :=
   inferInstance
 
--- source: MIPStarRE/LDT/Test/StrategyCore.lean:725-768  (MIPStarRE.LDT.ProjStrat)
+-- source: MIPStarRE/LDT/Test/StrategyCore.lean:761-808  (MIPStarRE.LDT.ProjStrat)
 /-- Paper-faithful two-space projective strategy data.
 
 This matches the paper's `def:general-projective-strategy`
@@ -683,7 +683,11 @@ separate local carriers `ιA` and `ιB`, and the bipartite state lives on
 `ιA × ιB` without a built-in swap symmetry.
 
 The `isNormalized` field records that the bipartite state's density operator
-has normalized trace `1`. -/
+has normalized trace `1`.
+
+The four covariance conditions express that the line-indexed projectors
+descend from chosen affine parametrizations to geometric lines; transport and
+zero-coordinate evaluation are equivalent consequences. -/
 structure ProjStrat (params : Parameters) [FieldModel params.q]
     (ιA : Type*) [Fintype ιA] [DecidableEq ιA]
     (ιB : Type*) [Fintype ιB] [DecidableEq ιB] where
@@ -728,7 +732,7 @@ variable {params : Parameters} [FieldModel params.q]
 variable {ιA : Type*} [Fintype ιA] [DecidableEq ιA]
 variable {ιB : Type*} [Fintype ιB] [DecidableEq ιB]
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:350-355  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyA)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:310-315  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyA)
 /-- Alice's point answers in the axis-parallel branch: Alice receives `u`,
 the base point of the sampled line, and answers with `A^{A,u}`. -/
 noncomputable def axisParallelPointAnswerFamilyA
@@ -736,7 +740,7 @@ noncomputable def axisParallelPointAnswerFamilyA
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιA :=
   fun s => (strategy.pointMeasurementA s.1).toSubMeas
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:357-362  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyB)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:317-322  (MIPStarRE.LDT.ProjStrat.axisParallelPointAnswerFamilyB)
 /-- Bob's point answers in the axis-parallel branch: Bob receives `u`,
 the base point of the sampled line, and answers with `A^{B,u}`. -/
 noncomputable def axisParallelPointAnswerFamilyB
@@ -744,7 +748,7 @@ noncomputable def axisParallelPointAnswerFamilyB
     IdxSubMeas (AxisParallelTestSample params) (Fq params) ιB :=
   fun s => (strategy.pointMeasurementB s.1).toSubMeas
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:364-375  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyA)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:324-335  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyA)
 /-- Alice's axis-parallel-line answers: Alice receives `ℓ`, answers with
 `B^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
@@ -758,7 +762,7 @@ noncomputable def axisParallelLineAnswerFamilyA
       ((strategy.axisParallelMeasurementA ℓ).toSubMeas)
       (· zeroCoord)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:377-388  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyB)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:337-348  (MIPStarRE.LDT.ProjStrat.axisParallelLineAnswerFamilyB)
 /-- Bob's axis-parallel-line answers: Bob receives `ℓ`, answers with
 `B^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
@@ -772,7 +776,7 @@ noncomputable def axisParallelLineAnswerFamilyB
       ((strategy.axisParallelMeasurementB ℓ).toSubMeas)
       (· zeroCoord)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:390-395  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyA)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:350-355  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyA)
 /-- Alice's point answers in the restricted diagonal branch: Alice receives the
 sampled base point `u` and answers with `A^{A,u}`. -/
 noncomputable def diagonalPointAnswerFamilyA
@@ -780,7 +784,7 @@ noncomputable def diagonalPointAnswerFamilyA
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιA :=
   fun s => (strategy.pointMeasurementA s.1).toSubMeas
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:397-402  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyB)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:357-362  (MIPStarRE.LDT.ProjStrat.diagonalPointAnswerFamilyB)
 /-- Bob's point answers in the restricted diagonal branch: Bob receives the
 sampled base point `u` and answers with `A^{B,u}`. -/
 noncomputable def diagonalPointAnswerFamilyB
@@ -788,7 +792,7 @@ noncomputable def diagonalPointAnswerFamilyB
     IdxSubMeas (RestrictedDiagonalSample params j) (Fq params) ιB :=
   fun s => (strategy.pointMeasurementB s.1).toSubMeas
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:404-416  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyA)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:364-376  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyA)
 /-- Alice's restricted diagonal-line answers: Alice receives `ℓ`, answers with
 `L^{A,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
@@ -803,7 +807,7 @@ noncomputable def diagonalLineAnswerFamilyA
       ((strategy.diagonalMeasurementA ℓ).toSubMeas)
       (· zeroCoord)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:418-430  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyB)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:378-390  (MIPStarRE.LDT.ProjStrat.diagonalLineAnswerFamilyB)
 /-- Bob's restricted diagonal-line answers: Bob receives `ℓ`, answers with
 `L^{B,ℓ}`, and the verifier postprocesses to the value at the sampled base
 point. -/
@@ -818,7 +822,7 @@ noncomputable def diagonalLineAnswerFamilyB
       ((strategy.diagonalMeasurementB ℓ).toSubMeas)
       (· zeroCoord)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:432-439  (MIPStarRE.LDT.ProjStrat.axisParallelLineLeftPointRightFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:392-399  (MIPStarRE.LDT.ProjStrat.axisParallelLineLeftPointRightFailureProbability)
 /-- Axis-parallel branch component where Alice receives the sampled line and Bob
 receives its base point. -/
 noncomputable def axisParallelLineLeftPointRightFailureProbability
@@ -828,7 +832,7 @@ noncomputable def axisParallelLineLeftPointRightFailureProbability
     (axisParallelLineAnswerFamilyA strategy)
     (axisParallelPointAnswerFamilyB strategy)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:441-448  (MIPStarRE.LDT.ProjStrat.axisParallelPointLeftLineRightFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:401-408  (MIPStarRE.LDT.ProjStrat.axisParallelPointLeftLineRightFailureProbability)
 /-- Axis-parallel branch component where Alice receives the sampled base point
 and Bob receives the sampled line. -/
 noncomputable def axisParallelPointLeftLineRightFailureProbability
@@ -838,7 +842,7 @@ noncomputable def axisParallelPointLeftLineRightFailureProbability
     (axisParallelPointAnswerFamilyA strategy)
     (axisParallelLineAnswerFamilyB strategy)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:450-455  (MIPStarRE.LDT.ProjStrat.axisParallelRoleAverage)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:410-415  (MIPStarRE.LDT.ProjStrat.axisParallelRoleAverage)
 /-- The paper's axis-parallel branch for a two-space general strategy, averaged
 over the two role choices. -/
 noncomputable def axisParallelRoleAverage
@@ -846,7 +850,7 @@ noncomputable def axisParallelRoleAverage
   (axisParallelLineLeftPointRightFailureProbability strategy +
     axisParallelPointLeftLineRightFailureProbability strategy) / 2
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:457-464  (MIPStarRE.LDT.ProjStrat.pointAgreementFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:417-424  (MIPStarRE.LDT.ProjStrat.pointAgreementFailureProbability)
 /-- Point-agreement branch: both provers receive the same point and the verifier
 checks equality of their field answers. -/
 noncomputable def pointAgreementFailureProbability
@@ -856,7 +860,7 @@ noncomputable def pointAgreementFailureProbability
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
     (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:466-475  (MIPStarRE.LDT.ProjStrat.diagonalLineLeftPointRightFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:426-435  (MIPStarRE.LDT.ProjStrat.diagonalLineLeftPointRightFailureProbability)
 /-- Diagonal branch component where Alice receives the sampled diagonal line and
 Bob receives its base point. -/
 noncomputable def diagonalLineLeftPointRightFailureProbability
@@ -868,7 +872,7 @@ noncomputable def diagonalLineLeftPointRightFailureProbability
         (diagonalLineAnswerFamilyA strategy j)
         (diagonalPointAnswerFamilyB strategy j)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:477-486  (MIPStarRE.LDT.ProjStrat.diagonalPointLeftLineRightFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:437-446  (MIPStarRE.LDT.ProjStrat.diagonalPointLeftLineRightFailureProbability)
 /-- Diagonal branch component where Alice receives the sampled base point and
 Bob receives the sampled diagonal line. -/
 noncomputable def diagonalPointLeftLineRightFailureProbability
@@ -880,7 +884,7 @@ noncomputable def diagonalPointLeftLineRightFailureProbability
         (diagonalPointAnswerFamilyA strategy j)
         (diagonalLineAnswerFamilyB strategy j)
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:488-493  (MIPStarRE.LDT.ProjStrat.diagonalRoleAverage)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:448-453  (MIPStarRE.LDT.ProjStrat.diagonalRoleAverage)
 /-- The paper's diagonal branch for a two-space general strategy, averaged over
 the two role choices and the restricted diagonal samples. -/
 noncomputable def diagonalRoleAverage
@@ -888,7 +892,7 @@ noncomputable def diagonalRoleAverage
   (diagonalLineLeftPointRightFailureProbability strategy +
     diagonalPointLeftLineRightFailureProbability strategy) / 2
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:495-505  (MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:455-465  (MIPStarRE.LDT.ProjStrat.lowIndividualDegreeFailureProbability)
 /-- Trace-based failure surrogate for the full low-individual-degree test for a
 paper-faithful two-space projective strategy.
 
@@ -901,7 +905,7 @@ noncomputable def lowIndividualDegreeFailureProbability
   (strategy.axisParallelRoleAverage + strategy.pointAgreementFailureProbability +
     strategy.diagonalRoleAverage) / 3
 
--- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:507-511  (MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest)
+-- source: MIPStarRE/LDT/Test/StrategyBiProj/Measurements.lean:467-471  (MIPStarRE.LDT.ProjStrat.PassesLowIndividualDegreeTest)
 /-- Passing the full low-individual-degree test with error `ε`, for the
 paper-faithful two-space strategy container. -/
 structure PassesLowIndividualDegreeTest
