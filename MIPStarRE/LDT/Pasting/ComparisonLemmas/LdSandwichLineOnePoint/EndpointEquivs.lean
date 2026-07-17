@@ -26,8 +26,7 @@ noncomputable def postprocessMeasurement
     [Fintype α] [Fintype β] [Fintype ι] [DecidableEq ι]
     (B : Measurement α ι) (f : α → β) : Measurement β ι where
   toSubMeas := postprocess B.toSubMeas f
-  total_eq_one := by
-    simpa [postprocess_total] using B.total_eq_one
+  total_eq_one := (postprocess_total B.toSubMeas f).trans B.total_eq_one
 
 /-- Split a sandwiched-line question at one selected slice coordinate. -/
 noncomputable def sandwichedLineQuestionSplitAtEquiv
@@ -38,13 +37,11 @@ noncomputable def sandwichedLineQuestionSplitAtEquiv
   toFun q := ((q.1, q.2 i), fun j => q.2 j.1)
   invFun q :=
     (q.1.1, (Equiv.funSplitAt i (Fq params)).symm (q.1.2, q.2))
-  left_inv := by
-    rintro ⟨u, xs⟩
+  left_inv := fun ⟨u, xs⟩ => by
     simpa [Equiv.funSplitAt] using
       congrArg (fun ys : PointTuple params k => (u, ys))
         ((Equiv.funSplitAt i (Fq params)).left_inv xs)
-  right_inv := by
-    rintro ⟨⟨u, x⟩, xs⟩
+  right_inv := fun ⟨⟨u, x⟩, xs⟩ => by
     simp only [ne_eq, Equiv.funSplitAt_symm_apply, ↓reduceDIte, Subtype.coe_eta, dite_eq_ite,
       Prod.mk.injEq, true_and]
     funext j
@@ -63,11 +60,8 @@ noncomputable def sandwichedLineQuestionPrefixEquiv
         q.1.2 ⟨j.1, by omega⟩
       else
         q.2 ⟨j, by omega⟩)
-  left_inv := by
-    rintro ⟨u, xs⟩
-    simp
-  right_inv := by
-    rintro ⟨⟨u, xsPrefix⟩, xsRest⟩
+  left_inv := fun ⟨u, xs⟩ => by simp
+  right_inv := fun ⟨⟨u, xsPrefix⟩, xsRest⟩ => by
     simp only [Fin.eta, Subtype.coe_eta, Prod.mk.injEq, true_and]
     constructor
     · funext j
@@ -81,12 +75,8 @@ noncomputable def sandwichedLineQuestionPrefixEquiv
 def prodPrefixReassocEquiv (α β γ : Type*) : ((α × β) × γ) ≃ β × (α × γ) where
   toFun q := (q.1.2, (q.1.1, q.2))
   invFun q := ((q.2.1, q.1), q.2.2)
-  left_inv := by
-    rintro ⟨⟨a, b⟩, c⟩
-    rfl
-  right_inv := by
-    rintro ⟨b, a, c⟩
-    rfl
+  left_inv := fun _ => rfl
+  right_inv := fun _ => rfl
 
 /-- View the prefix of a sandwiched-line question as the first product coordinate. -/
 noncomputable def sandwichedLineQuestionPrefixFstEquiv
@@ -108,8 +98,7 @@ def pointTupleLastFrontEquiv
       xs 0
     else
       xs ⟨j.1 + 1, by omega⟩
-  left_inv := by
-    intro xs
+  left_inv := fun xs => by
     funext j
     by_cases hji : j.1 = i
     · have hj : j = ⟨i, Nat.lt_succ_self i⟩ := Fin.ext hji
@@ -122,8 +111,7 @@ def pointTupleLastFrontEquiv
         rfl]
       simp only [Fin.succ_mk]
       exact congrArg xs (Fin.ext rfl)
-  right_inv := by
-    intro xs
+  right_inv := fun xs => by
     funext j
     cases j using Fin.cases with
     | zero => simp
@@ -142,8 +130,7 @@ def gHatTupleOutcomeLastFrontEquiv
       gs 0
     else
       gs ⟨j.1 + 1, by omega⟩
-  left_inv := by
-    intro gs
+  left_inv := fun gs => by
     funext j
     by_cases hji : j.1 = i
     · have hj : j = ⟨i, Nat.lt_succ_self i⟩ := Fin.ext hji
@@ -156,8 +143,7 @@ def gHatTupleOutcomeLastFrontEquiv
         rfl]
       simp only [Fin.succ_mk]
       exact congrArg gs (Fin.ext rfl)
-  right_inv := by
-    intro gs
+  right_inv := fun gs => by
     funext j
     cases j using Fin.cases with
     | zero => simp
@@ -177,8 +163,7 @@ def pointTupleLastReverseEquiv
       xs 0
     else
       xs ⟨i - j.1, by omega⟩
-  left_inv := by
-    intro xs
+  left_inv := fun xs => by
     funext j
     by_cases hji : j.1 = i
     · have hj : j = ⟨i, Nat.lt_succ_self i⟩ := Fin.ext hji
@@ -194,8 +179,7 @@ def pointTupleLastReverseEquiv
       simp only [Fin.cons_succ]
       have hle : (j : ℕ) ≤ i - 1 := by omega
       exact congrArg xs (Fin.ext (Nat.sub_sub_self hle))
-  right_inv := by
-    intro xs
+  right_inv := fun xs => by
     funext j
     cases j using Fin.cases with
     | zero => simp
@@ -218,8 +202,7 @@ def gHatTupleOutcomeLastReverseEquiv
       gs 0
     else
       gs ⟨i - j.1, by omega⟩
-  left_inv := by
-    intro gs
+  left_inv := fun gs => by
     funext j
     by_cases hji : j.1 = i
     · have hj : j = ⟨i, Nat.lt_succ_self i⟩ := Fin.ext hji
@@ -235,8 +218,7 @@ def gHatTupleOutcomeLastReverseEquiv
       simp only [Fin.cons_succ]
       have hle : (j : ℕ) ≤ i - 1 := by omega
       exact congrArg gs (Fin.ext (Nat.sub_sub_self hle))
-  right_inv := by
-    intro gs
+  right_inv := fun gs => by
     funext j
     cases j using Fin.cases with
     | zero => simp
@@ -255,8 +237,7 @@ def gHatTupleOutcomePrefixLastEquiv
   toFun gs := (fun j => gs ⟨j.1, by omega⟩, gs ⟨n, Nat.lt_succ_self n⟩)
   invFun p := fun j =>
     if hj : j.1 < n then p.1 ⟨j.1, hj⟩ else p.2
-  left_inv := by
-    intro gs
+  left_inv := fun gs => by
     funext j
     by_cases hj : j.1 < n
     · simp [hj]
@@ -264,8 +245,7 @@ def gHatTupleOutcomePrefixLastEquiv
       have hfin : j = ⟨n, Nat.lt_succ_self n⟩ := Fin.ext hjeq
       subst j
       simp
-  right_inv := by
-    rintro ⟨gs, g⟩
+  right_inv := fun ⟨gs, g⟩ => by
     simp only [Prod.mk.injEq]
     constructor
     · funext j
