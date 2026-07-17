@@ -78,49 +78,10 @@ private theorem diagonalSandwichFamily_total_le_one {Question Outcome : Type*}
           rightTensor (ι₁ := ιA) ((B q).outcome a)
       ≤ ∑ a : Outcome, leftTensor (ι₂ := ιB) ((A q).outcome a) := by
           refine Finset.sum_le_sum ?_
-          intro a ha
-          have hopTensor_le :
-              opTensor ((A q).outcome a) ((B q).outcome a) ≤
-                leftTensor (ι₂ := ιB) ((A q).outcome a) := by
-            change
-              (leftTensor (ι₂ := ιB) ((A q).outcome a) -
-                opTensor ((A q).outcome a) ((B q).outcome a)).PosSemidef
-            have hrewrite :
-                leftTensor (ι₂ := ιB) ((A q).outcome a) -
-                  opTensor ((A q).outcome a) ((B q).outcome a) =
-                opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
-              have hneg :
-                  Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) =
-                    -Matrix.kronecker ((A q).outcome a) ((B q).outcome a) := by
-                simpa using
-                  (Matrix.kronecker_smul (-1 : ℂ) ((A q).outcome a) ((B q).outcome a))
-              calc
-                leftTensor (ι₂ := ιB) ((A q).outcome a) -
-                    opTensor ((A q).outcome a) ((B q).outcome a)
-                  =
-                    Matrix.kronecker ((A q).outcome a) 1 +
-                      Matrix.kronecker ((A q).outcome a) (-((B q).outcome a)) := by
-                        rw [hneg]
-                        simp [leftTensor, opTensor, sub_eq_add_neg]
-                _ = Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a) := by
-                      simpa [sub_eq_add_neg] using
-                        (Matrix.kronecker_add ((A q).outcome a) 1 (-((B q).outcome a))).symm
-                _ = opTensor ((A q).outcome a) (1 - (B q).outcome a) := by
-                      simp [opTensor]
-            have hpsd :
-                Matrix.PosSemidef
-                  (opTensor ((A q).outcome a) (1 - (B q).outcome a)) := by
-              change
-                Matrix.PosSemidef
-                  (Matrix.kronecker ((A q).outcome a) (1 - (B q).outcome a))
-              exact
-                Matrix.PosSemidef.kronecker
-                  (Matrix.nonneg_iff_posSemidef.mp ((A q).outcome_pos a))
-                  (Matrix.nonneg_iff_posSemidef.mp
-                    (sub_nonneg.mpr (Measurement.outcome_le_one (B q) a)))
-            rwa [hrewrite]
+          intro a _ha
           rw [leftTensor_mul_rightTensor_eq_opTensor]
-          exact hopTensor_le
+          exact opTensor_le_leftTensor
+            ((A q).outcome_pos a) (Measurement.outcome_le_one (B q) a)
     _ = leftTensor (ι₂ := ιB) ((A q).total) := by
       rw [leftTensor_finset_sum (ι₂ := ιB) Finset.univ (fun a => (A q).outcome a)]
       rw [(A q).sum_eq_total]
