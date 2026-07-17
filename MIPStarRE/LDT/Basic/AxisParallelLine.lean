@@ -19,7 +19,8 @@ namespace MIPStarRE.LDT
 structure AxisParallelLine (params : Parameters) where
   base : Point params
   direction : Fin params.m
-  deriving DecidableEq, Inhabited
+
+deriving instance DecidableEq, Inhabited for AxisParallelLine
 
 namespace AxisParallelLine
 

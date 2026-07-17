@@ -43,7 +43,8 @@ structure Parameters where
   hq : 0 < q
   /-- Paper-faithful witness that `q` is a prime power. -/
   hqPrimePower : ∃ p n, Nat.Prime p ∧ 0 < n ∧ q = p ^ n
-  deriving DecidableEq
+
+deriving instance DecidableEq for Parameters
 
 namespace Parameters
 
