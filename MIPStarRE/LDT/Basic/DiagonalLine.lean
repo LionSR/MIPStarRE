@@ -17,7 +17,8 @@ namespace MIPStarRE.LDT
 structure DiagonalLine (params : Parameters) where
   base : Point params
   direction : Point params
-  deriving DecidableEq, Inhabited
+
+deriving instance DecidableEq, Inhabited for DiagonalLine
 
 namespace DiagonalLine
 
