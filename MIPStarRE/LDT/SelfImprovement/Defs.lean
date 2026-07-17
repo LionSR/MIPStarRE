@@ -292,7 +292,7 @@ noncomputable def sandwichedPolynomialSubMeasAt (params : Parameters)
     total_le_one := sandwichedPolynomialOutcomeOperatorAt_sum_le_one params strategy T u }
 
 /-- The average of the total pointwise sandwiched operators is bounded by the identity. -/
-private theorem averagedSandwichedPolynomialSubMeasAt_total_le_one (params : Parameters)
+private theorem averagedSandwichedPolynomialSubMeas_total_le_one (params : Parameters)
     [FieldModel params.q] (strategy : SymStrat params ι)
     (T : SubMeas (Polynomial params) ι) :
     ∑ h : Polynomial params,
@@ -334,7 +334,7 @@ noncomputable def averagedSandwichedPolynomialSubMeas (params : Parameters)
       (fun u => sandwichedPolynomialOutcomeOperatorAt params strategy T u h)
       (fun u => (sandwichedPolynomialSubMeasAt params strategy T u).outcome_pos h)
     sum_eq_total := rfl
-    total_le_one := averagedSandwichedPolynomialSubMeasAt_total_le_one params strategy T }
+    total_le_one := averagedSandwichedPolynomialSubMeas_total_le_one params strategy T }
 
 /-- The variance error entering `lem:add-in-u`. -/
 noncomputable def selfImprovementVarianceError (params : Parameters)
