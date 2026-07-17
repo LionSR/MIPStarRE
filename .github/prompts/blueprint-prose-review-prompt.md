@@ -6,7 +6,7 @@ Authoritative source for category B: `docs/mathematical_language.md`. Read it on
 before reviewing; do not paraphrase the tables here.
 
 All other concerns (proof integrity, Mathlib style, performance, etc.)
-belong to the main `Claude Code Review (Lean)` workflow — do NOT comment
+belong to the code-review jobs of the `PR Review` workflow — do NOT comment
 on them.
 
 PR: <REPOSITORY>/pull/<PR_NUMBER>
@@ -161,7 +161,8 @@ stale `\leanok`, 4 prose issues").
 feedback via `mcp__github__get_review_comments` (inline) and
 `mcp__github__get_comments` (conversation). Skip issues already raised.
 
-**Resolving previous review comments.** On `synchronize`:
+**Resolving previous review comments.** When the PR already carries
+review threads from an earlier review cycle:
 1. Fetch review-thread IDs via `gh api graphql` (MCP does not return
    thread IDs).
 2. For each unresolved thread authored by `claude`,
