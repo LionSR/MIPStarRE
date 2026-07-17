@@ -13,9 +13,30 @@ dependency order, every declaration in the kernel closure of the statement of
 `mainFormal`, each with a provenance comment; the theorem itself is stated
 with `sorry`.
 
-## Regenerating
+## Drift guard and regeneration
 
-Run from the repository root (requires a built library):
+The repository keeps the generated challenge checked in at
+`scripts/comparator/expected/Challenge.lean.expected`.  The final `.expected`
+suffix keeps this generated, intentionally monolithic fixture out of the
+1000-line project-source guard.  The PR CI guard regenerates the challenge in a
+temporary directory and byte-compares it with this checked-in copy; it never
+writes `Challenge.lean` at the repository root.
+
+Run the deterministic guard from the repository root (requires a built library):
+
+```sh
+python3 scripts/comparator/check_challenge_drift.py --root .
+```
+
+To update the checked-in expected copy after an intentional statement or
+dependency change, run the exact maintenance command:
+
+```sh
+python3 scripts/comparator/check_challenge_drift.py --root . --update
+```
+
+The update command performs the documented extraction and assembly pipeline in a
+temporary directory:
 
 ```sh
 # 1. extract the closure of the statement of mainFormal
@@ -26,12 +47,13 @@ awk -F'\t' 'NF==4' closure.tsv > closure.clean.tsv
 # 2. assemble the challenge file (topological order, namespace handling)
 python3 scripts/comparator/assemble_challenge.py closure.clean.tsv > draft.lean
 cat scripts/comparator/challenge_header.lean draft.lean \
-    scripts/comparator/challenge_footer.lean > Challenge.lean
+    scripts/comparator/challenge_footer.lean \
+    > scripts/comparator/expected/Challenge.lean.expected
 ```
 
-Then copy `Challenge.lean` into the LDT-comparator repository, bump the
-`rev` pin in its `lakefile.toml` to the library commit it was generated from,
-and run its `./verify.sh` (its CI also runs on every push).
+Then copy `scripts/comparator/expected/Challenge.lean.expected` into the LDT-comparator
+repository, bump the `rev` pin in its `lakefile.toml` to the library commit it
+was generated from, and run its `./verify.sh` (its CI also runs on every push).
 
 ## Maintenance notes
 
@@ -40,10 +62,10 @@ and run its `./verify.sh` (its CI also runs on every push).
   kernel closure cannot see.  Extend them if regeneration produces compile
   errors in `Challenge.lean`; the script fails loudly if a table key no
   longer matches any extracted declaration.
-- The `mainFormal` statement in `challenge_footer.lean` is a manual copy of
-  the theorem in `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean`.  If the
-  library statement changes, update the footer too — comparator fails with
-  "theorem statement do not match" until the two agree.
+- The `mainFormal` statement in `challenge_footer.lean` mirrors the theorem in
+  `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean`.  If the library statement
+  changes, update the footer too — comparator fails with "theorem statement do
+  not match" until the two agree.
 - Declarations without a source range (compiler-generated congruence lemmas
   and `autoParam` helpers) are emitted as explanatory comments; they
   regenerate identically during elaboration of the challenge file.
