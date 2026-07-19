@@ -1,8 +1,8 @@
-<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.RingTheory.RamificationInertia.Inertia</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.RingTheory.RamificationInertia.Inertia";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">RingTheory</span>.<span class="name">RamificationInertia</span>.<span class="name">Inertia</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/NumberTheory/RamificationInertia/Inertia.html">Mathlib.NumberTheory.RamificationInertia.Inertia</a></li><li><a href="../../.././Mathlib/RingTheory/QuasiFinite/Basic.html">Mathlib.RingTheory.QuasiFinite.Basic</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.RingTheory.RamificationInertia.Inertia" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'"><span class="name">Ideal</span>.<span class="name">inertiaDeg'</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_def"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_def</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_of_not_isPrime"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_of_not_isPrime</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_pos"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_pos</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_eq"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_eq_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq_inertiaDeg'</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_tower"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_tower</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_smul"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_smul</span></a></div></nav><main>
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.RingTheory.RamificationInertia.Inertia</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.RingTheory.RamificationInertia.Inertia";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">RingTheory</span>.<span class="name">RamificationInertia</span>.<span class="name">Inertia</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/NumberTheory/RamificationInertia/Inertia.html">Mathlib.NumberTheory.RamificationInertia.Inertia</a></li><li><a href="../../.././Mathlib/RingTheory/QuasiFinite/Basic.html">Mathlib.RingTheory.QuasiFinite.Basic</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.RingTheory.RamificationInertia.Inertia" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg"><span class="name">Ideal</span>.<span class="name">inertiaDeg</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_def"><span class="name">Ideal</span>.<span class="name">inertiaDeg_def</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_def"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_def</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_of_not_isPrime"><span class="name">Ideal</span>.<span class="name">inertiaDeg_of_not_isPrime</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_of_not_isPrime"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_of_not_isPrime</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_pos"><span class="name">Ideal</span>.<span class="name">inertiaDeg_pos</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_eq"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_eq"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_eq_of_isFractionRing"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq_of_isFractionRing</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_eq_of_isFractionRing"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq_of_isFractionRing</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_eq_of_isMaximal"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq_of_isMaximal</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_eq_of_isMaximal"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq_of_isMaximal</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_eq_inertiaDeg"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq_inertiaDeg</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_eq_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq_inertiaDeg'</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_tower"><span class="name">Ideal</span>.<span class="name">inertiaDeg_tower</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_tower"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_tower</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_below_dvd"><span class="name">Ideal</span>.<span class="name">inertiaDeg_below_dvd</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_below_dvd"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_below_dvd</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_above_dvd"><span class="name">Ideal</span>.<span class="name">inertiaDeg_above_dvd</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_above_dvd"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_above_dvd</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_below_le"><span class="name">Ideal</span>.<span class="name">inertiaDeg_below_le</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_below_le"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_below_le</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_above_le"><span class="name">Ideal</span>.<span class="name">inertiaDeg_above_le</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_above_le"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_above_le</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg_smul"><span class="name">Ideal</span>.<span class="name">inertiaDeg_smul</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.inertiaDeg'_smul"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_smul</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.cardQuot_pow_inertiaDeg"><span class="name">Ideal</span>.<span class="name">cardQuot_pow_inertiaDeg</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.cardQuot_pow_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">cardQuot_pow_inertiaDeg'</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.absNorm_pow_inertiaDeg"><span class="name">Ideal</span>.<span class="name">absNorm_pow_inertiaDeg</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.absNorm_pow_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">absNorm_pow_inertiaDeg'</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.natAbs_pow_inertiaDeg"><span class="name">Ideal</span>.<span class="name">natAbs_pow_inertiaDeg</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.natAbs_pow_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">natAbs_pow_inertiaDeg'</span></a></div><div class="nav_link"><a class="break_within" href="#Ideal.pow_inertiaDeg"><span class="name">Ideal</span>.<span class="name">pow_inertiaDeg</span></a></div></nav><main>
 <div class="mod_doc"><h1 id="Inertia-degree" class="markdown-heading">Inertia degree <a class="hover-link" href="#Inertia-degree">#</a></h1><p>Given a prime ideal <code>q</code> of an <code>R</code>-algebra <code>S</code>, the inertia degree of <code>q</code> over <code>R</code> is defined
-to be the degree of the residue field of <code>q</code> over the residue field of its preimage <code>p</code> in <code>R</code>.</p><h2 id="Main-definitions" class="markdown-heading">Main definitions <a class="hover-link" href="#Main-definitions">#</a></h2><ul><li><code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">Ideal.inertiaDeg'</a> q R</code>: The inertia degree of <code>q</code> over <code>R</code>.</li></ul><h2 id="Main-statements" class="markdown-heading">Main statements <a class="hover-link" href="#Main-statements">#</a></h2><ul><li><code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_eq_inertiaDeg'">inertiaDeg_eq_inertiaDeg'</a></code>: The inertia degree agrees with the usual definition in the case of
-maximal ideals.</li><li><code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_tower">inertiaDeg'_tower</a></code>: Inertia degree is multiplicative in towers.</li></ul></div><div class="decl" id="Ideal.inertiaDeg'"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L37-L46">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
-<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'"><span class="name">Ideal</span>.<span class="name">inertiaDeg'</span></a></span><span class="impl_arg"><span class="decl_args">
+to be the degree of the residue field of <code>q</code> over the residue field of its preimage <code>p</code> in <code>R</code>.</p><h2 id="Main-definitions" class="markdown-heading">Main definitions <a class="hover-link" href="#Main-definitions">#</a></h2><ul><li><code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">Ideal.inertiaDeg</a> q R</code>: The inertia degree of <code>q</code> over <code>R</code>.</li></ul><h2 id="Main-statements" class="markdown-heading">Main statements <a class="hover-link" href="#Main-statements">#</a></h2><ul><li><code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_eq_inertiaDeg">inertiaDeg'_eq_inertiaDeg</a></code>: The inertia degree agrees with the usual definition in the case of
+maximal ideals.</li><li><code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_tower">inertiaDeg_tower</a></code>: Inertia degree is multiplicative in towers.</li></ul></div><div class="decl" id="Ideal.inertiaDeg"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L37-L46">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg"><span class="name">Ideal</span>.<span class="name">inertiaDeg</span></a></span><span class="impl_arg"><span class="decl_args">
 <span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
 </span><span class="impl_arg"><span class="decl_args">
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
@@ -15,7 +15,27 @@ maximal ideals.</li><li><code><a href="../../.././Mathlib/RingTheory/Ramificatio
 </span><span class="impl_arg"><span class="decl_args">
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
 </span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Init/Prelude.html#Nat">ℕ</a></div></div><p>Given a prime ideal <code>q</code> of an <code>R</code>-algebra <code>S</code>, the inertia degree of <code>q</code> over <code>R</code> is defined
-to be the degree of the residue field of <code>q</code> over the residue field of its preimage <code>p</code> in <code>R</code>.</p><p>When <code>q</code> is not prime, we use a junk value of <code>0</code>.</p><p>This will eventually replace the existing definition of <code><a href="../../.././Mathlib/NumberTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">Ideal.inertiaDeg</a></code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">if x : <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span> then <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">Ideal.under</a> <span class="fn">R</span> <span class="fn">q</span>)</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span> <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span></span> else <span class="fn">0</span></span></li></ul></details><details id="instances-for-list-Ideal.inertiaDeg'" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Ideal.inertiaDeg'_def"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L48-L53">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+to be the degree of the residue field of <code>q</code> over the residue field of its preimage <code>p</code> in <code>R</code>.</p><p>When <code>q</code> is not prime, we use a junk value of <code>0</code>.</p><p>This will eventually replace the existing definition of <code><a href="../../.././Mathlib/NumberTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">Ideal.inertiaDeg'</a></code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">if x : <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span> then <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">Ideal.under</a> <span class="fn">R</span> <span class="fn">q</span>)</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span> <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span></span> else <span class="fn">0</span></span></li></ul></details><details id="instances-for-list-Ideal.inertiaDeg" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Ideal.inertiaDeg_def"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L48-L53">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_def"><span class="name">Ideal</span>.<span class="name">inertiaDeg_def</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hq</span> : <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime">Localization.AtPrime</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">under</a> <span class="fn">R</span> <span class="fn">q</span>)</span>)</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime">Localization.AtPrime</a> <span class="fn">q</span>)</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime.IsLiesOverAlgebra">Localization.AtPrime.IsLiesOverAlgebra</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">under</a> <span class="fn">R</span> <span class="fn">q</span>)</span> <span class="fn">q</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">under</a> <span class="fn">R</span> <span class="fn">q</span>)</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span> <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_def"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L55-L55">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_def (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
 <span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_def"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_def</span></a></span><span class="impl_arg"><span class="decl_args">
 <span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
 </span><span class="impl_arg"><span class="decl_args">
@@ -34,7 +54,23 @@ to be the degree of the residue field of <code>q</code> over the residue field o
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime">Localization.AtPrime</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">under</a> <span class="fn">R</span> <span class="fn">q</span>)</span>)</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime">Localization.AtPrime</a> <span class="fn">q</span>)</span></span>]</span></span>
 </span><span class="impl_arg"><span class="decl_args">
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime.IsLiesOverAlgebra">Localization.AtPrime.IsLiesOverAlgebra</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">under</a> <span class="fn">R</span> <span class="fn">q</span>)</span> <span class="fn">q</span></span>]</span></span>
-</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">under</a> <span class="fn">R</span> <span class="fn">q</span>)</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span> <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_of_not_isPrime"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L55-L56">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.under">under</a> <span class="fn">R</span> <span class="fn">q</span>)</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span> <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_def">Ideal.inertiaDeg_def</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_of_not_isPrime"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L57-L58">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_of_not_isPrime"><span class="name">Ideal</span>.<span class="name">inertiaDeg_of_not_isPrime</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hq</span> : <a href="../../.././Init/Prelude.html#Not">¬</a><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_of_not_isPrime"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L60-L61">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_of_not_isPrime (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
 <span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_of_not_isPrime"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_of_not_isPrime</span></a></span><span class="impl_arg"><span class="decl_args">
 <span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
 </span><span class="impl_arg"><span class="decl_args">
@@ -49,8 +85,8 @@ to be the degree of the residue field of <code>q</code> over the residue field o
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
 </span><span class="decl_args">
 <span class="fn">(<span class="fn">hq</span> : <a href="../../.././Init/Prelude.html#Not">¬</a><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>)</span></span>
-<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_pos"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L58-L61">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
-<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_pos"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_pos</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_of_not_isPrime">Ideal.inertiaDeg_of_not_isPrime</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_pos"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L63-L66">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_pos"><span class="name">Ideal</span>.<span class="name">inertiaDeg_pos</span></a></span><span class="impl_arg"><span class="decl_args">
 <span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
 </span><span class="impl_arg"><span class="decl_args">
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
@@ -66,7 +102,33 @@ to be the degree of the residue field of <code>q</code> over the residue field o
 <span class="fn">[<span class="fn">hq</span> : <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
 </span><span class="impl_arg"><span class="decl_args">
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
-</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L71-L77">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L76-L82">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_eq"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime">Localization.AtPrime</a> <span class="fn">p</span>)</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime">Localization.AtPrime</a> <span class="fn">q</span>)</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime.IsLiesOverAlgebra">Localization.AtPrime.IsLiesOverAlgebra</a> <span class="fn">p</span> <span class="fn">q</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span> <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L84-L84">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_eq (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
 <span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_eq"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq</span></a></span><span class="impl_arg"><span class="decl_args">
 <span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
 </span><span class="impl_arg"><span class="decl_args">
@@ -91,7 +153,179 @@ to be the degree of the residue field of <code>q</code> over the residue field o
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime">Localization.AtPrime</a> <span class="fn">p</span>)</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime">Localization.AtPrime</a> <span class="fn">q</span>)</span></span>]</span></span>
 </span><span class="impl_arg"><span class="decl_args">
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/AtPrime/Basic.html#Localization.AtPrime.IsLiesOverAlgebra">Localization.AtPrime.IsLiesOverAlgebra</a> <span class="fn">p</span> <span class="fn">q</span></span>]</span></span>
-</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span> <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg_eq_inertiaDeg'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L79-L94">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span> <span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/LocalRing/ResidueField/Ideal.html#Ideal.ResidueField">ResidueField</a></span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_eq">Ideal.inertiaDeg_eq</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_eq_of_isFractionRing"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L86-L105">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_eq_of_isFractionRing"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq_of_isFractionRing</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> (<span class="fn">R</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">p</span>) <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> (<span class="fn">R</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">p</span>) <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> (<span class="fn">S</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">q</span>) <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> (<span class="fn">S</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">q</span>) <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> (<span class="fn">R</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">p</span>) <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">S</span> (<span class="fn">S</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">q</span>) <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">K</span> <span class="fn">L</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_eq_of_isFractionRing"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L107-L108">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_eq_of_isFractionRing (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_eq_of_isFractionRing"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq_of_isFractionRing</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> (<span class="fn">R</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">p</span>) <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> (<span class="fn">R</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">p</span>) <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> (<span class="fn">S</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">q</span>) <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> (<span class="fn">S</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">q</span>) <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> (<span class="fn">R</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">p</span>) <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">S</span> (<span class="fn">S</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">q</span>) <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">K</span> <span class="fn">L</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_eq_of_isFractionRing">Ideal.inertiaDeg_eq_of_isFractionRing</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_eq_of_isMaximal"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L110-L114">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_eq_of_isMaximal"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq_of_isMaximal</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> (<span class="fn">R</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">p</span>) (<span class="fn">S</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">q</span>)</span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_eq_of_isMaximal"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L116-L117">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_eq_of_isMaximal (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_eq_of_isMaximal"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq_of_isMaximal</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> (<span class="fn">R</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">p</span>) (<span class="fn">S</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">q</span>)</span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_eq_of_isMaximal">Ideal.inertiaDeg_eq_of_isMaximal</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg'_eq_inertiaDeg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L119-L121">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_eq_inertiaDeg"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_eq_inertiaDeg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/NumberTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg_eq_inertiaDeg'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L123-L123">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg'_eq_inertiaDeg (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
 <span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_eq_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">inertiaDeg_eq_inertiaDeg'</span></a></span><span class="impl_arg"><span class="decl_args">
 <span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
 </span><span class="impl_arg"><span class="decl_args">
@@ -112,7 +346,35 @@ to be the degree of the residue field of <code>q</code> over the residue field o
 <span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
 </span><span class="impl_arg"><span class="decl_args">
 <span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
-</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/NumberTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_tower"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L96-L106">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/NumberTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">q</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_eq_inertiaDeg">Ideal.inertiaDeg'_eq_inertiaDeg</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_tower"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L125-L135">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_tower"><span class="name">Ideal</span>.<span class="name">inertiaDeg_tower</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">S</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_tower"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L137-L137">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_tower (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
 <span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_tower"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_tower</span></a></span><span class="impl_arg"><span class="decl_args">
 <span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
 </span><span class="impl_arg"><span class="decl_args">
@@ -139,7 +401,267 @@ to be the degree of the residue field of <code>q</code> over the residue field o
 <span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
 <span class="impl_arg"><span class="decl_args">
 <span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
-</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">S</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_smul"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/fabf563a7c95a166b8d7b6efca11c8b4dc9d911f/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L110-L121">source</a></div><div class="attributes">@[simp]</div>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">S</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_tower">Ideal.inertiaDeg_tower</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_below_dvd"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L139-L142">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_below_dvd"><span class="name">Ideal</span>.<span class="name">inertiaDeg_below_dvd</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Dvd.dvd">∣</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_below_dvd"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L144-L144">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_below_dvd (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_below_dvd"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_below_dvd</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Dvd.dvd">∣</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_below_dvd">Ideal.inertiaDeg_below_dvd</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_above_dvd"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L146-L149">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_above_dvd"><span class="name">Ideal</span>.<span class="name">inertiaDeg_above_dvd</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">S</span></span> <a href="../../.././Init/Prelude.html#Dvd.dvd">∣</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_above_dvd"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L151-L151">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_above_dvd (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_above_dvd"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_above_dvd</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">S</span></span> <a href="../../.././Init/Prelude.html#Dvd.dvd">∣</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_above_dvd">Ideal.inertiaDeg_above_dvd</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_below_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L153-L155">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_below_le"><span class="name">Ideal</span>.<span class="name">inertiaDeg_below_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_below_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L157-L157">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_below_le (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_below_le"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_below_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_below_le">Ideal.inertiaDeg_below_le</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_above_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L159-L161">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_above_le"><span class="name">Ideal</span>.<span class="name">inertiaDeg_above_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">S</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_above_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L163-L163">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_above_le (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_above_le"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_above_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">T</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">T</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">q</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">T</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">S</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_above_le">Ideal.inertiaDeg_above_le</a></code>.</p></div></div><div class="decl" id="Ideal.inertiaDeg_smul"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L167-L178">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_smul"><span class="name">Ideal</span>.<span class="name">inertiaDeg_smul</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">G</span> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">G</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">q</span>).<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div></div></div><div class="decl" id="Ideal.inertiaDeg'_smul"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L180-L180">source</a></div><div class="attributes">@[deprecated Ideal.inertiaDeg_smul (since := &quot;2026-07-03&quot;)]</div>
 <div class="decl_header"><span class="decl_kind">theorem</span>
 <span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'_smul"><span class="name">Ideal</span>.<span class="name">inertiaDeg'_smul</span></a></span><span class="decl_args">
 <span class="fn">(<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
@@ -163,5 +685,169 @@ to be the degree of the residue field of <code>q</code> over the residue field o
 <span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">G</span> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
 </span><span class="decl_args">
 <span class="fn">(<span class="fn">g</span> : <span class="fn">G</span>)</span></span>
-<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">q</span>).<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg'">inertiaDeg'</a></span> <span class="fn">R</span></span></div></div></div></div></main>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">q</span>).<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg_smul">Ideal.inertiaDeg_smul</a></code>.</p></div></div><div class="decl" id="Ideal.cardQuot_pow_inertiaDeg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L182-L186">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.cardQuot_pow_inertiaDeg"><span class="name">Ideal</span>.<span class="name">cardQuot_pow_inertiaDeg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Submodule.cardQuot">Submodule.cardQuot</a> <span class="fn">p</span></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Submodule.cardQuot">Submodule.cardQuot</a> <span class="fn">q</span></span></div></div></div></div><div class="decl" id="Ideal.cardQuot_pow_inertiaDeg'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L188-L188">source</a></div><div class="attributes">@[deprecated Ideal.cardQuot_pow_inertiaDeg (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.cardQuot_pow_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">cardQuot_pow_inertiaDeg'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Maximal.html#Ideal.IsMaximal">IsMaximal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Submodule.cardQuot">Submodule.cardQuot</a> <span class="fn">p</span></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Submodule.cardQuot">Submodule.cardQuot</a> <span class="fn">q</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.cardQuot_pow_inertiaDeg">Ideal.cardQuot_pow_inertiaDeg</a></code>.</p></div></div><div class="decl" id="Ideal.absNorm_pow_inertiaDeg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L190-L199">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.absNorm_pow_inertiaDeg"><span class="name">Ideal</span>.<span class="name">absNorm_pow_inertiaDeg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/DedekindDomain/Basic.html#IsDedekindDomain">IsDedekindDomain</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/DedekindDomain/Basic.html#IsDedekindDomain">IsDedekindDomain</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FreeModule/Basic.html#Module.Free">Module.Free</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FreeModule/Basic.html#Module.Free">Module.Free</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Ideal.absNorm">absNorm</a> <span class="fn">p</span></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Ideal.absNorm">absNorm</a> <span class="fn">q</span></span></div></div></div></div><div class="decl" id="Ideal.absNorm_pow_inertiaDeg'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L201-L201">source</a></div><div class="attributes">@[deprecated Ideal.absNorm_pow_inertiaDeg (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.absNorm_pow_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">absNorm_pow_inertiaDeg'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">q</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">S</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">p</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/DedekindDomain/Basic.html#IsDedekindDomain">IsDedekindDomain</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/DedekindDomain/Basic.html#IsDedekindDomain">IsDedekindDomain</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FreeModule/Basic.html#Module.Free">Module.Free</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FreeModule/Basic.html#Module.Free">Module.Free</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Ideal.absNorm">absNorm</a> <span class="fn">p</span></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><span class="fn"><span class="fn">q</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <span class="fn">R</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Ideal.absNorm">absNorm</a> <span class="fn">q</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.absNorm_pow_inertiaDeg">Ideal.absNorm_pow_inertiaDeg</a></code>.</p></div></div><div class="decl" id="Ideal.natAbs_pow_inertiaDeg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L203-L206">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.natAbs_pow_inertiaDeg"><span class="name">Ideal</span>.<span class="name">natAbs_pow_inertiaDeg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/DedekindDomain/Basic.html#IsDedekindDomain">IsDedekindDomain</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FreeModule/Basic.html#Module.Free">Module.Free</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">P</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Span.html#Ideal.span">span</a> <a href="../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">p</span><a href="../../.././Init/Core.html#Singleton.singleton">}</a>)</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">p</span>.<a href="../../.././Init/Data/Int/Basic.html#Int.natAbs">natAbs</a></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Ideal.absNorm">absNorm</a> <span class="fn">P</span></span></div></div></div></div><div class="decl" id="Ideal.natAbs_pow_inertiaDeg'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L208-L208">source</a></div><div class="attributes">@[deprecated Ideal.natAbs_pow_inertiaDeg (since := &quot;2026-07-03&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.natAbs_pow_inertiaDeg'"><span class="name">Ideal</span>.<span class="name">natAbs_pow_inertiaDeg'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/DedekindDomain/Basic.html#IsDedekindDomain">IsDedekindDomain</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FreeModule/Basic.html#Module.Free">Module.Free</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">P</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Span.html#Ideal.span">span</a> <a href="../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">p</span><a href="../../.././Init/Core.html#Singleton.singleton">}</a>)</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">p</span>.<a href="../../.././Init/Data/Int/Basic.html#Int.natAbs">natAbs</a></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Ideal.absNorm">absNorm</a> <span class="fn">P</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.natAbs_pow_inertiaDeg">Ideal.natAbs_pow_inertiaDeg</a></code>.</p></div></div><div class="decl" id="Ideal.pow_inertiaDeg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/RamificationInertia/Inertia.lean#L210-L213">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.pow_inertiaDeg"><span class="name">Ideal</span>.<span class="name">pow_inertiaDeg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/DedekindDomain/Basic.html#IsDedekindDomain">IsDedekindDomain</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FreeModule/Basic.html#Module.Free">Module.Free</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Finiteness/Defs.html#Module.Finite">Module.Finite</a> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <a href="../../.././Init/Prelude.html#Nat">ℕ</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">P</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Defs.html#Ideal">Ideal</a> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Prime.html#Ideal.IsPrime">IsPrime</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/Ideal/Over.html#Ideal.LiesOver">LiesOver</a></span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Ideal/Span.html#Ideal.span">span</a> <a href="../../.././Init/Core.html#Singleton.singleton">{</a><span class="fn">↑<span class="fn">p</span></span><a href="../../.././Init/Core.html#Singleton.singleton">}</a>)</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">p</span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><span class="fn"><span class="fn">P</span>.<a href="../../.././Mathlib/RingTheory/RamificationInertia/Inertia.html#Ideal.inertiaDeg">inertiaDeg</a></span> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/Ideal/Norm/AbsNorm.html#Ideal.absNorm">absNorm</a> <span class="fn">P</span></span></div></div></div></div></main>
 <nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

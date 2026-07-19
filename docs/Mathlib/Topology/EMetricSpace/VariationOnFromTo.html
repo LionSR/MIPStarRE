@@ -1,0 +1,603 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.Topology.EMetricSpace.VariationOnFromTo</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.Topology.EMetricSpace.VariationOnFromTo";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">Topology</span>.<span class="name">EMetricSpace</span>.<span class="name">VariationOnFromTo</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html">Mathlib.Topology.EMetricSpace.BoundedVariation</a></li><li><a href="../../.././Mathlib/Analysis/Normed/Group/Real.html">Mathlib.Analysis.Normed.Group.Real</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.Topology.EMetricSpace.VariationOnFromTo" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo"><span class="name">variationOnFromTo</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.self"><span class="name">variationOnFromTo</span>.<span class="name">self</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.nonneg_of_le"><span class="name">variationOnFromTo</span>.<span class="name">nonneg_of_le</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.eq_neg_swap"><span class="name">variationOnFromTo</span>.<span class="name">eq_neg_swap</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.nonpos_of_ge"><span class="name">variationOnFromTo</span>.<span class="name">nonpos_of_ge</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.abs_le_eVariationOn"><span class="name">variationOnFromTo</span>.<span class="name">abs_le_eVariationOn</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.eq_of_le"><span class="name">variationOnFromTo</span>.<span class="name">eq_of_le</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.eq_of_ge"><span class="name">variationOnFromTo</span>.<span class="name">eq_of_ge</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.add"><span class="name">variationOnFromTo</span>.<span class="name">add</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.sub_right"><span class="name">variationOnFromTo</span>.<span class="name">sub_right</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.sub_left"><span class="name">variationOnFromTo</span>.<span class="name">sub_left</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.edist_zero_of_eq_zero"><span class="name">variationOnFromTo</span>.<span class="name">edist_zero_of_eq_zero</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.eq_left_iff"><span class="name">variationOnFromTo</span>.<span class="name">eq_left_iff</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.eq_zero_iff_of_le"><span class="name">variationOnFromTo</span>.<span class="name">eq_zero_iff_of_le</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.eq_zero_iff_of_ge"><span class="name">variationOnFromTo</span>.<span class="name">eq_zero_iff_of_ge</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.eq_zero_iff"><span class="name">variationOnFromTo</span>.<span class="name">eq_zero_iff</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.monotoneOn"><span class="name">variationOnFromTo</span>.<span class="name">monotoneOn</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.antitoneOn"><span class="name">variationOnFromTo</span>.<span class="name">antitoneOn</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.abs_sub_le_sub_of_le"><span class="name">variationOnFromTo</span>.<span class="name">abs_sub_le_sub_of_le</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.add_self_monotoneOn"><span class="name">variationOnFromTo</span>.<span class="name">add_self_monotoneOn</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.sub_self_monotoneOn"><span class="name">variationOnFromTo</span>.<span class="name">sub_self_monotoneOn</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.comp_eq_of_monotoneOn"><span class="name">variationOnFromTo</span>.<span class="name">comp_eq_of_monotoneOn</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.tendsto_left"><span class="name">variationOnFromTo</span>.<span class="name">tendsto_left</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.tendsto_right"><span class="name">variationOnFromTo</span>.<span class="name">tendsto_right</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.leftLim_eq"><span class="name">variationOnFromTo</span>.<span class="name">leftLim_eq</span></a></div><div class="nav_link"><a class="break_within" href="#variationOnFromTo.rightLim_eq"><span class="name">variationOnFromTo</span>.<span class="name">rightLim_eq</span></a></div><div class="nav_link"><a class="break_within" href="#BoundedVariationOn.continuousWithinAt_variationOnFromTo_Ici"><span class="name">BoundedVariationOn</span>.<span class="name">continuousWithinAt_variationOnFromTo_Ici</span></a></div><div class="nav_link"><a class="break_within" href="#BoundedVariationOn.continuousWithinAt_variationOnFromTo_rightLim_Ici"><span class="name">BoundedVariationOn</span>.<span class="name">continuousWithinAt_variationOnFromTo_rightLim_Ici</span></a></div><div class="nav_link"><a class="break_within" href="#LocallyBoundedVariationOn.exists_monotoneOn_sub_monotoneOn'"><span class="name">LocallyBoundedVariationOn</span>.<span class="name">exists_monotoneOn_sub_monotoneOn'</span></a></div><div class="nav_link"><a class="break_within" href="#LocallyBoundedVariationOn.exists_monotoneOn_sub_monotoneOn"><span class="name">LocallyBoundedVariationOn</span>.<span class="name">exists_monotoneOn_sub_monotoneOn</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Signed-variation" class="markdown-heading">Signed variation <a class="hover-link" href="#Signed-variation">#</a></h1><p>We define <code><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> f s a b : ℝ</code> as the signed variation of <code>f</code> between <code>a</code> and <code>b</code>, i.e.,
+its variation if <code>a ≤ b</code>, and its opposite otherwise. We establish basic properties of this notion,
+and use it to show that a bounded variation real function is the difference of two monotone
+functions.</p></div><div class="decl" id="variationOnFromTo"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L27-L31">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo"><span class="name">variationOnFromTo</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></div></div><p>The <strong>signed</strong> variation of <code>f</code> on the interval <code>Icc a b</code> intersected with the set <code>s</code>,
+squashed to a real (therefore only really meaningful if the variation is finite)</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <a href="../../.././Init/Prelude.html#ite">if</a> <span class="fn">a</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">b</span> <a href="../../.././Init/Prelude.html#ite">then</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#eVariationOn">eVariationOn</a> <span class="fn">f</span> (<span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Icc">Set.Icc</a> <span class="fn">a</span> <span class="fn">b</span></span>))</span>.<a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.toReal">toReal</a></span> <a href="../../.././Init/Prelude.html#ite">else</a> <a href="../../.././Init/Prelude.html#Neg.neg">-</a><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#eVariationOn">eVariationOn</a> <span class="fn">f</span> (<span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Icc">Set.Icc</a> <span class="fn">b</span> <span class="fn">a</span></span>))</span>.<a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.toReal">toReal</a></span></li></ul></details><details id="instances-for-list-variationOnFromTo" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="variationOnFromTo.self"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L37-L40">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.self"><span class="name">variationOnFromTo</span>.<span class="name">self</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">a</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">a</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></div></div></div></div><div class="decl" id="variationOnFromTo.nonneg_of_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L42-L43">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.nonneg_of_le"><span class="name">variationOnFromTo</span>.<span class="name">nonneg_of_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">b</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.eq_neg_swap"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L45-L50">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.eq_neg_swap"><span class="name">variationOnFromTo</span>.<span class="name">eq_neg_swap</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Prelude.html#Neg.neg">-</a><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">b</span> <span class="fn">a</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.nonpos_of_ge"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L52-L54">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.nonpos_of_ge"><span class="name">variationOnFromTo</span>.<span class="name">nonpos_of_ge</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">a</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">0</span></div></div></div></div><div class="decl" id="variationOnFromTo.abs_le_eVariationOn"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L57-L63">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.abs_le_eVariationOn"><span class="name">variationOnFromTo</span>.<span class="name">abs_le_eVariationOn</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#BoundedVariationOn">BoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Mathlib/Algebra/Order/Group/Unbundled/Abs.html#abs">|</a><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span><a href="../../.././Mathlib/Algebra/Order/Group/Unbundled/Abs.html#abs">|</a> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#eVariationOn">eVariationOn</a> <span class="fn">f</span> <span class="fn">s</span>)</span>.<a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.toReal">toReal</a></span></div></div></div></div><div class="decl" id="variationOnFromTo.eq_of_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L65-L67">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.eq_of_le"><span class="name">variationOnFromTo</span>.<span class="name">eq_of_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">b</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#eVariationOn">eVariationOn</a> <span class="fn">f</span> (<span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Icc">Set.Icc</a> <span class="fn">a</span> <span class="fn">b</span></span>))</span>.<a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.toReal">toReal</a></span></div></div></div></div><div class="decl" id="variationOnFromTo.eq_of_ge"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L69-L71">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.eq_of_ge"><span class="name">variationOnFromTo</span>.<span class="name">eq_of_ge</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">a</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Prelude.html#Neg.neg">-</a><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#eVariationOn">eVariationOn</a> <span class="fn">f</span> (<span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Icc">Set.Icc</a> <span class="fn">b</span> <span class="fn">a</span></span>))</span>.<a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.toReal">toReal</a></span></div></div></div></div><div class="decl" id="variationOnFromTo.add"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L73-L83">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.add"><span class="name">variationOnFromTo</span>.<span class="name">add</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b </span><span class="fn">c</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hc</span> : <span class="fn">c</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">b</span> <span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">c</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.sub_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L85-L88">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.sub_right"><span class="name">variationOnFromTo</span>.<span class="name">sub_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b </span><span class="fn">c</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hc</span> : <span class="fn">c</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">c</span> <span class="fn">b</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.sub_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L90-L93">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.sub_left"><span class="name">variationOnFromTo</span>.<span class="name">sub_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b </span><span class="fn">c</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hc</span> : <span class="fn">c</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">c</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">c</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.edist_zero_of_eq_zero"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L96-L106">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.edist_zero_of_eq_zero"><span class="name">variationOnFromTo</span>.<span class="name">edist_zero_of_eq_zero</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#EDist.edist">edist</a> <span class="fn">(<span class="fn">f</span> <span class="fn">a</span>)</span> <span class="fn">(<span class="fn">f</span> <span class="fn">b</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></div></div></div></div><div class="decl" id="variationOnFromTo.eq_left_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L108-L111">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.eq_left_iff"><span class="name">variationOnFromTo</span>.<span class="name">eq_left_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b </span><span class="fn">c</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hc</span> : <span class="fn">c</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">c</span></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">b</span> <span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></div></div></div></div><div class="decl" id="variationOnFromTo.eq_zero_iff_of_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L113-L118">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.eq_zero_iff_of_le"><span class="name">variationOnFromTo</span>.<span class="name">eq_zero_iff_of_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ab</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">b</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn">∀ ⦃<span class="fn">x</span> : <span class="fn">α</span>⦄, <span class="fn"><span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Icc">Set.Icc</a> <span class="fn">a</span> <span class="fn">b</span></span> → <span class="fn">∀ ⦃<span class="fn">y</span> : <span class="fn">α</span>⦄, <span class="fn"><span class="fn">y</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Icc">Set.Icc</a> <span class="fn">a</span> <span class="fn">b</span></span> → <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#EDist.edist">edist</a> <span class="fn">(<span class="fn">f</span> <span class="fn">x</span>)</span> <span class="fn">(<span class="fn">f</span> <span class="fn">y</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></span></span></span></span></div></div></div></div><div class="decl" id="variationOnFromTo.eq_zero_iff_of_ge"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L120-L125">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.eq_zero_iff_of_ge"><span class="name">variationOnFromTo</span>.<span class="name">eq_zero_iff_of_ge</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ba</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">a</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn">∀ ⦃<span class="fn">x</span> : <span class="fn">α</span>⦄, <span class="fn"><span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Icc">Set.Icc</a> <span class="fn">b</span> <span class="fn">a</span></span> → <span class="fn">∀ ⦃<span class="fn">y</span> : <span class="fn">α</span>⦄, <span class="fn"><span class="fn">y</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Icc">Set.Icc</a> <span class="fn">b</span> <span class="fn">a</span></span> → <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#EDist.edist">edist</a> <span class="fn">(<span class="fn">f</span> <span class="fn">x</span>)</span> <span class="fn">(<span class="fn">f</span> <span class="fn">y</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></span></span></span></span></div></div></div></div><div class="decl" id="variationOnFromTo.eq_zero_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L127-L135">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.eq_zero_iff"><span class="name">variationOnFromTo</span>.<span class="name">eq_zero_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span> <a href="../../.././Init/Core.html#Iff">↔</a>   <span class="fn">∀ ⦃<span class="fn">x</span> : <span class="fn">α</span>⦄, <span class="fn"><span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/UnorderedInterval.html#Set.uIcc">Set.uIcc</a> <span class="fn">a</span> <span class="fn">b</span></span> → <span class="fn">∀ ⦃<span class="fn">y</span> : <span class="fn">α</span>⦄, <span class="fn"><span class="fn">y</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/UnorderedInterval.html#Set.uIcc">Set.uIcc</a> <span class="fn">a</span> <span class="fn">b</span></span> → <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#EDist.edist">edist</a> <span class="fn">(<span class="fn">f</span> <span class="fn">x</span>)</span> <span class="fn">(<span class="fn">f</span> <span class="fn">y</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span></span></span></span></span></div></div></div></div><div class="decl" id="variationOnFromTo.monotoneOn"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L139-L143">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.monotoneOn"><span class="name">variationOnFromTo</span>.<span class="name">monotoneOn</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">as</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#MonotoneOn">MonotoneOn</a> <span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span>)</span> <span class="fn">s</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.antitoneOn"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L145-L150">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.antitoneOn"><span class="name">variationOnFromTo</span>.<span class="name">antitoneOn</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">bs</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#AntitoneOn">AntitoneOn</a> <span class="fn">(fun (<span class="fn">a</span> : <span class="fn">α</span>) =&gt; <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span>)</span> <span class="fn">s</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.abs_sub_le_sub_of_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L152-L162">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.abs_sub_le_sub_of_le"><span class="name">variationOnFromTo</span>.<span class="name">abs_sub_le_sub_of_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b </span><span class="fn">c</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">as</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">bs</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">cs</span> : <span class="fn">c</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">bc</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">c</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Mathlib/Algebra/Order/Group/Unbundled/Abs.html#abs">|</a><span class="fn"><span class="fn">f</span> <span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><span class="fn">f</span> <span class="fn">b</span></span><a href="../../.././Mathlib/Algebra/Order/Group/Unbundled/Abs.html#abs">|</a> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.add_self_monotoneOn"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L164-L170">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.add_self_monotoneOn"><span class="name">variationOnFromTo</span>.<span class="name">add_self_monotoneOn</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">as</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#MonotoneOn">MonotoneOn</a> (<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span></span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">f</span>) <span class="fn">s</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.sub_self_monotoneOn"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L172-L178">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.sub_self_monotoneOn"><span class="name">variationOnFromTo</span>.<span class="name">sub_self_monotoneOn</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">as</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#MonotoneOn">MonotoneOn</a> (<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">f</span>) <span class="fn">s</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.comp_eq_of_monotoneOn"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L180-L187">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.comp_eq_of_monotoneOn"><span class="name">variationOnFromTo</span>.<span class="name">comp_eq_of_monotoneOn</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">β</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">β</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">t</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">β</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">φ</span> : <span class="fn"><span class="fn">β</span> → <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hφ</span> : <span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#MonotoneOn">MonotoneOn</a> <span class="fn">φ</span> <span class="fn">t</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn">β</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hx</span> : <span class="fn">x</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">t</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hy</span> : <span class="fn">y</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">t</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> (<span class="fn">f</span> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <span class="fn">φ</span>) <span class="fn">t</span> <span class="fn">x</span> <span class="fn">y</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> (<span class="fn">φ</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.image">''</a> <span class="fn">t</span>) <span class="fn">(<span class="fn">φ</span> <span class="fn">x</span>)</span> <span class="fn">(<span class="fn">φ</span> <span class="fn">y</span>)</span></span></div></div></div></div><div class="decl" id="variationOnFromTo.tendsto_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L189-L207">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.tendsto_left"><span class="name">variationOnFromTo</span>.<span class="name">tendsto_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/MetricSpace/Pseudo/Defs.html#PseudoMetricSpace">PseudoMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Order/Basic.html#OrderTopology">OrderTopology</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">l</span> : <span class="fn">E</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h'f</span> : <span class="fn"><a href="../../.././Mathlib/Order/Filter/Defs.html#Filter.Tendsto">Filter.Tendsto</a> <span class="fn">f</span> <span class="fn">(<a href="../../.././Mathlib/Topology/Defs/Filter.html#nhdsWithin">nhdsWithin</a> <span class="fn">b</span> (<span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Iio">Set.Iio</a> <span class="fn">b</span></span>))</span> <span class="fn">(<a href="../../.././Mathlib/Topology/Defs/Filter.html#nhds">nhds</a> <span class="fn">l</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Order/Filter/Defs.html#Filter.Tendsto">Filter.Tendsto</a> <span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span>)</span> <span class="fn">(<a href="../../.././Mathlib/Topology/Defs/Filter.html#nhdsWithin">nhdsWithin</a> <span class="fn">b</span> (<span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Iio">Set.Iio</a> <span class="fn">b</span></span>))</span>
+  <span class="fn">(<a href="../../.././Mathlib/Topology/Defs/Filter.html#nhds">nhds</a> (<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././Mathlib/Topology/MetricSpace/Pseudo/Defs.html#Dist.dist">dist</a> <span class="fn">(<span class="fn">f</span> <span class="fn">b</span>)</span> <span class="fn">l</span></span>))</span></span></div></div><p>The jump of <code><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a></code> on the left of a point is given by the distance between the
+left limit and the value of the function.</p></div></div><div class="decl" id="variationOnFromTo.tendsto_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L209-L227">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.tendsto_right"><span class="name">variationOnFromTo</span>.<span class="name">tendsto_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/MetricSpace/Pseudo/Defs.html#PseudoMetricSpace">PseudoMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Order/Basic.html#OrderTopology">OrderTopology</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">l</span> : <span class="fn">E</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">a</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">s</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h'f</span> : <span class="fn"><a href="../../.././Mathlib/Order/Filter/Defs.html#Filter.Tendsto">Filter.Tendsto</a> <span class="fn">f</span> <span class="fn">(<a href="../../.././Mathlib/Topology/Defs/Filter.html#nhdsWithin">nhdsWithin</a> <span class="fn">b</span> (<span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Ioi">Set.Ioi</a> <span class="fn">b</span></span>))</span> <span class="fn">(<a href="../../.././Mathlib/Topology/Defs/Filter.html#nhds">nhds</a> <span class="fn">l</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Order/Filter/Defs.html#Filter.Tendsto">Filter.Tendsto</a> <span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span>)</span> <span class="fn">(<a href="../../.././Mathlib/Topology/Defs/Filter.html#nhdsWithin">nhdsWithin</a> <span class="fn">b</span> (<span class="fn">s</span> <a href="../../.././Init/Core.html#Inter.inter">∩</a> <span class="fn"><a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Ioi">Set.Ioi</a> <span class="fn">b</span></span>))</span>
+  <span class="fn">(<a href="../../.././Mathlib/Topology/Defs/Filter.html#nhds">nhds</a> (<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn"><a href="../../.././Mathlib/Topology/MetricSpace/Pseudo/Defs.html#Dist.dist">dist</a> <span class="fn">(<span class="fn">f</span> <span class="fn">b</span>)</span> <span class="fn">l</span></span>))</span></span></div></div><p>The jump of <code><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a></code> on the right of a point is given by the distance between the
+right limit and the value of the function.</p></div></div><div class="decl" id="variationOnFromTo.leftLim_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L229-L243">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.leftLim_eq"><span class="name">variationOnFromTo</span>.<span class="name">leftLim_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/MetricSpace/Pseudo/Defs.html#PseudoMetricSpace">PseudoMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/UniformSpace/Cauchy.html#CompleteSpace">CompleteSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#BoundedVariationOn">BoundedVariationOn</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/Order/LeftRightLim.html#Function.leftLim">Function.leftLim</a> <span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a> <span class="fn">a</span>)</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><a href="../../.././Mathlib/Topology/MetricSpace/Pseudo/Defs.html#Dist.dist">dist</a> <span class="fn">(<span class="fn">f</span> <span class="fn">b</span>)</span> <span class="fn">(<a href="../../.././Mathlib/Topology/Order/LeftRightLim.html#Function.leftLim">Function.leftLim</a> <span class="fn">f</span> <span class="fn">b</span>)</span></span></div></div><p>The jump of <code><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a></code> on the left of a point is given by the distance between the
+left limit and the value of the function.</p></div></div><div class="decl" id="variationOnFromTo.rightLim_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L245-L259">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo.rightLim_eq"><span class="name">variationOnFromTo</span>.<span class="name">rightLim_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/MetricSpace/Pseudo/Defs.html#PseudoMetricSpace">PseudoMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/UniformSpace/Cauchy.html#CompleteSpace">CompleteSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#BoundedVariationOn">BoundedVariationOn</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/Order/LeftRightLim.html#Function.rightLim">Function.rightLim</a> <span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a> <span class="fn">a</span>)</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn"><a href="../../.././Mathlib/Topology/MetricSpace/Pseudo/Defs.html#Dist.dist">dist</a> <span class="fn">(<span class="fn">f</span> <span class="fn">b</span>)</span> <span class="fn">(<a href="../../.././Mathlib/Topology/Order/LeftRightLim.html#Function.rightLim">Function.rightLim</a> <span class="fn">f</span> <span class="fn">b</span>)</span></span></div></div><p>The jump of <code><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a></code> on the right of a point is given by the distance between the
+right limit and the value of the function.</p></div></div><div class="decl" id="BoundedVariationOn.continuousWithinAt_variationOnFromTo_Ici"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L261-L277">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#BoundedVariationOn.continuousWithinAt_variationOnFromTo_Ici"><span class="name">BoundedVariationOn</span>.<span class="name">continuousWithinAt_variationOnFromTo_Ici</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Order/Basic.html#OrderTopology">OrderTopology</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#BoundedVariationOn">BoundedVariationOn</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">x</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hx</span> : <span class="fn"><a href="../../.././Mathlib/Topology/Defs/Filter.html#ContinuousWithinAt">ContinuousWithinAt</a> <span class="fn">f</span> <span class="fn">(<a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Ici">Set.Ici</a> <span class="fn">x</span>)</span> <span class="fn">x</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/Defs/Filter.html#ContinuousWithinAt">ContinuousWithinAt</a> <span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a> <span class="fn">a</span>)</span> <span class="fn">(<a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Ici">Set.Ici</a> <span class="fn">x</span>)</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="BoundedVariationOn.continuousWithinAt_variationOnFromTo_rightLim_Ici"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L279-L283">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#BoundedVariationOn.continuousWithinAt_variationOnFromTo_rightLim_Ici"><span class="name">BoundedVariationOn</span>.<span class="name">continuousWithinAt_variationOnFromTo_rightLim_Ici</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/Defs.html#PseudoEMetricSpace">PseudoEMetricSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <span class="fn">E</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Order/Basic.html#OrderTopology">OrderTopology</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/Separation/Regular.html#T3Space">T3Space</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/UniformSpace/Cauchy.html#CompleteSpace">CompleteSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#BoundedVariationOn">BoundedVariationOn</a> <span class="fn">f</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">x</span> : <span class="fn">α</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Topology/Defs/Filter.html#ContinuousWithinAt">ContinuousWithinAt</a> <span class="fn">(<a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">(<a href="../../.././Mathlib/Topology/Order/LeftRightLim.html#Function.rightLim">Function.rightLim</a> <span class="fn">f</span>)</span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.univ">Set.univ</a> <span class="fn">a</span>)</span> <span class="fn">(<a href="../../.././Mathlib/Order/Interval/Set/Defs.html#Set.Ici">Set.Ici</a> <span class="fn">x</span>)</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="LocallyBoundedVariationOn.exists_monotoneOn_sub_monotoneOn'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L287-L312">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#LocallyBoundedVariationOn.exists_monotoneOn_sub_monotoneOn'"><span class="name">LocallyBoundedVariationOn</span>.<span class="name">exists_monotoneOn_sub_monotoneOn'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∃ (<span class="fn">p</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>) (<span class="fn">q</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>),
+  <span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#MonotoneOn">MonotoneOn</a> <span class="fn">p</span> <span class="fn">s</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#MonotoneOn">MonotoneOn</a> <span class="fn">q</span> <span class="fn">s</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn">f</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">p</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">q</span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn">∀ <span class="fn">x</span> ∈ <span class="fn">s</span>, <span class="fn">∀ <span class="fn">y</span> ∈ <span class="fn">s</span>, <span class="fn"><span class="fn">p</span> <span class="fn">y</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><span class="fn">p</span> <span class="fn">x</span></span> <a href="../../.././Init/Prelude.html#HAdd.hAdd">+</a> (<span class="fn"><span class="fn">q</span> <span class="fn">y</span></span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn"><span class="fn">q</span> <span class="fn">x</span></span>) <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#variationOnFromTo">variationOnFromTo</a> <span class="fn">f</span> <span class="fn">s</span> <span class="fn">x</span> <span class="fn">y</span></span></span></span></span></div></div><p>If a real-valued function has bounded variation on a set, then it is a difference of monotone
+functions there. Moreover, one can make sure that the two monotone functions add up to the
+variation of <code>f</code>.</p></div></div><div class="decl" id="LocallyBoundedVariationOn.exists_monotoneOn_sub_monotoneOn"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Topology/EMetricSpace/VariationOnFromTo.lean#L314-L320">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Topology/EMetricSpace/VariationOnFromTo.html#LocallyBoundedVariationOn.exists_monotoneOn_sub_monotoneOn"><span class="name">LocallyBoundedVariationOn</span>.<span class="name">exists_monotoneOn_sub_monotoneOn</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">α</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././Mathlib/Topology/EMetricSpace/BoundedVariation.html#LocallyBoundedVariationOn">LocallyBoundedVariationOn</a> <span class="fn">f</span> <span class="fn">s</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∃ (<span class="fn">p</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>) (<span class="fn">q</span> : <span class="fn"><span class="fn">α</span> → <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></span>), <span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#MonotoneOn">MonotoneOn</a> <span class="fn">p</span> <span class="fn">s</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><a href="../../.././Mathlib/Order/Monotone/Defs.html#MonotoneOn">MonotoneOn</a> <span class="fn">q</span> <span class="fn">s</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn">f</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">p</span> <a href="../../.././Init/Prelude.html#HSub.hSub">-</a> <span class="fn">q</span></span></div></div><p>If a real-valued function has bounded variation on a set, then it is a difference of monotone
+functions there.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

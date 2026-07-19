@@ -1,0 +1,816 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.RingTheory.IsGaloisGroup.Basic</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.RingTheory.IsGaloisGroup.Basic";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">RingTheory</span>.<span class="name">IsGaloisGroup</span>.<span class="name">Basic</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/RingTheory/IntegralClosure/IntegrallyClosed.html">Mathlib.RingTheory.IntegralClosure.IntegrallyClosed</a></li><li><a href="../../.././Mathlib/RingTheory/Invariant/Basic.html">Mathlib.RingTheory.Invariant.Basic</a></li><li><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html">Mathlib.RingTheory.IsGaloisGroup.Defs</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.RingTheory.IsGaloisGroup.Basic" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#Subgroup.smul_algebraMap"><span class="name">Subgroup</span>.<span class="name">smul_algebraMap</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.smul_mem_of_normal"><span class="name">IsGaloisGroup</span>.<span class="name">smul_mem_of_normal</span></a></div><div class="nav_link"><a class="break_within" href="#smul_eq_self"><span class="name">smul_eq_self</span></a></div><div class="nav_link"><a class="break_within" href="#smul_mem_of_normal"><span class="name">smul_mem_of_normal</span></a></div><div class="nav_link"><a class="break_within" href="#instIsGaloisGroupSubtypeMemSubringRangeAlgebraMap"><span class="name">instIsGaloisGroupSubtypeMemSubringRangeAlgebraMap</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.to_isFractionRing_of_isIntegral"><span class="name">IsGaloisGroup</span>.<span class="name">to_isFractionRing_of_isIntegral</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.to_isFractionRing"><span class="name">IsGaloisGroup</span>.<span class="name">to_isFractionRing</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.of_isFractionRing"><span class="name">IsGaloisGroup</span>.<span class="name">of_isFractionRing</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.iff_isFractionRing"><span class="name">IsGaloisGroup</span>.<span class="name">iff_isFractionRing</span></a></div><div class="nav_link"><a class="break_within" href="#FractionRing.mulSemiringAction_of_isGaloisGroup"><span class="name">FractionRing</span>.<span class="name">mulSemiringAction_of_isGaloisGroup</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.toFractionRing"><span class="name">IsGaloisGroup</span>.<span class="name">toFractionRing</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.mulEquivAlgEquiv"><span class="name">IsGaloisGroup</span>.<span class="name">mulEquivAlgEquiv</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.mulEquivAlgEquiv_apply_symm_apply"><span class="name">IsGaloisGroup</span>.<span class="name">mulEquivAlgEquiv_apply_symm_apply</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.mulEquivAlgEquiv_apply_apply"><span class="name">IsGaloisGroup</span>.<span class="name">mulEquivAlgEquiv_apply_apply</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.mulEquivAlgEquiv_symm_apply"><span class="name">IsGaloisGroup</span>.<span class="name">mulEquivAlgEquiv_symm_apply</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.instSubtypeMemSubgroupSubalgebraSubalgebra"><span class="name">IsGaloisGroup</span>.<span class="name">instSubtypeMemSubgroupSubalgebraSubalgebra</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.smulOfNormal"><span class="name">IsGaloisGroup</span>.<span class="name">smulOfNormal</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.algebraMap_smulOfNormal"><span class="name">IsGaloisGroup</span>.<span class="name">algebraMap_smulOfNormal</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.smulDistribClass_smulOfNormal"><span class="name">IsGaloisGroup</span>.<span class="name">smulDistribClass_smulOfNormal</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.mulSemiringActionOfNormal"><span class="name">IsGaloisGroup</span>.<span class="name">mulSemiringActionOfNormal</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.mulSemiringActionQuotient"><span class="name">IsGaloisGroup</span>.<span class="name">mulSemiringActionQuotient</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.mulSemiringActionQuotient_smul_def"><span class="name">IsGaloisGroup</span>.<span class="name">mulSemiringActionQuotient_smul_def</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.isScalarTower_mulSemiringActionQuotient"><span class="name">IsGaloisGroup</span>.<span class="name">isScalarTower_mulSemiringActionQuotient</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.smulCommClassQuotient"><span class="name">IsGaloisGroup</span>.<span class="name">smulCommClassQuotient</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.instMulSemiringActionQuotientSubgroupSubtypeMemIntermediateField"><span class="name">IsGaloisGroup</span>.<span class="name">instMulSemiringActionQuotientSubgroupSubtypeMemIntermediateField</span></a></div><div class="nav_link"><a class="break_within" href="#IsGaloisGroup.instSMulCommClassQuotientSubgroupSubtypeMemIntermediateFieldOfSMulDistribClassOfIsScalarTower"><span class="name">IsGaloisGroup</span>.<span class="name">instSMulCommClassQuotientSubgroupSubtypeMemIntermediateFieldOfSMulDistribClassOfIsScalarTower</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Galois-Groups-of-Rings" class="markdown-heading">Galois Groups of Rings <a class="hover-link" href="#Galois-Groups-of-Rings">#</a></h1><p>Given an action of a group <code>G</code> on an extension of rings <code>B/A</code>, the predicate <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> G A B</code>
+states that <code>G</code> acts faithfully on <code>B</code> with fixed ring <code>A</code>. This file develops some of the theory
+of this predicate without assuming Galois theory for fields.</p></div><div class="decl" id="Subgroup.smul_algebraMap"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L36-L39">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#Subgroup.smul_algebraMap"><span class="name">Subgroup</span>.<span class="name">smul_algebraMap</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">C</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">H</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">(↥<span class="fn">H</span>)</span> <span class="fn">C</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">g</span> : <span class="fn">G</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hg</span> : <span class="fn">g</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">H</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">C</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">C</span> <span class="fn">B</span>)</span> <span class="fn">x</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">C</span> <span class="fn">B</span>)</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="IsGaloisGroup.smul_mem_of_normal"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L41-L47">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.smul_mem_of_normal"><span class="name">IsGaloisGroup</span>.<span class="name">smul_mem_of_normal</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">C</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hN</span> : <span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hC</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">C</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">G</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">C</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">C</span> <span class="fn">B</span>)</span> <span class="fn">x</span></span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../.././Mathlib/Data/Set/Operations.html#Set.range">Set.range</a> <span class="fn">⇑<span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">C</span> <span class="fn">B</span>)</span></span></span></div></div></div></div><div class="decl" id="smul_eq_self"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L49-L49">source</a></div><div class="attributes">@[deprecated Subgroup.smul_algebraMap (since := &quot;2026-05-28&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#smul_eq_self"><span class="name">smul_eq_self</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">C</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">H</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">(↥<span class="fn">H</span>)</span> <span class="fn">C</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">g</span> : <span class="fn">G</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hg</span> : <span class="fn">g</span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">H</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">C</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">C</span> <span class="fn">B</span>)</span> <span class="fn">x</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">C</span> <span class="fn">B</span>)</span> <span class="fn">x</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#Subgroup.smul_algebraMap">Subgroup.smul_algebraMap</a></code>.</p></div></div><div class="decl" id="smul_mem_of_normal"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L50-L50">source</a></div><div class="attributes">@[deprecated IsGaloisGroup.smul_mem_of_normal (since := &quot;2026-05-28&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#smul_mem_of_normal"><span class="name">smul_mem_of_normal</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">C</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hN</span> : <span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hC</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">C</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">G</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">C</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">C</span> <span class="fn">B</span>)</span> <span class="fn">x</span></span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../.././Mathlib/Data/Set/Operations.html#Set.range">Set.range</a> <span class="fn">⇑<span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">C</span> <span class="fn">B</span>)</span></span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.smul_mem_of_normal">IsGaloisGroup.smul_mem_of_normal</a></code>.</p></div></div><div class="decl" id="instIsGaloisGroupSubtypeMemSubringRangeAlgebraMap"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L61-L66">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#instIsGaloisGroupSubtypeMemSubringRangeAlgebraMap"><span class="name">instIsGaloisGroupSubtypeMemSubringRangeAlgebraMap</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">(↥<span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">A</span> <span class="fn">B</span>)</span>.<a href="../../.././Mathlib/Algebra/Ring/Subring/Basic.html#RingHom.range">range</a></span>)</span> <span class="fn">B</span></span></div></div></div></div><div class="decl" id="IsGaloisGroup.to_isFractionRing_of_isIntegral"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L68-L76">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.to_isFractionRing_of_isIntegral"><span class="name">IsGaloisGroup</span>.<span class="name">to_isFractionRing_of_isIntegral</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">A</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IntegralClosure/Algebra/Defs.html#Algebra.IsIntegral">Algebra.IsIntegral</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hGAB</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">K</span> <span class="fn">L</span></span></div></div><p><code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a></code> for rings implies <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a></code> for their fraction fields.</p></div></div><div class="decl" id="IsGaloisGroup.to_isFractionRing"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L78-L82">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.to_isFractionRing"><span class="name">IsGaloisGroup</span>.<span class="name">to_isFractionRing</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">A</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hGAB</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">K</span> <span class="fn">L</span></span></div></div><p><code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a></code> for rings implies <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a></code> for their fraction fields.</p></div></div><div class="decl" id="IsGaloisGroup.of_isFractionRing"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L84-L102">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.of_isFractionRing"><span class="name">IsGaloisGroup</span>.<span class="name">of_isFractionRing</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">A</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hGKL</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IntegralClosure/IntegrallyClosed.html#IsIntegrallyClosed">IsIntegrallyClosed</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IntegralClosure/Algebra/Defs.html#Algebra.IsIntegral">Algebra.IsIntegral</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span></div></div><p>If <code>B</code> is an integral extension of an integrally closed domain <code>A</code>, then <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a></code> for
+their fraction fields implies <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a></code> for these rings.</p></div></div><div class="decl" id="IsGaloisGroup.iff_isFractionRing"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L104-L109">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.iff_isFractionRing"><span class="name">IsGaloisGroup</span>.<span class="name">iff_isFractionRing</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_5)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">A</span> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IntegralClosure/IntegrallyClosed.html#IsIntegrallyClosed">IsIntegrallyClosed</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/IntegralClosure/Algebra/Defs.html#Algebra.IsIntegral">Algebra.IsIntegral</a> <span class="fn">A</span> <span class="fn">B</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">K</span> <span class="fn">L</span></span></div></div><p>If <code>G</code> is finite and <code>A</code> is integrally closed then <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> G A B</code> is equivalent to <code>B/A</code>
+being integral and the fields of fractions <code>Frac(B)/Frac(A)</code> being Galois with Galois group <code>G</code>.</p></div></div><div class="decl" id="FractionRing.mulSemiringAction_of_isGaloisGroup"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L111-L112">source</a></div><div class="attributes">@[deprecated IsFractionRing.mulSemiringAction (since := &quot;2026-04-20&quot;)]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#FractionRing.mulSemiringAction_of_isGaloisGroup"><span class="name">FractionRing</span>.<span class="name">mulSemiringAction_of_isGaloisGroup</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_10)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_12)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_14)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing">IsFractionRing</a> <span class="fn">B</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">L</span></span></div></div><p><strong>Alias</strong> of <code><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing.mulSemiringAction">IsFractionRing.mulSemiringAction</a></code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#FractionRing.mulSemiringAction_of_isGaloisGroup">FractionRing.mulSemiringAction_of_isGaloisGroup</a> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing.mulSemiringAction">IsFractionRing.mulSemiringAction</a></li></ul></details><details id="instances-for-list-FractionRing.mulSemiringAction_of_isGaloisGroup" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="IsGaloisGroup.toFractionRing"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L114-L125">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.toFractionRing"><span class="name">IsGaloisGroup</span>.<span class="name">toFractionRing</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#IsDomain">IsDomain</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#IsDomain">IsDomain</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#FractionRing">FractionRing</a> <span class="fn">A</span>)</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#FractionRing">FractionRing</a> <span class="fn">B</span>)</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#FractionRing">FractionRing</a> <span class="fn">A</span>)</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#FractionRing">FractionRing</a> <span class="fn">B</span>)</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#FractionRing">FractionRing</a> <span class="fn">A</span>)</span> <span class="fn">(<a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#FractionRing">FractionRing</a> <span class="fn">B</span>)</span></span></div></div><p>If <code>G</code> is finite and <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> G A B</code> with <code>A</code> and <code>B</code> domains, then <code>G</code> is also
+a Galois group for <code><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#FractionRing">FractionRing</a> B / <a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#FractionRing">FractionRing</a> A</code> for the action defined by
+<code><a href="../../.././Mathlib/RingTheory/Localization/FractionRing.html#IsFractionRing.mulSemiringAction">IsFractionRing.mulSemiringAction</a></code>.</p></div></div><div class="decl" id="IsGaloisGroup.mulEquivAlgEquiv"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L139-L149">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulEquivAlgEquiv"><span class="name">IsGaloisGroup</span>.<span class="name">mulEquivAlgEquiv</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#IsDomain">IsDomain</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Group/Equiv/Defs.html#MulEquiv">≃*</a> <span class="fn">B</span> <a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">≃ₐ[</a><span class="fn">A</span><a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">]</a> <span class="fn">B</span></div></div><p>If <code>G</code> is a finite Galois group for <code>B/A</code>, then <code>G</code> is isomorphic to <code>Gal(B/A)</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulEquivAlgEquiv">IsGaloisGroup.mulEquivAlgEquiv</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Equiv/Defs.html#MulEquiv.ofBijective">MulEquiv.ofBijective</a> <span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#MulSemiringAction.toAlgAut">MulSemiringAction.toAlgAut</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span>)</span> <span class="fn">⋯</span></span></li></ul></details><details id="instances-for-list-IsGaloisGroup.mulEquivAlgEquiv" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="IsGaloisGroup.mulEquivAlgEquiv_apply_symm_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L140-L140">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulEquivAlgEquiv_apply_symm_apply"><span class="name">IsGaloisGroup</span>.<span class="name">mulEquivAlgEquiv_apply_symm_apply</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#IsDomain">IsDomain</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">a</span> : <span class="fn">G</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">a✝</span> : <span class="fn">B</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulEquivAlgEquiv">mulEquivAlgEquiv</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span>)</span> <span class="fn">a</span>)</span>.<a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv.symm">symm</a></span> <span class="fn">a✝</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">a</span><a href="../../.././Init/Prelude.html#Inv.inv">⁻¹</a> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">a✝</span></div></div></div></div><div class="decl" id="IsGaloisGroup.mulEquivAlgEquiv_apply_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L140-L140">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulEquivAlgEquiv_apply_apply"><span class="name">IsGaloisGroup</span>.<span class="name">mulEquivAlgEquiv_apply_apply</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#IsDomain">IsDomain</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">a</span> : <span class="fn">G</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">a✝</span> : <span class="fn">B</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulEquivAlgEquiv">mulEquivAlgEquiv</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span>)</span> <span class="fn">a</span>)</span> <span class="fn">a✝</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">a</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">a✝</span></div></div></div></div><div class="decl" id="IsGaloisGroup.mulEquivAlgEquiv_symm_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L140-L140">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulEquivAlgEquiv_symm_apply"><span class="name">IsGaloisGroup</span>.<span class="name">mulEquivAlgEquiv_symm_apply</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#IsDomain">IsDomain</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Finite/Defs.html#Finite">Finite</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">b</span> : <span class="fn">B</span> <a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">≃ₐ[</a><span class="fn">A</span><a href="../../.././Mathlib/Algebra/Algebra/Equiv.html#AlgEquiv">]</a> <span class="fn">B</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulEquivAlgEquiv">mulEquivAlgEquiv</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">B</span>)</span>.<a href="../../.././Mathlib/Algebra/Group/Equiv/Defs.html#MulEquiv.symm">symm</a></span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Logic/Function/Basic.html#Function.surjInv">Function.surjInv</a> <span class="fn">⋯</span> <span class="fn">b</span></span></div></div></div></div><div class="decl" id="IsGaloisGroup.instSubtypeMemSubgroupSubalgebraSubalgebra"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L155-L160">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.instSubtypeMemSubgroupSubalgebraSubalgebra"><span class="name">IsGaloisGroup</span>.<span class="name">instSubtypeMemSubgroupSubalgebraSubalgebra</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">H</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">S</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn">hGKL</span> : <span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">G</span> <span class="fn">R</span> <span class="fn">S</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">H</span>)</span> <span class="fn">(↥<span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Subalgebra/Operations.html#FixedPoints.subalgebra">FixedPoints.subalgebra</a> <span class="fn">R</span> <span class="fn">S</span> <span class="fn">↥<span class="fn">H</span></span>)</span>)</span> <span class="fn">S</span></span></div></div></div></div><div class="decl" id="IsGaloisGroup.smulOfNormal"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L169-L174">source</a></div><div class="attributes">@[implicit_reducible]</div>
+<div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.smulOfNormal"><span class="name">IsGaloisGroup</span>.<span class="name">smulOfNormal</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Init/Prelude.html#SMul">SMul</a> <span class="fn">G</span> <span class="fn">B</span></span></div></div><p>If <code>N</code> is a normal subgroup of <code>G</code> and <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> N B C</code>, then <code>G</code> acts on <code>B</code>.
+For <code>g : G</code> and <code>x : B</code>, <code>g • x</code> is the unique element of <code>B</code> whose image in <code>C</code> is
+<code>g • algebraMap B C x</code>, see <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.algebraMap_smulOfNormal">algebraMap_smulOfNormal</a></code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.smulOfNormal">IsGaloisGroup.smulOfNormal</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">C</span> <span class="fn">N</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Prelude.html#SMul.mk">{</a> <span class="fn">smul</span> := <span class="fn">fun (<span class="fn">g</span> : <span class="fn">G</span>) (<span class="fn">x</span> : <span class="fn">B</span>) =&gt; <span class="fn"><a href="../../.././Init/Classical.html#Exists.choose">Exists.choose</a> <span class="fn">⋯</span></span></span> <a href="../../.././Init/Prelude.html#SMul.mk">}</a></li></ul></details><details id="instances-for-list-IsGaloisGroup.smulOfNormal" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="IsGaloisGroup.algebraMap_smulOfNormal"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L176-L180">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.algebraMap_smulOfNormal"><span class="name">IsGaloisGroup</span>.<span class="name">algebraMap_smulOfNormal</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">G</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">B</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">B</span> <span class="fn">C</span>)</span> (<span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">x</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra.algebraMap">algebraMap</a> <span class="fn">B</span> <span class="fn">C</span>)</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="IsGaloisGroup.smulDistribClass_smulOfNormal"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L182-L188">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.smulDistribClass_smulOfNormal"><span class="name">IsGaloisGroup</span>.<span class="name">smulDistribClass_smulOfNormal</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">C</span></span></div></div><p>If <code>N</code> is normal and <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> N B C</code>, the action <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.smulOfNormal">smulOfNormal</a> G B C</code> satisfies
+<code><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> G B C</code>.</p></div></div><div class="decl" id="IsGaloisGroup.mulSemiringActionOfNormal"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L192-L199">source</a></div><div class="attributes">@[implicit_reducible]</div>
+<div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulSemiringActionOfNormal"><span class="name">IsGaloisGroup</span>.<span class="name">mulSemiringActionOfNormal</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span></div></div><p>If <code>N</code> is a normal subgroup of <code>G</code> and <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> N B C</code>, then <code>G</code> acts on <code>B</code> as a
+<code><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a></code>, via the action defined in <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.smulOfNormal">smulOfNormal</a></code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulSemiringActionOfNormal">IsGaloisGroup.mulSemiringActionOfNormal</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">C</span> <span class="fn">N</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Basic.html#mulSemiringActionOfSmulDistribClass">mulSemiringActionOfSmulDistribClass</a> <span class="fn">B</span> <span class="fn">C</span> <span class="fn">G</span></span></li></ul></details><details id="instances-for-list-IsGaloisGroup.mulSemiringActionOfNormal" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="IsGaloisGroup.mulSemiringActionQuotient"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L201-L217">source</a></div><div class="attributes">@[implicit_reducible]</div>
+<div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulSemiringActionQuotient"><span class="name">IsGaloisGroup</span>.<span class="name">mulSemiringActionQuotient</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> (<span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">N</span>) <span class="fn">B</span></span></div></div><p>If <code>N</code> is a normal subgroup of <code>G</code> and <code><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> N B C</code>, then the quotient group <code>G ⧸ N</code>
+acts on <code>B</code> by <code>(g : G ⧸ N) • x = g • x</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation">One or more equations did not get rendered due to their size.</li></ul></details><details id="instances-for-list-IsGaloisGroup.mulSemiringActionQuotient" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="IsGaloisGroup.mulSemiringActionQuotient_smul_def"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L219-L225">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulSemiringActionQuotient_smul_def"><span class="name">IsGaloisGroup</span>.<span class="name">mulSemiringActionQuotient_smul_def</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">G</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">b</span> : <span class="fn">B</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">g</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">b</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">g</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">b</span></div></div></div></div><div class="decl" id="IsGaloisGroup.isScalarTower_mulSemiringActionQuotient"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L227-L233">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.isScalarTower_mulSemiringActionQuotient"><span class="name">IsGaloisGroup</span>.<span class="name">isScalarTower_mulSemiringActionQuotient</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">G</span> (<span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">N</span>) <span class="fn">B</span></span></div></div></div></div><div class="decl" id="IsGaloisGroup.smulCommClassQuotient"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L236-L244">source</a></div><div class="attributes">@[implicit_reducible]</div>
+<div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.smulCommClassQuotient"><span class="name">IsGaloisGroup</span>.<span class="name">smulCommClassQuotient</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">B</span> : <a href="../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">A</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Faithful.html#FaithfulSMul">FaithfulSMul</a> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">A</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">A</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">G</span> <span class="fn">A</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#MulAction">MulAction</a> (<span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">N</span>) <span class="fn">B</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">B</span> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">G</span> (<span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">N</span>) <span class="fn">B</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> (<span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">N</span>) <span class="fn">A</span> <span class="fn">B</span></span></div></div><p>If <code>G</code> acts on <code>C</code> commuting with <code>A</code>, then the action of <code>G ⧸ N</code> on <code>B</code> commutes with <code>A</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn">⋯</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">⋯</span></li></ul></details><details id="instances-for-list-IsGaloisGroup.smulCommClassQuotient" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="IsGaloisGroup.instMulSemiringActionQuotientSubgroupSubtypeMemIntermediateField"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L252-L256">source</a></div><div class="attributes">@[implicit_reducible]</div>
+<div class="decl_header"><span class="decl_kind">noncomputable instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.instMulSemiringActionQuotientSubgroupSubtypeMemIntermediateField"><span class="name">IsGaloisGroup</span>.<span class="name">instMulSemiringActionQuotientSubgroupSubtypeMemIntermediateField</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn"><a href="../../.././Mathlib/FieldTheory/IntermediateField/Basic.html#IntermediateField">IntermediateField</a> <span class="fn">K</span> <span class="fn">L</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">(↥<span class="fn">F</span>)</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> (<span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">N</span>) <span class="fn">↥<span class="fn">F</span></span></span></div></div><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.instMulSemiringActionQuotientSubgroupSubtypeMemIntermediateField">IsGaloisGroup.instMulSemiringActionQuotientSubgroupSubtypeMemIntermediateField</a> <span class="fn">G</span> <span class="fn">F</span> <span class="fn">N</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.mulSemiringActionQuotient">IsGaloisGroup.mulSemiringActionQuotient</a> <span class="fn">G</span> <span class="fn">(↥<span class="fn">F</span>)</span> <span class="fn">L</span> <span class="fn">N</span></span></li></ul></details></div></div><div class="decl" id="IsGaloisGroup.instSMulCommClassQuotientSubgroupSubtypeMemIntermediateFieldOfSMulDistribClassOfIsScalarTower"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/RingTheory/IsGaloisGroup/Basic.lean#L258-L260">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/RingTheory/IsGaloisGroup/Basic.html#IsGaloisGroup.instSMulCommClassQuotientSubgroupSubtypeMemIntermediateFieldOfSMulDistribClassOfIsScalarTower"><span class="name">IsGaloisGroup</span>.<span class="name">instSMulCommClassQuotientSubgroupSubtypeMemIntermediateFieldOfSMulDistribClassOfIsScalarTower</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">G</span> : <a href="../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Defs.html#Group">Group</a> <span class="fn">G</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">K</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">L</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">K</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Field/Defs.html#Field">Field</a> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Algebra/Defs.html#Algebra">Algebra</a> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn"><a href="../../.././Mathlib/FieldTheory/IntermediateField/Basic.html#IntermediateField">IntermediateField</a> <span class="fn">K</span> <span class="fn">L</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">N</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup">Subgroup</a> <span class="fn">G</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">N</span>.<a href="../../.././Mathlib/Algebra/Group/Subgroup/Defs.html#Subgroup.Normal">Normal</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/RingTheory/IsGaloisGroup/Defs.html#IsGaloisGroup">IsGaloisGroup</a> <span class="fn">(↥<span class="fn">N</span>)</span> <span class="fn">(↥<span class="fn">F</span>)</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> <span class="fn">G</span> <span class="fn">K</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Action/Basic.html#MulSemiringAction">MulSemiringAction</a> <span class="fn">G</span> <span class="fn">↥<span class="fn">F</span></span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulDistribClass">SMulDistribClass</a> <span class="fn">G</span> <span class="fn">(↥<span class="fn">F</span>)</span> <span class="fn">L</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#IsScalarTower">IsScalarTower</a> <span class="fn">G</span> (<span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">N</span>) <span class="fn">↥<span class="fn">F</span></span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Group/Action/Defs.html#SMulCommClass">SMulCommClass</a> (<span class="fn">G</span> <a href="../../.././Mathlib/Algebra/Quotient.html#HasQuotient.Quotient">⧸</a> <span class="fn">N</span>) <span class="fn">K</span> <span class="fn">↥<span class="fn">F</span></span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

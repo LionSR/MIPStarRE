@@ -1,0 +1,840 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../.././style.css"></link><link rel="icon" href="../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.NumberTheory.Padics.Measure.Basic</title><script defer="true" src="../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../.././";</script><script>const MODULE_NAME="Mathlib.NumberTheory.Padics.Measure.Basic";</script><script type="module" src="../../../.././jump-src.js"></script><script type="module" src="../../../.././search.js"></script><script type="module" src="../../../.././expand-nav.js"></script><script type="module" src="../../../.././how-about.js"></script><script type="module" src="../../../.././instances.js"></script><script type="module" src="../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">NumberTheory</span>.<span class="name">Padics</span>.<span class="name">Measure</span>.<span class="name">Basic</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../.././Init.html">Init</a></li><li><a href="../../../.././Mathlib/Topology/UniformSpace/ProdApproximation.html">Mathlib.Topology.UniformSpace.ProdApproximation</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.NumberTheory.Padics.Measure.Basic" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure"><span class="name">AbstractMeasure</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.«termD(_,_)»"><span class="name">AbstractMeasure</span>.<span class="name">«termD(_,_)»</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.instFunLikeContinuousMap"><span class="name">AbstractMeasure</span>.<span class="name">instFunLikeContinuousMap</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.instContinuousLinearMapClassContinuousMap"><span class="name">AbstractMeasure</span>.<span class="name">instContinuousLinearMapClassContinuousMap</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.instAddCommGroup"><span class="name">AbstractMeasure</span>.<span class="name">instAddCommGroup</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.isAddApply"><span class="name">AbstractMeasure</span>.<span class="name">isAddApply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.instModule"><span class="name">AbstractMeasure</span>.<span class="name">instModule</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.isSMulApply"><span class="name">AbstractMeasure</span>.<span class="name">isSMulApply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.toCLMEquiv"><span class="name">AbstractMeasure</span>.<span class="name">toCLMEquiv</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.coe_toCLMEquiv"><span class="name">AbstractMeasure</span>.<span class="name">coe_toCLMEquiv</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.coe_symm_toCLMEquiv"><span class="name">AbstractMeasure</span>.<span class="name">coe_symm_toCLMEquiv</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.dirac"><span class="name">AbstractMeasure</span>.<span class="name">dirac</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.dirac_apply"><span class="name">AbstractMeasure</span>.<span class="name">dirac_apply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.map"><span class="name">AbstractMeasure</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.map_apply"><span class="name">AbstractMeasure</span>.<span class="name">map_apply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.map_map"><span class="name">AbstractMeasure</span>.<span class="name">map_map</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.map_id"><span class="name">AbstractMeasure</span>.<span class="name">map_id</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.map_dirac"><span class="name">AbstractMeasure</span>.<span class="name">map_dirac</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.contractSnd"><span class="name">AbstractMeasure</span>.<span class="name">contractSnd</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.contractFst"><span class="name">AbstractMeasure</span>.<span class="name">contractFst</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.contractFst_apply"><span class="name">AbstractMeasure</span>.<span class="name">contractFst_apply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.contractSnd_apply"><span class="name">AbstractMeasure</span>.<span class="name">contractSnd_apply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.contractFst_dirac"><span class="name">AbstractMeasure</span>.<span class="name">contractFst_dirac</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.contractSnd_dirac"><span class="name">AbstractMeasure</span>.<span class="name">contractSnd_dirac</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.contractSndCLM"><span class="name">AbstractMeasure</span>.<span class="name">contractSndCLM</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.contractFstCLM"><span class="name">AbstractMeasure</span>.<span class="name">contractFstCLM</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.prodMk"><span class="name">AbstractMeasure</span>.<span class="name">prodMk</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.prodMk_apply"><span class="name">AbstractMeasure</span>.<span class="name">prodMk_apply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.prodMk_prod_apply"><span class="name">AbstractMeasure</span>.<span class="name">prodMk_prod_apply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.prodMk'"><span class="name">AbstractMeasure</span>.<span class="name">prodMk'</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.prodMk'_apply"><span class="name">AbstractMeasure</span>.<span class="name">prodMk'_apply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.prodMk'_flip"><span class="name">AbstractMeasure</span>.<span class="name">prodMk'_flip</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.prodMk'_prod_apply"><span class="name">AbstractMeasure</span>.<span class="name">prodMk'_prod_apply</span></a></div><div class="nav_link"><a class="break_within" href="#AbstractMeasure.prodMk_eq_prodMk'"><span class="name">AbstractMeasure</span>.<span class="name">prodMk_eq_prodMk'</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Abstract-measures-on-topological-spaces" class="markdown-heading">Abstract measures on topological spaces <a class="hover-link" href="#Abstract-measures-on-topological-spaces">#</a></h1><p>We define an &quot;abstract measure&quot; on <code>X</code>, with values in a normed ring <code>R</code>, to be an <code>R</code>-linear
+functional on continuous maps <code>X → R</code>. This is an important construction in p-adic analysis (where
+the Iwasawa algebra is defined as the space of abstract measures on <code>ℤ_[p]</code> with values in <code>ℚ_[p]</code>).</p></div><div class="mod_doc"><h3 id="Basic-definitions" class="markdown-heading">Basic definitions <a class="hover-link" href="#Basic-definitions">#</a></h3></div><div class="decl" id="AbstractMeasure"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L33-L40">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure"><span class="name">AbstractMeasure</span></a></span><span class="decl_args">
+<span class="fn">(<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../../.././foundational_types.html">Type</a> (max (max u_3 u_1) u_4)</div></div><p>The space of <code>E</code>-valued measures on <code>X</code>, i.e. continuous linear maps <code>C(X, R) → E</code>. (The case
+<code>R = E</code> is the most important case.)</p><p>This is the same space <code>C(X, R) →L[R] E</code>, but we do not want it to inherit the default
+(norm) topology, so we make a type synonym.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> (<a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">R</span><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">E</span>)</li></ul></details><details id="instances-for-list-AbstractMeasure" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.«termD(_,_)»"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L42-L43">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.«termD(_,_)»"><span class="name">AbstractMeasure</span>.<span class="name">«termD(_,_)»</span></a></span><span class="decl_args"> :</span><div class="decl_type"><a href="../../../.././Init/Prelude.html#Lean.ParserDescr">Lean.ParserDescr</a></div></div><p>The space of <code>E</code>-valued measures on <code>X</code>, i.e. continuous linear maps <code>C(X, R) → E</code>. (The case
+<code>R = E</code> is the most important case.)</p><p>This is the same space <code>C(X, R) →L[R] E</code>, but we do not want it to inherit the default
+(norm) topology, so we make a type synonym.</p><details><summary>Equations</summary><ul class="equations"><li class="equation">One or more equations did not get rendered due to their size.</li></ul></details><details id="instances-for-list-AbstractMeasure.«termD(_,_)»" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.instFunLikeContinuousMap"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L51-L53">source</a></div><div class="attributes">@[implicit_reducible]</div>
+<div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.instFunLikeContinuousMap"><span class="name">AbstractMeasure</span>.<span class="name">instFunLikeContinuousMap</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Data/FunLike/Basic.html#FunLike">FunLike</a> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span>)</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <span class="fn">E</span></span></div></div><p>Inherit <code><a href="../../../.././Mathlib/Data/FunLike/Basic.html#FunLike">FunLike</a></code> structure from <code>C(X, R) →L[R] E</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.instFunLikeContinuousMap">AbstractMeasure.instFunLikeContinuousMap</a> <a href="../../../.././Init/Prelude.html#Eq">=</a>   <a href="../../../.././Mathlib/Data/FunLike/Basic.html#DFunLike.mk">{</a> <span class="fn">coe</span> := <a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.instFunLikeContinuousMap">AbstractMeasure.instFunLikeContinuousMap._aux_1</a>, <span class="fn">coe_injective</span> := <span class="fn">⋯</span> <a href="../../../.././Mathlib/Data/FunLike/Basic.html#DFunLike.mk">}</a></li></ul></details></div></div><div class="decl" id="AbstractMeasure.instContinuousLinearMapClassContinuousMap"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L55-L57">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.instContinuousLinearMapClassContinuousMap"><span class="name">AbstractMeasure</span>.<span class="name">instContinuousLinearMapClassContinuousMap</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMapClass">ContinuousLinearMapClass</a> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span>)</span> <span class="fn">R</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <span class="fn">E</span></span></div></div><p>Inherit <code><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMapClass">ContinuousLinearMapClass</a></code> structure from <code>C(X, R) →L[R] E</code>.</p></div></div><div class="decl" id="AbstractMeasure.instAddCommGroup"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L59-L61">source</a></div><div class="attributes">@[implicit_reducible]</div>
+<div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.instAddCommGroup"><span class="name">AbstractMeasure</span>.<span class="name">instAddCommGroup</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span>)</span></span></div></div><p>Inherit <code><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a></code> structure from <code>C(X, R) →L[R] E</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation">One or more equations did not get rendered due to their size.</li></ul></details></div></div><div class="decl" id="AbstractMeasure.isAddApply"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L63-L64">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.isAddApply"><span class="name">AbstractMeasure</span>.<span class="name">isAddApply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Data/FunLike/IsApply.html#IsAddApply">IsAddApply</a> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span>)</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <span class="fn">E</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.instModule"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L72-L74">source</a></div><div class="attributes">@[implicit_reducible]</div>
+<div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.instModule"><span class="name">AbstractMeasure</span>.<span class="name">instModule</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span>)</span></span></div></div><p>Inherit <code>R</code>-module structure from <code>C(X, R) →L[R] E</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.instModule">AbstractMeasure.instModule</a> <a href="../../../.././Init/Prelude.html#Eq">=</a>   <a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module.mk">{</a> <span class="fn">smul</span> := <a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.instModule">AbstractMeasure.instModule._aux_1</a>, <span class="fn">mul_smul</span> := <span class="fn">⋯</span>, <span class="fn">one_smul</span> := <span class="fn">⋯</span>, <span class="fn">smul_zero</span> := <span class="fn">⋯</span>, <span class="fn">smul_add</span> := <span class="fn">⋯</span>,
+    <span class="fn">add_smul</span> := <span class="fn">⋯</span>, <span class="fn">zero_smul</span> := <span class="fn">⋯</span> <a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module.mk">}</a></li></ul></details></div></div><div class="decl" id="AbstractMeasure.isSMulApply"><div class="instance"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L76-L77">source</a></div><div class="decl_header"><span class="decl_kind">instance</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.isSMulApply"><span class="name">AbstractMeasure</span>.<span class="name">isSMulApply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/Data/FunLike/IsApply.html#IsSMulApply">IsSMulApply</a> <span class="fn">R</span> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span>)</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <span class="fn">E</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.toCLMEquiv"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L79-L81">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.toCLMEquiv"><span class="name">AbstractMeasure</span>.<span class="name">toCLMEquiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span></span> <a href="../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv">≃ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">R</span><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">E</span></div></div><p>The defining equivalence between measures and continuous linear maps on continuous functions.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.toCLMEquiv">AbstractMeasure.toCLMEquiv</a> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv.refl">LinearEquiv.refl</a> <span class="fn">R</span> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span>)</span></span></li></ul></details><details id="instances-for-list-AbstractMeasure.toCLMEquiv" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.coe_toCLMEquiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L83-L85">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.coe_toCLMEquiv"><span class="name">AbstractMeasure</span>.<span class="name">coe_toCLMEquiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.toCLMEquiv">toCLMEquiv</a> <span class="fn">μ</span>)</span> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">μ</span> <span class="fn">f</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.coe_symm_toCLMEquiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L87-L89">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.coe_symm_toCLMEquiv"><span class="name">AbstractMeasure</span>.<span class="name">coe_symm_toCLMEquiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">L</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">R</span><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">E</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.toCLMEquiv">toCLMEquiv</a>.<a href="../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv.symm">symm</a></span> <span class="fn">L</span>)</span> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">L</span> <span class="fn">f</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.dirac"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L92-L94">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.dirac"><span class="name">AbstractMeasure</span>.<span class="name">dirac</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">X</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span></div></div><p>The Dirac measure, &quot;evaluation at <code>x</code>&quot;.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.dirac">AbstractMeasure.dirac</a> <span class="fn">R</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.toCLMEquiv">AbstractMeasure.toCLMEquiv</a>.<a href="../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv.symm">symm</a></span> <span class="fn">(<a href="../../../.././Mathlib/Topology/ContinuousMap/Algebra.html#ContinuousMap.evalCLM">ContinuousMap.evalCLM</a> <span class="fn">R</span> <span class="fn">x</span>)</span></span></li></ul></details><details id="instances-for-list-AbstractMeasure.dirac" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.dirac_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L96-L96">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.dirac_apply"><span class="name">AbstractMeasure</span>.<span class="name">dirac_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">X</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.dirac">dirac</a> <span class="fn">R</span> <span class="fn">x</span>)</span> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">f</span> <span class="fn">x</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.map"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L100-L104">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map"><span class="name">AbstractMeasure</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">E</span></span></div></div><p>Measures can be pushed forward (<code>R</code>-linearly) along continuous maps.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map">AbstractMeasure.map</a> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a>   <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.mk">{</a> <span class="fn">toFun</span> := <span class="fn">fun (<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span></span>) =&gt; <span class="fn">μ</span> <a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.comp">∘SL</a> <span class="fn"><a href="../../../.././Mathlib/Topology/ContinuousMap/Algebra.html#ContinuousMap.compCLM">ContinuousMap.compCLM</a> <span class="fn">R</span> <span class="fn">R</span> <span class="fn">f</span></span></span>, <span class="fn">map_add'</span> := <span class="fn">⋯</span>, <span class="fn">map_smul'</span> := <span class="fn">⋯</span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.mk">}</a></li></ul></details><details id="instances-for-list-AbstractMeasure.map" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.map_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L106-L108">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map_apply"><span class="name">AbstractMeasure</span>.<span class="name">map_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map">map</a> <span class="fn">f</span>)</span> <span class="fn">μ</span>)</span> <span class="fn">g</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">μ</span> <span class="fn">(<span class="fn"><span class="fn">g</span>.<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.comp">comp</a></span> <span class="fn">f</span>)</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.map_map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L110-L113">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map_map"><span class="name">AbstractMeasure</span>.<span class="name">map_map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Z</span> : <a href="../../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Z</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">Z</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map">map</a> <span class="fn">g</span>)</span> <span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map">map</a> <span class="fn">f</span>)</span> <span class="fn">μ</span>)</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map">map</a> <span class="fn">(<span class="fn"><span class="fn">g</span>.<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.comp">comp</a></span> <span class="fn">f</span>)</span>)</span> <span class="fn">μ</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.map_id"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L115-L118">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map_id"><span class="name">AbstractMeasure</span>.<span class="name">map_id</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">E</span> : <a href="../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Group/Defs.html#IsTopologicalAddGroup">IsTopologicalAddGroup</a> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/MulAction.html#ContinuousSMul">ContinuousSMul</a> <span class="fn">R</span> <span class="fn">E</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">E</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map">map</a> <span class="fn">(<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.id">ContinuousMap.id</a> <span class="fn">X</span>)</span>)</span> <span class="fn">μ</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn">μ</span></div></div></div></div><div class="decl" id="AbstractMeasure.map_dirac"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L120-L122">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map_dirac"><span class="name">AbstractMeasure</span>.<span class="name">map_dirac</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">X</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.map">map</a> <span class="fn">f</span>)</span> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.dirac">dirac</a> <span class="fn">R</span> <span class="fn">x</span>)</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.dirac">dirac</a> <span class="fn">R</span> <span class="fn">(<span class="fn">f</span> <span class="fn">x</span>)</span></span></div></div></div></div><div class="mod_doc"><h3 id="Product-structure" class="markdown-heading">Product structure <a class="hover-link" href="#Product-structure">#</a></h3></div><div class="decl" id="AbstractMeasure.contractSnd"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L134-L138">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd"><span class="name">AbstractMeasure</span>.<span class="name">contractSnd</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a></div></div><p>Send a measure <code>ν</code> on <code>Y</code> and a function <code>f</code> on <code>X × Y</code> to the function on <code>X</code> given by
+<code>x ↦ ν (f (x, ·))</code>, or more suggestively, <code>x ↦ ∫ f(x, y) dμ(y)</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd">AbstractMeasure.contractSnd</a> <a href="../../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../../.././Mathlib/LinearAlgebra/BilinearMap.html#LinearMap.mk₂">LinearMap.mk₂</a> <span class="fn">R</span> <span class="fn">(fun (<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>) (<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>) =&gt; <span class="fn"><span class="fn"><span class="fn">(↑<span class="fn">ν</span>)</span>.<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.comp">comp</a></span> <span class="fn"><span class="fn">f</span>.<a href="../../../.././Mathlib/Topology/CompactOpen.html#ContinuousMap.curry">curry</a></span></span>)</span> <span class="fn">⋯</span> <span class="fn">⋯</span> <span class="fn">⋯</span> <span class="fn">⋯</span></span></li></ul></details><details id="instances-for-list-AbstractMeasure.contractSnd" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.contractFst"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L140-L143">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFst"><span class="name">AbstractMeasure</span>.<span class="name">contractFst</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a></div></div><p>Send a measure <code>μ</code> on <code>X</code> and a function <code>f</code> on <code>X × Y</code> to the function on <code>Y</code> given by
+<code>y ↦ μ (f (·, y))</code>, or more suggestively, <code>y ↦ ∫ f(x, y) dμ(x)</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFst">AbstractMeasure.contractFst</a> <a href="../../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><span class="fn"><a href="../../../.././Mathlib/LinearAlgebra/BilinearMap.html#LinearMap.lcomp">LinearMap.lcomp</a> <span class="fn">R</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <span class="fn">↑<span class="fn">(<a href="../../../.././Mathlib/Topology/ContinuousMap/Algebra.html#ContinuousMap.compCLM">ContinuousMap.compCLM</a> <span class="fn">R</span> <span class="fn">R</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.prodSwap">ContinuousMap.prodSwap</a>)</span></span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.comp">∘ₗ</a> <a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd">AbstractMeasure.contractSnd</a></span></li></ul></details><details id="instances-for-list-AbstractMeasure.contractFst" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.contractFst_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L147-L149">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFst_apply"><span class="name">AbstractMeasure</span>.<span class="name">contractFst_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFst">contractFst</a> <span class="fn">μ</span>)</span> <span class="fn">f</span>)</span> <span class="fn">y</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">μ</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap.mk">{</a> <span class="fn">toFun</span> := <span class="fn">fun (<span class="fn">x</span> : <span class="fn">X</span>) =&gt; <span class="fn"><span class="fn">f</span> <a href="../../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">x</span><a href="../../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">y</span><a href="../../../.././Init/Prelude.html#Prod.mk">)</a></span></span>, <span class="fn">continuous_toFun</span> := <span class="fn">⋯</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap.mk">}</a></span></div></div></div></div><div class="decl" id="AbstractMeasure.contractSnd_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L151-L153">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd_apply"><span class="name">AbstractMeasure</span>.<span class="name">contractSnd_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">X</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd">contractSnd</a> <span class="fn">ν</span>)</span> <span class="fn">f</span>)</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">ν</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap.mk">{</a> <span class="fn">toFun</span> := <span class="fn">fun (<span class="fn">y</span> : <span class="fn">Y</span>) =&gt; <span class="fn"><span class="fn">f</span> <a href="../../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">x</span><a href="../../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">y</span><a href="../../../.././Init/Prelude.html#Prod.mk">)</a></span></span>, <span class="fn">continuous_toFun</span> := <span class="fn">⋯</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap.mk">}</a></span></div></div></div></div><div class="decl" id="AbstractMeasure.contractFst_dirac"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L155-L157">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFst_dirac"><span class="name">AbstractMeasure</span>.<span class="name">contractFst_dirac</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">X</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFst">contractFst</a> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.dirac">dirac</a> <span class="fn">R</span> <span class="fn">x</span>)</span>)</span> <span class="fn">f</span>)</span> <span class="fn">y</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">f</span> <a href="../../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">x</span><a href="../../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">y</span><a href="../../../.././Init/Prelude.html#Prod.mk">)</a></span></div></div></div></div><div class="decl" id="AbstractMeasure.contractSnd_dirac"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L159-L161">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd_dirac"><span class="name">AbstractMeasure</span>.<span class="name">contractSnd_dirac</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">x</span> : <span class="fn">X</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">y</span> : <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd">contractSnd</a> <span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.dirac">dirac</a> <span class="fn">R</span> <span class="fn">y</span>)</span>)</span> <span class="fn">f</span>)</span> <span class="fn">x</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">f</span> <a href="../../../.././Init/Prelude.html#Prod.mk">(</a><span class="fn">x</span><a href="../../../.././Init/Prelude.html#Prod.mk">,</a> <span class="fn">y</span><a href="../../../.././Init/Prelude.html#Prod.mk">)</a></span></div></div></div></div><div class="decl" id="AbstractMeasure.contractSndCLM"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L167-L175">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSndCLM"><span class="name">AbstractMeasure</span>.<span class="name">contractSndCLM</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">R</span><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a></div></div><p><code><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd">AbstractMeasure.contractSnd</a></code> bundled with continuity in the function argument.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSndCLM">AbstractMeasure.contractSndCLM</a> <a href="../../../.././Init/Prelude.html#Eq">=</a>   <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.mk">{</a> <span class="fn">toFun</span> := <span class="fn">fun (<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>) =&gt; <a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.mk">{</a> <span class="fn">toLinearMap</span> := <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd">AbstractMeasure.contractSnd</a> <span class="fn">ν</span></span>, <span class="fn">cont</span> := <span class="fn">⋯</span> <a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.mk">}</a></span>,
+    <span class="fn">map_add'</span> := <span class="fn">⋯</span>, <span class="fn">map_smul'</span> := <span class="fn">⋯</span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.mk">}</a></li></ul></details><details id="instances-for-list-AbstractMeasure.contractSndCLM" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.contractFstCLM"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L177-L179">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFstCLM"><span class="name">AbstractMeasure</span>.<span class="name">contractFstCLM</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">R</span><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a></div></div><p><code><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFst">AbstractMeasure.contractFst</a></code> bundled with continuity in the function argument.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFstCLM">AbstractMeasure.contractFstCLM</a> <a href="../../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.lcomp">ContinuousLinearMap.lcomp</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <span class="fn">(<a href="../../../.././Mathlib/Topology/ContinuousMap/Algebra.html#ContinuousMap.compCLM">ContinuousMap.compCLM</a> <span class="fn">R</span> <span class="fn">R</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.prodSwap">ContinuousMap.prodSwap</a>)</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.comp">∘ₗ</a> <a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSndCLM">AbstractMeasure.contractSndCLM</a></span></li></ul></details><details id="instances-for-list-AbstractMeasure.contractFstCLM" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.prodMk"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L181-L184">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk"><span class="name">AbstractMeasure</span>.<span class="name">prodMk</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> (<span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span>) <span class="fn">R</span> <span class="fn">R</span></span></div></div><p>&quot;Left-handed&quot; version of the natural product map on measures (acting on functions
+as first integrating along <code>X</code>, and then integrating the result along <code>Y</code>).</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk">AbstractMeasure.prodMk</a> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.llcomp">ContinuousLinearMap.llcomp</a> <span class="fn">R</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.comp">∘ₗ</a> <a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFstCLM">AbstractMeasure.contractFstCLM</a></span></li></ul></details><details id="instances-for-list-AbstractMeasure.prodMk" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.prodMk_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L186-L187">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk_apply"><span class="name">AbstractMeasure</span>.<span class="name">prodMk_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk">prodMk</a> <span class="fn">μ</span>)</span> <span class="fn">ν</span>)</span> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">ν</span> <span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractFst">contractFst</a> <span class="fn">μ</span>)</span> <span class="fn">f</span>)</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.prodMk_prod_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L189-L199">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk_prod_apply"><span class="name">AbstractMeasure</span>.<span class="name">prodMk_prod_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk">prodMk</a> <span class="fn">μ</span>)</span> <span class="fn">ν</span>)</span> (<span class="fn"><span class="fn"><span class="fn">f</span>.<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.comp">comp</a></span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.fst">ContinuousMap.fst</a></span> <a href="../../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">g</span>.<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.comp">comp</a></span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.snd">ContinuousMap.snd</a></span>)</span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">μ</span> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">ν</span> <span class="fn">g</span></span></div></div><p>On functions of the form <code>(x, y) ↦ f x * g y</code>, the measure <code><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk">prodMk</a> μ ν</code> agrees with the
+algebraic tensor product of <code>μ</code> and <code>ν</code>.</p></div></div><div class="decl" id="AbstractMeasure.prodMk'"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L201-L204">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'"><span class="name">AbstractMeasure</span>.<span class="name">prodMk'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> (<span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span>) <span class="fn">R</span> <span class="fn">R</span></span></div></div><p>&quot;Right-handed&quot; version of the natural product map on measures (acting on functions
+as first integrating along <code>Y</code>, and then integrating the result along <code>X</code>).</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'">AbstractMeasure.prodMk'</a> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.llcomp">ContinuousLinearMap.llcomp</a> <span class="fn">R</span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a> <span class="fn">R</span></span> <a href="../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.comp">∘ₗ</a> <a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSndCLM">AbstractMeasure.contractSndCLM</a>)</span>.<a href="../../../.././Mathlib/LinearAlgebra/BilinearMap.html#LinearMap.flip">flip</a></span></li></ul></details><details id="instances-for-list-AbstractMeasure.prodMk'" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="AbstractMeasure.prodMk'_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L206-L207">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'_apply"><span class="name">AbstractMeasure</span>.<span class="name">prodMk'_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'">prodMk'</a> <span class="fn">μ</span>)</span> <span class="fn">ν</span>)</span> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">μ</span> <span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.contractSnd">contractSnd</a> <span class="fn">ν</span>)</span> <span class="fn">f</span>)</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.prodMk'_flip"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L209-L210">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'_flip"><span class="name">AbstractMeasure</span>.<span class="name">prodMk'_flip</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span> <a href="../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'">prodMk'</a> <span class="fn">μ</span>)</span> <span class="fn">ν</span>)</span> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk">prodMk</a> <span class="fn">ν</span>)</span> <span class="fn">μ</span>)</span> <span class="fn">(<span class="fn"><span class="fn">f</span>.<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.comp">comp</a></span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.prodSwap">ContinuousMap.prodSwap</a>)</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.prodMk'_prod_apply"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L212-L218">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'_prod_apply"><span class="name">AbstractMeasure</span>.<span class="name">prodMk'_prod_apply</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#LocallyCompactSpace">LocallyCompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">X</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">C(</a><span class="fn">Y</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">,</a> <span class="fn">R</span><a href="../../../.././Mathlib/Topology/ContinuousMap/Defs.html#ContinuousMap">)</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'">prodMk'</a> <span class="fn">μ</span>)</span> <span class="fn">ν</span>)</span> (<span class="fn"><span class="fn"><span class="fn">f</span>.<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.comp">comp</a></span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.fst">ContinuousMap.fst</a></span> <a href="../../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn"><span class="fn">g</span>.<a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.comp">comp</a></span> <a href="../../../.././Mathlib/Topology/ContinuousMap/Basic.html#ContinuousMap.snd">ContinuousMap.snd</a></span>)</span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">μ</span> <span class="fn">f</span></span> <a href="../../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">ν</span> <span class="fn">g</span></span></div></div></div></div><div class="decl" id="AbstractMeasure.prodMk_eq_prodMk'"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/NumberTheory/Padics/Measure/Basic.lean#L227-L234">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk_eq_prodMk'"><span class="name">AbstractMeasure</span>.<span class="name">prodMk_eq_prodMk'</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X</span> : <a href="../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">Y</span> : <a href="../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Basic.html#TopologicalSpace">TopologicalSpace</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Algebra/Ring/Basic.html#IsTopologicalRing">IsTopologicalRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">μ</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">X</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ν</span> : <span class="fn"><a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure">AbstractMeasure</a> <span class="fn">Y</span> <span class="fn">R</span> <span class="fn">R</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#CompactSpace">CompactSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Defs/Filter.html#CompactSpace">CompactSpace</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Separation/Hausdorff.html#T2Space">T2Space</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Separation/Hausdorff.html#T2Space">T2Space</a> <span class="fn">Y</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Connected/TotallyDisconnected.html#TotallyDisconnectedSpace">TotallyDisconnectedSpace</a> <span class="fn">X</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../.././Mathlib/Topology/Separation/Basic.html#T0Space">T0Space</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk">prodMk</a> <span class="fn">μ</span>)</span> <span class="fn">ν</span></span> <a href="../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../../.././Mathlib/NumberTheory/Padics/Measure/Basic.html#AbstractMeasure.prodMk'">prodMk'</a> <span class="fn">μ</span>)</span> <span class="fn">ν</span></span></div></div><p>For profinite spaces, the two product structures on measures agree.</p></div></div></main>
+<nav class="nav"><iframe src="../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

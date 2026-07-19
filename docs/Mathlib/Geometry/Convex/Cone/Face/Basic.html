@@ -1,0 +1,833 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../../../.././style.css"></link><link rel="icon" href="../../../../.././favicon.svg"></link><link rel="mask-icon" href="../../../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.Geometry.Convex.Cone.Face.Basic</title><script defer="true" src="../../../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../../../.././";</script><script>const MODULE_NAME="Mathlib.Geometry.Convex.Cone.Face.Basic";</script><script type="module" src="../../../../.././jump-src.js"></script><script type="module" src="../../../../.././search.js"></script><script type="module" src="../../../../.././expand-nav.js"></script><script type="module" src="../../../../.././how-about.js"></script><script type="module" src="../../../../.././instances.js"></script><script type="module" src="../../../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">Geometry</span>.<span class="name">Convex</span>.<span class="name">Cone</span>.<span class="name">Face</span>.<span class="name">Basic</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../../../.././Init.html">Init</a></li><li><a href="../../../../.././Mathlib/Analysis/Convex/Extreme.html">Mathlib.Analysis.Convex.Extreme</a></li><li><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html">Mathlib.Geometry.Convex.Cone.Pointed</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.Geometry.Convex.Cone.Face.Basic" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.isFaceOf_iff"><span class="name">PointedCone</span>.<span class="name">isFaceOf_iff</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.mem_of_smul_add_smul_mem_left"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_smul_add_smul_mem_left</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.mem_of_smul_add_smul_mem_right"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_smul_add_smul_mem_right</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.refl"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">refl</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.rfl"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">rfl</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.isFaceOf_iff_le"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">isFaceOf_iff_le</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.isExtreme"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">isExtreme</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.inf"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">inf</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.inf_left"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">inf_left</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.inf_right"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">inf_right</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.sInf"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">sInf</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.mem_of_add_mem_left"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_add_mem_left</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.mem_of_add_mem_right"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_add_mem_right</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.add_mem_iff_mem"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">add_mem_iff_mem</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.mem_of_sum_mem"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_sum_mem</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.sum_mem_iff_mem"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">sum_mem_iff_mem</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.mem_of_sum_smul_mem"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_sum_smul_mem</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.trans"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">trans</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.map"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">map</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.map_equiv"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">map_equiv</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.of_map_injective"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">of_map_injective</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.comap"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">comap</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.of_comap_surjective"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">of_comap_surjective</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.isFaceOf_map_iff"><span class="name">PointedCone</span>.<span class="name">isFaceOf_map_iff</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.isFaceOf_comap_iff"><span class="name">PointedCone</span>.<span class="name">isFaceOf_comap_iff</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.of_mem_of_add_mem_left"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">of_mem_of_add_mem_left</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.lineal"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">lineal</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.lineal_le"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">lineal_le</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.lineal_congr"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">lineal_congr</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.prod"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">prod</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.fst"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">fst</span></a></div><div class="nav_link"><a class="break_within" href="#PointedCone.IsFaceOf.snd"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">snd</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Faces-of-pointed-cones" class="markdown-heading">Faces of pointed cones <a class="hover-link" href="#Faces-of-pointed-cones">#</a></h1><p>This file defines what it means for a pointed cone to be a face of another pointed cone and
+establishes basic properties of this relation.
+A subcone <code>F</code> of a cone <code>C</code> is a face if any two points in <code>C</code> that have a positive combination
+in <code>F</code> are also in <code>F</code>.</p><h2 id="Main-declarations" class="markdown-heading">Main declarations <a class="hover-link" href="#Main-declarations">#</a></h2><ul><li><code><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a> F C</code>: States that the pointed cone <code>F</code> is a face of the pointed cone <code>C</code>.</li></ul><h2 id="Implementation-notes" class="markdown-heading">Implementation notes <a class="hover-link" href="#Implementation-notes">#</a></h2><ul><li>We do not use <code><a href="../../../../.././Mathlib/Analysis/Convex/Extreme.html#IsExtreme">IsExtreme</a></code> as a definition because this is an affine notion and does not allow the
+flexibility necessary to deal wth cones over general rings. E.g. the cone of positive integers has
+no proper subset that are extreme. We prove that every face is an extreme set of its cone.</li><li>Most results proven over a division ring hold more generally over an Archimedean ring. In
+particular, <code>iff_mem_of_add_mem_left</code> holds whenever for every <code>x ∈ R</code> there is a <code>y ∈ R</code> with
+<code>1 ≤ x * y</code>.</li></ul></div><div class="decl" id="PointedCone.IsFaceOf"><div class="structure"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L47-L53">source</a></div><div class="decl_header"><span class="decl_kind">structure</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F </span><span class="fn">C</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../../../.././foundational_types.html">Prop</a></div></div><p>A sub-cone <code>F</code> of a pointed cone <code>C</code> is a face of <code>C</code> if any two points of <code>C</code> with a strictly
+positive combination in <code>F</code> are also in <code>F</code>.</p><ul class="structure_fields" id="PointedCone.IsFaceOf.mk"><li id="PointedCone.IsFaceOf.le" class="structure_field"><div class="structure_field_info">le : <span class="fn">F</span> <a href="../../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">C</span></div></li><li id="PointedCone.IsFaceOf.mem_of_smul_add_mem" class="structure_field"><div class="structure_field_info">mem_of_smul_add_mem<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn">M</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a</span> : <span class="fn">R</span>}</span></span>
+</span> : <span class="fn"><span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span> → <span class="fn"><span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span> → <span class="fn"><span class="fn">0</span> <a href="../../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">a</span> → <span class="fn"><span class="fn">a</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span> → <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></span></span></span></span></div></li></ul><details id="instances-for-list-PointedCone.IsFaceOf" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="PointedCone.isFaceOf_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L49-L49">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.isFaceOf_iff"><span class="name">PointedCone</span>.<span class="name">isFaceOf_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F </span><span class="fn">C</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span> <a href="../../../../.././Init/Core.html#Iff">↔</a> <span class="fn">F</span> <a href="../../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">C</span> <a href="../../../../.././Init/Prelude.html#And">∧</a> <span class="fn">∀ {<span class="fn">x </span><span class="fn">y</span> : <span class="fn">M</span>} {<span class="fn">a</span> : <span class="fn">R</span>}, <span class="fn"><span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span> → <span class="fn"><span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span> → <span class="fn"><span class="fn">0</span> <a href="../../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">a</span> → <span class="fn"><span class="fn">a</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span> → <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></span></span></span></span></span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.mem_of_smul_add_smul_mem_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L59-L61">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.mem_of_smul_add_smul_mem_left"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_smul_add_smul_mem_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn">M</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">R</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hx</span> : <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hy</span> : <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">0</span> <a href="../../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">a</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">0</span> <a href="../../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">b</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">a</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">b</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.mem_of_smul_add_smul_mem_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L63-L65">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.mem_of_smul_add_smul_mem_right"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_smul_add_smul_mem_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn">M</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">a </span><span class="fn">b</span> : <span class="fn">R</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hx</span> : <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hy</span> : <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">ha</span> : <span class="fn">0</span> <a href="../../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">a</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hb</span> : <span class="fn">0</span> <a href="../../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn">b</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">a</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">b</span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.refl"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L67-L69">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.refl"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">refl</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">C</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div><p>A pointed cone <code>C</code> is a face of itself.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.rfl"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L71-L71">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.rfl"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">rfl</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">C</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.isFaceOf_iff_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L73-L76">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.isFaceOf_iff_le"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">isFaceOf_iff_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F₁ </span><span class="fn">F₂</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h₁</span> : <span class="fn"><span class="fn"><span class="fn">F₁</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h₂</span> : <span class="fn"><span class="fn"><span class="fn">F₂</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">F₁</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">F₂</span></span> <a href="../../../../.././Init/Core.html#Iff">↔</a> <span class="fn">F₁</span> <a href="../../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">F₂</span></div></div><p>A face of a cone is a face of another if and only if they are contained in each other.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.isExtreme"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L78-L82">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.isExtreme"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">isExtreme</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Analysis/Convex/Extreme.html#IsExtreme">IsExtreme</a> <span class="fn">R</span> <span class="fn">↑<span class="fn">C</span></span> <span class="fn">↑<span class="fn">F</span></span></span></div></div><p>A face of a cone is an extreme subset of the cone.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.inf"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L84-L91">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.inf"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">inf</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁ </span><span class="fn">C₂ </span><span class="fn">F₁ </span><span class="fn">F₂</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h₁</span> : <span class="fn"><span class="fn"><span class="fn">F₁</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C₁</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h₂</span> : <span class="fn"><span class="fn"><span class="fn">F₂</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C₂</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<span class="fn">F₁</span> ⊓ <span class="fn">F₂</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<span class="fn">C₁</span> ⊓ <span class="fn">C₂</span>)</span></span></div></div><p>The intersection of two faces of two cones is a face of the intersection of the cones.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.inf_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L93-L95">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.inf_left"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">inf_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F₁ </span><span class="fn">F₂</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h₁</span> : <span class="fn"><span class="fn"><span class="fn">F₁</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h₂</span> : <span class="fn"><span class="fn"><span class="fn">F₂</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<span class="fn">F₁</span> ⊓ <span class="fn">F₂</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div><p>The intersection of two faces of a cone is a face of the cone.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.inf_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L97-L99">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.inf_right"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">inf_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁ </span><span class="fn">C₂ </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h₁</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C₁</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h₂</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C₂</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<span class="fn">C₁</span> ⊓ <span class="fn">C₂</span>)</span></span></div></div><p>If a cone is a face of two cones simultaneously, then it's also a face of their intersection.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.sInf"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L101-L107">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.sInf"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">sInf</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span>)</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ <span class="fn">f</span> ∈ <span class="fn">F</span>, <span class="fn"><span class="fn"><span class="fn">f</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<span class="fn">C</span> ⊓ <span class="fn"><a href="../../../../.././Mathlib/Order/SetNotation.html#InfSet.sInf">sInf</a> <span class="fn">F</span></span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.mem_of_add_mem_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L109-L112">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.mem_of_add_mem_left"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_add_mem_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn">M</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hx</span> : <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hy</span> : <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hxy</span> : <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.mem_of_add_mem_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L114-L116">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.mem_of_add_mem_right"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_add_mem_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn">M</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hx</span> : <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hy</span> : <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hxy</span> : <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.add_mem_iff_mem"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L118-L121">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.add_mem_iff_mem"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">add_mem_iff_mem</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">x </span><span class="fn">y</span> : <span class="fn">M</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hx</span> : <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hy</span> : <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span> <a href="../../../../.././Init/Core.html#Iff">↔</a> <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span> <a href="../../../../.././Init/Prelude.html#And">∧</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.mem_of_sum_mem"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L123-L127">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.mem_of_sum_mem"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_sum_mem</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">ι</span> → <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hsC</span> : <span class="fn">∀ (<span class="fn">i</span> : <span class="fn">ι</span>), <span class="fn"><span class="fn">f</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hs</span> : <span class="fn">∑ <span class="fn">i</span> : <span class="fn">ι</span>, <span class="fn"><span class="fn">f</span> <span class="fn">i</span></span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">i</span> : <span class="fn">ι</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></div></div><p>If the sum of points of a cone is in a face, then all the points are in the face.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.sum_mem_iff_mem"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L129-L131">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.sum_mem_iff_mem"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">sum_mem_iff_mem</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">ι</span> → <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hsC</span> : <span class="fn">∀ (<span class="fn">i</span> : <span class="fn">ι</span>), <span class="fn"><span class="fn">f</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∑ <span class="fn">i</span> : <span class="fn">ι</span>, <span class="fn"><span class="fn">f</span> <span class="fn">i</span></span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span> <a href="../../../../.././Init/Core.html#Iff">↔</a> <span class="fn">∀ (<span class="fn">i</span> : <span class="fn">ι</span>), <span class="fn"><span class="fn">f</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.mem_of_sum_smul_mem"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L133-L141">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.mem_of_sum_smul_mem"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">mem_of_sum_smul_mem</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn"><span class="fn">ι</span> → <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">c</span> : <span class="fn"><span class="fn">ι</span> → <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hsC</span> : <span class="fn">∀ (<span class="fn">i</span> : <span class="fn">ι</span>), <span class="fn"><span class="fn">f</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hc</span> : <span class="fn">∀ (<span class="fn">i</span> : <span class="fn">ι</span>), <span class="fn">0</span> <a href="../../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn">c</span> <span class="fn">i</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hs</span> : <span class="fn">∑ <span class="fn">i</span> : <span class="fn">ι</span>, <span class="fn"><span class="fn">c</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn"><span class="fn">f</span> <span class="fn">i</span></span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">i</span> : <span class="fn">ι</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hci</span> : <span class="fn">0</span> <a href="../../../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><span class="fn">c</span> <span class="fn">i</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span> <span class="fn">i</span></span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></div></div><p>If the positive combination of points of a cone is in a face, then all the points are
+in the face.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.trans"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L143-L147">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.trans"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">trans</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F₁ </span><span class="fn">F₂</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h₁</span> : <span class="fn"><span class="fn"><span class="fn">F₂</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">F₁</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h₂</span> : <span class="fn"><span class="fn"><span class="fn">F₁</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">F₂</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div><p>The face of a face of a cone is also a face of the cone.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.map"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L153-L162">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.map"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">map</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">M</span> <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">N</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../../../.././Init/Data/Function.html#Function.Injective">Function.Injective</a> <span class="fn">⇑<span class="fn">f</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">f</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">f</span> <span class="fn">C</span>)</span></span></div></div><p>The image of a face of a cone under an injective linear map is a face of the
+image of the cone.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.map_equiv"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L164-L166">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.map_equiv"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">map_equiv</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">M</span> <a href="../../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv">≃ₗ[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Algebra/Module/Equiv/Defs.html#LinearEquiv">]</a> <span class="fn">N</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">(↑<span class="fn">e</span>)</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">(↑<span class="fn">e</span>)</span> <span class="fn">C</span>)</span></span></div></div><p>The image of a face of a cone under an equivalence is a face of the image of the cone.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.of_map_injective"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L168-L177">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.of_map_injective"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">of_map_injective</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">M</span> <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">N</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../../../.././Init/Data/Function.html#Function.Injective">Function.Injective</a> <span class="fn">⇑<span class="fn">f</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hc</span> : <span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">f</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">f</span> <span class="fn">C</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.comap"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L179-L183">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.comap"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">comap</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">N</span> <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">M</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.comap">comap</a> <span class="fn">f</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.comap">comap</a> <span class="fn">f</span> <span class="fn">C</span>)</span></span></div></div><p>The comap of a face of a cone under a linear map is a face of the comap of the cone.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.of_comap_surjective"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L185-L192">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.of_comap_surjective"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">of_comap_surjective</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">N</span> <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">M</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../../../.././Init/Data/Function.html#Function.Surjective">Function.Surjective</a> <span class="fn">⇑<span class="fn">f</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hc</span> : <span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.comap">comap</a> <span class="fn">f</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.comap">comap</a> <span class="fn">f</span> <span class="fn">C</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div></div></div><div class="decl" id="PointedCone.isFaceOf_map_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L198-L202">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.isFaceOf_map_iff"><span class="name">PointedCone</span>.<span class="name">isFaceOf_map_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">M</span> <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">N</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../../../.././Init/Data/Function.html#Function.Injective">Function.Injective</a> <span class="fn">⇑<span class="fn">f</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">f</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">f</span> <span class="fn">C</span>)</span></span> <a href="../../../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div><p>The image of a cone <code>F</code> under an injective linear map is a face of the
+image of another cone <code>C</code> if and only if <code>F</code> is a face of <code>C</code>.</p></div></div><div class="decl" id="PointedCone.isFaceOf_comap_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L204-L208">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.isFaceOf_comap_iff"><span class="name">PointedCone</span>.<span class="name">isFaceOf_comap_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/PartialOrder.html#PartialOrder">PartialOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">N</span> <a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">R</span><a href="../../../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">M</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><a href="../../../../.././Init/Data/Function.html#Function.Surjective">Function.Surjective</a> <span class="fn">⇑<span class="fn">f</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.comap">comap</a> <span class="fn">f</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.comap">comap</a> <span class="fn">f</span> <span class="fn">C</span>)</span></span> <a href="../../../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div><p>The comap of a cone <code>F</code> under a surjective linear map is a face of the
+comap of another cone <code>F</code> if and only if <code>F</code> is a face of <code>C</code>.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.of_mem_of_add_mem_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L220-L224">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.of_mem_of_add_mem_left"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">of_mem_of_add_mem_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Field/Defs.html#DivisionRing">DivisionRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h₁</span> : <span class="fn">F</span> <a href="../../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">C</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h₂</span> : <span class="fn">∀ {<span class="fn">x </span><span class="fn">y</span> : <span class="fn">M</span>}, <span class="fn"><span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span> → <span class="fn"><span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">C</span> → <span class="fn"><span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#HAdd.hAdd">+</a> <span class="fn">y</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span> → <span class="fn">x</span> <a href="../../../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">F</span></span></span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div></div></div><div class="decl" id="PointedCone.IsFaceOf.lineal"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L226-L231">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.lineal"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">lineal</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Field/Defs.html#DivisionRing">DivisionRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">C</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(↑<span class="fn"><span class="fn">C</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.lineal">lineal</a></span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span></div></div><p>The lineality space of a cone is a face.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.lineal_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L233-L235">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.lineal_le"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">lineal_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Field/Defs.html#DivisionRing">DivisionRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn"><span class="fn">C</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.lineal">lineal</a></span></span> <a href="../../../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn">F</span></div></div><p>The lineality space of a cone lies in every face.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.lineal_congr"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L237-L242">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.lineal_congr"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">lineal_congr</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Field/Defs.html#DivisionRing">DivisionRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C </span><span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.lineal">lineal</a></span> <a href="../../../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">C</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.lineal">lineal</a></span></div></div><p>The lineality space of a face of a cone agrees with the lineality space of the cone.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.prod"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L248-L255">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.prod"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">prod</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Field/Defs.html#DivisionRing">DivisionRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁ </span><span class="fn">F₁</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂ </span><span class="fn">F₂</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">N</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF₁</span> : <span class="fn"><span class="fn"><span class="fn">F₁</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C₁</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hF₂</span> : <span class="fn"><span class="fn"><span class="fn">F₂</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C₂</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/Span/Basic.html#Submodule.prod">Submodule.prod</a> <span class="fn">F₁</span> <span class="fn">F₂</span>)</span> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/Span/Basic.html#Submodule.prod">Submodule.prod</a> <span class="fn">C₁</span> <span class="fn">C₂</span>)</span></span></div></div><p>The product of two faces of two cones is a face of the product of the cones.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.fst"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L257-L271">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.fst"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">fst</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Field/Defs.html#DivisionRing">DivisionRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">N</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> (<span class="fn">M</span> <a href="../../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">N</span>)</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/Span/Basic.html#Submodule.prod">Submodule.prod</a> <span class="fn">C₁</span> <span class="fn">C₂</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/Prod.html#LinearMap.fst">LinearMap.fst</a> <span class="fn">R</span> <span class="fn">M</span> <span class="fn">N</span>)</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C₁</span></span></div></div><p>The projection of a face of a product cone onto the first component is a face of the
+projection of the product cone onto the first component.</p></div></div><div class="decl" id="PointedCone.IsFaceOf.snd"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Geometry/Convex/Cone/Face/Basic.lean#L273-L279">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf.snd"><span class="name">PointedCone</span>.<span class="name">IsFaceOf</span>.<span class="name">snd</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">M</span> : <a href="../../../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">N</span> : <a href="../../../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Field/Defs.html#DivisionRing">DivisionRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Order/Ring/Defs.html#IsOrderedRing">IsOrderedRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">M</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Group/Defs.html#AddCommGroup">AddCommGroup</a> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../../../.././Mathlib/Algebra/Module/Defs.html#Module">Module</a> <span class="fn">R</span> <span class="fn">N</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₁</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">M</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C₂</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> <span class="fn">N</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">F</span> : <span class="fn"><a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone">PointedCone</a> <span class="fn">R</span> (<span class="fn">M</span> <a href="../../../../.././Init/Prelude.html#Prod">×</a> <span class="fn">N</span>)</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hF</span> : <span class="fn"><span class="fn"><span class="fn">F</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/Span/Basic.html#Submodule.prod">Submodule.prod</a> <span class="fn">C₁</span> <span class="fn">C₂</span>)</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">(<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Pointed.html#PointedCone.map">map</a> <span class="fn">(<a href="../../../../.././Mathlib/LinearAlgebra/Prod.html#LinearMap.snd">LinearMap.snd</a> <span class="fn">R</span> <span class="fn">M</span> <span class="fn">N</span>)</span> <span class="fn">F</span>)</span>.<a href="../../../../.././Mathlib/Geometry/Convex/Cone/Face/Basic.html#PointedCone.IsFaceOf">IsFaceOf</a></span> <span class="fn">C₂</span></span></div></div><p>The projection of a face of a product cone onto the second component is a face of the
+projection of the product cone onto the second component.</p></div></div></main>
+<nav class="nav"><iframe src="../../../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

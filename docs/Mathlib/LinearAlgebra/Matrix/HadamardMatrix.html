@@ -1,0 +1,417 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.LinearAlgebra.Matrix.HadamardMatrix</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.LinearAlgebra.Matrix.HadamardMatrix";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">LinearAlgebra</span>.<span class="name">Matrix</span>.<span class="name">HadamardMatrix</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/Algebra/Star/Unitary.html">Mathlib.Algebra.Star.Unitary</a></li><li><a href="../../.././Mathlib/Data/Matrix/Basic.html">Mathlib.Data.Matrix.Basic</a></li><li><a href="../../.././Mathlib/LinearAlgebra/Matrix/Adjugate.html">Mathlib.LinearAlgebra.Matrix.Adjugate</a></li><li><a href="../../.././Mathlib/LinearAlgebra/Matrix/Kronecker.html">Mathlib.LinearAlgebra.Matrix.Kronecker</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.LinearAlgebra.Matrix.HadamardMatrix" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard"><span class="name">Matrix</span>.<span class="name">IsHadamard</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.isHadamard_iff"><span class="name">Matrix</span>.<span class="name">isHadamard_iff</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.isStarNormal"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">isStarNormal</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.conjTranspose"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">conjTranspose</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.isHadamard_conjTranspose_iff"><span class="name">Matrix</span>.<span class="name">isHadamard_conjTranspose_iff</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.reindex"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">reindex</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.isHadamard_submatrix_equiv_iff"><span class="name">Matrix</span>.<span class="name">isHadamard_submatrix_equiv_iff</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.kronecker"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">kronecker</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.card_eq_mul_star_of_const_col_sum"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">card_eq_mul_star_of_const_col_sum</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.card_eq_star_mul_of_const_row_sum"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">card_eq_star_mul_of_const_row_sum</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.transpose"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">transpose</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.isHadamard_transpose_iff"><span class="name">Matrix</span>.<span class="name">isHadamard_transpose_iff</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.neg"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">neg</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.neg_iff"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">neg_iff</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.det_mul_star_det"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">det_mul_star_det</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.star_det_mul_det"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">star_det_mul_det</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.det_ne_zero"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">det_ne_zero</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.isRegular_det"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">isRegular_det</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.of_mul_conjTranspose"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">of_mul_conjTranspose</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.isHadamard_iff_mul_conjTranspose"><span class="name">Matrix</span>.<span class="name">isHadamard_iff_mul_conjTranspose</span></a></div><div class="nav_link"><a class="break_within" href="#Matrix.IsHadamard.four_dvd_card"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">four_dvd_card</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Hadamard-matrices" class="markdown-heading">Hadamard matrices <a class="hover-link" href="#Hadamard-matrices">#</a></h1><p>This file defines <code><a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">Matrix.IsHadamard</a></code>, a unified notion that specializes to the classical real
+Hadamard matrices over <code>ℝ</code>/<code>ℤ</code> (where <code>star</code> is trivial and entries are <code>±1</code>) and to the complex
+Hadamard matrices over <code>ℂ</code> (where entries have unit norm). Basic results: conjugate-transpose
+closure, the order identity <code>n = s * star s</code> from constant row or column sums, the Sylvester
+(Kronecker) construction, and the divisibility obstruction <code>4 ∣ n</code>.</p><h2 id="References" class="markdown-heading">References <a class="hover-link" href="#References">#</a></h2><ul><li>[W. de Launey and D. L. Flannery, <em>Algebraic Design Theory</em>][deLauneyFlannery2011]</li></ul></div><div class="decl" id="Matrix.IsHadamard"><div class="structure"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L41-L54">source</a></div><div class="decl_header"><span class="decl_kind">structure</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard"><span class="name">Matrix</span>.<span class="name">IsHadamard</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Prop</a></div></div><p>A square matrix over a <code>*</code>-semiring whose entries are unitary and whose rows and columns are
+orthogonal with respect to the conjugate transpose:
+<code>A * Aᴴ = n • 1</code> and <code>Aᴴ * A = n • 1</code>.</p><p>Over a commutative ring in which the order is regular, the one-sided condition from
+[Definition 2.3.1][deLauneyFlannery2011] implies this predicate by
+<code><a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.of_mul_conjTranspose">IsHadamard.of_mul_conjTranspose</a></code>; over a ring with trivial star (e.g. <code>ℝ</code>, <code>ℤ</code>), the entry
+condition becomes <code>A i j = 1 ∨ A i j = -1</code>. Over <code>ℂ</code>, the entry condition becomes <code>‖A i j‖ = 1</code>,
+generalizing the fourth-root complex Hadamard matrices of
+[Definition 2.7.1][deLauneyFlannery2011].</p><ul class="structure_fields" id="Matrix.IsHadamard.mk"><li id="Matrix.IsHadamard.apply_mem" class="structure_field"><div class="structure_field_info">apply_mem<span class="decl_args">
+<span class="fn">(<span class="fn">i </span><span class="fn">j</span> : <span class="fn">n</span>)</span></span>
+ : <span class="fn"><span class="fn">A</span> <span class="fn">i</span> <span class="fn">j</span></span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Star/Unitary.html#unitary">unitary</a> <span class="fn">R</span></span></div></li><li id="Matrix.IsHadamard.mul_conjTranspose" class="structure_field"><div class="structure_field_info">mul_conjTranspose : <span class="fn">A</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/ConjTranspose.html#Matrix.conjTranspose">conjTranspose</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">1</span></div></li><li id="Matrix.IsHadamard.conjTranspose_mul" class="structure_field"><div class="structure_field_info">conjTranspose_mul : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/ConjTranspose.html#Matrix.conjTranspose">conjTranspose</a></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">A</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">1</span></div></li></ul><details id="instances-for-list-Matrix.IsHadamard" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="Matrix.isHadamard_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L51-L51">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.isHadamard_iff"><span class="name">Matrix</span>.<span class="name">isHadamard_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span> <a href="../../.././Init/Core.html#Iff">↔</a>   <span class="fn">(∀ (<span class="fn">i </span><span class="fn">j</span> : <span class="fn">n</span>), <span class="fn"><span class="fn">A</span> <span class="fn">i</span> <span class="fn">j</span></span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Star/Unitary.html#unitary">unitary</a> <span class="fn">R</span></span>)</span> <a href="../../.././Init/Prelude.html#And">∧</a>     <span class="fn">A</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/ConjTranspose.html#Matrix.conjTranspose">conjTranspose</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">1</span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/ConjTranspose.html#Matrix.conjTranspose">conjTranspose</a></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">A</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">1</span></div></div></div></div><div class="decl" id="Matrix.IsHadamard.isStarNormal"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L58-L60">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.isStarNormal"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">isStarNormal</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Star/SelfAdjoint.html#IsStarNormal">IsStarNormal</a> <span class="fn">A</span></span></div></div></div></div><div class="decl" id="Matrix.IsHadamard.conjTranspose"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L62-L66">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.conjTranspose"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">conjTranspose</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/ConjTranspose.html#Matrix.conjTranspose">conjTranspose</a></span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div><p>The conjugate transpose of a Hadamard matrix is Hadamard.</p></div></div><div class="decl" id="Matrix.isHadamard_conjTranspose_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L68-L70">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.isHadamard_conjTranspose_iff"><span class="name">Matrix</span>.<span class="name">isHadamard_conjTranspose_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/ConjTranspose.html#Matrix.conjTranspose">conjTranspose</a></span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div></div></div><div class="decl" id="Matrix.IsHadamard.reindex"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L72-L77">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.reindex"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">reindex</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">e₁ </span><span class="fn">e₂</span> : <span class="fn">n</span> <a href="../../.././Mathlib/Logic/Equiv/Defs.html#Equiv">≃</a> <span class="fn">m</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix.reindex">Matrix.reindex</a> <span class="fn">e₁</span> <span class="fn">e₂</span>)</span> <span class="fn">A</span>)</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div><p>Permuting the rows and columns of a Hadamard matrix gives a Hadamard matrix.</p></div></div><div class="decl" id="Matrix.isHadamard_submatrix_equiv_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L79-L83">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.isHadamard_submatrix_equiv_iff"><span class="name">Matrix</span>.<span class="name">isHadamard_submatrix_equiv_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">e₁ </span><span class="fn">e₂</span> : <span class="fn">m</span> <a href="../../.././Mathlib/Logic/Equiv/Defs.html#Equiv">≃</a> <span class="fn">n</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix.submatrix">submatrix</a></span> <span class="fn">⇑<span class="fn">e₁</span></span> <span class="fn">⇑<span class="fn">e₂</span></span>)</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div></div></div><div class="decl" id="Matrix.IsHadamard.kronecker"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L85-L107">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.kronecker"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">kronecker</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">m</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">m</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">m</span> <span class="fn">m</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">B</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hB</span> : <span class="fn"><span class="fn">B</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Matrix/Kronecker.html#Matrix.kroneckerMap">kroneckerMap</a> <span class="fn">(fun (<span class="fn">x1</span> <span class="fn">x2</span> : <span class="fn">R</span>) =&gt; <span class="fn">x1</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">x2</span>)</span> <span class="fn">A</span> <span class="fn">B</span>)</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div><p>The Kronecker product of two Hadamard matrices is Hadamard.</p></div></div><div class="decl" id="Matrix.IsHadamard.card_eq_mul_star_of_const_col_sum"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L109-L133">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.card_eq_mul_star_of_const_col_sum"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">card_eq_mul_star_of_const_col_sum</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn">R</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hcard</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Regular/Defs.html#IsRegular">IsRegular</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hcol</span> : <span class="fn">∀ (<span class="fn">j</span> : <span class="fn">n</span>), <span class="fn">∑ <span class="fn">i</span> : <span class="fn">n</span>, <span class="fn"><span class="fn">A</span> <span class="fn">i</span> <span class="fn">j</span></span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">s</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">s</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Notation/Defs.html#Star.star">star</a> <span class="fn">s</span></span></div></div><p>A Hadamard matrix with constant column sum <code>s</code> has order <code>s * star s</code>, provided the order
+is regular in <code>R</code>.</p><p>The row-sum form is <code><a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.card_eq_star_mul_of_const_row_sum">IsHadamard.card_eq_star_mul_of_const_row_sum</a></code>; over a ring with trivial
+star the conclusion becomes <code>(Fintype.card n : R) = s ^ 2</code>, a slightly stronger form of
+[Theorem 2.3.7][deLauneyFlannery2011]: only a constant sum hypothesis on one side is needed
+under the two-sided orthogonality condition.</p></div></div><div class="decl" id="Matrix.IsHadamard.card_eq_star_mul_of_const_row_sum"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L135-L142">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.card_eq_star_mul_of_const_row_sum"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">card_eq_star_mul_of_const_row_sum</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Semiring">Semiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">s</span> : <span class="fn">R</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hcard</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Regular/Defs.html#IsRegular">IsRegular</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hrow</span> : <span class="fn">∀ (<span class="fn">i</span> : <span class="fn">n</span>), <span class="fn">∑ <span class="fn">j</span> : <span class="fn">n</span>, <span class="fn"><span class="fn">A</span> <span class="fn">i</span> <span class="fn">j</span></span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">s</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Notation/Defs.html#Star.star">star</a> <span class="fn">s</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn">s</span></div></div><p>A Hadamard matrix with constant row sum <code>s</code> has order <code>star s * s</code>, provided the order
+is regular in <code>R</code>. This generalizes [Theorem 2.3.7][deLauneyFlannery2011].</p></div></div><div class="decl" id="Matrix.IsHadamard.transpose"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L149-L160">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.transpose"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">transpose</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix.transpose">transpose</a></span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div><p>The transpose of a Hadamard matrix is Hadamard.</p><p>Unlike <code><a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.conjTranspose">IsHadamard.conjTranspose</a></code> this requires commutativity: over a noncommutative ring the
+transpose of a Hadamard matrix need not be Hadamard.</p></div></div><div class="decl" id="Matrix.isHadamard_transpose_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L162-L164">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.isHadamard_transpose_iff"><span class="name">Matrix</span>.<span class="name">isHadamard_transpose_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommSemiring">CommSemiring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix.transpose">transpose</a></span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div></div></div><div class="decl" id="Matrix.IsHadamard.neg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L171-L173">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.neg"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">neg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Ring">Ring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././Init/Prelude.html#Neg.neg">-</a><span class="fn">A</span>).<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div><p>Negating a Hadamard matrix gives a Hadamard matrix.</p></div></div><div class="decl" id="Matrix.IsHadamard.neg_iff"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L175-L178">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.neg_iff"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">neg_iff</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#Ring">Ring</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././Init/Prelude.html#Neg.neg">-</a><span class="fn">A</span>).<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div><p>A matrix is Hadamard iff its negation is.</p></div></div><div class="decl" id="Matrix.IsHadamard.det_mul_star_det"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L185-L189">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.det_mul_star_det"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">det_mul_star_det</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Notation/Defs.html#Star.star">star</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span></span></div></div><p>The Hadamard determinant identity: <code>det A * star (det A) = (card n)^(card n)</code>.</p></div></div><div class="decl" id="Matrix.IsHadamard.star_det_mul_det"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L191-L194">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.star_det_mul_det"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">star_det_mul_det</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Notation/Defs.html#Star.star">star</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span></span></div></div><p>The Hadamard determinant identity: <code>star (det A) * det A = (card n)^(card n)</code>.</p></div></div><div class="decl" id="Matrix.IsHadamard.det_ne_zero"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L196-L200">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.det_ne_zero"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">det_ne_zero</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/GroupWithZero/Basic.html#IsReduced">IsReduced</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hcard</span> : <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Core.html#Ne">≠</a> <span class="fn">0</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span> <a href="../../.././Init/Core.html#Ne">≠</a> <span class="fn">0</span></div></div><p>A Hadamard matrix over a reduced commutative ring has nonzero determinant, provided the order
+is nonzero in <code>R</code>.</p></div></div><div class="decl" id="Matrix.IsHadamard.isRegular_det"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L202-L208">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.isRegular_det"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">isRegular_det</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hcard</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Regular/Defs.html#IsRegular">IsRegular</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Regular/Defs.html#IsRegular">IsRegular</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span></span></div></div><p>The determinant of a Hadamard matrix is regular, provided the order is regular in <code>R</code>.</p></div></div><div class="decl" id="Matrix.IsHadamard.of_mul_conjTranspose"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L210-L227">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.of_mul_conjTranspose"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">of_mul_conjTranspose</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hentry</span> : <span class="fn">∀ (<span class="fn">i </span><span class="fn">j</span> : <span class="fn">n</span>), <span class="fn"><span class="fn">A</span> <span class="fn">i</span> <span class="fn">j</span></span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Star/Unitary.html#unitary">unitary</a> <span class="fn">R</span></span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hmul</span> : <span class="fn">A</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/ConjTranspose.html#Matrix.conjTranspose">conjTranspose</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">1</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hcard</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Regular/Defs.html#IsRegular">IsRegular</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span></div></div><p>Build a Hadamard matrix from the one-sided row-orthogonality condition, provided the order is
+regular in <code>R</code>.</p><p>This is the matrix form of [Theorem 2.3.6][deLauneyFlannery2011].</p></div></div><div class="decl" id="Matrix.isHadamard_iff_mul_conjTranspose"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L229-L235">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.isHadamard_iff_mul_conjTranspose"><span class="name">Matrix</span>.<span class="name">isHadamard_iff_mul_conjTranspose</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">R</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Ring/Defs.html#CommRing">CommRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Algebra/Star/Basic.html#StarRing">StarRing</a> <span class="fn">R</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <span class="fn">R</span></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hcard</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Regular/Defs.html#IsRegular">IsRegular</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn">(∀ (<span class="fn">i </span><span class="fn">j</span> : <span class="fn">n</span>), <span class="fn"><span class="fn">A</span> <span class="fn">i</span> <span class="fn">j</span></span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn"><a href="../../.././Mathlib/Algebra/Star/Unitary.html#unitary">unitary</a> <span class="fn">R</span></span>)</span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn">A</span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/ConjTranspose.html#Matrix.conjTranspose">conjTranspose</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span>)</span></span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">1</span></div></div></div></div><div class="decl" id="Matrix.IsHadamard.four_dvd_card"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/LinearAlgebra/Matrix/HadamardMatrix.lean#L239-L259">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard.four_dvd_card"><span class="name">Matrix</span>.<span class="name">IsHadamard</span>.<span class="name">four_dvd_card</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">n</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">n</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">A</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Matrix/Defs.html#Matrix">Matrix</a> <span class="fn">n</span> <span class="fn">n</span> <a href="../../.././Init/Data/Int/Basic.html#Int">ℤ</a></span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hA</span> : <span class="fn"><span class="fn">A</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/HadamardMatrix.html#Matrix.IsHadamard">IsHadamard</a></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hcard</span> : <span class="fn">2</span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">4</span> <a href="../../.././Init/Prelude.html#Dvd.dvd">∣</a> <span class="fn"><a href="../../.././Mathlib/Data/Fintype/Card.html#Fintype.card">Fintype.card</a> <span class="fn">n</span></span></div></div><p>An integer Hadamard matrix of order greater than two has order divisible by four.</p><p>This is the standard divisibility obstruction in [Section 2.3][deLauneyFlannery2011].</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

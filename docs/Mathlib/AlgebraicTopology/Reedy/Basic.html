@@ -1,0 +1,783 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.AlgebraicTopology.Reedy.Basic</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.AlgebraicTopology.Reedy.Basic";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">AlgebraicTopology</span>.<span class="name">Reedy</span>.<span class="name">Basic</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/CategoryTheory/Skeletal.html">Mathlib.CategoryTheory.Skeletal</a></li><li><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html">Mathlib.CategoryTheory.MorphismProperty.Composition</a></li><li><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html">Mathlib.CategoryTheory.MorphismProperty.Factorization</a></li><li><a href="../../.././Mathlib/Order/SuccPred/Basic.html">Mathlib.Order.SuccPred.Basic</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.AlgebraicTopology.Reedy.Basic" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.op"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">op</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.op_deg"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">op_deg</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.le₁"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">le₁</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.le₂"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">le₂</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.identities_of_prop₁_of_eq"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">identities_of_prop₁_of_eq</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.identities_of_prop₂_of_eq"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">identities_of_prop₂_of_eq</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.subsingleton_mapFactorizationData"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">subsingleton_mapFactorizationData</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.mapFactorizationData"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">mapFactorizationData</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.unique_obj"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">unique_obj</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.unique"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">unique</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom_eq"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_eq</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.exists_fac"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">exists_fac</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom_le"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_le</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom_le_deg_left"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_le_deg_left</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom_le_deg_right"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_le_deg_right</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom_comp_le_left"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_comp_le_left</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom_comp_le_right"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_comp_le_right</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.prop₂_of_degHom_eq_deg_left"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">prop₂_of_degHom_eq_deg_left</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.prop₁_of_degHom_eq_deg_right"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">prop₁_of_degHom_eq_deg_right</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom_lt_or_of_degHom_comp_lt"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_lt_or_of_degHom_comp_lt</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.degHom_id"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_id</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.deg_eq_of_iso"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">deg_eq_of_iso</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.prop₁_of_iso"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">prop₁_of_iso</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.prop₂_of_iso"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">prop₂_of_iso</span></a></div><div class="nav_link"><a class="break_within" href="#HomotopicalAlgebra.ReedyStructure.skeletal"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">skeletal</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Reedy-categories" class="markdown-heading">Reedy categories <a class="hover-link" href="#Reedy-categories">#</a></h1><p>In this file, we introduce the definition of a Reedy structure
+on a category <code>C</code> equipped with two classes of morphisms
+<code>W₁</code> and <code>W₂</code> (these are sometimes denoted <code>C₋</code> and <code>C₊</code> in
+the literature).</p><h2 id="TODO" class="markdown-heading">TODO <a class="hover-link" href="#TODO">#</a></h2><ul><li>Construct the Reedy model category structure on the category of
+functors <code>C ⥤ D</code> when <code>C</code> is a Reedy category and <code>D</code> a model category
+<a href="https://github.com/leanprover-community/project-intentions/issues/5">https://github.com/leanprover-community/project-intentions/issues/5</a></li></ul><h2 id="References" class="markdown-heading">References <a class="hover-link" href="#References">#</a></h2><ul><li>[Emily Riehl and Dominic Verity, <em>Elements of ∞-Category Theory</em>, C.4][RiehlVerity2022]</li></ul></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure"><div class="structure"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L40-L55">source</a></div><div class="decl_header"><span class="decl_kind">structure</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><a href="../../.././foundational_types.html">Type</a> (max u_1 u_2)</div></div><p>A Reedy structure on a category <code>C</code> equipped with two multiplicative
+classes of morphisms <code>W₁</code> and <code>W₂</code> consists of the data of a degree
+map for objects <code><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a> : C → α</code>, where <code>α</code> is a well ordered type. The first
+two axioms <code><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.lt₁">lt₁</a></code> and <code><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.lt₂">lt₂</a></code> express the behaviour of the degree with
+respect to morphisms in <code>W₁</code> (resp. <code>W₂</code>) that are not identities, and
+the last axiom says that any morphism can be factored in a unique way
+as a morphism in <code>W₁</code> followed by a morphism in <code>W₂</code>.</p><ul class="structure_fields" id="HomotopicalAlgebra.ReedyStructure.mk"><li id="HomotopicalAlgebra.ReedyStructure.deg" class="structure_field"><div class="structure_field_info">deg : <span class="fn"><span class="fn">C</span> → <span class="fn">α</span></span></div><div class="structure_field_doc"><p>the degree of an object</p></div></li><li id="HomotopicalAlgebra.ReedyStructure.lt₁" class="structure_field"><div class="structure_field_info">lt₁<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><span class="fn">W₁</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf'</span> : <a href="../../.././Init/Prelude.html#Not">¬</a><span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.identities">CategoryTheory.MorphismProperty.identities</a> <span class="fn">C</span> <span class="fn">f</span></span>)</span></span>
+ : <span class="fn"><span class="fn"><span class="fn">self</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><span class="fn"><span class="fn">self</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span></div></li><li id="HomotopicalAlgebra.ReedyStructure.lt₂" class="structure_field"><div class="structure_field_info">lt₂<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><span class="fn">W₂</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf'</span> : <a href="../../.././Init/Prelude.html#Not">¬</a><span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.identities">CategoryTheory.MorphismProperty.identities</a> <span class="fn">C</span> <span class="fn">f</span></span>)</span></span>
+ : <span class="fn"><span class="fn"><span class="fn">self</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><span class="fn"><span class="fn">self</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span></div></li><li id="HomotopicalAlgebra.ReedyStructure.nonempty_unique" class="structure_field"><div class="structure_field_info">nonempty_unique<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+ : <span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">(<a href="../../.././Mathlib/Logic/Unique.html#Unique">Unique</a> <span class="fn">(<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData">MapFactorizationData</a></span> <span class="fn">W₂</span> <span class="fn">f</span>)</span>)</span></span></div></li></ul><details id="instances-for-list-HomotopicalAlgebra.ReedyStructure" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.op"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L64-L74">source</a></div><div class="decl_header"><span class="decl_kind">def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.op"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">op</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.op">op</a></span> <span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty.op">op</a></span> <span class="fn">α</span></span></div></div><p>The opposite of a Reedy structure.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.op">op</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.mk">{</a> <span class="fn">deg</span> := <span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <a href="../../.././Mathlib/Data/Opposite.html#Opposite.unop">Opposite.unop</a>, <span class="fn">lt₁</span> := <span class="fn">⋯</span>, <span class="fn">lt₂</span> := <span class="fn">⋯</span>, <span class="fn">nonempty_unique</span> := <span class="fn">⋯</span> <a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.mk">}</a></li></ul></details><details id="instances-for-list-HomotopicalAlgebra.ReedyStructure.op" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.op_deg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L65-L65">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.op_deg"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">op_deg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">a✝</span> : <span class="fn">C</span><a href="../../.././Mathlib/Data/Opposite.html#Opposite">ᵒᵖ</a>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.op">op</a></span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">a✝</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">(<span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <a href="../../.././Init/Prelude.html#Function.comp">∘</a> <a href="../../.././Mathlib/Data/Opposite.html#Opposite.unop">Opposite.unop</a>) <span class="fn">a✝</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.le₁"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L76-L80">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.le₁"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">le₁</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><span class="fn">W₁</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.le₂"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L82-L86">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.le₂"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">le₂</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><span class="fn">W₂</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.identities_of_prop₁_of_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L88-L91">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.identities_of_prop₁_of_eq"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">identities_of_prop₁_of_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><span class="fn">W₁</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.identities">CategoryTheory.MorphismProperty.identities</a> <span class="fn">C</span> <span class="fn">f</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.identities_of_prop₂_of_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L93-L96">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.identities_of_prop₂_of_eq"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">identities_of_prop₂_of_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><span class="fn">W₂</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.identities">CategoryTheory.MorphismProperty.identities</a> <span class="fn">C</span> <span class="fn">f</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.subsingleton_mapFactorizationData"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L99-L102">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.subsingleton_mapFactorizationData"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">subsingleton_mapFactorizationData</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">⦃<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>⦄</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Init/Core.html#Subsingleton">Subsingleton</a> <span class="fn">(<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData">MapFactorizationData</a></span> <span class="fn">W₂</span> <span class="fn">f</span>)</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.mapFactorizationData"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L104-L110">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.mapFactorizationData"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">mapFactorizationData</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData">MapFactorizationData</a></span> <span class="fn">W₂</span> <span class="fn">f</span></span></div></div><p>The Reedy factorization of a morphism <code>f : X ⟶ Y</code> as a morphism in <code>W₁</code>
+followed by a morphism in <code>W₂</code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.mapFactorizationData">mapFactorizationData</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Init/Prelude.html#Inhabited.default">default</a></li></ul></details><details id="instances-for-list-HomotopicalAlgebra.ReedyStructure.mapFactorizationData" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.unique_obj"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L113-L117">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.unique_obj"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">unique_obj</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">fac </span><span class="fn">fac'</span> : <span class="fn"><span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData">MapFactorizationData</a></span> <span class="fn">W₂</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">fac</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.Z">Z</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">fac'</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.Z">Z</a></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.unique"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L120-L124">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.unique"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">unique</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">fac </span><span class="fn">fac'</span> : <span class="fn"><span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData">MapFactorizationData</a></span> <span class="fn">W₂</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∃ (<span class="fn">h</span> : <span class="fn"><span class="fn">fac</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.Z">Z</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">fac'</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.Z">Z</a></span>),
+  <span class="fn"><span class="fn">fac</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.i">i</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.CategoryStruct.comp">CategoryTheory.CategoryStruct.comp</a> <span class="fn"><span class="fn">fac'</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.i">i</a></span> <span class="fn">(<a href="../../.././Mathlib/CategoryTheory/EqToHom.html#CategoryTheory.eqToHom">CategoryTheory.eqToHom</a> <span class="fn">⋯</span>)</span></span> <a href="../../.././Init/Prelude.html#And">∧</a>     <span class="fn"><span class="fn">fac</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.p">p</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.CategoryStruct.comp">CategoryTheory.CategoryStruct.comp</a> <span class="fn">(<a href="../../.././Mathlib/CategoryTheory/EqToHom.html#CategoryTheory.eqToHom">CategoryTheory.eqToHom</a> <span class="fn">h</span>)</span> <span class="fn"><span class="fn">fac'</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.p">p</a></span></span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L126-L130">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">α</span></div></div><p>The degree of a morphisms for a Reedy structure. It is defined as the degree of
+the intermediate object in the Reedy factorization, but it is also the smallest
+degree of an intermediate object in a factorization, see the lemma <code><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_le">degHom_le</a></code>.</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn"><span class="fn">(<span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.mapFactorizationData">mapFactorizationData</a></span> <span class="fn">f</span>)</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.Z">Z</a></span></span></li></ul></details><details id="instances-for-list-HomotopicalAlgebra.ReedyStructure.degHom" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L132-L136">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_eq"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData">MapFactorizationData</a></span> <span class="fn">W₂</span> <span class="fn">f</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn"><span class="fn">h</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Factorization.html#CategoryTheory.MorphismProperty.MapFactorizationData.Z">Z</a></span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.exists_fac"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L138-L141">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.exists_fac"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">exists_fac</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">∃ (<span class="fn">Z</span> : <span class="fn">C</span>) (<span class="fn">a</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Z</span>) (<span class="fn">b</span> : <span class="fn">Z</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>), <span class="fn"><span class="fn">W₁</span> <span class="fn">a</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><span class="fn">W₂</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.CategoryStruct.comp">CategoryTheory.CategoryStruct.comp</a> <span class="fn">a</span> <span class="fn">b</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">f</span> <a href="../../.././Init/Prelude.html#And">∧</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Z</span></span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom_le"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L143-L152">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_le"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_le</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Z </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Z</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">Z</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">(<a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.CategoryStruct.comp">CategoryTheory.CategoryStruct.comp</a> <span class="fn">f</span> <span class="fn">g</span>)</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Z</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom_le_deg_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L154-L156">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_le_deg_left"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_le_deg_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom_le_deg_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L158-L160">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_le_deg_right"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_le_deg_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom_comp_le_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L162-L166">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_comp_le_left"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_comp_le_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y </span><span class="fn">Z</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">Y</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Z</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">(<a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.CategoryStruct.comp">CategoryTheory.CategoryStruct.comp</a> <span class="fn">f</span> <span class="fn">g</span>)</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom_comp_le_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L168-L172">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_comp_le_right"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_comp_le_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y </span><span class="fn">Z</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">Y</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Z</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">(<a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.CategoryStruct.comp">CategoryTheory.CategoryStruct.comp</a> <span class="fn">f</span> <span class="fn">g</span>)</span></span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">g</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.prop₂_of_degHom_eq_deg_left"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L174-L179">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.prop₂_of_degHom_eq_deg_left"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">prop₂_of_degHom_eq_deg_left</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">W₂</span> <span class="fn">f</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.prop₁_of_degHom_eq_deg_right"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L181-L186">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.prop₁_of_degHom_eq_deg_right"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">prop₁_of_degHom_eq_deg_right</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">hf</span> : <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">W₁</span> <span class="fn">f</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom_lt_or_of_degHom_comp_lt"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L188-L195">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_lt_or_of_degHom_comp_lt"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_lt_or_of_degHom_comp_lt</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Z </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">X</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Z</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">Z</span> <a href="../../.././Mathlib/Combinatorics/Quiver/Basic.html#Quiver.Hom">⟶</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">hfg</span> : <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">(<a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.CategoryStruct.comp">CategoryTheory.CategoryStruct.comp</a> <span class="fn">f</span> <span class="fn">g</span>)</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Z</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">f</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Z</span></span> <a href="../../.././Init/Prelude.html#Or">∨</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">g</span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Z</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.degHom_id"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L197-L200">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom_id"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">degHom_id</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">X</span> : <span class="fn">C</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.degHom">degHom</a></span> <span class="fn">(<a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.CategoryStruct.id">CategoryTheory.CategoryStruct.id</a> <span class="fn">X</span>)</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.deg_eq_of_iso"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L202-L206">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg_eq_of_iso"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">deg_eq_of_iso</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">X</span> <a href="../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">X</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn"><span class="fn">r</span>.<a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.deg">deg</a></span> <span class="fn">Y</span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.prop₁_of_iso"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L209-L213">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.prop₁_of_iso"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">prop₁_of_iso</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">X</span> <a href="../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">W₁</span> <span class="fn"><span class="fn">e</span>.<a href="../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso.hom">hom</a></span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.prop₂_of_iso"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L216-L217">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.prop₂_of_iso"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">prop₂_of_iso</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">X </span><span class="fn">Y</span> : <span class="fn">C</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">e</span> : <span class="fn">X</span> <a href="../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso">≅</a> <span class="fn">Y</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">W₂</span> <span class="fn"><span class="fn">e</span>.<a href="../../.././Mathlib/CategoryTheory/Iso.html#CategoryTheory.Iso.hom">hom</a></span></span></div></div></div></div><div class="decl" id="HomotopicalAlgebra.ReedyStructure.skeletal"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/AlgebraicTopology/Reedy/Basic.lean#L220-L224">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure.skeletal"><span class="name">HomotopicalAlgebra</span>.<span class="name">ReedyStructure</span>.<span class="name">skeletal</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">C</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/CategoryTheory/Category/Basic.html#CategoryTheory.Category">CategoryTheory.Category.{v_1, u_1}</a> <span class="fn">C</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W₁ </span><span class="fn">W₂</span> : <span class="fn"><a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Basic.html#CategoryTheory.MorphismProperty">CategoryTheory.MorphismProperty</a> <span class="fn">C</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₁</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><span class="fn">W₂</span>.<a href="../../.././Mathlib/CategoryTheory/MorphismProperty/Composition.html#CategoryTheory.MorphismProperty.IsMultiplicative">IsMultiplicative</a></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">α</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/Defs/LinearOrder.html#LinearOrder">LinearOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/BoundedOrder/Basic.html#OrderBot">OrderBot</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/SuccPred/Basic.html#SuccOrder">SuccOrder</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Order/RelClasses.html#WellFoundedLT">WellFoundedLT</a> <span class="fn">α</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">r</span> : <span class="fn"><a href="../../.././Mathlib/AlgebraicTopology/Reedy/Basic.html#HomotopicalAlgebra.ReedyStructure">ReedyStructure</a> <span class="fn">W₁</span> <span class="fn">W₂</span> <span class="fn">α</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/CategoryTheory/Skeletal.html#CategoryTheory.Skeletal">CategoryTheory.Skeletal</a> <span class="fn">C</span></span></div></div></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>

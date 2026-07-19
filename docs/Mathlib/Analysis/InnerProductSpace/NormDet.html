@@ -1,0 +1,651 @@
+<html lang="en"><head><meta charset="UTF-8"></meta><meta name="viewport" content="width=device-width, initial-scale=1"></meta><link rel="stylesheet" href="../../.././style.css"></link><link rel="icon" href="../../.././favicon.svg"></link><link rel="mask-icon" href="../../.././favicon.svg" color="#000000"></link><link rel="prefetch" href="../../.././/declarations/declaration-data.bmp" as="image"></link><title>Mathlib.Analysis.InnerProductSpace.NormDet</title><script defer="true" src="../../.././mathjax-config.js"></script><script defer="true" src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script><script defer="true" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script><script>const SITE_ROOT="../../.././";</script><script>const MODULE_NAME="Mathlib.Analysis.InnerProductSpace.NormDet";</script><script type="module" src="../../.././jump-src.js"></script><script type="module" src="../../.././search.js"></script><script type="module" src="../../.././expand-nav.js"></script><script type="module" src="../../.././how-about.js"></script><script type="module" src="../../.././instances.js"></script><script type="module" src="../../.././importedBy.js"></script></head><body><input id="nav_toggle" type="checkbox"></input><header><h1><label for="nav_toggle"></label><span>Documentation</span></h1><h2 class="header_filename break_within"><span class="name">Mathlib</span>.<span class="name">Analysis</span>.<span class="name">InnerProductSpace</span>.<span class="name">NormDet</span></h2><form id="search_form"><input type="text" name="q" autocomplete="off"></input>&#32;<button id="search_button" onclick="javascript: form.action='../../.././search.html';">Search</button></form></header><nav class="internal_nav"><p><a href="#top">return to top</a></p><p class="gh_nav_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean">source</a></p><div class="imports"><details><summary>Imports</summary><ul><li><a href="../../.././Init.html">Init</a></li><li><a href="../../.././Mathlib/Analysis/InnerProductSpace/Adjoint.html">Mathlib.Analysis.InnerProductSpace.Adjoint</a></li><li><a href="../../.././Mathlib/Analysis/InnerProductSpace/GramMatrix.html">Mathlib.Analysis.InnerProductSpace.GramMatrix</a></li><li><a href="../../.././Mathlib/Analysis/InnerProductSpace/SingularValues.html">Mathlib.Analysis.InnerProductSpace.SingularValues</a></li><li><a href="../../.././Mathlib/Topology/MetricSpace/HausdorffDimension.html">Mathlib.Topology.MetricSpace.HausdorffDimension</a></li><li><a href="../../.././Mathlib/Geometry/Euclidean/Volume/Measure.html">Mathlib.Geometry.Euclidean.Volume.Measure</a></li><li><a href="../../.././Mathlib/MeasureTheory/Measure/Lebesgue/EqHaar.html">Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar</a></li></ul></details><details><summary>Imported by</summary><ul id="imported-by-Mathlib.Analysis.InnerProductSpace.NormDet" class="imported-by-list"></ul></details></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet"><span class="name">LinearMap</span>.<span class="name">normDet</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_nonneg"><span class="name">LinearMap</span>.<span class="name">normDet_nonneg</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_eq_norm_det_toMatrix_rangeRestrict"><span class="name">LinearMap</span>.<span class="name">normDet_eq_norm_det_toMatrix_rangeRestrict</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_eq_zero_iff_ker_ne_bot"><span class="name">LinearMap</span>.<span class="name">normDet_eq_zero_iff_ker_ne_bot</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_eq_zero_iff_rank_range_ne"><span class="name">LinearMap</span>.<span class="name">normDet_eq_zero_iff_rank_range_ne</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_ne_zero_tfae"><span class="name">LinearMap</span>.<span class="name">normDet_ne_zero_tfae</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_eq_zero_tfae"><span class="name">LinearMap</span>.<span class="name">normDet_eq_zero_tfae</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_eq_norm_det_toMatrix"><span class="name">LinearMap</span>.<span class="name">normDet_eq_norm_det_toMatrix</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_eq_norm_det"><span class="name">LinearMap</span>.<span class="name">normDet_eq_norm_det</span></a></div><div class="nav_link"><a class="break_within" href="#LinearIsometry.normDet_eq_one"><span class="name">LinearIsometry</span>.<span class="name">normDet_eq_one</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_id"><span class="name">LinearMap</span>.<span class="name">normDet_id</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_subtype"><span class="name">LinearMap</span>.<span class="name">normDet_subtype</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_of_subsingleton"><span class="name">LinearMap</span>.<span class="name">normDet_of_subsingleton</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_zero"><span class="name">LinearMap</span>.<span class="name">normDet_zero</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_smul"><span class="name">LinearMap</span>.<span class="name">normDet_smul</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_neg"><span class="name">LinearMap</span>.<span class="name">normDet_neg</span></a></div><div class="nav_link"><a class="break_within" href="#ContinuousLinearMap.normDet_sq"><span class="name">ContinuousLinearMap</span>.<span class="name">normDet_sq</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_sq"><span class="name">LinearMap</span>.<span class="name">normDet_sq</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_sq_eq_det_gram"><span class="name">LinearMap</span>.<span class="name">normDet_sq_eq_det_gram</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_comp"><span class="name">LinearMap</span>.<span class="name">normDet_comp</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_comp_of_finrank_eq"><span class="name">LinearMap</span>.<span class="name">normDet_comp_of_finrank_eq</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_codRestrict"><span class="name">LinearMap</span>.<span class="name">normDet_codRestrict</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_eq_prod_singularValues"><span class="name">LinearMap</span>.<span class="name">normDet_eq_prod_singularValues</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.normDet_eq_abs_det"><span class="name">LinearMap</span>.<span class="name">normDet_eq_abs_det</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.hausdorffMeasure_image"><span class="name">LinearMap</span>.<span class="name">hausdorffMeasure_image</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.euclideanHausdorffMeasure_image"><span class="name">LinearMap</span>.<span class="name">euclideanHausdorffMeasure_image</span></a></div><div class="nav_link"><a class="break_within" href="#LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume"><span class="name">LinearMap</span>.<span class="name">euclideanHausdorffMeasure_image_eq_normDet_mul_volume</span></a></div></nav><main>
+<div class="mod_doc"><h1 id="Norm-determinant-of-a-linear-map" class="markdown-heading">Norm determinant of a linear map <a class="hover-link" href="#Norm-determinant-of-a-linear-map">#</a></h1><p>Given a rectangular matrix $T$, it is common to talk about $\sqrt{det(T^{H}T)}$, where $T^{H}$ is
+the conjugate transpose of $T$, as a generalization to the determinant of a square matrix. It is the
+$m$-dimensional volume factor for linear maps $\mathbb{R}^m \to \mathbb{R}^n$. It is given various
+names in the literature:</p><ul><li>&quot;Jacobian&quot; (definition 3.4 of [lawrenceronald2025]), in the context of volume factor
+for a non-linear map. However, we choose to reserve this name for the matrix consisting of
+derivatives.</li><li>&quot;Gram determinant&quot;, which is already used by <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/GramMatrix.html#Matrix.gram">Matrix.gram</a></code>, and it is often referring to
+$det(T^{H}T)$ without the square root.</li><li>&quot;Nonnegative determinant&quot; (definition 1 of [haruoyoshiohidetoki2006]).</li></ul><p>Without a standardized name, we give a descriptive name <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> to reflect its
+definition and show that it is a generalization of <code>‖(f : <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">LinearMap</a> 𝕜 U U).det‖</code>
+(See <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_norm_det">LinearMap.normDet_eq_norm_det</a></code>). We also construct this on linear maps between inner product
+spaces instead of matrices, and allow the codomain to have infinite dimension.</p><h2 id="Main-definition" class="markdown-heading">Main definition <a class="hover-link" href="#Main-definition">#</a></h2><ul><li><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> : the norm determinant of a linear map.</li></ul><h2 id="Main-result" class="markdown-heading">Main result <a class="hover-link" href="#Main-result">#</a></h2><ul><li><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#ContinuousLinearMap.normDet_sq">ContinuousLinearMap.normDet_sq</a></code> and <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_sq">LinearMap.normDet_sq</a></code>: The square of <code>f.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></code>
+equals to the determinant of <code>f.adjoint ∘ₗ f</code>.</li><li><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_sq_eq_det_gram">LinearMap.normDet_sq_eq_det_gram</a></code>: The square of <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> equals to the determinant of
+the Gram matrix formed by vectors mapped from an orthonormal basis.</li><li><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_prod_singularValues">LinearMap.normDet_eq_prod_singularValues</a></code>: <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> equals to the product of singular
+values.</li><li><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.hausdorffMeasure_image">LinearMap.hausdorffMeasure_image</a></code>: <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> is the volume factor for Hausdorff
+measure.</li></ul></div><div class="decl" id="LinearMap.normDet"><div class="def"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L61-L74">source</a></div><div class="decl_header"><span class="decl_kind">noncomputable def</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet"><span class="name">LinearMap</span>.<span class="name">normDet</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a></div></div><p>The norm determinant of a linear map <code>f : U →ₗ[𝕜] V</code> is defined as the norm of the determinant of
+the square matrix representing the linear map <code>U →ₗ[𝕜] f.range</code> over a pair of orthonormal basis of
+equal dimensions.
+(See <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_norm_det_toMatrix_rangeRestrict">LinearMap.normDet_eq_norm_det_toMatrix_rangeRestrict</a></code> for using arbitrary orthonormal basis)</p><p>If such basis doesn't exist (e.g. the map is not injective), the norm determinant is zero.
+(See <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_zero_iff_ker_ne_bot">LinearMap.normDet_eq_zero_iff_ker_ne_bot</a></code>)</p><details><summary>Equations</summary><ul class="equations"><li class="equation"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn">if h : <span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">(<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis">OrthonormalBasis</a> <span class="fn">(<a href="../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span>)</span>)</span> <span class="fn">𝕜</span> <span class="fn">↥<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span></span>)</span></span> then
+    <a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a><span class="fn"><span class="fn">(<span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Matrix/ToLin.html#LinearMap.toMatrix">LinearMap.toMatrix</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#stdOrthonormalBasis">stdOrthonormalBasis</a> <span class="fn">𝕜</span> <span class="fn">U</span>)</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis.toBasis">toBasis</a></span> <span class="fn"><span class="fn"><span class="fn">h</span>.<a href="../../.././Mathlib/Logic/Nonempty.html#Nonempty.some">some</a></span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis.toBasis">toBasis</a></span>)</span> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.rangeRestrict">rangeRestrict</a></span>)</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a>
+  else <span class="fn">0</span></span></li></ul></details><details id="instances-for-list-LinearMap.normDet" class="instances-for-list"><summary>Instances For</summary><ul class="instances-for-enum"></ul></details></div></div><div class="decl" id="LinearMap.normDet_nonneg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L76-L78">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_nonneg"><span class="name">LinearMap</span>.<span class="name">normDet_nonneg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">0</span> <a href="../../.././Init/Prelude.html#LE.le">≤</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></div></div></div></div><div class="decl" id="LinearMap.normDet_eq_norm_det_toMatrix_rangeRestrict"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L80-L107">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_norm_det_toMatrix_rangeRestrict"><span class="name">LinearMap</span>.<span class="name">normDet_eq_norm_det_toMatrix_rangeRestrict</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">bu</span> : <span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis">OrthonormalBasis</a> <span class="fn">ι</span> <span class="fn">𝕜</span> <span class="fn">U</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">bv</span> : <span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis">OrthonormalBasis</a> <span class="fn">ι</span> <span class="fn">𝕜</span> <span class="fn">↥<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span></span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a><span class="fn"><span class="fn">(<span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Matrix/ToLin.html#LinearMap.toMatrix">toMatrix</a> <span class="fn"><span class="fn">bu</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis.toBasis">toBasis</a></span> <span class="fn"><span class="fn">bv</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis.toBasis">toBasis</a></span>)</span> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.rangeRestrict">rangeRestrict</a></span>)</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a></div></div><p><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> is well-defined under any pair of orthonormal basis.</p></div></div><div class="decl" id="LinearMap.normDet_eq_zero_iff_ker_ne_bot"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L109-L133">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_zero_iff_ker_ne_bot"><span class="name">LinearMap</span>.<span class="name">normDet_eq_zero_iff_ker_ne_bot</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Ker.html#LinearMap.ker">ker</a></span> <a href="../../.././Init/Core.html#Ne">≠</a> <a href="../../.././Mathlib/Order/Notation.html#Bot.bot">⊥</a></div></div><p><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> vanishes iff the map is not injective.</p></div></div><div class="decl" id="LinearMap.normDet_eq_zero_iff_rank_range_ne"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L135-L137">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_zero_iff_rank_range_ne"><span class="name">LinearMap</span>.<span class="name">normDet_eq_zero_iff_rank_range_ne</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>}</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span> <a href="../../.././Init/Core.html#Iff">↔</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">↥<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span></span></span> <a href="../../.././Init/Core.html#Ne">≠</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span></span></div></div></div></div><div class="decl" id="LinearMap.normDet_ne_zero_tfae"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L139-L155">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_ne_zero_tfae"><span class="name">LinearMap</span>.<span class="name">normDet_ne_zero_tfae</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Init/Prelude.html#List.cons">[</a><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Core.html#Ne">≠</a> <span class="fn">0</span><a href="../../.././Init/Prelude.html#List.cons">,</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Ker.html#LinearMap.ker">ker</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Order/Notation.html#Bot.bot">⊥</a><a href="../../.././Init/Prelude.html#List.cons">,</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">↥<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span></span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span></span><a href="../../.././Init/Prelude.html#List.cons">,</a>     <span class="fn"><a href="../../.././Init/Prelude.html#Nonempty">Nonempty</a> <span class="fn">(<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis">OrthonormalBasis</a> <span class="fn">(<a href="../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span>)</span>)</span> <span class="fn">𝕜</span> <span class="fn">↥<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span></span>)</span></span><a href="../../.././Init/Prelude.html#List.cons">,</a> <span class="fn"><a href="../../.././Init/Data/Function.html#Function.Injective">Function.Injective</a> <span class="fn">⇑<span class="fn">f</span></span></span><a href="../../.././Init/Prelude.html#List.cons">]</a>.<a href="../../.././Mathlib/Data/List/TFAE.html#List.TFAE">TFAE</a></span></div></div></div></div><div class="decl" id="LinearMap.normDet_eq_zero_tfae"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L163-L177">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_zero_tfae"><span class="name">LinearMap</span>.<span class="name">normDet_eq_zero_tfae</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Init/Prelude.html#List.cons">[</a><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span><a href="../../.././Init/Prelude.html#List.cons">,</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Ker.html#LinearMap.ker">ker</a></span> <a href="../../.././Init/Core.html#Ne">≠</a> <a href="../../.././Mathlib/Order/Notation.html#Bot.bot">⊥</a><a href="../../.././Init/Prelude.html#List.cons">,</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">↥<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span></span></span> <a href="../../.././Init/Core.html#Ne">≠</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span></span><a href="../../.././Init/Prelude.html#List.cons">,</a>     <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">↥<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span></span></span> <a href="../../.././Init/Prelude.html#LT.lt">&lt;</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span></span><a href="../../.././Init/Prelude.html#List.cons">,</a> <span class="fn"><a href="../../.././Mathlib/Logic/IsEmpty/Defs.html#IsEmpty">IsEmpty</a> <span class="fn">(<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis">OrthonormalBasis</a> <span class="fn">(<a href="../../.././Init/Prelude.html#Fin">Fin</a> <span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span>)</span>)</span> <span class="fn">𝕜</span> <span class="fn">↥<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span></span>)</span></span><a href="../../.././Init/Prelude.html#List.cons">,</a>     <a href="../../.././Init/Prelude.html#Not">¬</a><span class="fn"><a href="../../.././Init/Data/Function.html#Function.Injective">Function.Injective</a> <span class="fn">⇑<span class="fn">f</span></span></span><a href="../../.././Init/Prelude.html#List.cons">]</a>.<a href="../../.././Mathlib/Data/List/TFAE.html#List.TFAE">TFAE</a></span></div></div></div></div><div class="decl" id="LinearMap.normDet_eq_norm_det_toMatrix"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L179-L202">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_norm_det_toMatrix"><span class="name">LinearMap</span>.<span class="name">normDet_eq_norm_det_toMatrix</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">bu</span> : <span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis">OrthonormalBasis</a> <span class="fn">ι</span> <span class="fn">𝕜</span> <span class="fn">U</span></span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">bv</span> : <span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis">OrthonormalBasis</a> <span class="fn">ι</span> <span class="fn">𝕜</span> <span class="fn">V</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a><span class="fn"><span class="fn">(<span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Matrix/ToLin.html#LinearMap.toMatrix">toMatrix</a> <span class="fn"><span class="fn">bu</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis.toBasis">toBasis</a></span> <span class="fn"><span class="fn">bv</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis.toBasis">toBasis</a></span>)</span> <span class="fn">f</span>)</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a></div></div><p><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> can be calculated with any pair of orthonormal basis if the domain and the
+codomain have equal dimension.</p></div></div><div class="decl" id="LinearMap.normDet_eq_norm_det"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L204-L208">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_norm_det"><span class="name">LinearMap</span>.<span class="name">normDet_eq_norm_det</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">U</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a><span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Determinant.html#LinearMap.det">LinearMap.det</a> <span class="fn">f</span></span><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a></div></div><p><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> equals the norm of <code><a href="../../.././Mathlib/LinearAlgebra/Determinant.html#LinearMap.det">LinearMap.det</a></code> for an endomorphism.</p></div></div><div class="decl" id="LinearIsometry.normDet_eq_one"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L210-L218">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearIsometry.normDet_eq_one"><span class="name">LinearIsometry</span>.<span class="name">normDet_eq_one</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Analysis/Normed/Operator/LinearIsometry.html#LinearIsometry">→ₗᵢ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Analysis/Normed/Operator/LinearIsometry.html#LinearIsometry">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">1</span></div></div><p><code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code> of a linear isometry is 1.</p></div></div><div class="decl" id="LinearMap.normDet_id"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L220-L222">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_id"><span class="name">LinearMap</span>.<span class="name">normDet_id</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.id">id</a>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">1</span></div></div></div></div><div class="decl" id="LinearMap.normDet_subtype"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L224-L226">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_subtype"><span class="name">LinearMap</span>.<span class="name">normDet_subtype</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Module/Submodule/Defs.html#Submodule">Submodule</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn"><span class="fn">p</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/LinearMap.html#Submodule.subtype">subtype</a></span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">1</span></div></div></div></div><div class="decl" id="LinearMap.normDet_of_subsingleton"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L228-L234">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_of_subsingleton"><span class="name">LinearMap</span>.<span class="name">normDet_of_subsingleton</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Core.html#Subsingleton">Subsingleton</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">1</span></div></div></div></div><div class="decl" id="LinearMap.normDet_zero"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L236-L239">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_zero"><span class="name">LinearMap</span>.<span class="name">normDet_zero</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args"> :</span><div class="decl_type"><span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a> <span class="fn">0</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">0</span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span></span></div></div></div></div><div class="decl" id="LinearMap.normDet_smul"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L241-L259">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_smul"><span class="name">LinearMap</span>.<span class="name">normDet_smul</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">c</span> : <span class="fn">𝕜</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<span class="fn">c</span> <a href="../../.././Init/Prelude.html#HSMul.hSMul">•</a> <span class="fn">f</span>).<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a><span class="fn">c</span><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#Norm.norm">‖</a> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></div></div></div></div><div class="decl" id="LinearMap.normDet_neg"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L261-L263">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_neg"><span class="name">LinearMap</span>.<span class="name">normDet_neg</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">(<a href="../../.././Init/Prelude.html#Neg.neg">-</a><span class="fn">f</span>).<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></div></div></div></div><div class="decl" id="ContinuousLinearMap.normDet_sq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L265-L289">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#ContinuousLinearMap.normDet_sq"><span class="name">ContinuousLinearMap</span>.<span class="name">normDet_sq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Topology/UniformSpace/Cauchy.html#CompleteSpace">CompleteSpace</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">→L[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑(<span class="fn"><span class="fn">(↑<span class="fn">f</span>)</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">2</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">(<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Adjoint.html#ContinuousLinearMap.adjoint">adjoint</a> <span class="fn">f</span></span> <a href="../../.././Mathlib/Topology/Algebra/Module/ContinuousLinearMap/Basic.html#ContinuousLinearMap.comp">∘SL</a> <span class="fn">f</span>).<a href="../../.././Mathlib/Topology/Algebra/Module/Determinant.html#ContinuousLinearMap.det">det</a></span></div></div><p>The square of <code>f.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></code> equals the determinant of <code>f.adjoint ∘L f</code>.</p></div></div><div class="decl" id="LinearMap.normDet_sq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L291-L298">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_sq"><span class="name">LinearMap</span>.<span class="name">normDet_sq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑(<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">2</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Determinant.html#LinearMap.det">LinearMap.det</a> <span class="fn">(<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Adjoint.html#LinearMap.adjoint">adjoint</a> <span class="fn">f</span></span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.comp">∘ₗ</a> <span class="fn">f</span>)</span></span></div></div><p>The square of <code>f.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></code> equals the determinant of <code>f.adjoint ∘ₗ f</code> when the codomain is finite
+dimensional.</p></div></div><div class="decl" id="LinearMap.normDet_sq_eq_det_gram"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L300-L323">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_sq_eq_det_gram"><span class="name">LinearMap</span>.<span class="name">normDet_sq_eq_det_gram</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">ι</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Data/Fintype/Defs.html#Fintype">Fintype</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Init/Prelude.html#DecidableEq">DecidableEq</a> <span class="fn">ι</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">b</span> : <span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/PiL2.html#OrthonormalBasis">OrthonormalBasis</a> <span class="fn">ι</span> <span class="fn">𝕜</span> <span class="fn">U</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn">↑(<span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#HPow.hPow">^</a> <span class="fn">2</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Analysis/InnerProductSpace/GramMatrix.html#Matrix.gram">Matrix.gram</a> <span class="fn">𝕜</span> <span class="fn">fun (<span class="fn">x</span> : <span class="fn">ι</span>) =&gt; <span class="fn"><span class="fn">f</span> <span class="fn">(<span class="fn">b</span> <span class="fn">x</span>)</span></span></span>)</span>.<a href="../../.././Mathlib/LinearAlgebra/Matrix/Determinant/Basic.html#Matrix.det">det</a></span></div></div><p>The square of <code>f.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></code> equals the determinant of the Gram matrix formed by vectors mapped from
+an orthonormal basis.</p></div></div><div class="decl" id="LinearMap.normDet_comp"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L325-L347">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_comp"><span class="name">LinearMap</span>.<span class="name">normDet_comp</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">W</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">W</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">V</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">W</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">g</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.comp">∘ₗ</a> <span class="fn">f</span>)</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">(<span class="fn"><span class="fn">g</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/LinearMap.html#LinearMap.domRestrict">domRestrict</a></span> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Algebra/Module/Submodule/Range.html#LinearMap.range">range</a></span>)</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></div></div></div></div><div class="decl" id="LinearMap.normDet_comp_of_finrank_eq"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L349-L363">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_comp_of_finrank_eq"><span class="name">LinearMap</span>.<span class="name">normDet_comp_of_finrank_eq</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">W</span> : <a href="../../.././foundational_types.html">Type</a> u_4}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">W</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">W</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">g</span> : <span class="fn">V</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">W</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<span class="fn">g</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap.comp">∘ₗ</a> <span class="fn">f</span>)</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">g</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></div></div></div></div><div class="decl" id="LinearMap.normDet_codRestrict"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L365-L373">source</a></div><div class="attributes">@[simp]</div>
+<div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_codRestrict"><span class="name">LinearMap</span>.<span class="name">normDet_codRestrict</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">p</span> : <span class="fn"><a href="../../.././Mathlib/Algebra/Module/Submodule/Defs.html#Submodule">Submodule</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>}</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">h</span> : <span class="fn">∀ (<span class="fn">c</span> : <span class="fn">U</span>), <span class="fn"><span class="fn">f</span> <span class="fn">c</span></span> <a href="../../.././Init/Prelude.html#Membership.mem">∈</a> <span class="fn">p</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Algebra/Module/Submodule/LinearMap.html#LinearMap.codRestrict">codRestrict</a> <span class="fn">p</span> <span class="fn">f</span> <span class="fn">h</span>)</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></div></div></div></div><div class="decl" id="LinearMap.normDet_eq_prod_singularValues"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L375-L381">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_prod_singularValues"><span class="name">LinearMap</span>.<span class="name">normDet_eq_prod_singularValues</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">𝕜</span> : <a href="../../.././foundational_types.html">Type</a> u_1}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_2}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_3}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/RCLike/Basic.html#RCLike">RCLike</a> <span class="fn">𝕜</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <span class="fn">𝕜</span> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><span class="fn">𝕜</span><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <span class="fn">∏ <span class="fn">i</span> ∈ <span class="fn"><a href="../../.././Mathlib/Data/Finset/Range.html#Finset.range">Finset.range</a> <span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <span class="fn">𝕜</span> <span class="fn">U</span>)</span></span>, <span class="fn"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/SingularValues.html#LinearMap.singularValues">singularValues</a></span> <span class="fn">i</span></span></span></div></div></div></div><div class="decl" id="LinearMap.normDet_eq_abs_det"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L390-L391">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet_eq_abs_det"><span class="name">LinearMap</span>.<span class="name">normDet_eq_abs_det</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">U</span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span> <a href="../../.././Init/Prelude.html#Eq">=</a> <a href="../../.././Mathlib/Algebra/Order/Group/Unbundled/Abs.html#abs">|</a><span class="fn"><a href="../../.././Mathlib/LinearAlgebra/Determinant.html#LinearMap.det">LinearMap.det</a> <span class="fn">f</span></span><a href="../../.././Mathlib/Algebra/Order/Group/Unbundled/Abs.html#abs">|</a></div></div></div></div><div class="decl" id="LinearMap.hausdorffMeasure_image"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L393-L417">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.hausdorffMeasure_image"><span class="name">LinearMap</span>.<span class="name">hausdorffMeasure_image</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_6}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/MeasurableSpace/Defs.html#MeasurableSpace">MeasurableSpace</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/Constructions/BorelSpace/Basic.html#BorelSpace">BorelSpace</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/MeasurableSpace/Defs.html#MeasurableSpace">MeasurableSpace</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/Constructions/BorelSpace/Basic.html#BorelSpace">BorelSpace</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">U</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/MeasureTheory/Measure/Hausdorff.html#MeasureTheory.Measure.hausdorffMeasure">MeasureTheory.Measure.hausdorffMeasure</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span>)</span></span>)</span> (<span class="fn">⇑<span class="fn">f</span></span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.image">''</a> <span class="fn">s</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.ofReal">ENNReal.ofReal</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/MeasureTheory/Measure/Hausdorff.html#MeasureTheory.Measure.hausdorffMeasure">MeasureTheory.Measure.hausdorffMeasure</a> <span class="fn">↑<span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span>)</span></span>)</span> <span class="fn">s</span></span></div></div><p>Using Hausdorff measure with the domain dimension, the volume of the image is scaled by
+<code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code>.</p></div></div><div class="decl" id="LinearMap.euclideanHausdorffMeasure_image"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L419-L428">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.euclideanHausdorffMeasure_image"><span class="name">LinearMap</span>.<span class="name">euclideanHausdorffMeasure_image</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_6}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/MeasurableSpace/Defs.html#MeasurableSpace">MeasurableSpace</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/Constructions/BorelSpace/Basic.html#BorelSpace">BorelSpace</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/MeasurableSpace/Defs.html#MeasurableSpace">MeasurableSpace</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/Constructions/BorelSpace/Basic.html#BorelSpace">BorelSpace</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">U</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Geometry/Euclidean/Volume/Measure.html#MeasureTheory.Measure.euclideanHausdorffMeasure">MeasureTheory.Measure.euclideanHausdorffMeasure</a> <span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span>)</span>)</span> (<span class="fn">⇑<span class="fn">f</span></span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.image">''</a> <span class="fn">s</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.ofReal">ENNReal.ofReal</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><span class="fn">(<a href="../../.././Mathlib/Geometry/Euclidean/Volume/Measure.html#MeasureTheory.Measure.euclideanHausdorffMeasure">MeasureTheory.Measure.euclideanHausdorffMeasure</a> <span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span>)</span>)</span> <span class="fn">s</span></span></div></div><p>Using Euclidean Hausdorff measure with the domain dimension, the volume of the image is scaled by
+<code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code>.</p></div></div><div class="decl" id="LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume"><div class="theorem"><div class="gh_link"><a href="https://github.com/leanprover-community/mathlib4/blob/81a5d257c8e410db227a6665ed08f64fea08e997/Mathlib/Analysis/InnerProductSpace/NormDet.lean#L430-L437">source</a></div><div class="decl_header"><span class="decl_kind">theorem</span>
+<span class="decl_name"><a class="break_within" href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume"><span class="name">LinearMap</span>.<span class="name">euclideanHausdorffMeasure_image_eq_normDet_mul_volume</span></a></span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">U</span> : <a href="../../.././foundational_types.html">Type</a> u_5}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">{<span class="fn">V</span> : <a href="../../.././foundational_types.html">Type</a> u_6}</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/LinearAlgebra/FiniteDimensional/Defs.html#FiniteDimensional">FiniteDimensional</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/Normed/Group/Defs.html#NormedAddCommGroup">NormedAddCommGroup</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/Analysis/InnerProductSpace/Defs.html#InnerProductSpace">InnerProductSpace</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/MeasurableSpace/Defs.html#MeasurableSpace">MeasurableSpace</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/Constructions/BorelSpace/Basic.html#BorelSpace">BorelSpace</a> <span class="fn">U</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/MeasurableSpace/Defs.html#MeasurableSpace">MeasurableSpace</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="impl_arg"><span class="decl_args">
+<span class="fn">[<span class="fn"><a href="../../.././Mathlib/MeasureTheory/Constructions/BorelSpace/Basic.html#BorelSpace">BorelSpace</a> <span class="fn">V</span></span>]</span></span>
+</span><span class="decl_args">
+<span class="fn">(<span class="fn">f</span> : <span class="fn">U</span> <a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">→ₗ[</a><a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a><a href="../../.././Mathlib/Algebra/Module/LinearMap/Defs.html#LinearMap">]</a> <span class="fn">V</span>)</span></span>
+<span class="decl_args">
+<span class="fn">(<span class="fn">s</span> : <span class="fn"><a href="../../.././Mathlib/Data/Set/Defs.html#Set">Set</a> <span class="fn">U</span></span>)</span></span>
+<span class="decl_args"> :</span><div class="decl_type"><span class="fn"><span class="fn">(<a href="../../.././Mathlib/Geometry/Euclidean/Volume/Measure.html#MeasureTheory.Measure.euclideanHausdorffMeasure">MeasureTheory.Measure.euclideanHausdorffMeasure</a> <span class="fn">(<a href="../../.././Mathlib/LinearAlgebra/Dimension/Finrank.html#Module.finrank">Module.finrank</a> <a href="../../.././Mathlib/Data/Real/Basic.html#Real">ℝ</a> <span class="fn">U</span>)</span>)</span> (<span class="fn">⇑<span class="fn">f</span></span> <a href="../../.././Mathlib/Data/Set/Defs.html#Set.image">''</a> <span class="fn">s</span>)</span> <a href="../../.././Init/Prelude.html#Eq">=</a>   <span class="fn"><a href="../../.././Mathlib/Data/ENNReal/Basic.html#ENNReal.ofReal">ENNReal.ofReal</a> <span class="fn"><span class="fn">f</span>.<a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">normDet</a></span></span> <a href="../../.././Init/Prelude.html#HMul.hMul">*</a> <span class="fn"><a href="../../.././Mathlib/MeasureTheory/Measure/MeasureSpaceDef.html#MeasureTheory.MeasureSpace.volume">MeasureTheory.volume</a> <span class="fn">s</span></span></div></div><p>The volume of the image measured by Euclidean Hausdorff measure is equal to the Lebesgue measure
+scaled by <code><a href="../../.././Mathlib/Analysis/InnerProductSpace/NormDet.html#LinearMap.normDet">LinearMap.normDet</a></code>.</p></div></div></main>
+<nav class="nav"><iframe src="../../.././navbar.html" class="navframe" frameBorder="0"></iframe></nav></body></html>
