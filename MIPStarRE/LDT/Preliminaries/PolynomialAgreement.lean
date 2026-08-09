@@ -38,14 +38,8 @@ def pointScalarEquiv (params : Parameters) [FieldModel params.q] :
     Point params ≃ (Fin params.m → Scalar params) where
   toFun := decodePoint
   invFun := fun u i => encodeScalar (u i)
-  left_inv := by
-    intro u
-    funext i
-    simp [decodePoint, encode_decodeScalar]
-  right_inv := by
-    intro u
-    funext i
-    simp [decodePoint, decode_encodeScalar]
+  left_inv := fun u => by funext i; simp [decodePoint, encode_decodeScalar]
+  right_inv := fun u => by funext i; simp [decodePoint, decode_encodeScalar]
 
 /-- Reindex evaluation equality from coded `Point params` points to the scalar
 function space used by `schwartzZippel_individualDegree`. -/

@@ -56,9 +56,7 @@ private lemma wrongSideEstimate
   intro hssc ⟨hε⟩
   let PL : IdxProjSubMeas Question α (ι × ι) := fun q =>
     { toSubMeas := ((P q).toSubMeas).liftLeft
-      proj := by
-        intro a
-        simp [SubMeas.liftLeft, leftTensor_mul_leftTensor, (P q).proj a] }
+      proj := fun a => by simp [SubMeas.liftLeft, leftTensor_mul_leftTensor, (P q).proj a] }
   let LPf : IdxSubMeas Question β (ι × ι) :=
     IdxSubMeas.liftLeft (fun q => postprocess ((P q).toSubMeas) (f q))
   let RAf : IdxSubMeas Question β (ι × ι) :=

@@ -1,6 +1,7 @@
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
 import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
 import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
+import MIPStarRE.LDT.Basic.MeasurementLift
 
 /-!
 # Preliminary comparison theorems: completion and chain rules
@@ -184,10 +185,7 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
   -- Lift A to a full Measurement on ι × ι: total_eq_one follows from
   -- leftTensor 1 = 1 (Kronecker I ⊗ I = I on the product space).
   let A_lifted : Measurement Outcome (ι × ι) :=
-    { toSubMeas := A.toSubMeas.liftLeft
-      total_eq_one := by
-        simpa [SubMeas.liftLeft, A.total_eq_one] using
-          (leftTensor_one (ι₁ := ι) (ι₂ := ι)) }
+    leftLiftedMeasurement (ιB := ι) A
   have hlocal :=
     closenessAfterCompletion_core_local ψ hψ A_lifted B.liftLeft a0 δ ζ
       hlocal_ssc hsdd
@@ -195,7 +193,8 @@ private lemma closenessAfterCompletion_core {Outcome : Type*}
   have hlocal' :
       qSDD ψ A.toSubMeas.liftLeft (completeAtOutcome B.liftLeft a0).toSubMeas ≤
         2 * δ + 4 * Real.sqrt δ + 2 * ζ := by
-    simpa [A_lifted, constFamily_sdd_unit] using hlocal_bound
+    simpa [A_lifted, leftLiftedMeasurement, leftPlacedSubMeas, SubMeas.liftLeft,
+      constFamily_sdd_unit] using hlocal_bound
   have hcomplete_outcome :
       ∀ a : Outcome,
         (completeAtOutcome B.liftLeft a0).toSubMeas.outcome a =
