@@ -3,7 +3,9 @@
 
 Badges
 ------
-* ``sorries`` — count of ``sorry`` in tracked ``.lean`` files.
+* ``sorries`` — count of ``sorry`` in tracked project ``.lean`` files.  The
+  intentionally incomplete comparator challenge is excluded because its
+  ``sorry`` is replaced by the submitted proof during external verification.
 * ``axioms`` — count of ``axiom`` declarations in tracked ``.lean`` files.
 * ``lean`` / ``mathlib`` — toolchain versions.
 * ``blueprint_no_leanok`` — unique blueprint declarations that have a
@@ -40,6 +42,10 @@ from pathlib import Path
 
 
 SORRY_RE = re.compile(r"\bsorry\b")
+# Comparator challenge scaffolding deliberately presents the target theorem with
+# ``sorry``; the companion repository replaces it with the submitted proof.
+# It is therefore an audit fixture, not project proof debt.
+BADGE_EXCLUDED_LEAN_PATHS = frozenset({"scripts/comparator/challenge_footer.lean"})
 AXIOM_RE = re.compile(
     r"(?m)^\s*"
     r"(?:@\[[^\]\n]*(?:\n\s*[^\]\n]*)*\]\s*)*"
@@ -52,7 +58,11 @@ def tracked_lean_files(repo_root: Path) -> list[Path]:
     output = subprocess.check_output(
         ["git", "ls-files", "*.lean"], cwd=repo_root, text=True
     )
-    return [repo_root / line for line in output.splitlines() if line]
+    return [
+        repo_root / line
+        for line in output.splitlines()
+        if line and line not in BADGE_EXCLUDED_LEAN_PATHS
+    ]
 
 
 def strip_comments_and_strings(source: str) -> str:

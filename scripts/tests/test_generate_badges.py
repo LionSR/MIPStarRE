@@ -9,6 +9,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest import mock
 
 SCRIPT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SCRIPT_DIR))
@@ -18,6 +19,7 @@ from generate_badges import (  # noqa: E402
     SORRY_RE,
     _blueprint_badge_counts,
     count_pattern,
+    tracked_lean_files,
 )
 
 # Canonical proof-bearing environment types (must match
@@ -89,6 +91,26 @@ class GenerateBadgesTests(unittest.TestCase):
         )
 
         self.assertEqual(count, 4)
+
+    @mock.patch("generate_badges.subprocess.check_output")
+    def test_tracked_files_exclude_intentional_comparator_challenge_sorry(
+        self, check_output: mock.Mock
+    ) -> None:
+        check_output.return_value = (
+            "MIPStarRE/Complete.lean\n"
+            "scripts/comparator/challenge_footer.lean\n"
+            "scripts/comparator/extract_closure.lean\n"
+        )
+
+        files = tracked_lean_files(Path("/repo"))
+
+        self.assertEqual(
+            files,
+            [
+                Path("/repo/MIPStarRE/Complete.lean"),
+                Path("/repo/scripts/comparator/extract_closure.lean"),
+            ],
+        )
 
 
 class BlueprintBadgeCountsTests(unittest.TestCase):
