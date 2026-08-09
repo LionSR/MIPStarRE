@@ -27,8 +27,7 @@ def pointNextEquiv (params : Parameters) [FieldModel params.q] :
     Point params.next ≃ Point params × Fq params where
   toFun := fun u => (truncatePoint params u, pointHeight params u)
   invFun := fun ux => appendPoint params ux.1 ux.2
-  left_inv := by
-    intro u
+  left_inv := fun u => by
     funext i
     by_cases h : i.1 < params.m
     · simp [appendPoint, truncatePoint, h]
@@ -40,8 +39,7 @@ def pointNextEquiv (params : Parameters) [FieldModel params.q] :
         apply Fin.ext
         simp [lastCoord, hi]
       simp [appendPoint, truncatePoint, pointHeight, hlast]
-  right_inv := by
-    rintro ⟨u, x⟩
+  right_inv := fun ⟨u, x⟩ => by
     simp [truncatePoint_appendPoint, pointHeight_appendPoint]
 
 /-- Decompose the uniform average over a next-level point into a height and prefix average. -/
@@ -96,8 +94,7 @@ private noncomputable def lastRestrictedDirectionEquiv
     direction ⟨i.val, by
       have h := lastRestrictionIndex_val_succ params
       omega⟩
-  left_inv := by
-    intro free
+  left_inv := fun free => by
     funext i
     have hlt : i.val < params.m := by
       have h := lastRestrictionIndex_val_succ params
@@ -111,8 +108,7 @@ private noncomputable def lastRestrictedDirectionEquiv
       rfl
     rw [← hidx]
     simp [extendRestrictedDirection, hle]
-  right_inv := by
-    intro direction
+  right_inv := fun direction => by
     funext k
     have hk : k.val ≤ (lastRestrictionIndex params).val := by
       dsimp [lastRestrictionIndex]
@@ -138,8 +134,7 @@ private noncomputable def lastRestrictedSampleEquivDiagonalLine
       direction := lastRestrictedDirectionEquiv params s.2 }
   invFun := fun ℓ =>
     (ℓ.base, (lastRestrictedDirectionEquiv params).symm ℓ.direction)
-  left_inv := by
-    rintro ⟨base, free⟩
+  left_inv := fun ⟨base, free⟩ => by
     refine Prod.ext rfl ?_
     funext i
     have hlt : i.val < params.m := by
@@ -154,8 +149,7 @@ private noncomputable def lastRestrictedSampleEquivDiagonalLine
       rfl
     rw [← hidx]
     simp [lastRestrictedDirectionEquiv, extendRestrictedDirection, hle]
-  right_inv := by
-    rintro ⟨base, direction⟩
+  right_inv := fun ⟨base, direction⟩ => by
     change
       ({ base := base,
          direction := extendRestrictedDirection (lastRestrictionIndex params)
@@ -192,11 +186,9 @@ private noncomputable def rebasedLastRestrictedQuestionEquiv
   invFun := fun q =>
     let ℓ := DiagonalLine.rebaseAt q.1 q.2
     ((lastRestrictedSampleEquivDiagonalLine params).symm ℓ, q.2)
-  left_inv := by
-    rintro ⟨s, t⟩
+  left_inv := fun ⟨s, t⟩ => by
     simp [DiagonalLine.rebaseAt_rebase, addCoord_subCoord_left]
-  right_inv := by
-    rintro ⟨ℓ, t⟩
+  right_inv := fun ⟨ℓ, t⟩ => by
     simp [DiagonalLine.rebaseAt_rebase, addCoord_subCoord_right]
 
 /-- Evaluate each restricted diagonal measurement at the distinguished base
@@ -292,13 +284,18 @@ private lemma sampledDiagonalLineApproximation
   let lineFamily : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
     fun s =>
       { toSubMeas := rawDiagonalLineAnswerFamily params strategy j s
-        total_eq_one := by
-          dsimp [rawDiagonalLineAnswerFamily]
-          rw [postprocess_total]
-          exact
-            (strategy.diagonalMeasurement
-              { base := s.1
-                direction := extendRestrictedDirection j s.2 }).total_eq_one }
+        total_eq_one :=
+          calc
+            (rawDiagonalLineAnswerFamily params strategy j s).total =
+                ((strategy.diagonalMeasurement
+                  { base := s.1
+                    direction := extendRestrictedDirection j s.2 }).toSubMeas).total := by
+              dsimp [rawDiagonalLineAnswerFamily]
+              rw [postprocess_total]
+            _ = 1 :=
+              (strategy.diagonalMeasurement
+                { base := s.1
+                  direction := extendRestrictedDirection j s.2 }).total_eq_one }
   have hcons := sampledDiagonalLineConsistency params strategy eps delta gamma hgood
   have hcons' :
       ConsRel strategy.state
@@ -470,8 +467,7 @@ lemma sampledDiagonalLineApproximation_pointWithDiagonalLine
             intro a _
             rw [hA a, hB a]
     _ = avgOver (uniformDistribution (RestrictedDiagonalSample params j))
-          g := by
-            exact hignore
+          g := hignore
     _ = sddError strategy.state
           (uniformDistribution (RestrictedDiagonalSample params j))
           (IdxSubMeas.liftLeft (diagonalPointAnswerFamily strategy j))
@@ -562,13 +558,18 @@ private lemma answer_sampledDiagonalLineApproximation
   let lineFamily : IdxMeas (RestrictedDiagonalSample params j) (Fq params) ι :=
     fun s =>
       { toSubMeas := rawAnswerDiagonalLineAnswerFamily params strategy j s
-        total_eq_one := by
-          dsimp [rawAnswerDiagonalLineAnswerFamily]
-          rw [postprocess_total]
-          exact
-            (strategy.diagonalMeasurement
-              { base := s.1
-                direction := extendRestrictedDirection j s.2 }).total_eq_one }
+        total_eq_one :=
+          calc
+            (rawAnswerDiagonalLineAnswerFamily params strategy j s).total =
+                ((strategy.diagonalMeasurement
+                  { base := s.1
+                    direction := extendRestrictedDirection j s.2 }).toSubMeas).total := by
+              dsimp [rawAnswerDiagonalLineAnswerFamily]
+              rw [postprocess_total]
+            _ = 1 :=
+              (strategy.diagonalMeasurement
+                { base := s.1
+                  direction := extendRestrictedDirection j s.2 }).total_eq_one }
   have hcons := answer_sampledDiagonalLineConsistency params strategy eps delta gamma hgood
   have hcons' :
       ConsRel strategy.state
@@ -793,8 +794,7 @@ lemma answer_sampledDiagonalLineApproximation_pointWithDiagonalLine
             intro a _
             rw [hA a, hB a]
     _ = avgOver (uniformDistribution (RestrictedDiagonalSample params j))
-          g := by
-            exact hignore
+          g := hignore
     _ = sddError strategy.state
           (uniformDistribution (RestrictedDiagonalSample params j))
           (IdxSubMeas.liftLeft (AnswerSymStrat.diagonalPointAnswerFamily strategy j))
