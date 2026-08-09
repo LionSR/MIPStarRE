@@ -51,12 +51,8 @@ lemma fullSliceCommutation_avg_swap_terms
   let e : (Q × O) ≃ (Q × O) :=
     { toFun := fun z => ((z.1.2, z.1.1), (z.2.2, z.2.1))
       invFun := fun z => ((z.1.2, z.1.1), (z.2.2, z.2.1))
-      left_inv := by
-        rintro ⟨⟨x, y⟩, ⟨g, h⟩⟩
-        rfl
-      right_inv := by
-        rintro ⟨⟨x, y⟩, ⟨g, h⟩⟩
-        rfl }
+      left_inv := fun ⟨⟨_, _⟩, ⟨_, _⟩⟩ => rfl
+      right_inv := fun ⟨⟨_, _⟩, ⟨_, _⟩⟩ => rfl }
   have hpairBAB :
       avgOver (uniformDistribution (Q × O))
           (fun z => fullSliceBABTerm params strategy family z.1 z.2) =
@@ -335,12 +331,10 @@ private def xEvaluatedQuestionPointNextEquiv
     Point params × FullSliceQuestion params ≃ Point params.next × Fq params where
   toFun := fun ux => (appendPoint params ux.1 ux.2.1, ux.2.2)
   invFun := fun wy => (truncatePoint params wy.1, (pointHeight params wy.1, wy.2))
-  left_inv := by
-    rintro ⟨u, x, y⟩
-    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
-  right_inv := by
-    rintro ⟨w, y⟩
-    exact Prod.ext ((pointNextEquiv params).left_inv w) rfl
+  left_inv := fun ⟨u, x, _⟩ =>
+    Prod.ext (truncatePoint_appendPoint params u x)
+      (Prod.ext (pointHeight_appendPoint params u x) rfl)
+  right_inv := fun ⟨w, _⟩ => Prod.ext ((pointNextEquiv params).left_inv w) rfl
 
 /-- Averaging mixed x-evaluated data and ignoring the full-y coordinate gives the
 uniform average over `Point params.next`. -/
@@ -404,13 +398,13 @@ def evaluatedSliceQuestionYDataEquiv
       truncatePoint params q.2)
   invFun := fun r =>
     (appendPoint params r.1.1 r.1.2.1, appendPoint params r.2 r.1.2.2)
-  left_inv := by
-    rintro ⟨u, v⟩
-    exact Prod.ext
-      ((CommutativityPoints.pointNextEquiv params).left_inv u)
+  left_inv := fun ⟨u, v⟩ =>
+    Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv u)
       ((CommutativityPoints.pointNextEquiv params).left_inv v)
-  right_inv := by
-    rintro ⟨⟨u, x, y⟩, v⟩
-    simp [fullSliceQuestionOfEvaluatedSlice]
+  right_inv := fun ⟨⟨u, x, y⟩, v⟩ =>
+    Prod.ext
+      (Prod.ext (truncatePoint_appendPoint params u x)
+        (Prod.ext (pointHeight_appendPoint params u x) (pointHeight_appendPoint params v y)))
+      (truncatePoint_appendPoint params v y)
 
 end MIPStarRE.LDT.Commutativity
