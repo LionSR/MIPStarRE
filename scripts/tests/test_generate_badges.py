@@ -9,6 +9,7 @@ import tempfile
 import textwrap
 import unittest
 from pathlib import Path
+from unittest import mock
 
 SCRIPT_DIR = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(SCRIPT_DIR))
@@ -18,6 +19,8 @@ from generate_badges import (  # noqa: E402
     SORRY_RE,
     _blueprint_badge_counts,
     count_pattern,
+    sorry_badge_count,
+    tracked_lean_files,
 )
 
 # Canonical proof-bearing environment types (must match
@@ -89,6 +92,50 @@ class GenerateBadgesTests(unittest.TestCase):
         )
 
         self.assertEqual(count, 4)
+
+    @mock.patch("generate_badges.subprocess.check_output")
+    def test_sorry_count_exempts_exactly_one_comparator_challenge_hole(
+        self, check_output: mock.Mock
+    ) -> None:
+        check_output.return_value = (
+            "MIPStarRE/Incomplete.lean\n"
+            "scripts/comparator/challenge_footer.lean\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            project_file = repo_root / "MIPStarRE/Incomplete.lean"
+            challenge_file = repo_root / "scripts/comparator/challenge_footer.lean"
+            project_file.parent.mkdir(parents=True)
+            challenge_file.parent.mkdir(parents=True)
+            project_file.write_text("theorem openGoal : True := by sorry\n")
+            challenge_file.write_text(
+                "namespace Test\n"
+                "theorem mainFormal : True := by\n"
+                "  sorry\n"
+                "end Test\n"
+            )
+
+            files = tracked_lean_files(repo_root)
+            self.assertEqual(sorry_badge_count(repo_root, files), 1)
+
+            challenge_file.write_text(
+                "namespace Test\n"
+                "theorem accidental : True := by sorry\n"
+                "theorem mainFormal : True := by\n"
+                "  sorry\n"
+                "end Test\n"
+            )
+            self.assertEqual(sorry_badge_count(repo_root, files), 2)
+
+            challenge_file.write_text(
+                "namespace Test\n"
+                "theorem mainFormal : True := by trivial\n"
+                "example : True := by\n"
+                "  sorry\n"
+                "end Test\n"
+            )
+            with self.assertRaisesRegex(RuntimeError, "expected mainFormal"):
+                sorry_badge_count(repo_root, files)
 
 
 class BlueprintBadgeCountsTests(unittest.TestCase):

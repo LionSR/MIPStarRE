@@ -3,7 +3,9 @@
 
 Badges
 ------
-* ``sorries`` — count of ``sorry`` in tracked ``.lean`` files.
+* ``sorries`` — count of ``sorry`` in tracked project ``.lean`` files.  The
+  intentionally incomplete comparator challenge is excluded because its
+  ``sorry`` is replaced by the submitted proof during external verification.
 * ``axioms`` — count of ``axiom`` declarations in tracked ``.lean`` files.
 * ``lean`` / ``mathlib`` — toolchain versions.
 * ``blueprint_no_leanok`` — unique blueprint declarations that have a
@@ -40,6 +42,11 @@ from pathlib import Path
 
 
 SORRY_RE = re.compile(r"\bsorry\b")
+# Comparator challenge scaffolding deliberately presents the target theorem with
+# exactly one ``sorry``; the companion repository replaces that hole with the
+# submitted proof. Additional holes in the same file must still count.
+INTENTIONAL_SORRY_PATH = "scripts/comparator/challenge_footer.lean"
+MAIN_FORMAL_DECL_RE = re.compile(r"(?m)^theorem\s+mainFormal\b")
 AXIOM_RE = re.compile(
     r"(?m)^\s*"
     r"(?:@\[[^\]\n]*(?:\n\s*[^\]\n]*)*\]\s*)*"
@@ -53,6 +60,46 @@ def tracked_lean_files(repo_root: Path) -> list[Path]:
         ["git", "ls-files", "*.lean"], cwd=repo_root, text=True
     )
     return [repo_root / line for line in output.splitlines() if line]
+
+
+def main_formal_has_intentional_sorry(source: str) -> bool:
+    """Check the proof body of the footer's ``mainFormal`` declaration only."""
+    declaration = MAIN_FORMAL_DECL_RE.search(source)
+    if declaration is None:
+        return False
+    declaration_lines = source[declaration.start():].splitlines()
+    block = [declaration_lines[0]]
+    for line in declaration_lines[1:]:
+        # The generated footer keeps declaration continuations and tactic lines
+        # indented. Any nonblank column-zero command starts a new Lean command,
+        # regardless of its introducer (`theorem`, `example`, `opaque`, ...).
+        if line and not line[0].isspace():
+            break
+        block.append(line)
+    block_lines = [line.strip() for line in block if line.strip()]
+    return (
+        len(block_lines) >= 2
+        and block_lines[-2].endswith(":= by")
+        and block_lines[-1] == "sorry"
+    )
+
+
+def sorry_badge_count(repo_root: Path, lean_files: list[Path]) -> int:
+    """Count proof debt after validating and subtracting one challenge hole."""
+    intentional_path = repo_root / INTENTIONAL_SORRY_PATH
+    if intentional_path not in lean_files:
+        raise RuntimeError(f"tracked challenge footer missing: {INTENTIONAL_SORRY_PATH}")
+
+    source = strip_comments_and_strings(intentional_path.read_text(encoding="utf-8"))
+    if not main_formal_has_intentional_sorry(source):
+        raise RuntimeError(
+            "expected mainFormal to end with the intentional challenge sorry in "
+            f"{INTENTIONAL_SORRY_PATH}"
+        )
+
+    # Exempt that one structurally identified hole. Every other hole remains in
+    # the repository-wide count, including unrelated holes in the same file.
+    return count_pattern(lean_files, SORRY_RE) - 1
 
 
 def strip_comments_and_strings(source: str) -> str:
@@ -252,7 +299,7 @@ def main() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     lean_files = tracked_lean_files(repo_root)
 
-    sorry_count = count_pattern(lean_files, SORRY_RE)
+    sorry_count = sorry_badge_count(repo_root, lean_files)
     axiom_count = count_pattern(lean_files, AXIOM_RE)
 
     badge_records = {
