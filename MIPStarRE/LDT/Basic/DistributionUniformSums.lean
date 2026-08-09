@@ -416,12 +416,8 @@ theorem uniformOnFinset_filter_sum_smul_eq_subtype {α M : Type*}
     { toFun := fun a => ⟨a.1, (Finset.mem_filter.mp a.2).2⟩
       invFun := fun a =>
         ⟨a.1, Finset.mem_filter.mpr ⟨Finset.mem_univ a.1, a.2⟩⟩
-      left_inv := by
-        intro a
-        rfl
-      right_inv := by
-        intro a
-        rfl }
+      left_inv := fun _ => rfl
+      right_inv := fun _ => rfl }
   haveI : Nonempty {a : α // a ∈ support} := by
     rcases (inferInstance : Nonempty {a : α // p a}) with ⟨a⟩
     exact ⟨⟨a.1, Finset.mem_filter.mpr ⟨Finset.mem_univ a.1, a.2⟩⟩⟩

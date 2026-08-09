@@ -45,17 +45,11 @@ noncomputable def map {α β : Type*} [DecidableEq β]
     (𝒟 : Distribution α) (e : α → β) : Distribution β where
   support := 𝒟.support.image e
   weight := fun b => ∑ a ∈ 𝒟.support.filter (fun a => e a = b), 𝒟.weight a
-  nonnegative := by
-    intro b
-    exact Finset.sum_nonneg fun a _ => 𝒟.nonnegative a
-  outsideSupport := by
-    intro b hb
-    exact Finset.sum_eq_zero fun a ha => by
-      rcases Finset.mem_filter.mp ha with ⟨ha𝒟, hae⟩
-      have hb' : b ∈ 𝒟.support.image e := by
-        rw [← hae]
-        exact Finset.mem_image.mpr ⟨a, ha𝒟, rfl⟩
-      exact (hb hb').elim
+  nonnegative := fun _ => Finset.sum_nonneg fun a _ => 𝒟.nonnegative a
+  outsideSupport := fun _ hb =>
+    Finset.sum_eq_zero fun a ha =>
+      (hb (Finset.mem_image.mpr
+        ⟨a, (Finset.mem_filter.mp ha).1, (Finset.mem_filter.mp ha).2⟩)).elim
 
 @[simp]
 theorem map_support {α β : Type*} [DecidableEq β]
@@ -236,11 +230,9 @@ while exposing the `Error`-module structure of the weighted sum. -/
 noncomputable def weightedSumLinearMap (M : Type*) [AddCommMonoid M] [Module Error M]
     {α : Type*} (𝒟 : Distribution α) : (α → M) →ₗ[Error] M where
   toFun := fun f => ∑ a ∈ 𝒟.support, 𝒟.weight a • f a
-  map_add' := by
-    intro f g
+  map_add' := fun f g => by
     simp only [Pi.add_apply, smul_add, Finset.sum_add_distrib]
-  map_smul' := by
-    intro c f
+  map_smul' := fun c f => by
     simp only [Pi.smul_apply]
     calc
       ∑ a ∈ 𝒟.support, 𝒟.weight a • c • f a =
@@ -415,19 +407,14 @@ The stored support is `s`, and the weight of a point is the elementary finite
 uniform weight `1 / s.card` on `s` and `0` off `s`.  When the support is empty
 this gives the zero sub-probability distribution, matching the convention used
 for degenerate filtered supports in the LDT development. -/
-noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α := by
-  classical
-  exact
-    { support := s
-      weight := fun a => if a ∈ s then 1 / (s.card : Error) else 0
-      nonnegative := by
-        intro a
-        by_cases ha : a ∈ s
-        · simp [ha]
-        · simp [ha]
-      outsideSupport := by
-        intro a ha
-        simp [ha] }
+noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α :=
+  letI := Classical.decEq α
+  { support := s
+    weight := fun a => if a ∈ s then 1 / (s.card : Error) else 0
+    nonnegative := fun _ => by
+      split_ifs <;> positivity
+    outsideSupport := fun _ ha => by
+      simp [ha] }
 
 @[simp]
 theorem uniformOnFinset_support {α : Type*} (s : Finset α) :

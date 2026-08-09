@@ -40,17 +40,11 @@ noncomputable def axisLinePolynomialToPolynomial
     (params : Parameters) [FieldModel params.q]
     (i : Fin params.m) (f : AxisLinePolynomial params) : Polynomial params where
   poly := f.poly.eval₂ MvPolynomial.C (MvPolynomial.X i)
-  lowIndividualDegree := by
-    intro j
-    calc
-      MvPolynomial.degreeOf j
-          (f.poly.eval₂ MvPolynomial.C (MvPolynomial.X i) : PolynomialModel params)
-        ≤ if j = i then f.poly.natDegree else 0 :=
-          degreeOf_eval₂_C_X_le_natDegree f.poly j i
-      _ ≤ params.d := by
-        by_cases hji : j = i
-        · simp [hji, f.degreeBounded]
-        · simp [hji]
+  lowIndividualDegree := fun j =>
+    (degreeOf_eval₂_C_X_le_natDegree f.poly j i).trans <| by
+      by_cases hji : j = i
+      · simp [hji, f.degreeBounded]
+      · simp [hji]
 
 /-- Evaluating the lifted polynomial at a point `u` recovers the original line
 polynomial at the `i`th coordinate `u i`. -/
