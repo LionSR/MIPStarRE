@@ -130,7 +130,8 @@ class GenerateBadgesTests(unittest.TestCase):
             challenge_file.write_text(
                 "namespace Test\n"
                 "theorem mainFormal : True := by trivial\n"
-                "theorem accidental : True := by sorry\n"
+                "theorem accidental : True := by\n"
+                "  sorry\n"
                 "end Test\n"
             )
             with self.assertRaisesRegex(RuntimeError, "expected mainFormal"):

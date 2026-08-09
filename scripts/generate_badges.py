@@ -46,9 +46,9 @@ SORRY_RE = re.compile(r"\bsorry\b")
 # exactly one ``sorry``; the companion repository replaces that hole with the
 # submitted proof. Additional holes in the same file must still count.
 INTENTIONAL_SORRY_PATH = "scripts/comparator/challenge_footer.lean"
-INTENTIONAL_SORRY_RE = re.compile(
-    r"(?ms)^\s*theorem\s+mainFormal\b.*?:=\s*by\s*\n\s*sorry\s*"
-    r"(?=\n\s*end\s+Test\b)"
+MAIN_FORMAL_DECL_RE = re.compile(r"(?m)^theorem\s+mainFormal\b")
+NEXT_TOP_LEVEL_DECL_RE = re.compile(
+    r"(?m)^(?:theorem|lemma|def|abbrev|instance|structure|class|inductive|end)\b"
 )
 AXIOM_RE = re.compile(
     r"(?m)^\s*"
@@ -65,6 +65,25 @@ def tracked_lean_files(repo_root: Path) -> list[Path]:
     return [repo_root / line for line in output.splitlines() if line]
 
 
+def main_formal_has_intentional_sorry(source: str) -> bool:
+    """Check the proof body of the footer's ``mainFormal`` declaration only."""
+    declaration = MAIN_FORMAL_DECL_RE.search(source)
+    if declaration is None:
+        return False
+    next_declaration = NEXT_TOP_LEVEL_DECL_RE.search(source, declaration.end())
+    block_end = next_declaration.start() if next_declaration is not None else len(source)
+    block_lines = [
+        line.strip()
+        for line in source[declaration.start():block_end].splitlines()
+        if line.strip()
+    ]
+    return (
+        len(block_lines) >= 2
+        and block_lines[-2].endswith(":= by")
+        and block_lines[-1] == "sorry"
+    )
+
+
 def sorry_badge_count(repo_root: Path, lean_files: list[Path]) -> int:
     """Count proof debt after validating and subtracting one challenge hole."""
     intentional_path = repo_root / INTENTIONAL_SORRY_PATH
@@ -72,7 +91,7 @@ def sorry_badge_count(repo_root: Path, lean_files: list[Path]) -> int:
         raise RuntimeError(f"tracked challenge footer missing: {INTENTIONAL_SORRY_PATH}")
 
     source = strip_comments_and_strings(intentional_path.read_text(encoding="utf-8"))
-    if len(INTENTIONAL_SORRY_RE.findall(source)) != 1:
+    if not main_formal_has_intentional_sorry(source):
         raise RuntimeError(
             "expected mainFormal to end with the intentional challenge sorry in "
             f"{INTENTIONAL_SORRY_PATH}"
