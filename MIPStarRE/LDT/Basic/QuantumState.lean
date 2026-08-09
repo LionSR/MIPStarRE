@@ -68,7 +68,7 @@ structure PureState (ι : Type*) [Fintype ι] [DecidableEq ι] [Nonempty ι] whe
 
 namespace PureState
 
-/-- The coordinate-basis vector has unit matrix dot product norm. -/
+/-- The coordinate-basis vector has unit self-dot product. -/
 private theorem basis_unit {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (i : ι) :
     star (fun j => if j = i then (1 : ℂ) else 0) ⬝ᵥ
