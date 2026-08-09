@@ -182,10 +182,10 @@ noncomputable def extractRoleRegisterAlice {α ιA ιB : Type*}
   outcome := fun a => ProjStrat.extractRoleRegisterAliceBlock (A.outcome a)
   total := ProjStrat.extractRoleRegisterAliceBlock A.total
   outcome_pos := fun a => ProjStrat.extractRoleRegisterAliceBlock_nonneg (A.outcome_pos a)
-  sum_eq_total := by
-    simpa using congrArg ProjStrat.extractRoleRegisterAliceBlock A.sum_eq_total
-  total_le_one := by
-    simpa using ProjStrat.extractRoleRegisterAliceBlock_le A.total_le_one
+  sum_eq_total := (ProjStrat.extractRoleRegisterAliceBlock_univ_sum A.outcome).symm.trans
+      (congrArg ProjStrat.extractRoleRegisterAliceBlock A.sum_eq_total)
+  total_le_one := (ProjStrat.extractRoleRegisterAliceBlock_le A.total_le_one).trans_eq
+      ProjStrat.extractRoleRegisterAliceBlock_one
 
 /-- Extract Bob's original local block from a submeasurement on the
 heterogeneous role-register space. -/
@@ -195,10 +195,10 @@ noncomputable def extractRoleRegisterBob {α ιA ιB : Type*}
   outcome := fun a => ProjStrat.extractRoleRegisterBobBlock (A.outcome a)
   total := ProjStrat.extractRoleRegisterBobBlock A.total
   outcome_pos := fun a => ProjStrat.extractRoleRegisterBobBlock_nonneg (A.outcome_pos a)
-  sum_eq_total := by
-    simpa using congrArg ProjStrat.extractRoleRegisterBobBlock A.sum_eq_total
-  total_le_one := by
-    simpa using ProjStrat.extractRoleRegisterBobBlock_le A.total_le_one
+  sum_eq_total := (ProjStrat.extractRoleRegisterBobBlock_univ_sum A.outcome).symm.trans
+      (congrArg ProjStrat.extractRoleRegisterBobBlock A.sum_eq_total)
+  total_le_one := (ProjStrat.extractRoleRegisterBobBlock_le A.total_le_one).trans_eq
+      ProjStrat.extractRoleRegisterBobBlock_one
 
 @[simp] theorem extractRoleRegisterAlice_outcome {α ιA ιB : Type*}
     [Fintype α] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -270,9 +270,8 @@ noncomputable def extractRoleRegisterAlice {α ιA ιB : Type*}
     [Fintype α] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Measurement α (ProjStrat.RoleRegisterLocal ιA ιB)) : Measurement α ιA where
   toSubMeas := A.toSubMeas.extractRoleRegisterAlice
-  total_eq_one := by
-    simpa [SubMeas.extractRoleRegisterAlice] using
-      congrArg ProjStrat.extractRoleRegisterAliceBlock A.total_eq_one
+  total_eq_one := (congrArg ProjStrat.extractRoleRegisterAliceBlock A.total_eq_one).trans
+      ProjStrat.extractRoleRegisterAliceBlock_one
 
 /-- Extract Bob's original local block from a measurement on the heterogeneous
 role-register space. -/
@@ -280,9 +279,8 @@ noncomputable def extractRoleRegisterBob {α ιA ιB : Type*}
     [Fintype α] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
     (A : Measurement α (ProjStrat.RoleRegisterLocal ιA ιB)) : Measurement α ιB where
   toSubMeas := A.toSubMeas.extractRoleRegisterBob
-  total_eq_one := by
-    simpa [SubMeas.extractRoleRegisterBob] using
-      congrArg ProjStrat.extractRoleRegisterBobBlock A.total_eq_one
+  total_eq_one := (congrArg ProjStrat.extractRoleRegisterBobBlock A.total_eq_one).trans
+      ProjStrat.extractRoleRegisterBobBlock_one
 
 @[simp] theorem extractRoleRegisterAlice_toSubMeas {α ιA ιB : Type*}
     [Fintype α] [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
