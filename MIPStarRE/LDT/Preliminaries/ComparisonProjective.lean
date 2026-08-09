@@ -31,14 +31,10 @@ private lemma two_questionConsistency_eq_questionSDD_of_projective
       qSDD ψ A.toSubMeas.liftLeft B.toSubMeas.liftRight := by
   let ALeft : ProjSubMeas Outcome (ι × ι) :=
     { toSubMeas := A.toSubMeas.liftLeft
-      proj := by
-        intro a
-        simp [SubMeas.liftLeft, leftTensor_mul_leftTensor, A.proj a] }
+      proj := fun a => by simp [SubMeas.liftLeft, leftTensor_mul_leftTensor, A.proj a] }
   let BRight : ProjSubMeas Outcome (ι × ι) :=
     { toSubMeas := B.toSubMeas.liftRight
-      proj := by
-        intro a
-        simp [SubMeas.liftRight, rightTensor_mul_rightTensor, B.proj a] }
+      proj := fun a => by simp [SubMeas.liftRight, rightTensor_mul_rightTensor, B.proj a] }
   let totalMass : Error := ev ψ (1 : MIPStarRE.Quantum.Op (ι × ι))
   let overlap : Error :=
     ∑ a : Outcome, ev ψ (ALeft.outcome a * BRight.outcome a)
@@ -203,14 +199,10 @@ private lemma two_questionConsistency_eq_questionSDD_of_projective_heterogeneous
         (rightPlacedSubMeas (ιA := ιA) B.toSubMeas) := by
   let ALeft : ProjSubMeas Outcome (ιA × ιB) :=
     { toSubMeas := leftPlacedSubMeas (ιB := ιB) A.toSubMeas
-      proj := by
-        intro a
-        simp [leftPlacedSubMeas, leftTensor_mul_leftTensor, A.proj a] }
+      proj := fun a => by simp [leftPlacedSubMeas, leftTensor_mul_leftTensor, A.proj a] }
   let BRight : ProjSubMeas Outcome (ιA × ιB) :=
     { toSubMeas := rightPlacedSubMeas (ιA := ιA) B.toSubMeas
-      proj := by
-        intro a
-        simp [rightPlacedSubMeas, rightTensor_mul_rightTensor, B.proj a] }
+      proj := fun a => by simp [rightPlacedSubMeas, rightTensor_mul_rightTensor, B.proj a] }
   let totalMass : Error := ev ψ (1 : MIPStarRE.Quantum.Op (ιA × ιB))
   let overlap : Error :=
     ∑ a : Outcome, ev ψ (ALeft.outcome a * BRight.outcome a)
@@ -308,8 +300,8 @@ private lemma two_questionConsistency_eq_questionSDD_of_projective_heterogeneous
     have htotal :
         ev ψ
             ((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total *
-              (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).total) =
-          totalMass := by
+              (rightPlacedSubMeas (ιA := ιA) B.toSubMeas).total)
+          = totalMass := by
       calc
         ev ψ
             ((leftPlacedSubMeas (ιB := ιB) A.toSubMeas).total *

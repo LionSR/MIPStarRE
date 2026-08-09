@@ -1,4 +1,5 @@
 import MIPStarRE.LDT.Preliminaries.Defs
+import MIPStarRE.LDT.Basic.MeasurementLift
 
 /-!
 # Preliminary comparison theorems: core layer
@@ -175,17 +176,12 @@ theorem simeqToApprox {Question Outcome : Type*}
           apply avgOver_mono
           intro q
           let A' : Measurement Outcome (ι × ι) :=
-            { toSubMeas := ((A q).toSubMeas).liftLeft
-              total_eq_one := by
-                simpa [SubMeas.liftLeft, (A q).total_eq_one] using
-                  (leftTensor_one (ι₁ := ι) (ι₂ := ι)) }
+            leftLiftedMeasurement (ιB := ι) (A q)
           let B' : Measurement Outcome (ι × ι) :=
-            { toSubMeas := ((B q).toSubMeas).liftRight
-              total_eq_one := by
-                simpa [SubMeas.liftRight, (B q).total_eq_one] using
-                  (rightTensor_one (ι₁ := ι) (ι₂ := ι)) }
-          simpa [A', B', IdxSubMeas.liftLeft, IdxSubMeas.liftRight,
-            SubMeas.liftLeft, SubMeas.liftRight, IdxMeas.toIdxSubMeas] using
+            rightLiftedMeasurement (ιA := ι) (B q)
+          simpa [A', B', leftLiftedMeasurement, rightLiftedMeasurement,
+            IdxSubMeas.liftLeft, IdxSubMeas.liftRight, SubMeas.liftLeft, SubMeas.liftRight,
+            leftPlacedSubMeas, rightPlacedSubMeas, IdxMeas.toIdxSubMeas] using
             questionSDD_le_two_questionConsistency ψ A' B'
     _ = 2 * avgOver 𝒟
           (fun q =>
@@ -233,17 +229,12 @@ theorem simeqToApprox_heterogeneous {Question Outcome : Type*}
           apply avgOver_mono
           intro q
           let A' : Measurement Outcome (ιA × ιB) :=
-            { toSubMeas := leftPlacedSubMeas (ιB := ιB) ((A q).toSubMeas)
-              total_eq_one := by
-                simpa [leftPlacedSubMeas, (A q).total_eq_one] using
-                  (leftTensor_one (ι₁ := ιA) (ι₂ := ιB)) }
+            leftLiftedMeasurement (ιB := ιB) (A q)
           let B' : Measurement Outcome (ιA × ιB) :=
-            { toSubMeas := rightPlacedSubMeas (ιA := ιA) ((B q).toSubMeas)
-              total_eq_one := by
-                simpa [rightPlacedSubMeas, (B q).total_eq_one] using
-                  (rightTensor_one (ι₁ := ιA) (ι₂ := ιB)) }
-          simpa [A', B', IdxSubMeas.placeLeft, IdxSubMeas.placeRight,
-            leftPlacedSubMeas, rightPlacedSubMeas, IdxMeas.toIdxSubMeas] using
+            rightLiftedMeasurement (ιA := ιA) (B q)
+          simpa [A', B', leftLiftedMeasurement, rightLiftedMeasurement,
+            IdxSubMeas.placeLeft, IdxSubMeas.placeRight, leftPlacedSubMeas, rightPlacedSubMeas,
+            IdxMeas.toIdxSubMeas] using
             questionSDD_le_two_questionConsistency ψ A' B'
     _ = 2 * avgOver 𝒟
           (fun q =>

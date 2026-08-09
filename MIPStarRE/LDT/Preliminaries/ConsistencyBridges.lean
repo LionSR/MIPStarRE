@@ -561,17 +561,16 @@ theorem consSubMeas_heterogeneous {Question Outcome : Type*}
   intro hcons
   have hdc := consSubMeas_diagonalControl_heterogeneous ψ 𝒟 A B γ hcons
   have hsc := consSubMeas_sandwichControl_heterogeneous ψ 𝒟 A B γ hcons
+  have hcombined :=
+    stateDependentDistanceRel_mono ψ 𝒟 (IdxSubMeas.placeLeft A)
+      (heterogeneousTotalSandwichFamily A B) (2 * (γ + γ)) (4 * γ) (by linarith)
+      (stateDependentDistanceRel_triangle ψ 𝒟 (IdxSubMeas.placeLeft A)
+        (heterogeneousDiagonalSandwichFamily A B)
+        (heterogeneousTotalSandwichFamily A B) γ γ hdc hsc)
   exact {
     diagonalControl := hdc
     sandwichControl := hsc
-    combinedControl := by
-      have h :=
-        stateDependentDistanceRel_triangle ψ 𝒟 (IdxSubMeas.placeLeft A)
-          (heterogeneousDiagonalSandwichFamily A B)
-          (heterogeneousTotalSandwichFamily A B) γ γ hdc hsc
-      exact
-        stateDependentDistanceRel_mono ψ 𝒟 (IdxSubMeas.placeLeft A)
-          (heterogeneousTotalSandwichFamily A B) (2 * (γ + γ)) (4 * γ) (by linarith) h
+    combinedControl := hcombined
   }
 
 /-- Same-space specialization of `prop:cons-sub-meas`.
@@ -590,16 +589,15 @@ theorem consSubMeas {Question Outcome : Type*}
   intro hcons
   have hdc := consSubMeas_diagonalControl ψ 𝒟 A B γ hcons
   have hsc := consSubMeas_sandwichControl ψ 𝒟 A B γ hcons
+  have hcombined :=
+    stateDependentDistanceRel_mono ψ 𝒟 (IdxSubMeas.liftLeft A)
+      (totalSandwichFamily A B) (2 * (γ + γ)) (4 * γ) (by linarith)
+      (stateDependentDistanceRel_triangle ψ 𝒟 (IdxSubMeas.liftLeft A)
+        (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hdc hsc)
   exact {
     diagonalControl := hdc
     sandwichControl := hsc
-    combinedControl := by
-      have h :=
-        stateDependentDistanceRel_triangle ψ 𝒟 (IdxSubMeas.liftLeft A)
-          (diagonalSandwichFamily A B) (totalSandwichFamily A B) γ γ hdc hsc
-      exact
-        stateDependentDistanceRel_mono ψ 𝒟 (IdxSubMeas.liftLeft A)
-          (totalSandwichFamily A B) (2 * (γ + γ)) (4 * γ) (by linarith) h
+    combinedControl := hcombined
   }
 
 
