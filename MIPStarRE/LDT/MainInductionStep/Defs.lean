@@ -156,14 +156,8 @@ def axisLinePolynomialEquiv (params : Parameters) [FieldModel params.q] (x : Fq 
     AxisLinePolynomial params ≃ AxisLinePolynomial params.next where
   toFun := liftAxisAnswer params x
   invFun := fun f => AxisLinePolynomial.restrictAtHeight params f x
-  left_inv := by
-    intro f
-    cases f
-    rfl
-  right_inv := by
-    intro f
-    cases f
-    rfl
+  left_inv := fun ⟨_, _⟩ => rfl
+  right_inv := fun ⟨_, _⟩ => rfl
 
 /-- Restrict an axis-parallel line measurement to the slice at height `x`. -/
 noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldModel params.q]
@@ -192,14 +186,10 @@ noncomputable def restrictAxisParallelMeasurement (params : Parameters) [FieldMo
             lifted.toSubMeas.outcome (liftAxisAnswer params x f)
           total := 1
           outcome_pos := fun f => lifted.outcome_pos (liftAxisAnswer params x f)
-          sum_eq_total := by
-            simpa [restrictedTotal] using hrestrictedTotal
-          total_le_one := by
-            change Matrix.PosSemidef ((1 : MIPStarRE.Quantum.Op ι) - 1)
-            simpa using (Matrix.PosSemidef.zero : Matrix.PosSemidef (0 : MIPStarRE.Quantum.Op ι))
+          sum_eq_total := hrestrictedTotal
+          total_le_one := le_rfl
         }
-        total_eq_one := by
-          rfl }
+        total_eq_one := rfl }
       proj := fun f => lifted.proj (liftAxisAnswer params x f) }
 
 private theorem restrictAxisParallelMeasurement_transportInvariant
@@ -254,8 +244,7 @@ private noncomputable def diagonalValueRepresentative (params : Parameters)
     [FieldModel params.q] (a : Fq params) :
     DiagonalLinePolynomial params where
   poly := _root_.Polynomial.C (decodeScalar a)
-  degreeBounded := by
-    simp
+  degreeBounded := (_root_.Polynomial.natDegree_C (decodeScalar a)).trans_le (Nat.zero_le _)
 
 /-- Restrict a diagonal-line measurement to the slice at height `x`.
 
