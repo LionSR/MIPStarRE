@@ -26,8 +26,7 @@ private noncomputable def ldGbconAxisLineMeasurement
   let ℓ : AxisParallelLine params.next :=
     { base := u, direction := lastCoord params }
   { toSubMeas := postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (· zeroCoord)
-    total_eq_one := by
-      simpa [postprocess_total] using (strategy.axisParallelMeasurement ℓ).total_eq_one }
+    total_eq_one := (strategy.axisParallelMeasurement ℓ).total_eq_one }
 
 private noncomputable def ldGbconVerticalLineMeasurement
     (params : Parameters) [FieldModel params.q]
@@ -37,12 +36,11 @@ private noncomputable def ldGbconVerticalLineMeasurement
       postprocess
         (verticalLineMeasurementFamily params strategy (truncatePoint params u))
         (fun f => f (pointHeight params u))
-    total_eq_one := by
+    total_eq_one :=
       let ℓ : AxisParallelLine params.next :=
         { base := appendPoint params (truncatePoint params u) zeroCoord
           direction := lastCoord params }
-      simpa [verticalLineMeasurementFamily, ℓ, postprocess_total] using
-        (strategy.axisParallelMeasurement ℓ).total_eq_one }
+      (strategy.axisParallelMeasurement ℓ).total_eq_one }
 
 private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
     (params : Parameters) [FieldModel params.q]
@@ -238,19 +236,17 @@ theorem pointVerticalLineSdd_of_axis_self
       (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      delta := by
-    have hself_rel :
+      delta :=
+    let hself_rel :
         BipartiteSSCRel strategy.state
           (uniformDistribution (Point params.next))
           (IdxMeas.toIdxSubMeas pointMeas)
-          delta := by
-      constructor
-      rw [hpointMeas_sub]
-      exact hself
-    have hcons :=
+          delta :=
+      ⟨by rw [hpointMeas_sub]; exact hself⟩
+    let hcons :=
       (Preliminaries.bipartiteSSCRel_iff_consRel_self_measurement strategy.state
         (uniformDistribution (Point params.next)) pointMeas delta).mp hself_rel
-    rwa [hpointMeas_sub] at hcons
+    hpointMeas_sub ▸ hcons
   have heps_nonneg : 0 ≤ eps := by
     exact le_trans
       (bipartiteConsError_nonneg strategy.state
@@ -418,19 +414,17 @@ theorem ldGbcon_of_axis_self
       (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      delta := by
-    have hself_rel :
+      delta :=
+    let hself_rel :
         BipartiteSSCRel strategy.state
           (uniformDistribution (Point params.next))
           (IdxMeas.toIdxSubMeas pointMeas)
-          delta := by
-      constructor
-      rw [hpointMeas_sub]
-      exact hself
-    have hcons :=
+          delta :=
+      ⟨by rw [hpointMeas_sub]; exact hself⟩
+    let hcons :=
       (Preliminaries.bipartiteSSCRel_iff_consRel_self_measurement strategy.state
         (uniformDistribution (Point params.next)) pointMeas delta).mp hself_rel
-    rwa [hpointMeas_sub] at hcons
+    hpointMeas_sub ▸ hcons
   have heps_nonneg : 0 ≤ eps := by
     exact le_trans
       (bipartiteConsError_nonneg strategy.state
@@ -456,18 +450,18 @@ theorem ldGbcon_of_axis_self
       (evaluateFiberFamilyAtNextPoint params
         (IdxProjSubMeas.toIdxSubMeas family.meas))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-      zeta := by
-        exact consRel_symm_of_density_fixed strategy.state strategy.densityFixed
-          (uniformDistribution (Point params.next))
+      zeta :=
+    consRel_symm_of_density_fixed strategy.state strategy.densityFixed
+      (uniformDistribution (Point params.next))
+      (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+      (evaluateFiberFamilyAtNextPoint params
+        (IdxProjSubMeas.toIdxSubMeas family.meas))
+      zeta
+      (by
+        change ConsRel strategy.state (uniformDistribution (Point params.next))
           (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-          (evaluateFiberFamilyAtNextPoint params
-            (IdxProjSubMeas.toIdxSubMeas family.meas))
-          zeta
-          (by
-            change ConsRel strategy.state (uniformDistribution (Point params.next))
-              (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
-              family.evaluatedAtNextPoint zeta
-            exact hcons.pointConsistency)
+          family.evaluatedAtNextPoint zeta
+        exact hcons.pointConsistency)
   have haxis_last : ConsRel strategy.state
       (uniformDistribution (Point params.next))
       (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
