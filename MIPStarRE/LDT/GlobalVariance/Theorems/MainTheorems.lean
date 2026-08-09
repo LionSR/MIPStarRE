@@ -61,19 +61,15 @@ lemma localVarianceOfPointsFromEdgeDeviation
             intro g
             simpa [localVarianceDeviationAtPolynomial] using hedge g)
       pointwiseEdgeNormBound := hedge
-      pointwiseLocalVarianceBound := by
-        intro g
-        exact pointConditionedLocalVarianceAtPolynomial_le_of_deviation
+      pointwiseLocalVarianceBound :=
+        fun g => pointConditionedLocalVarianceAtPolynomial_le_of_deviation
           params strategy G (hedge g)
-      averagedLocalVarianceBound := by
-        simpa [pointConditionedLocalVariance] using
-          avgOver_polynomialDistribution_le_of_pointwise params
-            (fun g => pointConditionedLocalVarianceAtPolynomial params strategy G g)
-            (localVarianceOfPointsError params eps delta)
-            (by
-              intro g
-              exact pointConditionedLocalVarianceAtPolynomial_le_of_deviation
-                params strategy G (hedge g)) }
+      averagedLocalVarianceBound :=
+        avgOver_polynomialDistribution_le_of_pointwise params
+          (fun g => pointConditionedLocalVarianceAtPolynomial params strategy G g)
+          (localVarianceOfPointsError params eps delta)
+          (fun g => pointConditionedLocalVarianceAtPolynomial_le_of_deviation
+            params strategy G (hedge g)) }
 
 -- This lemma builds the global-variance record from the local record and the
 -- expansion transfer, expanding several indexed operator families.
@@ -136,11 +132,10 @@ lemma globalVarianceOfPointsFromLocalDeviation
       pointwiseGlobalNormBound := hglobalNorm
       pointwiseExpansionTransfer := pointConditionedExpansionTransfer params strategy G
       pointwiseGlobalVarianceBound := hglobalVariance
-      averagedGlobalVarianceBound := by
-        simpa [pointConditionedGlobalVariance] using
-          avgOver_polynomialDistribution_le_of_pointwise params
-            (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
-            (globalVarianceOfPointsError params eps delta) hglobalVariance }
+      averagedGlobalVarianceBound :=
+        avgOver_polynomialDistribution_le_of_pointwise params
+          (fun g => pointConditionedGlobalVarianceAtPolynomial params strategy G g)
+          (globalVarianceOfPointsError params eps delta) hglobalVariance }
 
 -- The sum-level transfer expands both the global and local deviation families
 -- over all polynomials.

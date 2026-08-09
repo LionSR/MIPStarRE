@@ -47,11 +47,10 @@ private lemma generalizeB_of_pointwise
             intro g
             simpa [generalizeBDeviationAtPolynomial] using hpoint g)
       pointwiseNormBound := hpoint
-      averagedNormBound := by
-        simpa [generalizeBDeviation] using
-          avgOver_polynomialDistribution_le_of_pointwise params
-            (fun g => generalizeBDeviationAtPolynomial params strategy ψbi G g)
-            (generalizeBError params) hpoint }
+      averagedNormBound :=
+        avgOver_polynomialDistribution_le_of_pointwise params
+          (fun g => generalizeBDeviationAtPolynomial params strategy ψbi G g)
+          (generalizeBError params) hpoint }
 
 /-- `lem:generalize-b`. -/
 lemma generalizeB
@@ -79,24 +78,19 @@ private noncomputable def axisParallelLineQuestionParameterEquiv (params : Param
       {qu : AxisParallelLineQuestion params // pointOnLine (params := params) qu} where
   toFun := fun ℓt => ⟨(ℓt.1, ℓt.1.pointAt ℓt.2), ⟨ℓt.2, rfl⟩⟩
   invFun := fun qu => (qu.1.1, axisParallelLineQuestionParameter qu.1)
-  left_inv := by
-    intro ℓt
-    cases ℓt with
-    | mk ℓ t =>
+  left_inv := fun
+    | ⟨ℓ, t⟩ => by
         simp [axisParallelLineQuestionParameter_pointAt]
-  right_inv := by
-    intro qu
-    rcases qu with ⟨qu, hqu⟩
-    rcases qu with ⟨ℓ, u⟩
-    rcases hqu with ⟨t, ht⟩
-    apply Subtype.ext
-    dsimp only
-    have hparam : axisParallelLineQuestionParameter (ℓ, u) = t := by
-      calc
-        axisParallelLineQuestionParameter (ℓ, u) =
-            axisParallelLineQuestionParameter (ℓ, ℓ.pointAt t) := by rw [ht]
-        _ = t := axisParallelLineQuestionParameter_pointAt ℓ t
-    ext <;> simp [hparam, ht]
+  right_inv := fun
+    | ⟨⟨ℓ, u⟩, ⟨t, ht⟩⟩ => by
+        apply Subtype.ext
+        dsimp only
+        have hparam : axisParallelLineQuestionParameter (ℓ, u) = t := by
+          calc
+            axisParallelLineQuestionParameter (ℓ, u) =
+                axisParallelLineQuestionParameter (ℓ, ℓ.pointAt t) := by rw [ht]
+            _ = t := axisParallelLineQuestionParameter_pointAt ℓ t
+        ext <;> simp [hparam, ht]
 
 /-- Reindex the axis-parallel line-question distribution as a uniform average over
 line/parameter seeds `(ℓ,t)` with sampled point `u = ℓ(t)`.
@@ -131,26 +125,18 @@ noncomputable def axisParallelLinePointParamEquiv (params : Parameters)
   invFun := fun st =>
     (({ base := fun j => if j = st.1.2 then subCoord (st.1.1 j) st.2 else st.1.1 j,
         direction := st.1.2 } : AxisParallelLine params), st.2)
-  left_inv := by
-    intro ℓt
-    cases ℓt with
-    | mk ℓ t =>
-        cases ℓ with
-        | mk base direction =>
-            simp only [Prod.mk.injEq, AxisParallelLine.mk.injEq, and_true]
-            funext j
-            by_cases hj : j = direction <;>
-              simp [AxisParallelLine.pointAt, hj, subCoord_addCoord_right]
-  right_inv := by
-    intro st
-    cases st with
-    | mk s t =>
-        cases s with
-        | mk u direction =>
-            simp only [Prod.mk.injEq, and_true]
-            ext j
-            by_cases hj : j = direction <;>
-              simp [AxisParallelLine.pointAt, hj]
+  left_inv := fun
+    | ⟨⟨base, direction⟩, t⟩ => by
+      simp only [Prod.mk.injEq, AxisParallelLine.mk.injEq, and_true]
+      funext j
+      by_cases hj : j = direction <;>
+        simp [AxisParallelLine.pointAt, hj, subCoord_addCoord_right]
+  right_inv := fun
+    | ⟨⟨u, direction⟩, t⟩ => by
+      simp only [Prod.mk.injEq, and_true]
+      ext j
+      by_cases hj : j = direction <;>
+        simp [AxisParallelLine.pointAt, hj]
 
 /-- Marginalizing the uniform line/parameter presentation to the sampled point
 and direction gives the native axis-parallel base-point test distribution. -/
