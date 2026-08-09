@@ -12,12 +12,11 @@ on:
         default: 'main'
 
 concurrency:
-  group: gh-pages-deploy
+  group: docgen-build
   cancel-in-progress: false
 
 permissions:
-  contents: write
-  issues: write
+  contents: read
 
 jobs:
   build_project:
@@ -132,14 +131,47 @@ jobs:
           cd docbuild
           lake build MIPStarRE:docs
 
-      - name: Deploy to gh-pages
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: ./scripts/deploy-to-gh-pages.sh --with-docs --ci
+      - name: Package blueprint component
+        uses: ./.github/actions/package-blueprint-component
 
+      - name: Package docs component
+        run: |
+          mkdir -p site-docs
+          cp -r docbuild/.lake/build/doc site-docs/docs
+
+      - name: Upload blueprint component
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-blueprint
+          path: site-blueprint
+          retention-days: 30
+
+      - name: Upload docs component
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-docs
+          path: site-docs
+          retention-days: 90
+
+  deploy:
+    name: Deploy Pages site
+    needs: build_project
+    uses: ./.github/workflows/deploy-pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      actions: read
+
+  report_failure:
+    name: Open issue on failure
+    needs: [build_project, deploy]
+    if: ${{ always() && (needs.build_project.result == 'failure' || needs.deploy.result == 'failure') }}
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
       - name: Open issue on failure
-        if: failure()
         uses: actions/github-script@v8
         with:
           script: |

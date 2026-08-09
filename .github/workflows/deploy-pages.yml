@@ -1,0 +1,74 @@
+name: Deploy Pages
+
+# Reusable deployment workflow: assemble the site from the newest component
+# artifacts and publish it through GitHub's artifact-based Pages flow. Generated
+# output never enters git history.
+
+on:
+  workflow_call:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Assemble and deploy Pages site
+    concurrency:
+      group: github-pages-deploy
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout deployment scripts
+        uses: actions/checkout@v6
+        with:
+          sparse-checkout: scripts
+
+      - name: Fetch latest site components
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ./scripts/fetch-latest-artifact.sh site-blueprint components/site-blueprint
+          ./scripts/fetch-latest-artifact.sh site-docs components/site-docs
+          ./scripts/fetch-latest-artifact.sh site-badges components/site-badges
+
+      # Transitional: preserve docs and badges from the legacy branch until
+      # their artifacts have each been published once. The blueprint component
+      # must always be Jekyll-built, so raw legacy homepage sources are never
+      # uploaded as static output. Remove this step after branch deletion.
+      - name: Seed missing components from legacy github-pages branch
+        run: |
+          if [ -d components/site-docs ] && [ -d components/site-badges ]; then
+            exit 0
+          fi
+          if ! git ls-remote --exit-code --heads \
+              "https://github.com/${GITHUB_REPOSITORY}.git" github-pages >/dev/null; then
+            echo "No github-pages branch; required artifact validation will decide whether deployment can continue"
+            exit 0
+          fi
+          echo "==> Seeding missing components from legacy github-pages branch..."
+          git clone --branch github-pages --single-branch --depth 1 \
+            "https://github.com/${GITHUB_REPOSITORY}.git" legacy-site
+          if [ ! -d components/site-docs ] && [ -d legacy-site/docs ]; then
+            mkdir -p components/site-docs
+            mv legacy-site/docs components/site-docs/docs
+          fi
+          if [ ! -d components/site-badges ] && [ -d legacy-site/badges ]; then
+            mkdir -p components/site-badges
+            cp -r legacy-site/badges/. components/site-badges/
+          fi
+          rm -rf legacy-site
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Assemble site
+        run: ./scripts/assemble-pages-site.sh components _site
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

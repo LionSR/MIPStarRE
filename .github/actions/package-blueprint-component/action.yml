@@ -1,0 +1,26 @@
+name: Package blueprint site component
+description: Package the built blueprint and Jekyll-rendered homepage for Pages
+
+inputs:
+  output-dir:
+    description: Destination directory for the site-blueprint component
+    required: false
+    default: site-blueprint
+
+runs:
+  using: composite
+  steps:
+    - name: Package blueprint web output and PDF
+      shell: bash
+      run: |
+        mkdir -p "${{ inputs.output-dir }}"
+        cp -r blueprint/web "${{ inputs.output-dir }}/blueprint"
+        cp blueprint/print/print.pdf "${{ inputs.output-dir }}/blueprint.pdf"
+
+    # This action runs in Docker and can produce root-owned output. Keep it
+    # after packaging so it only writes into the pre-created component tree.
+    - name: Build homepage
+      uses: actions/jekyll-build-pages@v1
+      with:
+        source: home_page
+        destination: ${{ inputs.output-dir }}/homepage
