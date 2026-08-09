@@ -26,7 +26,7 @@ These scripts may have their own tests or workflows, but they are not part of th
 
 - `scripts/generate_badges.py` generates repository status badges in `.github/workflows/badges.yml`; it does not parse blueprint LaTeX or enforce blueprint/Lean sync.
 - `scripts/audit_conclusion_shaped_hypotheses.py`, `scripts/audit_readme_freshness.py`, `scripts/audit_stale_issues.py`, and `scripts/lean_linter_warning_report.py` are independent audit/reporting tools.
-- `scripts/deploy-to-gh-pages.sh` is a deployment helper, not a Python validation helper.
+- `scripts/assemble-pages-site.sh` and `scripts/fetch-latest-artifact.sh` support artifact-based Pages deployment; they are not Python validation helpers.
 - `scripts/Checkdecls.lean` is a Lean executable used by CI, so it is outside the Python-unit-test convention.
 
 ## Convention for new blueprint-support helpers

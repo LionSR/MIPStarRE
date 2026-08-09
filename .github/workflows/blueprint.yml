@@ -7,22 +7,26 @@ on:
     paths:
       - 'blueprint/src/**'
       - 'home_page/**'
+      - '.github/workflows/blueprint.yml'
+      - '.github/workflows/deploy-pages.yml'
+      - 'scripts/assemble-pages-site.sh'
+      - 'scripts/fetch-latest-artifact.sh'
   workflow_dispatch:
 
-# Serialize gh-pages deployments across blueprint/docgen workflows;
-# do not cancel in-progress deploys when new commits arrive.
+# Rapid pushes only need the newest build. Actual Pages deployments are
+# serialized by the reusable deployment workflow.
 concurrency:
-  group: gh-pages-deploy
-  cancel-in-progress: false
+  group: blueprint-build
+  cancel-in-progress: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   blueprint:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    name: Build and deploy blueprint
+    name: Build blueprint site component
     steps:
       - name: Checkout project
         uses: actions/checkout@v6
@@ -69,8 +73,33 @@ jobs:
             exit "$cmd_status"
           fi
 
-      - name: Deploy to gh-pages
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GITHUB_REPOSITORY: ${{ github.repository }}
-        run: ./scripts/deploy-to-gh-pages.sh --ci
+      - name: Package blueprint component
+        run: |
+          mkdir -p site-blueprint
+          cp -r blueprint/web site-blueprint/blueprint
+          cp blueprint/print/print.pdf site-blueprint/blueprint.pdf
+
+      # This action runs in Docker and can produce root-owned output. Keep it
+      # after packaging so it only writes into the pre-created component tree.
+      - name: Build homepage
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: home_page
+          destination: site-blueprint/homepage
+
+      - name: Upload blueprint component
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-blueprint
+          path: site-blueprint
+          retention-days: 30
+
+  deploy:
+    name: Deploy Pages site
+    needs: blueprint
+    uses: ./.github/workflows/deploy-pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+      actions: read
