@@ -130,12 +130,9 @@ private noncomputable def addCoordLeftEquiv (params : Parameters) [FieldModel pa
     (c : Fq params) : Fq params ≃ Fq params where
   toFun := fun x => addCoord c x
   invFun := fun y => subCoord y c
-  left_inv := by
-    intro x
+  left_inv := fun x => by
     simp [addCoord, subCoord, decode_encodeScalar]
-  right_inv := by
-    intro y
-    exact addCoord_subCoord_right y c
+  right_inv := fun y => addCoord_subCoord_right y c
 
 private lemma transportQuestionEquiv_symm_pair
     (params : Parameters) [FieldModel params.q]
