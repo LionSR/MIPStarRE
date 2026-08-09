@@ -46,6 +46,10 @@ SORRY_RE = re.compile(r"\bsorry\b")
 # exactly one ``sorry``; the companion repository replaces that hole with the
 # submitted proof. Additional holes in the same file must still count.
 INTENTIONAL_SORRY_PATH = "scripts/comparator/challenge_footer.lean"
+INTENTIONAL_SORRY_RE = re.compile(
+    r"(?ms)^\s*theorem\s+mainFormal\b.*?:=\s*by\s*\n\s*sorry\s*"
+    r"(?=\n\s*end\s+Test\b)"
+)
 AXIOM_RE = re.compile(
     r"(?m)^\s*"
     r"(?:@\[[^\]\n]*(?:\n\s*[^\]\n]*)*\]\s*)*"
@@ -67,14 +71,15 @@ def sorry_badge_count(repo_root: Path, lean_files: list[Path]) -> int:
     if intentional_path not in lean_files:
         raise RuntimeError(f"tracked challenge footer missing: {INTENTIONAL_SORRY_PATH}")
 
-    intentional_count = count_pattern([intentional_path], SORRY_RE)
-    if intentional_count < 1:
+    source = strip_comments_and_strings(intentional_path.read_text(encoding="utf-8"))
+    if len(INTENTIONAL_SORRY_RE.findall(source)) != 1:
         raise RuntimeError(
-            f"expected the intentional challenge sorry in {INTENTIONAL_SORRY_PATH}"
+            "expected mainFormal to end with the intentional challenge sorry in "
+            f"{INTENTIONAL_SORRY_PATH}"
         )
 
-    # Exempt one known challenge hole. Any additional hole, including another
-    # one in the challenge footer, remains in the repository-wide count.
+    # Exempt that one structurally identified hole. Every other hole remains in
+    # the repository-wide count, including unrelated holes in the same file.
     return count_pattern(lean_files, SORRY_RE) - 1
 
 

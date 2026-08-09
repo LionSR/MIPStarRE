@@ -108,19 +108,32 @@ class GenerateBadgesTests(unittest.TestCase):
             project_file.parent.mkdir(parents=True)
             challenge_file.parent.mkdir(parents=True)
             project_file.write_text("theorem openGoal : True := by sorry\n")
-            challenge_file.write_text("theorem challenge : True := by sorry\n")
+            challenge_file.write_text(
+                "namespace Test\n"
+                "theorem mainFormal : True := by\n"
+                "  sorry\n"
+                "end Test\n"
+            )
 
             files = tracked_lean_files(repo_root)
             self.assertEqual(sorry_badge_count(repo_root, files), 1)
 
             challenge_file.write_text(
-                "theorem challenge : True := by sorry\n"
+                "namespace Test\n"
                 "theorem accidental : True := by sorry\n"
+                "theorem mainFormal : True := by\n"
+                "  sorry\n"
+                "end Test\n"
             )
             self.assertEqual(sorry_badge_count(repo_root, files), 2)
 
-            challenge_file.write_text("theorem challenge : True := by trivial\n")
-            with self.assertRaisesRegex(RuntimeError, "expected the intentional"):
+            challenge_file.write_text(
+                "namespace Test\n"
+                "theorem mainFormal : True := by trivial\n"
+                "theorem accidental : True := by sorry\n"
+                "end Test\n"
+            )
+            with self.assertRaisesRegex(RuntimeError, "expected mainFormal"):
                 sorry_badge_count(repo_root, files)
 
 
