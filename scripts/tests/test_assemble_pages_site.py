@@ -13,19 +13,22 @@ SCRIPT = Path(__file__).resolve().parents[1] / "assemble-pages-site.sh"
 
 
 class AssemblePagesSiteTests(unittest.TestCase):
+    def _write_blueprint_component(self, components: Path) -> None:
+        blueprint = components / "site-blueprint"
+        (blueprint / "homepage").mkdir(parents=True)
+        (blueprint / "blueprint").mkdir()
+        (blueprint / "homepage" / "index.html").write_text("home")
+        (blueprint / "blueprint" / "index.html").write_text("blueprint")
+        (blueprint / "blueprint.pdf").write_text("pdf")
+
     def test_assembles_preserved_site_layout(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_dir:
             root = Path(tmp_dir)
             components = root / "components"
-            blueprint = components / "site-blueprint"
-            (blueprint / "homepage").mkdir(parents=True)
-            (blueprint / "blueprint").mkdir()
+            self._write_blueprint_component(components)
             (components / "site-docs" / "docs").mkdir(parents=True)
             (components / "site-badges").mkdir()
 
-            (blueprint / "homepage" / "index.html").write_text("home")
-            (blueprint / "blueprint" / "index.html").write_text("blueprint")
-            (blueprint / "blueprint.pdf").write_text("pdf")
             (components / "site-docs" / "docs" / "index.html").write_text("docs")
             (components / "site-badges" / "sorries.json").write_text("{}")
 
@@ -51,6 +54,31 @@ class AssemblePagesSiteTests(unittest.TestCase):
 
             self.assertNotEqual(result.returncode, 0)
             self.assertIn("site-blueprint component missing", result.stdout)
+
+    def test_rejects_missing_docs_or_badges_to_preserve_live_components(self) -> None:
+        for missing, expected in [
+            ("docs", "site-docs component missing"),
+            ("badges", "site-badges component missing"),
+        ]:
+            with self.subTest(missing=missing), tempfile.TemporaryDirectory() as tmp_dir:
+                root = Path(tmp_dir)
+                components = root / "components"
+                self._write_blueprint_component(components)
+                if missing != "docs":
+                    (components / "site-docs" / "docs").mkdir(parents=True)
+                if missing != "badges":
+                    badges = components / "site-badges"
+                    badges.mkdir()
+                    (badges / "sorries.json").write_text("{}")
+
+                result = subprocess.run(
+                    [SCRIPT, components, root / "site"],
+                    capture_output=True,
+                    text=True,
+                )
+
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(expected, result.stdout)
 
 
 if __name__ == "__main__":

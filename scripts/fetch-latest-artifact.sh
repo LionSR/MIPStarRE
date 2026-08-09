@@ -6,12 +6,19 @@
 # is available. Requires GH_TOKEN with actions:read on GITHUB_REPOSITORY.
 set -euo pipefail
 
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 NAME DEST_DIR" >&2
+  exit 2
+fi
+
 NAME="$1"
 DEST="$2"
 REPO="${GITHUB_REPOSITORY:?GITHUB_REPOSITORY must be set}"
 
 artifact_id="$(gh api "repos/${REPO}/actions/artifacts?name=${NAME}&per_page=100" \
-  --jq '[.artifacts[] | select(.expired | not)] | sort_by(.created_at) | last | .id // empty')"
+  | jq -r --arg name "$NAME" \
+      '[.artifacts[] | select(.name == $name and (.expired | not))]
+       | sort_by(.created_at) | last | .id // empty')"
 
 if [ -z "$artifact_id" ]; then
   echo "::warning::No non-expired artifact named '${NAME}' found"

@@ -4,9 +4,14 @@
 #
 # COMPONENTS_DIR may contain:
 #   site-blueprint/  Jekyll-built homepage, blueprint web, and PDF (required)
-#   site-docs/       doc-gen4 API documentation (optional)
-#   site-badges/     Shields.io endpoint JSON (optional)
+#   site-docs/       doc-gen4 API documentation (required)
+#   site-badges/     Shields.io endpoint JSON (required)
 set -euo pipefail
+
+if [ "$#" -ne 2 ]; then
+  echo "Usage: $0 COMPONENTS_DIR OUT_DIR" >&2
+  exit 2
+fi
 
 COMPONENTS="$1"
 OUT="$2"
@@ -27,6 +32,15 @@ if [ ! -f "$COMPONENTS/site-blueprint/blueprint.pdf" ]; then
   echo "::error::site-blueprint/blueprint.pdf missing — cannot assemble site"
   exit 1
 fi
+if [ ! -d "$COMPONENTS/site-docs/docs" ]; then
+  echo "::error::site-docs component missing — refusing to remove deployed API docs"
+  exit 1
+fi
+if [ ! -d "$COMPONENTS/site-badges" ] \
+    || ! find "$COMPONENTS/site-badges" -maxdepth 1 -name '*.json' -print -quit | grep -q .; then
+  echo "::error::site-badges component missing — refusing to remove deployed badge endpoints"
+  exit 1
+fi
 
 rm -rf "$OUT"
 mkdir -p "$OUT"
@@ -41,21 +55,12 @@ mkdir -p "$OUT/blueprint"
 cp -r "$COMPONENTS/site-blueprint/blueprint/." "$OUT/blueprint/"
 cp "$COMPONENTS/site-blueprint/blueprint.pdf" "$OUT/blueprint.pdf"
 
-if [ -d "$COMPONENTS/site-docs/docs" ]; then
-  echo "==> API docs..."
-  cp -r "$COMPONENTS/site-docs/docs" "$OUT/docs"
-else
-  echo "::warning::site-docs component missing — deploying without API docs"
-fi
+echo "==> API docs..."
+cp -r "$COMPONENTS/site-docs/docs" "$OUT/docs"
 
-if [ -d "$COMPONENTS/site-badges" ] \
-    && find "$COMPONENTS/site-badges" -maxdepth 1 -name '*.json' -print -quit | grep -q .; then
-  echo "==> Badges..."
-  mkdir -p "$OUT/badges"
-  cp "$COMPONENTS/site-badges"/*.json "$OUT/badges/"
-else
-  echo "::warning::site-badges component missing — deploying without badge endpoints"
-fi
+echo "==> Badges..."
+mkdir -p "$OUT/badges"
+cp "$COMPONENTS/site-badges"/*.json "$OUT/badges/"
 
 echo "==> Site assembled at $OUT"
 du -sh "$OUT"

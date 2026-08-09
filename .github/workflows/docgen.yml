@@ -131,20 +131,13 @@ jobs:
           cd docbuild
           lake build MIPStarRE:docs
 
-      - name: Package site components
-        run: |
-          mkdir -p site-blueprint site-docs
-          cp -r blueprint/web site-blueprint/blueprint
-          cp blueprint/print/print.pdf site-blueprint/blueprint.pdf
-          cp -r docbuild/.lake/build/doc site-docs/docs
+      - name: Package blueprint component
+        uses: ./.github/actions/package-blueprint-component
 
-      # This action runs in Docker and can produce root-owned output. Keep it
-      # after packaging so it only writes into the pre-created component tree.
-      - name: Build homepage
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: home_page
-          destination: site-blueprint/homepage
+      - name: Package docs component
+        run: |
+          mkdir -p site-docs
+          cp -r docbuild/.lake/build/doc site-docs/docs
 
       - name: Upload blueprint component
         uses: actions/upload-artifact@v4

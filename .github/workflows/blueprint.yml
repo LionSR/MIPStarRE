@@ -9,6 +9,7 @@ on:
       - 'home_page/**'
       - '.github/workflows/blueprint.yml'
       - '.github/workflows/deploy-pages.yml'
+      - '.github/actions/package-blueprint-component/action.yml'
       - 'scripts/assemble-pages-site.sh'
       - 'scripts/fetch-latest-artifact.sh'
   workflow_dispatch:
@@ -74,18 +75,7 @@ jobs:
           fi
 
       - name: Package blueprint component
-        run: |
-          mkdir -p site-blueprint
-          cp -r blueprint/web site-blueprint/blueprint
-          cp blueprint/print/print.pdf site-blueprint/blueprint.pdf
-
-      # This action runs in Docker and can produce root-owned output. Keep it
-      # after packaging so it only writes into the pre-created component tree.
-      - name: Build homepage
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: home_page
-          destination: site-blueprint/homepage
+        uses: ./.github/actions/package-blueprint-component
 
       - name: Upload blueprint component
         uses: actions/upload-artifact@v4

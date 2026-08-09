@@ -31,45 +31,30 @@ jobs:
           ./scripts/fetch-latest-artifact.sh site-docs components/site-docs
           ./scripts/fetch-latest-artifact.sh site-badges components/site-badges
 
-      # Transitional: preserve components from the legacy branch until each
-      # artifact has been published once. This becomes a no-op after the first
-      # successful blueprint, docgen, and badges runs, and can be removed after
-      # the github-pages branch is deleted.
+      # Transitional: preserve docs and badges from the legacy branch until
+      # their artifacts have each been published once. The blueprint component
+      # must always be Jekyll-built, so raw legacy homepage sources are never
+      # uploaded as static output. Remove this step after branch deletion.
       - name: Seed missing components from legacy github-pages branch
         run: |
-          if [ -d components/site-blueprint ] \
-              && [ -d components/site-docs ] \
-              && [ -d components/site-badges ]; then
+          if [ -d components/site-docs ] && [ -d components/site-badges ]; then
             exit 0
           fi
           if ! git ls-remote --exit-code --heads \
               "https://github.com/${GITHUB_REPOSITORY}.git" github-pages >/dev/null; then
-            echo "No github-pages branch; deploying without unavailable optional components"
+            echo "No github-pages branch; required artifact validation will decide whether deployment can continue"
             exit 0
           fi
           echo "==> Seeding missing components from legacy github-pages branch..."
           git clone --branch github-pages --single-branch --depth 1 \
             "https://github.com/${GITHUB_REPOSITORY}.git" legacy-site
-          if [ ! -d components/site-blueprint ] \
-              && [ -d legacy-site/blueprint ] \
-              && [ -f legacy-site/blueprint.pdf ]; then
-            mkdir -p components/site-blueprint/homepage
-            cp -r legacy-site/. components/site-blueprint/homepage/
-            rm -rf components/site-blueprint/homepage/.git \
-              components/site-blueprint/homepage/blueprint \
-              components/site-blueprint/homepage/docs \
-              components/site-blueprint/homepage/badges \
-              components/site-blueprint/homepage/blueprint.pdf
-            mv legacy-site/blueprint components/site-blueprint/blueprint
-            cp legacy-site/blueprint.pdf components/site-blueprint/blueprint.pdf
-          fi
           if [ ! -d components/site-docs ] && [ -d legacy-site/docs ]; then
             mkdir -p components/site-docs
             mv legacy-site/docs components/site-docs/docs
           fi
           if [ ! -d components/site-badges ] && [ -d legacy-site/badges ]; then
             mkdir -p components/site-badges
-            mv legacy-site/badges/. components/site-badges/
+            cp -r legacy-site/badges/. components/site-badges/
           fi
           rm -rf legacy-site
 
