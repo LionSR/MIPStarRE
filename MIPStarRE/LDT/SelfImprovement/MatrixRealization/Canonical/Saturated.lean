@@ -116,8 +116,8 @@ theorem matrixSdpCanonicalSaturateSlackBlockMatrix_feasible
     (X : MatrixOperator (matrixSdpCanonicalBlockHilbertSpace params model))
     (hX : MatrixSdpCanonicalPrimalFeasible params model X) :
     MatrixSdpCanonicalPrimalFeasible params model
-      (matrixSdpCanonicalSaturateSlackBlockMatrix params model X) where
-  nonnegative := by
+      (matrixSdpCanonicalSaturateSlackBlockMatrix params model X) :=
+  have hnonnegative : 0 ≤ matrixSdpCanonicalSaturateSlackBlockMatrix params model X := by
     rw [matrixSdpCanonicalSaturateSlackBlockMatrix]
     refine matrixSdpCanonicalBlockDiagonal_nonneg params model
       (matrixSdpCanonicalSaturateSlackBlockFamily params model X) ?_
@@ -135,7 +135,8 @@ theorem matrixSdpCanonicalSaturateSlackBlockMatrix_feasible
             matrixSdpCanonicalDiagonalBlock_nonneg params model hX.nonnegative none
           simpa [hg] using add_nonneg hsome hnone
         · simpa [hg] using hsome
-  constraintEqOne := by
+  have hconstraintEqOne : matrixSdpCanonicalConstraintOperator params model
+      (matrixSdpCanonicalSaturateSlackBlockMatrix params model X) = 1 := by
     classical
     have hconstraint :
         matrixSdpCanonicalDiagonalBlock params model X none +
@@ -145,8 +146,7 @@ theorem matrixSdpCanonicalSaturateSlackBlockMatrix_feasible
       simpa [matrixSdpCanonicalConstraintOperator, Fintype.sum_option] using
         hX.constraintEqOne
     rw [matrixSdpCanonicalSaturateSlackBlockMatrix,
-      matrixSdpCanonicalConstraintOperator_blockDiagonal]
-    rw [Fintype.sum_option]
+      matrixSdpCanonicalConstraintOperator_blockDiagonal, Fintype.sum_option]
     simp only [matrixSdpCanonicalSaturateSlackBlockFamily_none,
       matrixSdpCanonicalSaturateSlackBlockFamily_some, zero_add]
     rw [Finset.sum_add_distrib]
@@ -162,8 +162,8 @@ theorem matrixSdpCanonicalSaturateSlackBlockMatrix_feasible
         simp [hg]
       · intro hnot
         simp at hnot
-    rw [hsingle]
-    simpa [add_comm, add_left_comm, add_assoc] using hconstraint
+    simpa [hsingle, add_comm, add_left_comm, add_assoc] using hconstraint
+  { nonnegative := hnonnegative, constraintEqOne := hconstraintEqOne }
 
 /-- Exact objective formula for source-faithful slack saturation.
 
@@ -357,12 +357,12 @@ theorem matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness
     matrixSdpPrimalTotalEqOne_of_canonicalSlackOperator_eq_zero params model T hSlack
   dualFeasible := hdual
   strongDuality := hstrong
-  complementarySlackness := by
-    intro g
+  complementarySlackness :=
+    fun g =>
     have hzero :
         matrixSdpComplementarySlacknessDefect params model T Z g = 0 :=
       matrixSdpComplementarySlacknessDefect_of_canonical params model T Z hcanonical g
-    exact sub_eq_zero.mp (by
+    sub_eq_zero.mp (by
       simpa [matrixSdpComplementarySlacknessDefect, matrixSdpDualSlackOperator,
         Matrix.mul_sub] using hzero)
 
@@ -434,11 +434,11 @@ theorem matrixSdpStatementWithSlackness_of_canonicalSaturatedComplementarySlackn
         0)
     (hSlack : matrixSdpCanonicalSlackOperator params model T = 0) :
     MatrixSdpStatementWithSlackness params model where
-  witness := by
+  witness :=
     let hopt :=
       matrixSdpOptimalWitness_of_canonicalSaturatedComplementarySlackness
         params model T Z hdual hstrong hcanonical hSlack
-    exact ⟨hopt.primalMeasurement, Z, by
+    ⟨hopt.primalMeasurement, Z, by
       simpa [MatrixSdpOptimalWitness.primalMeasurement,
         MIPStarRE.Quantum.Measurement.ofSumEqOne] using hopt⟩
 
@@ -469,11 +469,11 @@ theorem matrixSdpStatementWithSlackness_of_canonicalFeasibleSaturatedComplementa
         0)
     (hSlack : matrixSdpCanonicalDiagonalBlock params model X none = 0) :
     MatrixSdpStatementWithSlackness params model where
-  witness := by
+  witness :=
     let hopt :=
       matrixSdpOptimalWitness_of_canonicalFeasibleSaturatedComplementarySlackness
         params model X hX Z hdual hstrong hcanonical hSlack
-    exact ⟨hopt.primalMeasurement, Z, by
+    ⟨hopt.primalMeasurement, Z, by
       simpa [MatrixSdpOptimalWitness.primalMeasurement,
         MIPStarRE.Quantum.Measurement.ofSumEqOne] using hopt⟩
 
