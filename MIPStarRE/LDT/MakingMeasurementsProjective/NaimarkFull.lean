@@ -16,6 +16,13 @@ open MIPStarRE.LDT
 
 universe u
 
+private theorem idxSubMeas_outcome_sum_le_one
+    {Question Outcome ι : Type*}
+    [Fintype Outcome] [Fintype ι] [DecidableEq ι]
+    (A : IdxSubMeas Question Outcome ι) (x : Question) :
+    ∑ a, (A x).outcome a ≤ 1 := by
+  simpa [(A x).sum_eq_total] using (A x).total_le_one
+
 /-! ### Questionwise Naimark dilation interface -/
 
 /-- The one-measurement Naimark dilation attached to a single question.
@@ -35,8 +42,7 @@ noncomputable def questionwiseOneMeasNaimarkData
   Classical.choose <| oneMeasNaimark ({
     effect := (A x).outcome
     pos := (A x).outcome_pos
-    sum_le_one := by
-      simpa [(A x).sum_eq_total] using (A x).total_le_one
+    sum_le_one := idxSubMeas_outcome_sum_le_one A x
   } : MIPStarRE.Quantum.Submeasurement Outcome ι)
 
 /-- The questionwise Naimark data is attached to the intended source
@@ -52,8 +58,7 @@ theorem questionwiseOneMeasNaimarkData_source_effect
       Classical.choose_spec <| oneMeasNaimark ({
         effect := (A x).outcome
         pos := (A x).outcome_pos
-        sum_le_one := by
-          simpa [(A x).sum_eq_total] using (A x).total_le_one
+        sum_le_one := idxSubMeas_outcome_sum_le_one A x
       } : MIPStarRE.Quantum.Submeasurement Outcome ι)
 
 /-- Lean-only questionwise Naimark interface.
@@ -309,15 +314,13 @@ theorem naimarkTensorProductCorrelation
     fun x => Classical.choose <| oneMeasNaimark ({
       effect := (A x).outcome
       pos := (A x).outcome_pos
-      sum_le_one := by
-        simpa [(A x).sum_eq_total] using (A x).total_le_one
+      sum_le_one := idxSubMeas_outcome_sum_le_one A x
     } : MIPStarRE.Quantum.Submeasurement OutcomeA HA.carrier)
   let rightData : (y : QuestionB) → OneMeasNaimarkData OutcomeB HB.carrier :=
     fun y => Classical.choose <| oneMeasNaimark ({
       effect := (B y).outcome
       pos := (B y).outcome_pos
-      sum_le_one := by
-        simpa [(B y).sum_eq_total] using (B y).total_le_one
+      sum_le_one := idxSubMeas_outcome_sum_le_one B y
     } : MIPStarRE.Quantum.Submeasurement OutcomeB HB.carrier)
   have hleft : ∀ x : QuestionA, (leftData x).source.effect = (A x).outcome := by
     intro x
@@ -325,8 +328,7 @@ theorem naimarkTensorProductCorrelation
       Classical.choose_spec <| oneMeasNaimark ({
         effect := (A x).outcome
         pos := (A x).outcome_pos
-        sum_le_one := by
-          simpa [(A x).sum_eq_total] using (A x).total_le_one
+        sum_le_one := idxSubMeas_outcome_sum_le_one A x
       } : MIPStarRE.Quantum.Submeasurement OutcomeA HA.carrier)
   have hright : ∀ y : QuestionB, (rightData y).source.effect = (B y).outcome := by
     intro y
@@ -334,8 +336,7 @@ theorem naimarkTensorProductCorrelation
       Classical.choose_spec <| oneMeasNaimark ({
         effect := (B y).outcome
         pos := (B y).outcome_pos
-        sum_le_one := by
-          simpa [(B y).sum_eq_total] using (B y).total_le_one
+        sum_le_one := idxSubMeas_outcome_sum_le_one B y
       } : MIPStarRE.Quantum.Submeasurement OutcomeB HB.carrier)
   have hauxLeft : auxLeft.IsNormalized := by
     simpa [auxLeft, HauxA] using oneNaimarkAuxState_isNormalized OutcomeA
@@ -358,8 +359,7 @@ theorem naimarkTensorProductCorrelation
       naimarkProductExtensionState_isNormalized HA HB HauxA HauxB hψ hauxState
     left := fun x => (leftData x).toProjSubMeas
     right := fun y => (rightData y).toProjSubMeas
-    correlation_preservation := by
-      intro x y a b
+    correlation_preservation := fun x y a b => by
       simpa [HauxA, HauxB, auxLeft, auxRight, auxState, hleft x, hright y] using
         OneMeasNaimarkData.twoSidedCorrelationPreservation HA HB ψ
           (leftData x) (rightData y) a b
