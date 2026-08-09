@@ -135,14 +135,10 @@ private noncomputable def finSigmaProjMeas (n : ℕ) (m : Fin n → ℕ) :
   outcome := fun i =>
     Matrix.diagonal fun x : ULift.{uι} (Σ i : Fin n, Fin (m i)) => if x.down.1 = i then 1 else 0
   total := 1
-  outcome_pos := by
-    intro i
-    refine Matrix.nonneg_iff_posSemidef.mpr ?_
-    exact Matrix.PosSemidef.diagonal <| by
-      intro x
+  outcome_pos := fun i =>
+    Matrix.nonneg_iff_posSemidef.mpr <| Matrix.PosSemidef.diagonal fun x => by
       by_cases hx : x.down.1 = i <;> simp [hx]
-  sum_eq_total := by
-    ext x y
+  sum_eq_total := Matrix.ext fun x y => by
     rw [Matrix.sum_apply]
     by_cases hxy : x = y
     · subst hxy
@@ -150,8 +146,7 @@ private noncomputable def finSigmaProjMeas (n : ℕ) (m : Fin n → ℕ) :
     · simp [hxy]
   total_le_one := le_rfl
   total_eq_one := rfl
-  proj := by
-    intro i
+  proj := fun i => by
     rw [Matrix.diagonal_mul_diagonal]
     ext x y
     by_cases hxy : x = y
@@ -200,14 +195,10 @@ noncomputable def sigmaProjMeas {Outcome : Type uOutcome}
   outcome := fun a =>
     Matrix.diagonal fun x : Σ a : Outcome, Fin (m a) => if x.1 = a then 1 else 0
   total := 1
-  outcome_pos := by
-    intro a
-    refine Matrix.nonneg_iff_posSemidef.mpr ?_
-    exact Matrix.PosSemidef.diagonal <| by
-      intro x
+  outcome_pos := fun a =>
+    Matrix.nonneg_iff_posSemidef.mpr <| Matrix.PosSemidef.diagonal fun x => by
       by_cases hx : x.1 = a <;> simp [hx]
-  sum_eq_total := by
-    ext x y
+  sum_eq_total := Matrix.ext fun x y => by
     rw [Matrix.sum_apply]
     by_cases hxy : x = y
     · subst hxy
@@ -215,8 +206,7 @@ noncomputable def sigmaProjMeas {Outcome : Type uOutcome}
     · simp [hxy]
   total_le_one := le_rfl
   total_eq_one := rfl
-  proj := by
-    intro a
+  proj := fun a => by
     rw [Matrix.diagonal_mul_diagonal]
     ext x y
     by_cases hxy : x = y
@@ -657,15 +647,13 @@ noncomputable def pointProjMeas {Outcome : Type uOutcome}
     ProjMeas Outcome (ULift.{uι} Unit) where
   outcome := fun a => if a = a0 then 1 else 0
   total := 1
-  outcome_pos := by
-    intro a
+  outcome_pos := fun a => by
     by_cases h : a = a0 <;> simp [h]
-  sum_eq_total := by
+  sum_eq_total := Matrix.ext fun _ _ => by
     simp [eq_comm, Finset.sum_ite_eq]
   total_le_one := le_rfl
   total_eq_one := rfl
-  proj := by
-    intro a
+  proj := fun a => by
     by_cases h : a = a0 <;> simp [h]
 
 /-- The lifted finite-enumeration model of `Σ a, Fin (m a)` has cardinality
@@ -700,22 +688,23 @@ theorem RankReductionWitness.toSigmaRangeQLayer
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))] :
-    RankReductionWitness ψ A ζ (sigmaRangeQLayer qLayer.q) where
-  projective := by
-    simpa [sigmaRangeQLayer, Qa] using hRank.projective
-  outcome_nonneg := by
-    simpa [sigmaRangeQLayer, Qa] using hRank.outcome_nonneg
-  sum_eq_total := by
-    simpa [sigmaRangeQLayer, Qa, QTotal] using hRank.sum_eq_total
-  source_almost_projective := hRank.source_almost_projective
-  closeness := by
-    simpa [sigmaRangeQLayer] using hRank.closeness
-  total_le := by
-    simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
-  totalRank_le := by
-    simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
-  auxDim_le := by
-    change Fintype.card (sigmaRangeCarrier qLayer.q) ≤ Fintype.card ι
+    RankReductionWitness ψ A ζ (sigmaRangeQLayer qLayer.q) := by
+  refine
+    { projective := fun a => by
+        simpa [sigmaRangeQLayer, Qa] using hRank.projective a
+      outcome_nonneg := fun a => by
+        simpa [sigmaRangeQLayer, Qa] using hRank.outcome_nonneg a
+      sum_eq_total := ?_
+      source_almost_projective := hRank.source_almost_projective
+      closeness := ?_
+      total_le := ?_
+      totalRank_le := ?_
+      auxDim_le := ?_ }
+  · simpa [sigmaRangeQLayer, Qa, QTotal] using hRank.sum_eq_total
+  · simpa [sigmaRangeQLayer] using hRank.closeness
+  · simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
+  · simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
+  · change Fintype.card (sigmaRangeCarrier qLayer.q) ≤ Fintype.card ι
     rw [Fintype.card_ulift]
     exact sigmaFinCard_le_of_sum_le
       (m := fun a : Outcome => (qLayer.q.outcome a).rank)
