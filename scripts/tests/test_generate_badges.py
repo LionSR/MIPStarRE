@@ -19,7 +19,7 @@ from generate_badges import (  # noqa: E402
     SORRY_RE,
     _blueprint_badge_counts,
     count_pattern,
-    sorry_badge_files,
+    sorry_badge_count,
     tracked_lean_files,
 )
 
@@ -94,33 +94,34 @@ class GenerateBadgesTests(unittest.TestCase):
         self.assertEqual(count, 4)
 
     @mock.patch("generate_badges.subprocess.check_output")
-    def test_only_sorry_input_excludes_intentional_comparator_challenge(
+    def test_sorry_count_exempts_exactly_one_comparator_challenge_hole(
         self, check_output: mock.Mock
     ) -> None:
-        repo_root = Path("/repo")
         check_output.return_value = (
-            "MIPStarRE/Complete.lean\n"
+            "MIPStarRE/Incomplete.lean\n"
             "scripts/comparator/challenge_footer.lean\n"
-            "scripts/comparator/extract_closure.lean\n"
         )
+        with tempfile.TemporaryDirectory() as tmp_dir:
+            repo_root = Path(tmp_dir)
+            project_file = repo_root / "MIPStarRE/Incomplete.lean"
+            challenge_file = repo_root / "scripts/comparator/challenge_footer.lean"
+            project_file.parent.mkdir(parents=True)
+            challenge_file.parent.mkdir(parents=True)
+            project_file.write_text("theorem openGoal : True := by sorry\n")
+            challenge_file.write_text("theorem challenge : True := by sorry\n")
 
-        files = tracked_lean_files(repo_root)
+            files = tracked_lean_files(repo_root)
+            self.assertEqual(sorry_badge_count(repo_root, files), 1)
 
-        self.assertEqual(
-            files,
-            [
-                Path("/repo/MIPStarRE/Complete.lean"),
-                Path("/repo/scripts/comparator/challenge_footer.lean"),
-                Path("/repo/scripts/comparator/extract_closure.lean"),
-            ],
-        )
-        self.assertEqual(
-            sorry_badge_files(repo_root, files),
-            [
-                Path("/repo/MIPStarRE/Complete.lean"),
-                Path("/repo/scripts/comparator/extract_closure.lean"),
-            ],
-        )
+            challenge_file.write_text(
+                "theorem challenge : True := by sorry\n"
+                "theorem accidental : True := by sorry\n"
+            )
+            self.assertEqual(sorry_badge_count(repo_root, files), 2)
+
+            challenge_file.write_text("theorem challenge : True := by trivial\n")
+            with self.assertRaisesRegex(RuntimeError, "expected the intentional"):
+                sorry_badge_count(repo_root, files)
 
 
 class BlueprintBadgeCountsTests(unittest.TestCase):

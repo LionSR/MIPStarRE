@@ -43,9 +43,9 @@ from pathlib import Path
 
 SORRY_RE = re.compile(r"\bsorry\b")
 # Comparator challenge scaffolding deliberately presents the target theorem with
-# ``sorry``; the companion repository replaces it with the submitted proof.
-# It is therefore an audit fixture, not project proof debt.
-BADGE_EXCLUDED_LEAN_PATHS = frozenset({"scripts/comparator/challenge_footer.lean"})
+# exactly one ``sorry``; the companion repository replaces that hole with the
+# submitted proof. Additional holes in the same file must still count.
+INTENTIONAL_SORRY_PATH = "scripts/comparator/challenge_footer.lean"
 AXIOM_RE = re.compile(
     r"(?m)^\s*"
     r"(?:@\[[^\]\n]*(?:\n\s*[^\]\n]*)*\]\s*)*"
@@ -61,13 +61,21 @@ def tracked_lean_files(repo_root: Path) -> list[Path]:
     return [repo_root / line for line in output.splitlines() if line]
 
 
-def sorry_badge_files(repo_root: Path, lean_files: list[Path]) -> list[Path]:
-    """Exclude intentional challenge holes without weakening axiom counting."""
-    return [
-        path
-        for path in lean_files
-        if path.relative_to(repo_root).as_posix() not in BADGE_EXCLUDED_LEAN_PATHS
-    ]
+def sorry_badge_count(repo_root: Path, lean_files: list[Path]) -> int:
+    """Count proof debt after validating and subtracting one challenge hole."""
+    intentional_path = repo_root / INTENTIONAL_SORRY_PATH
+    if intentional_path not in lean_files:
+        raise RuntimeError(f"tracked challenge footer missing: {INTENTIONAL_SORRY_PATH}")
+
+    intentional_count = count_pattern([intentional_path], SORRY_RE)
+    if intentional_count < 1:
+        raise RuntimeError(
+            f"expected the intentional challenge sorry in {INTENTIONAL_SORRY_PATH}"
+        )
+
+    # Exempt one known challenge hole. Any additional hole, including another
+    # one in the challenge footer, remains in the repository-wide count.
+    return count_pattern(lean_files, SORRY_RE) - 1
 
 
 def strip_comments_and_strings(source: str) -> str:
@@ -267,7 +275,7 @@ def main() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     lean_files = tracked_lean_files(repo_root)
 
-    sorry_count = count_pattern(sorry_badge_files(repo_root, lean_files), SORRY_RE)
+    sorry_count = sorry_badge_count(repo_root, lean_files)
     axiom_count = count_pattern(lean_files, AXIOM_RE)
 
     badge_records = {
