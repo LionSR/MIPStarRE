@@ -68,14 +68,19 @@ structure PureState (ι : Type*) [Fintype ι] [DecidableEq ι] [Nonempty ι] whe
 
 namespace PureState
 
+/-- The coordinate-basis vector has unit self-dot product. -/
+private theorem basis_unit {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
+    (i : ι) :
+    star (fun j => if j = i then (1 : ℂ) else 0) ⬝ᵥ
+        (fun j => if j = i then (1 : ℂ) else 0) = 1 := by
+  rw [dotProduct]
+  simp
+
 /-- The coordinate-basis pure state at a distinguished basis vector. -/
 noncomputable def basis {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (i : ι) : PureState ι where
   vector := fun j => if j = i then 1 else 0
-  unit := by
-    classical
-    rw [dotProduct]
-    simp
+  unit := basis_unit i
 
 /-- The density matrix represented by a pure-state witness. -/
 noncomputable def density {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]

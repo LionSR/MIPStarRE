@@ -371,48 +371,43 @@ noncomputable instance {params : Parameters} [FieldModel params.q] :
   ⟨Polynomial.toFun⟩
 end Polynomial
 
--- source: MIPStarRE/LDT/Basic/QuantumState.lean:168-171  (MIPStarRE.LDT.ev)
+-- source: MIPStarRE/LDT/Basic/QuantumState.lean:173-176  (MIPStarRE.LDT.ev)
 /-- The expectation `Re τ(ψ X)`. Dimensions match by construction. -/
 noncomputable def ev {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState ι) (X : MIPStarRE.Quantum.Op ι) : Error :=
   Complex.re <| MIPStarRE.Quantum.normalizedTrace (ψ.density * X)
 
--- source: MIPStarRE/LDT/Basic/QuantumState.lean:180-184  (MIPStarRE.LDT.opTensor)
+-- source: MIPStarRE/LDT/Basic/QuantumState.lean:185-189  (MIPStarRE.LDT.opTensor)
 /-- Tensor product of two operators via Kronecker product. -/
 abbrev opTensor {ι₁ ι₂ : Type*} [Fintype ι₁] [DecidableEq ι₁] [Fintype ι₂] [DecidableEq ι₂]
     (A : MIPStarRE.Quantum.Op ι₁) (B : MIPStarRE.Quantum.Op ι₂) :
     MIPStarRE.Quantum.Op (ι₁ × ι₂) :=
   Matrix.kronecker A B
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:224-226  (MIPStarRE.LDT.avgOver)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:218-220  (MIPStarRE.LDT.avgOver)
 /-- Average a scalar function against the stored finite support of a distribution. -/
 def avgOver {α : Type*} (𝒟 : Distribution α) (f : α → Error) : Error :=
   ∑ a ∈ 𝒟.support, 𝒟.weight a * f a
 namespace Distribution
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:412-430  (MIPStarRE.LDT.Distribution.uniformOnFinset)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:404-417  (MIPStarRE.LDT.Distribution.uniformOnFinset)
 /-- The uniform distribution on a specified finite support.
 
 The stored support is `s`, and the weight of a point is the elementary finite
 uniform weight `1 / s.card` on `s` and `0` off `s`.  When the support is empty
 this gives the zero sub-probability distribution, matching the convention used
 for degenerate filtered supports in the LDT development. -/
-noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α := by
-  classical
-  exact
-    { support := s
-      weight := fun a => if a ∈ s then 1 / (s.card : Error) else 0
-      nonnegative := by
-        intro a
-        by_cases ha : a ∈ s
-        · simp [ha]
-        · simp [ha]
-      outsideSupport := by
-        intro a ha
-        simp [ha] }
+noncomputable def uniformOnFinset {α : Type*} (s : Finset α) : Distribution α :=
+  letI := Classical.decEq α
+  { support := s
+    weight := fun a => if a ∈ s then 1 / (s.card : Error) else 0
+    nonnegative := fun _ => by
+      split_ifs <;> positivity
+    outsideSupport := fun _ ha => by
+      simp [ha] }
 end Distribution
 
--- source: MIPStarRE/LDT/Basic/Distribution.lean:492-495  (MIPStarRE.LDT.uniformDistribution)
+-- source: MIPStarRE/LDT/Basic/Distribution.lean:479-482  (MIPStarRE.LDT.uniformDistribution)
 /-- The uniform distribution on a nonempty finite type. -/
 noncomputable def uniformDistribution (α : Type*)
     [Fintype α] [DecidableEq α] [Nonempty α] : Distribution α :=
