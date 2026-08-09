@@ -58,10 +58,15 @@ def tracked_lean_files(repo_root: Path) -> list[Path]:
     output = subprocess.check_output(
         ["git", "ls-files", "*.lean"], cwd=repo_root, text=True
     )
+    return [repo_root / line for line in output.splitlines() if line]
+
+
+def sorry_badge_files(repo_root: Path, lean_files: list[Path]) -> list[Path]:
+    """Exclude intentional challenge holes without weakening axiom counting."""
     return [
-        repo_root / line
-        for line in output.splitlines()
-        if line and line not in BADGE_EXCLUDED_LEAN_PATHS
+        path
+        for path in lean_files
+        if path.relative_to(repo_root).as_posix() not in BADGE_EXCLUDED_LEAN_PATHS
     ]
 
 
@@ -262,7 +267,7 @@ def main() -> None:
     repo_root = Path(__file__).resolve().parents[1]
     lean_files = tracked_lean_files(repo_root)
 
-    sorry_count = count_pattern(lean_files, SORRY_RE)
+    sorry_count = count_pattern(sorry_badge_files(repo_root, lean_files), SORRY_RE)
     axiom_count = count_pattern(lean_files, AXIOM_RE)
 
     badge_records = {
