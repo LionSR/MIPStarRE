@@ -54,20 +54,17 @@ noncomputable def matrixSdpPointRealizationOfStrategy (params : Parameters)
     carrier := ι
     instFintype := inferInstance
     instDecidableEq := inferInstance
-    instNonempty := by
-      rcases strategy.isNormalized.nonempty with ⟨x⟩
-      exact ⟨x.1⟩
+    instNonempty := ⟨(Classical.choice strategy.isNormalized.nonempty).1⟩
   }
   state := {
     matrix := 0
-    positive := by simp
+    positive := le_rfl
   }
   pointMeasurement := fun u => {
     effect := fun a => (strategy.pointMeasurement u).toSubMeas.outcome a
     pos := fun a => (strategy.pointMeasurement u).toSubMeas.outcome_pos a
-    sum_le_one := by
-      rw [(strategy.pointMeasurement u).toSubMeas.sum_eq_total]
-      exact le_of_eq (strategy.pointMeasurement u).total_eq_one
+    sum_le_one := le_of_eq ((strategy.pointMeasurement u).toSubMeas.sum_eq_total.trans
+      (strategy.pointMeasurement u).total_eq_one)
   }
 
 /-- The averaged point operator for the point-measurement matrix realization is
@@ -170,8 +167,8 @@ theorem ofFeasibleStrongDualitySaturateSlackBlock
     complementarySlackness :=
       matrixSdpCanonicalComplementarySlackness_of_strongDuality
         params model Xsat hXsat Z hdual hstrongSat
-    slackBlock_eq_zero := by
-      simp }
+    slackBlock_eq_zero :=
+      matrixSdpCanonicalDiagonalBlock_saturateSlackBlockMatrix_none params model X }
 
 /-- A saturated canonical optimal pair gives the matrix-level slackness
 statement without adding the auxiliary dominance condition. -/
@@ -200,22 +197,23 @@ theorem toSdpOptimalPairWithSlackness
     {Z : MIPStarRE.Quantum.Op ι}
     (h : MatrixSdpOptimalWitness params
       (matrixSdpPointRealizationOfStrategy params strategy) T Z) :
-    SdpOptimalPairWithSlackness params strategy (MatrixSubmeasurement.toSubMeas T) Z where
-  toSdpOptimalPair := {
-    primalTotalOperator := by
-      change (∑ g : Polynomial params, T.effect g) = (1 : MIPStarRE.Quantum.Op ι)
-      exact h.primalTotalEqOne
-    dualFeasible := by
-      intro g
-      rw [← matrixSdpDualSlackOperator_ofPointRealization params strategy Z g]
-      exact h.dualFeasible g
-  }
-  complementarySlackness := by
+    SdpOptimalPairWithSlackness params strategy (MatrixSubmeasurement.toSubMeas T) Z := by
+  have hSlack :
+      ∀ g : Polynomial params,
+        sdpComplementarySlacknessEquation params strategy
+          (MatrixSubmeasurement.toSubMeas T) Z g := by
     intro g
     dsimp [MatrixSubmeasurement.toSubMeas, sdpComplementarySlacknessEquation,
       sdpDualSlackOperator, matrixSdpPointRealizationOfStrategy]
     rw [← matrixAveragedPointOperator_ofPointRealization params strategy g]
     exact h.complementarySlacknessEquation g
+  exact {
+    toSdpOptimalPair := {
+      primalTotalOperator := h.primalTotalEqOne
+      dualFeasible := fun g =>
+        (matrixSdpDualSlackOperator_ofPointRealization params strategy Z g).symm ▸ h.dualFeasible g
+    }
+    complementarySlackness := hSlack }
 
 end MatrixSdpOptimalWitness
 
