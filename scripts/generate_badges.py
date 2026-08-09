@@ -47,9 +47,6 @@ SORRY_RE = re.compile(r"\bsorry\b")
 # submitted proof. Additional holes in the same file must still count.
 INTENTIONAL_SORRY_PATH = "scripts/comparator/challenge_footer.lean"
 MAIN_FORMAL_DECL_RE = re.compile(r"(?m)^theorem\s+mainFormal\b")
-NEXT_TOP_LEVEL_DECL_RE = re.compile(
-    r"(?m)^(?:theorem|lemma|def|abbrev|instance|structure|class|inductive|end)\b"
-)
 AXIOM_RE = re.compile(
     r"(?m)^\s*"
     r"(?:@\[[^\]\n]*(?:\n\s*[^\]\n]*)*\]\s*)*"
@@ -70,13 +67,16 @@ def main_formal_has_intentional_sorry(source: str) -> bool:
     declaration = MAIN_FORMAL_DECL_RE.search(source)
     if declaration is None:
         return False
-    next_declaration = NEXT_TOP_LEVEL_DECL_RE.search(source, declaration.end())
-    block_end = next_declaration.start() if next_declaration is not None else len(source)
-    block_lines = [
-        line.strip()
-        for line in source[declaration.start():block_end].splitlines()
-        if line.strip()
-    ]
+    declaration_lines = source[declaration.start():].splitlines()
+    block = [declaration_lines[0]]
+    for line in declaration_lines[1:]:
+        # The generated footer keeps declaration continuations and tactic lines
+        # indented. Any nonblank column-zero command starts a new Lean command,
+        # regardless of its introducer (`theorem`, `example`, `opaque`, ...).
+        if line and not line[0].isspace():
+            break
+        block.append(line)
+    block_lines = [line.strip() for line in block if line.strip()]
     return (
         len(block_lines) >= 2
         and block_lines[-2].endswith(":= by")
