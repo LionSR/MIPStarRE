@@ -688,22 +688,23 @@ theorem RankReductionWitness.toSigmaRangeQLayer
     (hRank : RankReductionWitness ψ A ζ qLayer)
     [Nonempty (FiniteHilbertSpace.sigmaFinCarrier
       (fun a : Outcome => (qLayer.q.outcome a).rank))] :
-    RankReductionWitness ψ A ζ (sigmaRangeQLayer qLayer.q) where
-  projective := fun a => by
-    simpa [sigmaRangeQLayer, Qa] using hRank.projective a
-  outcome_nonneg := fun a => by
-    simpa [sigmaRangeQLayer, Qa] using hRank.outcome_nonneg a
-  sum_eq_total := show _ from by
-    simpa [sigmaRangeQLayer, Qa, QTotal] using hRank.sum_eq_total
-  source_almost_projective := hRank.source_almost_projective
-  closeness := show _ from by
-    simpa [sigmaRangeQLayer] using hRank.closeness
-  total_le := show _ from by
-    simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
-  totalRank_le := show _ from by
-    simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
-  auxDim_le := show _ from by
-    change Fintype.card (sigmaRangeCarrier qLayer.q) ≤ Fintype.card ι
+    RankReductionWitness ψ A ζ (sigmaRangeQLayer qLayer.q) := by
+  refine
+    { projective := fun a => by
+        simpa [sigmaRangeQLayer, Qa] using hRank.projective a
+      outcome_nonneg := fun a => by
+        simpa [sigmaRangeQLayer, Qa] using hRank.outcome_nonneg a
+      sum_eq_total := ?_
+      source_almost_projective := hRank.source_almost_projective
+      closeness := ?_
+      total_le := ?_
+      totalRank_le := ?_
+      auxDim_le := ?_ }
+  · simpa [sigmaRangeQLayer, Qa, QTotal] using hRank.sum_eq_total
+  · simpa [sigmaRangeQLayer] using hRank.closeness
+  · simpa [sigmaRangeQLayer, QTotal] using hRank.total_le
+  · simpa [sigmaRangeQLayer, Qa] using hRank.totalRank_le
+  · change Fintype.card (sigmaRangeCarrier qLayer.q) ≤ Fintype.card ι
     rw [Fintype.card_ulift]
     exact sigmaFinCard_le_of_sum_le
       (m := fun a : Outcome => (qLayer.q.outcome a).rank)
