@@ -127,16 +127,16 @@ noncomputable def axisParallelLinePointParamEquiv (params : Parameters)
         direction := st.1.2 } : AxisParallelLine params), st.2)
   left_inv := fun
     | ⟨⟨base, direction⟩, t⟩ => by
-            simp only [Prod.mk.injEq, AxisParallelLine.mk.injEq, and_true]
-            funext j
-            by_cases hj : j = direction <;>
-              simp [AxisParallelLine.pointAt, hj, subCoord_addCoord_right]
+      simp only [Prod.mk.injEq, AxisParallelLine.mk.injEq, and_true]
+      funext j
+      by_cases hj : j = direction <;>
+        simp [AxisParallelLine.pointAt, hj, subCoord_addCoord_right]
   right_inv := fun
     | ⟨⟨u, direction⟩, t⟩ => by
-            simp only [Prod.mk.injEq, and_true]
-            ext j
-            by_cases hj : j = direction <;>
-              simp [AxisParallelLine.pointAt, hj]
+      simp only [Prod.mk.injEq, and_true]
+      ext j
+      by_cases hj : j = direction <;>
+        simp [AxisParallelLine.pointAt, hj]
 
 /-- Marginalizing the uniform line/parameter presentation to the sampled point
 and direction gives the native axis-parallel base-point test distribution. -/
