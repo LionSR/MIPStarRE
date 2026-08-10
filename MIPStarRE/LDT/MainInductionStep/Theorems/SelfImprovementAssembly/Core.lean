@@ -60,6 +60,8 @@ theorem mainInductionOfWitness
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
+/-- Convert same-register closeness of a projective submeasurement into bipartite strong
+self-consistency. -/
 private theorem strongSelfConsistency_of_sddRel
     (params : Parameters) [FieldModel params.q] (strategy : SymStrat params ι)
     (eps delta gamma : Error) (H : ProjSubMeas (Polynomial params) ι)
