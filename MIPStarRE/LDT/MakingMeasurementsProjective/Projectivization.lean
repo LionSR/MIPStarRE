@@ -540,7 +540,7 @@ def zeroProjSubMeas {Outcome : Type*} {ι : Type*}
     { outcome := fun _ => 0
       total := 0
       outcome_pos := fun _ => le_rfl
-      sum_eq_total := by simp
+      sum_eq_total := Fintype.sum_eq_zero _ fun _ => rfl
       total_le_one := zero_le_one }
   proj := fun _ => by simp
 

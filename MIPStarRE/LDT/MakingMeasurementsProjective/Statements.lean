@@ -347,16 +347,11 @@ noncomputable def optionCompletion {Outcome : Type*}
         | none => 1 - A.total
         | some a => A.outcome a
       total := 1
-      outcome_pos := by
-        intro oa
-        cases oa with
-        | none =>
-            exact sub_nonneg.mpr A.total_le_one
-        | some a =>
-            exact A.outcome_pos a
-      sum_eq_total := by
-        rw [Fintype.sum_option, A.sum_eq_total]
-        exact sub_add_cancel (1 : MIPStarRE.Quantum.Op ι) A.total
+      outcome_pos := fun
+        | none => sub_nonneg.mpr A.total_le_one
+        | some a => A.outcome_pos a
+      sum_eq_total := (Fintype.sum_option _).trans <|
+        (congrArg (1 - A.total + ·) A.sum_eq_total).trans (sub_add_cancel 1 A.total)
       total_le_one := le_rfl }
   total_eq_one := rfl
 

@@ -25,15 +25,9 @@ noncomputable def restrictSomeProjSubMeas {Outcome : Type*} {ι : Type*}
       total := ∑ a : Outcome, P.outcome (some a)
       outcome_pos := fun a => P.outcome_pos (some a)
       sum_eq_total := rfl
-      total_le_one := by
-        calc
-          ∑ a : Outcome, P.outcome (some a)
-            ≤ P.outcome none + ∑ a : Outcome, P.outcome (some a) :=
-                le_add_of_nonneg_left (P.outcome_pos none)
-          _ = ∑ oa : Option Outcome, P.outcome oa := by
-                simp [Fintype.sum_option]
-          _ = P.total := by rw [P.sum_eq_total]
-          _ ≤ 1 := P.total_le_one }
+      total_le_one :=
+        ((le_add_of_nonneg_left (P.outcome_pos none)).trans_eq
+          ((Fintype.sum_option P.outcome).symm.trans P.sum_eq_total)).trans P.total_le_one }
   proj := fun a => by simpa using P.proj (some a)
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
