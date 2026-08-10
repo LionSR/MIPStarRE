@@ -163,10 +163,10 @@ noncomputable def singleOutcomeRightSubMeas
     | true => B.outcome a0
     | false => 0
   total := B.outcome a0
-  outcome_pos := by
-    intro b
-    cases b <;> simp [B.outcome_pos a0]
-  sum_eq_total := by simp
+  outcome_pos
+    | true => B.outcome_pos a0
+    | false => le_refl 0
+  sum_eq_total := (Fintype.sum_bool _).trans (add_zero _)
   total_le_one := le_trans (B.outcome_le_total a0) B.total_le_one
 
 /-- If the right-hand Boolean submeasurement has only the `true` outcome, the
@@ -345,12 +345,10 @@ noncomputable def ldSandwichLineOnePointRightMeasurement
     {k : ℕ} (i : Fin k) (q : SandwichedLineQuestion params k) :
     Measurement (Option (Fq params)) ι where
   toSubMeas := ((ldSandwichLineOnePointRightFamily params strategy family k i.1) q)
-  total_eq_one := by
-    let ℓ : AxisParallelLine params.next :=
+  total_eq_one :=
+    (strategy.axisParallelMeasurement
       { base := appendPoint params q.1 zeroCoord
-        direction := lastCoord params }
-    simpa [ldSandwichLineOnePointRightFamily, verticalLineMeasurementFamily, i.2,
-      postprocess_total, ℓ] using (strategy.axisParallelMeasurement ℓ).total_eq_one
+        direction := lastCoord params }).total_eq_one
 
 lemma ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum
     (params : Parameters) [FieldModel params.q]

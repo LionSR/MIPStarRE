@@ -22,11 +22,7 @@ noncomputable def completePartProjFamily
     IdxProjSubMeas (SliceQuestion params) Unit ι :=
   fun x =>
     { toSubMeas := completePartSubMeas params family x
-      proj := by
-        intro u
-        cases u
-        rw [completePartSubMeas_outcome_unit params family x]
-        simpa using ProjSubMeas.total_proj (family.meas x) }
+      proj := ProjSubMeas.postprocess_outcome_proj (family.meas x) (fun _ => ()) }
 
 /-- The second positive term in the switcheroo expansion. -/
 noncomputable def switcherooAggregateSecondTerm
