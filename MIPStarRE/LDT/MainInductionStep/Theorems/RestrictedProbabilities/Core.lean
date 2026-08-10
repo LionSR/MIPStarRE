@@ -44,9 +44,7 @@ lemma RestrictedProbabilitiesStatement.ofWeightedBounds
         (xRestrictedStrategy params strategy x).selfConsistencyFailureProbability
       diagonal := fun x =>
         (xRestrictedStrategy params strategy x).diagonalFailureProbability
-      restrictedGood := by
-        intro x
-        exact ⟨le_rfl, le_rfl, le_rfl⟩ }
+      restrictedGood := fun _ => ⟨le_rfl, le_rfl, le_rfl⟩ }
   have haxis_weighted_avg :
       sliceTransverseDirectionWeight params *
           averageRestrictedAxisParallelError params profile ≤ eps := by

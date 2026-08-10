@@ -60,6 +60,41 @@ theorem mainInductionOfWitness
   refine ⟨G, ?_⟩
   exact ⟨le_trans hG.offDiagonalBound herror⟩
 
+private theorem strongSelfConsistency_of_sddRel
+    (params : Parameters) [FieldModel params.q] (strategy : SymStrat params ι)
+    (eps delta gamma : Error) (H : ProjSubMeas (Polynomial params) ι)
+    (hclose : SDDRel strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily H.toSubMeas.liftLeft)
+        (constSubMeasFamily H.toSubMeas.liftRight)
+        (SelfImprovement.selfImprovementError params eps delta)) :
+    BipartiteSSCRel strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily H.toSubMeas)
+      (selfImprovementInInductionError params eps delta gamma) := by
+  have hssc_eq :
+      bipartiteSSCError strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily H.toSubMeas) =
+        (1 / 2 : Error) * sddError strategy.state (uniformDistribution Unit)
+          (constSubMeasFamily H.toSubMeas.liftLeft)
+          (constSubMeasFamily H.toSubMeas.liftRight) := by
+    simpa [bipartiteSSCError, sddError, avgOver, uniformDistribution, constSubMeasFamily] using
+      Commutativity.qBipartiteSSCDefect_eq_half_qSDD_of_proj
+        strategy.state strategy.permInvState H
+  refine ⟨hssc_eq ▸ ?_⟩
+  have herr_nonneg : 0 ≤ SelfImprovement.selfImprovementError params eps delta :=
+    le_trans (sddError_nonneg strategy.state (uniformDistribution Unit)
+      (constSubMeasFamily H.toSubMeas.liftLeft)
+      (constSubMeasFamily H.toSubMeas.liftRight)) hclose.squaredDistanceBound
+  calc
+    (1 / 2 : Error) * sddError strategy.state (uniformDistribution Unit)
+        (constSubMeasFamily H.toSubMeas.liftLeft)
+        (constSubMeasFamily H.toSubMeas.liftRight)
+      ≤ (1 / 2 : Error) * SelfImprovement.selfImprovementError params eps delta :=
+        mul_le_mul_of_nonneg_left hclose.squaredDistanceBound (by norm_num)
+    _ ≤ 1 * SelfImprovement.selfImprovementError params eps delta :=
+      mul_le_mul_of_nonneg_right (by norm_num) herr_nonneg
+    _ = selfImprovementInInductionError params eps delta gamma := by
+      simp [SelfImprovement.selfImprovementError, selfImprovementInInductionError]
+
 /-- Convert the Section 9 self-improvement conclusion into the Section 6
 induction-level self-improvement conclusion.
 
@@ -81,70 +116,15 @@ theorem selfImprovementInInductionSectionConclusion_ofSelfImprovementConclusion
       SelfImprovement.SelfImprovementConclusion params strategy Gmeas H Z
         eps delta gamma nu) :
     SelfImprovementInInductionSectionConclusion params strategy G H Z
-      eps delta gamma nu := by
-  refine
-    { completeness := by
-        simpa [SelfImprovement.selfImprovementError, selfImprovementInInductionError] using
-          hfinal.completeness
-      pointConsistency := by
-        simpa [SelfImprovement.selfImprovementError, selfImprovementInInductionError] using
-          hfinal.pointConsistency
-      strongSelfConsistency := by
-        have hssc_eq :
-            bipartiteSSCError strategy.state (uniformDistribution Unit)
-                (constSubMeasFamily H.toSubMeas) =
-              (1 / 2 : Error) *
-                sddError strategy.state (uniformDistribution Unit)
-                  (constSubMeasFamily H.toSubMeas.liftLeft)
-                  (constSubMeasFamily H.toSubMeas.liftRight) := by
-          simpa [bipartiteSSCError, sddError, avgOver, uniformDistribution, constSubMeasFamily]
-            using
-              Commutativity.qBipartiteSSCDefect_eq_half_qSDD_of_proj
-                strategy.state strategy.permInvState H
-        refine ⟨?_⟩
-        rw [hssc_eq]
-        have herr_nonneg : 0 ≤ SelfImprovement.selfImprovementError params eps delta := by
-          exact le_trans
-            (sddError_nonneg strategy.state (uniformDistribution Unit)
-              (constSubMeasFamily H.toSubMeas.liftLeft)
-              (constSubMeasFamily H.toSubMeas.liftRight))
-            hfinal.selfCloseness.squaredDistanceBound
-        calc
-          (1 / 2 : Error) *
-              sddError strategy.state (uniformDistribution Unit)
-                (constSubMeasFamily H.toSubMeas.liftLeft)
-                (constSubMeasFamily H.toSubMeas.liftRight)
-            ≤ (1 / 2 : Error) * SelfImprovement.selfImprovementError params eps delta := by
-                exact
-                  mul_le_mul_of_nonneg_left
-                    hfinal.selfCloseness.squaredDistanceBound (by norm_num)
-          _ ≤ 1 * SelfImprovement.selfImprovementError params eps delta := by
-                exact mul_le_mul_of_nonneg_right (by norm_num) herr_nonneg
-          _ = selfImprovementInInductionError params eps delta gamma := by
-                simp [SelfImprovement.selfImprovementError, selfImprovementInInductionError]
-      selfCloseness := by
-        simpa [SelfImprovement.selfImprovementError, selfImprovementInInductionError] using
-          hfinal.selfCloseness
-      bounded := by
-        simpa [tensorFailureExpectation, SelfImprovement.projectiveBoundednessGap,
-          SelfImprovement.projectiveResidualOperator, SelfImprovement.selfImprovementError,
-          selfImprovementInInductionError] using hfinal.projectiveResidualBound
-      dominatesAveragePointOperator := by
-        intro h
-        have hdom :=
-          hfinal.dualDominatesAveragedPoint h
-        have havg :
-            IdxPolyFamily.averagedPointEvaluationOperator strategy h =
-              ∑ x ∈ (uniformDistribution (Point params)).support,
-                (uniformDistribution (Point params)).weight x •
-                  (strategy.pointMeasurement x).outcome (h x) := by
-          rfl
-        rw [havg]
-        have hdom' := hdom
-        simp [SelfImprovement.sdpDualSlackOperator, SelfImprovement.averagedPointOperator,
-          averageOperatorOverDistribution,
-          GlobalVariance.pointConditionedOutcomeOperatorAtPolynomial] at hdom'
-        simpa using hdom' }
+      eps delta gamma nu :=
+  { completeness := hfinal.completeness
+    pointConsistency := hfinal.pointConsistency
+    strongSelfConsistency :=
+      strongSelfConsistency_of_sddRel params strategy eps delta gamma H hfinal.selfCloseness
+    selfCloseness := hfinal.selfCloseness
+    bounded := hfinal.projectiveResidualBound
+    dominatesAveragePointOperator := fun h =>
+      sub_nonneg.mp (hfinal.dualDominatesAveragedPoint h) }
 
 /-- `thm:self-improvement-in-induction-section`.
 

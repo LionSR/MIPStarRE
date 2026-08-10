@@ -36,14 +36,12 @@ noncomputable def dummyDiagonalCovariantMeasurement
     DiagonalCovariantMeasurement params ι where
   toIdxProjMeas := fun _ =>
     ProjMeas.trivialDistinguishedOutcome (default : DiagonalLinePolynomial params)
-  transportInvariant := by
-    intro ℓ t
-    have hdefault :
-        (DiagonalLinePolynomial.reparamAtEquiv (params := params) t)
-          (default : DiagonalLinePolynomial params) =
-            default := by
-      simp [DiagonalLinePolynomial.reparamAtEquiv]
-    simp [DiagonalLine.transportMeasurement, hdefault]
+  transportInvariant := fun _ t =>
+    ((ProjMeas.transport_trivialDistinguishedOutcome
+      (DiagonalLinePolynomial.reparamAtEquiv (params := params) t)
+      (default : DiagonalLinePolynomial params)).trans
+        (congrArg (ProjMeas.trivialDistinguishedOutcome (ι := ι))
+          (DiagonalLinePolynomial.reparamAt_default t))).symm
 
 /-- Forget the answer-valued diagonal alphabet of a restricted slice, replacing
 it by an inert ordinary diagonal measurement.

@@ -29,12 +29,10 @@ def pointAppendProdEquiv (params : Parameters) [FieldModel params.q] (β : Type*
     Fq params × (Point params × β) ≃ Point params.next × β where
   toFun := fun xb => (appendPoint params xb.2.1 xb.1, xb.2.2)
   invFun := fun ub => (pointHeight params ub.1, (truncatePoint params ub.1, ub.2))
-  left_inv := by
-    rintro ⟨x, u, b⟩
-    simp [truncatePoint_appendPoint, pointHeight_appendPoint]
-  right_inv := by
-    rintro ⟨u, b⟩
-    exact Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv u) rfl
+  left_inv := fun xb => Prod.ext (pointHeight_appendPoint params xb.2.1 xb.1)
+    (Prod.ext (truncatePoint_appendPoint params xb.2.1 xb.1) rfl)
+  right_inv := fun ub =>
+    Prod.ext ((CommutativityPoints.pointNextEquiv params).left_inv ub.1) rfl
 
 /-- Reindex a uniform average over a restriction height and a point, retaining
 an auxiliary finite index, by appending the height as the final coordinate. -/

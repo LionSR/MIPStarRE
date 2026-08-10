@@ -46,14 +46,8 @@ theorem mainInductionBaseCase
   let eSample : AxisParallelTestSample params ≃ Point params :=
     { toFun := fun s => s.1
       invFun := fun u => (u, i0)
-      left_inv := by
-        intro s
-        rcases s with ⟨u, j⟩
-        have hj : j = i0 := Subsingleton.elim _ _
-        simp [hj, i0]
-      right_inv := by
-        intro u
-        rfl }
+      left_inv := fun s => Prod.ext rfl (Subsingleton.elim _ _)
+      right_inv := fun _ => rfl }
   let canonicalLine : AxisParallelLine params :=
     AxisParallelLine.throughPoint (params := params) zeroPoint i0
   let G : Measurement (Polynomial params) ι :=
@@ -210,14 +204,8 @@ theorem answerMainInductionBaseCase
   let eSample : AxisParallelTestSample params ≃ Point params :=
     { toFun := fun s => s.1
       invFun := fun u => (u, i0)
-      left_inv := by
-        intro s
-        rcases s with ⟨u, j⟩
-        have hj : j = i0 := Subsingleton.elim _ _
-        simp [hj, i0]
-      right_inv := by
-        intro u
-        rfl }
+      left_inv := fun s => Prod.ext rfl (Subsingleton.elim _ _)
+      right_inv := fun _ => rfl }
   let canonicalLine : AxisParallelLine params :=
     AxisParallelLine.throughPoint (params := params) zeroPoint i0
   let G : Measurement (Polynomial params) ι :=
