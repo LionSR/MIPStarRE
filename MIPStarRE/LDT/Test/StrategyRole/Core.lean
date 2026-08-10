@@ -112,14 +112,8 @@ def roleRegisterPairLocalEquiv (ι : Type*) :
     ((Role × Role) × (ι × ι)) ≃ ((Role × ι) × (Role × ι)) where
   toFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
   invFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
-  left_inv := by
-    intro x
-    rcases x with ⟨⟨rL, rR⟩, ⟨iL, iR⟩⟩
-    rfl
-  right_inv := by
-    intro x
-    rcases x with ⟨⟨rL, iL⟩, ⟨rR, iR⟩⟩
-    rfl
+  left_inv := fun ⟨⟨_, _⟩, ⟨_, _⟩⟩ => rfl
+  right_inv := fun ⟨⟨_, _⟩, ⟨_, _⟩⟩ => rfl
 
 /-- Basis projector onto a pair of role sectors. -/
 noncomputable def rolePairProj (rL rR : Role) : MIPStarRE.Quantum.Op (Role × Role) :=
@@ -194,15 +188,11 @@ noncomputable def classicalRoleSymmState {ι : Type*} [Fintype ι] [DecidableEq 
   density :=
     (2 : Error) • rolePairCond Role.A Role.B ψ.density +
       (2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density)
-  density_psd := by
-    have hAB : 0 ≤ rolePairCond Role.A Role.B ψ.density :=
-      rolePairCond_nonneg Role.A Role.B ψ.density_psd
-    have hswap : 0 ≤ swapDensity ψ.density := swapDensity_nonneg ψ.density_psd
-    have hBA : 0 ≤ rolePairCond Role.B Role.A (swapDensity ψ.density) :=
-      rolePairCond_nonneg Role.B Role.A hswap
-    exact add_nonneg
-      (smul_nonneg (by norm_num) hAB)
-      (smul_nonneg (by norm_num) hBA)
+  density_psd := add_nonneg
+    (smul_nonneg zero_le_two
+      (rolePairCond_nonneg Role.A Role.B ψ.density_psd))
+    (smul_nonneg zero_le_two
+      (rolePairCond_nonneg Role.B Role.A (swapDensity_nonneg ψ.density_psd)))
 
 @[simp] theorem classicalRoleSymmState_density_fixed {ι : Type*}
     [Fintype ι] [DecidableEq ι] (ψ : QuantumState (ι × ι)) :

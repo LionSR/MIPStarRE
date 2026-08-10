@@ -554,7 +554,7 @@ noncomputable def polynomialEvaluationFamily {ι : Type*} [Fintype ι] [Decidabl
     IdxSubMeas (Point params) (Fq params) ι :=
   fun u => evaluateAt params u G
 
--- source: MIPStarRE/LDT/Test/Defs.lean:176-183  (MIPStarRE.LDT.qBipartiteMatchMass)
+-- source: MIPStarRE/LDT/Test/Defs.lean:175-182  (MIPStarRE.LDT.qBipartiteMatchMass)
 /-- Bipartite matching mass `∑_a ⟨ψ, (A_a ⊗ B_a) ψ⟩`, with `A` on the left
 register and `B` on the right register of a tensor-product state. -/
 noncomputable def qBipartiteMatchMass {Outcome : Type*}
@@ -564,7 +564,7 @@ noncomputable def qBipartiteMatchMass {Outcome : Type*}
     (A : SubMeas Outcome ιA) (B : SubMeas Outcome ιB) : Error :=
   ∑ a, ev ψ (opTensor (A.outcome a) (B.outcome a))
 
--- source: MIPStarRE/LDT/Test/Defs.lean:185-198  (MIPStarRE.LDT.qBipartiteConsDefect)
+-- source: MIPStarRE/LDT/Test/Defs.lean:184-197  (MIPStarRE.LDT.qBipartiteConsDefect)
 /-- Bipartite questionwise consistency defect.
 
 In the paper (Definition 4.8), the consistency of `A` on `H_A` and `B` on
@@ -580,7 +580,7 @@ noncomputable def qBipartiteConsDefect {Outcome : Type*}
   let totalOverlap := ev ψ (opTensor A.total B.total)
   max 0 (totalOverlap - qBipartiteMatchMass ψ A B)
 
--- source: MIPStarRE/LDT/Test/Defs.lean:200-207  (MIPStarRE.LDT.bipartiteConsError)
+-- source: MIPStarRE/LDT/Test/Defs.lean:199-206  (MIPStarRE.LDT.bipartiteConsError)
 /-- Averaged bipartite off-diagonal mass for consistency statements. -/
 noncomputable def bipartiteConsError {Question Outcome : Type*}
     {ιA ιB : Type*} [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -590,7 +590,7 @@ noncomputable def bipartiteConsError {Question Outcome : Type*}
     (B : IdxSubMeas Question Outcome ιB) : Error :=
   avgOver 𝒟 (fun q => qBipartiteConsDefect ψ (A q) (B q))
 
--- source: MIPStarRE/LDT/Test/Defs.lean:239-251  (MIPStarRE.LDT.ConsRel)
+-- source: MIPStarRE/LDT/Test/Defs.lean:238-250  (MIPStarRE.LDT.ConsRel)
 /-- Consistency relation (bipartite, paper Definition 4.8).
 
 The state `ψ` lives on `H_A ⊗ H_B`, Alice's submeasurement `A` acts on

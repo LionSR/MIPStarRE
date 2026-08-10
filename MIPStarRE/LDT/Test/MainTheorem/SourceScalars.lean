@@ -220,16 +220,13 @@ theorem cascadeHypotheses_of_not_mainFormalError_ge_one
     (hepsNN : 0 ≤ eps) (hk0 : 0 < k)
     (hsmall : ¬ 1 ≤ mainFormalError params k eps) :
     CascadeHypotheses params k eps where
-  hk := by exact_mod_cast hk0
-  hm := by exact_mod_cast params.hm
+  hk := Nat.one_le_cast.mpr hk0
+  hm := Nat.one_le_cast.mpr params.hm
   hepsNN := hepsNN
-  hepsOne := by
-    by_contra heps_not
-    exact hsmall (mainFormalError_ge_one_of_one_lt_eps params k hk0 (lt_of_not_ge heps_not))
-  hdq := by
-    by_contra hdq_not
-    exact hsmall (mainFormalError_ge_one_of_q_lt_d params k eps hk0 hepsNN
-      (lt_of_not_ge hdq_not))
+  hepsOne := le_of_not_gt fun heps =>
+    hsmall (mainFormalError_ge_one_of_one_lt_eps params k hk0 heps)
+  hdq := le_of_not_gt fun hdq =>
+    hsmall (mainFormalError_ge_one_of_q_lt_d params k eps hk0 hepsNN hdq)
   hqPos := params.q_cast_pos
 
 /-- Scalar hypotheses for the Section 3 error cascade of `mainFormal`.
