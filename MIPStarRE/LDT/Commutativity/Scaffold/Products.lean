@@ -358,10 +358,7 @@ noncomputable def evaluatedSliceFirstProj
     IdxProjSubMeas (EvaluatedSliceQuestion params) (Fq params) ι :=
   fun q =>
     { toSubMeas := evaluatedSliceFirstFactor params family q
-      proj := by
-        intro a
-        simpa [evaluatedSliceFirstFactor] using
-          evaluatedPointFamily_outcome_proj params family q.1 a }
+      proj := evaluatedPointFamily_outcome_proj params family q.1 }
 
 /-- The second evaluated-slice factor viewed as a projective family. -/
 noncomputable def evaluatedSliceSecondProj
@@ -370,10 +367,7 @@ noncomputable def evaluatedSliceSecondProj
     IdxProjSubMeas (EvaluatedSliceQuestion params) (Fq params) ι :=
   fun q =>
     { toSubMeas := evaluatedSliceSecondFactor params family q
-      proj := by
-        intro b
-        simpa [evaluatedSliceSecondFactor] using
-          evaluatedPointFamily_outcome_proj params family q.2 b }
+      proj := evaluatedPointFamily_outcome_proj params family q.2 }
 
 /-- The first full-slice factor viewed as a projective family. -/
 noncomputable def fullSliceFirstProj

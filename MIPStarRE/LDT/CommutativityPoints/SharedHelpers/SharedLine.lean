@@ -98,15 +98,13 @@ private noncomputable def pointPairSharedDiagonalLine_ignore_first_equiv
     let tv := r.2
     (((ℓ.pointAt (subCoord tv (encodeScalar 1)), ℓ.pointAt tv)),
       subCoord tv (encodeScalar 1))
-  left_inv := by
-    rintro ⟨⟨u, v⟩, t⟩
+  left_inv := fun ⟨⟨u, v⟩, t⟩ => by
     refine Prod.ext ?_ ?_
     · simpa [Prod.ext_iff, sampledPointPairFromSharedDiagonalQuestion,
         sharedDiagonalLineQuestionOfPointPair, addCoord, subCoord] using
         sharedDiagonalLineQuestionOfPointPair_sampledPointPair params ((u, v), t)
     · simp [sharedDiagonalLineQuestionOfPointPair, addCoord, subCoord]
-  right_inv := by
-    rintro ⟨ℓ, tv⟩
+  right_inv := fun ⟨ℓ, tv⟩ => by
     simpa [addCoord, subCoord] using
       congrArg (fun q => (q.1, q.2.2))
         (sharedDiagonalLineQuestionOfPointPair_of_line params ℓ
@@ -123,15 +121,13 @@ private noncomputable def pointPairSharedDiagonalLine_ignore_second_equiv
     let ℓ := r.1
     let t := r.2
     (((ℓ.pointAt t, ℓ.pointAt (addCoord t (encodeScalar 1))), t))
-  left_inv := by
-    rintro ⟨⟨u, v⟩, t⟩
+  left_inv := fun ⟨⟨u, v⟩, t⟩ => by
     refine Prod.ext ?_ ?_
     · simpa [Prod.ext_iff, sampledPointPairFromSharedDiagonalQuestion,
         sharedDiagonalLineQuestionOfPointPair] using
         sharedDiagonalLineQuestionOfPointPair_sampledPointPair params ((u, v), t)
     · simp [sharedDiagonalLineQuestionOfPointPair]
-  right_inv := by
-    rintro ⟨ℓ, t⟩
+  right_inv := fun ⟨ℓ, t⟩ => by
     simpa using
       congrArg (fun q => (q.1, q.2.1))
         (sharedDiagonalLineQuestionOfPointPair_of_line params ℓ t)
