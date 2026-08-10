@@ -571,7 +571,7 @@ lemma pProjectivity {Outcome : Type*}
     outcome := Pa data
     total := ∑ a, Pa data a
     outcome_pos := ?_
-    sum_eq_total := by simp
+    sum_eq_total := rfl
     total_le_one := ?_
     proj := ?_
   }, ?_⟩

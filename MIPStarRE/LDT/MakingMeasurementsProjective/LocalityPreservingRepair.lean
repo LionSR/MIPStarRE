@@ -105,8 +105,8 @@ private lemma trace_blockDiagonal_const_mul_eq_sum_trace_diagBlock
   let e : ((ιA × ιB) × ιA) ≃ (ιB × (ιA × ιA)) :=
     { toFun := fun x => (x.1.2, (x.1.1, x.2))
       invFun := fun x => ((x.2.1, x.1), x.2.2)
-      left_inv := by intro x; cases x; rfl
-      right_inv := by intro x; cases x; rfl }
+      left_inv := fun ⟨⟨_, _⟩, _⟩ => rfl
+      right_inv := fun ⟨_, ⟨_, _⟩⟩ => rfl }
   simpa [diagBlock, Matrix.trace, Matrix.mul_apply, Matrix.blockDiagonal_apply,
     Fintype.sum_prod_type, Finset.sum_sigma', e] using
     (e.sum_comp (fun y : ιB × (ιA × ιA) =>
@@ -198,8 +198,8 @@ private lemma trace_mul_rightTensor_eq_sum_trace_rightDiagBlock
   let e : ((ιA × ιB) × ιB) ≃ (ιA × (ιB × ιB)) :=
     { toFun := fun x => (x.1.1, (x.1.2, x.2))
       invFun := fun x => ((x.1, x.2.1), x.2.2)
-      left_inv := by intro x; cases x; rfl
-      right_inv := by intro x; cases x; rfl }
+      left_inv := fun ⟨⟨_, _⟩, _⟩ => rfl
+      right_inv := fun ⟨_, ⟨_, _⟩⟩ => rfl }
   simpa [rightDiagBlock, Matrix.trace, Matrix.mul_apply, rightTensor, Matrix.one_apply,
     Fintype.sum_prod_type, Finset.sum_sigma', e] using
     (e.sum_comp (fun y : ιA × (ιB × ιB) =>

@@ -121,8 +121,7 @@ noncomputable def toSubMeas {Outcome : Type*}
   total := MIPStarRE.Quantum.Submeasurement.total M
   outcome_pos := M.pos
   sum_eq_total := rfl
-  total_le_one := by
-    simpa [MIPStarRE.Quantum.Submeasurement.total] using M.sum_le_one
+  total_le_one := M.sum_le_one
 
 @[simp] theorem toSubMeas_outcome {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
@@ -149,9 +148,7 @@ noncomputable def toMeasurement {Outcome : Type*}
     {H : FiniteHilbertSpace}
     (M : MatrixMeasurement Outcome H) : MIPStarRE.LDT.Measurement Outcome H.carrier where
   toSubMeas := MatrixSubmeasurement.toSubMeas M.toSubmeasurement
-  total_eq_one := by
-    simpa [MatrixSubmeasurement.toSubMeas, MIPStarRE.Quantum.Submeasurement.total] using
-      M.sum_eq_one
+  total_eq_one := M.sum_eq_one
 
 @[simp] theorem toMeasurement_toSubMeas {Outcome : Type*}
     [Fintype Outcome] [DecidableEq Outcome]
