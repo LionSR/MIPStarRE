@@ -468,11 +468,14 @@ private lemma matrixLaplacianOperator_charpoly_roots_eq_fourier (params : Parame
           · simp [d]
           · exact Finset.prod_ne_zero_iff.mpr fun i _ => Polynomial.X_sub_C_ne_zero (d i)
 
+private lemma laplacianEigenvalue_zero (params : Parameters) :
+    laplacianEigenvalue params (0 : Point params) = 0 := by
+  simp [laplacianEigenvalue, frequencyWeight_zero]
+
 private lemma hypercubeSpectralGap_operator_posSemidef (params : Parameters) :
     (matrixLaplacianOperator params -
       ((hypercubeSpectralGap params : ℂ) • orthogonalModeProjectorMatrix params)).PosSemidef := by
-  have hlap0 : laplacianEigenvalue params (0 : Point params) = 0 := by
-    simp [laplacianEigenvalue, frequencyWeight_zero]
+  have hlap0 := laplacianEigenvalue_zero params
   have hcoeff_nonneg :
       ∀ α ∈ (Finset.univ.erase (0 : Point params)),
         0 ≤ laplacianEigenvalue params α - hypercubeSpectralGap params := by
@@ -591,22 +594,16 @@ eigenvalue `0` and spectral gap `1 / (mM)`, expressed through the Fourier
 diagonalization of `L`. -/
 lemma laplacianSpectralGap (params : Parameters) :
     LaplacianSpectralGapConclusion params where
-  zeroEigenvalue := by
-    simp [laplacianEigenvalue, frequencyWeight_zero]
-  nonzeroEigenvalue_ge_gap := by
-    intro α hα
-    exact hypercubeSpectralGap_le_laplacianEigenvalue params α
+  zeroEigenvalue := laplacianEigenvalue_zero params
+  nonzeroEigenvalue_ge_gap := fun α hα =>
+    hypercubeSpectralGap_le_laplacianEigenvalue params α
       (frequencyWeight_pos_of_ne_zero params hα)
-  gap_attained := by
-    rcases exists_frequencyWeight_one params with ⟨α, hα_weight⟩
-    have hα_ne : α ≠ 0 := by
-      intro hα_zero
-      have hweight_zero : frequencyWeight params α = 0 := by
-        simpa [hα_zero] using frequencyWeight_zero params
-      exact (by decide : (1 : ℕ) ≠ 0) (hα_weight.symm.trans hweight_zero)
-    exact ⟨α, hα_ne, laplacianEigenvalue_of_weight_one params α hα_weight⟩
-  gap_eq := by
-    simp [hypercubeSpectralGap, hypercubeVertexCount]
+  gap_attained := (exists_frequencyWeight_one params).imp fun α hα_weight =>
+    ⟨fun hα_zero => Nat.one_ne_zero
+        (hα_weight.symm.trans
+          ((congrArg (frequencyWeight params) hα_zero).trans (frequencyWeight_zero params))),
+      laplacianEigenvalue_of_weight_one params α hα_weight⟩
+  gap_eq := rfl
 
 private lemma laplacianEigenvalue_eq_zero_iff (params : Parameters) {α : Point params} :
     (laplacianEigenvalue params α = 0) ↔ α = 0 := by

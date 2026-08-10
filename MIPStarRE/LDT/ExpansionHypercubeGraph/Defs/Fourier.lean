@@ -94,13 +94,8 @@ lemma sum_stdAddChar_mul_fin (params : Parameters) (a : ZMod params.q) :
   let e : Fq params ≃ ZMod params.q :=
     { toFun := fun x => (x.val : ZMod params.q)
       invFun := fun z => ⟨z.val, z.val_lt⟩
-      left_inv := by
-        intro x
-        ext
-        simp [Nat.mod_eq_of_lt x.2]
-      right_inv := by
-        intro z
-        exact ZMod.natCast_zmod_val z }
+      left_inv := fun x => Fin.ext (ZMod.val_natCast_of_lt x.2)
+      right_inv := ZMod.natCast_zmod_val }
   calc
     ∑ x : Fq params, ZMod.stdAddChar (N := params.q) (((x.val : ZMod params.q) * a))
       = ∑ x : Fq params, ZMod.stdAddChar (N := params.q) ((e x) * a) := by
@@ -218,6 +213,21 @@ lemma GlobalVarianceDecomposition.orthogonalComponent_eq_sub_average
   rw [eq_sub_iff_add_eq]
   simpa [add_comm, add_left_comm, add_assoc] using (decomp.decomposition u).symm
 
+omit [Fintype ι] [DecidableEq ι] in
+private lemma centered_sum_eq_zero (params : Parameters)
+    (A : Point params → MIPStarRE.Quantum.Op ι) :
+    ∑ u, (A u - ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v) = 0 := by
+  classical
+  have hM_ne : (hypercubeVertexCount params : ℂ) ≠ 0 := by
+    exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
+  rw [Finset.sum_sub_distrib, Finset.sum_const, sub_eq_zero,
+    ← Nat.cast_smul_eq_nsmul ℂ]
+  simp only [Finset.card_univ, Fintype.card_pi, Fintype.card_fin,
+    Finset.prod_const, hypercubeVertexCount, Nat.cast_pow]
+  have hqm_ne : (params.q ^ params.m : ℂ) ≠ 0 := by
+    simpa [hypercubeVertexCount] using hM_ne
+  rw [smul_smul, mul_inv_cancel₀ hqm_ne, one_smul]
+
 /-- The canonical decomposition from `lem:global-rewrite`.
 
 Its `averageComponent` is the paper's `A_avg = E_u A^u = (1/M) · ∑_u A^u`, and its
@@ -231,34 +241,8 @@ noncomputable def canonicalGlobalVarianceDecomposition (params : Parameters)
   orthogonalComponent := fun u =>
     A u - ((hypercubeVertexCount params : ℂ)⁻¹) • ∑ v, A v
   averageComponent_eq := rfl
-  orthogonal_sum_zero := by
-    classical
-    have hM_ne : (hypercubeVertexCount params : ℂ) ≠ 0 := by
-      exact_mod_cast (Nat.ne_of_gt (pow_pos params.hq params.m))
-    ext i j
-    simp only [Matrix.sum_apply, Finset.sum_sub_distrib, smul_eq_mul,
-      Finset.mul_sum, hypercubeVertexCount, Finset.sum_const, Finset.card_univ,
-      Fintype.card_pi, Fintype.card_fin, Finset.prod_const, nsmul_eq_mul,
-      Nat.cast_pow, Matrix.sub_apply, Matrix.smul_apply, Matrix.zero_apply]
-    rw [sub_eq_zero]
-    refine Finset.sum_congr rfl ?_
-    intro x hx
-    calc
-      A x i j = (1 : ℂ) * A x i j := by simp
-      _ =
-          ((hypercubeVertexCount params : ℂ) *
-            (hypercubeVertexCount params : ℂ)⁻¹) * A x i j := by
-            simp [hM_ne]
-      _ =
-          (hypercubeVertexCount params : ℂ) *
-            ((hypercubeVertexCount params : ℂ)⁻¹ * A x i j) := by
-            ring_nf
-      _ = (params.q ^ params.m : ℂ) * (((params.q ^ params.m : ℂ)⁻¹) * A x i j) := by
-            simp [hypercubeVertexCount]
-  decomposition := by
-    intro u
-    rw [sub_eq_add_neg]
-    abel
+  orthogonal_sum_zero := centered_sum_eq_zero params A
+  decomposition := fun _ => eq_add_of_sub_eq' rfl
 
 /-- Paper origin: `references/ldt-paper/expansion.tex:179-190`
 (`\label{lem:global-rewrite}`); trace witness for the global-variance rewrite.
