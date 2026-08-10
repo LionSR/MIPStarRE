@@ -39,6 +39,17 @@ private theorem matrixSdpStrictPrimalConstantSum (params : Parameters)
       ((1 / 2 : Error) • (1 : MatrixOperator model.space)) := by
   exact sdpStrictPrimalConstantSum (ι := model.space.carrier) params
 
+private theorem sdpStrictPrimalEffect_nonneg (params : Parameters)
+    [FieldModel params.q] (space : FiniteHilbertSpace.{u}) :
+    0 ≤ sdpStrictPrimalWeight params • (1 : MatrixOperator space) := by
+  unfold sdpStrictPrimalWeight; positivity
+
+private theorem errorHalf_smul_one_le_one (space : FiniteHilbertSpace.{u}) :
+    (1 / 2 : Error) • (1 : MatrixOperator space) ≤ 1 := by
+  have hhalf : (1 / 2 : Error) ≤ 1 := by norm_num
+  simpa using smul_le_smul_of_nonneg_right hhalf
+    (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MatrixOperator space))
+
 /-- The matrix-level strict-feasible primal witness
 `T_g = (2 |\polyfunc{m}{q}{d}|)^{-1} I`. -/
 noncomputable def matrixSdpStrictPrimalSubmeasurement (params : Parameters)
@@ -46,22 +57,11 @@ noncomputable def matrixSdpStrictPrimalSubmeasurement (params : Parameters)
     (model : MatrixSdpRealization params) :
     MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space where
   effect := fun _ => sdpStrictPrimalWeight params • (1 : MatrixOperator model.space)
-  pos := by
-    intro _
-    have hweight : 0 ≤ sdpStrictPrimalWeight params := by
-      unfold sdpStrictPrimalWeight
-      positivity
-    exact smul_nonneg hweight
-      (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MatrixOperator model.space))
-  sum_le_one := by
-    rw [matrixSdpStrictPrimalConstantSum params model]
-    simpa using
-      (smul_le_smul_of_nonneg_right
-        (show (1 / 2 : Error) ≤ 1 by norm_num)
-        (Matrix.PosSemidef.one.nonneg : 0 ≤ (1 : MatrixOperator model.space)))
+  pos := fun _ => sdpStrictPrimalEffect_nonneg params model.space
+  sum_le_one := (le_of_eq (matrixSdpStrictPrimalConstantSum params model)).trans
+    (errorHalf_smul_one_le_one model.space)
 
-/-- The matrix-level strict-feasible primal witness has total mass
-`(1/2) I`. -/
+/-- The matrix-level strict-feasible primal witness has total mass `(1/2) I`. -/
 theorem matrixSdpStrictPrimalSubmeasurement_sum_effect (params : Parameters)
     [FieldModel params.q]
     (model : MatrixSdpRealization params) :
