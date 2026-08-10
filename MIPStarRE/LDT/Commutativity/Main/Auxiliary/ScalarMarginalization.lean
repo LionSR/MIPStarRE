@@ -41,9 +41,7 @@ private noncomputable def evaluatedPointProj
     IdxProjSubMeas (Point params.next) (Fq params) ι :=
   fun u =>
     { toSubMeas := evaluatedPointFamily params family u
-      proj := by
-        intro a
-        exact evaluatedPointFamily_outcome_proj params family u a }
+      proj := evaluatedPointFamily_outcome_proj params family u }
 
 /-- Triangle inequality with explicit bounds for an intermediate point. -/
 private lemma abs_sub_le_of_two_step

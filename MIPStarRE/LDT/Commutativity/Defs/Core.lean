@@ -87,44 +87,37 @@ noncomputable def sandwichByOuterSubMeas {α β : Type*} [Fintype α] [Fintype �
         A.outcome a * B.outcome b * A.outcome a
   total :=
     ∑ a : α, A.outcome a * B.total * A.outcome a
-  outcome_pos := by
-    rintro ⟨a, b⟩
-    simpa using
-      IsSelfAdjoint.conjugate_nonneg
-        (c := A.outcome a)
-        (a := B.outcome b)
-        (B.outcome_pos b)
-        (A.outcome_hermitian a)
-  sum_eq_total := by
-    calc
-      ∑ ab : α × β, A.outcome ab.1 * B.outcome ab.2 * A.outcome ab.1 =
-          ∑ a : α, ∑ b : β, A.outcome a * B.outcome b * A.outcome a := by
-            rw [Fintype.sum_prod_type]
-      _ = ∑ a : α, A.outcome a * B.total * A.outcome a := by
-        refine Finset.sum_congr rfl ?_
-        intro a _
-        rw [← Matrix.sum_mul, ← Matrix.mul_sum, B.sum_eq_total]
-  total_le_one := by
-    calc
-      ∑ a : α, A.outcome a * B.total * A.outcome a
-        ≤ ∑ a : α, A.outcome a := by
-            refine Finset.sum_le_sum ?_
-            intro a ha
-            exact le_trans
-                (by
-                  simpa using
-                  IsSelfAdjoint.conjugate_le_conjugate
-                    (c := A.outcome a)
-                    B.total_le_one
-                    (A.outcome_hermitian a))
-              (by
-                simpa using
-                  sq_le_self
-                    (A.outcome_pos a)
-                    (SubMeas.outcome_le_one A a))
-      _ = A.total := by
-          rw [A.sum_eq_total]
-      _ ≤ 1 := A.total_le_one
+  outcome_pos := fun ⟨a, b⟩ =>
+    IsSelfAdjoint.conjugate_nonneg
+      (c := A.outcome a)
+      (a := B.outcome b)
+      (B.outcome_pos b)
+      (A.outcome_hermitian a)
+  sum_eq_total := calc
+    ∑ ab : α × β, A.outcome ab.1 * B.outcome ab.2 * A.outcome ab.1 =
+        ∑ a : α, ∑ b : β, A.outcome a * B.outcome b * A.outcome a := by
+          rw [Fintype.sum_prod_type]
+    _ = ∑ a : α, A.outcome a * B.total * A.outcome a := by
+      refine Finset.sum_congr rfl ?_
+      intro a _
+      rw [← Matrix.sum_mul, ← Matrix.mul_sum, B.sum_eq_total]
+  total_le_one := calc
+    ∑ a : α, A.outcome a * B.total * A.outcome a
+      ≤ ∑ a : α, A.outcome a := by
+          refine Finset.sum_le_sum ?_
+          intro a ha
+          calc
+            A.outcome a * B.total * A.outcome a ≤ A.outcome a * A.outcome a := by
+              simpa using
+                IsSelfAdjoint.conjugate_le_conjugate
+                  (c := A.outcome a)
+                  B.total_le_one
+                  (A.outcome_hermitian a)
+            _ ≤ A.outcome a :=
+              sq_le_self (A.outcome_pos a) (SubMeas.outcome_le_one A a)
+    _ = A.total := by
+        rw [A.sum_eq_total]
+    _ ≤ 1 := A.total_le_one
 
 /-- The full-slice question underlying an evaluated-slice sample. -/
 def fullSliceQuestionOfEvaluatedSlice (params : Parameters)

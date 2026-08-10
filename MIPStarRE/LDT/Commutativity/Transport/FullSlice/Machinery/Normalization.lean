@@ -55,10 +55,7 @@ noncomputable def evaluateAtProjSubMeas
     (params : Parameters) [FieldModel params.q] (u : Point params)
     (P : ProjSubMeas (Polynomial params) ι) : ProjSubMeas (Fq params) ι where
   toSubMeas := evaluateAt params u P.toSubMeas
-  proj := by
-    intro a
-    simpa [evaluateAt] using
-      postprocess_proj_outcome P (fun g => g u) a
+  proj := ProjSubMeas.postprocess_outcome_proj P (fun g => g u)
 
 /-- Tensor-lifted form of `normalizationCondition_sandwich_bound`, used as the
 `C`-normalization hypothesis in `closenessOfIP`.

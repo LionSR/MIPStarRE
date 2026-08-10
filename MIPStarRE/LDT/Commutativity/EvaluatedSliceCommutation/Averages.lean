@@ -130,16 +130,8 @@ lemma evaluatedSliceCommutation_avg_swap_terms
       avgOver (uniformDistribution (EvaluatedSliceQuestion params))
         (fun q => ∑ ab : EvaluatedSliceOutcome params,
           evaluatedSliceABABTerm params strategy family q ab) := by
-  let eQ : EvaluatedSliceQuestion params ≃ EvaluatedSliceQuestion params :=
-    { toFun := Prod.swap
-      invFun := Prod.swap
-      left_inv := by intro q; cases q; rfl
-      right_inv := by intro q; cases q; rfl }
-  let eA : EvaluatedSliceOutcome params ≃ EvaluatedSliceOutcome params :=
-    { toFun := Prod.swap
-      invFun := Prod.swap
-      left_inv := by intro ab; cases ab; rfl
-      right_inv := by intro ab; cases ab; rfl }
+  let eQ : EvaluatedSliceQuestion params ≃ EvaluatedSliceQuestion params := Equiv.prodComm _ _
+  let eA : EvaluatedSliceOutcome params ≃ EvaluatedSliceOutcome params := Equiv.prodComm _ _
   constructor
   · calc
       avgOver (uniformDistribution (EvaluatedSliceQuestion params))
