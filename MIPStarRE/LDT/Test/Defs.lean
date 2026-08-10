@@ -57,8 +57,7 @@ noncomputable def polynomialEvaluationMeasurementFamily
     IdxMeas (Point params) (Fq params) ι :=
   fun u =>
     { toSubMeas := evaluateAt params u G.toSubMeas
-      total_eq_one := by
-        simpa [evaluateAt, postprocess] using G.total_eq_one }
+      total_eq_one := G.total_eq_one }
 
 namespace Test
 

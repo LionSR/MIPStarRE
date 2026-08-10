@@ -40,14 +40,8 @@ def roleRegisterPairLocalEquiv (ιA ιB : Type*) :
       (RoleRegisterLocal ιA ιB × RoleRegisterLocal ιA ιB) where
   toFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
   invFun x := ((x.1.1, x.2.1), (x.1.2, x.2.2))
-  left_inv := by
-    intro x
-    rcases x with ⟨⟨rL, rR⟩, ⟨iL, iR⟩⟩
-    rfl
-  right_inv := by
-    intro x
-    rcases x with ⟨⟨rL, iL⟩, ⟨rR, iR⟩⟩
-    rfl
+  left_inv := fun ⟨⟨_, _⟩, ⟨_, _⟩⟩ => rfl
+  right_inv := fun ⟨⟨_, _⟩, ⟨_, _⟩⟩ => rfl
 
 /-! ### Direct-sum block states for heterogeneous role symmetrization -/
 
@@ -439,22 +433,13 @@ noncomputable def roleRegisterSymmState {ιA ιB : Type*}
     roleRegisterDensityScale ιA ιB •
       rolePairDirectSumCond Role.B Role.A
         (localPairBABlock (heterogeneousSwapDensity ψ.density))
-  density_psd := by
-    have hABBlock : 0 ≤ localPairABBlock ψ.density :=
-      localPairABBlock_nonneg ψ.density_psd
-    have hAB : 0 ≤ rolePairDirectSumCond Role.A Role.B (localPairABBlock ψ.density) :=
-      rolePairDirectSumCond_nonneg Role.A Role.B hABBlock
-    have hswap : 0 ≤ heterogeneousSwapDensity ψ.density :=
-      heterogeneousSwapDensity_nonneg ψ.density_psd
-    have hBABlock : 0 ≤ localPairBABlock (heterogeneousSwapDensity ψ.density) :=
-      localPairBABlock_nonneg hswap
-    have hBA :
-        0 ≤ rolePairDirectSumCond Role.B Role.A
-          (localPairBABlock (heterogeneousSwapDensity ψ.density)) :=
-      rolePairDirectSumCond_nonneg Role.B Role.A hBABlock
-    exact add_nonneg
-      (smul_nonneg (roleRegisterDensityScale_nonneg ιA ιB) hAB)
-      (smul_nonneg (roleRegisterDensityScale_nonneg ιA ιB) hBA)
+  density_psd := add_nonneg
+    (smul_nonneg (roleRegisterDensityScale_nonneg ιA ιB)
+      (rolePairDirectSumCond_nonneg Role.A Role.B
+        (localPairABBlock_nonneg ψ.density_psd)))
+    (smul_nonneg (roleRegisterDensityScale_nonneg ιA ιB)
+      (rolePairDirectSumCond_nonneg Role.B Role.A
+        (localPairBABlock_nonneg (heterogeneousSwapDensity_nonneg ψ.density_psd))))
 
 @[simp] theorem roleRegisterSymmState_density_fixed {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]

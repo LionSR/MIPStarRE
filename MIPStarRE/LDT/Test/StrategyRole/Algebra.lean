@@ -66,25 +66,15 @@ noncomputable def roleSymmetrizedMeasurement {Outcome ι : Type*}
   toSubMeas :=
     { outcome := fun a => roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a)
       total := 1
-      outcome_pos := by
-        intro a
-        exact add_nonneg
-          (roleCond_nonneg Role.A (MA.outcome_pos a))
-          (roleCond_nonneg Role.B (MB.outcome_pos a))
-      sum_eq_total := by
-        calc
-          ∑ a, (roleCond Role.A (MA.outcome a) + roleCond Role.B (MB.outcome a))
-              = ∑ a, roleCond Role.A (MA.outcome a) +
-                  ∑ a, roleCond Role.B (MB.outcome a) := by
-                    rw [Finset.sum_add_distrib]
-          _ = roleCond Role.A (∑ a, MA.outcome a) +
-                roleCond Role.B (∑ a, MB.outcome a) := by
-                  rw [roleCond_finset_sum Role.A Finset.univ MA.outcome]
-                  rw [roleCond_finset_sum Role.B Finset.univ MB.outcome]
-          _ = roleCond Role.A (1 : MIPStarRE.Quantum.Op ι) +
-                roleCond Role.B 1 := by
-                  rw [MA.sum_eq, MB.sum_eq]
-          _ = 1 := roleCond_one_sum
+      outcome_pos := fun a => add_nonneg
+        (roleCond_nonneg Role.A (MA.outcome_pos a))
+        (roleCond_nonneg Role.B (MB.outcome_pos a))
+      sum_eq_total := Finset.sum_add_distrib.trans <|
+        (congrArg₂ (· + ·)
+          (roleCond_finset_sum Role.A Finset.univ MA.outcome)
+          (roleCond_finset_sum Role.B Finset.univ MB.outcome)).trans <|
+        (congrArg₂ (fun X Y => roleCond Role.A X + roleCond Role.B Y)
+          MA.sum_eq MB.sum_eq).trans roleCond_one_sum
       total_le_one := le_rfl }
   total_eq_one := rfl
 

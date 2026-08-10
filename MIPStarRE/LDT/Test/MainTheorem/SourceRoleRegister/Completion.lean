@@ -753,9 +753,8 @@ theorem completedProjectiveMeasurements_ofTwoSidedSubmeasurements
           (MakingMeasurementsProjective.orthonormalizeAndCompleteError ζ) := by
   let a0 : Polynomial params :=
     { poly := 0
-      lowIndividualDegree := by
-        intro i
-        simp }
+      lowIndividualDegree := fun i =>
+        (MvPolynomial.degreeOf_zero i).trans_le (Nat.zero_le _) }
   let Q_A := Preliminaries.completeAtOutcomeProj P_A a0
   let Q_B := Preliminaries.completeAtOutcomeProj P_B a0
   have hleftComplete :
@@ -829,9 +828,8 @@ theorem completedProjectiveMeasurementsAndLine169_ofTwoSidedSubmeasurements
           (ζ + Real.sqrt (MakingMeasurementsProjective.orthonormalizationError ζ)) := by
   let a0 : Polynomial params :=
     { poly := 0
-      lowIndividualDegree := by
-        intro i
-        simp }
+      lowIndividualDegree := fun i =>
+        (MvPolynomial.degreeOf_zero i).trans_le (Nat.zero_le _) }
   let Q_A := Preliminaries.completeAtOutcomeProj P_A a0
   let Q_B := Preliminaries.completeAtOutcomeProj P_B a0
   have hleftComplete :
