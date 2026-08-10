@@ -138,9 +138,7 @@ lemma AnswerRestrictedProbabilitiesStatement.ofWeightedBounds
         (xRestrictedAnswerSymStrat params strategy x).selfConsistencyFailureProbability
       diagonal := fun x =>
         (xRestrictedAnswerSymStrat params strategy x).diagonalFailureProbability
-      restrictedGood := by
-        intro x
-        exact ⟨le_rfl, le_rfl, le_rfl⟩ }
+      restrictedGood := fun _ => ⟨le_rfl, le_rfl, le_rfl⟩ }
   have haxis_weighted_avg :
       sliceTransverseDirectionWeight params *
           averageAnswerRestrictedAxisParallelError params profile ≤ eps := by
@@ -580,9 +578,7 @@ lemma AnswerSuccessorRestrictedProbabilitiesStatement.ofWeightedBounds
         (xRestrictedAnswerSymStratOfAnswer params strategy x).selfConsistencyFailureProbability
       diagonal := fun x =>
         (xRestrictedAnswerSymStratOfAnswer params strategy x).diagonalFailureProbability
-      restrictedGood := by
-        intro x
-        exact ⟨le_rfl, le_rfl, le_rfl⟩ }
+      restrictedGood := fun _ => ⟨le_rfl, le_rfl, le_rfl⟩ }
   have haxis_weighted_avg :
       sliceTransverseDirectionWeight params *
           averageAnswerSuccessorRestrictedAxisParallelError params profile ≤ eps := by

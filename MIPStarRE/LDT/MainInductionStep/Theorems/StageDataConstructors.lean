@@ -93,24 +93,18 @@ noncomputable def SliceRestrictionData.ofAnswer
       diagonal := answerPkg.profile.diagonal
       restrictedGood := fun x =>
         let hgood := answerPkg.profile.restrictedGood x
-        { axisParallelTest := by
-            simpa [answerRestricted_axisParallelFailureProbability_eq params strategy x]
-              using hgood.axisParallelTest
-          selfConsistencyTest := by
-            simpa [answerRestricted_selfConsistencyFailureProbability_eq params strategy x]
-              using hgood.selfConsistencyTest
-          diagonalLineTest := by
-            simpa [answerRestricted_diagonalFailureProbability_eq params strategy x]
-              using hgood.diagonalLineTest } }
-  axisAverageBound := by
-    simpa [averageRestrictedAxisParallelError, averageAnswerRestrictedAxisParallelError]
-      using answerPkg.axisAverageBound
-  selfAverageBound := by
-    simpa [averageRestrictedSelfConsistencyError, averageAnswerRestrictedSelfConsistencyError]
-      using answerPkg.selfAverageBound
-  diagonalAverageBound := by
-    simpa [averageRestrictedDiagonalError, averageAnswerRestrictedDiagonalError]
-      using answerPkg.diagonalAverageBound
+        { axisParallelTest :=
+            answerRestricted_axisParallelFailureProbability_eq params strategy x ▸
+              hgood.axisParallelTest
+          selfConsistencyTest :=
+            answerRestricted_selfConsistencyFailureProbability_eq params strategy x ▸
+              hgood.selfConsistencyTest
+          diagonalLineTest :=
+            answerRestricted_diagonalFailureProbability_eq params strategy x ▸
+              hgood.diagonalLineTest } }
+  axisAverageBound := answerPkg.axisAverageBound
+  selfAverageBound := answerPkg.selfAverageBound
+  diagonalAverageBound := answerPkg.diagonalAverageBound
 
 /-- Turn the recursive family of slice-wise induction witnesses into explicit
 slice data `x ↦ (σ_x, G^x)`.
