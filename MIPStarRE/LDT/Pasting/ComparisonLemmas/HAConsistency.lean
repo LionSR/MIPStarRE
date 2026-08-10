@@ -68,13 +68,10 @@ theorem hAConsistency_submeas_from_lineConsistency_of_axis_self
           eps delta gamma zeta) := by
   let pointLineMeas : IdxMeas (Point params.next) (Fq params.next) ι := fun u =>
     { toSubMeas := liftedVerticalLineAnswerFamily params strategy u
-      total_eq_one := by
-        let ℓ : AxisParallelLine params.next :=
+      total_eq_one :=
+        (strategy.axisParallelMeasurement
           { base := appendPoint params (truncatePoint params u) zeroCoord
-            direction := lastCoord params }
-        simpa [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, ℓ,
-          postprocess_total] using
-          (strategy.axisParallelMeasurement ℓ).total_eq_one }
+            direction := lastCoord params }).total_eq_one }
   let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
     fun u => (strategy.pointMeasurement u).toMeasurement
   let νB := hBConsistencyError params eps delta gamma zeta k

@@ -85,13 +85,9 @@ lemma chernoffBernoulliMatrix {ι : Type*} [Fintype ι] [DecidableEq ι]
     (hcomplete : CompletenessAtLeast ψ
       ({ outcome := fun _ => X
          total := X
-         outcome_pos := by
-           intro _
-           exact hXpsd
-         sum_eq_total := by
-           simp
-         total_le_one := by
-           exact hXleOne } : SubMeas Unit ι)
+         outcome_pos := fun _ => hXpsd
+         sum_eq_total := Fintype.sum_unique fun _ => X
+         total_le_one := hXleOne } : SubMeas Unit ι)
       (1 - kappa)) :
     ChernoffBernoulliMatrixStatement ψ theta k degree X kappa hXpsd hXleOne := by
   let expTerm : Error := Real.exp (-((theta ^ (2 : ℕ)) * (k : Error)) / 2)

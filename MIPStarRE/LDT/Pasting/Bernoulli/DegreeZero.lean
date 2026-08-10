@@ -316,12 +316,10 @@ private theorem degreeZero_averagedSlice_pointConsistency
   let delta' : Error := min delta 1
   let lineMeas : IdxMeas (Point params.next) (Fq params.next) ι := fun u =>
     { toSubMeas := liftedVerticalLineAnswerFamily params strategy u
-      total_eq_one := by
-        let ℓ : AxisParallelLine params.next :=
+      total_eq_one :=
+        (strategy.axisParallelMeasurement
           { base := appendPoint params (truncatePoint params u) zeroCoord
-            direction := lastCoord params }
-        simpa [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, ℓ,
-          postprocess_total] using (strategy.axisParallelMeasurement ℓ).total_eq_one }
+            direction := lastCoord params }).total_eq_one }
   let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
     fun u => (strategy.pointMeasurement u).toMeasurement
   have hline :
@@ -561,12 +559,10 @@ private theorem degreeZero_averagedSlice_pointConsistency_of_axis_self
   let delta' : Error := min delta 1
   let lineMeas : IdxMeas (Point params.next) (Fq params.next) ι := fun u =>
     { toSubMeas := liftedVerticalLineAnswerFamily params strategy u
-      total_eq_one := by
-        let ℓ : AxisParallelLine params.next :=
+      total_eq_one :=
+        (strategy.axisParallelMeasurement
           { base := appendPoint params (truncatePoint params u) zeroCoord
-            direction := lastCoord params }
-        simpa [liftedVerticalLineAnswerFamily, verticalLineMeasurementFamily, ℓ,
-          postprocess_total] using (strategy.axisParallelMeasurement ℓ).total_eq_one }
+            direction := lastCoord params }).total_eq_one }
   let pointMeas : IdxMeas (Point params.next) (Fq params.next) ι :=
     fun u => (strategy.pointMeasurement u).toMeasurement
   have hline :

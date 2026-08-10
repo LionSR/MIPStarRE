@@ -34,9 +34,8 @@ trivially satisfies the low-individual-degree bound. -/
 noncomputable def fallbackInterpolatedPolynomial (params : Parameters) [FieldModel params.q] :
     Polynomial params.next where
   poly := 0
-  lowIndividualDegree := by
-    intro i
-    simp [MvPolynomial.degreeOf_zero]
+  lowIndividualDegree := fun i =>
+    (MvPolynomial.degreeOf_zero i).trans_le (Nat.zero_le params.d)
 
 /-- Extract the polynomial from a genuine slice outcome. -/
 def extractSlicePoly {params : Parameters} {k : ℕ}
@@ -108,6 +107,91 @@ noncomputable def interpolationSupportWitness {params : Parameters} {k : ℕ}
     subset_support := (Classical.choose_spec hs).1
     card_eq := (Classical.choose_spec hs).2 }
 
+/-- The Lagrange interpolation expression has individual degree at most `d`. -/
+private theorem interpolateCompletedSlicesFromSupport_degree
+    (params : Parameters) [FieldModel params.q] {k : ℕ} (xs : PointTuple params k)
+    (gs : GHatTupleOutcome params k) (σ : Finset (Fin k))
+    (hσsupport : σ ⊆ gHatTupleSupport gs) (hσcard : σ.card = params.d + 1)
+    (coord : Fin params.next.m) :
+    MvPolynomial.degreeOf coord
+      (∑ idx ∈ σ.attach,
+        let slicePoly :=
+          MvPolynomial.rename (embedCoord params)
+            (extractSlicePoly gs idx.1 (hσsupport idx.2)).poly
+        let Li : _root_.Polynomial (Scalar params) :=
+          Lagrange.basis σ (fun i => decodeScalar (xs i)) idx.1
+        let LiMv := Li.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+        LiMv * slicePoly) ≤ params.d := by
+  refine (MvPolynomial.degreeOf_sum_le coord σ.attach _).trans ?_
+  refine Finset.sup_le fun idx _hidx => ?_
+  let slice : Polynomial params := extractSlicePoly gs idx.1 (hσsupport idx.2)
+  let slicePoly : PolynomialModel params.next :=
+    MvPolynomial.rename (embedCoord params) slice.poly
+  let Li : _root_.Polynomial (Scalar params) :=
+    Lagrange.basis σ (fun i => decodeScalar (xs i)) idx.1
+  let LiMv : PolynomialModel params.next :=
+    Li.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
+  have hLi_natDegree : Li.natDegree ≤ params.d := by
+    have hbasis : Li.natDegree ≤ σ.card - 1 := by
+      exact natDegree_lagrangeBasis_le_card_sub_one idx.2
+    simpa [Li, hσcard] using hbasis
+  by_cases hcoord : coord.val < params.m
+  · let oldCoord : Fin params.m := ⟨coord.val, hcoord⟩
+    have hcoord_eq : embedCoord params oldCoord = coord := by
+      ext
+      simp [embedCoord, oldCoord]
+    have hcoord_ne_last : coord ≠ lastCoord params := by
+      rw [← hcoord_eq]
+      exact embedCoord_ne_lastCoord params oldCoord
+    have hLiMv_zero : MvPolynomial.degreeOf coord LiMv ≤ 0 := by
+      have hdeg :=
+        (degreeOf_eval₂_C_X_le_natDegree
+          (p := Li) (i := coord) (j := lastCoord params))
+      rw [if_neg hcoord_ne_last] at hdeg
+      exact hdeg
+    have hslice : MvPolynomial.degreeOf coord slicePoly ≤ params.d := by
+      change MvPolynomial.degreeOf coord
+          (MvPolynomial.rename (embedCoord params) slice.poly :
+            PolynomialModel params.next) ≤ params.d
+      rw [← hcoord_eq, MvPolynomial.degreeOf_rename_of_injective
+        (embedCoord_injective params)]
+      exact slice.lowIndividualDegree oldCoord
+    calc
+      MvPolynomial.degreeOf coord (LiMv * slicePoly)
+          ≤ MvPolynomial.degreeOf coord LiMv + MvPolynomial.degreeOf coord slicePoly := by
+            exact MvPolynomial.degreeOf_mul_le _ _ _
+      _ ≤ 0 + params.d := Nat.add_le_add hLiMv_zero hslice
+      _ = params.d := by simp
+  · have hcoord_eq_last : coord = lastCoord params := by
+      have hlt_succ : coord.val < params.m + 1 := by
+        simpa [Parameters.next] using coord.isLt
+      have hle : params.m ≤ coord.val := Nat.le_of_not_gt hcoord
+      have hval : coord.val = params.m := le_antisymm (Nat.le_of_lt_succ hlt_succ) hle
+      ext
+      simp [lastCoord, hval]
+    subst coord
+    have hLiMv : MvPolynomial.degreeOf (lastCoord params) LiMv ≤ params.d := by
+      have hLiMv_nat :
+          MvPolynomial.degreeOf (lastCoord params) LiMv ≤ Li.natDegree := by
+        have hdeg :=
+          (degreeOf_eval₂_C_X_le_natDegree
+            (p := Li) (i := lastCoord params) (j := lastCoord params))
+        rw [if_pos rfl] at hdeg
+        exact hdeg
+      exact hLiMv_nat.trans hLi_natDegree
+    have hslice_zero : MvPolynomial.degreeOf (lastCoord params) slicePoly ≤ 0 := by
+      change MvPolynomial.degreeOf (lastCoord params)
+          (MvPolynomial.rename (embedCoord params) slice.poly :
+            PolynomialModel params.next) ≤ 0
+      rw [degreeOf_rename_embedCoord_lastCoord]
+    calc
+      MvPolynomial.degreeOf (lastCoord params) (LiMv * slicePoly)
+          ≤ MvPolynomial.degreeOf (lastCoord params) LiMv +
+              MvPolynomial.degreeOf (lastCoord params) slicePoly := by
+            exact MvPolynomial.degreeOf_mul_le _ _ _
+      _ ≤ params.d + 0 := Nat.add_le_add hLiMv hslice_zero
+      _ = params.d := by simp
+
 /-- Interpolate from a specified `d+1`-element index set to recover
 a polynomial in `m+1` variables via Lagrange interpolation.
 The caller must provide `hσsupport : σ ⊆ gHatTupleSupport gs`, i.e. every
@@ -137,76 +221,7 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
       Li.eval₂ MvPolynomial.C
         (MvPolynomial.X (lastCoord params))
     LiMv * slicePoly
-  lowIndividualDegree := by
-    intro coord
-    refine (MvPolynomial.degreeOf_sum_le coord σ.attach _).trans ?_
-    refine Finset.sup_le fun idx _hidx => ?_
-    let slice : Polynomial params := extractSlicePoly gs idx.1 (hσsupport idx.2)
-    let slicePoly : PolynomialModel params.next :=
-      MvPolynomial.rename (embedCoord params) slice.poly
-    let Li : _root_.Polynomial (Scalar params) :=
-      Lagrange.basis σ (fun i => decodeScalar (xs i)) idx.1
-    let LiMv : PolynomialModel params.next :=
-      Li.eval₂ MvPolynomial.C (MvPolynomial.X (lastCoord params))
-    have hLi_natDegree : Li.natDegree ≤ params.d := by
-      have hbasis : Li.natDegree ≤ σ.card - 1 := by
-        exact natDegree_lagrangeBasis_le_card_sub_one idx.2
-      simpa [Li, hσcard] using hbasis
-    by_cases hcoord : coord.val < params.m
-    · let oldCoord : Fin params.m := ⟨coord.val, hcoord⟩
-      have hcoord_eq : embedCoord params oldCoord = coord := by
-        ext
-        simp [embedCoord, oldCoord]
-      have hcoord_ne_last : coord ≠ lastCoord params := by
-        rw [← hcoord_eq]
-        exact embedCoord_ne_lastCoord params oldCoord
-      have hLiMv_zero : MvPolynomial.degreeOf coord LiMv ≤ 0 := by
-        have hdeg :=
-          (degreeOf_eval₂_C_X_le_natDegree
-            (p := Li) (i := coord) (j := lastCoord params))
-        rw [if_neg hcoord_ne_last] at hdeg
-        exact hdeg
-      have hslice : MvPolynomial.degreeOf coord slicePoly ≤ params.d := by
-        change MvPolynomial.degreeOf coord
-            (MvPolynomial.rename (embedCoord params) slice.poly :
-              PolynomialModel params.next) ≤ params.d
-        rw [← hcoord_eq, MvPolynomial.degreeOf_rename_of_injective
-          (embedCoord_injective params)]
-        exact slice.lowIndividualDegree oldCoord
-      calc
-        MvPolynomial.degreeOf coord (LiMv * slicePoly)
-            ≤ MvPolynomial.degreeOf coord LiMv + MvPolynomial.degreeOf coord slicePoly := by
-              exact MvPolynomial.degreeOf_mul_le _ _ _
-        _ ≤ 0 + params.d := Nat.add_le_add hLiMv_zero hslice
-        _ = params.d := by simp
-    · have hcoord_eq_last : coord = lastCoord params := by
-        have hlt_succ : coord.val < params.m + 1 := by
-          simpa [Parameters.next] using coord.isLt
-        have hle : params.m ≤ coord.val := Nat.le_of_not_gt hcoord
-        have hval : coord.val = params.m := le_antisymm (Nat.le_of_lt_succ hlt_succ) hle
-        ext
-        simp [lastCoord, hval]
-      subst coord
-      have hLiMv : MvPolynomial.degreeOf (lastCoord params) LiMv ≤ params.d := by
-        have hLiMv_nat :
-            MvPolynomial.degreeOf (lastCoord params) LiMv ≤ Li.natDegree := by
-          have hdeg :=
-            (degreeOf_eval₂_C_X_le_natDegree
-              (p := Li) (i := lastCoord params) (j := lastCoord params))
-          rw [if_pos rfl] at hdeg
-          exact hdeg
-        exact hLiMv_nat.trans hLi_natDegree
-      have hslice_zero : MvPolynomial.degreeOf (lastCoord params) slicePoly ≤ 0 := by
-        change MvPolynomial.degreeOf (lastCoord params)
-            (MvPolynomial.rename (embedCoord params) slice.poly :
-              PolynomialModel params.next) ≤ 0
-        rw [degreeOf_rename_embedCoord_lastCoord]
-      calc
-        MvPolynomial.degreeOf (lastCoord params) (LiMv * slicePoly)
-            ≤ MvPolynomial.degreeOf (lastCoord params) LiMv +
-                MvPolynomial.degreeOf (lastCoord params) slicePoly := by
-              exact MvPolynomial.degreeOf_mul_le _ _ _
-        _ ≤ params.d + 0 := Nat.add_le_add hLiMv hslice_zero
-        _ = params.d := by simp
+  lowIndividualDegree :=
+    interpolateCompletedSlicesFromSupport_degree params xs gs σ hσsupport hσcard
 
 end MIPStarRE.LDT.Pasting

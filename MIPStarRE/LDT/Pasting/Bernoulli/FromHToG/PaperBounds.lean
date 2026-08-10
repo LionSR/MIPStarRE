@@ -304,24 +304,14 @@ lemma fromHToG_headTail_adjoint_qSDDCore_bound
               (gHatHalfProductOutcomeOperator params family n q.2 ogs.2)ᴴ))) ≤
       commuteGHalfSandwichError params gamma zeta k := by
   let eQ : (Fq params × PointTuple params n) ≃ (Fq params × PointTuple params n) :=
-    { toFun := fun q => (q.1, (fromHToGPointTupleReverseEquiv params n) q.2)
-      invFun := fun q => (q.1, (fromHToGPointTupleReverseEquiv params n) q.2)
-      left_inv := by
-        rintro ⟨x, xs⟩
-        simp [fromHToGPointTupleReverseEquiv]
-      right_inv := by
-        rintro ⟨x, xs⟩
-        simp [fromHToGPointTupleReverseEquiv] }
+    (Function.Involutive.prodMap (f := id)
+      (g := fromHToGPointTupleReverseEquiv params n) (fun _ => rfl)
+      (fromHToGPointTupleReverseEquiv params n).left_inv).toPerm
   let eO : (GHatOutcome params × GHatTupleOutcome params n) ≃
       (GHatOutcome params × GHatTupleOutcome params n) :=
-    { toFun := fun ogs => (ogs.1, (fromHToGGHatTupleOutcomeReverseEquiv params n) ogs.2)
-      invFun := fun ogs => (ogs.1, (fromHToGGHatTupleOutcomeReverseEquiv params n) ogs.2)
-      left_inv := by
-        rintro ⟨g, gs⟩
-        simp [fromHToGGHatTupleOutcomeReverseEquiv]
-      right_inv := by
-        rintro ⟨g, gs⟩
-        simp [fromHToGGHatTupleOutcomeReverseEquiv] }
+    (Function.Involutive.prodMap (f := id)
+      (g := fromHToGGHatTupleOutcomeReverseEquiv params n) (fun _ => rfl)
+      (fromHToGGHatTupleOutcomeReverseEquiv params n).left_inv).toPerm
   let baseIntegrand := fun q : Fq params × PointTuple params n =>
     qSDDCore ψbi
       (fun ogs : GHatOutcome params × GHatTupleOutcome params n =>
