@@ -611,8 +611,9 @@ Checked in this repository snapshot:
 The `texra-lean-skills` plugin (texra-ai/texra-lean-skills) carries the
 canonical Mathlib-style, proof-integrity, and prose convention texts as the
 `lean-conventions` skill. Claude Code installs it automatically via
-`.claude/settings.json`; other agents: `npx skills add
-texra-ai/texra-lean-skills` (or the repo's install.sh without Node).
+`.claude/settings.json`; other agents install it by cloning the
+repository and symlinking the skill directories into their skill
+location, as described in its README.
 MIPStarRE-local addenda to those conventions live in
 `docs/project_conventions.md`, which restates no shared rule.
 

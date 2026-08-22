@@ -114,8 +114,8 @@ Shared Mathlib-style conventions (style, naming, documentation, PR review,
 proof integrity, prose) live in the `lean-conventions` skill of
 [texra-ai/texra-lean-skills](https://github.com/texra-ai/texra-lean-skills),
 auto-installed for Claude Code via `.claude/settings.json` (other agents:
-`npx skills add texra-ai/texra-lean-skills`, or the repo's install.sh
-without Node).
+clone the repository and symlink the skill directories into the agent's
+skill location, as described in its README).
 
 MIPStarRE-local references:
 

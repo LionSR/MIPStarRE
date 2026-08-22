@@ -3,7 +3,8 @@
 The canonical convention documents live in the `lean-conventions` skill of
 [texra-ai/texra-lean-skills](https://github.com/texra-ai/texra-lean-skills)
 (auto-installed for Claude Code sessions via `.claude/settings.json`; other
-agents: `npx skills add texra-ai/texra-lean-skills`). This file holds only
+agents: clone the repository and symlink the skill directories, per its
+README). This file holds only
 MIPStarRE's project-local facts — it restates no shared rule, and shared
 rules never move here.
 
@@ -37,7 +38,8 @@ the main mechanism for a linter-warning cleanup PR.
 
 For this repository, the first review question is whether a paper-facing Lean
 statement still represents the cited result in `references/ldt-paper/`.  Before
-applying the general mathlib review checklist above, compare every changed
+applying the general mathlib review checklist in the lean-conventions
+`MATHLIB_pr-review` reference, compare every changed
 source-labelled theorem, lemma, proposition, corollary, or definition with the
 corresponding paper statement and the active blueprint entry.
 
@@ -59,7 +61,8 @@ remark states that they are not additional hypotheses in the paper theorem.
 ### Companion document
 
 > **Companion document:** [`anti_patterns.md`](./anti_patterns.md) catalogues
-> subtler proof-evasion patterns that pass every blocker check above yet still
+> subtler proof-evasion patterns that pass every blocker check in the
+> lean-conventions `PROOF_INTEGRITY` reference yet still
 > fail to prove the claimed mathematics (conclusion-shaped hypotheses,
 > definitional sleight-of-hand, zero-fallback branches, trivial default
 > witnesses, Mathlib-bypass castles, external `*Statement` smuggles).
@@ -67,13 +70,15 @@ remark states that they are not additional hypotheses in the paper theorem.
 
 ### Project paper-realignment protocol
 
-The canonical paper-realignment exception above is instantiated here as
+The canonical paper-realignment exception in the lean-conventions
+`PROOF_INTEGRITY` reference is instantiated here as
 follows (the protocol and the `**Unfaithful:**` marker are described in
 `AGENTS.md`):
 
 > **Paper-realignment exception:** When a PR is explicitly realigning a
 > source-labelled declaration with `references/ldt-paper/`, the `sorry`
-> blocker above may be temporarily relaxed for the affected proof bodies.  The
+> blocker of the lean-conventions `PROOF_INTEGRITY` reference may be
+> temporarily relaxed for the affected proof bodies.  The
 > PR must restore the source-faithful public statement, name the remaining proof
 > obligation as a theorem or lemma, and cite the paper passage plus the
 > tracking issue or paper-gap note.  A theorem whose proof still depends on a
