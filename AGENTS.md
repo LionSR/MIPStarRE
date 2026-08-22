@@ -606,6 +606,16 @@ Checked in this repository snapshot:
 - No `.cursor/rules/`
 - No `.github/copilot-instructions.md`
 
+### Skills
+
+The `texra-lean-skills` plugin (texra-ai/texra-lean-skills) carries the
+canonical Mathlib-style, proof-integrity, and prose convention texts as the
+`lean-conventions` skill. Claude Code installs it automatically via
+`.claude/settings.json`; other agents install it with the `install.sh`
+script in the texra-lean-skills repository. The `docs/MATHLIB_*.md`,
+`docs/PROOF_INTEGRITY.md`, and `docs/prose_style.md` files below are pointer
+stubs into that skill, keeping only their project addenda repo-local.
+
 Use this file together with:
 
 | File | Purpose |
