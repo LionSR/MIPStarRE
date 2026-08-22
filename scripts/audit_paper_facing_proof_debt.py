@@ -220,22 +220,22 @@ SOURCE_CONTEXT_TOKENS = {
     "NaimarkData": (
         "standard one-measurement Naimark construction data; see "
         "references/ldt-paper/orthonormalization.tex:121-187 and "
-        "docs/paper-gaps/naimark.tex"
+        "docs/paper-gaps/naimark-dilation.tex"
     ),
     "OneMeasNaimarkData": (
         "standard one-measurement Naimark construction data; see "
         "references/ldt-paper/orthonormalization.tex:121-187 and "
-        "docs/paper-gaps/naimark.tex"
+        "docs/paper-gaps/naimark-dilation.tex"
     ),
     "leftData": (
         "left-hand one-measurement Naimark data in the two-sided trace "
         "identity; see references/ldt-paper/orthonormalization.tex:161-187 "
-        "and docs/paper-gaps/naimark.tex"
+        "and docs/paper-gaps/naimark-dilation.tex"
     ),
     "rightData": (
         "right-hand one-measurement Naimark data in the two-sided trace "
         "identity; see references/ldt-paper/orthonormalization.tex:161-187 "
-        "and docs/paper-gaps/naimark.tex"
+        "and docs/paper-gaps/naimark-dilation.tex"
     ),
     "hresidual": (
         "local residual-mass comparison for restricting an Option-completed "

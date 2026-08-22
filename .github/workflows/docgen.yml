@@ -121,6 +121,9 @@ jobs:
             exit "$cmd_status"
           fi
 
+      - name: Check paper-gap note names and references
+        run: texra-blueprint --root . paper-gaps check
+
       - name: Build paper-gap PDFs
         run: texra-blueprint --root . paper-gaps build
 

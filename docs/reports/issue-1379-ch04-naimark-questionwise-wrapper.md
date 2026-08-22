@@ -8,7 +8,7 @@ The questionwise interface described below has been superseded as the boundary
 for the source theorem.  The current blueprint links `thm:naimark` to the proved
 tensor-product correlation theorem
 `MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation` in
-the projective-submeasurement form documented in `docs/paper-gaps/naimark.tex`.
+the projective-submeasurement form documented in `docs/paper-gaps/naimark-dilation.tex`.
 The declaration `questionwiseNaimark` remains a useful Lean-only auxiliary
 interface below that source theorem; it is no longer the stopping point for
 Chapter 4 Naimark.
@@ -31,7 +31,7 @@ single-outcome marginal-preservation identities.
 
 This was the first Lean interface used by the formal development.  The full
 simultaneous tensor-product assembly is now proved by
-`naimarkTensorProductCorrelation`; `docs/paper-gaps/naimark.tex` records the
+`naimarkTensorProductCorrelation`; `docs/paper-gaps/naimark-dilation.tex` records the
 projective-submeasurement correction to the printed complete-measurement form.
 
 ## Statement integrity audit

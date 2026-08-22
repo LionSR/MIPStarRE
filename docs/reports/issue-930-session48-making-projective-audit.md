@@ -52,7 +52,7 @@ one-measurement helper.  This historical audit predated the repair of the full
 tensor-product statement.  The current blueprint links `thm:naimark` to
 `MIPStarRE.LDT.MakingMeasurementsProjective.naimarkTensorProductCorrelation`
 and marks it `\leanok` in the projective-submeasurement form documented in
-`docs/paper-gaps/naimark.tex`.
+`docs/paper-gaps/naimark-dilation.tex`.
 
 The audited one-measurement theorem `oneMeasNaimark` matches the paper helper. It constructs a projective submeasurement on the enlarged space `d × Option α`, using the extra `none` outcome as the auxiliary direction, and proves the normalized-trace compression identity for each original outcome (`NaimarkOneMeas.lean:238-257`). The proof follows the paper route: build the isometry column from the square roots of the submeasurement effects and the residual effect, extend it to a unitary, and conjugate the auxiliary-basis projectors (`NaimarkOneMeas.lean:247-255`, `:271-286`).
 

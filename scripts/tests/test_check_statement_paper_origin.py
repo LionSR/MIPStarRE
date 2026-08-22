@@ -153,7 +153,7 @@ class HasOriginTests(unittest.TestCase):
         self.assertTrue(_has_origin("references/ldt-paper/expansion.tex:145-178"))
 
     def test_paper_gap_path(self) -> None:
-        self.assertTrue(_has_origin("see docs/paper-gaps/naimark.tex"))
+        self.assertTrue(_has_origin("see docs/paper-gaps/naimark-dilation.tex"))
 
     def test_latex_lemma_label(self) -> None:
         self.assertTrue(_has_origin(r"\label{lem:add-in-u}"))
@@ -330,7 +330,7 @@ class ScanFileTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as td:
             path = Path(td) / "F.lean"
             _write(path, (
-                "/-- See `docs/paper-gaps/naimark.tex`. -/\n"
+                "/-- See `docs/paper-gaps/naimark-dilation.tex`. -/\n"
                 "structure FooStatement where\n"
             ))
             self.assertEqual(_scan_file(path), [])
