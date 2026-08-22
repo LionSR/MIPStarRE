@@ -372,7 +372,7 @@ Project-preferred variable names:
 - `P` — projective measurements
 - `G` — graphs (hypercube expansion)
 
-For full details, see `docs/naming.md` and `docs/style.md`.
+For full details, see `docs/MATHLIB_naming.md` and `docs/MATHLIB_style.md`.
 
 ### Types and signatures
 
@@ -562,7 +562,7 @@ Use `Addresses #N` (keeps the issue open) or `Closes #N` (auto-closes on merge).
 Every PR touching Lean code should be reviewed against these criteria:
 
 1. **Proof correctness** — No unexplained `sorry`. No `axiom` unless discussed.
-2. **Mathlib style** — Follow `docs/naming.md` and `docs/doc.md`.
+2. **Mathlib style** — Follow `docs/MATHLIB_naming.md` and `docs/MATHLIB_doc.md`.
 3. **Paper terminology** — Public Lean names and documentation should use
    terminology from the paper and blueprint. See `docs/mathematical_language.md`.
 4. **Linter hygiene** — Fix warnings, don't mask them with broad
@@ -581,7 +581,7 @@ Every PR touching Lean code should be reviewed against these criteria:
    a paper theorem.
 12. **Proof-evasion anti-patterns** — Review against `docs/anti_patterns.md`.
 
-For full details, see `docs/CONTRIBUTING.md` and `docs/pr-review.md`.
+For full details, see `docs/CONTRIBUTING.md` and `docs/MATHLIB_pr-review.md`.
 
 ## Blueprint and Documentation Work
 
@@ -615,9 +615,9 @@ Use this file together with:
 | `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
 | `docs/anti_patterns.md` | Subtler proof-evasion patterns |
 | `docs/proof_frontier_review.md` | Review checklist for construction theorems and residual inputs |
-| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
-| `docs/naming.md` | Mathlib naming conventions |
-| `docs/doc.md` | Mathlib documentation standards |
+| `docs/MATHLIB_style.md` | Mathlib code style (line length, indentation, tactic formatting) |
+| `docs/MATHLIB_naming.md` | Mathlib naming conventions |
+| `docs/MATHLIB_doc.md` | Mathlib documentation standards |
 | `docs/mathematical_language.md` | Project-local terminology rules |
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
 | `docs/api_surface.md` | Useful obligation-closing lemmas for `SubMeas` |
@@ -626,7 +626,7 @@ Use this file together with:
 | `docs/formalization-patterns.md` | Conditional scaffolding, blueprint sync, split imports, and bridge records |
 | `docs/external-lemmas-pedagogy.md` | Pedagogical notes on Mathlib and external lemmas |
 | `docs/ci-automation.md` | CI/CD workflow details |
-| `docs/pr-review.md` | Mathlib PR review guide |
+| `docs/MATHLIB_pr-review.md` | Mathlib PR review guide |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |
 | `audits/` | Chapter-by-chapter scouting reports |
 | Pinned memories (external agent tooling) | Agent session memory maintained by the agent runtime; not a directory in the repository checkout. Pinned memories contain accumulated project lessons |

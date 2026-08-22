@@ -1,3 +1,9 @@
+<!-- Canonical source: https://github.com/texra-ai/texra-lean-skills/blob/main/docs/PROOF_INTEGRITY.md
+     This file is a stamped mirror: the body below this header is the shared
+     canonical text; project-specific material lives only in the "Project
+     addendum" section at the end. Edit the canonical file upstream and
+     re-copy; edit only the addendum here. -->
+
 # Lean Proof Integrity Rules
 
 This file is the **single source of truth** for proof integrity checks in this
@@ -6,24 +12,15 @@ rather than duplicating the rules inline.
 
 > **Lean version**: 4.x (Lean 3 keywords like `constant` do not apply)
 
-> **Companion document:** [`anti_patterns.md`](./anti_patterns.md) catalogues
-> subtler proof-evasion patterns that pass every blocker check below yet still
-> fail to prove the claimed mathematics (conclusion-shaped hypotheses,
-> definitional sleight-of-hand, zero-fallback branches, trivial default
-> witnesses, Mathlib-bypass castles, external `*Statement` smuggles).
-> Consult it alongside this file during review.
-
-> **Paper-realignment exception:** When a PR is explicitly realigning a
-> source-labelled declaration with `references/ldt-paper/`, the `sorry`
-> blocker below may be temporarily relaxed for the affected proof bodies.  The
-> PR must restore the source-faithful public statement, name the remaining proof
-> obligation as a theorem or lemma, and cite the paper passage plus the
-> tracking issue or paper-gap note.  A theorem whose proof still depends on a
-> known non-paper bridge, residual, repair input, obligation structure, or
-> conditional helper
-> must carry the `**Unfaithful:**` docstring marker described in `AGENTS.md`.
-> Review such PRs against statement faithfulness and the documented discharge
-> plan, not merely against the temporary `sorry` count.
+> **Paper-realignment exception**: When the formalization is being realigned
+> to a cited source (replacing wrong hypotheses, restating divergent theorems
+> to match the paper), the `sorry` blocker below is temporarily relaxed for
+> the *specific* theorems whose old proof depended on the deviating
+> hypotheses. The protocol — including the required `**Unfaithful:**` marker
+> on every such theorem and a paper-gap note documenting the deviation — is
+> in `CLAUDE.md` §"Paper-realignment mode". Reviewers should evaluate
+> paper-realignment PRs against the gap note and the planned follow-up, not
+> against the `sorry` count alone.
 
 ---
 
@@ -51,21 +48,14 @@ These patterns **must** be resolved before merging.
 
 | Pattern | Risk |
 |---------|------|
-| `axiom` declarations | Introduces unproven assumptions that could be inconsistent; must be explicitly justified |
+| `axiom` declarations | Introduces unproven assumptions that could be inconsistent; every new declaration is a blocker |
 
-When an external mathematical result must remain unformalized temporarily,
-prefer a caller-supplied `Prop` hypothesis over a global `axiom`
-declaration, and add a regression check (for example a
-`Lean.collectAxioms`-based assertion, as in
-`MIPStarRE.LDT.Test.AxiomAudit`) so later refactors cannot silently widen
-the axiomatic base.
+#### Sanctioned axioms
 
-This preference does not license proposition inputs on source-labelled paper
-theorems.  If the cited paper theorem does not assume the proposition, a
-caller-supplied `Prop` hypothesis is an additional theorem hypothesis, not a
-proof of the paper statement.  Use such hypotheses only for explicitly
-conditional auxiliary results, and keep the source-labelled theorem statement
-faithful to the paper.
+Any new `axiom` declaration is a blocker unless explicitly sanctioned.
+A historically sanctioned axiom, and the theorem that later discharged
+it, is project fact rather than policy: record that history in the
+project's own conventions addendum, not here.
 
 ### Circular reasoning
 
@@ -101,6 +91,106 @@ Proofs that avoid grounding in Mathlib:
 When flagging, perform an actual lookup (grep, `#find?`, `exact?`,
 `library_search`). If an equivalent exists, cite the Mathlib lemma and module
 path. If not, state "no equivalent found" with search evidence.
+
+---
+
+
+## Warnings
+
+These should be flagged for review but may be acceptable with justification.
+
+### Placeholder tactics
+
+| Pattern | Risk |
+|---------|------|
+| `exact?`, `apply?`, `library_search`, `suggest` | Search tactics left as placeholders — replace with the concrete result |
+
+### Safety / termination bypasses
+
+| Pattern | Risk |
+|---------|------|
+| `unsafe def` | Bypasses Lean safety checks; should not appear in proof-relevant code |
+| `partial def` | No termination proof required; unsound if used to build proof terms |
+| `implemented_by` / `implementedBy` | Decouples runtime behavior from proven specification |
+
+### Suspicious options
+
+| Pattern | Risk |
+|---------|------|
+| `set_option maxHeartbeats 0` | Disables timeout — can hide non-terminating proofs |
+| `set_option maxHeartbeats` with values >= 4,000,000 | 20x the default (200,000) — likely indicates an inefficient proof |
+| `set_option maxRecDepth` with values >= 10,000 | May hide structural issues in proofs |
+
+### Debug artifacts
+
+| Pattern | Risk |
+|---------|------|
+| `dbg_trace` | Debug trace left in code |
+| `stop` | Halts elaboration — development aid only |
+| `#check`, `#eval`, `#print` in proof files | Debug commands that should be removed |
+
+---
+
+## How to use this file
+
+**In CI review prompts**: Reference this file instead of inlining the rules:
+```
+Read `docs/PROOF_INTEGRITY.md` for the complete list of proof integrity
+rules. Flag blockers as must-fix issues that should block merge.
+Flag warnings as advisory — note them but acknowledge they may be
+acceptable with justification.
+```
+
+**For manual review**: Use this as a checklist when reviewing Lean PRs.
+
+**Updating rules**: Edit this file and all referencing workflows will
+automatically pick up the changes.
+
+
+## Project addendum (MIPStarRE)
+
+### Companion document
+
+> **Companion document:** [`anti_patterns.md`](./anti_patterns.md) catalogues
+> subtler proof-evasion patterns that pass every blocker check above yet still
+> fail to prove the claimed mathematics (conclusion-shaped hypotheses,
+> definitional sleight-of-hand, zero-fallback branches, trivial default
+> witnesses, Mathlib-bypass castles, external `*Statement` smuggles).
+> Consult it alongside this file during review.
+
+### Project paper-realignment protocol
+
+The canonical paper-realignment exception above is instantiated here as
+follows (the protocol and the `**Unfaithful:**` marker are described in
+`AGENTS.md`):
+
+> **Paper-realignment exception:** When a PR is explicitly realigning a
+> source-labelled declaration with `references/ldt-paper/`, the `sorry`
+> blocker above may be temporarily relaxed for the affected proof bodies.  The
+> PR must restore the source-faithful public statement, name the remaining proof
+> obligation as a theorem or lemma, and cite the paper passage plus the
+> tracking issue or paper-gap note.  A theorem whose proof still depends on a
+> known non-paper bridge, residual, repair input, obligation structure, or
+> conditional helper
+> must carry the `**Unfaithful:**` docstring marker described in `AGENTS.md`.
+> Review such PRs against statement faithfulness and the documented discharge
+> plan, not merely against the temporary `sorry` count.
+
+### Axiom policy
+
+When an external mathematical result must remain unformalized temporarily,
+prefer a caller-supplied `Prop` hypothesis over a global `axiom`
+declaration, and add a regression check (for example a
+`Lean.collectAxioms`-based assertion, as in
+`MIPStarRE.LDT.Test.AxiomAudit`) so later refactors cannot silently widen
+the axiomatic base.
+
+This preference does not license proposition inputs on source-labelled paper
+theorems.  If the cited paper theorem does not assume the proposition, a
+caller-supplied `Prop` hypothesis is an additional theorem hypothesis, not a
+proof of the paper statement.  Use such hypotheses only for explicitly
+conditional auxiliary results, and keep the source-labelled theorem statement
+faithful to the paper.
 
 ### Scaffolding that blocks real formalization
 
@@ -176,45 +266,7 @@ For every paper-labelled theorem change, require a statement integrity audit:
 - verdict: exact, faithful boundary hypotheses, extra assumptions, weakened
   conclusion, or strengthened conclusion.
 
----
-
-## Warnings
-
-These should be flagged for review but may be acceptable with justification.
-
-### Placeholder tactics
-
-| Pattern | Risk |
-|---------|------|
-| `exact?`, `apply?`, `library_search`, `suggest` | Search tactics left as placeholders — replace with the concrete result |
-
-### Safety / termination bypasses
-
-| Pattern | Risk |
-|---------|------|
-| `unsafe def` | Bypasses Lean safety checks; should not appear in proof-relevant code |
-| `partial def` | No termination proof required; unsound if used to build proof terms |
-| `implemented_by` / `implementedBy` | Decouples runtime behavior from proven specification |
-
-### Suspicious options
-
-| Pattern | Risk |
-|---------|------|
-| `set_option maxHeartbeats 0` | Disables timeout — can hide non-terminating proofs |
-| `set_option maxHeartbeats` with values >= 4,000,000 | 20x the default (200,000) — likely indicates an inefficient proof |
-| `set_option maxRecDepth` with values >= 10,000 | May hide structural issues in proofs |
-
-### Debug artifacts
-
-| Pattern | Risk |
-|---------|------|
-| `dbg_trace` | Debug trace left in code |
-| `stop` | Halts elaboration — development aid only |
-| `#check`, `#eval`, `#print` in proof files | Debug commands that should be removed |
-
----
-
-## How to use this file
+### Source-statement proof gaps
 
 **For source-statement proof gaps**: Read
 [`paper-gaps/proof-gap-protocol.tex`](paper-gaps/proof-gap-protocol.tex) when a
@@ -222,16 +274,3 @@ proof is blocked by a bridge, residual, repair, input, package, or obligation
 structure.  It explains when to introduce an internal obligation theorem, why
 conditional helpers are exceptional temporary quarantine objects, and why a
 tracked `sorry` is preferable to a strengthened source theorem statement.
-
-**In CI review prompts**: Reference this file instead of inlining the rules:
-```
-Read `docs/PROOF_INTEGRITY.md` for the complete list of proof integrity
-rules. Flag blockers as must-fix issues that should block merge.
-Flag warnings as advisory — note them but acknowledge they may be
-acceptable with justification.
-```
-
-**For manual review**: Use this as a checklist when reviewing Lean PRs.
-
-**Updating rules**: Edit this file and all referencing workflows will
-automatically pick up the changes.

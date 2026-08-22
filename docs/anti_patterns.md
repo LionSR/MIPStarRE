@@ -642,8 +642,8 @@ add these checks.
   (`sorry`, `native_decide`, bare `axiom`, etc.).
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) — overall contributor workflow;
   review checklist section should link here.
-- [`pr-review.md`](./pr-review.md) — detailed PR review guidelines.
-- [`naming.md`](./naming.md) and [`style.md`](./style.md) — Mathlib
+- [`MATHLIB_pr-review.md`](./MATHLIB_pr-review.md) — detailed PR review guidelines.
+- [`MATHLIB_naming.md`](./MATHLIB_naming.md) and [`MATHLIB_style.md`](./MATHLIB_style.md) — Mathlib
   conventions; avoiding A5 (bypassing Mathlib) often starts with using
   Mathlib's names.
 - [#1379] — live `*Statement` ledger (replaces [#449], [#451])

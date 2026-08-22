@@ -1,25 +1,10 @@
+<!-- Canonical source: https://github.com/texra-ai/texra-lean-skills/blob/main/docs/MATHLIB_pr-review.md
+     This file is a stamped mirror: the body below this header is the shared
+     canonical text; project-specific material lives only in the "Project
+     addendum" section at the end. Edit the canonical file upstream and
+     re-copy; edit only the addendum here. -->
+
 # Pull Request Review Guide
-
-## MIPStarRE Source-Faithfulness Checks
-
-For this repository, the first review question is whether a paper-facing Lean
-statement still represents the cited result in `references/ldt-paper/`.  Before
-applying the general mathlib review checklist below, compare every changed
-source-labelled theorem, lemma, proposition, corollary, or definition with the
-corresponding paper statement and the active blueprint entry.
-
-Reject a paper-facing statement if it has acquired a non-paper bridge, residual,
-repair, package, producer, proof-obligation, assumptions-bundle, hypotheses-bundle,
-or arbitrary implication hypothesis.  Necessary boundary hypotheses, such as
-positivity for division or nonemptiness of a finite type, may be faithful formal
-encodings of implicit paper assumptions, but they should be documented when
-mathematically load-bearing.
-
-Reviewers should also inspect `\lean{}` and `\leanok` links.  A source-labelled
-blueprint entry should point to the source theorem or its faithful construction
-theorem, not to conditional helpers whose assumptions are proof obligations.
-Auxiliary Lean declarations may be recorded in a separate remark, provided the
-remark states that they are not additional hypotheses in the paper theorem.
 
 This guide provides a detailed look at how to conduct PR reviews for mathlib. You may
 wonder whether this guide applies to you, and the answer is "yes!"
@@ -737,3 +722,27 @@ However, as some practical examples:
   subobjects and making use of the `SetLike` API. For reference, see the [relevant section 
   in Mathematics in Lean](https://leanprover-community.github.io/mathematics_in_lean/C08_Hierarchies.html#sub-objects).
 - Follow the advice of any existing library note.
+
+
+## Project addendum (MIPStarRE)
+
+### Source-faithfulness checks
+
+For this repository, the first review question is whether a paper-facing Lean
+statement still represents the cited result in `references/ldt-paper/`.  Before
+applying the general mathlib review checklist above, compare every changed
+source-labelled theorem, lemma, proposition, corollary, or definition with the
+corresponding paper statement and the active blueprint entry.
+
+Reject a paper-facing statement if it has acquired a non-paper bridge, residual,
+repair, package, producer, proof-obligation, assumptions-bundle, hypotheses-bundle,
+or arbitrary implication hypothesis.  Necessary boundary hypotheses, such as
+positivity for division or nonemptiness of a finite type, may be faithful formal
+encodings of implicit paper assumptions, but they should be documented when
+mathematically load-bearing.
+
+Reviewers should also inspect `\lean{}` and `\leanok` links.  A source-labelled
+blueprint entry should point to the source theorem or its faithful construction
+theorem, not to conditional helpers whose assumptions are proof obligations.
+Auxiliary Lean declarations may be recorded in a separate remark, provided the
+remark states that they are not additional hypotheses in the paper theorem.

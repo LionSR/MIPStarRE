@@ -202,7 +202,7 @@ cleanup PR with the `auto-fix-claude`, `cleanup`, `formalization`, `2009.12982`,
 `ci`, and `infrastructure` labels as appropriate. Any automated or manual
 follow-up must fix warnings rather than hide them behind broad
 `set_option linter.<name> false` blocks; see
-[`docs/style.md#linter-warnings`](style.md#linter-warnings). If a genuine false
+[`docs/MATHLIB_style.md#linter-warnings`](MATHLIB_style.md#linter-warnings). If a genuine false
 positive needs a temporary exception, keep the `set_option` declaration-local,
 place it after the imports and module docstring, and explain why it is not a
 fixable warning. The sweep is strictly for linter/unused-instance hygiene, not

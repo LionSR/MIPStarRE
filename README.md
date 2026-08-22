@@ -114,10 +114,10 @@ Mathlib-derived references:
 
 | File | Purpose |
 |------|---------|
-| `docs/style.md` | Mathlib code style (line length, indentation, tactic formatting) |
-| `docs/naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
-| `docs/doc.md` | Mathlib documentation standards (module headers, docstrings) |
-| `docs/pr-review.md` | Mathlib PR review guide |
+| `docs/MATHLIB_style.md` | Mathlib code style (line length, indentation, tactic formatting) |
+| `docs/MATHLIB_naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
+| `docs/MATHLIB_doc.md` | Mathlib documentation standards (module headers, docstrings) |
+| `docs/MATHLIB_pr-review.md` | Mathlib PR review guide |
 
 MIPStarRE-local references:
 

@@ -1,3 +1,9 @@
+<!-- Canonical source: https://github.com/texra-ai/texra-lean-skills/blob/main/docs/MATHLIB_style.md
+     This file is a stamped mirror: the body below this header is the shared
+     canonical text; project-specific material lives only in the "Project
+     addendum" section at the end. Edit the canonical file upstream and
+     re-copy; edit only the addendum here. -->
+
 # Library Style Guidelines
 
 In addition to the [naming conventions](naming.html),
@@ -31,28 +37,6 @@ Lines should not be longer than 100 characters. This makes files
 easier to read, especially on a small screen or in a small window.
 If you are editing with VS Code, there is a visual marker which
 will indicate a 100 character limit.
-
-### Linter warnings
-
-Do not mask linter warnings instead of fixing them. A cleanup PR should not add
-broad `set_option linter.<name> false` blocks, and especially not file-wide
-blocks, just to make the build output quieter. Linters exist to expose real
-maintenance problems; hiding them makes later proof work and review harder.
-
-Fix the warning at its source whenever possible:
-
-- wrap long lines rather than disabling `linter.style.longLine`;
-- remove or narrow unused variables, section variables, and unused typeclass
-  assumptions rather than disabling the corresponding unused-* linter;
-- remove unused `simp` arguments rather than disabling `linter.unusedSimpArgs`;
-- rewrite proof terms or state the simplified goal explicitly rather than
-  silencing `linter.flexible`.
-
-If a linter warning is a genuine false positive or a temporary porting
-exception, use the narrowest possible scope, preferably
-`set_option linter.<name> false in <decl>`, and add a short nearby explanation.
-Such exceptions should be rare and reviewable. Never use linter suppression as
-the main mechanism for a linter-warning cleanup PR.
 
 ### Header and imports
 
@@ -774,9 +758,48 @@ In this case, no deprecation attribute is required for X, but it is for W.
 
 Named instances do not require deprecations. Deprecated declarations can be deleted after 6 months.
 
+A project may also permit a narrow repository-local exception for exact pass-through
+declarations with no independent mathematical content.  A public theorem,
+definition, or abbreviation may be removed without a transition declaration
+only when all of the following hold:
+
+- the old declaration merely forwards to an existing theorem or definition,
+  exposes a field of a bundled structure, or names a proof step now written
+  directly at the use site;
+- all non-archive uses in the project have been migrated or were already absent, and
+  no blueprint `\lean{...}` tag cites the old name;
+- the PR body and an audit note name the removed declarations, give the
+  replacement for each one, and state that this repository-local exception is
+  being used.
+
 ### Avoid `nonrec`
 
 The `nonrec` keyword tells Lean to assume that apparently recursive calls in the declaration body
 are not actually recursive, and instead look for declarations in other namespaces with the same name.
 Avoid `nonrec` when the recursive call conflicts with another declaration *in a namespace*, because then adding the namespace to that declaration is more informative (to both Lean and the user). If it conflicts with a declaration in the root namespace, then both `nonrec` and `_root_.[...]` are acceptable. Sometimes avoiding `nonrec` requires forgoing the use of dot notation within the body of that declaration.
 (There are currently many places in Mathlib that break this rule.)
+
+
+## Project addendum (MIPStarRE)
+
+### Linter warnings
+
+Do not mask linter warnings instead of fixing them. A cleanup PR should not add
+broad `set_option linter.<name> false` blocks, and especially not file-wide
+blocks, just to make the build output quieter. Linters exist to expose real
+maintenance problems; hiding them makes later proof work and review harder.
+
+Fix the warning at its source whenever possible:
+
+- wrap long lines rather than disabling `linter.style.longLine`;
+- remove or narrow unused variables, section variables, and unused typeclass
+  assumptions rather than disabling the corresponding unused-* linter;
+- remove unused `simp` arguments rather than disabling `linter.unusedSimpArgs`;
+- rewrite proof terms or state the simplified goal explicitly rather than
+  silencing `linter.flexible`.
+
+If a linter warning is a genuine false positive or a temporary porting
+exception, use the narrowest possible scope, preferably
+`set_option linter.<name> false in <decl>`, and add a short nearby explanation.
+Such exceptions should be rare and reviewable. Never use linter suppression as
+the main mechanism for a linter-warning cleanup PR.
