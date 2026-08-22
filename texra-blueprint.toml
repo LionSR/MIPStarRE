@@ -1,0 +1,46 @@
+# Configuration for the shared texra-blueprint tooling.
+# https://github.com/LionSR/texra-blueprint
+
+[paper_gaps]
+dir         = "docs/paper-gaps"
+site_base   = "https://sirui-lu.com/MIPStarRE"
+blob_base   = "https://github.com/LionSR/MIPStarRE/blob/main/docs/paper-gaps"
+bib_author  = "The {MIPStarRE} contributors"
+institution = "MIPStarRE"
+title       = "MIPStarRE paper-gap notes"
+scan_roots  = ["MIPStarRE", "blueprint/src", "docs"]
+skip        = ["command.tex", "template.tex", "proof-gap-protocol.tex"]
+
+# The source-key registry. The shared tool reads the key as everything before
+# the first underscore of a note's file name; the notes here predate the
+# platform's `<key>_<topic>.tex` convention and use hyphenated issue-anchored
+# names, so each full note stem is registered as-is. All notes audit the one
+# source paper of this project, arXiv:2009.12982 (quantum soundness of the
+# classical low individual degree test), or the formal development itself.
+# Enforced by `texra-blueprint paper-gaps check`.
+[paper_gaps.sources]
+issue-1032-orthonormalization-constant = "arXiv:2009.12982 (constant in the completion-route orthonormalization theorem)"
+issue-1093-submeasurement-triangle-total-overlap = "arXiv:2009.12982 (total-overlap term in projective point-consistency transport)"
+issue-1099-line169-triangle-sub-loss = "arXiv:2009.12982 (line-169 replacement step in the main-induction projectivization chain)"
+issue-1099-sharper-local-fix = "arXiv:2009.12982 (sharper local repair for the line-169 transport step)"
+issue-1100-projective-non-measurement-endpoints = "arXiv:2009.12982 (endpoint branches in the projectivization proof)"
+issue-1228-orthonormalization-svd-usage = "arXiv:2009.12982 (SVD step in orthonormalization)"
+issue-1230-self-improvement-sdp-usage = "arXiv:2009.12982 (use of the self-improvement SDP)"
+issue-1622-ld-pasting-degree-zero = "arXiv:2009.12982 (degree-zero branch of low-degree pasting)"
+issue-196-sdp-weakening = "arXiv:2009.12982 (SDP primal constraint as a submeasurement constraint)"
+issue-2338-ch3-same-space-specializations = "arXiv:2009.12982 (chapter-3 same-space specializations of two-space propositions)"
+issue-422-main-formal-zero-k-boundary = "arXiv:2009.12982 (zero-sampling boundary in the main formal theorem)"
+issue-458-foundation-layer = "internal foundation-layer formalization design audit"
+issue-713-scalar-tensor-decision = "arXiv:2009.12982 (extra term in the full-slice ABAB transport)"
+issue-760-scalar-chain-alignment = "arXiv:2009.12982 (evaluated-slice commutativity estimate alignment)"
+issue-904-zeta2-completion = "arXiv:2009.12982 (missing completion term in the zeta-2 definition)"
+issue-906-main-formal-k-bound = "arXiv:2009.12982 (large-k side condition in the main induction)"
+issue-930-com-main-dimension-typo = "arXiv:2009.12982 (ambient dimension in the commutativity theorem for G)"
+issue-930-distinct-tuple-support = "arXiv:2009.12982 (support of the distinct-tuple distribution)"
+issue-930-main-induction-successor-coefficient = "arXiv:2009.12982 (first successor-step error absorption in the main induction)"
+issue-930-pasting-from-H-to-G-error = "arXiv:2009.12982 (accumulated error in the pasting from-H-to-G lemma)"
+issue-930-self-improvement-missing-nu-consistency = "arXiv:2009.12982 (missing nu-consistency hypothesis in the self-improvement theorem)"
+issue-933-quantumstate-normalization = "arXiv:2009.12982 (normalization of quantum states in the LDT formalization)"
+issue-polynomial-function-divergence = "arXiv:2009.12982 (polynomial definition: functions with a representative)"
+naimark = "arXiv:2009.12982 (Naimark dilation: projective-submeasurement form and bipartite assembly)"
+truncation-combinatorics-f-nonneg = "arXiv:2009.12982 (nonnegativity hypothesis in the small-overlaps bound)"
