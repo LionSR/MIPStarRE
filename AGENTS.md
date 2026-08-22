@@ -372,7 +372,7 @@ Project-preferred variable names:
 - `P` — projective measurements
 - `G` — graphs (hypercube expansion)
 
-For full details, see `docs/MATHLIB_naming.md` and `docs/MATHLIB_style.md`.
+For full details, see the lean-conventions `MATHLIB_naming` and `MATHLIB_style` references.
 
 ### Types and signatures
 
@@ -473,7 +473,7 @@ use any Lean declaration only as verification.
 
 ### Blockers (must be resolved before merge)
 
-See `docs/PROOF_INTEGRITY.md` for the full catalog.
+See the lean-conventions `PROOF_INTEGRITY` reference and `docs/project_conventions.md` for the full catalog.
 
 **Direct proof holes**: `sorry`, `admit`
 
@@ -498,7 +498,7 @@ of this?*
 
 Placeholder tactics (`exact?`, `apply?`, `library_search`) should be replaced
 with concrete results. Debug artifacts (`dbg_trace`, `#check`, `#eval`,
-`#print`) should be removed from proof files. See `docs/PROOF_INTEGRITY.md` for
+`#print`) should be removed from proof files. See the lean-conventions `PROOF_INTEGRITY` reference for
 the full warning catalog.
 
 ### Anti-patterns
@@ -508,7 +508,7 @@ prove the claimed mathematics are catalogued in `docs/anti_patterns.md`:
 conclusion-shaped hypotheses, definitional sleight-of-hand, zero-fallback
 branches, trivial default witnesses, Mathlib-bypass castles, and external
 `*Statement` smuggles. Reviewers should consult this file alongside
-`docs/PROOF_INTEGRITY.md`.
+the lean-conventions `PROOF_INTEGRITY` reference and `docs/project_conventions.md`.
 
 ## PR and Commit Conventions
 
@@ -562,7 +562,7 @@ Use `Addresses #N` (keeps the issue open) or `Closes #N` (auto-closes on merge).
 Every PR touching Lean code should be reviewed against these criteria:
 
 1. **Proof correctness** — No unexplained `sorry`. No `axiom` unless discussed.
-2. **Mathlib style** — Follow `docs/MATHLIB_naming.md` and `docs/MATHLIB_doc.md`.
+2. **Mathlib style** — Follow the lean-conventions `MATHLIB_naming` and `MATHLIB_doc` references.
 3. **Paper terminology** — Public Lean names and documentation should use
    terminology from the paper and blueprint. See `docs/mathematical_language.md`.
 4. **Linter hygiene** — Fix warnings, don't mask them with broad
@@ -581,7 +581,7 @@ Every PR touching Lean code should be reviewed against these criteria:
    a paper theorem.
 12. **Proof-evasion anti-patterns** — Review against `docs/anti_patterns.md`.
 
-For full details, see `docs/CONTRIBUTING.md` and `docs/MATHLIB_pr-review.md`.
+For full details, see `docs/CONTRIBUTING.md` and the lean-conventions `MATHLIB_pr-review` reference.
 
 ## Blueprint and Documentation Work
 
@@ -611,10 +611,10 @@ Checked in this repository snapshot:
 The `texra-lean-skills` plugin (texra-ai/texra-lean-skills) carries the
 canonical Mathlib-style, proof-integrity, and prose convention texts as the
 `lean-conventions` skill. Claude Code installs it automatically via
-`.claude/settings.json`; other agents install it with the `install.sh`
-script in the texra-lean-skills repository. The `docs/MATHLIB_*.md`,
-`docs/PROOF_INTEGRITY.md`, and `docs/prose_style.md` files below are pointer
-stubs into that skill, keeping only their project addenda repo-local.
+`.claude/settings.json`; other agents: `npx skills add
+texra-ai/texra-lean-skills` (or the repo's install.sh without Node).
+MIPStarRE-local addenda to those conventions live in
+`docs/project_conventions.md`, which restates no shared rule.
 
 Use this file together with:
 
@@ -622,12 +622,10 @@ Use this file together with:
 |------|---------|
 | `CLAUDE.md` | Claude Code-specific notes (minimal pointer to this file) |
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
-| `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
+| `lean-conventions` skill | Mathlib style, naming, documentation, PR review, proof integrity, prose style (canonical; installed) |
+| `docs/project_conventions.md` | MIPStarRE-local addenda to the shared conventions |
 | `docs/anti_patterns.md` | Subtler proof-evasion patterns |
 | `docs/proof_frontier_review.md` | Review checklist for construction theorems and residual inputs |
-| `docs/MATHLIB_style.md` | Mathlib code style (line length, indentation, tactic formatting) |
-| `docs/MATHLIB_naming.md` | Mathlib naming conventions |
-| `docs/MATHLIB_doc.md` | Mathlib documentation standards |
 | `docs/mathematical_language.md` | Project-local terminology rules |
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
 | `docs/api_surface.md` | Useful obligation-closing lemmas for `SubMeas` |
@@ -636,7 +634,6 @@ Use this file together with:
 | `docs/formalization-patterns.md` | Conditional scaffolding, blueprint sync, split imports, and bridge records |
 | `docs/external-lemmas-pedagogy.md` | Pedagogical notes on Mathlib and external lemmas |
 | `docs/ci-automation.md` | CI/CD workflow details |
-| `docs/MATHLIB_pr-review.md` | Mathlib PR review guide |
 | `docs/pr_review_management.md` | Review thread workflow and bot integration |
 | `audits/` | Chapter-by-chapter scouting reports |
 | Pinned memories (external agent tooling) | Agent session memory maintained by the agent runtime; not a directory in the repository checkout. Pinned memories contain accumulated project lessons |

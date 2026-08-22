@@ -5,8 +5,9 @@ non-trivial goals, or any placeholder. A tracked `sorry` is allowed only when
 restoring a paper-aligned theorem statement under the repository's
 paper-realignment policy. Hold your fix to the same 8-category quality bar used
 by Claude Code Review (proof integrity, proof correctness, Mathlib style, type
-safety, performance, modularity, documentation, blueprint sync). See
-docs/PROOF_INTEGRITY.md for the full integrity ruleset.
+safety, performance, modularity, documentation, blueprint sync). See the
+lean-conventions PROOF_INTEGRITY reference and docs/project_conventions.md
+for the full integrity ruleset.
 
 If a mathematical result looks wrong, too strong, or suspiciously general, scout
 the LaTeX sources in `references/ldt-paper/` and cite the specific paper/section.

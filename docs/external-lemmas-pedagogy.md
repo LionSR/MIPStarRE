@@ -387,7 +387,7 @@ to use in the project, add a section to this document:
 - `docs/paper-gaps/policy.tex` — paper-gap documentation conventions
 - `docs/formalization-patterns.md` — formalization patterns
 - Issue [#1250] — Mathlib upstreaming candidates tracker
-- `docs/PROOF_INTEGRITY.md` — proof integrity rules
+- the lean-conventions `PROOF_INTEGRITY` reference — proof integrity rules
   (A5 castle-in-the-air = Mathlib-bypass; A6 external `*Statement` smuggles)
 
 [#1250]: https://github.com/LionSR/MIPStarRE/issues/1250

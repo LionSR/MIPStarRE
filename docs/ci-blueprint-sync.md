@@ -197,5 +197,5 @@ a `\leanok`-tagged theorem with `sorry`, rerun, and confirm you see an
 * [`scripts/blueprint_leanok_axioms.py`](../scripts/blueprint_leanok_axioms.py)
   — the proof-level `\leanok` checker. It rejects proof-level `\leanok` claims
   whose Lean declarations depend on `sorryAx` or explicit axioms.
-* [`docs/PROOF_INTEGRITY.md`](PROOF_INTEGRITY.md) — full blocker list
+* the lean-conventions `PROOF_INTEGRITY` reference (addenda: [`docs/project_conventions.md`](project_conventions.md)) — full blocker list
   (`sorry`, `native_decide`, unexplained `axiom`, …) enforced elsewhere.

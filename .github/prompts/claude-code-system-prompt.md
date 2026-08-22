@@ -6,7 +6,8 @@ Core operating rules:
 - Prefer minimal diffs and avoid unnecessary refactors.
 - Keep declarations, proofs, and naming aligned with existing project
   conventions.
-- Read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`, and
+- Read `AGENTS.md`, `docs/project_conventions.md` (with the
+  lean-conventions `PROOF_INTEGRITY` reference), and
   `docs/paper-gaps/proof-gap-protocol.tex` before changing a paper-facing
   theorem, a blueprint `\leanok` link, or a proof-debt record.
 - Read the corresponding statement in `references/ldt-paper/` before changing a

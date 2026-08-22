@@ -110,21 +110,19 @@ leanblueprint web    # HTML output
 
 Start with [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for PR/issue conventions and the review checklist. Key references:
 
-Mathlib-derived references:
-
-| File | Purpose |
-|------|---------|
-| `docs/MATHLIB_style.md` | Mathlib code style (line length, indentation, tactic formatting) |
-| `docs/MATHLIB_naming.md` | Mathlib naming conventions (70+ rules, symbol dictionary) |
-| `docs/MATHLIB_doc.md` | Mathlib documentation standards (module headers, docstrings) |
-| `docs/MATHLIB_pr-review.md` | Mathlib PR review guide |
+Shared Mathlib-style conventions (style, naming, documentation, PR review,
+proof integrity, prose) live in the `lean-conventions` skill of
+[texra-ai/texra-lean-skills](https://github.com/texra-ai/texra-lean-skills),
+auto-installed for Claude Code via `.claude/settings.json` (other agents:
+`npx skills add texra-ai/texra-lean-skills`, or the repo's install.sh
+without Node).
 
 MIPStarRE-local references:
 
 | File | Purpose |
 |------|---------|
 | `docs/CONTRIBUTING.md` | PR format, issue templates, label taxonomy, review checklist |
-| `docs/PROOF_INTEGRITY.md` | Blocker / warning patterns for proof correctness |
+| `docs/project_conventions.md` | MIPStarRE-local addenda to the shared conventions (linter warnings, source-faithfulness review, proof integrity) |
 | `docs/mathematical_language.md` | Project-local mathematical language rules for Lean names and documentation |
 | `docs/blueprint_style_guide.md` | Blueprint notation and section conventions |
 | `docs/ci-automation.md` | CI/CD workflow details |

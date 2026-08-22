@@ -26,11 +26,11 @@ pinned: true
 5. If unaddressed comments exist: do NOT merge. Either fix first or flag to user.
 6. Present summary to user and let them decide.
 
-## Mathlib-style PR and Documentation Standards (from docs/MATHLIB_pr-review.md and docs/MATHLIB_doc.md)
+## Mathlib-style PR and Documentation Standards (from the lean-conventions MATHLIB_pr-review and MATHLIB_doc references)
 
 PRs should follow the mathlib review checklist — review for: **style**, **documentation**, **location**, **improvements**, and **library integration**.
 
-### Documentation (docs/MATHLIB_doc.md)
+### Documentation (lean-conventions MATHLIB_doc reference)
 - Every file needs: copyright header, imports, module docstring with `/-! -/`
 - Module docstring sections (in order): Main definitions, Main statements, Notation, Implementation notes, References, Tags
 - Every `def` must have a docstring. Theorems encouraged. Use backticks for Lean names, LaTeX for math.
@@ -46,7 +46,7 @@ PRs should follow the mathlib review checklist — review for: **style**, **docu
 - **Body**: should have `### Motivation` and `### Description` sections. Reference the issue number. List files changed.
 - **Clean up bot-generated titles** before merging — codex/claude often produce verbose or inconsistent titles like `[PR #165 follow-up] BlockedChainFT style cleanups and term-mode endpoint`. Rename to e.g. `style(MPS/Chain): BlockedChainFT term-mode endpoint and naming cleanup`.
 
-### Review checklist (docs/MATHLIB_pr-review.md)
+### Review checklist (lean-conventions MATHLIB_pr-review reference)
 - **Style**: code formatting, naming conventions (`naming.html`), PR title/description informative
 - **Documentation**: docstrings on defs, cross-references, proof sketches in comments for complex proofs, warnings for restricted-use code
 - **Location**: declarations in right files, no duplicate results, imports not too heavy, files not too long (>1000 lines → split)

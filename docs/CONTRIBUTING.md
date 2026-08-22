@@ -364,9 +364,9 @@ Every PR touching Lean code should be reviewed against these criteria:
 1. **Proof correctness** -- No unexplained `sorry`. No `axiom` unless discussed.
    Run `rg -n "sorry|axiom" <file>` to verify.
 
-2. **Mathlib style** -- Follow the naming conventions in [MATHLIB_naming.md](MATHLIB_naming.md)
-   and documentation standards in [MATHLIB_doc.md](MATHLIB_doc.md). See [MATHLIB_pr-review.md](MATHLIB_pr-review.md)
-   for the full Mathlib review guide.
+2. **Mathlib style** -- Follow the lean-conventions `MATHLIB_naming` and
+   `MATHLIB_doc` references. See the lean-conventions `MATHLIB_pr-review`
+   reference for the full Mathlib review guide.
 
 3. **Paper terminology** -- Public Lean names, module docstrings, declaration
    docstrings, and documentation-visible comments should use terminology from
@@ -389,7 +389,7 @@ Every PR touching Lean code should be reviewed against these criteria:
 
 4. **Linter hygiene** -- Linter-warning cleanup must fix warnings, not mask
    them with broad `set_option linter.<name> false` blocks. See
-   [MATHLIB_style.md](MATHLIB_style.md#linter-warnings) for the project rule and the narrow
+   [project_conventions.md](project_conventions.md#linter-warnings) for the project rule and the narrow
    exception policy.
 
 5. **Type safety** -- No universe mismatches, coercion problems, or unresolved
@@ -428,11 +428,12 @@ Every PR touching Lean code should be reviewed against these criteria:
    definitions (types, theorem statements with `sorry` proofs), verify that
    the types and API surface align with Mathlib. Scaffolding that uses custom
    types incompatible with Mathlib blocks future proof work. See
-   [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) for details.
+   the lean-conventions `PROOF_INTEGRITY` reference and
+   [project_conventions.md](project_conventions.md) for details.
 
 11. **Proof-evasion anti-patterns** -- Review against
    [anti_patterns.md](anti_patterns.md), which catalogues subtler failure
-   modes that pass the `PROOF_INTEGRITY.md` blocker checks but still fail
+   modes that pass the proof-integrity blocker checks but still fail
    to prove the claimed mathematics: conclusion-shaped hypotheses (A1),
    `:= rfl` definitional sleight-of-hand (A2), zero-fallback branches
    hiding preconditions (A3), trivial default witnesses (A4),
@@ -480,21 +481,23 @@ This project follows Mathlib conventions with project-specific additions.
 
 ### Reference guides
 
-Mathlib-derived references:
+Shared references (the `lean-conventions` skill of
+texra-ai/texra-lean-skills, auto-installed via `.claude/settings.json`):
 
-- **Documentation style**: [MATHLIB_doc.md](MATHLIB_doc.md) -- module headers, docstrings,
-  LaTeX in comments, sectioning comments.
-- **Naming conventions**: [MATHLIB_naming.md](MATHLIB_naming.md) -- capitalization rules,
-  symbol-to-name dictionary, variable conventions.
-- **Review guide**: [MATHLIB_pr-review.md](MATHLIB_pr-review.md) -- detailed examples of
+- **Documentation style**: the `MATHLIB_doc` reference -- module headers,
+  docstrings, LaTeX in comments, sectioning comments.
+- **Naming conventions**: the `MATHLIB_naming` reference -- capitalization
+  rules, symbol-to-name dictionary, variable conventions.
+- **Review guide**: the `MATHLIB_pr-review` reference -- detailed examples of
   style, documentation, location, and improvement considerations.
 
 MIPStarRE-local references:
 
 - **Mathematical language**: [mathematical_language.md](mathematical_language.md)
   -- project-local terminology rules for Lean names and documentation.
-- **Proof integrity**: [PROOF_INTEGRITY.md](PROOF_INTEGRITY.md) -- blocker and
-  warning patterns for proof correctness.
+- **Proof integrity**: the lean-conventions `PROOF_INTEGRITY` reference plus
+  the addenda in [project_conventions.md](project_conventions.md) -- blocker
+  and warning patterns for proof correctness.
 - **Blueprint style**: [blueprint_style_guide.md](blueprint_style_guide.md) --
   notation and section conventions for the active blueprint.
 
@@ -527,7 +530,7 @@ identifiers in backticks.
 **Sectioning comments**: Use `/-! ### Section Title -/` to organize long files
 into logical sections.
 
-**Variable naming**: Follow the conventions in [MATHLIB_naming.md](MATHLIB_naming.md). For
+**Variable naming**: Follow the lean-conventions `MATHLIB_naming` reference. For
 this project specifically:
 - `q` for alphabet size / finite field order
 - `n`, `m` for dimension parameters

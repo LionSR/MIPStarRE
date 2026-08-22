@@ -6,7 +6,8 @@ gap between paper-level mathematics and a compilable Lean proof.
 This document is intended for contributors who need to understand *why* the
 Lean code is structured as it is, and for reviewers who need to recognize
 these patterns when reading PRs.  It complements the individual chapter audits
-in `audits/`, the proof-integrity rules in `docs/PROOF_INTEGRITY.md`, and the
+in `audits/`, the proof-integrity rules in the lean-conventions skill (addenda:
+`docs/project_conventions.md`), and the
 proof-gap protocol in `docs/paper-gaps/proof-gap-protocol.tex`.
 
 ## Table of Contents
@@ -500,7 +501,7 @@ with the step it replaces.
 
 ## See also
 
-- `docs/PROOF_INTEGRITY.md` — kernel-level proof integrity rules
+- the lean-conventions `PROOF_INTEGRITY` reference — kernel-level proof integrity rules
 - `docs/anti_patterns.md` — catalog of proof-evasion anti-patterns
 - `docs/CONTRIBUTING.md` — overall contributor workflow
 - `docs/mathematical_language.md` — naming norm and shared-helper rules
