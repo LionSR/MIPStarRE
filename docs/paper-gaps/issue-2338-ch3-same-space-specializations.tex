@@ -114,16 +114,16 @@ interface.%
 
 \footnote{The five retargetings map
 \leanid{triangleSub}~$\to$~\leanid{triangleSub\_heterogeneous}
-(blueprint \verb|prop:triangle-sub|, bound \(\delta+\sqrt\eps\)),
+(blueprint \texttt{prop:triangle-sub}, bound \(\delta+\sqrt\eps\)),
 \leanid{simeqTriangleInequality}~$\to$~\leanid{simeqTriangleInequality\_heterogeneous}
-(\verb|prop:simeq-triangle-inequality|, bound \(\eps+2\sqrt{\delta+\gamma}\)),
+(\texttt{prop:simeq-triangle-inequality}, bound \(\eps+2\sqrt{\delta+\gamma}\)),
 \leanid{simeqToApprox}~$\to$~\leanid{simeqToApprox\_heterogeneous}
-(\verb|prop:simeq-to-approx| forward, \(\simeq_\delta\Rightarrow\approx_{2\delta}\)),
+(\texttt{prop:simeq-to-approx} forward, \(\simeq_\delta\Rightarrow\approx_{2\delta}\)),
 \leanid{approxToSimeq}~$\to$~\leanid{approxToSimeq\_heterogeneous}
 (converse, projective), and
 \leanid{simeqDataProcessing}~$\to$~\leanid{simeqDataProcessing\_heterogeneous}
-(\verb|prop:simeq-data-processing|, bound \(\delta\)).
-All five \verb|_heterogeneous| forms are \verb|sorry|-free.
+(\texttt{prop:simeq-data-processing}, bound \(\delta\)).
+All five \texttt{\_heterogeneous} forms are \texttt{sorry}-free.
 Four are consumed on the main-theorem path at
 \path{MIPStarRE/LDT/Test/MainTheorem/SourceRoleRegister/Final.lean}
 lines~449,~495,~505,~512,~563;
@@ -149,7 +149,7 @@ now linked to \leanid{consSubMeas\_heterogeneous}, whose state space is
 The same-space theorem \leanid{consSubMeas} is retained as an auxiliary
 specialization.  The only consumer of this specialization on the main-theorem path is
 \path{MainChain.lean}:209, which applies it at the symmetrized state
-\leanid{strategy.state : QuantumState (ι×ι)}.  The global proof never needs
+\leanid{strategy.state : QuantumState (\(\iota\times\iota\))}.  The global proof never needs
 the fully general two-space form at that point.  The retained same-space
 \leanid{consSubMeas} is therefore \emph{downstream-sufficient}, while the
 blueprint now advertises the source-faithful two-space theorem.
@@ -171,7 +171,7 @@ blueprint now advertises the source-faithful two-space theorem.
 There is no mathematical discrepancy.  The retargeting makes the blueprint
 cross-references more faithful to the paper's two-space definition of
 \(\simeq_\delta\).%
-\footnote{Related: \ghissue{2337} (same-space cleanup of the \verb|mainFormal|
+\footnote{Related: \ghissue{2337} (same-space cleanup of the \texttt{mainFormal}
 interface, the Preliminaries-layer analogue).  The same-space forms here are
 distinct from the genuine open mathematical gap in \ghissue{1093} (the
 \S9~\(\eta\) / total-overlap term).}
