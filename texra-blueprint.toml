@@ -9,7 +9,7 @@ bib_author  = "The {MIPStarRE} contributors"
 institution = "MIPStarRE"
 title       = "MIPStarRE paper-gap notes"
 scan_roots  = ["MIPStarRE", "blueprint/src", "docs"]
-skip        = ["command.tex", "template.tex", "proof-gap-protocol.tex"]
+skip        = ["command.tex", "template.tex"]
 
 # The source-key registry. A note is named `<key>_<topic>.tex` (or, in the
 # hyphenated house style here, `<key>-<topic>.tex`), and the shared tool
@@ -26,6 +26,10 @@ issue = "arXiv:2009.12982 (quantum soundness of the classical low individual deg
 issue-458 = "internal foundation-layer formalization design audit"
 naimark = "arXiv:2009.12982 (Naimark dilation: projective-submeasurement form and bipartite assembly)"
 truncation-combinatorics = "arXiv:2009.12982 (truncation combinatorics: the small-overlaps bound)"
+# The protocol document is instructional, not a source audit; the tool's one
+# policy slot is taken by policy.tex, so this key admits it into the site
+# index as a listed document until upstream supports several policy pages.
+proof-gap = "protocol for source-faithful formalization (instructional document, not a source audit)"
 
 # Slugs published before a rename keep resolving: the site serves the old
 # PDF URL as a copy of the target note, and `check` accepts references to
