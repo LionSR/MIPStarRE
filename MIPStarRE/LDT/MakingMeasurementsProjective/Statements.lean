@@ -50,7 +50,7 @@ def OneMeasNaimarkLemma (α : Type*) [Fintype α] [DecidableEq α]
 /-! ### Questionwise Naimark interface -/
 
 /-- Paper origin: Lean-only questionwise interface below
-`docs/paper-gaps/naimark.tex`.
+`docs/paper-gaps/naimark-dilation.tex`.
 
 The paper's full tensor-product Naimark dilation
 (`references/ldt-paper/orthonormalization.tex:36-115`,
