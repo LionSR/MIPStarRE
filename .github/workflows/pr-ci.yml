@@ -188,7 +188,7 @@ jobs:
           # plastex.cfg lists the texra_blueprint plugin; every job that runs
           # leanblueprint must install it (pin matches blueprint.yml,
           # docgen.yml, and claude.yml).
-          pip install 'git+https://github.com/LionSR/texra-blueprint@v0.3.6'
+          pip install 'git+https://github.com/LionSR/texra-blueprint@v0.3.7'
 
       - name: Run leanblueprint pdf (catches undefined macros and LaTeX errors)
         working-directory: blueprint
