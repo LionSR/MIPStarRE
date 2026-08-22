@@ -70,7 +70,7 @@ jobs:
       - name: Install leanblueprint
         uses: texra-ai/lean-env-action/leanblueprint@v1
         with:
-          extra-pip-packages: 'git+https://github.com/LionSR/texra-blueprint@v0.3.4'
+          extra-pip-packages: 'git+https://github.com/LionSR/texra-blueprint@v0.3.6'
 
       - name: Run Claude Code
         id: claude
@@ -87,7 +87,10 @@ jobs:
           additional-permissions: |
             actions: read
 
-          # Load Lean skills from the official leanprover skills repository
+          # Load Lean skills from the official leanprover skills repository.
+          # texra-lean-skills stays unpinned here: claude-code-action@v1
+          # accepts only bare .git marketplace URLs, so the tag pin lives in
+          # .claude/settings.json; workflow-side pinning is tracked in #2651.
           plugin_marketplaces: |
             https://github.com/leanprover/skills.git
             https://github.com/texra-ai/texra-lean-skills.git
