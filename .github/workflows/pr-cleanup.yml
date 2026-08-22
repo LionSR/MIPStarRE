@@ -72,6 +72,9 @@ jobs:
           provider: ${{ env.CLAUDE_CODE_PROVIDER }}
           model-tier: sonnet
           allowed-bots: 'claude,chatgpt-codex-connector'
+          # texra-lean-skills stays unpinned here: claude-code-action@v1
+          # accepts only bare .git marketplace URLs, so the tag pin lives in
+          # .claude/settings.json; workflow-side pinning is tracked in #2651.
           plugin_marketplaces: |
             https://github.com/texra-ai/texra-lean-skills.git
           plugins: |

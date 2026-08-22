@@ -3,7 +3,8 @@
     "texra-lean-skills": {
       "source": {
         "source": "github",
-        "repo": "texra-ai/texra-lean-skills"
+        "repo": "texra-ai/texra-lean-skills",
+        "ref": "v0.2.3"
       }
     }
   },
