@@ -58,6 +58,11 @@ cp "$COMPONENTS/site-blueprint/blueprint.pdf" "$OUT/blueprint.pdf"
 echo "==> API docs..."
 cp -r "$COMPONENTS/site-docs/docs" "$OUT/docs"
 
+if [ -d "$COMPONENTS/site-docs/paper-gaps" ]; then
+  echo "==> Paper-gap PDFs..."
+  cp -r "$COMPONENTS/site-docs/paper-gaps" "$OUT/paper-gaps"
+fi
+
 echo "==> Badges..."
 mkdir -p "$OUT/badges"
 cp "$COMPONENTS/site-badges"/*.json "$OUT/badges/"

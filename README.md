@@ -8,6 +8,12 @@
 ![blueprint: no \leanok](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/blueprint_no_leanok.json)
 ![blueprint: not ready](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/blueprint_not_ready.json)
 
+<p align="center">
+  <a href="https://sirui-lu.com/MIPStarRE/blueprint/">Blueprint</a> ·
+  <a href="https://sirui-lu.com/MIPStarRE/docs/">Documentation</a> ·
+  <a href="https://sirui-lu.com/MIPStarRE/paper-gaps/">Paper-gap notes</a>
+</p>
+
 Formalization project for mathematics around $\mathrm{MIP}^*=\mathrm{RE}$.
 
 ## Active paper track
