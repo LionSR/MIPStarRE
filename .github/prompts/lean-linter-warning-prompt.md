@@ -6,7 +6,8 @@ count are supplied in the runtime context appended to this prompt.
 Instructions:
 0. Before editing a Lean declaration that is named as, linked to, or documented
    as a paper theorem, lemma, proposition, or corollary, check `AGENTS.md`,
-   `docs/PROOF_INTEGRITY.md`, and
+   `docs/project_conventions.md` (with the lean-conventions
+   `PROOF_INTEGRITY` reference), and
    `docs/paper-gaps/proof-gap-protocol.tex`.  The public Lean statement must
    remain the cited paper statement, up to faithful formal encoding.
 1. Read the warning report files above and fix only the Lean

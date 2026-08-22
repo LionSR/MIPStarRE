@@ -1,21 +1,84 @@
-# Lean Proof Integrity Rules
+# MIPStarRE-local convention addenda
 
-This file is the **single source of truth** for proof integrity checks in this
-repository. All CI workflows and review prompts should reference this file
-rather than duplicating the rules inline.
+The canonical convention documents live in the `lean-conventions` skill of
+[texra-ai/texra-lean-skills](https://github.com/texra-ai/texra-lean-skills)
+(auto-installed for Claude Code sessions via `.claude/settings.json`; other
+agents: clone the repository and symlink the skill directories, per its
+README). This file holds only
+MIPStarRE's project-local facts — it restates no shared rule, and shared
+rules never move here.
 
-> **Lean version**: 4.x (Lean 3 keywords like `constant` do not apply)
+## Style (MATHLIB_style)
+
+### Linter warnings
+
+Do not mask linter warnings instead of fixing them. A cleanup PR should not add
+broad `set_option linter.<name> false` blocks, and especially not file-wide
+blocks, just to make the build output quieter. Linters exist to expose real
+maintenance problems; hiding them makes later proof work and review harder.
+
+Fix the warning at its source whenever possible:
+
+- wrap long lines rather than disabling `linter.style.longLine`;
+- remove or narrow unused variables, section variables, and unused typeclass
+  assumptions rather than disabling the corresponding unused-* linter;
+- remove unused `simp` arguments rather than disabling `linter.unusedSimpArgs`;
+- rewrite proof terms or state the simplified goal explicitly rather than
+  silencing `linter.flexible`.
+
+If a linter warning is a genuine false positive or a temporary porting
+exception, use the narrowest possible scope, preferably
+`set_option linter.<name> false in <decl>`, and add a short nearby explanation.
+Such exceptions should be rare and reviewable. Never use linter suppression as
+the main mechanism for a linter-warning cleanup PR.
+
+## PR review (MATHLIB_pr-review)
+
+### Source-faithfulness checks
+
+For this repository, the first review question is whether a paper-facing Lean
+statement still represents the cited result in `references/ldt-paper/`.  Before
+applying the general mathlib review checklist in the lean-conventions
+`MATHLIB_pr-review` reference, compare every changed
+source-labelled theorem, lemma, proposition, corollary, or definition with the
+corresponding paper statement and the active blueprint entry.
+
+Reject a paper-facing statement if it has acquired a non-paper bridge, residual,
+repair, package, producer, proof-obligation, assumptions-bundle, hypotheses-bundle,
+or arbitrary implication hypothesis.  Necessary boundary hypotheses, such as
+positivity for division or nonemptiness of a finite type, may be faithful formal
+encodings of implicit paper assumptions, but they should be documented when
+mathematically load-bearing.
+
+Reviewers should also inspect `\lean{}` and `\leanok` links.  A source-labelled
+blueprint entry should point to the source theorem or its faithful construction
+theorem, not to conditional helpers whose assumptions are proof obligations.
+Auxiliary Lean declarations may be recorded in a separate remark, provided the
+remark states that they are not additional hypotheses in the paper theorem.
+
+## Proof integrity (PROOF_INTEGRITY)
+
+### Companion document
 
 > **Companion document:** [`anti_patterns.md`](./anti_patterns.md) catalogues
-> subtler proof-evasion patterns that pass every blocker check below yet still
+> subtler proof-evasion patterns that pass every blocker check in the
+> lean-conventions `PROOF_INTEGRITY` reference yet still
 > fail to prove the claimed mathematics (conclusion-shaped hypotheses,
 > definitional sleight-of-hand, zero-fallback branches, trivial default
 > witnesses, Mathlib-bypass castles, external `*Statement` smuggles).
 > Consult it alongside this file during review.
 
+### Project paper-realignment protocol
+
+The canonical paper-realignment exception in the lean-conventions
+`PROOF_INTEGRITY` reference is instantiated here as
+follows (the protocol and the `**Unfaithful:**` marker are described in
+`AGENTS.md`):
+
 > **Paper-realignment exception:** When a PR is explicitly realigning a
 > source-labelled declaration with `references/ldt-paper/`, the `sorry`
-> blocker below may be temporarily relaxed for the affected proof bodies.  The
+> blocker of the lean-conventions `PROOF_INTEGRITY` reference may be
+> temporarily relaxed for the affected proof bodies.  The
 > PR must restore the source-faithful public statement, name the remaining proof
 > obligation as a theorem or lemma, and cite the paper passage plus the
 > tracking issue or paper-gap note.  A theorem whose proof still depends on a
@@ -25,33 +88,7 @@ rather than duplicating the rules inline.
 > Review such PRs against statement faithfulness and the documented discharge
 > plan, not merely against the temporary `sorry` count.
 
----
-
-## Blockers
-
-These patterns **must** be resolved before merging.
-
-### Direct proof holes
-
-| Pattern | Risk |
-|---------|------|
-| `sorry` | Axiomatically closes any goal — the proof is incomplete |
-| `admit` | Tactic alias for `sorry` |
-
-### Kernel / type system bypasses
-
-| Pattern | Risk |
-|---------|------|
-| `native_decide` | Relies on trusted native evaluation / compiler; banned in Mathlib for soundness and process reasons |
-| `unsafeCast`, `unsafeCoerce` | Type system bypass — can fabricate any proof term |
-| `lcProof` | Low-level proof fabrication primitive — can prove `False` |
-| `ofReduceBool`, `ofReduceNat` | Kernel reduction primitives exploitable for unsound proofs |
-
-### Axiom smuggling
-
-| Pattern | Risk |
-|---------|------|
-| `axiom` declarations | Introduces unproven assumptions that could be inconsistent; must be explicitly justified |
+### Axiom policy
 
 When an external mathematical result must remain unformalized temporarily,
 prefer a caller-supplied `Prop` hypothesis over a global `axiom`
@@ -66,41 +103,6 @@ caller-supplied `Prop` hypothesis is an additional theorem hypothesis, not a
 proof of the paper statement.  Use such hypotheses only for explicitly
 conditional auxiliary results, and keep the source-labelled theorem statement
 faithful to the paper.
-
-### Circular reasoning
-
-Lean's kernel forbids literal declaration cycles, so focus on **mathematical
-circularity**:
-
-- Proofs that assume (or trivially reintroduce) the statement being proved as a
-  local hypothesis, then immediately close the goal from that hypothesis
-- Helper lemmas in the same file that essentially restate the main goal and are
-  only used to prove that goal
-- Local `have`/`let` bindings that are just the goal rephrased, used to solve
-  the goal without any real argument
-- Newly introduced `axiom` that makes a difficult statement trivially provable
-  without connecting to existing Mathlib / core theorems
-- Abuse of `unsafe` features to fabricate proofs instead of giving a genuine
-  derivation
-- `by exact h` where `h` came from an unjustified assumption identical to the
-  goal
-
-### Castle-in-the-air (ungrounded proofs)
-
-Proofs that avoid grounding in Mathlib:
-
-- Custom re-declarations of standard Mathlib lemmas (e.g., re-proving
-  `add_comm` instead of importing it)
-- `axiom` or `sorry`-based helper lemmas for facts that already exist in
-  Mathlib
-- Chains of custom lemmas that never bottom out in Mathlib or Lean core
-- `private` helper lemmas that duplicate Mathlib API (e.g., custom matrix
-  transpose lemmas when `Matrix.transpose_*` exists)
-- Overly long proof chains replaceable by a single Mathlib lemma
-
-When flagging, perform an actual lookup (grep, `#find?`, `exact?`,
-`library_search`). If an equivalent exists, cite the Mathlib lemma and module
-path. If not, state "no equivalent found" with search evidence.
 
 ### Scaffolding that blocks real formalization
 
@@ -176,45 +178,7 @@ For every paper-labelled theorem change, require a statement integrity audit:
 - verdict: exact, faithful boundary hypotheses, extra assumptions, weakened
   conclusion, or strengthened conclusion.
 
----
-
-## Warnings
-
-These should be flagged for review but may be acceptable with justification.
-
-### Placeholder tactics
-
-| Pattern | Risk |
-|---------|------|
-| `exact?`, `apply?`, `library_search`, `suggest` | Search tactics left as placeholders — replace with the concrete result |
-
-### Safety / termination bypasses
-
-| Pattern | Risk |
-|---------|------|
-| `unsafe def` | Bypasses Lean safety checks; should not appear in proof-relevant code |
-| `partial def` | No termination proof required; unsound if used to build proof terms |
-| `implemented_by` / `implementedBy` | Decouples runtime behavior from proven specification |
-
-### Suspicious options
-
-| Pattern | Risk |
-|---------|------|
-| `set_option maxHeartbeats 0` | Disables timeout — can hide non-terminating proofs |
-| `set_option maxHeartbeats` with values >= 4,000,000 | 20x the default (200,000) — likely indicates an inefficient proof |
-| `set_option maxRecDepth` with values >= 10,000 | May hide structural issues in proofs |
-
-### Debug artifacts
-
-| Pattern | Risk |
-|---------|------|
-| `dbg_trace` | Debug trace left in code |
-| `stop` | Halts elaboration — development aid only |
-| `#check`, `#eval`, `#print` in proof files | Debug commands that should be removed |
-
----
-
-## How to use this file
+### Source-statement proof gaps
 
 **For source-statement proof gaps**: Read
 [`paper-gaps/proof-gap-protocol.tex`](paper-gaps/proof-gap-protocol.tex) when a
@@ -222,16 +186,3 @@ proof is blocked by a bridge, residual, repair, input, package, or obligation
 structure.  It explains when to introduce an internal obligation theorem, why
 conditional helpers are exceptional temporary quarantine objects, and why a
 tracked `sorry` is preferable to a strengthened source theorem statement.
-
-**In CI review prompts**: Reference this file instead of inlining the rules:
-```
-Read `docs/PROOF_INTEGRITY.md` for the complete list of proof integrity
-rules. Flag blockers as must-fix issues that should block merge.
-Flag warnings as advisory — note them but acknowledge they may be
-acceptable with justification.
-```
-
-**For manual review**: Use this as a checklist when reviewing Lean PRs.
-
-**Updating rules**: Edit this file and all referencing workflows will
-automatically pick up the changes.

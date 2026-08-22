@@ -72,6 +72,10 @@ jobs:
           provider: ${{ env.CLAUDE_CODE_PROVIDER }}
           model-tier: sonnet
           allowed-bots: 'claude,chatgpt-codex-connector'
+          plugin_marketplaces: |
+            https://github.com/texra-ai/texra-lean-skills.git
+          plugins: |
+            texra-lean-skills@texra-lean-skills
           claude-prompt-file: .github/prompts/pr-cleanup-prompt.md
           claude-prompt-context: |
             PR number: ${{ github.event.pull_request.number }}

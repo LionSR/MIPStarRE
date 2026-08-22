@@ -40,6 +40,8 @@
 *-blx.bib
 *.pdf
 blueprint/lean_decls
-.claude/
+# .claude/settings.json is checked in (plugin install); local state stays ignored.
+.claude/*
+!.claude/settings.json
 .worktrees/
 __pycache__/

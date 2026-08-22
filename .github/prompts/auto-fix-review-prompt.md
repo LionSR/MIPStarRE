@@ -4,7 +4,8 @@ Instructions:
 
 1. First, use the GitHub MCP tools to read the full PR diff and all review threads yourself. Treat the thread summaries from this workflow as seeds only.
 1a. Before changing a paper-facing theorem statement, a blueprint `\leanok`
-    link, or a proof-debt record, read `AGENTS.md`, `docs/PROOF_INTEGRITY.md`,
+    link, or a proof-debt record, read `AGENTS.md`, `docs/project_conventions.md`
+    (with the lean-conventions `PROOF_INTEGRITY` reference),
     and `docs/paper-gaps/proof-gap-protocol.tex`. The repair must preserve the
     cited statement in `references/ldt-paper/` up to faithful formal encoding.
 2. Use your judgment on whether Mathlib scouting is needed for this fix. For review comments about proofs (`sorry` removal, tactic suggestions, proof restructuring), read PR/issue comments for existing **Mathlib Scouting Reports** and use them to inform your fix. For cosmetic comments (naming, docstrings, style), skip scouting and fix directly.
@@ -65,7 +66,7 @@ Quality bar (same rubric as Claude Code Review — your fix MUST satisfy ALL of 
 - Proof integrity (BLOCKER): no untracked `sorry`, no `admit`, no
   `native_decide` on non-trivial goals, no `unsafeCast`, and no new axioms. A
   tracked `sorry` is allowed only when restoring a paper-aligned theorem
-  statement under the paper-realignment policy in docs/PROOF_INTEGRITY.md.
+  statement under the paper-realignment policy in docs/project_conventions.md.
 - Proof correctness (BLOCKER): structured proofs, not brute-force `simp`/`omega`/`ring` chains. If a result looks wrong, too strong, or suspiciously general, scout `references/ldt-paper/` first, then `blueprint/src/chapter/`, compare hypotheses/conclusions, and cite the specific source path, label, and line.
 - Source-statement fidelity (BLOCKER): declarations named after paper results or
   linked by `\lean{...}` must preserve the cited statement up to faithful formal

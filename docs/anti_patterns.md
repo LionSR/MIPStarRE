@@ -3,7 +3,7 @@
 Catalog of subtle proof-evasion patterns that pass kernel-level checks
 (`sorry`-free, no forbidden tactics, all axioms standard) yet still fail to
 prove the claimed mathematics. Complements
-[`PROOF_INTEGRITY.md`](./PROOF_INTEGRITY.md), which covers the kernel-level
+the lean-conventions `PROOF_INTEGRITY` reference, which covers the kernel-level
 blockers; this file covers patterns where the Lean code *compiles and the
 trick is at the level of what the statement says or what the definitions
 bake in*.
@@ -409,7 +409,7 @@ statements are compatible with each other — it is a closed ecosystem that
 doesn't ground in the reference library.
 
 This is the "scaffolding that blocks real formalization" section of
-[`PROOF_INTEGRITY.md`](./PROOF_INTEGRITY.md) in concrete examples. The two
+[`project_conventions.md`](./project_conventions.md) in concrete examples. The two
 flavours:
 
 1. **Re-proving Mathlib.** Writing `private lemma my_add_comm : a + b = b + a`
@@ -573,8 +573,8 @@ merge.
 
 ## Reviewer checklist
 
-Use this alongside the [`PROOF_INTEGRITY.md`](./PROOF_INTEGRITY.md) blocker
-list and the [`proof_frontier_review.md`](./proof_frontier_review.md)
+Use this alongside the blocker
+list in the lean-conventions `PROOF_INTEGRITY` reference and the [`proof_frontier_review.md`](./proof_frontier_review.md)
 checklist for structure fields. For any theorem or lemma that claims a paper
 result, ask:
 
@@ -638,12 +638,13 @@ add these checks.
 
 ## See also
 
-- [`PROOF_INTEGRITY.md`](./PROOF_INTEGRITY.md) — kernel-level blockers
-  (`sorry`, `native_decide`, bare `axiom`, etc.).
+- the lean-conventions `PROOF_INTEGRITY` reference — kernel-level blockers
+  (`sorry`, `native_decide`, bare `axiom`, etc.); local addenda in
+  [`project_conventions.md`](./project_conventions.md).
 - [`CONTRIBUTING.md`](./CONTRIBUTING.md) — overall contributor workflow;
   review checklist section should link here.
-- [`pr-review.md`](./pr-review.md) — detailed PR review guidelines.
-- [`naming.md`](./naming.md) and [`style.md`](./style.md) — Mathlib
+- the lean-conventions `MATHLIB_pr-review` reference — detailed PR review guidelines.
+- the lean-conventions `MATHLIB_naming` and `MATHLIB_style` references — Mathlib
   conventions; avoiding A5 (bypassing Mathlib) often starts with using
   Mathlib's names.
 - [#1379] — live `*Statement` ledger (replaces [#449], [#451])

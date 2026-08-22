@@ -31,8 +31,8 @@ Use this order when deciding terminology:
 
 1. `references/ldt-paper/`
 2. `blueprint/src/chapter/`
-3. Established repository conventions in `docs/naming.md` and neighboring Lean
-   files
+3. Established repository conventions in the lean-conventions
+   `MATHLIB_naming` reference and neighboring Lean files
 
 ## Term Norm
 

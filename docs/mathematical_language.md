@@ -4,8 +4,8 @@ MIPStarRE Lean names and documentation should be written for readers comparing
 the formalization with the paper and blueprint.
 
 This is a project-local supplement to the Mathlib-derived documentation,
-naming, and style guides in `docs/doc.md`, `docs/naming.md`, and
-`docs/style.md`.
+naming, and style guides in the lean-conventions skill's `MATHLIB_doc`,
+`MATHLIB_naming`, and `MATHLIB_style` references.
 
 ## Scope
 
