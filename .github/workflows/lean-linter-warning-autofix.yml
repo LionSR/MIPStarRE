@@ -185,6 +185,9 @@ jobs:
           system-prompt-file: .github/prompts/lean-linter-warning-system-prompt.md
           allowed_tools_preset: lean-linter-warning-auto-fix
           allowed_tools_preset_map_file: .github/allowed-tools.json
+          # texra-lean-skills stays unpinned here: claude-code-action@v1
+          # accepts only bare .git marketplace URLs, so the tag pin lives in
+          # .claude/settings.json; workflow-side pinning is tracked in #2651.
           plugin_marketplaces: |
             https://github.com/leanprover/skills.git
             https://github.com/texra-ai/texra-lean-skills.git
