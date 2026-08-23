@@ -221,6 +221,12 @@ paper statement unless a separate construction supplies that data.
 3. Copy `blueprint/src/print.bbl` → `blueprint/src/web.bbl`  ← **must do this every time bib changes**
 4. Run `leanblueprint web` (plasTeX reads `web.bbl`)
 5. Citation key format: e.g., `Ji2020MIPStar`, `Natarajan2020Quantum`
+6. Paper-gap notes: blueprint prose cites `\cite{gap:<slug>}` (never the raw
+   `docs/paper-gaps/<slug>.tex` path); each cited note has a `@techreport`
+   entry in `blueprint/src/references.bib` whose `note` field carries the
+   published PDF URL as `\url{...}` (the alpha style drops `url` fields for
+   techreport entries). Lean docstrings and comments keep the repository
+   path form.
 
 ## Stale/Corrupt Aux File Recovery
 If LaTeX reports `! File ended while scanning use of \@newl@bel` on startup:
