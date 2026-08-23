@@ -1,6 +1,29 @@
 \newcommand{\etalchar}[1]{$^{#1}$}
 \begin{thebibliography}{JNV{\etalchar{+}}20}
 
+\bibitem[con26a]{gap:issue-1032-orthonormalization-constant}
+The~{MIPStarRE} contributors.
+\newblock The constant in the completion-route orthonormalization theorem.
+\newblock Paper-gap note issue-1032-orthonormalization-constant, MIPStarRE,
+  2026.
+\newblock
+  \url{https://sirui-lu.com/MIPStarRE/paper-gaps/issue-1032-orthonormalization-constant.pdf}.
+
+\bibitem[con26b]{gap:issue-906-main-formal-k-bound}
+The~{MIPStarRE} contributors.
+\newblock The large-$k$ side condition in the main induction.
+\newblock Paper-gap note issue-906-main-formal-k-bound, MIPStarRE, 2026.
+\newblock
+  \url{https://sirui-lu.com/MIPStarRE/paper-gaps/issue-906-main-formal-k-bound.pdf}.
+
+\bibitem[con26c]{gap:issue-422-main-formal-zero-k-boundary}
+The~{MIPStarRE} contributors.
+\newblock The zero-sampling boundary in the main formal theorem.
+\newblock Paper-gap note issue-422-main-formal-zero-k-boundary, MIPStarRE,
+  2026.
+\newblock
+  \url{https://sirui-lu.com/MIPStarRE/paper-gaps/issue-422-main-formal-zero-k-boundary.pdf}.
+
 \bibitem[JNV{\etalchar{+}}20]{Ji2020LowIndividualDegree}
 Zhengfeng Ji, Anand Natarajan, Thomas Vidick, John Wright, and Henry Yuen.
 \newblock Quantum soundness of the classical low individual degree test, 2020.
