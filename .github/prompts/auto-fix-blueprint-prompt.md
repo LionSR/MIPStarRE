@@ -37,7 +37,9 @@ Instructions:
 4. The blueprint `.tex` files are in `blueprint/src/chapter/`. The blueprint configuration is in `blueprint/src/`.
 5. You can test your fix locally by running:
 
-   - `pip install leanblueprint plastex`
+   - `pip install leanblueprint plastex git+https://github.com/LionSR/texra-blueprint@v0.3.8`
+   - `texra-blueprint bbl` (from the repository root; regenerates the
+     uncommitted `blueprint/src/web.bbl` that the web build reads)
    - `cd blueprint && leanblueprint web`
    - `python3 scripts/blueprint_lean_sync.py --root . --ci`
 

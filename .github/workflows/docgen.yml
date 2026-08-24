@@ -85,7 +85,12 @@ jobs:
       - name: Install leanblueprint
         uses: texra-ai/lean-env-action/leanblueprint@v1
         with:
-          extra-pip-packages: 'git+https://github.com/LionSR/texra-blueprint@v0.3.7'
+          extra-pip-packages: 'git+https://github.com/LionSR/texra-blueprint@v0.3.8'
+
+      # web.bbl is not committed: this regenerates it from the \cite keys in
+      # the blueprint sources, with slug-shaped labels for paper-gap entries.
+      - name: Build blueprint bibliography
+        run: texra-blueprint bbl
 
       - name: Build blueprint
         working-directory: blueprint

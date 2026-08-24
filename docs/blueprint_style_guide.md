@@ -217,23 +217,31 @@ paper statement unless a separate construction supplies that data.
 
 ## Bibliography Workflow
 1. Edit `blueprint/src/references.bib` (standalone, AuthorYYYYKeyword keys)
-2. Run `cd blueprint/src && latexmk -lualatex -interaction=nonstopmode print.tex` (generates `print.bbl`)
-3. Copy `blueprint/src/print.bbl` → `blueprint/src/web.bbl`  ← **must do this every time bib changes**
-4. Run `leanblueprint web` (plasTeX reads `web.bbl`)
+2. Run `texra-blueprint bbl` from the repository root — it regenerates
+   `blueprint/src/web.bbl` from the `\cite` keys in the blueprint sources.
+   `web.bbl` is not committed (`.gitignore` covers `*.bbl`); every CI job
+   that runs the web build regenerates it first, and so must a local run.
+3. Run `leanblueprint web` (plasTeX reads `web.bbl`)
+4. The PDF build needs no separate step: `leanblueprint pdf` runs bibtex on
+   `print.tex` itself, and `print.bbl` never feeds the web build.
 5. Citation key format: e.g., `Ji2020MIPStar`, `Natarajan2020Quantum`
 6. Paper-gap notes: blueprint prose cites `\cite{gap:<slug>}` (never the raw
    `docs/paper-gaps/<slug>.tex` path); each cited note has a `@techreport`
-   entry in `blueprint/src/references.bib` whose `note` field carries the
-   published PDF URL as `\url{...}` (the alpha style drops `url` fields for
-   techreport entries). Lean docstrings and comments keep the repository
-   path form.
+   entry in `blueprint/src/references.bib` with `type = {Paper-gap note}`,
+   whose `note` field carries the published PDF URL as `\url{...}` (the
+   alpha style of the PDF build drops `url` fields for techreport entries).
+   `texra-blueprint bbl` renders such entries with slug-shaped citation
+   labels (e.g. `[issue-906-main-formal-k-bound]`) in the web bibliography,
+   while ordinary entries keep alpha labels. Lean docstrings and comments
+   keep the repository path form.
 
 ## Stale/Corrupt Aux File Recovery
 If LaTeX reports `! File ended while scanning use of \@newl@bel` on startup:
 - The `.aux` file was truncated by a previous killed/timed-out run
 - Fix: `rm -f blueprint/src/print.aux blueprint/print/print.aux blueprint/print.aux`
 - Then rerun latexmk — it rebuilds the aux from scratch cleanly
-- After rebuild, copy fresh `print.bbl` → `web.bbl`
+- `web.bbl` is unaffected: it comes from `texra-blueprint bbl`, not from
+  `print.bbl`
 
 ## Build Commands
 ```bash

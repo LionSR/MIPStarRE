@@ -18,6 +18,12 @@ on:
       - 'lake-manifest.json'
       - 'blueprint/**'
       - 'scripts/**'
+      - 'texra-blueprint.toml'
+      # Trees the paper-gap reference check scans (texra-blueprint
+      # paper-gaps check); without these the check never runs on merge
+      # pushes that only touch a note or another scanned file.
+      - 'docs/paper-gaps/**'
+      - 'docs/**/*.md'
       - '.github/workflows/pr-ci.yml'
   pull_request:
     types: [opened, synchronize, reopened]
@@ -27,8 +33,9 @@ on:
       # every heavy job skips via the changes filter.
       - '.github/prompts/**'
       - 'AGENTS.md'
-      - 'docs/*.md'
+      - 'docs/**/*.md'
       - 'docs/paper-gaps/**'
+      - 'texra-blueprint.toml'
       - '**.lean'
       - 'lakefile.*'
       - 'lean-toolchain'
@@ -65,6 +72,7 @@ jobs:
       blueprint: ${{ steps.filter.outputs.blueprint }}
       blueprint_src: ${{ steps.filter.outputs.blueprint_src }}
       tex_chapter: ${{ steps.filter.outputs.tex_chapter }}
+      paper_gaps: ${{ steps.filter.outputs.paper_gaps }}
       scripts: ${{ steps.filter.outputs.scripts }}
       comparator: ${{ steps.filter.outputs.comparator }}
       workflow: ${{ steps.filter.outputs.workflow }}
@@ -88,6 +96,15 @@ jobs:
               - 'blueprint/src/**'
             tex_chapter:
               - 'blueprint/src/chapter/**/*.tex'
+            paper_gaps:
+              - 'docs/paper-gaps/**'
+              - 'texra-blueprint.toml'
+              # Trees the paper-gap reference check scans (texra-blueprint
+              # paper-gaps check); without these the check skips pull
+              # requests that only touch a scanned file.
+              - 'MIPStarRE/**/*.lean'
+              - 'blueprint/src/**'
+              - 'docs/**/*.md'
             scripts:
               - 'scripts/**'
             comparator:
@@ -188,7 +205,7 @@ jobs:
           # plastex.cfg lists the texra_blueprint plugin; every job that runs
           # leanblueprint must install it (pin matches blueprint.yml,
           # docgen.yml, and claude.yml).
-          pip install 'git+https://github.com/LionSR/texra-blueprint@v0.3.7'
+          pip install 'git+https://github.com/LionSR/texra-blueprint@v0.3.8'
 
       - name: Run leanblueprint pdf (catches undefined macros and LaTeX errors)
         working-directory: blueprint
@@ -199,6 +216,11 @@ jobs:
             echo "::error::leanblueprint pdf produced no output"
             exit 1
           fi
+
+      # web.bbl is not committed: this regenerates it from the \cite keys in
+      # the blueprint sources, with slug-shaped labels for paper-gap entries.
+      - name: Build blueprint bibliography
+        run: texra-blueprint bbl
 
       - name: Run texra-blueprint web and check for errors
         working-directory: blueprint
@@ -219,6 +241,34 @@ jobs:
           if grep -q "WARNING: File not found:" "$tmp_output_file"; then
             echo "::warning::Blueprint has missing file references (see WARNING lines above)"
           fi
+
+  # Paper-gap note name and \leanid slug validation. Mirrors the check in
+  # the weekly docgen.yml run so a malformed note name or a stale reference
+  # is caught on every push and pull request, not only on the Sunday build.
+  paper-gaps:
+    name: Check paper-gap note names and references
+    needs: changes
+    if: |
+      !cancelled() && (
+        github.event_name != 'pull_request' ||
+        needs.changes.outputs.paper_gaps == 'true' ||
+        needs.changes.outputs.workflow == 'true'
+      )
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install texra-blueprint
+        # Pin matches blueprint.yml, docgen.yml, claude.yml, and the
+        # blueprint-render job above.
+        run: pip install 'git+https://github.com/LionSR/texra-blueprint@v0.3.8'
+
+      - name: Check paper-gap note names and references
+        run: texra-blueprint --root . paper-gaps check
 
   blueprint-sync:
     name: Check blueprint ↔ Lean surface sync
