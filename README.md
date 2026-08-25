@@ -1,6 +1,7 @@
 # MIPStarRE
 
-[![Lean Action CI](https://github.com/LionSR/MIPStarRE/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/LionSR/MIPStarRE/actions/workflows/pr-ci.yml)
+[![PR CI](https://github.com/LionSR/MIPStarRE/actions/workflows/pr-ci.yml/badge.svg)](https://github.com/LionSR/MIPStarRE/actions/workflows/pr-ci.yml)
+[![Compile blueprint](https://github.com/LionSR/MIPStarRE/actions/workflows/blueprint.yml/badge.svg)](https://github.com/LionSR/MIPStarRE/actions/workflows/blueprint.yml)
 ![sorries](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/sorries.json)
 ![axioms](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/axioms.json)
 ![Lean](https://img.shields.io/endpoint?url=https://sirui-lu.com/MIPStarRE/badges/lean.json)
