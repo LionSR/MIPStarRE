@@ -14,7 +14,7 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 
-universe u
+universe u v
 
 private theorem idxSubMeas_outcome_sum_le_one
     {Question Outcome ι : Type*}
@@ -135,7 +135,7 @@ theorem oneNaimarkAuxState_isNormalized (Outcome : Type u)
 compression block of the dilated projector with the original effect. -/
 theorem OneMeasNaimarkData.compression_none_none
     {Outcome : Type u} [Fintype Outcome] [DecidableEq Outcome]
-    {d : Type u} [Fintype d] [DecidableEq d]
+    {d : Type v} [Fintype d] [DecidableEq d]
     (data : OneMeasNaimarkData Outcome d) (a : Outcome) (i j : d) :
     data.liftedEffect (some a) (i, none) (j, none) =
       data.source.effect a i j := by
@@ -186,7 +186,7 @@ compression identity for every test operator.  The statement below isolates the
 standard four-register trace calculation which turns the two local compression
 identities into preservation of bipartite correlations. -/
 theorem OneMeasNaimarkData.twoSidedCorrelationPreservation
-    {OutcomeA OutcomeB : Type u}
+    {OutcomeA OutcomeB : Type v}
     [Fintype OutcomeA] [DecidableEq OutcomeA]
     [Fintype OutcomeB] [DecidableEq OutcomeB]
     (HA HB : FiniteHilbertSpace.{u})

@@ -1,0 +1,4133 @@
+\documentclass[11pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm,amsfonts,latexsym,xspace,graphicx,float,mathtools,braket,}
+\usepackage[letterpaper,margin=1in]{geometry}
+\usepackage[backref,colorlinks,citecolor=blue,,linkcolor=magenta,bookmarks=true]{hyperref}
+\usepackage{enumitem}
+\usepackage{aliascnt}
+\usepackage[nameinlink,capitalize]{cleveref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newcommand{\newsharedtheorem}[3]{%
+  \newaliascnt{#1}{theorem}%
+  \newtheorem{#1}[#1]{#2}%
+  \aliascntresetthe{#1}%
+  \crefname{#1}{#2}{#3}%
+  \Crefname{#1}{#2}{#3}%
+}
+\newtheorem*{namedtheorem}{\theoremname}
+\newcommand{\theoremname}{testing}
+\newenvironment{named}[1]{ \renewcommand{\theoremname}{#1} \begin{namedtheorem}} {\end{namedtheorem}}
+\newsharedtheorem{lemma}{Lemma}{Lemmas}
+\newsharedtheorem{claim}{Claim}{Claims}
+\newsharedtheorem{proposition}{Proposition}{Propositions}
+\newsharedtheorem{fact}{Fact}{Facts}
+\newsharedtheorem{corollary}{Corollary}{Corollaries}
+\newsharedtheorem{conjecture}{Conjecture}{Conjectures}
+\newsharedtheorem{infthm}{Informal Theorem}{Informal Theorems}
+
+\theoremstyle{definition}
+\newsharedtheorem{definition}{Definition}{Definitions}
+\newsharedtheorem{infdef}{Informal Definition}{Informal Definitions}
+\newsharedtheorem{remark}{Remark}{Remarks}
+\newsharedtheorem{notation}{Notation}{Notations}
+\newsharedtheorem{example}{Example}{Examples}
+\newsharedtheorem{examples}{Examples}{Examples}
+\renewcommand{\Pr}{\mathop{\bf Pr\/}}
+\newcommand{\E}{\mathop{\bf E\/}}
+\newcommand{\tr}{\mathrm{tr}} \newcommand{\Tr}{\tr}
+\newcommand{\poly}{\mathrm{poly}}
+\newcommand{\supp}{\mathrm{supp}}
+\newcommand{\C}{\mathbb C}
+\newcommand{\F}{\mathbb F}
+\newcommand{\NP}{\mathsf{NP}}
+\newcommand{\NEXP}{\mathsf{NEXP}}
+\newcommand{\NEEXP}{\mathsf{NEEXP}}
+\newcommand{\MIP}{\mathsf{MIP}}
+\newcommand{\QMA}{\mathsf{QMA}}
+\newcommand{\eps}{\epsilon}
+\newcommand{\ot}{\otimes}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calH}{\mathcal{H}}
+\newcommand{\calO}{\mathcal{O}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\calX}{\mathcal{X}}
+\newcommand{\bone}{\boldsymbol{1}}
+\newcommand{\ba}{\boldsymbol{a}}
+\newcommand{\bb}{\boldsymbol{b}}
+\newcommand{\boldf}{\boldsymbol{f}}
+\newcommand{\bg}{\boldsymbol{g}}
+\newcommand{\bi}{\boldsymbol{i}}
+\newcommand{\bell}{\boldsymbol{\ell}}
+\newcommand{\br}{\boldsymbol{r}}
+\newcommand{\bs}{\boldsymbol{s}}
+\newcommand{\bt}{\boldsymbol{t}}
+\newcommand{\bu}{\boldsymbol{u}}
+\newcommand{\bv}{\boldsymbol{v}}
+\newcommand{\bw}{\boldsymbol{w}}
+\newcommand{\bx}{{\boldsymbol{x}}}
+\newcommand{\by}{\boldsymbol{y}}
+\newcommand{\abs}[1]{\lvert #1 \rvert}
+\newcommand{\polyfunc}[3]{\calP(#1, #2, #3)}
+\newcommand{\polymeas}[3]{\mathrm{PolyMeas}(#1, #2, #3)}
+\newcommand{\polysub}[3]{\mathrm{PolySub}(#1, #2, #3)}
+
+
+\title{Quantum soundness of the classical low individual degree test}
+
+\author{
+Zhengfeng Ji\thanks{zhengfeng.ji@uts.edu.au}\\
+\small{\sl University of Technology Sydney}
+\and Anand Natarajan\thanks{anandn@mit.edu.  Most of this work performed while affiliated with
+the California Institute of Technology.}\\
+ \small{\sl Massachusetts Institute of Technology}
+ \and Thomas Vidick\thanks{vidick@caltech.edu}\\
+ \small{\sl California Institute of Technology}
+ \and John Wright\thanks{wright@cs.utexas.edu. Most of this work performed while also affiliated with
+the California Institute of Technology.}\\
+ \small{\sl University of Texas at Austin}
+ \and Henry Yuen\thanks{hyen@cs.toronto.edu}\\
+ \small{\sl University of Toronto}\vspace*{10pt}
+}
+
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Low degree tests play an important role in classical complexity theory,
+serving as basic ingredients in foundational results such as $\MIP = \NEXP$~\cite{BFL91}
+and the PCP theorem~\cite{AS98,ALM+98}.
+Over the last ten years,
+versions of these tests which are sound against quantum provers
+have found increasing applications to the study of nonlocal games and the complexity class~$\MIP^*$.
+The culmination of this line of work is the result $\MIP^* = \mathsf{RE}$~\cite{JNV+20}.
+
+One of the key ingredients in the first reported proof of  $\MIP^* = \mathsf{RE}$ is a two-prover variant of the low degree test, initially
+shown to be sound against multiple quantum provers in~\cite{Vid16}.
+Unfortunately a mistake was recently discovered in the latter result, invalidating the main result of~\cite{Vid16} as well as its use in subsequent works, including~\cite{JNV+20}.
+
+We analyze a variant of the low degree test called the low individual degree test.
+We give a simplified proof that the two-player version of this test is
+sound against quantum provers.  The quantitative bound proved here is
+$21000m^4\max\{1,d^2\}(\eps^{1/64}+(d/q)^{1/64})$.
+The historical motivation is to repair applications of low-degree
+testing to~$\MIP^*$; this exposition does not derive those applications
+from its weaker dependence on~$d$.
+\end{abstract}
+
+\newpage
+
+\tableofcontents
+\vfill
+\thispagestyle{empty}
+\newpage
+
+\section{Introduction}\label{sec:intro}
+
+An $m$-variate polynomial over the finite field~$\F_q$ is a function $g:\F_q^m \rightarrow \F_q$ of the form
+\begin{equation*}
+g(x_1, \ldots, x_m) = \sum_{i_1, \ldots, i_m} c_{i_1, \ldots, i_m} \cdot x_1^{i_1} \cdots x_{m}^{i_m},
+\end{equation*}
+where each coefficient~$c_{i_1, \ldots, i_m}$ is an element of~$\F_q$.
+We say that~$g$ has \emph{total degree $d$}
+(or \emph{degree $d$}, for short) if $i_1 + \cdots + i_m \leq d$ for each nonzero coefficient $c_{i_1, \ldots, i_m}$,
+and \emph{individual degree $d$} if $i_1, \ldots, i_m \leq d$ for each nonzero coefficient $c_{i_1, \ldots, i_m}$.
+Low-degree polynomials have a variety of properties which make them useful in theoretical computer science,
+chief among which is their \emph{distance}:
+by the Schwartz-Zippel lemma, two nonequal degree $d$ polynomials~$g$ and~$h$ agree on at most a $d/q$ fraction of the points in~$\F_q^m$.
+
+\emph{Low (individual) degree testing} refers to the task
+of verifying that an unknown function $g:\F_q^m \rightarrow \F_q$
+is representable as a polynomial of (individual) degree~$d$
+by querying~$g$ on a small number of points $u \in \F_q^m$.
+There is a pair of canonical tests for doing so
+known as the \emph{surface-versus-point low-degree test}
+and the \emph{low individual degree test}.
+It is common to frame these tests
+as games between a referee and two provers.
+In this setting, the surface-versus-point low degree test, parameterized by an integer $1\leq k\leq m$, is performed by the verifier as follows.
+\begin{enumerate}
+\item Select~$\bu \sim \F_q^m$ uniformly at random. Give it to Prover~$\mathrm{A}$. They respond with a value~$\ba \in \F_q$.
+\item Select a uniformly random $k$-dimensional affine surface~$\bs$ in~$\F_q^m$ containing~$\bu$.
+	Give it to Prover~$\mathrm{B}$. They respond with a degree-$d$ $k$-variate polynomial $\boldf:\bs\rightarrow \F_q$.
+\item Accept if $\boldf(\bu) = \ba$.
+\end{enumerate}
+This test is motivated by the fact that a degree-$d$ polynomial
+$g:\F_q^m\rightarrow\F_q$ restricts to a degree-$d$ polynomial
+on every affine $k$-dimensional surface~$s$.
+Hence, if~$g$ is degree-$d$,
+then the provers can win with probability~$1$ by always replying with~$\ba = g(\bu)$ and $\boldf = g|_{\bs}$.
+\emph{Soundness} of the low-degree test refers to the converse statement,
+namely that players who succeed with high probability
+must be responding based on a low-degree polynomial.
+This is formalized as follows.
+
+\begin{theorem}[Raz-Safra~\cite{RS97}]\label{thm:raz-safra}
+Suppose deterministic classical Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the $k = 2$ surface-versus-point low-degree test with probability~$1-\eps$.
+Then there exists a degree-$d$ polynomial $g:\F_q^m \rightarrow \F_q$ such that
+\begin{equation*}
+\Pr_{\bu \sim \F_q^m}[g(\bu) = \ba] \geq 1 - \eps - \poly(m) \cdot \poly(d/q).
+\end{equation*}
+\end{theorem}
+
+A similar ``local characterization" of low individual degree polynomials states that a polynomial~$g$ has individual degree $d$
+if and only if $g|_{\ell}$ is a univariate degree-$d$ polynomial for all axis-parallel lines~$\ell$.
+An axis-parallel line is a line of the form
+$\ell = \{u+t e_i \mid t \in \F_q\}$, for $u \in \F_q^m$ and
+$i \in \{1, \ldots, m\}$.
+Motivated by this, the low individual degree test follows the same outline as the surface-versus-point low degree test
+except with the second step substituted with the following.
+\begin{enumerate}
+\setcounter{enumi}{1}
+\item Select a uniformly random axis-parallel line $\bell$ in~$\F_q^m$ containing~$\bu$.
+	Give it to Prover~$\mathrm{B}$. They respond with a degree-$d$ univariate polynomial $\boldf:\bell\rightarrow \F_q$.
+\end{enumerate}
+When $d = 1$, the low individual degree test
+is called the \emph{multilinearity test} because a polynomial with individual degree $d = 1$ is a multilinear polynomial.
+The multilinearity  and low individual degree tests were
+first introduced and proven sound by Babai, Fortnow, and Lund in~\cite{BFL91}.
+The analysis of its soundness was then improved by~\cite{AS98} and then further sharpened by~\cite{FHS94}.
+The best bound follows from the work of Polishchuk and Spielman~\cite{PS94};
+their work considers only the bivariate $m = 2$ case,
+but extending it to the multivariate case yields the following result.
+\begin{theorem}[Polishchuk-Spielman~\cite{PS94}]\label{thm:classical-test-soundness}
+Suppose deterministic classical Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the low individual degree test with probability~$1-\eps$.
+Then there exists a polynomial $g:\F_q^m \rightarrow \F_q$ with individual degree~$d$ such that
+\begin{equation*}
+\Pr_{\bu \sim \F_q^m}[g(\bu) = \ba] \geq 1 -  \poly(m) \cdot (\poly(\eps) + \poly(d/q)).
+\end{equation*}
+\end{theorem}
+We note that the soundness error the low individual test gives is actually worse than the low degree test,
+because the low individual degree function~$g$ is only $\poly(m) \cdot (\poly(\eps) + \poly(d/q))$ close to Player~$\mathrm{A}$'s strategy,
+rather than $\eps + \poly(m) \cdot \poly(d/q)$.
+We will discuss this weakness of the low individual degree test below.
+
+The multilinearity test, low individual degree test, and low-degree test
+form a sequence
+in which each test generally enables more applications than the previous one.
+The multilinearity test can be used to show that $\MIP = \NEXP$ using a polynomial number of rounds~\cite{BFL91},
+the low individual degree test can reduce the number of rounds to~$1$,
+and the low degree test can be used to ``scale this result down''
+and prove the PCP theorem, i.e.\ $\NP = \MIP[O(\log(n)), O(1)]$~\cite{AS98,ALM+98}.
+
+\subsection{Quantum soundness of the low degree tests}
+
+The work of Ito and Vidick~\cite{IV12}
+initiated a program of studying these tests
+in the case when the players are quantum,
+as a means of proving bounds on the complexity class~$\MIP^*$.
+Because the provers are quantum,
+they are allowed to share an entangled state,
+a resource which could potentially allow them to ``cheat" the test
+and win without using a low-degree polynomial.
+The goal of this program is to show that this is not possible.
+In other words, the goal is to show that these tests are \emph{quantum sound},
+which means that provers who succeed with high success probability
+must answer their questions according to a low (individual) degree polynomial,
+even if they are allowed to share quantum entanglement.\footnote{We note that \emph{quantum soundness of the low-degree tests}, which is the focus of this work,
+is distinct from \emph{soundness of the quantum low-degree test}.
+The ``quantum low-degree test'' is a particular test introduced by Natarajan and Vidick in~\cite{NV18a}
+which gets its name from the prominent role that the low-degree test plays as a subroutine,
+and its ``soundness'' is simply the result that they prove about it.
+}
+
+Correctly formalizing the notion of quantum soundness is a subtle task,
+as quantum provers can in fact ace these tests
+using a broader class of strategies than their classical counterparts.
+For example, the two provers can use their quantum state~$\ket{\psi}$ to simulate shared randomness,
+which they can use to sample a random low-degree polynomial~$\bg$  to answer their questions with;
+what makes this still acceptable is that~$\bg$ depends only on their shared randomness and not their questions.
+The correct formalization of quantum soundness was identified by Ito and Vidick~\cite{IV12},
+which states the following:
+suppose Provers~$\mathrm{A}$ and~$\mathrm{B}$ pass the low-degree test with probability close to~$1$.
+For each point question~$u \in \F_q^m$,
+let $A^{u} = \{A^{u}_a\}$ be the measurement that Prover~$\mathrm{A}$ applies to
+their share of~$\ket{\psi}$ to produce the answer $\ba \in \F_q$.
+Then the test being quantum sound
+means that there should be a measurement $G = \{G_g\}$, independent of~$u \in \F_q^m$,
+which outputs degree-$d$ polynomials~$g$
+and ``acts like~$A$''.
+In other words, rather than measuring~$A^{u}$ to produce the outcome~$\ba \in \F_q$,
+Prover~$\mathrm{A}$ could have simply measured~$G$, received the polynomial~$\bg$,
+and outputted its evaluation at~$\bu$, i.e.\ the value $\bg(\bu)$.
+We will measure the similarity between~$A$ and~$G$
+by considering the experiment where Prover~$\mathrm{A}$ measures with~$A^{\bu}$ to produce~$\ba$,
+Prover~$\mathrm{B}$ measures with~$G$ to produce~$\bg$, and we check if $\bg(\bu) = \ba$.
+This entails studying the quantity
+\begin{equation*}
+\E_{\bu \sim \F_q^m} \sum_{a \in \F_q} \sum_{g:g(\bu) = a}\bra{\psi} A^{\bu}_a \ot G_g \ket{\psi},
+\end{equation*}
+which we aim to show is as close to~$1$ as possible.
+In this way, the provers' quantum advantage is limited to their ability to select a low-degree polynomial~$g$.
+
+One additional quirk of the quantum setting
+is that it has been historically useful to consider variants of these tests which feature more than two provers.
+This allows one to use monogamy of entanglement to reduce the power that entanglement gives to the provers,
+making it easier to show that a given test is quantum sound.
+Low degree test results with fewer provers are more difficult to show and have more applications.
+
+The program of showing that these tests are quantum sound was carried out for the $3$-prover multilinearity test by Ito and Vidick~\cite{IV12}
+and for the $3$-prover low-degree test by Vidick~\cite{Vid16},
+which was later improved to $2$-provers by Natarajan and Vidick~\cite{NV18b}.
+This latter result led to a sequence of works
+which culminated in the proof that $\mathsf{MIP}^* = \mathsf{RE}$
+and the refutation of the Connes embedding conjecture in~\cite{JNV+20}.
+We summarize this line of research in \Cref{fig:research}.
+
+{
+\floatstyle{boxed}
+\restylefloat{figure}
+\begin{figure}
+\begin{tabular}{l c c c}
+& Test shown & Complexity-theoretic  & Number \\
+&  quantum-sound &  consequence & of provers  \\
+			& &&\\
+1. \cite{IV12}: & multilinearity test & $\NEXP \subseteq \mathsf{MIP}^*$ & 3\\[1ex]
+2. \cite{Vid16}: & low-degree test & $\NP \subseteq \mathsf{MIP}^*[O(\log(n)), O(1)]$  &3\\[1ex]
+3. \cite{NV18b}: & low-degree test & $\NP \subseteq \mathsf{MIP}^*[O(\log(n)), O(1)]$ & 2\\
+			& &&\\
+& Consequences of \cite{NV18b}: & &\\
+			& & &\\
+&\multicolumn{1}{l}{\quad\qquad(a) \cite{NV18a}:}   & $\QMA \subseteq \mathsf{MIP}^*[O(\log(n)), O(1)]$ &7\\
+&    & (under randomized reductions) &\\[1ex]
+&\multicolumn{1}{l}{\quad\qquad (b) \cite{NW19}:}   & $\NEEXP \subseteq \mathsf{MIP}^*$ &2\\[1ex]
+&\multicolumn{1}{l}{\quad\qquad (c) \cite{JNV+20}:}   & $\MIP^* = \mathsf{RE}$&2
+\end{tabular}
+	\caption{Prior work on quantum-sound low degree tests and their complexity-theoretic consequences.
+			The first three works showed a quantum-sound test and an $\MIP^*$ bound,
+			both involving the same number of provers indicated in the final column.
+			The last three works use the low-degree test from~\cite{NV18b}
+			to show the indicated $\MIP^*$ bound.}
+\label{fig:research}
+\end{figure}
+}
+
+Subsequent to the initial posting of~\cite{JNV+20} on the arXiv,
+an error was discovered in the analysis of the quantum-sound low degree test
+contained in~\cite{Vid16} which was propagated to~\cite{NV18b}. The error affects the proof in a manner that appears difficult to fix. As such, we currently do not know if the low-degree test is quantum-sound for any number of provers.
+The invalidation of this analysis affects every result in \Cref{fig:research} except for~\cite{IV12}.
+
+The purpose of this exposition is to give a simplified soundness
+analysis for the low individual degree test, with the quantitative
+parameters stated explicitly below.
+We do so by revisiting the three-player quantum-sound multilinearity test of~\cite{IV12}
+and improving this result in two ways.
+First, we generalize it to hold for the degree-$d$ low individual degree test,
+of which the multilinearity test is the $d=1$ special case.
+Second, using techniques introduced in~\cite{Vid16,NV18b},
+we reduce the number of provers from~$3$ to~$2$.
+Our main result is as follows.
+
+\begin{theorem}[Main theorem, informal]\label{thm:main-informal}
+Suppose Provers~$\mathrm{A}$ and~$\mathrm{B}$
+pass the two-prover degree-$d$ low individual degree test with probability $1-\eps$
+using a finite-dimensional projective strategy.
+Let $A = \{A^u_a\}$ be the measurement the provers perform when they are given the point $u \in \F_q^m$
+to produce a value $a \in \F_q$.
+Then there exists a projective measurement $G = \{G_g\}$
+whose outcomes~$g$ are polynomials of individual degree~$d$
+such that
+\begin{equation*}
+\E_{\bu \sim \F_q^m}\sum_{a \in \F_q} \sum_{g:g(\bu) = a} \bra{\psi} A^{\bu}_{a} \ot G_g \ket{\psi}
+\geq 1 - \poly(m,d) \cdot (\poly(\eps) + \poly(d/q)).
+\end{equation*}
+In other words, if Prover~$\mathrm{A}$ measures according to~$A^{\bu}$ to produce $\ba$ and Prover~$\mathrm{B}$ measures according to~$G$ to produce~$\bg$,
+then $\bg(\bu) = \ba$ except with probability $\poly(m,d) \cdot (\poly(\eps) + \poly(d/q))$.
+\end{theorem}
+\noindent
+Thus, we are able to extend \Cref{thm:classical-test-soundness}
+to the case of two quantum provers (with an additional polynomial dependence on $d$; see \Cref{thm:main-formal} below for the formal statement of \Cref{thm:main-informal}).
+
+The historical motivation for the original low individual degree
+analysis was to recover $\NEEXP\subseteq\MIP^*$ from~\cite{NW19},
+$\MIP^*=\mathsf{RE}$ from~\cite{JNV+20}, and the self-testing
+applications of~\cite{NV18a}.  The simplified proof in this document
+has an additional $\max\{1,d^2\}$ prefactor.  We state that dependence
+explicitly and make no claim here that this quantitative bound
+suffices for all of those applications.
+
+\subsection{Total degree versus individual degree}
+
+We now contrast the low degree test with the individual degree test
+and explain why we are only able to prove the latter quantum sound.
+We begin by explaining why the low individual degree test,
+unlike the low degree test,
+requires a $\poly(m) \cdot \poly(\eps)$ dependence in the soundness error.
+
+\begin{example}\label{ex:bad-individual-degree-example}
+Assume $d+1<q$, and consider the degree-$(d+1)$ polynomial
+$h(x_1, \ldots, x_m) = x_1^{d+1}$,
+and suppose that Players~$\mathrm{A}$ and~$\mathrm{B}$ play according to the following classical strategy.
+\begin{itemize}
+\item[$\circ$] (Player~$\mathrm{A}$): given $\bu \in \F_q^m$, return the value $\ba = h(\bu)$.
+\item[$\circ$] (Player~$\mathrm{B}$): given the axis parallel line~$\bell = \{\bu + x \cdot e_{\bi} \mid x \in \F_q\}$, act as follows.
+				If $\bi > 1$, then $h$ is a constant function along~$\bell$, and so return $\boldf = h|_{\bell}$.
+				Otherwise, if $\bi = 1$, then $h$ is a degree-$(d+1)$ polynomial along~$\bell$.
+				As the verifier expects a degree-$d$ polynomial,
+				simply give up and return $\boldf \equiv 0$.
+\end{itemize}
+Using this strategy, $\boldf(\bu) = h|_{\bell}(\bu) = h(\bu) = \ba$ whenever $\bi \neq 1$, which occurs with probability $1- \frac{1}{m}$.
+Hence, the players pass the degree-$d$ low individual degree test with probability at least $1 -\eps$ for $\eps = \frac{1}{m}$.
+However, Player~$\mathrm{A}$ is responding to their questions using the polynomial~$h$
+which is degree-$(d+1)$ but not degree-$d$,
+and any individual-degree-$d$ polynomial~$g$ agrees with~$h$ on at
+most a $\frac{d+1}{q}$ fraction of all inputs.  Indeed, after fixing
+$x_2,\ldots,x_m$, the difference $h-g$ is a nonzero univariate
+polynomial in $x_1$ of degree $d+1$, so Schwartz--Zippel applies.
+This means that the agreement between Player~$\mathrm{A}$'s strategy and any individual-degree-$d$ polynomial~$g$ is at most
+\begin{equation*}
+\Pr_{\bu \sim \F_q^m}[g(\bu) = \ba]
+\leq
+1 - m \cdot \eps + \frac{d+1}{q}.
+\end{equation*}
+\end{example}
+
+\Cref{ex:bad-individual-degree-example} shows why a dependence on~$m$
+is necessary in the soundness error; it does not address the additional
+$d$ dependence in \Cref{thm:main-informal}.
+This reveals a weakness with the low individual degree test:
+one can only conclude that the players are using a low individual degree strategy
+when their failure probability $\eps$ is tiny---on the order of $\frac{1}{m}$ or smaller.
+The low (total) degree test is alluring because it has the potential to avoid this dependence on~$m$.
+
+Soundness of the low total and individual degree tests
+is typically proven by induction on~$m$.
+For the low individual degree test,
+our simplified induction incurs errors polynomial in both $m$ and $d$.
+The recurrence keeps the accumulated error of the form
+$\poly(m,d)\cdot(\poly(\eps)+\poly(d/q))$,
+exactly as in \Cref{thm:main-informal}.
+For the low degree test,
+on the other hand, each step of the induction only incurs an error of $\poly(\eps) + \poly(d/q)$.
+However, if summed over all~$m$ steps,
+this still gives a total error of $m \cdot (\poly(\eps) + \poly(d/q))$,
+which is too large.
+
+To account for this,
+the soundness proofs in \cite{Vid16, NV18b}
+introduce a technique at the end of each induction step
+called \emph{Consolidation}
+in which the growing error is ``reset''
+down to an error $\poly(\eps) + \poly(d/q)$
+which remains fixed across all levels of the induction.
+This allows them to conclude with an error that was independent of the dimension~$m$.
+Consolidation works as follows:
+if the error of the projective measurement $G = \{G_g\}$
+ever grows past this fixed error, the Consolidation step argues that on some portion of the Hilbert space,
+the measurement~$G$ must be performing much worse than expected;
+it then corrects this by inductively calling the low-degree test soundness to produce a better measurement on this portion of the Hilbert space.
+Ultimately, however, this creates a cascade of Consolidation steps calling each other with increasing error,
+which at some point grows so large that the low-degree soundness can no longer be applied.
+This is the source of the bug.
+
+Fortunately, this work shows that the techniques of these prior works,
+aside from Consolidation,
+are still sound.
+So we can show soundness bounds which grow as a function of~$m$,
+even if we cannot yet show bounds independent of~$m$.
+In the end, this ``weakness" of the low individual degree test
+is precisely what allows us to show that it, and not the low degree test, is quantum sound.
+
+That said, we do believe, although we have not rigorously verified,
+that related techniques could prove the original dimension-only
+error form for the low degree test,
+i.e.\ a soundness bound of $\poly(m) \cdot (\poly(\eps) + \poly(d/q))$ rather than $\eps + \poly(m) \cdot \poly(d/q)$.
+This ``weak'' quantum soundness does not rule out the possibility that quantum provers can significantly outperform their classical counterparts.
+It is, however, still sufficient for the same applications as the low individual degree test,
+and it hints towards the possibility of a full quantum soundness of the low degree test.
+
+\subsection{Conclusion and open problems}
+
+In recent years,
+the classical low-degree test has played a critical role in the study of nonlocal games
+and the complexity class~$\MIP^*$.
+In addition to correcting previous proofs of soundness,
+we hope that this new exposition
+will invite new researchers to engage with this beautiful area.
+We conclude with a short list of open problems for future work.
+
+\begin{enumerate}
+\item Is the classical low-degree test quantum sound? Can the Consolidation step be fixed?
+\item Even if the classical low-degree test is shown quantum sound,
+	there are still interesting questions to be answered about the low individual degree test.
+	For example, can the diagonal lines test be removed? (See \Cref{sec:the-test} for a description of this subtest.)
+	Doing so would likely simplify the proof of $\MIP^* = \mathsf{RE}$~\cite{JNV+20},
+	as one could replace the complicated ``conditional linear functions'' used in the proof
+	with a simpler subclass known as ``coordinate deletion functions''.
+	However, as discussed at the end of \Cref{sec:technical-overview},
+	we know of an example that requires the diagonal lines test
+	for the low individual degree test with parameters $m = 2$, $d = 2$, and $q = 4$.
+	Can we find similar examples for larger~$q$?
+\item Classically,  the low degree test
+	generalized in various directions,
+	including tests for affine invariant properties~\cite{KS08,Sud11}
+	and tests for tensor product codes (see, for example, \cite{CMS17}).
+	Does quantum soundness hold for these tests as well?
+\item This work continues the trend of showing that well-studied classical property testers
+	are also quantum sound.
+	Prior to this, the work of~\cite{IV12} (see also \cite[Chapter 2]{Vid11}) showed that the linearity tester of Blum, Luby, and Rubinfeld~\cite{BLR93}
+	is also quantum sound.
+	The proofs of these results have so far been case-by-case adaptations of the classical proofs to the quantum setting;
+	in the case of this paper, the proof is highly nontrivial
+	and involves many ad hoc calculations which fortunately go in our favor.
+	Is there a more conceptual reason why quantum soundness holds for these testers?
+	Perhaps a reduction from the quantum case to the classical case?
+\end{enumerate}
+
+\section{Technical overview}\label{sec:technical-overview}
+
+At a high level, our proof follows the approach of~\cite{BFL91}, and
+it is useful to start by summarizing their analysis, which applies to
+classical, \emph{deterministic} strategies. In this version of the test, the provers' strategy is described
+by a ``points function,'' assigning a value in $\F_q$ to each point in
+$\F_q^m$, and a
+``lines function,'' assigning a low-degree polynomial to each
+line in $\F_q^{m}$ queried in the test. From the assumption that the
+points and lines functions agree at a randomly chosen point with high
+probability, we would like to construct a global low-degree polynomial that has high agreement with
+the points function. This is done by inductively constructing
+``subspace functions'' defined on affine axis-aligned subspaces of increasing
+dimension $k$. The base case is $k=1$, and is supplied by the lines
+function. At each step, to construct the subspace function for a
+subspace $S$ of dimension $k+1$, we pick $d+1$ parallel subspaces of
+dimension $k$ that lie within $S$, and compute the unique degree-$d$
+polynomial that interpolates them. The analysis shows that at each
+stage, the function constructed through interpolation has high
+agreement on average with the points function and lines function. In
+the end, when we reach $k=m$ the ambient dimension, the subspace
+function we construct is the desired global function.
+
+For the sake of simplicity, it suffices to consider the case $d=1$,
+i.e. multilinear functions. In this case, whenever we perform
+interpolation, we need to combine $2$ parallel subspaces.
+
+\paragraph{The classical zero-error case}
+
+To start building intuition, it is useful to think about how to carry
+out the above program in a highly simplified setting: the classical
+zero-error case, for $m=3$. In this case, we assume that we have access to a
+points function $f$ and lines function $g$ that \emph{perfectly} pass the BFL
+test. Moreover, we will focus on the \emph{final} step of the
+induction: thus, we assume that we have already constructed a set of
+planes functions defined for every axis-parallel plane, that are
+perfectly consistent with the line and point functions. In the final
+step of the induction, our goal is to combine these planes functions
+to create a single global function $h$
+over all of $\F_q^{3}$ that is consistent with the points and lines functions.
+
+To do this, we will interpolate the planes as follows. Let us label
+the 3 coordinates in the space $x, y, $and $z$, and consider planes
+parallel to the $(x,y)$-plane. Each plane $S_z$ is specified by a
+value of the $z$ coordinate:
+\[ S_z = \{(x,y,z): (x, y) \in \F_q^2\}. \]
+By the induction hypothesis, for every such plane $S_z$ there exists a
+bilinear function $g_{z}: \F_q^{2} \to \F_q$ that agrees with the
+points function. To construct a global multilinear function $h:
+\F_q^3 \to \F_q$, we pick two distinct values $z_1 \neq z_2$, and ``paste''
+the two plane functions $g_{z_1} $ and
+$g_{z_2}$ together using \emph{polynomial
+  interpolation}. Specifically, we define $h$ to be the unique
+multilinear polynomial that interpolates between $g_{z_1}$ on the
+plane $S_{z_1}$ and $g_{z_2}$ on the plane $S_{z_2}$.
+\[ h(x,y,z) = \mathrm{interpolate}_{z_1, z_2}(g_{z_1}, g_{z_2}) = \left(\frac{z - z_2}{z_1 - z_2}\right) g_{z_1}(x,y) +
+  \left(\frac{z - z_1}{z_2 - z_1}\right) g_{z_2}(x,y). \]
+
+This procedure defines a global function $h$, and by the assumption
+that $g_{z_1}$ and $g_{z_2}$ are multilinear, it follows that $h$ is
+also a multilinear function. But why is $h$ consistent with the points
+function? To show this, we need to consider the lines function on
+lines parallel to the $z$ axis. Given a point $(x,y,z)$, let $\ell$ be
+the line parallel to the $z$ axis through this point, and let $g_\ell$
+be the associated lines function. By construction, $h$ agrees with
+$g_\ell$ at the two points $z_1$ and $z_2$. But $g_\ell$ and the restriction
+$h_{|\ell}$ of $h$ to $\ell$ are both linear functions, and hence if
+they agree at two points, they must agree \emph{everywhere}. (This is
+a special case of the \emph{Schwartz-Zippel lemma}, which says that if
+two degree-$d$ polynomials agree at $d+1$ points, they must be equal.)
+Thus, $h$
+agrees with $g_\ell$ at the original point $z$ as well. By success in
+the test, $g_\ell$ in turn agrees with the points function $f$ at
+$(x,y,z)$, and thus, $h(x,y,z) = f(x,y,z)$. Thus, we have shown that
+the global function $h$ is both multilinear and agrees with the points
+function $f$ exactly.
+
+\paragraph{Dealing with errors}
+To extend the sketch above to the general case, with nonzero error,
+requires some modifications. At the most basic level, we may consider
+what happens when we allow for deterministic classical strategies that
+succeed with probability less than $1$ in the test. Such strategies
+may have ``mislabeling'' error: the points function
+$f$ may be imagined to be a multilinear function that has been
+corrupted at a small fraction of the points. This type of error is
+handled by the analysis in~\cite{BFL91}. The main modification to the zero-error
+sketch above is a careful analysis of the probability that the pasting
+step produces a ``good'' interpolated polynomial for a randomly chosen
+pair of planes $S_{z_1}, S_{z_2}$. This analysis makes use of the
+Schwartz-Zippel lemma together with combinatorial properties of the
+point-line test itself (e.g. the expansion properties of the question
+graph associated with the test).
+
+At the next level of generality, we could consider classical
+\emph{randomized} strategies. Suppose we are given a randomized
+strategy that succeeds in the test with probability $1 - \eps$. Any
+randomized strategy can be modeled by first sampling a random seed,
+and then playing a deterministic strategy conditioned on the value of
+the seed. A success probability of $1 - \eps$ could have two
+qualitatively different underlying causes: (1) on $O(\eps)$ fraction
+of the seeds, the strategy uses a function which is totally corrupted,
+and (2) on a large fraction of the seeds, the strategy uses functions
+which are only $\eps$-corrupted. An analysis of randomized
+strategies could naturally proceed in a ``seed-by-seed'' fashion, applying the
+deterministic analysis of~\cite{BFL91} to the large fraction of ``good'' seeds (which
+are each only $\eps$-corrupted), while giving up entirely on the
+``bad'' seeds.
+
+In this document, we consider quantum strategies, which
+have much richer possibilities for error. Nevertheless, we are able to
+preserve some intuition from the randomized case, by working with
+\emph{sub-measurements}: quantum measurements that do not always yield
+an outcome. Working with a sub-measurement allows us to distinguish two
+kinds of error: \emph{consistency error} (the probability that a
+sub-measurement returns a wrong outcome) and \emph{completeness error}
+(the probability that the sub-measurement fails to return an outcome at
+all). Roughly speaking, the completeness error corresponds to the
+probability of obtaining a ``bad'' seed in the randomized case, while
+the consistency error corresponds to how well the strategies do on
+``good'' seeds.
+
+The technique of using sub-measurements and managing the two types of
+error separately goes back to~\cite{IV12}. That work developed a
+crucial tool to convert between these two types of error called the
+\emph{self-improvement lemma}, and in our analysis we make extensive
+use of a refined version of this lemma (\Cref{thm:self-improvement-in-induction-section}), building on~\cite{Vid16,NV18b}. Essentially, the lemma says the
+following: suppose that (a) the provers pass the test with probability
+$1 - \eps$, and (b) there is a complete measurement $G_{g}$ whose
+outcomes are low-degree polynomials that has
+consistency error $\nu$: that is, $G$ always returns an outcome, but
+has probability $\nu$ of producing an outcome $g$ that disagrees with the points measurement $A^u_a$ at a
+random point $u$. Then there exists an
+``improved'' sub-measurement  $H_{h}$ with consistency error $\zeta$
+depending on the test error and the parameters $m,d/q$, independently
+of $\nu$, and with completeness error
+(i.e. probability of not producing an outcome at all) of $\nu
++\zeta$. Essentially, this lemma says we can always ``reset'' the
+consistency error of any measurement we construct at intermediate
+points in the analysis to a universal
+function $\zeta$ of the test error and the fixed test parameters,
+at the cost of introducing some amount completeness error. Intuitively, one may
+think of the action of the lemma as correcting $G$ on the portions of
+Hilbert space where it is only mildly corrupted, while ``cutting out'' the
+portions of Hilbert space where $G$ is too corrupted to be
+correctable. In some sense, this lemma is the quantum analog of the
+idea of identifying ``good'' and ``bad'' random seeds in the classical
+randomized case. The proof of the lemma uses a primal--dual semidefinite program for measurements
+together with the combinatorial facts used in~\cite{BFL91}
+(specifically, expansion of the question graph of the test, and
+the Schwartz-Zippel lemma).
+
+Armed with the self-improvement lemma, we set up the following
+quantum version of the BFL
+induction loop: for $r$ running from $1$ to $m$, we construct a family
+of subspace measurements $G^{S}_{g}$ that returns a low-degree
+polynomial $g$ for every axis-aligned affine subspace $S$ of dimension $r$.
+\begin{enumerate}
+  \item By the induction hypothesis, we know that there exists a
+    measurement  $G^{S}_{g}$ for every $r$-dimensional subspace, which
+    has consistency error $\delta(r)$ with the points
+    measurement. (For the base case $r = 1$, this is the lines
+    measurement from the provers' strategy).
+  \item We apply the self-improvement lemma to these measurements, yielding
+    sub-measurements $\hat{G}^{S}_{g}$ that have consistency error
+    $\zeta$ independent of $\delta(r)$, and completeness error $\kappa(r) = \delta(r) + \zeta$.
+    We dilate all of these sub-measurements on a common enlarged space
+    to obtain projective slices with the same correlations.
+  \item For each subspace $S$ of dimension $r+1$, we construct a
+    pasted sub-measurement, by performing a quantum version of the
+    classical interpolation argument: we define the pasted
+    sub-measurement by completing the measurements with a rejection
+    outcome, sampling parallel $r$-dimensional subspaces, and
+    interpolating only the first $d+1$ successful outcomes at distinct
+    slice coordinates. This pasted sub-measurement has consistency slightly worse than $\zeta$, and completeness error which
+    is slightly worse than $\kappa(r)$. It is at this step that it is crucial to treat the two types
+    of error separately: in particular, we need the consistency error
+    to be low to ensure that the interpolation produces a good result.
+  \item We convert the resulting sub-measurement into a full
+    measurement, by assigning an arbitrary fixed outcome whenever the
+    sub-measurement fails to yield an outcome. This measurement will
+    have consistency error $\delta(r+1)$ which is larger than $\delta(r)$
+    by some additive factor.  Compressing this measurement back to the
+    original space preserves its consistency with the point measurements.
+  \end{enumerate}
+  At the end of the loop, when $r = m$, we obtain a single measurement that returns
+  a global polynomial as desired.
+
+The pasting analysis uses one positive contraction, the average of the
+projections onto matching outcomes of the completed slice measurements.
+Its powers control independent random sequences of questions.  A
+spectral inequality then bounds both the cost of moving a successful
+slice past an entire prefix and the change in marginal success
+probabilities.  A union bound proves consistency of the interpolant,
+and the expected number of successes controls completeness.  No
+independence between the outcomes is needed.  In \Cref{sec:first-construction}, boundedness turns the same
+estimates into a bound on $\bra\psi(G-G^2)\otimes I\ket\psi$ and proves
+that the original construction with exactly $d+1$ slices also works.
+The induction uses the first-success construction for its sharper
+quantitative bound.
+\paragraph{The diagonal lines test}
+An important element of the test we analyze in this document, which is
+unnecessary in the classical case, is the diagonal lines test. The purpose
+of this test is to certify that the points measurements used by the provers
+approximately commute on average over all pairs of points $(x, y)$ in
+$\F_q^m$---something which is automatically true in the classical case. This is done by asking one prover for a polynomial defined
+on the line going through $x$ and $y$, and the other for the function
+evaluation at either $x$ or $y$. The line through $x$ and
+$y$ will not in general be axis-parallel; we refer to these general
+lines as ``diagonal.''
+
+The commutation guarantee plays an important role in our analysis of
+the test, and it is an interesting question whether it is truly
+necessary to test it directly with the diagonal lines test; might it
+not automatically follow from success in the axis-parallel lines test? An interesting contrast can be drawn to
+the Magic Square
+game~\cite{mermin1990simple,peres1990incompatible,aravind2002simple},
+in which questions are either cells or axis-parallel lines in a $3 \times 3$ square grid.
+This has the same question distribution as
+the axis-parallel line-point test over $\F_3^2$ (although the answers in the Magic Square game are strings in~$\F_2$ rather than~$\F_3$).
+For the Magic Square game,
+``points'' measurements along the same axis-parallel ``line'' commute,
+but points that are not axis-aligned do \emph{not} commute: indeed,
+for the perfect strategy, they anticommute. Despite this example,
+we know that commutation between all pairs of points \emph{can} be deduced from the
+axis-parallel lines test alone, rendering the diagonal lines test unnecessary,
+at least in the case of the bivariate ($m = 2$) multilinearity test (the low individual degree test when $d = 1$).
+On the other hand, we know of a quantum strategy using noncommuting measurements
+which succeeds with probability~$1$ in the $m = 2$, $d = 2$, $q = 4$ low individual degree test.
+Whether this counterexample can be extended to larger~$q$ remains an open question.
+
+\paragraph{Organization}
+The rest of this document is organized as follows. In
+\Cref{sec:prelims} we review some preliminaries concerning finite
+fields, polynomials, and quantum measurements. In
+\Cref{sec:making-measurements-projective}, we prove the rounding
+lemma used once at the end to obtain projective output on the original
+local spaces. In \Cref{sec:induction}, we give the inductive argument
+proving the main theorem. In \Cref{sec:expansion,sec:variance} we show
+some properties of the hypercube graph and families of measurements
+indexed by points on the hypercube, which are used in
+\Cref{sec:self-improvement} to prove the self-improvement lemma. In
+\Cref{sec:commutativity-points,sec:g-comm}, we show commutativity
+properties of the measurements constructed in the induction, and
+finally in \Cref{sec:ld-pasting} we analyze the pasting step of the induction.
+
+\paragraph{Acknowledgments}
+
+We thank Lewis Bowen for pointing out typos and a few minor errors in a previous version.
+We also thank Madhu Sudan for help with references on the classical low individual degree test.
+
+\section{The test}\label{sec:the-test}
+
+\begin{definition}[Roles]
+The low individual degree test will be played between two provers and a verifier.
+The two provers are named Player~$\mathrm{A}$ and Player~$\mathrm{B}$.
+A \emph{role} $r$ is an element of the set $\{\mathrm{A}, \mathrm{B}\}$.
+Given a role~$r$, we write $\overline{r}$ for the other element of the set $\{\mathrm{A}, \mathrm{B}\}$.
+\end{definition}
+
+\begin{definition}[Low individual degree test]
+Let $m\geq1$ and $d\geq0$ be integers.
+Let $q$ be a prime power.
+Then the \emph{$(m,q,d)$-low individual degree test}
+is stated in \Cref{fig:test}.
+\end{definition}
+
+{
+\floatstyle{boxed}
+\restylefloat{figure}
+\begin{figure}
+With probability~$\tfrac{1}{3}$ each, perform one of the following three tests.
+\begin{enumerate}
+	\item \textbf{Axis-parallel lines test:}
+		Pick a uniformly random role $\br \sim \{\mathrm{A},\mathrm{B}\}$.
+		Let $\bu \sim \F_q^m$ be a uniformly random point.
+		Select $\bi \sim \{1, \ldots, m\}$ uniformly at random,
+		and let $\bell = \{\bu + t \cdot e_{\bi} \mid t \in \F_q\}$
+		be the axis-parallel line which passes through~$\bu$ in the $\bi$-th direction.
+		\begin{itemize}
+		\item[$\circ$] Player~$\br$:
+			Give $\bell$;
+			receive the univariate degree-$d$ polynomial $\boldf:\bell \rightarrow \F_q$.
+		\item[$\circ$] Player~$\overline{\br}$:
+			Give $\bu$;
+			receive $\ba \in \F_q$.
+		\end{itemize}
+		Accept if $\boldf(\bu) = \ba$.
+	\item \textbf{Self-consistency test:}
+		Let $\bu \sim \F_q^m$ be a uniformly random point.
+		\begin{itemize}
+		\item[$\circ$] Player~$\mathrm{A}$:
+			Give $\bu$;
+			receive $\ba \in \F_q$.
+		\item[$\circ$] Player~$\mathrm{B}$:
+			Give $\bu$;
+			receive $\bb \in \F_q$.
+		\end{itemize}
+		Accept if $\ba = \bb$.
+	\item \textbf{Diagonal lines test:}
+		Pick a uniformly random role $\br \sim \{\mathrm{A},\mathrm{B}\}$.
+		Let $\bu \sim \F_q^m$ be a uniformly random point.
+		Select $\bi \sim \{1, \ldots, m\}$ uniformly at random,
+		and let $\bv \in \F_q^m$ be a uniformly random point whose last $m - \bi$ coordinates are~$0$.
+		Finally,
+		let $\bell = \{\bu + t \cdot \bv \mid t \in \F_q\}$
+		be the line which passes through~$\bu$ in direction~$\bv$.
+		When $\bv=0$, this is the singleton $\{\bu\}$; throughout the
+		paper such a singleton is regarded as a permitted degenerate
+		diagonal line.
+		\begin{itemize}
+		\item[$\circ$] Player~$\br$:
+			Give $\bell$;
+			receive the univariate degree-$md$ polynomial $\boldf:\bell \rightarrow \F_q$.
+		\item[$\circ$] Player~$\overline{\br}$:
+			Give $\bu$;
+			receive $\ba \in \F_q$.
+		\end{itemize}
+		Accept if $\boldf(\bu) = \ba$.
+	\end{enumerate}
+	\caption{The $(m,q,d)$-low individual degree test.\label{fig:test}}
+\end{figure}
+}
+
+An important class of strategies are those which are \emph{symmetric}.
+In this case, the bipartite state $\ket{\psi}$ Alice and Bob share is symmetric.
+Furthermore, for any question Alice and Bob receive, they apply the same measurement to their share of the state.
+This means that rather than, for example, keeping track of a separate points measurement for Alice and Bob,
+we can use a single measurement to refer to both of their strategies,
+and similarly for the axis-parallel lines and diagonal lines measurements.
+This is formalized in the following definition, where we also consider strategies which are projective.
+
+We make one harmless relaxation that is important for the induction.
+For the diagonal-lines measurement $L^\ell$, we allow every function
+$f:\ell\to\F_q$ as an outcome, rather than only degree-$md$
+polynomials.  Given an ordinary strategy, first coarse-grain together
+all polynomial labels that induce the same function on~$\ell$, and set
+$L^\ell_f=0$ for every remaining function.  Coarse-graining a
+projective measurement is projective, and the acceptance probability
+is unchanged.  Conversely, the proof below uses $L$ only through
+projectivity and the coarse-grained evaluations
+$L^\ell_{[f(u)=a]}$, so it proves soundness even for this larger answer
+alphabet.  This relaxation is closed under restricting to an affine
+slice; the degree-$md$ answer alphabet alone is not.
+
+\begin{definition}[Symmetric, projective strategy]
+A \emph{symmetric, projective strategy} for the $(m,q, d)$-low individual degree test
+is a tuple $(\psi, A, B, L)$ defined as follows.
+\begin{itemize}
+\item[$\circ$] $\calH$ is finite-dimensional and
+$\ket{\psi} \in \calH \ot \calH$ is a bipartite, permutation-invariant state.
+\item[$\circ$] $A = \{A^u_a\}$ contains a matrix for each $u \in \F_q^m$ and $a \in \F_q$.
+			For each $u$, $A^u$ is a projective measurement on~$\calH$.
+\item[$\circ$] $B = \{B^{\ell}_f\}$ contains a matrix for each axis-parallel line~$\ell$ in $\F_q^m$
+			and univariate degree-$d$ polynomial $f:\ell\rightarrow \F_q$.
+			For each $\ell$, $B^{\ell}$ is a projective measurement on~$\calH$.
+\item[$\circ$] $L = \{L^{\ell}_f\}$ contains a matrix for each line~$\ell$ in $\F_q^m$
+			and each function $f:\ell\rightarrow \F_q$.
+			For each $\ell$, $L^{\ell}$ is a projective measurement on~$\calH$.
+\end{itemize}
+\end{definition}
+
+We can also consider more general strategies which are no longer assumed to be symmetric.
+In this case, Players~$\mathrm{A}$ and~$\mathrm{B}$ each have their own versions of the measurements~$A$, $B$, and~$L$.
+
+\begin{definition}[General projective strategy]
+A \emph{projective strategy} for the $(m,q, d)$-low individual degree test
+is a tuple $(\psi, A^{\mathrm{A}},B^{\mathrm{A}},L^{\mathrm{A}},A^{\mathrm{B}},B^{\mathrm{B}},L^{\mathrm{B}})$ defined as follows.
+\begin{itemize}
+\item[$\circ$] $\calH_{\mathrm A}$ and $\calH_{\mathrm B}$ are
+finite-dimensional, and
+$\ket{\psi} \in \calH_{\mathrm{A}} \ot \calH_{\mathrm{B}}$ is a bipartite state.
+\end{itemize}
+Furthermore, for each~$w \in \{\mathrm{A}, \mathrm{B}\}$:
+\begin{itemize}
+\item[$\circ$] $A^{w} = \{A^{w,u}_a\}$ contains a matrix for each $u \in \F_q^m$ and $a \in \F_q$.
+			For each $u$, $A^{w,u}$ is a projective measurement on~$\calH_{w}$.
+\item[$\circ$] $B^{w} = \{B^{w,\ell}_f\}$ contains a matrix for each axis-parallel line~$\ell$ in $\F_q^m$
+			and univariate degree-$d$ polynomial $f:\ell\rightarrow \F_q$.
+			For each $\ell$, $B^{w,\ell}$ is a projective measurement on~$\calH_{w}$.
+\item[$\circ$] $L^w = \{L^{w,\ell}_f\}$ contains a matrix for each line~$\ell$ in $\F_q^m$
+			and each function $f:\ell\rightarrow \F_q$.
+			For each $\ell$, $L^{w,\ell}$ is a projective measurement on~$\calH_{w}$.
+\end{itemize}
+\end{definition}
+
+\begin{remark}
+Throughout this work, we will only consider projective strategies.
+So we will henceforth use the terms ``strategy" and ``symmetric strategy'' to refer exclusively to projective strategies and symmetric, projective strategies, respectively.
+
+In addition, we will spend the vast majority of this work dealing solely with symmetric strategies, as they are notationally simpler to work with.
+Much of this work will focus on proving~\Cref{thm:main-induction},
+a variant of our main theorem for symmetric strategies.
+Our main theorem for general strategies, \Cref{thm:main-formal} below, will be proven in \Cref{sec:induction} by a standard reduction to the symmetric case.
+We will only see these more cumbersome-to-write general strategies
+in this section, where we state \Cref{thm:main-formal},
+and in \Cref{sec:induction}, where we carry out the reduction.
+\end{remark}
+
+\begin{definition}[Good strategy]
+A strategy is $(\eps, \delta, \gamma)$-good if it
+passes the axis-parallel lines test with probability at least $1-\eps$,
+the self consistency test with probability at least~$1-\delta$,
+and the diagonal lines test with probability at least~$1-\gamma$.
+\end{definition}
+
+\begin{remark}\label{rem:good-strat-characterization}
+Using notation which will be introduced in \Cref{sec:comparing-measurements} below,
+a symmetric strategy is $(\eps, \delta, \gamma)$-good
+if and only if it satisfies the following three conditions.
+For $\bell$ and $\bu$ as in the axis-parallel lines test,
+\begin{equation*}
+A^u_a \ot I \simeq_{\eps} I \ot B^{\ell}_{[f(u)=a]},
+\quad
+\text{and}
+\quad
+A^u_a \ot I \simeq_{\delta} I \ot A^u_a.
+\end{equation*}
+And for $\bell$ and $\bu$ as in the diagonal lines test,
+\begin{equation*}
+A^u_a \ot I \simeq_{\gamma} I \ot L^{\ell}_{[f(u)=a]}.
+\end{equation*}
+\end{remark}
+
+\begin{notation}\label{not:conditioned-on-last-direction}
+Our proof will be via induction,
+i.e.\ proving soundness of the $(m+1,q,d)$-low individual degree test
+using the soundness of the $(m,q,d)$-low individual degree test.
+To do this, we will frequently use the axis-parallel line test in the specific case of $i = m+1$.
+Thus, it will be convenient to introduce the following notation.
+Let $(\psi, A, B, L)$ be a symmetric strategy for the $(m+1, q, d)$-low individual degree test,
+Then for each $u \in \F_q^m$ we will write $B^u_f$ as shorthand for $B^{\ell}_f$,
+where $\ell = \{(u, x) \mid x \in \F_q\}$.
+For a function $f:\ell \rightarrow \F_q$,
+we will also sometimes write $f(x)$ as shorthand for $f(u,x)$.
+\end{notation}
+
+\begin{definition}
+Consider the $(m,q,d)$-low individual degree test.
+For $j \in \{1, \ldots, m\}$,
+we refer to the \emph{$j$-restricted diagonal lines test}
+as the diagonal lines test conditioned on $\bi = j$.
+For example, in the $m$-restricted diagonal lines test, one samples
+$u,v\in\F_q^m$ independently and uniformly and asks the line
+$\ell=\{u+tv:t\in\F_q\}$.  Thus the singleton $\{u\}$ has
+probability $q^{-m}$, while each nondegenerate line through~$u$ has
+probability $(q-1)q^{-m}$.
+\end{definition}
+
+Now we state our main theorem using notation which will be introduced in \Cref{sec:prelims} below.
+This is the formal version of \Cref{thm:main-informal}.
+
+\begin{theorem}[Main theorem; quantum soundness of the low individual degree test]\label{thm:main-formal}
+  Let $m\geq1$.  Consider a projective strategy $(\psi, A^{\mathrm{A}},B^{\mathrm{A}},L^{\mathrm{A}},A^{\mathrm{B}},B^{\mathrm{B}},L^{\mathrm{B}})$
+   which passes the  $(m,q,d)$-low individual degree test with probability at least $1-\eps$.
+  Set
+  \[
+  K_{m,d}=
+  \begin{cases}
+    m^4,&d=0,\\
+    d^2m^4,&d\geq1,
+  \end{cases}
+  \qquad
+  \nu = 21000 K_{m,d}
+  \Big(\eps^{1/64} + (d/q)^{1/64}\Big).
+  \]
+Then there exist projective measurements $G^{\mathrm{A}}, G^{\mathrm{B}} \in \polymeas{m}{q}{d}$ with the following properties:
+\begin{enumerate}
+  \item (Consistency with~$A$):  On average over $\bu \sim \F_q^{m}$,
+	  \begin{align*}
+	  A^{\mathrm{A},u}_a \otimes I
+		&\simeq_{\nu} I \otimes G^{\mathrm{B}}_{[g(u)=a]},\\
+	I \otimes A^{\mathrm{B},u}_a
+		&\simeq_{\nu}  G^{\mathrm{A}}_{[g(u)=a]} \ot I.
+	  \end{align*}
+\item (Self-consistency):
+	\begin{equation*}
+	G^{\mathrm{A}}_g \ot I \simeq_{\nu} I \ot G^{\mathrm{B}}_g.
+	\end{equation*}
+\end{enumerate}
+\end{theorem}
+
+\section{Preliminaries}\label{sec:prelims}
+
+We use \textbf{boldface font} to denote random variables.
+For two complex numbers $\alpha, \beta \in \C$, we write
+$\alpha \approx_{\eps} \beta$ if
+\begin{equation*}
+|\alpha - \beta| \leq \eps.
+\end{equation*}
+We note the following triangle inequality for numbers, which we will use repeatedly:
+\begin{equation}\label{eq:triangle-inequality-for-numbers}
+\text{if $\alpha \approx_{\eps} \beta$ and $\beta \approx_{\delta} \gamma$, then $\alpha \approx_{\eps+\delta}\gamma$.}
+\end{equation}
+
+\subsection{Finite fields}
+
+A \emph{finite field} is a field with a finite number of elements.
+There is a unique finite field~$\F_q$ of~$q$ elements for each prime power $q = p^t$,
+and there are no other finite fields.
+
+\subsection{Polynomials over finite fields}
+
+\begin{definition}[Polynomials of low individual degree]
+Let $q$ be a prime power,
+and let $m$ and $d$ be nonnegative integers.
+We define $\polyfunc{m}{q}{d}$ to be the set of polynomials in $\F_q^m$
+with individual degree~$d$.
+\end{definition}
+
+\begin{remark}
+Note that as defined in \Cref{sec:intro},
+in this work a polynomial with individual degree~$d$ is one in which the degree~$d_i$ of each coordinate~$i$
+is \emph{at most~$d$}.
+This allows us to say ``individual degree~$d$'' rather than the wordier ``individual degree at most~$d$''.
+For example, under this definition, $\polyfunc{m}{q}{d}$ is contained in $\polyfunc{m}{q}{d+1}$ for each~$d$.
+\end{remark}
+
+The most important fact about low-degree polynomials is that they have large distance from each other.
+This is shown by the following lemma.
+
+\begin{lemma}[Schwartz-Zippel lemma~\cite{Sch80,Zip79}]\label{lem:schwartz-zippel-total-degree}
+Let $g,h\in\F_q[X_1,\ldots,X_m]$ be formal polynomials such that
+$g-h$ is nonzero and has total degree at most~$d$.
+Then
+\begin{equation*}
+\Pr_{\bx \sim \F_q^m}[g(\bx) = h(\bx)] \leq \frac{d}{q}.
+\end{equation*}
+\end{lemma}
+
+Since any polynomial with individual degree~$d$ has total degree~$md$,
+\Cref{lem:schwartz-zippel-total-degree} implies the following corollary.
+
+\begin{corollary}[Schwartz-Zippel for individual degree]
+Let $g, h \in \polyfunc{m}{q}{d}$ be distinct. Then
+\begin{equation*}
+\Pr_{\bx \sim \F_q^m}[g(\bx) = h(\bx)] \leq \frac{md}{q}.
+\end{equation*}
+\end{corollary}
+\begin{proof}
+Apply \Cref{lem:schwartz-zippel-total-degree} to the nonzero
+polynomial $g-h$, whose total degree is at most~$md$.
+\end{proof}
+
+\subsection{Measurements}
+
+All measurement outcome sets in this paper are finite.
+
+\begin{definition}[Measurements and sub-measurements]
+Let $\calH$ be a Hilbert space and $\calA$ be a set of outcomes.
+A \emph{sub-measurement}
+is a set of Hermitian, positive-semidefinite matrices
+$A = \{A_a\}_{a \in \calA}$
+acting on~$\calH$
+such that $\sum_a A_a \leq I$.
+The sub-measurement is \emph{projective} if $(A_a)^2 = A_a$ for each~$a$.
+It is a \emph{measurement}
+if it satisfies the stronger condition $\sum_a A_a = I$.
+\end{definition}
+
+\begin{proposition}[Orthogonality of projective sub-measurements]
+\label{prop:projective-submeasurement-orthogonal}
+If $P=\{P_a\}$ is a projective sub-measurement, then
+$P_aP_b=0$ whenever $a\ne b$.  Consequently
+$P=\sum_aP_a$ is itself a projection.
+\end{proposition}
+\begin{proof}
+Fix~$a$ and put $S=\sum_bP_b\leq I$.  Since $I-S\geq0$,
+\[
+0\leq P_a(I-S)P_a=-\sum_{b\ne a}P_aP_bP_a.
+\]
+Each summand $P_aP_bP_a=(P_bP_a)^\dagger(P_bP_a)$ is positive
+semidefinite.  They must therefore all vanish, so $P_bP_a=0$ for
+$b\ne a$; taking adjoints gives $P_aP_b=0$.  Hence $P^2=P$.
+\end{proof}
+
+An important class of sub-measurements
+are those that output polynomials~$g$ of individual degree~$d$.
+These are defined as follows.
+
+\begin{definition}[Low-degree polynomial measurements]
+We write $\polysub{m}{q}{d}$ for the set of sub-measurements $G=\{G_g\}$
+with outcomes $g \in \polyfunc{m}{q}{d}$.
+We write $\polymeas{m}{q}{d}$ for the subset of $\polysub{m}{q}{d}$
+containing only those $G = \{G_g\}$ which are measurements.
+\end{definition}
+
+\begin{definition}[Post-processing measurements]\label{def:post-processing}
+Let $A = \{A_a\}_{a \in \calA}$ be a set of matrices,
+and let $f:\calA \rightarrow \calB$ be a function.
+Then for each $b \in \calB$,
+we define the matrix
+\begin{equation*}
+A_{[f(a)=b]} = \sum_{a:f(a)=b} A_a.
+\end{equation*}
+\end{definition}
+
+\begin{remark}
+We note that \Cref{def:post-processing}
+agrees with the notation for post-processing measurements
+used in \cite{NW19},
+but it disagrees with the notation used in \cite{JNV+20}.
+That work uses the notation ``$A_{[f(\cdot)=b]}$'' rather
+than the notation ``$A_{[f(a)=b]}$'' that we use in this work.
+\end{remark}
+
+An easy-to-prove fact is that measurements remain measurements after post-processing their outcomes.
+
+\begin{proposition}
+Let $A = \{A_a\}_{a \in \calA}$ be a set of matrices,
+and let $f:\calA \rightarrow \calB$ be a function.
+Then
+\begin{equation*}
+\sum_a A_a = \sum_b A_{[f(a)=b]}.
+\end{equation*}
+Thus, if~$\{A_a\}$ is a sub-measurement (respectively, measurement),
+then~$\{A_{[f(a)=b]}\}$ is also a sub-measurement (respectively, measurement).
+\end{proposition}
+\begin{proof}
+The fibers of~$f$ partition~$\calA$, so
+$\sum_bA_{[f(a)=b]}=\sum_b\sum_{a:f(a)=b}A_a=\sum_aA_a$.
+\end{proof}
+
+\begin{remark}
+We note that there is some ambiguity in the notation $A_{[f(a)=b]}$
+because it requires one to know which of~$f$ or~$a$ is the measurement outcome
+and which is the function applied to it.
+For example, given a sub-measurement $G = \{G_g\} \in \polysub{m}{q}{d}$,
+we will often consider evaluating its outputs at a point $u \in \F_q^m$.
+This entails looking at the sub-measurement
+\begin{equation*}
+\{G_{[g(u)=a]}\}_{a \in \F_q},
+\quad
+\text{where}
+\quad
+G_{[g(u)=a]} = \sum_{g:g(u) = a} G_g.
+\end{equation*}
+Here, $g$ is the measurement outcome of~$G$,
+and the function being applied maps it to its evaluation on the point~$u$, i.e.\ $g(u)$.
+In general, it should always be clear from context
+what the measurement outcome and the function being applied to it are.
+\end{remark}
+
+\begin{notation}[Measurements indexed by questions]
+We will frequently encounter sets of sub-measurements $A^x= \{A^x_{a}\}$ indexed by elements~$x$ from a set of ``questions" $\calX$. We will write $A = \{A^x_a\}$ for this set.
+We will typically refer to this set~$A$ as a sub-measurement,
+and we will refer to it as a measurement if each~$A^x$ is a measurement.
+In addition, we will refer to it as projective if each~$A^x$ is projective.
+\end{notation}
+
+\begin{notation}[Complete part of sub-measurement]
+Given a sub-measurement~$A = \{A_a\}$, we will write $A = \sum_a A_a$.
+Similarly, given a sub-measurement~$A = \{A^x_a\}$, we will write $A^x = \sum_a A^x_a$ and $A = \E_{\bx} A^{\bx}$.
+\end{notation}
+
+The complete part of a sub-measurement
+contrasts with its \emph{incomplete part},
+which is the matrix $I - A^x$.
+We will sometimes
+view~$A$ as a measurement
+by throwing in its incomplete part as an additional POVM element.
+This is formalized in the following definition.
+
+\begin{definition}[Completing a sub-measurement]\label{def:measurement-completion}
+Let $A = \{A^x_a\}_{a \in \calA}$ be a sub-measurement.
+We define the \emph{completion of~$A$},
+denoted $\mathrm{completion}(A)$,
+to be the measurement $\widehat{A} = \{\widehat{A}^x_a\}$
+with outcome set $\widehat{\calA} = \calA \cup \{\bot\}$
+such that for each $a \in \widehat{\calA}$,
+\begin{equation*}
+\widehat{A}^x_a
+= \left\{\begin{array}{cl}
+		A^x_a & \text{if $a \in \calA$,}\\
+		I - A^x & \text{if $a = \bot$}.
+		\end{array}\right.
+\end{equation*}
+\end{definition}
+
+\subsection{Comparing measurements}
+\label{sec:comparing-measurements}
+
+A central problem in this paper is recognizing when two measurements are close to each other.
+We will survey two methods of doing so,
+using the \emph{consistency} and the \emph{state dependent distance}.
+This section largely mirrors Sections 4.4 and 4.5 of \cite{NW19},
+which prove numerous properties of these two distances.
+However, we are unable to cite their results directly
+because they are mostly stated and proven only for measurements,
+whereas we will need to apply them to sub-measurements as well.
+
+\subsubsection{Consistency between measurements}
+
+The most basic notion of similarity between two measurements is given by their \emph{consistency}.
+
+\begin{definition}[Consistency]\label{def:simeq}
+Let $\ket{\psi}$ be a state in $\calH_{\mathrm{A}} \ot \calH_{\mathrm{B}}$.
+Let $A = \{A^x_a\}$ be a sub-measurement acting on $\calH_{\mathrm{A}}$
+and $B = \{B^x_a\}$ be a sub-measurement acting on $\calH_{\mathrm{B}}$.
+Finally, let $\calD$ be a distribution on the question set~$\calX$.
+Then we say that
+ \begin{equation*}
+ A^x_a \ot I \simeq_{\delta} I \ot B^x_a
+ \end{equation*}
+  on state $\ket{\psi}$ and distribution $\calD$ if
+  \begin{equation}\label{eq:no-big-Oh}
+  \E_{\bx \sim \calD} \sum_{a \neq b} \bra{\psi} A^{\bx}_a \ot B^{\bx}_b
+    \ket{\psi} \leq \delta.
+    \end{equation}
+\end{definition}
+
+This is the joint probability that both sub-measurements return an
+outcome and the two outcomes differ; it is not conditioned on success.
+
+\begin{notation}[Simplifying notation]
+Because the state $\ket{\psi}$ and distribution $\calD$ are typically clear from context,
+we will often write ``$ A^x_a \ot I \simeq_{\delta} I \ot B^x_a$"
+as shorthand for ``$ A^x_a \ot I \simeq_{\delta} I \ot B^x_a$ on state $\ket{\psi}$ and distribution $\calD$".
+In the case when $\calD$ is not clear by context,
+we might specify it implicitly in terms of a random variable~$\bx$ distributed according to~$\calD$.
+For example, suppose the distribution~$\calD$ is supposed to be uniform on the question set $\F_q$.
+Then we might say ``on average over $\bx \sim \F_q$,
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a"
+\end{equation*}
+as shorthand for ``$ A^x_a \ot I \simeq_{\delta} I \ot B^x_a$ on distribution $\calD$".
+\end{notation}
+
+We note that there are two differences between the definition of consistency in \Cref{def:simeq}
+and the original definition of consistency given in \cite[Definition 4.11]{NW19}.
+The first of these is that the~\cite{NW19} definition
+allows the right-hand side of \Cref{eq:no-big-Oh} to be $O(\delta)$
+rather than strictly~$\delta$.
+The benefit of this is that they do not need to keep track of constant prefactors in their proofs;
+we have elected to use this more concrete definition
+to make our proofs more easily verifiable, at the expense of tracking these constant prefactors.
+The second difference is that they define their consistency as the quantity
+\begin{equation*}
+1 - \E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot B^{\bx}_a \ket{\psi}.
+\end{equation*}
+As we show below in \Cref{prop:simeq-for-measurements},
+this agrees with \Cref{def:simeq}
+when~$A$ and~$B$ are both measurements.
+However, these two definitions disagree
+when~$A$ and~$B$ are \emph{sub}-measurements,
+which is a case we will frequently encounter throughout this paper.
+
+\begin{proposition}[Consistency for measurements]\label{prop:simeq-for-measurements}
+Let $A = \{A^x_a\}$ and $B = \{B^x_a\}$ be two measurements.
+Then
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a
+\end{equation*}
+if and only if
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \ot B^{\bx}_a \ket{\psi} \geq 1 - \delta.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+Completeness gives the identity
+\[
+ \E_x\sum_{a\ne b}\bra\psi A_a^x\otimes B_b^x\ket\psi
+ =1-\E_x\sum_a\bra\psi A_a^x\otimes B_a^x\ket\psi.
+\]
+The two stated inequalities are therefore equivalent.
+\end{proof}
+
+\subsubsection{The state-dependent distance}
+
+To transfer consistency between nearby measurements, we use the
+state-dependent distance.  It applies to arbitrary operator families,
+including products that need not be measurements or Hermitian.
+
+\begin{definition}[The state-dependent distance]\label{def:approx_delta}
+Let $\ket{\psi}$ be a state in $\calH$.
+Let $A = \{A^x_a\}$ and $B = \{B^x_a\}$ be
+sets of matrices acting on $\calH$.
+Finally, let $\calD$ be a distribution on the question set~$\calX$.
+Then we say that
+  \begin{equation*}
+  A^x_a \approx_{\delta}  B^x_a
+  \end{equation*}
+ on state $\ket{\psi}$ and distribution $\calD$ if
+  \begin{equation*}
+  \E_{\bx \sim \calD} \sum_{a} \Vert (A^{\bx}_a - B^{\bx}_a) \ket{\psi} \Vert^2 \leq \delta.
+    \end{equation*}
+\end{definition}
+
+\begin{lemma}[Direct-sum estimates]\label{lem:direct-sum-estimates}
+For vector families indexed by a question $x$ and an outcome $a$, write
+\[
+ \langle v,w\rangle_\oplus=\E_x\sum_a\langle v_a^x,w_a^x\rangle,
+ \qquad \|v\|_\oplus^2=\langle v,v\rangle_\oplus.
+\]
+Cauchy--Schwarz and the triangle inequality hold for this norm.  If
+$\sum_b(C_{a,b}^x)^\dagger C_{a,b}^x\leq I$ for every $x,a$, then
+\[
+ \|(C_{a,b}^xv_a^x)_{x,a,b}\|_\oplus\leq\|v\|_\oplus.
+\]
+For any contraction $M$ on the direct sum,
+\begin{equation}\label{eq:direct-sum-quadratic-form}
+ |\langle v,Mv\rangle_\oplus-\langle w,Mw\rangle_\oplus|
+ \leq(\|v\|_\oplus+\|w\|_\oplus)\|v-w\|_\oplus.
+\end{equation}
+\end{lemma}
+\begin{proof}
+These are Hilbert-space inequalities after weighting each question
+component by the square root of its probability.  For the contraction
+family, sum $\langle v_a^x,\sum_b(C_{a,b}^x)^\dagger C_{a,b}^xv_a^x\rangle$.
+For the last estimate, expand the difference as
+$\langle v-w,Mv\rangle_\oplus+\langle w,M(v-w)\rangle_\oplus$.
+\end{proof}
+
+All direct-sum norms below include the displayed question averages;
+we omit the subscript $\oplus$ when the indexing is clear.
+
+\begin{proposition}[Swap invariance of the state-dependent distance]
+\label{prop:approx-swap-invariance}
+If $\ket\psi\in\calH\otimes\calH$ is permutation invariant, then
+for any two families of matrices,
+\[
+X^x_a\otimes I\approx_\eta Y^x_a\otimes I
+\quad\Longleftrightarrow\quad
+I\otimes X^x_a\approx_\eta I\otimes Y^x_a.
+\]
+\end{proposition}
+\begin{proof}
+Apply the tensor-swap unitary, which fixes~$\ket\psi$, to every
+vector in the squared-distance sum.
+\end{proof}
+
+The next proposition transfers consistency even when the other
+family is only a sub-measurement.
+
+\begin{proposition}[Transferring ``$\simeq$" using ``$\approx$"]
+Let $\{A^x_a\}$ and $\{B^x_a\}$ be measurements,
+and let $\{C^x_a\}$ be a sub-measurement.
+Suppose that $A^x_a \ot I \simeq_{\delta} I \ot C^x_a$
+and $A^x_a \ot I \approx_{\eps} B^x_a \ot I$.
+Then $B^x_a \ot I \simeq_{\delta + \sqrt{\eps}} I \ot C^x_a$.
+  \label{prop:triangle-sub}
+\end{proposition}
+
+\begin{proof}
+Put $C^x=\sum_aC_a^x$.  Since $A$ and $B$ are complete, their
+inconsistencies with $C$ are respectively
+\[
+ \E_x\bra\psi I\otimes C^x\ket\psi
+ -\E_x\sum_a\bra\psi A_a^x\otimes C_a^x\ket\psi
+\]
+and the same expression with $A$ replaced by $B$.  Their difference
+has modulus at most
+\[
+ \left|\E_x\sum_a\bra\psi(A_a^x-B_a^x)\otimes C_a^x\ket\psi\right|
+ \leq\sqrt\eps,
+\]
+by direct-sum Cauchy--Schwarz and $\sum_a(C_a^x)^2\leq I$.
+\end{proof}
+
+\begin{proposition}[Rounding inside a consistency relation]
+\label{prop:round-right-submeasurement}
+Let $\ket\psi\in\calH_{\mathrm A}\otimes\calH_{\mathrm B}$, let
+$A=\{A^x_a\}_{a\in\calA}$ be a measurement on $\calH_{\mathrm A}$,
+and let $X=\{X^x_b\}_{b\in\calB}$ and
+$P=\{P^x_b\}_{b\in\calB}$ be, respectively, a sub-measurement and a
+projective sub-measurement on $\calH_{\mathrm B}$.  For each~$x$, let
+$f_x:\calB\to\calA$.  If
+\[
+A^x_a\otimes I\simeq_\delta I\otimes X^x_{[f_x(b)=a]},
+\qquad
+I\otimes X^x_b\approx_\eta I\otimes P^x_b,
+\]
+then
+\[
+A^x_a\otimes I
+\simeq_{(\sqrt\delta+\sqrt\eta)^2}
+I\otimes P^x_{[f_x(b)=a]}.
+\]
+If $\calH_{\mathrm A}=\calH_{\mathrm B}$ and $\ket\psi$ is
+permutation invariant, the second hypothesis may instead be given on
+the left tensor factor.  There is also an analogous statement with
+the two tensor factors exchanged.
+\end{proposition}
+\begin{proof}
+Since each $P^x_b$ is a projection, direct-sum Minkowski gives
+\begin{align*}
+&\left(\E_\bx\sum_{a,b:a\ne f_\bx(b)}
+\bra\psi A^{\bx}_a\otimes P^{\bx}_b\ket\psi\right)^{1/2}\\
+&\quad=\left(\E_\bx\sum_{a,b:a\ne f_\bx(b)}
+\|((A^{\bx}_a)^{1/2}\otimes P^{\bx}_b)\ket\psi\|^2\right)^{1/2}\\
+&\quad\leq
+\left(\E_\bx\sum_{a,b:a\ne f_\bx(b)}
+\|((A^{\bx}_a)^{1/2}\otimes(P^{\bx}_b-X^{\bx}_b))\ket\psi\|^2\right)^{1/2}\\
+&\qquad+
+\left(\E_\bx\sum_{a,b:a\ne f_\bx(b)}
+\|((A^{\bx}_a)^{1/2}\otimes X^{\bx}_b)\ket\psi\|^2\right)^{1/2}.
+\end{align*}
+The square of the first term is at most~$\eta$, because
+$\sum_{a:a\ne f_x(b)}A^x_a\leq I$ for every~$(x,b)$.  The square of
+the second term is at most
+$\delta$, because $(X^x_b)^2\leq X^x_b$ and the first hypothesis
+bounds the inconsistency.  Squaring proves the claim.
+The permutation-invariant version follows from
+\Cref{prop:approx-swap-invariance}; exchanging the tensor factors
+proves the final assertion.
+\end{proof}
+
+Next, we show that in the case of measurements,
+the state-dependent distance is a weakening of the consistency.
+
+\begin{proposition}[``$\simeq$" implies ``$\approx$" for measurements]\label{prop:simeq-to-approx}
+Let $A = \{A^x_a\}$ and $B = \{B^x_a\}$ be two measurements such that
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a.
+\end{equation*}
+Then
+\begin{equation*}
+A^x_a \ot I \approx_{2\delta} I \ot B^x_a.
+\end{equation*}
+This is an ``if and only if'' if~$A$ and~$B$ are both projective measurements.
+\end{proposition}
+\begin{proof}
+Expanding the squared distance and using $A_a^2\leq A_a$,
+$B_a^2\leq B_a$, and completeness gives
+\[
+ \E_x\sum_a\|(A_a^x\otimes I-I\otimes B_a^x)\psi\|^2
+ \leq2-2\E_x\sum_a\bra\psi A_a^x\otimes B_a^x\ket\psi
+ \leq2\delta.
+\]
+For projective measurements the first inequality is an equality,
+which also proves the converse.
+\end{proof}
+
+\begin{remark}
+We note that \Cref{prop:simeq-to-approx} certainly does \emph{not} hold for sub-measurements.
+For example, if $A^x_a = 0$ for all~$a$,
+then $A_a^x \ot I \simeq_{0} I \ot B_a^x$,
+but
+\begin{equation*}
+\E_{\bx} \sum_a \Vert (A^{\bx}_a \ot I - I \ot B^{\bx}_a)\ket{\psi} \Vert^2
+= \E_{\bx} \sum_a \Vert (I \ot B^{\bx}_a)\ket{\psi} \Vert^2,
+\end{equation*}
+which is nonzero unless $(I \ot B^x_a) \ket{\psi} = 0$ for all~$x$ and~$a$.
+\end{remark}
+
+\subsubsection{Deriving consistency relations from the state-dependent distance}
+\label{sec:consistency-from-state-dependent-distance}
+
+The next two rules justify replacing a factor inside an expectation
+or an operator product.  Their normalization hypotheses make the
+remaining factors contractions in the direct-sum norm.
+
+\begin{proposition}
+\label{prop:closeness-of-ip}
+	Let $\{A^x_a\}$, $\{B^x_a\}$, and $\{C^x_{a,b} \}$ be matrices.
+	Suppose that  $A^x_a \approx_\gamma B^x_a$ and that for all~$x$, $\sum_a (\sum_b C^x_{a,b}) (\sum_b C^x_{a,b})^\dagger  \leq I$. Then
+	\begin{equation}
+	\E_{\bx} \sum_{a,b} \bra{\psi} C^{\bx}_{a,b} A^{\bx}_a  \ket{\psi} \approx_{\sqrt{\gamma}} \E_{\bx} \sum_{a,b} \bra{\psi} C^{\bx}_{a,b} B^{\bx}_a  \ket{\psi} \,. \label{eq:closeness3}
+	\end{equation}
+	Similarly, suppose that  $(A^x_a)^\dagger \approx_\gamma (B^x_a)^\dagger$ and that for all~$x$, $\sum_a (\sum_b C^x_{a,b})^\dagger (\sum_b C^x_{a,b}) \leq I$. Then
+	\begin{equation}
+	\E_{\bx} \sum_{a,b} \bra{\psi} A^{\bx}_a  C^{\bx}_{a,b} \ket{\psi} \approx_{\sqrt{\gamma}} \E_{\bx} \sum_{a,b} \bra{\psi} B^{\bx}_a  C^{\bx}_{a,b}  \ket{\psi} \,. \label{eq:closeness4}
+	\end{equation}
+\end{proposition}
+\begin{proof}
+Set $D_a^x=\sum_b C_{a,b}^x$.  The difference in
+\Cref{eq:closeness3} is the direct-sum inner product of
+$((D_a^x)^\dagger\psi)_{x,a}$ and $((A_a^x-B_a^x)\psi)_{x,a}$.
+The first family has norm at most one by the normalization
+hypothesis, and the second has norm at most $\sqrt\gamma$.
+Cauchy--Schwarz proves the bound.  Taking adjoints proves
+\Cref{eq:closeness4} with its stated normalization.
+\end{proof}
+
+The product version is \cite[Fact~4.20]{NW19}.
+    \begin{proposition}
+      \label{prop:cab-approx-delta}
+      Let $\{A^x_a\}, \{B^x_a\},$ and $\{C^x_{a,b}\}$ be
+      matrices. Suppose that $A^{x}_a \approx_\delta B^{x}_a$ and that
+      for all $x$ and $a$, $\sum_b (C^{x}_{a,b})^\dagger
+      (C^{x}_{a,b}) \leq I$. Then
+      \[ C^{x}_{a,b} A^x_{a} \approx_{\delta} C^{x}_{a,b} B^{x}_a. \]
+    \end{proposition}
+    \begin{proof}
+Apply the contraction-family estimate in
+\Cref{lem:direct-sum-estimates} to $v_a^x=(A_a^x-B_a^x)\psi$.
+Its squared norm is at most $\delta$.
+\end{proof}
+
+\subsubsection{Miscellaneous distance properties}
+
+We now state a few miscellaneous properties of our two distances.
+
+\begin{proposition}[Triangle inequality for ``$\approx_{\delta}$"]
+\label{prop:triangle-inequality-for-approx_delta}
+Suppose $A_1 = \{(A_1)^x_a\}, \ldots, A_{k+1} = \{(A_{k+1})^x_a\}$ is a set of matrices such that
+\begin{equation*}
+(A_i)^x_a \approx_{\delta_i} (A_{i+1})^x_a
+\end{equation*}
+for all $i \in [k]$. Then
+\begin{equation*}
+(A_1)^x_a \approx_{(\sqrt{\delta_1}+\cdots+\sqrt{\delta_k})^2} (A_{k+1})^x_a.
+\end{equation*}
+\end{proposition}
+\begin{proof}
+Apply the direct-sum triangle inequality to the telescoping sum
+\[
+ ((A_1)^x_a-(A_{k+1})^x_a)\psi
+ =\sum_{i=1}^k((A_i)^x_a-(A_{i+1})^x_a)\psi.
+\]
+Its norm is at most $\sum_i\sqrt{\delta_i}$; squaring proves the claim.
+\end{proof}
+
+We note that \Cref{prop:triangle-inequality-for-approx_delta}
+contrasts with the triangle inequality for ``$\approx_{\delta}$'' when applied to numbers,
+i.e.\ \Cref{eq:triangle-inequality-for-numbers}, because the parameter in
+\Cref{def:approx_delta} is the square of the underlying norm.
+
+\begin{lemma}[Disagreement through a projective measurement]
+\label{lem:projective-bridge}
+Let $\ket\psi\in\calH\otimes\calH$ be permutation invariant, let
+$P=\{P_a^x\}$ be projective measurements, and let $C=\{C_a^x\}$ be
+sub-measurements with the same outcome set.  If, on the same question
+distribution,
+\[
+ P_a^x\otimes I\simeq_c I\otimes C_a^x,
+ \qquad P_a^x\otimes I\simeq_\delta I\otimes P_a^x,
+\]
+then
+\begin{equation}\label{eq:self-improvement-disagreement}
+ \E_x\sum_{a\ne b}\bra\psi C_a^x\otimes C_b^x\ket\psi
+ \leq(2\sqrt c+\sqrt{2\delta})^2.
+\end{equation}
+\end{lemma}
+\begin{proof}
+Suppress $x$ and take the direct sum over the question and $a\ne b$.
+Use the vectors
+\[
+ v_{ab}=(\sqrt{C_a}\otimes\sqrt{C_b})\psi,\quad
+ z_{ab}=(\sqrt{C_a}P_b\otimes\sqrt{C_b})\psi,\quad
+ w_{ab}=(\sqrt{C_a}\otimes\sqrt{C_b}P_b)\psi.
+\]
+Since $\sum_{a\ne b}C_a\leq I$ and $P_b$ is a projection,
+\[
+ \|v-z\|^2\leq\E_x\sum_b
+ \bra\psi(I-P_b)\otimes C_b\ket\psi\leq c.
+\]
+The squared coefficient of the $b$-th mirror difference in $z-w$ is
+$(\sum_{a\ne b}C_a)\otimes C_b\leq I$.  Thus
+\Cref{prop:simeq-to-approx,lem:direct-sum-estimates} give
+$\|z-w\|^2\leq2\delta$.
+Finally, $P_bC_bP_b\leq P_b$ and permutation invariance give
+\[
+ \|w\|^2\leq\E_x\sum_{a\ne b}
+ \bra\psi C_a\otimes P_b\ket\psi\leq c.
+\]
+The triangle inequality bounds $\|v\|$ by $2\sqrt c+\sqrt{2\delta}$.
+\end{proof}
+
+Post-processing cannot increase inconsistency, even for
+sub-measurements: $f(a)\ne f(a')$ implies $a\ne a'$, so
+\[
+ \E_x\sum_{b\ne b'}\bra\psi
+ A^x_{[f(a)=b]}\otimes B^x_{[f(a)=b']}\ket\psi
+ \leq\E_x\sum_{a\ne a'}\bra\psi A_a^x\otimes B_{a'}^x\ket\psi.
+\]
+
+The following fact is useful for translating between statements about consistency and closeness between sub-measurements.
+\begin{proposition}
+\label{prop:cons-sub-meas}
+Let $\{A^x_a\}$ be a sub-measurement and let $\{B^x_a\}$ be a measurement such that on average over $x$,
+\[
+	A^x_a \ot I \simeq_\gamma I \ot B^x_a \,.
+\]
+Then the following hold
+	\begin{gather}
+		A^x_a \ot I \approx_{\gamma} A^x_a \ot B^x_a \approx_{\gamma} A^x \ot B^x_a,
+		\label{eq:closeness5}
+	\end{gather}
+	where $A^x = \sum_a A^x_a$.
+	As a result, by \Cref{prop:triangle-inequality-for-approx_delta},
+	\begin{equation*}
+	A^x_a \ot I \approx_{4\gamma} A^x \ot B^x_a
+	\end{equation*}
+\end{proposition}
+\begin{proof}
+The positive contractions
+$X_a^x=A_a^x\otimes(I-B_a^x)$ and
+$Y_a^x=(A^x-A_a^x)\otimes B_a^x$ are the differences in the two
+approximations.  Since $X^2\leq X$ for every positive contraction,
+\[
+ \E_x\sum_a\bra\psi(X_a^x)^2\ket\psi
+ \leq\E_x\sum_{a\ne b}\bra\psi A_a^x\otimes B_b^x\ket\psi\leq\gamma,
+\]
+and the same calculation with $Y_a^x$ gives the second bound.
+The final assertion follows from the root-distance triangle inequality.
+\end{proof}
+
+\begin{proposition}  \label{prop:switch-sandwich}
+  Suppose $\{A^x_a\}$ is a projective sub-measurement
+  satisfying
+  \begin{equation}
+    A^x_a \ot I \approx_{\delta} I \ot A^x_a. \label{eq:Aapproxd}
+  \end{equation}
+  Then for any $0 \leq B \leq I$, the following holds:
+  \begin{equation}
+    \E_{\bx}\sum_a \bra{\psi} A^{\bx}_a B A^{\bx}_a \ot I \ket{\psi}
+    \approx_{2\sqrt{\delta}} \E_{\bx} \sum_a \bra{\psi} B
+    \ot A^{\bx}_a
+    \ket{\psi} \approx_{\sqrt{\delta}} \E_{\bx} \sum_a \bra{\psi}
+    BA^{\bx}_a \ot I \ket{\psi} \label{eq:switch-sandwich} \end{equation}
+
+\end{proposition}
+\begin{proof}
+In the direct sum over $x,a$, put
+$v_a^x=(A_a^x\otimes I)\psi$ and
+$w_a^x=(I\otimes A_a^x)\psi$.  Both norms are at most one and
+$\|v-w\|\leq\sqrt\delta$.  Apply
+\Cref{eq:direct-sum-quadratic-form} with $M=B\otimes I$.
+Projectivity identifies its two quadratic forms with the first two
+expressions in \Cref{eq:switch-sandwich}, proving their
+$2\sqrt\delta$ bound.
+
+For the second bound, set $S^x=\sum_aA_a^x$.  Orthogonality gives
+\begin{align*}
+ &\sum_a(A_a^x\otimes I-I\otimes A_a^x)^2
+       -(S^x\otimes I-I\otimes S^x)^2\\
+ &\qquad=2\sum_{a\ne b}A_a^x\otimes A_b^x\geq0.
+\end{align*}
+Hence $\E_x\|(S^x\otimes I-I\otimes S^x)\psi\|^2\leq\delta$.
+Cauchy--Schwarz with $(B\otimes I)\psi$ now bounds the difference
+between the last two expressions in \Cref{eq:switch-sandwich} by
+$\sqrt\delta$.
+\end{proof}
+
+
+\subsubsection{Strong self-consistency}
+
+An important property of a sub-measurement~$A = \{A^x_a\}$
+is that if both provers measure using~$A$,
+then they receive the same outcome.
+It seems natural to study this using \emph{self-consistency} of~$A$, i.e. the number~$\delta$ such that
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot A^x_a.
+\end{equation*}
+However, when~$A$ is a sub-measurement,
+being $\delta$-self consistent only bounds the probability that
+both provers return outcomes and those outcomes differ.  It does not
+bound the probability that one prover succeeds while the other
+returns no outcome.
+This motivates defining the following stronger notion of self-consistency.
+
+\begin{definition}[Strong self consistency]\label{def:strong-self-consistency}
+Let $\ket{\psi}$ be a permutation-invariant state in $\calH \ot \calH$
+and let $A = \{A^x_a\}$ be a sub-measurement acting on~$\calH$.
+Then $A$ is \emph{$\delta$-strongly self consistent} if
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi}
+\geq
+\bra{\psi} A \otimes I \ket{\psi} -  \delta.
+\end{equation*}
+\end{definition}
+
+Strong self-consistency bounds ordinary inconsistency because
+\[
+ \E_x\sum_{a\ne b}\bra\psi A_a^x\otimes A_b^x\ket\psi
+ \leq\bra\psi A\otimes I\ket\psi
+       -\E_x\sum_a\bra\psi A_a^x\otimes A_a^x\ket\psi.
+\]
+For measurements this is an equality.  Its relation to the
+state-dependent distance is the following.
+
+\begin{proposition}\label{prop:two-notions-of-self-consistency}
+Let $A=\{A_a^x\}$ be a sub-measurement, and let $\ket\psi$
+be a permutation-invariant state. If
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi} \geq \bra{\psi} A \otimes I \ket{\psi} - \delta
+\end{equation*}
+then $A^x_a \otimes I \approx_{2\delta} I \otimes A^x_a$.
+This is an ``if and only if" if $A$ is projective.
+\end{proposition}
+\begin{proof}
+Expanding the squares and using permutation invariance gives
+\begin{align}
+ &\E_x\sum_a\|(A_a^x\otimes I-I\otimes A_a^x)\psi\|^2\nonumber\\
+ &=2\E_x\sum_a\bra\psi
+       (A_a^x)^2\otimes I-A_a^x\otimes A_a^x\ket\psi\nonumber\\
+ &\leq2\left(\bra\psi A\otimes I\ket\psi
+       -\E_x\sum_a\bra\psi A_a^x\otimes A_a^x\ket\psi\right)
+ \leq2\delta.\label{eq:self-consistency-projective-step}
+\end{align}
+The inequality comparing the squared distance with twice the
+strong self-consistency defect is an equality when $A$ is projective,
+which proves the converse as well.
+\end{proof}
+
+Hence, we may also refer to the condition $A^x_a \ot I \approx_{2\delta} I \ot A^x_a$
+as ``strong self-consistency'' if~$A$ is projective.
+
+We will also use the following property of strongly self-consistent
+sub-measurements after evaluating their outcomes.
+
+\begin{proposition}\label{prop:two-notions-of-self-consistency-after-evaluation}
+Let $A=\{A_a^x\}$ be a sub-measurement on a
+permutation-invariant state $\ket\psi$, and suppose that
+\begin{equation*}
+\E_{\bx} \sum_a \bra{\psi} A^{\bx}_a \otimes A^{\bx}_a \ket{\psi} \geq  \bra{\psi} A \otimes I \ket{\psi} - \delta.
+\end{equation*}
+Then for any function~$f$,
+$A^x_{[f(a)=b]} \otimes I \approx_{2\delta} I \otimes A^x_{[f(a)=b]}$.
+\end{proposition}
+\begin{proof}
+Write $C_b^x=A^x_{[f(a)=b]}$.  This sub-measurement has the same
+total effect as $A^x$, and positivity gives
+\[
+ \E_x\sum_b\bra\psi C_b^x\otimes C_b^x\ket\psi
+ =\E_x\sum_{a,a':f(a)=f(a')}\bra\psi A_a^x\otimes A_{a'}^x\ket\psi
+ \geq\E_x\sum_a\bra\psi A_a^x\otimes A_a^x\ket\psi.
+\]
+Thus its strong self-consistency defect is at most $\delta$.
+\Cref{prop:two-notions-of-self-consistency} yields
+\begin{equation}\label{eq:evaluated-self-consistency-bound}
+ \E_x\sum_b\|(C_b^x\otimes I-I\otimes C_b^x)\psi\|^2\leq2\delta.
+\end{equation}
+The same proof allows the map $f$ to depend on the question $x$.
+\end{proof}
+
+
+\section{Making measurements projective}
+\label{sec:making-measurements-projective}
+
+Projective measurements are substantially easier to manipulate than general
+POVMs.  In particular, for projective measurements the consistency and
+state-dependent distance agree exactly up to the normalization in
+\Cref{prop:simeq-to-approx}:
+\begin{equation*}
+A^x_a \ot I \simeq_{\delta} I \ot B^x_a
+\qquad\Longleftrightarrow\qquad
+A^x_a \ot I \approx_{2\delta} I \ot B^x_a.
+\end{equation*}
+
+The conceptual parameter for orthogonalization is the state-dependent
+idempotence defect $\sum_a\varphi(M_a-M_a^2)$.  The next lemma rounds
+this defect linearly.  It is the finite-dimensional case of the
+orthogonalization theorem of de~la~Salle~\cite{deLaSalle22}; we give the
+argument to keep the final rounding self-contained.  The induction
+itself uses simultaneous dilation and compression, as proved in
+\Cref{sec:self-improvement-dilation}.
+
+\subsection{State-dependent orthogonalization}\label{sec:orthogonalization}
+
+\begin{lemma}[State-dependent orthogonalization]
+\label{lem:state-dependent-orthogonalization}
+Let $\calH$ be $d$-dimensional, let $\varphi$ be a state on
+$B(\calH)$, and let $M=\{M_a\}$ be a finite-outcome measurement.  Put
+\begin{equation}\label{eq:orthogonalization-defect}
+ \Delta
+ :=1-\varphi\left(\sum_aM_a^2\right)
+ =\sum_a\varphi(M_a-M_a^2).
+\end{equation}
+Then there is a projective measurement $P=\{P_a\}$ on $\calH$ such that
+\begin{equation}\label{eq:linear-orthogonalization}
+ \sum_a\varphi\bigl((M_a-P_a)^2\bigr)\leq9\Delta.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+For each $a$, choose a spectral decomposition
+\begin{equation*}
+ M_a=\sum_{j=1}^d\lambda_{a,j}
+       \ket{v_{a,j}}\!\bra{v_{a,j}},
+ \qquad 0\leq\lambda_{a,j}\leq1,
+\end{equation*}
+and define
+\begin{equation*}
+ r_{a,j}=\varphi\bigl(\ket{v_{a,j}}\!\bra{v_{a,j}}\bigr),
+ \qquad w_{a,j}=\lambda_{a,j}r_{a,j}.
+\end{equation*}
+Taking the ordinary trace in $\sum_aM_a=I$ gives
+\begin{equation*}
+ \sum_{a,j}\lambda_{a,j}=d.
+\end{equation*}
+For nonnegative weights, the sum of the $d$ largest weights is the
+maximum of $\sum_{a,j}x_{a,j}w_{a,j}$ over
+$0\leq x_{a,j}\leq1$ and $\sum_{a,j}x_{a,j}=d$: moving mass from a
+smaller weight to a larger one can only increase the objective.
+The fractional choice $x_{a,j}=\lambda_{a,j}$ is feasible.  Select the
+$d$ largest $w_{a,j}$, breaking ties arbitrarily, and let $Q_a$ project
+onto the selected eigenvectors belonging to outcome $a$.  Then
+\begin{equation}\label{eq:global-rank-allocation}
+ [Q_a,M_a]=0,
+ \qquad \sum_a\operatorname{rank}(Q_a)=d,
+\end{equation}
+and
+\begin{align}
+ s:=\sum_a\varphi(Q_aM_a)
+ &=\sum_{(a,j)\text{ selected}}w_{a,j}\nonumber\\
+ &\geq\sum_{a,j}\lambda_{a,j}w_{a,j}
+ =\sum_a\varphi(M_a^2)
+ =1-\Delta.\label{eq:selected-overlap}
+\end{align}
+The $Q_a$ need not be mutually orthogonal; the point of the selection
+is that their total rank is exactly $d$.
+
+Let
+\begin{equation*}
+ \mathcal K=\bigoplus_a Q_a\calH,
+\end{equation*}
+where the summands are abstract orthogonal copies.  By
+\Cref{eq:global-rank-allocation}, $\dim\mathcal K=d=\dim\calH$.  Let
+$E_a$ be the coordinate projection onto the $a$-th summand and define
+\begin{equation*}
+ X:\calH\longrightarrow\mathcal K,
+ \qquad
+ X\ket v=\bigl(Q_aM_a^{1/2}\ket v\bigr)_a.
+\end{equation*}
+Since $Q_a$ commutes with $M_a$,
+\begin{equation*}
+ X^\dagger X=\sum_aQ_aM_a=:S\leq\sum_aM_a=I.
+\end{equation*}
+Write $\abs{X}=S^{1/2}=(X^\dagger X)^{1/2}$.  Extend the partial isometry in the polar
+decomposition of $X$ to a unitary $U:\calH\to\mathcal K$, so that
+$X=U\abs{X}$.  Such an extension exists even when $X$ is singular because
+its domain and codomain have the same finite dimension.  Set
+\begin{equation*}
+ P_a=U^\dagger E_aU.
+\end{equation*}
+Then the $P_a$ are mutually orthogonal projections summing to $I$, and
+\begin{equation}\label{eq:polar-coordinate-identity}
+ \abs{X}P_a\abs{X}=X^\dagger E_aX=Q_aM_a.
+\end{equation}
+
+For an operator family $Y=(Y_a)_a$, write
+\begin{equation*}
+ \|Y\|_{\varphi,2}^2=\sum_a\varphi(Y_a^\dagger Y_a).
+\end{equation*}
+This is a Hilbert-space seminorm, so Minkowski's inequality applies.
+By \Cref{eq:polar-coordinate-identity}, there is an exact decomposition
+\begin{equation}\label{eq:orthogonalization-decomposition}
+ M_a-P_a
+ =(I-Q_a)M_a+(\abs{X}-I)P_a\abs{X}+P_a(\abs{X}-I).
+\end{equation}
+We bound the three families on the right separately.  First, using
+$[Q_a,M_a]=0$, $M_a^2\leq M_a$, and
+\Cref{eq:selected-overlap},
+\begin{align*}
+ \big\|\big((I-Q_a)M_a\big)_a\big\|_{\varphi,2}^2
+ &=\sum_a
+ \varphi\left(
+ \big((I-Q_a)M_a\big)^\dagger
+ \big((I-Q_a)M_a\big)
+ \right)\\
+ &=\sum_a
+ \varphi\left(
+ M_a(I-Q_a)^2M_a
+ \right)\\
+ &=\sum_a
+ \varphi\left(
+ M_a(I-Q_a)M_a
+ \right)\\
+ &=\sum_a
+ \varphi\left(
+ (I-Q_a)M_a^2
+ \right)\\
+ &\leq\sum_a
+ \varphi\left(
+ (I-Q_a)M_a
+ \right)\\
+ &=\sum_a\varphi(M_a)
+ -\sum_a\varphi(Q_aM_a)\\
+ &=\varphi\left(\sum_aM_a\right)-s\\
+ &=\varphi(I)-s\\
+ &=1-s\\
+ &\leq\Delta.
+\end{align*}
+Second, $0\leq\abs{X}\leq I$ implies $(I-\abs{X})^2\leq I-\abs{X}^2$.  If
+$C_a=\abs{X}P_a\abs{X}=Q_aM_a$, then
+\begin{align*}
+ \big\|\big((\abs{X}-I)P_a\abs{X}\big)_a\big\|_{\varphi,2}^2
+ &=\sum_a\varphi\bigl(\abs{X}P_a(I-\abs{X})^2P_a\abs{X}\bigr)\\
+ &\leq\sum_a\varphi\bigl(\abs{X}P_a(I-\abs{X}^2)P_a\abs{X}\bigr)\\
+ &=\sum_a\varphi(C_a-C_a^2)\\
+ &=\sum_a\varphi\bigl(Q_a(M_a-M_a^2)\bigr)\leq\Delta.
+\end{align*}
+The last inequality is valid because $Q_a$ commutes with the positive
+operator $M_a-M_a^2$.  Finally, using $\sum_aP_a=I$,
+\begin{align*}
+ \big\|\big(P_a(\abs{X}-I)\big)_a\big\|_{\varphi,2}^2
+ &=\varphi((I-\abs{X})^2)\\
+ &\leq\varphi(I-\abs{X}^2)=1-s\leq\Delta.
+\end{align*}
+Minkowski's inequality in \Cref{eq:orthogonalization-decomposition}
+now gives
+\begin{equation*}
+ \left(\sum_a\varphi((M_a-P_a)^2)\right)^{1/2}
+ \leq3\sqrt\Delta,
+\end{equation*}
+which proves \Cref{eq:linear-orthogonalization}.
+\end{proof}
+
+We record the consequence used for the final rounding in
+\Cref{thm:main-formal}.  It does not require a symmetric state or
+identical measurements on the two tensor factors.
+
+\begin{lemma}[Consistent measurements]
+\label{lem:orthonormalization-main-lemma}
+Let $\calH_{\mathrm A}$ and $\calH_{\mathrm B}$ be finite-dimensional,
+let $\ket\psi\in\calH_{\mathrm A}\ot\calH_{\mathrm B}$ be a state, and
+let $A=\{A_a\}$ and $B=\{B_a\}$ be finite-outcome measurements with the
+same outcome set.  If
+\begin{equation*}
+ A_a\ot I\simeq_\zeta I\ot B_a,
+\end{equation*}
+then there is a projective measurement $P=\{P_a\}$ on
+$\calH_{\mathrm A}$ such that
+\begin{equation}\label{eq:consistent-measurement-orthogonalization}
+ A_a\ot I\approx_{18\zeta}P_a\ot I.
+\end{equation}
+\end{lemma}
+
+\begin{proof}
+Let
+\begin{equation*}
+ e=1-\sum_a\bra\psi A_a\ot B_a\ket\psi
+\end{equation*}
+be the actual inconsistency.  By
+\Cref{prop:simeq-for-measurements}, $0\leq e\leq\zeta$.  Direct-sum
+Cauchy--Schwarz and $\sum_aB_a^2\leq I$ give
+\begin{align*}
+ (1-e)^2
+ &\leq
+ \left(\sum_a\bra\psi A_a^2\ot I\ket\psi\right)
+ \left(\sum_a\bra\psi I\ot B_a^2\ket\psi\right)\\
+ &\leq\sum_a\bra\psi A_a^2\ot I\ket\psi.
+\end{align*}
+Apply \Cref{lem:state-dependent-orthogonalization} to $A$ and the state
+$\varphi(X)=\bra\psi X\ot I\ket\psi$.  Its defect satisfies
+\begin{equation*}
+ \Delta_A\leq1-(1-e)^2=2e-e^2\leq2\zeta,
+\end{equation*}
+so the resulting projective measurement obeys
+\begin{equation*}
+ \sum_a\|(A_a-P_a)\ot I\ket\psi\|^2
+ \leq9(2e-e^2)\leq18\zeta.
+\end{equation*}
+\end{proof}
+
+\section{The main induction step}
+\label{sec:induction}
+
+We will now carry out the main inductive argument.
+The inductive hypothesis is stated as follows.
+
+\begin{theorem}[Main induction]\label{thm:main-induction}
+Let $m\geq1$, and let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric strategy
+for the $(m,q,d)$ low individual degree test.  There is a measurement
+$G\in\polymeas{m}{q}{d}$ such that, on average over
+$\bu\sim\F_q^m$,
+\[
+  A^u_a\otimes I\simeq_{\sigma}I\otimes G_{[g(u)=a]},
+\]
+where, if $d=0$,
+\[
+ \sigma=\delta+\sqrt{8m\eps},
+\]
+whereas, if $d\geq1$,
+\[
+ \sigma=1000d^2m^4\left(
+ \eps^{1/32}+\delta^{1/32}+(d/q)^{1/32}
+ +\gamma^{1/8}\right).
+\]
+\end{theorem}
+
+Comparing with our main theorem, \Cref{thm:main-formal},
+\Cref{thm:main-induction} produces a measurement which is consistent with~$A$,
+but it is not projective or self-consistent.
+In addition, the strategy is assumed to be symmetric.
+We correct these deficiencies in the following proof.
+
+\begin{proof}[Proof of~\Cref{thm:main-formal} assuming \Cref{thm:main-induction}]
+Let
+\[
+ \theta=\frac dq,\qquad
+ K=K_{m,d},\qquad
+ R=K\bigl(\eps^{1/64}+\theta^{1/64}\bigr),
+\]
+so the error in \Cref{thm:main-formal} is \(\nu=21000R\).
+If \(\nu\geq1\), fix any \(g_0\in\polyfunc{m}{q}{d}\) and let both
+players use the projective measurement supported on \(g_0\).  Its
+self-inconsistency is zero, and each point inconsistency is at most
+one, so the theorem is immediate.  We therefore assume
+\begin{equation}\label{eq:nontrivial-main-error}
+ R<\frac1{21000}.
+\end{equation}
+In particular, \(\eps,\theta<1\), and hence \(d<q\).
+
+Call the strategy in \Cref{thm:main-formal} the original strategy.
+Because the three subtests are chosen with equal probability, the
+original strategy is \((3\eps,3\eps,3\eps)\)-good.  We symmetrize it
+by a direct-sum construction, without first padding the local spaces
+to a common dimension.  Let
+\[
+ \mathcal K=\calH_{\mathrm A}\oplus\calH_{\mathrm B},
+\]
+and let \(\iota_{\mathrm A}\) and \(\iota_{\mathrm B}\) denote the
+canonical embeddings of the two summands into~\(\mathcal K\).  Define
+\[
+ \ket{\psi_{\rm sym}}
+ =\frac1{\sqrt2}\left(
+   (\iota_{\mathrm A}\otimes\iota_{\mathrm B})\ket\psi
+   +(\iota_{\mathrm B}\otimes\iota_{\mathrm A})
+      \ket{\psi_{\rm swap}}\right)\in\mathcal K\otimes\mathcal K,
+\]
+where \(\ket{\psi_{\rm swap}}\in
+\calH_{\mathrm B}\otimes\calH_{\mathrm A}\) is obtained by swapping
+the two registers of~\(\ket\psi\).  Componentwise, set
+\[
+ A_{\rm sym}=A^{\mathrm A}\oplus A^{\mathrm B},\qquad
+ B_{\rm sym}=B^{\mathrm A}\oplus B^{\mathrm B},\qquad
+ L_{\rm sym}=L^{\mathrm A}\oplus L^{\mathrm B}.
+\]
+This is a symmetric \((3\eps,3\eps,3\eps)\)-good strategy.
+
+The two cases of \Cref{thm:main-induction} imply that there is a
+measurement \(G\in\polymeas{m}{q}{d}\) such that, on average over~\(u\),
+\begin{equation}\label{eq:short-applied-induction}
+ (A_{\rm sym})^u_a\otimes I
+ \simeq_\sigma I\otimes G_{[g(u)=a]},
+ \qquad
+ \sigma=10000K\bigl(\eps^{1/32}+\theta^{1/32}\bigr).
+\end{equation}
+For \(d=0\), this bounds \(3\eps+\sqrt{24m\eps}\); for \(d\geq1\),
+it follows by substituting the three errors \(3\eps\) into the stated
+induction bound and using \(\eps<1\).
+Let \(\Pi_w=\iota_w\iota_w^\dagger\) for
+\(w\in\{\mathrm A,\mathrm B\}\), and pinch \(G\) to the two summands:
+\[
+ \overline G_g=\Pi_{\mathrm A}G_g\Pi_{\mathrm A}
+               +\Pi_{\mathrm B}G_g\Pi_{\mathrm B}.
+\]
+The operators \(\overline G_g\) form a measurement.  Replacing \(G\)
+by \(\overline G\) does not change the inconsistency in
+\eqref{eq:short-applied-induction}: \(A_{\rm sym}\) is block diagonal,
+and the two terms of \(\ket{\psi_{\rm sym}}\) occupy orthogonal
+direct-sum sectors.  Thus \eqref{eq:short-applied-induction} holds with
+\(\overline G\) in place of~\(G\).
+
+The symmetrized strategy also satisfies
+\[
+ (A_{\rm sym})^u_a\otimes I
+ \simeq_{3\eps}I\otimes(A_{\rm sym})^u_a.
+\]
+Apply \Cref{lem:projective-bridge} to the projective point
+measurement $(A_{\rm sym})^u$ and the evaluated measurement
+$\overline G_{[g(u)=a]}$ on the permutation-invariant state
+$\ket{\psi_{\rm sym}}$.  Together with
+\eqref{eq:short-applied-induction}, this gives
+\begin{equation}\label{eq:short-evaluation-self-consistency}
+ \overline G_{[g(u)=a]}\otimes I
+ \simeq_\tau I\otimes\overline G_{[g(u)=a]},
+ \qquad
+ \tau=(2\sqrt\sigma+\sqrt{6\eps})^2.
+\end{equation}
+For distinct individual-degree-\(d\) polynomials \(g,h\),
+Schwartz--Zippel gives
+\(\Pr_{\bu}[g(\bu)=h(\bu)]\leq md/q=m\theta\).  If
+\(w_{g,h}=\bra{\psi_{\rm sym}}\overline G_g\otimes\overline G_h
+\ket{\psi_{\rm sym}}\), then
+\[
+ \sum_{g\ne h}\Pr_{\bu}[g(\bu)=h(\bu)]w_{g,h}
+ \leq m\theta\sum_{g\ne h}w_{g,h}\leq m\theta.
+\]
+Expanding \eqref{eq:short-evaluation-self-consistency} in the
+polynomial outcomes therefore gives
+\begin{equation}\label{eq:short-symmetric-polynomial-consistency}
+ \sum_{g\ne h}
+ \bra{\psi_{\rm sym}}\overline G_g\otimes\overline G_h
+ \ket{\psi_{\rm sym}}
+ \leq\zeta,
+ \qquad
+ \zeta=\tau+m\theta.
+\end{equation}
+
+Define the diagonal blocks
+\[
+ G^w_g=\iota_w^\dagger\overline G_g\iota_w,
+ \qquad w\in\{\mathrm A,\mathrm B\}.
+\]
+They are measurements on the original local spaces.  Since
+\(\overline G\) is block diagonal, the left-hand side of
+\eqref{eq:short-symmetric-polynomial-consistency} is exactly
+\[
+ \sum_{g\ne h}\bra\psi
+ G^{\mathrm A}_g\otimes G^{\mathrm B}_h\ket\psi.
+\]
+Indeed, the two direct-sum sectors give the same sum after exchanging
+the indices $g$ and~$h$.
+Consequently,
+\begin{equation}\label{eq:short-polynomial-consistency}
+ G^{\mathrm A}_g\otimes I
+ \simeq_\zeta I\otimes G^{\mathrm B}_g.
+\end{equation}
+Moreover, decomposing the inconsistency in
+\eqref{eq:short-applied-induction} into its two orthogonal sectors
+shows that
+\begin{align}
+ A^{\mathrm A,u}_a\otimes I
+ &\simeq_{2\sigma}
+ I\otimes G^{\mathrm B}_{[g(u)=a]},\label{eq:short-point-cons-a}\\
+ G^{\mathrm A}_{[g(u)=a]}\otimes I
+ &\simeq_{2\sigma}
+ I\otimes A^{\mathrm B,u}_a.\label{eq:short-point-cons-b}
+\end{align}
+Indeed, the symmetrized inconsistency is one half the sum of the two
+displayed original-strategy inconsistencies, so each is at most
+\(2\sigma\).
+
+Apply \Cref{lem:orthonormalization-main-lemma} to
+\eqref{eq:short-polynomial-consistency} in both tensor orders.  This
+gives projective measurements
+\(Q^{\mathrm A},Q^{\mathrm B}\in\polymeas{m}{q}{d}\) such that
+\begin{equation}\label{eq:short-rounding-error}
+ G^{\mathrm A}_g\otimes I\approx_\alpha Q^{\mathrm A}_g\otimes I,
+ \qquad
+ I\otimes G^{\mathrm B}_g\approx_\alpha I\otimes Q^{\mathrm B}_g,
+ \qquad
+ \alpha=18\zeta.
+\end{equation}
+Together with \Cref{prop:simeq-to-approx}, the root-distance triangle
+inequality gives
+\[
+ Q^{\mathrm A}_g\otimes I
+ \approx_{(2\sqrt\alpha+\sqrt{2\zeta})^2}
+ I\otimes Q^{\mathrm B}_g.
+\]
+The parameter on the right is \(98\zeta\).  Since both measurements
+are projective, their actual inconsistency is at most \(49\zeta\).
+
+For point consistency, apply
+\Cref{prop:round-right-submeasurement} with the
+question-dependent map \(f_u(g)=g(u)\) to
+\Cref{eq:short-point-cons-a,eq:short-rounding-error}, and apply its
+tensor-reversed form to
+\Cref{eq:short-point-cons-b,eq:short-rounding-error}.  This gives
+\begin{align}
+ A^{\mathrm A,u}_a\otimes I
+ &\simeq_{(\sqrt{2\sigma}+\sqrt\alpha)^2}
+ I\otimes Q^{\mathrm B}_{[g(u)=a]},\label{eq:short-rounded-point-a}\\
+ Q^{\mathrm A}_{[g(u)=a]}\otimes I
+ &\simeq_{(\sqrt{2\sigma}+\sqrt\alpha)^2}
+ I\otimes A^{\mathrm B,u}_a.\label{eq:short-rounded-point-b}
+\end{align}
+
+It remains to compare these errors with~$\nu$.  Since $K\geq m\geq1$
+and $R<1/21000$, the definitions imply
+\begin{equation}\label{eq:short-sigma-bound}
+ \sigma\leq10000R^2,\qquad
+ \eps\leq R^{64},\qquad m\theta\leq R^{64}.
+\end{equation}
+Consequently,
+\[
+ \sigma\leq\zeta\leq8\sigma+12\eps+m\theta
+ \leq80013R^2\leq4R.
+\]
+Using $\alpha=18\zeta$, each rounded point inconsistency is at most
+$(\sqrt{2\sigma}+\sqrt{18\zeta})^2\leq32\zeta$, and the
+self-inconsistency is at most $49\zeta$.  All three are therefore
+at most $196R\leq21000R=\nu$, as required.
+\end{proof}
+
+The remainder of this section is organized as follows:
+first, in \Cref{sec:self-improvement-and-pasting}, we define the two main steps in the proof of \Cref{thm:main-induction}
+known as self-improvement and pasting.
+Following that, we prove \Cref{thm:main-induction} in \Cref{sec:proof-of-main-induction}.
+
+\subsection{Self-improvement and pasting}\label{sec:self-improvement-and-pasting}
+
+There are two main steps in the proof of \Cref{thm:main-induction}.
+The first is self-improvement, which is stated as follows.
+
+\begin{theorem}[Self-improvement with dilation]\label{thm:self-improvement-in-induction-section}
+Let $(\psi,A,B,L)$ be an $(\eps,\delta,\gamma)$-good symmetric
+strategy on $\calH\otimes\calH$ for the $(m,q,d)$ low individual
+degree test.  Let $G\in\polymeas{m}{q}{d}$ be a measurement satisfying
+\begin{enumerate}
+ \item (Consistency with $A$):\label{item:si-inductive-G-consistency}
+ on average over $\bu\sim\F_q^m$,
+ \[
+ A^u_a\otimes I\simeq_\nu I\otimes G_{[g(u)=a]}.
+ \]
+\end{enumerate}
+Set
+\[
+ \zeta=200m\bigl(\sqrt\eps+\sqrt\delta+\sqrt{d/q}\bigr).
+\]
+There exist a finite-dimensional ancilla $\mathcal K$, a unit vector
+$\ket0\in\mathcal K$, and a projective sub-measurement
+$H\in\polysub{m}{q}{d}$ on $\calH\otimes\mathcal K$ with the
+following properties.  Write $Jv=v\otimes\ket0$,
+$\ket{\psi'}=(J\otimes J)\ket\psi$, and
+$A'{}^u_a=A^u_a\otimes I_{\mathcal K}$; all relations below are on
+$\ket{\psi'}$.
+\begin{enumerate}
+ \item (Completeness):\label{item:si-inductive-completeness}
+ if $H=\sum_hH_h$, then
+ \[
+ \bra{\psi'}H\otimes I\ket{\psi'}\geq1-\nu-\zeta.
+ \]
+ \item (Consistency with $A'$):\label{item:si-inductive-A-consistency}
+ on average over $\bu\sim\F_q^m$,
+ \[
+ A'{}^u_a\otimes I\simeq_\zeta I\otimes H_{[h(u)=a]}.
+ \]
+ \item (Strong self-consistency):\label{item:si-inductive-self}
+ \[
+ H_h\otimes I\approx_\zeta I\otimes H_h.
+ \]
+ \item (Boundedness):\label{item:si-inductive-boundedness}
+ there is a positive contraction $Z$ on $\calH\otimes\mathcal K$ such that
+ \[
+ \bra{\psi'}Z\otimes(I-H)\ket{\psi'}\leq\zeta,
+ \qquad
+ Z\geq\E_{\bu}A'{}^{\bu}_{h(\bu)}
+ \quad\text{for every }h\in\polyfunc{m}{q}{d}.
+ \]
+\end{enumerate}
+For any finite family of such inputs on $\calH$, the same ancilla and
+embedding $J$ can be used for all outputs.  Extending $A,B,L$ by the
+identity on the ancilla preserves projectivity and all test success
+probabilities.
+\end{theorem}
+
+For projective $H$, \Cref{prop:two-notions-of-self-consistency} identifies
+\Cref{item:si-inductive-self} with a strong self-consistency defect at
+most $\zeta/2$.  Self-improvement moves the seed measurement's
+consistency error into incompleteness.  Its filtered output on the
+original space need not be projective; simultaneous dilation supplies
+the projective slices needed for pasting without a rounding loss.
+After pasting, compression recovers a measurement on the original
+space, as explained in \Cref{sec:self-improvement-dilation}.
+
+The second main step is pasting, which is stated as follows.
+
+\begin{theorem}[Pasting]\label{thm:ld-pasting-in-induction-section}
+  Let $m,d\geq1$, and let $(\psi, A, B, L)$ be an
+  $(\eps, \delta, \gamma)$-good symmetric strategy for the
+  $(m+1,q,d)$ low individual degree test.
+  Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:
+  \begin{enumerate}
+  \item (Completeness): \label{item:ld-pasting-inductive-completeness}  If $G = \E_{\bx} \sum_g G^{\bx}_g$, then
+	\begin{equation*}
+	\bra{\psi} G \otimes I \ket{\psi} \geq 1 - \kappa.
+	\end{equation*}
+  \item (Consistency with~$A$): \label{item:ld-pasting-inductive-consistency} On average over $(\bu, \bx) \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u, x}_a \otimes I \simeq_{\zeta} I \otimes G^x_{[g(u)=a]}.
+	  \end{equation*}
+  \item (Strong self-consistency): \label{item:ld-pasting-inductive-self-consistency} On average over~$\bx \sim \F_q$,
+	\begin{equation*}
+		G^x_g \otimes I \approx_{\zeta} I \otimes G^x_g.
+	\end{equation*}
+  \item (Boundedness): \label{item:ld-pasting-inductive-boundedness} There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+	\begin{equation*}
+		\E_{\bx} \bra{\psi} (I-G^{\bx})\otimes Z^{\bx} \ket{\psi} \leq \zeta
+	\end{equation*}
+	and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z^x \geq \E_{\bu} A^{\bu, x}_{g(\bu)}.
+	\end{equation*}
+  \end{enumerate}
+Let
+\[
+ s=\eps^{1/8}+\delta^{1/8}+\gamma^{1/8}
+   +\zeta^{1/8}+(d/q)^{1/8}.
+\]
+Then there is a measurement $H\in\polymeas{m+1}{q}{d}$ such that,
+on average over $\bu\sim\F_q^{m+1}$,
+\begin{equation*}
+ A^u_a\otimes I\simeq_{\sigma}I\otimes H_{[h(u)=a]},
+ \qquad
+ \sigma=\frac{m+1}{m}\,\kappa
+       +21(m+1)^2d^2\sqrt{m}\,s.
+\end{equation*}
+\end{theorem}
+
+This is the specialization of \Cref{thm:ld-pasting} with the attempt
+count $k=(m+1)d$: because $m,d\geq1$, one has $k\geq d+1$, and
+$k/(k-d)=(m+1)/m$.  Thus $k$ is a choice internal to the construction,
+not an auxiliary hypothesis of the induction theorem.
+
+Intuitively, $\sigma$ should be thought of as being roughly~$\kappa$,
+plus a small amount of error which does not depend on~$\kappa$.
+Hence, pasting states that we can take a family of sub-measurements $\{G^x\}$ with incompleteness $\kappa$
+and produce a pasted measurement~$H$ whose consistency error with~$A$ is roughly~$\kappa$,
+plus a small amount of new error.
+Thus, the overall inductive step looks as follows:
+given a family of measurements with some inconsistency error,
+we ``move'' the error into the incompleteness using self-improvement,
+and then we paste the measurements together to form a single measurement whose error is roughly the same as the original error.
+
+The fresh error $21(m+1)^2d^2\sqrt{m}\,s$ depends only on the small parameters
+$\eps$, $\delta$, $\zeta$, $\gamma$, and $d/q$, not on~$\kappa$.
+
+\subsection{\texorpdfstring{Proof of \Cref{thm:main-induction}}{Proof of the main induction}}\label{sec:proof-of-main-induction}
+
+\begin{definition}
+Let $x \in \F_q$.
+For each line $\ell \in \F_q^m$,
+we define $\mathrm{append}_x(\ell)$ to be the line in $\F_q^{m+1}$ containing every point $(u, x)$ such that $u \in \ell$.
+In addition, for each function $f : \ell \rightarrow \F_q$,
+we define $\mathrm{append}_x(f) : \mathrm{append}_x(\ell) \rightarrow \F_q$
+such that for each $(u, x) \in \mathrm{append}_x(\ell)$, $\mathrm{append}_x(f)(u, x) = f(u)$.
+\end{definition}
+
+\begin{definition}[$x$-restricted low-degree strategy]
+Let $(\psi, A, B, L)$ be a symmetric strategy for the
+$(m+1,q,d)$-low individual degree test.
+Given $x \in \F_q$, we define the \emph{$x$-restricted strategy}
+$(\psi, A^x, B^x, L^x)$ for the $(m,q,d)$-low individual degree test as follows.
+\begin{enumerate}
+\item For each $u \in \F_q^m$, $(A^x)^u_a = A^{u, x}_a$.
+\item For each axis parallel line $\ell \in \F_q^m$, $(B^x)^\ell_f = B^{\mathrm{append}_x(\ell)}_{\mathrm{append}_x(f)}$.
+\item For each  line $\ell \in \F_q^m$, $(L^x)^\ell_f = L^{\mathrm{append}_x(\ell)}_{\mathrm{append}_x(f)}$.
+\end{enumerate}
+\end{definition}
+
+The last item is a relabeling of a complete projective measurement:
+$f\mapsto\mathrm{append}_x(f)$ is a bijection between all functions on
+$\ell$ and all functions on $\mathrm{append}_x(\ell)$.  This is why the
+relaxed diagonal answer alphabet above is useful.  With only the
+nominal degree bounds, restricting a degree-$(m+1)d$ outcome would not
+necessarily give a degree-$md$ outcome, and $L^x$ could fail to be
+complete.
+
+\begin{lemma}\label{lem:restricted-probabilities}
+Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy
+		for the $(m+1,q,d)$-low individual degree test.
+For each $x \in \F_q$, let $(\psi, A^x, B^x, L^x)$ be the corresponding $x$-restricted strategy.
+In addition, write $\eps_x$ for the probability that it fails the axis-parallel lines test,
+$\delta_x$ for the probability it fails the self-consistency test,
+and $\gamma_x$ for the probability it fails the diagonal lines test.
+Then
+\begin{equation*}
+\E_{\bx} \eps_{\bx} \leq \left(\frac{m+1}{m}\right) \cdot\eps,
+\quad
+\E_{\bx} \delta_{\bx} \leq  \delta,
+\quad
+\E_{\bx} \gamma_{\bx} \leq \left(\frac{m+1}{m}\right) \cdot \gamma.
+\end{equation*}
+\end{lemma}
+\begin{proof}
+We begin with the self-consistency test.
+Here, both provers are given a uniformly random point $(\bu, \bx)$,
+they measure using $A^{\bu, \bx} = (A^{\bx})^{\bu}$, and they succeed if their outcomes are the same.
+This is equivalent to performing the self-consistency test on the $\bx$-restricted strategy, averaged over $\bx$,
+and so $\E_{\bx} \delta_{\bx} \leq  \delta$. (It is a ``$\leq$" rather than an ``$=$" because $\delta$ is just an upper-bound on the failure probability.)
+
+Next, we consider the axis-parallel lines test.
+Suppose the provers are sent the line $\bell$ and the point $(\bu, \bx) \in \bell$.
+With probability $\frac{1}{m+1}$, $\bell$ is parallel to the $(m+1)$-st direction.
+When it is not, then $\bell = \mathrm{append}_x(\bell')$, where $\bell'$ is an axis-parallel line in $\F_q^m$.
+In this case, the points prover measures with $A^{\bu, \bx} = (A^\bx)^{\bu}$,
+the lines prover measures with $B^{\bell} = (B^{\bx})^{\bell'}$, and the two
+outcomes fail the check exactly when the corresponding outcomes in the
+$\bx$-restricted test fail it.  Hence,
+\begin{align*}
+\eps
+&\geq \Pr_{\bell, \bu, \bx}[\text{the axis-parallel check fails}]\\
+&\geq \left(\frac{m}{m+1}\right) \cdot
+ \Pr[\text{the check fails}\mid \text{$\bell$ is not parallel to direction $m+1$}]\\
+& =  \left(\frac{m}{m+1}\right) \cdot\E_{\bx} \eps_{\bx}.
+\end{align*}
+
+For the diagonal-lines test, condition on the sampled direction index
+$i$ lying in $\{1,\ldots,m\}$, an event of probability $m/(m+1)$.
+The ambient direction then has the form $(v',0)$, where $v'$ has exactly
+the distribution of a diagonal direction in $\F_q^m$, and the ambient
+line through $(u,x)$ is $\mathrm{append}_x(\ell')$ for the corresponding
+line $\ell'$ through~$u$.  By the definition of $L^x$, the conditional
+failure probability is $\E_x\gamma_x$.  Consequently,
+\[
+ \gamma\geq\frac{m}{m+1}\E_x\gamma_x,
+\]
+which is the remaining claim.
+\end{proof}
+
+\begin{proof}[Proof of~\Cref{thm:main-induction}]
+We first dispose of the degree-zero case directly.  Suppose $d=0$.
+For each $a\in\F_q$, let $g_a$ be the constant polynomial with value~$a$,
+and define
+\[
+ G_{g_a}=\E_{\bv\sim\F_q^m}A^{\bv}_a.
+\]
+These operators form a measurement indexed by all polynomials in
+$\polyfunc{m}{q}{0}$.
+
+For this proof, sample $(\bu,\bv)$ by drawing
+$\bu\sim\F_q^m$, $\bi\sim\{1,\ldots,m\}$, and $\bt\sim\F_q$
+independently and setting $\bv=\bu+\bt e_{\bi}$; denote this edge
+distribution by~$C$.  Let $\ell$ be the axis-parallel line through them
+in the sampled direction.  Write $B^\ell_a$ for the outcome of $B^\ell$
+corresponding to the constant function with value~$a$.  The two
+point--line test relations, permutation invariance for the reversed
+second relation, and \Cref{prop:simeq-to-approx} give
+\[
+ A^{\bu}_a\otimes I\approx_{2\eps}I\otimes B^\ell_a
+ \approx_{2\eps}A^{\bv}_a\otimes I.
+\]
+Therefore \Cref{prop:triangle-inequality-for-approx_delta} gives
+\[
+ \E_{(\bu,\bv)\sim C}\sum_a
+ \left\|(A^{\bu}_a-A^{\bv}_a)\otimes I\ket\psi\right\|^2
+ \leq8\eps.
+\]
+Applying \Cref{lem:local-to-global} to each outcome and summing over~$a$
+shows that
+\begin{equation}\label{eq:d-zero-global-variance}
+ D:=\E_{\bu,\bv}\sum_a
+ \left\|(A^{\bu}_a-A^{\bv}_a)\otimes I\ket\psi\right\|^2
+ \leq8m\eps,
+\end{equation}
+where $\bu$ and $\bv$ are now independent and uniform.
+
+The inconsistency of $G$ with~$A$ is
+\[
+ 1-\E_{\bu,\bv}\sum_a
+ \bra\psi A^{\bu}_a\otimes A^{\bv}_a\ket\psi.
+\]
+The self-consistency test bounds the same expression with $\bv=\bu$
+by~$\delta$.  The difference is at most $\sqrt D$ by Cauchy--Schwarz:
+\begin{align*}
+ &\left|\E_{\bu,\bv}\sum_a
+ \bra\psi A^{\bu}_a\otimes(A^{\bu}_a-A^{\bv}_a)\ket\psi\right|\\
+ &\quad\leq
+ \left(\E_{\bu}\sum_a\bra\psi(A^{\bu}_a)^2\otimes I\ket\psi\right)^{1/2}
+ \left(\E_{\bu,\bv}\sum_a\bra\psi I\otimes
+ (A^{\bu}_a-A^{\bv}_a)^2\ket\psi\right)^{1/2}
+ =\sqrt D.
+\end{align*}
+Here the first factor is one because $A^{\bu}$ is projective, and
+the second factor equals $\sqrt D$ by symmetry.  Hence
+\[
+ A^{\bu}_a\otimes I\simeq_{\delta+\sqrt{8m\eps}}I\otimes G_{g_a}.
+\]
+This is the asserted degree-zero bound.
+
+We may therefore assume $d\geq1$.
+Consistency errors are at most one, so the result is immediate if one
+of $\eps,\delta,\gamma,d/q$ is at least one.  Hence all four parameters
+may now be assumed strictly less than one.
+We induct on $m$.  For $m=1$, there is a single axis-parallel line
+$\ell=\F_q$.  Taking $G=B^\ell$ gives
+\[
+ A^u_a\otimes I\simeq_{\eps}I\otimes G_{[g(u)=a]}.
+\]
+This is enough because $\eps\leq\eps^{1/32}\leq\sigma$.
+
+Suppose the assertion is known in dimension $m$, and consider an
+$(\eps,\delta,\gamma)$-good strategy in dimension $m+1$.  Let
+$(\eps_x,\delta_x,\gamma_x)$ be the failure probabilities of its
+$x$-restricted strategy.  By \Cref{lem:restricted-probabilities},
+\[
+ \E_x\eps_x\leq\frac{m+1}{m}\eps,
+ \qquad \E_x\delta_x\leq\delta,
+ \qquad \E_x\gamma_x\leq\frac{m+1}{m}\gamma.
+\]
+Let $p=1/32$, $r=1/8$, $\theta=d/q$, $c=(m+1)/m$, and
+\[
+ S=\eps^p+\delta^p+\theta^p+\gamma^r.
+\]
+The induction hypothesis on each restricted strategy gives a
+measurement with error
+\[
+ \sigma_x=1000d^2m^4
+ \bigl(\eps_x^p+\delta_x^p+\theta^p+\gamma_x^r\bigr).
+\]
+By concavity and \Cref{lem:restricted-probabilities},
+\begin{equation}\label{eq:average-induction-error}
+ \bar\sigma:=\E_x\sigma_x
+ \leq1000d^2m^4c^rS.
+\end{equation}
+
+Apply \Cref{thm:self-improvement-in-induction-section} to these
+measurements, using a common ancilla and embedding $J$ for all
+slices.  Extend the ambient strategy by the identity on this ancilla
+and use the symmetric state $\ket{\psi'}=(J\otimes J)\ket\psi$.
+By concavity of the square root, the output errors satisfy
+\[
+ \E_x\zeta_x
+ \leq200(m+1)\bigl(\sqrt\eps+\sqrt\delta+\sqrt\theta\bigr)
+ \leq\bar\zeta,
+ \qquad
+ \bar\zeta=3000(m+1)
+ \bigl(\eps^{1/4}+\delta^{1/4}+\theta^{1/4}\bigr)
+ \leq3000(m+1)S.
+\]
+Here we retain the larger budget $\bar\zeta$ to simplify the scalar
+recurrence; the parameters $\eps,\delta,\theta$ are less than one.
+The projective slices on this common enlarged space satisfy all four
+hypotheses of \Cref{thm:ld-pasting-in-induction-section}, with
+\[
+ \kappa=\bar\sigma+\bar\zeta,\qquad\zeta=\bar\zeta.
+\]
+For boundedness we use permutation invariance to exchange the tensor
+factors.  The other three slice hypotheses retain the same tensor
+orientation.  The extended ambient strategy has the original test
+errors $\eps,\delta,\gamma$.
+
+The pasting error also contains
+\[
+ s=\eps^{1/8}+\delta^{1/8}+\gamma^{1/8}
+   +\bar\zeta^{1/8}+\theta^{1/8}.
+\]
+Subadditivity and $3000^{1/8}<3$ give
+\[
+ \bar\zeta^{1/8}
+ \leq3(m+1)^{1/8}
+ \bigl(\eps^p+\delta^p+\theta^p\bigr),
+ \qquad
+ s\leq4(m+1)^{1/8}S.
+\]
+The pasting theorem therefore gives
+\begin{align*}
+ \sigma_{m+1}
+ &\leq c(\bar\sigma+\bar\zeta)
+       +21d^2(m+1)^2\sqrt{m}\,s\\
+ &\leq1000d^2m^4c^{1+r}S
+       +3000c(m+1)S
+       +84d^2\sqrt{m}\,(m+1)^{2+1/8}S.
+\end{align*}
+If $T=\{T_h\}$ is the pasted measurement on the enlarged local space,
+set $\widehat T_h=J^\dagger T_hJ$.  These positive operators sum to
+$I$, and
+\[
+ \bra\psi A^u_a\otimes\widehat T_h\ket\psi
+ =\bra{\psi'}(A^u_a\otimes I_{\mathcal K})\otimes T_h\ket{\psi'}.
+\]
+Thus $\widehat T$ has the same consistency bound on the original
+space.  Compression is applied only to individual measurement
+effects; no multiplicativity or preservation of projectivity is
+needed.  The displayed scalar recurrence is therefore the whole
+induction bookkeeping.
+By concavity, $c^r\leq1+r(c-1)=1+1/(8m)$; also
+$(m+1)^r\leq2\sqrt{m}$.  Hence the gap between the desired
+coefficient and the inherited term is at least
+\[
+ 1000d^2(m+1)\left(\frac{23}{8}m^2+3m+1\right).
+\]
+After division by $d^2(m+1)$, the two fresh coefficients are at most
+\[
+  3000\frac{m+1}{m}+84\sqrt{m}(m+1)^{1+r}
+  \leq6000+168m(m+1)
+  \leq1000\left(\frac{23}{8}m^2+3m+1\right),\qquad(m\geq1).
+\]
+They are therefore absorbed by the gap, proving
+\[
+ \sigma_{m+1}\leq1000d^2(m+1)^4S.
+\]
+This is exactly the asserted positive-degree bound in dimension $m+1$.
+\end{proof}
+
+\section{Expansion in the hypercube graph}
+\label{sec:expansion}
+
+\begin{definition}[Hypercube graph]
+The \emph{hypercube graph} $C=(V,E)$ has vertex set $V=\F_q^m$,
+with an edge between points that disagree in at most one coordinate
+(including a self-loop at every vertex).
+A random edge $(\bu,\bv)\sim C$ is sampled by drawing
+$\bu\sim\F_q^m$, $\bi\sim\{1,\ldots,m\}$, and $\bx\sim\F_q$
+independently and setting $\bv=\bu+\bx e_{\bi}$.
+\end{definition}
+
+\subsection{Local and global variance}
+
+In this subsection, $\ket\psi$ is a vector, not necessarily normalized,
+in $\calH_A\otimes\calH_B$, and $A^u$ is Hermitian for every
+$u\in\F_q^m$.
+
+\begin{definition}\label{def:local-and-variance}
+The \emph{local} and \emph{global variance} of~$A$ on $\ket\psi$ are
+\begin{align*}
+ \mathbf{Var}_{\mathrm{local}}(A,\psi)
+ &:=\frac12\E_{(\bu,\bv)\sim C}
+   \bra\psi(A^{\bu}-A^{\bv})^2\otimes I\ket\psi,\\
+ \mathbf{Var}_{\mathrm{global}}(A,\psi)
+ &:=\frac12\E_{\bu,\bv\sim\F_q^m}
+   \bra\psi(A^{\bu}-A^{\bv})^2\otimes I\ket\psi,
+\end{align*}
+where $\bu,\bv$ are independent in the second line.
+\end{definition}
+
+\begin{lemma}[Product Poincar\'e inequality]\label{lem:local-to-global}
+For any Hilbert space $\mathcal{K}$ and function $X:\F_q^m\to\mathcal{K}$,
+\[
+ \E_{\bu,\bv\sim\F_q^m}\|X(\bu)-X(\bv)\|^2
+ \leq m\,\E_{(\bu,\bv)\sim C}\|X(\bu)-X(\bv)\|^2,
+\]
+where $\bu,\bv$ are independent on the left.  In particular,
+\[
+ \mathbf{Var}_{\mathrm{global}}(A,\psi)
+ \leq m\,\mathbf{Var}_{\mathrm{local}}(A,\psi).
+\]
+\end{lemma}
+
+\begin{proof}
+Equip the space of $\mathcal{K}$-valued functions on $\F_q^m$ with the inner product
+$\langle X,Y\rangle=\E_u\langle X(u),Y(u)\rangle$.
+For each coordinate $i$, let $E_i$ average that coordinate while
+fixing the others.  These are commuting orthogonal projections, and
+$E=E_1\cdots E_m$ averages all coordinates.  The telescoping identity
+\[
+ I-E=\sum_{i=1}^m E_1\cdots E_{i-1}(I-E_i)
+ \leq\sum_{i=1}^m(I-E_i)
+\]
+holds because each summand is a product of commuting projections,
+hence is positive and bounded above by $I-E_i$.  Taking its quadratic
+form at $X$ gives
+\[
+ \E_u\|X(u)-\E_vX(v)\|^2
+ \leq\sum_{i=1}^m\E_u\|X(u)-(E_iX)(u)\|^2.
+\]
+The left side is half the mean squared difference between $X$ at
+two independent uniform points.  Conditioned on all coordinates
+except $i$, the $i$-th term on the right is half the mean squared
+difference between two independent choices of coordinate $i$.
+Their sum is therefore $m/2$ times the mean squared difference
+along a random edge of $C$.  This proves the Hilbert-space-valued
+inequality.  Taking $X(u)=(A^u\otimes I)\ket\psi$ gives the operator
+formulation, without requiring $\ket\psi$ to be normalized.
+\end{proof}
+
+\section{Global variance of the points measurements}
+\label{sec:variance}
+Throughout this section, $(\psi, A, B, L)$ will denote a fixed $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m,q,d)$-low individual degree test.
+
+\begin{lemma}\label{lem:generalize-b}
+Let $G \in \polysub{m}{q}{d}$. Then
+\begin{equation*}
+B^\ell_{[f(u) = g(u)]} \otimes (G_g)^{1/2} \approx_{d/q} B^\ell_{g|_\ell} \otimes (G_g)^{1/2}
+\end{equation*}
+on the axis-parallel lines test distribution.
+\end{lemma}
+\begin{proof}
+On an axis-parallel line, both $f$ and $g|_\ell$ have univariate
+degree at most~$d$.  Thus, when they are distinct, they agree at a
+uniform point of~$\ell$ with probability at most $d/q$.
+We now bound the squared distance:
+\begin{align*}
+&~\E_{\bu, \bell} \sum_{g \in \polyfunc{m}{q}{d}} \Vert (B^{\bell}_{[f(\bu) = g(\bu)]}  - B^{\bell}_{g|_{\bell}}) \otimes (G_g)^{1/2} \ket{\psi}\Vert^2\\
+=&~\E_{\bu, \bell} \sum_{g \in \polyfunc{m}{q}{d}} \bra{\psi} \bigg(\sum_{f : f \neq g|_{\bell}} \bone[f(\bu) = g(\bu)] \cdot B^{\bell}_f\bigg)^2 \otimes G_g \ket{\psi}\\
+\leq&~\E_{\bu, \bell} \sum_{g \in \polyfunc{m}{q}{d}} \bra{\psi} \bigg(\sum_{f : f \neq g|_{\bell}} \bone[f(\bu) = g(\bu)] \cdot B^{\bell}_f\bigg) \otimes G_g \ket{\psi} \\
+= &~\E_{\bell} \sum_{g \in \polyfunc{m}{q}{d}} \sum_{f : f \neq g|_{\bell}} \bra{\psi}  B^{\bell}_f \otimes G_g \ket{\psi} \cdot \left( \E_{\bu} \bone[f(\bu) = g(\bu)]\right)\\
+\leq &~\E_{\bell} \sum_{g \in \polyfunc{m}{q}{d}} \sum_{f : f \neq g|_{\bell}} \bra{\psi}  B^{\bell}_f \otimes G_g \ket{\psi} \cdot \frac{d}{q}\tag{by Schwartz-Zippel}\\
+\leq &~\frac{d}{q}.\qedhere
+\end{align*}
+\end{proof}
+
+\begin{lemma}\label{lem:local-variance-of-points}
+Let $G \in \polysub{m}{q}{d}$.  Then
+\begin{equation}\label{eq:local-variance-of-points-equation}
+A^u_{g(u)} \otimes (G_g)^{1/2} \approx_{24\cdot(\eps + \delta + \frac{d}{q})} A^v_{g(v)} \otimes (G_g)^{1/2}
+\end{equation}
+on the distribution $(\bu, \bv) \sim C$.
+\end{lemma}
+\begin{proof}
+Let $\bu$ and $\bell$ be distributed as in the axis-parallel lines test,
+and sample $\bv \sim \bell$.
+Then $\bv$ and $\bell$ are also distributed as in the axis-parallel lines test.
+As a result,
+\begin{align*}
+A^u_{g(u)} \otimes (G_g)^{1/2}
+&\approx_{2\delta} I \otimes (G_g)^{1/2} A^u_{g(u)}\tag{by \Cref{prop:simeq-to-approx}}\\
+&\approx_{2\eps} B^\ell_{[f(u) = g(u)]} \otimes (G_g)^{1/2}\tag{by \Cref{prop:simeq-to-approx}}\\
+&\approx_{\frac{d}{q}} B^\ell_{g|_{\ell}} \otimes (G_g)^{1/2}\tag{by \Cref{lem:generalize-b}}\\
+&\approx_{\frac{d}{q}} B^\ell_{[f(v) = g(v)]} \otimes (G_g)^{1/2}\tag{by \Cref{lem:generalize-b}}\\
+&\approx_{2\eps} I \otimes (G_g)^{1/2} A^v_{g(v)} \tag{by \Cref{prop:simeq-to-approx}}\\
+&\approx_{2\delta} A^v_{g(v)} \otimes (G_g)^{1/2}.\tag{by \Cref{prop:simeq-to-approx}}
+\end{align*}
+Steps 1, 2, 5, and 6 also use
+\Cref{rem:good-strat-characterization,prop:cab-approx-delta}; in
+steps 2 and 5, \Cref{prop:approx-swap-invariance} first puts the
+point--line approximation on the required tensor factor.
+The lemma now follows from \Cref{prop:triangle-inequality-for-approx_delta}.
+\end{proof}
+
+We note that \Cref{eq:local-variance-of-points-equation} is equivalent to the statement that
+\begin{equation}\label{eq:equivalent-local-variance}
+\sum_{g \in \polyfunc{m}{q}{d}}\E_{(\bu, \bv) \sim C} \bra{\psi} (A^{\bu}_{g(\bu)}  - A^{\bv}_{g(\bv)})^2 \otimes G_g \ket{\psi}
+\leq 24\left(\eps + \delta + \frac{d}{q}\right).
+\end{equation}
+This can be viewed as a form of local variance for the points measurements.
+We now derive the corresponding expression for the global variance of the points measurements.
+
+\begin{lemma}\label{lem:global-variance-of-points}
+Let $G \in \polysub{m}{q}{d}$.  Then
+\begin{equation}\label{eq:global-variance-of-points-equation}
+A^u_{g(u)} \otimes (G_g)^{1/2} \approx_{24m\cdot(\eps + \delta + \frac{d}{q})} A^v_{g(v)} \otimes (G_g)^{1/2}
+\end{equation}
+on the distribution $\bu, \bv \sim \F_q^m$.
+\end{lemma}
+\begin{proof}
+Apply \Cref{lem:local-to-global} to the single Hilbert-space-valued
+function
+\[
+ X(u)=\bigoplus_{g\in\polyfunc{m}{q}{d}}
+       (A^u_{g(u)}\otimes\sqrt{G_g})\ket\psi.
+\]
+The direct-sum norm adds the squared norms of its components, so
+\begin{equation}\label{eq:global-variance-target}
+ \begin{aligned}
+ &\E_{\bu,\bv}\sum_g\bra\psi
+       (A^{\bu}_{g(\bu)}-A^{\bv}_{g(\bv)})^2\otimes G_g\ket\psi\\
+ &\qquad=\E_{\bu,\bv}\|X(\bu)-X(\bv)\|^2
+ \leq m\,\E_{(\bu,\bv)\sim C}\|X(\bu)-X(\bv)\|^2\\
+ &\qquad\leq24m\left(\eps+\delta+\frac dq\right),
+ \end{aligned}
+\end{equation}
+where the unqualified points $\bu,\bv$ are independent and uniform,
+and the last inequality is \eqref{eq:equivalent-local-variance}.
+\end{proof}
+
+\section{Self-improvement}
+\label{sec:self-improvement}
+
+Throughout this section, $(\psi,A,B,L)$ is an
+$(\eps,\delta,\gamma)$-good symmetric strategy for the $(m,q,d)$ low
+individual degree test.  We first construct a sub-measurement on the
+original local space.  Its SDP certificate satisfies the
+operator inequality $Z^2\leq H\leq I$, which supplies strong
+self-consistency directly.  We then dilate any finite family of these
+sub-measurements simultaneously to projective sub-measurements on one
+common enlarged space.  After pasting, compression returns a
+measurement to the original space.
+
+For the non-projective output we state strong self-consistency as a
+defect in the diagonal overlap, following
+\Cref{def:strong-self-consistency}.  Upon dilation, the squared mirror
+error is exactly twice this defect; these two error conventions will
+be kept separate.
+
+\begin{lemma}[Self-improvement with non-projective output]\label{lem:self-improvement-helper}
+Let $G \in \polymeas{m}{q}{d}$ be a measurement with the following property:
+\begin{enumerate}
+  \item (Consistency with~$A$): \label{item:self-improvement-G-consistency} On average over $\bu \sim \F_q^{m}$,
+	  \begin{equation*}
+	  A^{u}_a \otimes I \simeq_{\nu} I \otimes G_{[g(u)=a]}.
+	  \end{equation*}
+	  \end{enumerate}
+Let
+\begin{equation*}
+\zeta_0 = 100m\cdot \Big(\eps^{1/2} + \delta^{1/2} + (d/q)^{1/2}\Big).
+\end{equation*}
+Then there exists $H \in \polysub{m}{q}{d}$ with the following properties:
+\begin{enumerate}
+    \item(Completeness):  \label{item:self-improvement-completeness} If $H =  \sum_h H_h$, then
+    \begin{equation*}
+    \bra{\psi} H \otimes I \ket{\psi} \geq (1-\nu)-\zeta_0.
+    \end{equation*}
+    \item(Consistency with~$A$):\label{item:self-improvement-A-consistency} On average over $\bu \sim \F_q^m$,
+        \begin{equation*}
+            A^u_a \otimes I \simeq_{\zeta_0} I \otimes H_{[h(u) = a]}.
+        \end{equation*}
+    \item(Strong self-consistency): \label{item:self-improvement-self}
+	\begin{equation*}
+		\sum_{h} \bra{\psi} H_h \ot H_h \ket{\psi} \geq \bra{\psi} H \ot I \ket{\psi} - \zeta_0.
+	\end{equation*}
+    \item(Boundedness): \label{item:self-improvement-boundedness} There exists a positive-semidefinite matrix~$Z\leq I$ such that
+    \begin{equation*}
+        \bra{\psi} Z \otimes I \ket{\psi} -\E_{\bu} \sum_a \bra{\psi}  A^{\bu}_{a} \otimes H_{[h(\bu)=a]} \ket{\psi} \leq \zeta_0
+    \end{equation*}
+    and for each $h \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z \geq \left(\E_{\bu} A^{\bu}_{h(\bu)}\right).
+	\end{equation*}
+\end{enumerate}
+\end{lemma}
+
+\subsection{A semidefinite program for measurements}
+
+To prove \Cref{lem:self-improvement-helper}, we use the primal--dual
+semidefinite program from the original proof.  Introduce the notation
+\begin{equation*}
+A_g = \E_{\bu \sim \F_q^m} A^{\bu}_{g(\bu)}.
+\end{equation*}
+The primal and dual programs are
+\begin{align}
+ \sup_{T_g\geq0,\,\sum_gT_g\leq I}
+   &\quad\sum_g\Tr(T_gA_g),\label{eq:primal-objective}\\
+ \inf_{Z\geq A_g\,\forall g}
+   &\quad\Tr(Z).\label{eq:dual-objective}
+\end{align}
+
+\begin{lemma}[SDP certificate]\label{lem:sdp}
+The programs \eqref{eq:primal-objective} and
+\eqref{eq:dual-objective} have the same attained optimum.  They admit
+optimal solutions $T=\{T_g\}$ and $Z$ for which $T$ is a measurement,
+$Z\geq A_g$ for every $g$, and
+\begin{equation}\label{eq:complementary-slackness}
+ T_g(Z-A_g)=0\qquad\text{for every }g\in\polyfunc{m}{q}{d}.
+\end{equation}
+In particular, $Z\geq0$.
+\end{lemma}
+
+\begin{proof}
+The block-diagonal canonical SDP has one block for each polynomial and
+one slack block for $I-\sum_gT_g$.  Its primal constraint is that the
+sum of these blocks is $I$, and its dual constraints are $Z\geq A_g$
+for each polynomial block and $Z\geq0$ for the slack block.  Thus its
+objective values are exactly those of the displayed programs.
+Both sides are strictly feasible: for $M=|\polyfunc{m}{q}{d}|$, take
+$T_g=I/(2M)$ with slack $I/2$, and take $Z=2I$ since $0\leq A_g\leq I$.
+Finite-dimensional SDP strong duality gives attained optima and
+complementary slackness.  The polynomial blocks of that relation give
+$T_g(Z-A_g)=0$.
+
+We may take the optimal polynomial family to be complete.  Indeed,
+assign its unused positive operator $R=I-\sum_gT_g$ to any fixed
+polynomial outcome.  Since $A_g\geq0$, this cannot decrease the primal
+objective, and optimality implies that it leaves the objective equal
+to the optimum.  This produces a measurement; equality of primal and
+dual values again gives the displayed complementary-slackness
+relations.  The dual constraints give $Z\geq A_g\geq0$.
+\end{proof}
+
+\subsection{The filtered measurement and its certificate}
+
+\begin{proof}[Proof of \Cref{lem:self-improvement-helper}]
+Write $\langle X\rangle=\bra\psi X\ket\psi$ and
+$\omega(M)=\langle M\otimes I\rangle$.  Apply
+\Cref{lem:sdp}, and put
+\[
+ P_g^u=A^u_{g(u)},\qquad
+ H_g=\E_u P_g^uT_gP_g^u,\qquad H=\sum_gH_g,
+ \qquad\eta=24m(\eps+\delta+d/q).
+\]
+Grouping $g$ by its evaluation at $u$ gives
+\[
+ \sum_gP_g^uT_gP_g^u
+ =\sum_aA_a^u\Bigl(\sum_{g:g(u)=a}T_g\Bigr)A_a^u
+ \leq\sum_aA_a^u=I.
+\]
+Thus $H$ is a sub-measurement.  Complementarity and its adjoint imply
+\[
+ Z^2=Z\Bigl(\sum_gT_g\Bigr)Z
+     =\sum_gA_gT_gA_g,
+ \qquad
+ H-Z^2=\sum_g\E_u(P_g^u-A_g)T_g(P_g^u-A_g)\geq0.
+\]
+Consequently
+\begin{equation}\label{eq:self-improvement-certificate-contraction}
+ Z^2\leq H\leq I,\qquad 0\leq Z\leq I.
+\end{equation}
+The only variance input is \Cref{lem:global-variance-of-points}, in
+its equivalent form
+\begin{equation}\label{eq:self-improvement-variance-input}
+ \E_{u,v}\sum_g\langle(P_g^u-P_g^v)^2\otimes T_g\rangle
+ \leq\eta.
+\end{equation}
+All direct sums below include the probability weights of the displayed
+questions.
+
+\medskip\noindent\emph{Consistency.}
+Let $c=(\sqrt{2\delta}+\sqrt\eta)^2$ and, in the direct sum over
+$(u,v,g)$, set
+\[
+ x_{u,v,g}=((I-P_g^u)\otimes\sqrt{T_g}P_g^v)\ket\psi,
+ \qquad
+ z_{u,v,g}=((I-P_g^u)P_g^v\otimes\sqrt{T_g})\ket\psi.
+\]
+The inconsistency with the point measurements is
+\[
+ \E_u\sum_g\langle(I-P_g^u)\otimes H_g\rangle=\|x\|^2.
+\]
+For $D_a^v=A_a^v\otimes I-I\otimes A_a^v$, grouping by $g(v)=a$
+gives
+\begin{align*}
+ \|x-z\|^2
+ &=\E_{u,v}\sum_a\left\langle D_a^v
+     \Bigl(\sum_{g:g(v)=a}(I-P_g^u)\otimes T_g\Bigr)D_a^v\right\rangle\\
+ &\leq\E_v\sum_a\langle(D_a^v)^2\rangle\leq2\delta.
+\end{align*}
+Here each parenthesized operator is at most $I$, and the last step
+uses point self-consistency and projectivity.  Since
+$(I-P_g^u)P_g^v=(I-P_g^u)(P_g^v-P_g^u)$,
+\Cref{eq:self-improvement-variance-input} gives $\|z\|^2\leq\eta$.
+The triangle inequality therefore proves
+\begin{equation}\label{eq:self-improvement-short-consistency}
+ \E_u\sum_g\langle(I-P_g^u)\otimes H_g\rangle\leq c.
+\end{equation}
+
+\medskip\noindent\emph{Strong self-consistency.}
+Put $h=\omega(H)$.  By $Z\geq A_g$, symmetry, and
+\Cref{eq:self-improvement-short-consistency},
+\[
+ \langle H\otimes Z\rangle
+ \geq\sum_g\langle H_g\otimes A_g\rangle\geq h-c.
+\]
+Moreover, \Cref{eq:self-improvement-certificate-contraction} gives
+$H\geq Z^2\geq2Z-I$.  Hence
+\begin{equation}\label{eq:self-improvement-total-mass}
+ \langle H\otimes H\rangle\geq h-2c.
+\end{equation}
+
+Apply \Cref{lem:projective-bridge} to $P=A^u$ and
+$C_a^u=\sum_{g:g(u)=a}H_g$, using
+\Cref{eq:self-improvement-short-consistency}.
+Let
+\[
+ \theta=\min\{1,md/q\},\qquad
+ F=\sum_{g\ne g'}\langle H_g\otimes H_{g'}\rangle.
+\]
+By Schwartz--Zippel, distinct polynomials of individual degree at
+most $d$ agree at a random point with probability at most $\theta$.  Splitting $F$ by agreement of the
+point evaluations gives
+\[
+ F\leq(2\sqrt c+\sqrt{2\delta})^2+\theta F
+   \leq(2\sqrt c+\sqrt{2\delta})^2+\theta,
+\]
+since $F\leq\langle H\otimes H\rangle\leq1$.  Subtracting this
+from \Cref{eq:self-improvement-total-mass} yields
+\begin{equation}\label{eq:self-improvement-short-self-consistency}
+ \sum_g\langle H_g\otimes H_g\rangle\geq h-s,
+ \qquad
+ s=2c+(2\sqrt c+\sqrt{2\delta})^2+\theta.
+\end{equation}
+
+\medskip\noindent\emph{Completeness and boundedness.}
+Since the seed $G$ is a measurement and has consistency error at
+most $\nu$,
+\begin{equation}\label{eq:self-improvement-seed-certificate}
+ \omega(Z)=\sum_g\langle Z\otimes G_g\rangle
+ \geq\sum_g\langle A_g\otimes G_g\rangle\geq1-\nu.
+\end{equation}
+Write $T_a^u=\sum_{g:g(u)=a}T_g$ and form the direct-sum vectors
+\[
+ t=(\sqrt{T_a^u}\otimes I)\ket\psi,\qquad
+ x=(\sqrt{T_a^u}A_a^u\otimes I)\ket\psi,\qquad
+ y=(\sqrt{T_a^u}\otimes A_a^u)\ket\psi.
+\]
+They satisfy
+\[
+ \|t\|=1,\quad \operatorname{Re}\langle t,x\rangle=\omega(Z),
+ \quad\|x\|^2=h,\quad\langle t,y\rangle=\|y\|^2,
+ \quad\|x-y\|\leq\sqrt{2\delta}.
+\]
+The second identity follows from $\sum_gT_gA_g=Z$, and the last
+inequality follows by inserting $T_a^u\otimes I\leq I$ in each
+point mirror error.  In particular, $\|t-2y\|=1$, and expansion
+around $y$ gives
+\begin{align*}
+ \omega(Z)-h
+ &=\operatorname{Re}\langle t-2y,x-y\rangle-\|x-y\|^2\\
+ &\leq\sqrt{2\delta}.
+\end{align*}
+Together with \Cref{eq:self-improvement-seed-certificate}, this proves
+\begin{equation}\label{eq:self-improvement-short-completeness}
+ h\geq1-\nu-\sqrt{2\delta}.
+\end{equation}
+Also, by \Cref{eq:self-improvement-short-consistency},
+\begin{equation}\label{eq:self-improvement-short-boundedness}
+ \omega(Z)-\sum_g\langle A_g\otimes H_g\rangle
+ \leq\omega(Z)-h+c\leq\sqrt{2\delta}+c.
+\end{equation}
+This is the helper's boundedness condition.  Since $Z\geq A_g$, it
+also implies
+\[
+ \langle Z\otimes(I-H)\rangle
+ \leq\omega(Z)-\sum_g\langle A_g\otimes H_g\rangle
+ \leq\sqrt{2\delta}+c.
+\]
+
+\medskip\noindent\emph{The uniform error budget.}
+The explicit estimates above imply
+\[
+ c\leq52m(\eps+\delta+d/q),\qquad
+ s\leq525m(\eps+\delta+d/q).
+\]
+Indeed $c\leq2\eta+4\delta$, and
+$s\leq10c+4\delta+\theta\leq20\eta+44\delta+md/q$.
+Put $E=\sqrt\eps+\sqrt\delta+\sqrt{d/q}$, so
+$\zeta_0=100mE$.  If $\zeta_0\geq1$, take instead $H_g=0$ for all
+$g$ and $Z=I$; all four conclusions hold.  Otherwise
+$E<1/(100m)$, and
+\[
+ c\leq52mE^2\leq\zeta_0,\qquad
+ s\leq525mE^2\leq5.25E\leq\zeta_0,
+ \qquad
+ \sqrt{2\delta}+c\leq(\sqrt2+0.52)E\leq\zeta_0.
+\]
+The completeness loss is at most $\sqrt{2\delta}\leq\zeta_0$ as
+well.  This proves the lemma.
+\end{proof}
+
+\subsection{Simultaneous dilation and compression}
+\label{sec:self-improvement-dilation}
+
+\begin{lemma}[Simultaneous dilation and compression]
+\label{lem:simultaneous-dilation-compression}
+Let $\{H^x\}_x$ be a finite family of sub-measurements on a
+finite-dimensional space $\calH$, with one common finite outcome
+set.  There are a finite ancillary space $\mathcal{K}$, an isometry
+$J:\calH\longrightarrow\calH\otimes\mathcal{K}$ of the form
+$Jv=v\otimes\ket0$, and projective sub-measurements $P^x$ such that
+\[
+ J^\dagger P_g^xJ=H_g^x.
+\]
+For a symmetric state $\ket\psi$, put
+$\ket{\psi'}=(J\otimes J)\ket\psi$, and extend any original operator
+$R$ to $R'=R\otimes I_{\mathcal{K}}$.  Slice masses, consistency with
+original measurements, and correlations involving one original
+operator and one slice effect are preserved.  Moreover,
+\begin{equation}\label{eq:dilation-mirror-defect}
+ \begin{split}
+ &\sum_g\|(P_g^x\otimes I-I\otimes P_g^x)\ket{\psi'}\|^2\\
+ &\qquad=2\left(\bra\psi H^x\otimes I\ket\psi
+       -\sum_g\bra\psi H_g^x\otimes H_g^x\ket\psi\right),
+ \qquad H^x=\sum_gH_g^x.
+ \end{split}
+\end{equation}
+Finally, if $T=\{T_h\}$ is a measurement on the enlarged local
+space, $\widehat T_h=J^\dagger T_hJ$ is a measurement on $\calH$
+with the same consistency with the original point measurements.
+\end{lemma}
+
+\begin{proof}
+Complete each sub-measurement to a measurement by
+$M_g^x=H_g^x$ and $M_\bot^x=I-H^x$.  Take $\mathcal{K}$ with an
+orthonormal basis indexed by these outcomes.  For each $x$,
+\[
+ V_xv=\sum_a\sqrt{M_a^x}\,v\otimes\ket a
+\]
+is an isometry.  The isometry from $J\calH$ to $V_x\calH$ given
+by $Jv\mapsto V_xv$ extends to a unitary $U_x$ on
+$\calH\otimes\mathcal{K}$.  Define
+\[
+ P_a^x=U_x^\dagger(I\otimes\ket a\!\bra a)U_x.
+\]
+These form a projective measurement, and
+$J^\dagger P_a^xJ=M_a^x$.  Discard the failure outcome.
+
+For original operators $R$ and slice outcomes,
+\[
+ \bra{\psi'}R'\otimes P_g^x\ket{\psi'}
+ =\bra\psi R\otimes H_g^x\ket\psi,
+ \qquad
+ \bra{\psi'}P_g^x\otimes P_h^y\ket{\psi'}
+ =\bra\psi H_g^x\otimes H_h^y\ket\psi.
+\]
+These identities prove the correlation claims.  Expanding the
+squared mirror error and using projectivity and symmetry proves
+\Cref{eq:dilation-mirror-defect}.  Domination inequalities are
+preserved by extension: for example, $Z^x\geq\E_uA_{g(u)}^{u,x}$
+implies $Z^{x\prime}\geq\E_uA_{g(u)}^{u,x\prime}$.  Boundedness
+is preserved exactly, since
+\[
+ \bra{\psi'}Z^{x\prime}\otimes\Bigl(I-\sum_gP_g^x\Bigr)\ket{\psi'}
+ =\bra\psi Z^x\otimes(I-H^x)\ket\psi.
+\]
+Finally, compression preserves positivity and
+$\sum_h\widehat T_h=J^\dagger I J=I$, while
+\[
+ \bra{\psi'}A_a^{u\prime}\otimes T_h\ket{\psi'}
+ =\bra\psi A_a^u\otimes\widehat T_h\ket\psi.
+\]
+This proves the last assertion.  No preservation of products or of
+projectivity under compression is asserted or required.
+\end{proof}
+
+\begin{proof}[Proof of \Cref{thm:self-improvement-in-induction-section}]
+Apply \Cref{lem:self-improvement-helper} on the original space and
+then \Cref{lem:simultaneous-dilation-compression}.  Completeness,
+point consistency, and boundedness are preserved with error
+$\zeta_0$, whereas \Cref{eq:dilation-mirror-defect} gives squared
+mirror error at most $2\zeta_0$.  All four conclusions therefore
+hold with
+\[
+ \zeta=2\zeta_0=200m(\sqrt\eps+\sqrt\delta+\sqrt{d/q}).
+\]
+The extended strategy has the same tested correlations and remains
+symmetric.  For a family of restricted strategies, apply the helper
+to every slice first and then use the single common dilation of
+\Cref{lem:simultaneous-dilation-compression}.  All bounds hold
+slice by slice, so they can be averaged before applying pasting.
+The pasted measurement can then be compressed to the original
+local space.
+\end{proof}
+
+\section{Commutativity of the points measurements}
+\label{sec:commutativity-points}
+
+\begin{theorem}\label{thm:commutativity-points}
+Let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the
+$(m,q,d)$ low individual degree test.
+On average over independent and uniformly random $\bu, \bv \sim \F_q^m$,
+\begin{equation*}
+(A^{u}_a \cdot A^{v}_b) \otimes I \approx_{32\gamma m} (A^{v}_b\cdot A^{u}_a) \otimes I.
+\end{equation*}
+\end{theorem}
+\begin{proof}
+The strategy passes the diagonal lines test with probability at least $1-\gamma$.
+Therefore, it passes the $m$-restricted diagonal lines test with probability at least $1- \gamma\cdot m$.
+This means that
+\begin{equation*}
+A^{u}_a \otimes I \simeq_{\gamma \cdot m} I \otimes L^{\ell}_{[f(u)=a]},
+\end{equation*}
+on average over independent uniform $\bu,\bw\in\F_q^m$, with
+$\bell=\{\bu+t\bw:t\in\F_q\}$.  This includes the degenerate line
+$\{\bu\}$ when $\bw=0$.
+By~\Cref{prop:simeq-to-approx}, this implies that
+\begin{equation}\label{eq:point-diagonal-line-approx}
+A^{u}_a \otimes I \approx_{2\cdot \gamma \cdot m} I \otimes L^{\ell}_{[f(u)=a]}.
+\end{equation}
+
+Let $\bu$ and $\bv$ be independent and uniformly random points in $\F_q^m$.
+Set $\bell=\{\bu+t(\bv-\bu):t\in\F_q\}$; in particular,
+$\bell=\{\bu\}$ when $\bu=\bv$.  Conditional on~$\bu$, the
+direction $\bv-\bu$ is uniform in~$\F_q^m$, so the marginal on
+$(\bu,\bell)$ is exactly the one in
+\Cref{eq:point-diagonal-line-approx}.  The same holds for
+$(\bv,\bell)$, using the uniform direction $\bu-\bv$.
+As a result,
+\begin{align*}
+(A^{u}_a \cdot A^{v}_b) \otimes I
+&\approx_{2\cdot \gamma \cdot m} A^{u}_a \otimes L^{\ell}_{[f(v)=b]} \tag{by \Cref{eq:point-diagonal-line-approx}}\\
+&\approx_{2\cdot \gamma \cdot m} I \otimes (L^{\ell}_{[f(v)=b]} \cdot L^{\ell}_{[f'(u)=a]}) \tag{by \Cref{eq:point-diagonal-line-approx}}\\
+&= I \otimes (L^{\ell}_{[f'(u)=a]} \cdot L^{\ell}_{[f(v)=b]}) \tag{because~$L$ is projective}\\
+&\approx_{2\cdot \gamma \cdot m} A^{v}_b \otimes L^{\ell}_{[f'(u)=a]} \tag{by \Cref{eq:point-diagonal-line-approx}}\\
+&\approx_{2\cdot \gamma \cdot m} (A^{v}_b \cdot A^{u}_a) \otimes I. \tag{by \Cref{eq:point-diagonal-line-approx}}
+\end{align*}
+Each approximation also uses \Cref{prop:cab-approx-delta} to insert
+the displayed relation next to the remaining contraction factors;
+its normalization hypotheses follow from projectivity of~$A$ and
+$L$.
+The theorem now follows from
+\Cref{prop:triangle-inequality-for-approx_delta}.
+\end{proof}
+
+\section{Commutativity}
+\label{sec:g-comm}
+
+Let $(\bu, \bx)$ and $(\bv, \by)$ be sampled independently and uniformly at random from $\F_q^{m+1}$.
+In \Cref{sec:G-commutes-after-evaluation},
+we will show that the $G$ measurements approximately commute ``after evaluation";
+namely, that $G^{\bx}_{[g(\bu)=a]}$ commutes with $G^{\by}_{[g(\bv)=b]}$.
+Then, in \Cref{sec:G-commutes},
+we will use this to show that $G^{\bx}_g$ approximately commutes with $G^{\by}_h$.
+This is necessary if we wish to ``paste" together several~$G^x$ measurements at different points~$x \in \F_q$
+to produce a single global measurement~$H \in \polysub{m+1}{q}{d}$, as we do in \Cref{sec:ld-pasting} below.
+
+\subsection{\texorpdfstring{Commutativity of $G$ after evaluation}{Commutativity after evaluation}}\label{sec:G-commutes-after-evaluation}
+
+\begin{lemma}[Boundedness controls rejection]\label{lem:boundedness-rejection}
+Let $F$ be a projection and $\{R_i\}$ a sub-measurement on the
+first local space, and let $Z\geq0$ and $0\leq\overline A_i\leq Z$
+act on the second local space.  Then
+\begin{equation}\label{eq:boundedness-rejection-operator}
+ \sum_iFR_iF\otimes\overline A_i\leq F\otimes Z.
+\end{equation}
+In particular, suppose $F^x$ and $\{R_i^x\}$ are such families
+indexed by a slice~$x$, independent of the evaluation question~$u$,
+and that $A_i^{u,x}\geq0$ satisfies
+$\E_uA_i^{u,x}\leq Z^x$ for every $x,i$.  If
+$\E_x\bra\psi F^x\otimes Z^x\ket\psi\leq\zeta$, then
+\begin{equation}\label{eq:boundedness-rejection-average}
+ \E_{x,u}\sum_i
+ \bra\psi F^xR_i^xF^x\otimes A_i^{u,x}\ket\psi\leq\zeta.
+\end{equation}
+\end{lemma}
+\begin{proof}
+Positivity and $\sum_iR_i\leq I$ give
+\[
+ \sum_iFR_iF\otimes\overline A_i
+ \leq F\Bigl(\sum_iR_i\Bigr)F\otimes Z
+ \leq F^2\otimes Z=F\otimes Z.
+\]
+For the averaged conclusion, first average over~$u$, using the
+stated independence, then apply this operator inequality for each~$x$
+and take the state expectation and average over~$x$.
+\end{proof}
+
+\begin{lemma}[Commutativity of~$G$ after evaluation]
+  \label{lem:comm-data-processed-g}
+  Let $m\geq1$, and let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
+  Let $\{G^x\} \in \polysub{m}{q}{d}$ be a collection of projective sub-measurements indexed by $x \in \F_q$ with the following properties:
+  \begin{enumerate}
+  \item (Consistency with~$A$): \label{item:data-processed-consistency} On average over $(\bu, \bx) \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u, x}_a \otimes I \simeq_{\zeta} I \otimes G^x_{[g(u)=a]}.
+	  \end{equation*}
+  \item (Strong self-consistency): \label{item:data-processed-self-consistency} On average over~$\bx \sim \F_q$,
+	\begin{equation*}
+		G^x_g \otimes I \approx_{\zeta} I \otimes G^x_g.
+	\end{equation*}
+  \item (Boundedness): \label{item:data-processed-boundedness} There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+	\begin{equation*}
+		\E_{\bx} \bra{\psi} (I-G^{\bx})\otimes Z^{\bx} \ket{\psi} \leq \zeta
+	\end{equation*}
+	and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	 Z^x \geq \left(\E_{\bu} A^{\bu, x}_{g(\bu)}\right).
+	\end{equation*}
+  \end{enumerate}
+  Let
+  \begin{equation*}
+  \nu = 26 m \cdot (\gamma^{1/2} + \zeta^{1/2}).
+  \end{equation*}
+  Then on average over independent and uniformly random $(\bu,\bx), (\bv,\by) \sim \F_q^{m+1}$,
+  \begin{equation*}
+    G^x_{[g(u) = a]} G^y_{[h(v) = b]} \ot I \approx_{\nu} G^y_{[h(v) = b]}
+    G^x_{[g(u) = a]} \ot I.
+  \end{equation*}
+\end{lemma}
+
+\begin{proof}
+For fixed $u,v,x,y$, abbreviate
+\[
+ P_g=G^x_g,\quad Q_h=G^y_h,\quad
+ P_a=G^x_{[g(u)=a]},\quad Q_b=G^y_{[h(v)=b]},
+ \quad P=G^x,\quad Q=G^y,
+\]
+and put $A_a=A^{u,x}_a$ and $B_b=A^{v,y}_b$.  We write
+\[
+ \mathcal E(X_{a,b})
+ =\E_{\bu,\bv,\bx,\by}\sum_{a,b}
+   \bra\psi X_{a,b}\ket\psi.
+\]
+All approximation relations below are understood with respect to the
+averages displayed in their applications.
+
+Permutation invariance reads the consistency hypothesis in reverse.
+Since $\{P_a\}_a$ and $\{Q_b\}_b$ are projective
+sub-measurements with totals $P$ and $Q$, respectively,
+\Cref{prop:cons-sub-meas} gives
+\begin{equation}\label{eq:evaluated-g-consistency-processed}
+ P_a\otimes I\approx_{4\zeta}P\otimes A_a,
+ \qquad
+ Q_b\otimes I\approx_{4\zeta}Q\otimes B_b.
+\end{equation}
+Moreover,
+\Cref{item:data-processed-self-consistency,%
+prop:two-notions-of-self-consistency,%
+prop:two-notions-of-self-consistency-after-evaluation} imply
+\begin{equation}\label{eq:evaluated-g-self-consistency-processed}
+ P_a\otimes I\approx_\zeta I\otimes P_a,
+ \qquad
+ Q_b\otimes I\approx_\zeta I\otimes Q_b.
+\end{equation}
+Finally, tensor-swap invariance and
+\Cref{thm:commutativity-points} give, in either direction,
+\begin{equation}\label{eq:evaluated-point-commutativity}
+ I\otimes A_aB_b
+ \approx_{32\gamma(m+1)}I\otimes B_bA_a.
+\end{equation}
+Set $\kappa=\sqrt{32\gamma(m+1)}$.
+
+We apply \Cref{lem:boundedness-rejection} to the two rejection
+terms below.  First, for fixed $y,h$, let
+\[
+ R_h^y=\E_{\bu,\bx}\sum_a P_aG_h^yP_a.
+\]
+This is positive, independent of~$v$, and satisfies
+\[
+ \sum_hR_h^y
+ =\E_{\bu,\bx}\sum_aP_aQP_a
+ \leq\E_{\bu,\bx}\sum_aP_a\leq I.
+\]
+Expanding $Q_b$ according to $h(v)=b$ and using projectivity of
+the point measurements, Cauchy--Schwarz with
+factors $\sqrt{R_h^y}\otimes I$ and
+$\sqrt{R_h^y}(I-Q)\otimes A^{v,y}_{h(v)}$ gives
+\begin{align}
+&\left|\mathcal E\bigl(P_aQ_bP_a(I-Q)\otimes B_b\bigr)\right|^2\nonumber\\
+&\quad\leq
+ \E_{\bv,\by}\sum_h
+   \bra\psi(I-Q)R_h^y(I-Q)\otimes A^{v,y}_{h(v)}\ket\psi
+ \leq\zeta.\label{eq:evaluated-g-first-leakage}
+\end{align}
+The omitted squared norm is at most one.  The last inequality is
+\eqref{eq:boundedness-rejection-average} with failure projection
+$I-G^y$, evaluation question~$v$, and the averaged domination and
+slice boundedness in \Cref{item:data-processed-boundedness}.
+
+For the second term, set
+\[
+ \widetilde R_g^x=\E_{\bv,\by}\sum_bQ_bP_gQ_b.
+\]
+These operators are positive and independent of~$u$, and
+$\sum_g\widetilde R_g^x
+=\E_{\bv,\by}\sum_bQ_bPQ_b\leq\E_{\by}G^y\leq I$.
+Expanding $P_a$ according to $g(u)=a$, Cauchy--Schwarz with factors
+$\sqrt{P_g}\otimes B_b$ and
+$\sqrt{P_g}Q_b(I-P)\otimes A^{u,x}_{g(u)}$ gives
+\begin{align}
+&\left|\mathcal E\bigl(P_aQ_b(I-P)\otimes B_bA_a\bigr)\right|^2\nonumber\\
+&\quad\leq
+ \E_{\bu,\bx}\sum_g
+   \bra\psi(I-P)\widetilde R_g^x(I-P)
+   \otimes A^{u,x}_{g(u)}\ket\psi
+ \leq\zeta.\label{eq:evaluated-g-second-leakage}
+\end{align}
+Here the omitted squared norm is at most
+$\E_{\bu,\bv,\bx,\by}\sum_{g,b}
+\bra\psi P_g\otimes B_b\ket\psi\leq1$.
+Apply \eqref{eq:boundedness-rejection-average} with failure projection
+$I-G^x$, evaluation question~$u$, and
+\Cref{item:data-processed-boundedness} to obtain the last inequality.
+
+We next verify once and for all the normalizations needed to apply
+\Cref{prop:closeness-of-ip}.  With
+$D=\sum_bQ_b\otimes B_b\leq I$, projectivity and
+sub-measurement normalization give
+\begin{gather}
+ \sum_b\left(\sum_aP_aQ_bP_a\right)^2\leq I,
+ \qquad
+ \sum_a(P_a\otimes I)D^2(P_a\otimes I)\leq I,\nonumber\\
+ D(P\otimes I)D\leq I,
+ \qquad
+ \sum_bPQ_bP\leq I,
+ \qquad
+ \sum_{a,b}P_aQ_bP_a\leq I.\label{eq:evaluated-g-normalizations}
+\end{gather}
+The first four bounds justify the four uses of
+\eqref{eq:evaluated-g-consistency-processed} below.  The last one
+justifies using \eqref{eq:evaluated-point-commutativity}, through
+\Cref{prop:closeness-of-ip}, with coefficient $P_aQ_b\otimes I$.
+
+Expanding the commutator, using projectivity, and exchanging
+$(u,x,a)$ with $(v,y,b)$ gives
+\[
+ \mathcal C=2(S-T),
+\]
+where $\mathcal C$ is the commutator error in the conclusion and
+\[
+ S=\mathcal E(Q_bP_aQ_b\otimes I),
+ \qquad
+ T=\mathcal E(P_aQ_bP_aQ_b\otimes I).
+\]
+The preceding relations and estimates yield the following direct
+comparison:
+\begin{align*}
+T
+&\approx_{2\sqrt\zeta}
+ \mathcal E(P_aQ_bP_aQ\otimes B_b)\\
+&\approx_{\sqrt\zeta}
+ \mathcal E(P_aQ_bP_a\otimes B_b)\\
+&\approx_{2\sqrt\zeta}
+ \mathcal E(P_aQ_bP\otimes B_bA_a)\\
+&\approx_{\sqrt\zeta}
+ \mathcal E(P_aQ_b\otimes B_bA_a)\\
+&\approx_\kappa
+ \mathcal E(P_aQ_b\otimes A_aB_b)\\
+&\approx_{2\sqrt\zeta}
+ \mathcal E(P_aQ_b\otimes B_b)\\
+&\approx_{2\sqrt\zeta}
+ \mathcal E(P_aQ_b\otimes I)\\
+&\approx_{3\sqrt\zeta}S.
+\end{align*}
+The second and fourth transitions are
+\eqref{eq:evaluated-g-first-leakage} and
+\eqref{eq:evaluated-g-second-leakage}.  The fifth uses
+\eqref{eq:evaluated-point-commutativity}.  The first, third, sixth,
+and seventh use \eqref{eq:evaluated-g-consistency-processed}, in that order.
+For the final transition, sum over~$a$ and apply
+\Cref{prop:switch-sandwich} to the projective sub-measurement
+$\{Q_b\}_b$ and the positive contraction~$P$, reading its two
+approximations from right to left and using
+\eqref{eq:evaluated-g-self-consistency-processed}.
+
+Consequently,
+\[
+ |T-S|\leq13\sqrt\zeta+\kappa.
+\]
+Since $m\geq1$ implies $m+1\leq2m^2$, we conclude that
+\begin{align*}
+ \mathcal C
+ &\leq26\sqrt\zeta+2\sqrt{32\gamma(m+1)}\\
+ &\leq26\sqrt\zeta+16m\sqrt\gamma\\
+ &\leq26m(\sqrt\gamma+\sqrt\zeta),
+\end{align*}
+as claimed.
+\end{proof}
+
+\subsection{\texorpdfstring{Commutativity of $G$}{Commutativity of the slice measurements}}\label{sec:G-commutes}
+
+\begin{theorem}[Commutativity of~$G$]\label{thm:com-main}
+  Let $m\geq1$, and let $(\psi, A, B, L)$ be an $(\eps, \delta, \gamma)$-good symmetric strategy for the $(m+1,q,d)$ low individual degree test.
+  Let $\{G^x\}_{x \in \F_q}$ denote a set of projective sub-measurements in $\polysub{m}{q}{d}$ with the following properties:
+  \begin{enumerate}
+  \item (Consistency with~$A$): \label{item:commuting-consistency} On average over $(\bu, \bx) \sim \F_q^{m+1}$,
+	  \begin{equation*}
+	  A^{u, x}_a \otimes I \simeq_{\zeta} I \otimes G^x_{[g(u)=a]}.
+	  \end{equation*}
+  \item (Strong self-consistency): \label{item:commuting-self-consistency} On average over~$\bx \sim \F_q$,
+	\begin{equation*}
+		G^x_g \otimes I \approx_{\zeta} I \otimes G^x_g.
+	\end{equation*}
+  \item (Boundedness): \label{item:commuting-boundedness} There exists a positive-semidefinite matrix $Z^x$ for each $x \in \F_q$ such that
+	\begin{equation*}
+		\E_{\bx} \bra{\psi} (I-G^{\bx})\otimes Z^{\bx} \ket{\psi} \leq \zeta
+	\end{equation*}
+	and for each $x \in \F_q$ and $g \in \polyfunc{m}{q}{d}$,
+	\begin{equation*}
+	Z^x \geq \left(\E_{\bu} A^{\bu, x}_{g(\bu)}\right).
+	\end{equation*}
+  \end{enumerate}
+  Let
+  \begin{equation*}
+  \nu = 30m \cdot \left(\gamma^{1/4}+ \zeta^{1/4} + (d/q)^{1/4}  \right).
+  \end{equation*}
+  Then on average over independent and uniformly random $(\bu,\bx), (\bv,\by) \sim \F_q^{m+1}$,
+  \begin{equation*}
+    G^{x}_{g} G^{y}_h \ot I \approx_{\nu} G^y_h G^x_g \ot I
+  \end{equation*}
+\end{theorem}
+
+\begin{proof}
+We first give a general lifting argument for projective
+sub-measurements $P=\{P_i\}$ and $Q=\{Q_j\}$ on~$\calH$.
+Write $X^{\mathrm L}=X\otimes I$ and
+$X^{\mathrm R}=I\otimes X$, and define
+\[
+ \mathcal T(P)=\sum_i(P_i^{\mathrm L}-P_i^{\mathrm R})^2,
+ \qquad \delta_P=\bra\psi\mathcal T(P)\ket\psi,
+ \qquad
+ C(P,Q)=\sum_{i,j}\|[P_i^{\mathrm L},Q_j^{\mathrm L}]\ket\psi\|^2.
+\]
+Suppose that evaluation maps $f_u$ satisfy
+$\Pr_{\bu}[f_{\bu}(i)=f_{\bu}(k)]\leq\theta<1$ for $i\ne k$,
+and set $P^u_a=\sum_{i:f_u(i)=a}P_i$.  Then
+\begin{equation}\label{eq:commutation-disagreement-operator}
+ (1-\theta)\mathcal T(P)
+ \leq\E_{\bu}\mathcal T(P^{\bu})\leq\mathcal T(P).
+\end{equation}
+To verify this even when $P$ is incomplete, adjoin the failure
+projection $P_\perp=I-\sum_iP_i$ solely to decompose the tensor
+product into orthogonal blocks $P_i\otimes P_k$.
+On unequal ordinary labels, the two operators
+$\mathcal T(P)$ and $\E_{\bu}\mathcal T(P^{\bu})$ act by
+$2$ and $2\Pr_{\bu}[f_{\bu}(i)\ne f_{\bu}(k)]$, respectively.
+On an ordinary/failure block both act by~$1$; on equal labels and
+on the failure/failure block both vanish.  This proves the operator
+inequalities block by block.
+
+Put
+\[
+ D(P,Q)=\sum_j\bra\psi Q_j^{\mathrm L}
+                   \mathcal T(P)Q_j^{\mathrm L}\ket\psi.
+\]
+The identity
+\[
+ (P_i^{\mathrm L}-P_i^{\mathrm R})Q_j^{\mathrm L}\ket\psi
+ -[P_i^{\mathrm L},Q_j^{\mathrm L}]\ket\psi
+ =Q_j^{\mathrm L}(P_i^{\mathrm L}-P_i^{\mathrm R})\ket\psi
+\]
+and $\sum_jQ_j\leq I$ give, by the triangle inequality in the
+direct sum over~$i,j$,
+\begin{equation}\label{eq:commutation-mirror-comparison}
+ |\sqrt{D(P,Q)}-\sqrt{C(P,Q)}|\leq\sqrt{\delta_P}.
+\end{equation}
+Applying \Cref{eq:commutation-disagreement-operator} inside~$D$
+and then \Cref{eq:commutation-mirror-comparison} before and after
+evaluation yields
+\begin{align}
+ \sqrt{C(P,Q)}
+ &\leq\sqrt{D(P,Q)}+\sqrt{\delta_P}\nonumber\\
+ &\leq\frac{\sqrt{\E_{\bu}C(P^{\bu},Q)}}{\sqrt{1-\theta}}
+  +\left(1+\frac1{\sqrt{1-\theta}}\right)\sqrt{\delta_P}.
+ \label{eq:commutation-one-sided-lifting}
+\end{align}
+Here Minkowski and
+$\E_{\bu}\delta_{P^{\bu}}\leq\delta_P$ justify the last line.
+The same argument includes any additional outer averages, by
+including their probability weights in the direct sums.
+
+Now apply this to $P=G^x$ and $Q=G^y$, with all quantities averaged
+over independent uniform $x,y$.  Schwartz--Zippel gives
+$\theta=md/q$ for the maps $g\mapsto g(u)$.
+Both averaged mirror errors are at most~$\zeta$, and
+\Cref{lem:comm-data-processed-g} gives
+\begin{equation}\label{eq:com-main-evaluated-commutativity}
+ \E_{\bu,\bv,\bx,\by}C((G^{\bx})^{\bu},(G^{\by})^{\bv})
+ \leq\chi,
+ \qquad \chi=26m(\sqrt\gamma+\sqrt\zeta).
+\end{equation}
+Apply \Cref{eq:commutation-one-sided-lifting} once to each family,
+using $C(P,Q)=C(Q,P)$.  If $\theta<1$, this gives
+\begin{equation}\label{eq:commutation-two-sided-lifting}
+ \sqrt{\E_{\bx,\by}C(G^{\bx},G^{\by})}
+ \leq\frac{\sqrt\chi}{1-\theta}
+ +\left(1+\frac1{\sqrt{1-\theta}}\right)^2\sqrt\zeta.
+\end{equation}
+In particular, if $\theta\leq\tfrac12$, then
+$(r+s)^2\leq2r^2+2s^2$ and
+$2(1+\sqrt2)^4<68$ imply
+\begin{equation}\label{eq:commutation-code-distance-bound}
+ \E_{\bx,\by}C(G^{\bx},G^{\by})
+ \leq8\chi+68\zeta
+ =208m(\sqrt\gamma+\sqrt\zeta)+68\zeta.
+\end{equation}
+
+It remains to compare with the stated budget~$\nu$.
+Sub-measurement normalization gives $C(P,Q)\leq4$ universally,
+since each of
+$\sum_{i,j}\|P_i^{\mathrm L}Q_j^{\mathrm L}\ket\psi\|^2$ and
+$\sum_{i,j}\|Q_j^{\mathrm L}P_i^{\mathrm L}\ket\psi\|^2$
+is at most~$1$.  Thus $\nu\geq4$ is immediate.
+Otherwise, writing $a=\gamma^{1/4}$ and $b=\zeta^{1/4}$, we have
+\[
+ a,b<\frac2{15m},\qquad
+ \theta=\frac{md}{q}
+ <m\left(\frac2{15m}\right)^4<\frac12.
+\]
+Consequently, \Cref{eq:commutation-code-distance-bound} gives
+\begin{align*}
+ \E_{\bx,\by}C(G^{\bx},G^{\by})
+ &\leq208m(a^2+b^2)+68b^4\\
+ &\leq\frac{416}{15}a
+   +\left(\frac{416}{15}+68\left(\frac2{15}\right)^3\right)b\\
+ &\leq30m(a+b)\leq\nu.
+\end{align*}
+This is exactly the desired state-dependent commutation bound.
+\end{proof}
+
+\section{Pasting}\label{sec:ld-pasting}
+
+A single positive contraction controls a whole sequence of independent
+random slice measurements.  Its powers give both the cost of moving a
+successful outcome to the start and the change in marginal success
+probabilities.  Interpolation and a first-moment bound then finish the
+argument.
+
+\begin{theorem}[Pasting, quantitative form]\label{thm:ld-pasting}
+Let $m\geq1$, $d\geq0$, and let $(\psi,A,B,L)$ be an
+$(\eps,\delta,\gamma)$-good symmetric strategy for the $(m+1,q,d)$ test.
+Suppose that the projective slice sub-measurements $\{G^x\}$ satisfy
+the four completeness, consistency, strong self-consistency, and
+boundedness conditions in \Cref{thm:ld-pasting-in-induction-section},
+interpreted also when $d=0$.
+For every integer $k\geq d+1$, there is a measurement
+$H\in\polymeas{m+1}{q}{d}$ such that
+\begin{equation}\label{eq:new-pasting-conclusion}
+ A^u_a\otimes I\simeq_\sigma I\otimes H_{[h(u)=a]},
+ \qquad
+ \sigma=\frac{k}{k-d}\kappa+21k^2\sqrt m\,s,
+\end{equation}
+where the relation is averaged over $u\in\F_q^{m+1}$ and
+\[
+ s=\eps^{1/8}+\delta^{1/8}+\gamma^{1/8}
+   +\zeta^{1/8}+(d/q)^{1/8}.
+\]
+\end{theorem}
+
+We may assume $\eps,\delta,\gamma,\zeta,d/q<1$: otherwise the error
+bound is at least one and a fixed polynomial measurement suffices.
+Throughout this section write
+\[
+ \omega(X)=\bra\psi X\otimes I\ket\psi,\qquad
+ G^x=\sum_gG_g^x,\qquad G=\E_xG^x,\qquad
+ p=\omega(G),\qquad\kappa_0=1-p\leq\kappa.
+\]
+We use $B^u$ for the line measurement in the last coordinate, as in
+\Cref{not:conditioned-on-last-direction}.  Conditioning the
+axis-parallel test on that direction gives error at most $(m+1)\eps$.
+Together with point self-consistency and
+\Cref{prop:simeq-to-approx,prop:triangle-inequality-for-approx_delta},
+this gives
+\begin{equation}\label{eq:ld-abcon}
+ I\otimes A^{u,x}_a\approx_D I\otimes B^u_{[f(x)=a]},
+ \qquad D=8m\eps+4\delta.
+\end{equation}
+Symmetry and \Cref{prop:triangle-sub} then imply
+\begin{equation}\label{eq:ld-gbcon}
+ G^x_{[g(u)=a]}\otimes I\simeq_b I\otimes B^u_{[f(x)=a]},
+ \qquad b=\zeta+\sqrt D.
+\end{equation}
+Finally, \Cref{thm:com-main} gives
+\begin{equation}\label{eq:quote-com-main}
+ \E_{x,y}\sum_{g,h}
+ \|([G_g^x,G_h^y]\otimes I)\ket\psi\|^2\leq\chi,
+ \qquad
+ \chi=30m\bigl(\gamma^{1/4}+\zeta^{1/4}+(d/q)^{1/4}\bigr).
+\end{equation}
+
+\subsection{A positive contraction for random measurement words}
+\label{sec:hat-consistency}
+
+Set $Q_x=I-G^x$, and complete each slice measurement by
+$P_g^x=G_g^x$ and $P_\bot^x=Q_x$.  Indices for $P$ include $\bot$;
+indices for $G_g^x$ do not.  Define
+\[
+ \Pi_x=\sum_aP_a^x\otimes P_a^x,
+ \qquad K=\E_x\Pi_x.
+\]
+Each $\Pi_x$ is a projection, so $0\leq K\leq I$.
+
+\begin{lemma}[Completion]\label{lem:pasting-completion}
+The total slice projectors and completed measurements satisfy
+\begin{align}
+ \E_x\|(G^x\otimes I-I\otimes G^x)\ket\psi\|^2
+ &\leq\zeta,\label{eq:pasting-total-mirror}\\
+ \E_x\sum_a\|(P_a^x\otimes I-I\otimes P_a^x)\ket\psi\|^2
+ &=2\bra\psi(I-K)\ket\psi\leq\alpha:=2\zeta.
+ \label{eq:gselfconall}
+\end{align}
+In particular, $\E_x\|\psi-\Pi_x\psi\|^2\leq\zeta$.
+\end{lemma}
+\begin{proof}
+For fixed $x$, put
+$e_x=\sum_g\|(G_g^x\otimes I-I\otimes G_g^x)\ket\psi\|^2$.
+Since $G^x\otimes G^x\geq\sum_gG_g^x\otimes G_g^x$,
+expanding the squares gives
+\[
+ \|(G^x\otimes I-I\otimes G^x)\ket\psi\|^2\leq e_x.
+\]
+Its average is at most $\zeta$.  The mirror difference for $Q_x$
+is the negative of that for $G^x$, so the completed error is at
+most $2e_x$.  For a complete projective measurement that error
+is exactly $2\bra\psi(I-\Pi_x)\ket\psi
+=2\|\psi-\Pi_x\psi\|^2$.  Averaging proves all the claims.
+\end{proof}
+
+For independent uniform questions $y_1,\ldots,y_j$ and their
+outcomes $a_1,\ldots,a_j$, write
+\[
+ W=P_{a_j}^{y_j}\cdots P_{a_1}^{y_1}.
+\]
+Below, $\E\sum_W$ means averaging these questions and summing their
+outcomes; for $j=0$ there is the single word $W=I$.  Successive
+outcome summation gives both $\sum_WW^\dagger W=I$ and
+$\sum_WWW^\dagger=I$ for every question tuple.  Independence of the
+questions gives the exact operator identity
+\[
+ \E\sum_W W\otimes W=K^j.
+\]
+Set $M_W=W\otimes I-I\otimes W^\dagger$.  Expanding the square
+gives the operator identity
+\begin{equation}\label{eq:random-word-energy}
+ \E\sum_W M_W^\dagger M_W
+ =2(I-K^j)\leq2j(I-K).
+\end{equation}
+Both diagonal terms sum to $I$, and the cross terms average to
+$K^j$ and $(K^j)^\dagger=K^j$.  The inequality follows from
+$I-K^j\leq j(I-K)$.  In particular, this identity holds on every
+vector, and \Cref{lem:pasting-completion} gives
+\begin{equation}\label{eq:random-word-mirror}
+ \E\sum_W\|M_W\ket\psi\|^2
+ =2\bra\psi(I-K^j)\ket\psi\leq j\alpha.
+\end{equation}
+
+\begin{lemma}[Stability of marginal probabilities]\label{lem:sequential-bot-marginal}
+Let $\rho$ be Alice's reduced state and
+$\Phi(\rho)=\E_x\sum_aP_a^x\rho P_a^x$.
+For every effect $0\leq M\leq I$ and integer $j\geq0$,
+\begin{equation}\label{eq:pasting-marginal-stability}
+ |\tr(M\Phi^j(\rho))-\tr(M\rho)|\leq\sqrt{j\alpha}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+In the weighted direct sum over words, put
+$U_W=(W\otimes I)\psi$ and $V_W=(I\otimes W^\dagger)\psi$.
+Both vectors have norm one.  Their $M\otimes I$ expectations are
+$\tr(M\Phi^j(\rho))$ and $\tr(M\rho)$, respectively; the second
+identity uses $\E\sum_WWW^\dagger=I$.
+Because the norms agree, replacing $M$ by $M-I/2$ preserves their
+expectation difference.  Cauchy--Schwarz and
+\eqref{eq:random-word-mirror} bound its modulus by
+$\tfrac12\|U-V\|(\|U\|+\|V\|)\leq\sqrt{j\alpha}$.
+\end{proof}
+
+\begin{lemma}[Moving a successful outcome]\label{lem:commute-g-half-sandwich}
+For a length-$j$ random word $W$ and an independent uniform $x$, let
+\[
+ D_j=\E_x\E\sum_W\sum_g
+       \|([G_g^x,W]\otimes I)\psi\|^2.
+\]
+Then both of the following bounds hold:
+\begin{align}
+ D_j&\leq2j(\sqrt\chi+2\sqrt\zeta)^2,
+       \label{eq:random-word-commutation-sharp}\\
+ D_j&\leq2j(\sqrt\chi+4\sqrt\zeta).
+       \label{eq:random-word-commutation}
+\end{align}
+\end{lemma}
+\begin{proof}
+Write $P=G_g^x\otimes I$ and $\Delta_h^y=G_h^y\otimes I-I\otimes G_h^y$.
+The operator inequality
+\[
+ \sum_h(\Delta_h^y)^2-(I-\Pi_y)
+ =\sum_{h\ne h'}G_h^y\otimes G_{h'}^y\geq0
+\]
+controls the energy
+$\beta=\E_x\sum_g\bra\psi P(I-K)P\ket\psi$.
+Indeed,
+\[
+ \beta\leq\E_{x,y}\sum_{g,h}\|\Delta_h^yP\psi\|^2,
+ \qquad
+ \Delta_h^yP\psi
+ =([G_h^y,G_g^x]\otimes I)\psi+P\Delta_h^y\psi.
+\]
+The direct-sum triangle inequality, fine commutation, and
+$\sum_g(G_g^x)^2=G^x\leq I$ give
+$\sqrt\beta\leq\sqrt\chi+\sqrt\zeta$; also $\beta\leq p\leq1$.
+
+Since $P$ commutes with $I\otimes W^\dagger$,
+\[
+ ([G_g^x,W]\otimes I)\psi=PM_W\psi-M_WP\psi.
+\]
+The two direct-sum norms on the right are at most
+$\sqrt{2j\zeta}$ and $\sqrt{2j\beta}$, respectively, by
+\eqref{eq:random-word-energy}, \Cref{lem:pasting-completion}, and
+sub-measurement normalization.  Hence
+\[
+ \sqrt{D_j}\leq\sqrt{2j}(\sqrt\zeta+\sqrt\beta),
+\]
+which proves \eqref{eq:random-word-commutation-sharp}.
+For the second bound, use $\zeta<1$ and
+$\beta\leq\min\{1,(\sqrt\chi+\sqrt\zeta)^2\}
+\leq\sqrt\chi+\sqrt\zeta$ to obtain
+$(\sqrt\zeta+\sqrt\beta)^2\leq\beta+3\sqrt\zeta
+\leq\sqrt\chi+4\sqrt\zeta$.
+\end{proof}
+
+For coarse error estimates we use
+\begin{equation}\label{eq:pasting-root-budgets}
+ \sqrt\chi+4\sqrt\zeta\leq(\sqrt{30}+4)\sqrt m\,s,
+ \qquad b\leq3\sqrt m\,s,
+ \qquad\sqrt D\leq3\sqrt m\,s.
+\end{equation}
+These follow by subadditivity of the square root and the standing
+assumption that all error parameters are below one.
+
+\subsection{Interpolation and consistency}
+\label{sec:ld-sandwiching}
+
+For independent uniform $x_1,\ldots,x_k$ and completed outcomes
+$a_1,\ldots,a_k$, the sequential effect is
+\begin{equation}\label{eq:sequential-povm}
+ E_a^x=P_{a_1}^{x_1}\cdots P_{a_k}^{x_k}
+             P_{a_k}^{x_k}\cdots P_{a_1}^{x_1}.
+\end{equation}
+It is positive, and summing the outcomes from the inside out gives
+$\sum_aE_a^x=I$.  Scan the successful indices in order, retaining
+only the first success at each distinct slice coordinate.  If
+$j_1<\cdots<j_{d+1}$ are the first $d+1$ retained indices, output
+\begin{equation}\label{eq:first-success-interpolation}
+ h_{x,a}(u,t)=\sum_{\ell=1}^{d+1}a_{j_\ell}(u)
+       \prod_{\substack{v=1\\v\ne\ell}}^{d+1}
+       \frac{t-x_{j_v}}{x_{j_\ell}-x_{j_v}}.
+\end{equation}
+Otherwise output nothing.  The denominators are nonzero, and this
+polynomial has individual degree at most $d$ in every coordinate.
+It is the unique such polynomial extending the selected slices.
+In particular, no condition is imposed on later successful outcomes.
+Define the resulting sub-measurement by
+\begin{equation}\label{eq:first-success-pasted-measurement}
+ T_{k,h}=\E_x\sum_{a:\,h_{x,a}\text{ defined and }h_{x,a}=h}E_a^x,
+ \qquad T_k=\sum_hT_{k,h}.
+\end{equation}
+This is a post-processing of a measurement, hence a sub-measurement.
+The construction is defined even for $k>q$.
+Set $L_k=\sum_{j=0}^{k-1}\sqrt j$, so $L_1=0$ and
+$L_k\leq k(k-1)/2$.
+
+\begin{lemma}[Consistency]\label{lem:pasting-consistency}
+Let $\eta_k$ be the inconsistency of $\{T_{k,h}\}$ with $A$.
+Then
+\begin{equation}\label{eq:pasting-consistency-budget}
+ \eta_k\leq2kb+2k(k-1)(\sqrt\chi+4\sqrt\zeta)+\sqrt D
+       \leq19k^2\sqrt m\,s.
+\end{equation}
+\end{lemma}
+\begin{proof}
+Fix $i$, sum out later outcomes, and write
+$W=P_{a_{i-1}}^{x_{i-1}}\cdots P_{a_1}^{x_1}$,
+$P=G_g^{x_i}$ for a successful outcome, and
+$C=I-B^u_{[f(x_i)=g(u)]}$.  In the direct sum over $u,x,a_{<i},g$,
+compare
+\[
+ v=(PW\otimes C^{1/2})\psi,\qquad
+ v'=(WP\otimes C^{1/2})\psi.
+\]
+The squared norm of $v$ is the successful-mismatch probability
+$S_i$ at position $i$.  Since $C$ is an effect,
+\Cref{lem:commute-g-half-sandwich} gives
+$\|v-v'\|\leq\sqrt{D_{i-1}}$.
+Summing the earlier outcomes in $\|v'\|^2$ leaves the original
+slice--line inconsistency, so $\|v'\|^2\leq b$ by
+\eqref{eq:ld-gbcon}.  Hence
+\[
+ S_i\leq(\sqrt b+\sqrt{D_{i-1}})^2\leq2b+2D_{i-1}.
+\]
+If Bob's degree-$d$ polynomial $f$ differs from
+$h_{x,a}(u,\cdot)$, it disagrees at some selected one of the $d+1$
+distinct coordinates.  A union bound over all successful positions
+bounds the line inconsistency by
+\[
+ \sum_{i=1}^kS_i
+ \leq2kb+2k(k-1)(\sqrt\chi+4\sqrt\zeta).
+\]
+Evaluation at an independent uniform point and
+\Cref{prop:triangle-sub,eq:ld-abcon} add at most $\sqrt D$.
+Symmetry gives either tensor orientation.
+Finally \eqref{eq:pasting-root-budgets} bounds this error by
+\[
+ \bigl[6k+2(\sqrt{30}+4)k(k-1)+3\bigr]
+       \sqrt m\,s
+ \leq19k^2\sqrt m\,s.
+\]
+\end{proof}
+
+\subsection{Completeness from the expected number of successes}
+
+\begin{lemma}[Completeness]\label{lem:first-success-completeness}
+Put $c_k=\bone[d\geq1]\,k(k-1)/(2q)$.  Then
+\begin{equation}\label{eq:first-success-completeness}
+ \omega(T_k)\geq
+ 1-\frac{k}{k-d}\kappa_0
+   -\frac{\sqrt\alpha L_k}{k-d}-c_k.
+\end{equation}
+\end{lemma}
+\begin{proof}
+Let $N$ count successful outcomes.  By
+\Cref{lem:sequential-bot-marginal}, its $i$-th success probability is
+at least $p-\sqrt{(i-1)\alpha}$, so
+$\E N\geq kp-\sqrt\alpha L_k$.
+The pointwise inequality
+$N\leq d+(k-d)\bone[N\geq d+1]$ implies
+$\Pr[N\geq d+1]\geq(\E N-d)/(k-d)$.
+If the slice coordinates are distinct, $d+1$ successes suffice for
+interpolation.  The probability of a coordinate collision is at
+most $\binom{k}{2}/q$ by a union bound; when $d=0$, a single success
+suffices and no collision can matter.  Subtracting this probability
+gives the claim.  Only the questions are independent; no independence
+between outcomes is used.
+\end{proof}
+
+\begin{proof}[Proof of \Cref{thm:ld-pasting}]
+Choose any polynomial $h^*$ and complete $T_k$ by
+$H_h=T_{k,h}+\bone[h=h^*](I-T_k)$.
+Its inconsistency is at most $\eta_k+1-\omega(T_k)$: the additional
+bad-outcome probability is bounded by the entire missing mass.
+Write $\operatorname{Inc}(A,H)$ for this inconsistency.
+The preceding lemmas give the explicit estimate
+\begin{equation}\label{eq:positive-contraction-pasting}
+ \begin{split}
+ \operatorname{Inc}(A,H)\leq{}&\frac{k}{k-d}\kappa+2kb
+       +2k(k-1)(\sqrt\chi+4\sqrt\zeta)\\
+ &+\frac{\sqrt{2\zeta}\,L_k}{k-d}
+       +\sqrt D+c_k.
+ \end{split}
+\end{equation}
+By \eqref{eq:pasting-consistency-budget}, the total error is at most
+\[
+ \frac{k}{k-d}\kappa+19k^2\sqrt m\,s
+       +\frac{\sqrt{2\zeta}L_k}{k-d}+c_k.
+\]
+Since $k-d\geq1$, the marginal term is at most
+$k^2\sqrt m\,s$.  For $d\geq1$,
+$c_k\leq k^2(d/q)/2\leq k^2\sqrt m\,s/2$; for $d=0$ it vanishes.
+The fresh error is therefore at most $20.5k^2\sqrt m\,s$, which is
+bounded by the stated $21k^2\sqrt m\,s$.
+Choosing $k=(m+1)d$ when $m,d\geq1$ proves
+\Cref{thm:ld-pasting-in-induction-section}.
+For $d=0$ one may take $k=1$; then $L_k=c_k=0$, there is no
+commutation term, and the uncompleted sub-measurement $T_1$ has
+total effect exactly $G$.
+\end{proof}
+
+\subsection{The second moment and the original construction}
+\label{sec:first-construction}
+
+The induction uses the preceding construction for its stronger
+error exponent.  The same estimates also certify the original
+procedure: perform exactly $d+1$ slice sub-measurements at uniformly
+distinct coordinates, and interpolate if they all succeed.
+Call its sub-measurement $H^{(1)}$.
+
+\begin{lemma}[Boundedness controls the second moment]\label{lem:pasting-second-moment}
+If a global polynomial sub-measurement $\{T_h\}$ has total effect $T$
+and inconsistency $\eta$ with $A$, then
+\begin{equation}\label{eq:pasting-support}
+ |\omega(T(I-G))|\leq\sqrt\eta+\sqrt\zeta,\qquad
+ \omega(G-G^2)\leq p-\omega(T)+2\sqrt\eta+2\sqrt\zeta.
+\end{equation}
+\end{lemma}
+\begin{proof}
+Abbreviate $A_h=A^{u,x}_{h(u,x)}$ and split
+\[
+ \omega(T(I-G))=\E_{u,x}\sum_h\bra\psi T_hQ_x\otimes A_h\ket\psi
+       +\E_{u,x}\sum_h\bra\psi T_hQ_x\otimes(I-A_h)\ket\psi.
+\]
+For the first term, Cauchy--Schwarz with vector factors
+$\sqrt{T_h}\otimes\sqrt{A_h}$ and
+$\sqrt{T_h}Q_x\otimes\sqrt{A_h}$ gives one squared norm at most one;
+the other is bounded by \Cref{lem:boundedness-rejection}:
+\[
+ \E_{u,x}\sum_h\bra\psi Q_xT_hQ_x\otimes A_h\ket\psi
+ \leq\zeta.
+\]
+Indeed, $\{T_h\}$ is independent of~$u$ and sums to at most~$I$,
+each restriction $h|_x$ is an admissible slice polynomial, and hence
+$\E_u A^{u,x}_{h(u,x)}\leq Z^x$.  The slice hypothesis
+$\E_x\bra\psi Q_x\otimes Z^x\ket\psi\leq\zeta$ completes the
+application of \eqref{eq:boundedness-rejection-average}.
+Replacing $A_h$ by $I-A_h$ gives squared
+norms at most $\eta$ and one for the second term.  This proves the
+first inequality, without any norm bound or commutation assumption
+on $Z^x$.  For the second, take expectations in
+\[
+ G^2-GT-TG+T=(G-T)^2+T-T^2\geq0
+\]
+and rearrange, using the real part of $\omega(T(I-G))$.
+\end{proof}
+
+\begin{corollary}[Pasting with exactly \(d+1\) slices]\label{cor:first-construction}
+Suppose $d\geq1$ and $q>d$.  Set
+\[
+ S=\eps^{1/32}+\delta^{1/32}+\gamma^{1/32}
+     +\zeta^{1/32}+(d/q)^{1/32}.
+\]
+Then
+\[
+ \omega(G-G^2)\leq40mdS,\qquad
+ 0\leq p-\omega(H^{(1)})\leq45md^2S.
+\]
+Completing $H^{(1)}$ gives inconsistency at most $\kappa+125md^2S$.
+For $d=0$, the one-slice construction has total effect exactly $G$.
+\end{corollary}
+\begin{proof}
+Write $V=\omega(G-G^2)$.  Apply \Cref{lem:pasting-second-moment}
+to $T_k$, using its established consistency and completeness:
+\begin{equation}\label{eq:direct-second-moment-tradeoff}
+ V\leq\frac{d\kappa_0}{k-d}
+  +\frac{\sqrt{2\zeta}L_k}{k-d}
+  +\frac{k(k-1)}{2q}+2\sqrt{\eta_k}+2\sqrt\zeta.
+\end{equation}
+For explicit bounds put $R=s$.  If $R>1$, the claims are trivial;
+otherwise $0<R\leq1$ and we choose $k=\lceil2dR^{-1/4}\rceil$.
+Thus $2d\leq k\leq3dR^{-1/4}$.
+Using $\eta_k\leq19k^2\sqrt m R$, $\kappa_0\leq1$,
+$\sqrt{2\zeta}\leq2R$,
+$L_k\leq k(k-1)/2$, and $d/q\leq R^8$,
+the five terms in \eqref{eq:direct-second-moment-tradeoff} are at most
+\[
+ R^{1/4},\quad6dR^{3/4},\quad
+ \tfrac92dR^{15/2},\quad6\sqrt{19}\,d m^{1/4}R^{1/4},\quad2R.
+\]
+Since $13.5+6\sqrt{19}<40$, their sum is at most
+$40mdR^{1/4}\leq40mdS$.
+This argument remains valid for $k>q$, since $T_k$ is defined for
+every $k$ and the collision bound is still an upper bound.
+
+To analyze the actual first construction, let
+\[
+ L=\E_{x,y}\sum_g\omega(G_g^xQ_yG_g^x)
+\]
+be the probability of a success followed immediately by rejection.
+Two mirror replacements in the quadratic form of $G$ give
+\[
+ \left|\E_x\sum_g\omega(G_g^xGG_g^x)
+       -\bra\psi G\otimes G\ket\psi\right|\leq2\sqrt\zeta.
+\]
+Indeed, the aggregate squared distance between
+$(G_g^x\otimes I)\psi$ and $(I\otimes G_g^x)\psi$ is at most
+$\zeta$, and each aggregate norm is at most one.
+By \eqref{eq:pasting-total-mirror} and Jensen,
+$|\bra\psi G\otimes G\ket\psi-\omega(G^2)|\leq\sqrt\zeta$.
+Consequently $|L-V|\leq3\sqrt\zeta$.
+
+In $d+1$ completed trials, if the first succeeds but some later
+trial fails, there is an adjacent success-to-rejection transition.
+The transition beginning at position $i$ has probability at most
+$L+\sqrt{(i-1)\alpha}$ by
+\eqref{eq:pasting-marginal-stability}, applied to its two-trial effect.
+Summing these probabilities and changing independent coordinates to
+uniformly distinct coordinates gives
+\begin{equation}\label{eq:first-construction-completeness}
+ p-\omega(H^{(1)})\leq
+ dV+3d\sqrt\zeta+\sqrt{2\zeta}L_d
+       +\frac{d(d+1)}{2q}.
+\end{equation}
+The distribution change costs at most the probability of a collision,
+by conditioning the independent sample on having none.
+Also $H^{(1)}\leq G$: for a fixed tuple the total successful effect
+is bounded by its first success projector, and the first coordinate
+is uniform under distinct sampling.  This proves the lower bound.
+Using $L_d\leq d(d-1)/2$, the terms beyond $dV$ in
+\eqref{eq:first-construction-completeness} are at most $5d^2S$,
+proving the claimed upper bound.
+
+For consistency, put $n=d+1$ and let $a>0$ be the probability that
+$n$ independent uniform coordinates are distinct.  With only $n$
+trials, $T_n$ outputs a polynomial exactly when every outcome
+succeeds and every coordinate is distinct.  Hence
+$T_{n,h}=aH_h^{(1)}$ for every $h$.  If $e$ denotes the
+inconsistency of $H^{(1)}$ with $A$, then $ae=\eta_n$ and $e\leq1$,
+so
+\[
+ e=\eta_n+(1-a)e
+ \leq\eta_n+\frac{d(d+1)}{2q}
+ \leq19(d+1)^2\sqrt m\,s+\frac{d(d+1)}{2q}
+ \leq77md^2S.
+\]
+Completion adds at most $\kappa_0+45md^2S$, so the resulting
+inconsistency is at most $\kappa+122md^2S\leq\kappa+125md^2S$.
+\end{proof}
+
+\bibliographystyle{alpha}
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{ALM{\etalchar{+}}98}
+
+\bibitem[ALM{\etalchar{+}}98]{ALM+98}
+Sanjeev Arora, Carsten Lund, Rajeev Motwani, Madhu Sudan, and Mario Szegedy.
+\newblock Proof verification and the hardness of approximation problems.
+\newblock {\em Journal of the ACM}, 45(3):501--555, 1998.
+
+\bibitem[Ara02]{aravind2002simple}
+PK~Aravind.
+\newblock A simple demonstration of {B}ell's theorem involving two observers
+  and no probabilities or inequalities.
+\newblock {\em arXiv preprint quant-ph/0206070}, 2002.
+
+\bibitem[AS98]{AS98}
+Sanjeev Arora and Shmuel Safra.
+\newblock Probabilistic checking of proofs: a new characterization of {NP}.
+\newblock {\em Journal of the ACM}, 45(1):70--122, 1998.
+
+\bibitem[BFL91]{BFL91}
+L{\'a}szl{\'o} Babai, Lance Fortnow, and Carsten Lund.
+\newblock Non-deterministic exponential time has two-prover interactive
+  protocols.
+\newblock {\em Computational complexity}, 1(1):3--40, 1991.
+
+\bibitem[BLR93]{BLR93}
+Manuel Blum, Michael Luby, and Ronitt Rubinfeld.
+\newblock Self-testing/correcting with applications to numerical problems.
+\newblock {\em Journal of computer and system sciences}, 47(3):549--595, 1993.
+
+\bibitem[CMS17]{CMS17}
+Alessandro Chiesa, Peter Manohar, and Igor Shinkar.
+\newblock On axis-parallel tests for tensor product codes.
+\newblock In {\em Proceedings of the 21st Annual International Workshop on
+  Randomization and Computation}, 2017.
+
+\bibitem[dlS22]{deLaSalle22}
+Mikael de~la~Salle.
+\newblock Orthogonalization of positive operator valued measures.
+\newblock {\em Comptes Rendus Math\'ematique}, 360:549--560, 2022.
+\newblock doi:10.5802/crmath.326.
+
+\bibitem[FHS94]{FHS94}
+Katalin Friedl, Zsolt Hatsagi, and Alexander Shen.
+\newblock Low-degree tests.
+\newblock In {\em Proceedings of the 5th Annual ACM-SIAM Symposium on Discrete
+  Algorithms}, pages 57--64, 1994.
+
+\bibitem[IV12]{IV12}
+Tsuyoshi Ito and Thomas Vidick.
+\newblock A multi-prover interactive proof for {NEXP} sound against entangled
+  provers.
+\newblock In {\em Proceedings of the 53rd Annual IEEE Symposium on Foundations
+  of Computer Science}, pages 243--252, 2012.
+
+\bibitem[JNV{\etalchar{+}}20]{JNV+20}
+Zhengfeng Ji, Anand Natarajan, Thomas Vidick, John Wright, and Henry Yuen.
+\newblock $\mathsf{MIP}^* = \mathsf{RE}$.
+\newblock Technical report, arXiv:2001.04383, 2020.
+
+\bibitem[KS08]{KS08}
+Tali Kaufman and Madhu Sudan.
+\newblock Algebraic property testing: the role of invariance.
+\newblock In {\em Proceedings of the 40th Annual ACM Symposium on Theory of
+  Computing}, pages 403--412, 2008.
+
+\bibitem[KV11]{KV11}
+Julia Kempe and Thomas Vidick.
+\newblock Parallel repetition of entangled games.
+\newblock In {\em Proceedings of the 43rd Annual ACM Symposium on Theory of
+  Computing}, pages 353--362, 2011.
+
+\bibitem[Mer90]{mermin1990simple}
+David Mermin.
+\newblock Simple unified form for the major no-hidden-variables theorems.
+\newblock {\em Physical Review Letters}, 65(27):3373, 1990.
+
+\bibitem[NV18a]{NV18a}
+Anand Natarajan and Thomas Vidick.
+\newblock Low-degree testing for quantum states, and a quantum entangled games
+  {PCP}.
+\newblock In {\em Proceedings of the 59th Annual IEEE Symposium on Foundations
+  of Computer Science}, 2018.
+
+\bibitem[NV18b]{NV18b}
+Anand Natarajan and Thomas Vidick.
+\newblock Two-player entangled games are {NP}-hard.
+\newblock In {\em Proceedings of the 33rd Annual IEEE Conference on
+  Computational Complexity}, 2018.
+
+\bibitem[NW19]{NW19}
+Anand Natarajan and John Wright.
+\newblock $\mathsf{NEEXP} \subseteq \mathsf{MIP}^*$.
+\newblock In {\em Proceedings of the 60th Annual IEEE Symposium on Foundations
+  of Computer Science}, pages 510--518, 2019.
+
+\bibitem[Per90]{peres1990incompatible}
+Asher Peres.
+\newblock Incompatible results of quantum measurements.
+\newblock {\em Physics Letters A}, 151(3-4):107--108, 1990.
+
+\bibitem[PS94]{PS94}
+Alexander Polishchuk and Daniel Spielman.
+\newblock Nearly-linear size holographic proofs.
+\newblock In {\em Proceedings of the 26th Annual ACM Symposium on Theory of
+  Computing}, pages 194--203, 1994.
+
+\bibitem[RS97]{RS97}
+Ran Raz and Shmuel Safra.
+\newblock A sub-constant error-probability low-degree test, and a sub-constant
+  error-probability {PCP} characterization of {NP}.
+\newblock In {\em Proceedings of the 29th Annual ACM Symposium on Theory of
+  Computing}, pages 475--484, 1997.
+
+\bibitem[Sch80]{Sch80}
+Jacob Schwartz.
+\newblock Fast probabilistic algorithms for verification of polynomial
+  identities.
+\newblock {\em Journal of the ACM}, 27(4):701--717, 1980.
+
+\bibitem[Sud11]{Sud11}
+Madhu Sudan.
+\newblock Guest column: testing linear properties: some general theme.
+\newblock {\em ACM SIGACT News}, 42(1):59--80, 2011.
+
+\bibitem[Vid11]{Vid11}
+Thomas Vidick.
+\newblock {\em The complexity of entangled games}.
+\newblock PhD thesis, University of California, Berkeley, 2011.
+
+\bibitem[Vid16]{Vid16}
+Thomas Vidick.
+\newblock Three-player entangled {XOR} games are {NP}-hard to approximate.
+\newblock {\em SIAM Journal on Computing}, 45(3):1007--1063, 2016.
+
+\bibitem[Zip79]{Zip79}
+Richard Zippel.
+\newblock Probabilistic algorithms for sparse polynomials.
+\newblock In {\em Proceedings of the 2nd International Symposium on Symbolic
+  and Algebraic Manipulation}, pages 216--226, 1979.
+
+\end{thebibliography}
+
+\end{document}

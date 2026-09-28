@@ -298,7 +298,7 @@ private theorem degreeZero_averagedSlice_liftedVerticalLineConsistency
 
 /-- The averaged degree-zero pasted submeasurement is point-consistent before
 completion. -/
-private theorem degreeZero_averagedSlice_pointConsistency
+theorem degreeZero_averagedSlice_pointConsistency
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (eps delta gamma zeta : Error)

@@ -34,7 +34,7 @@ namespace MIPStarRE.LDT.MakingMeasurementsProjective
 
 open MIPStarRE.LDT
 
-universe u
+universe u v
 
 /-! ### One-measurement Naimark statement -/
 
@@ -107,7 +107,8 @@ local dilated measurements act on `Alice × AliceAux` and `Bob × BobAux`, the
 matrix entries below are the corresponding tensor-product density after the
 canonical reassociation and permutation of the four finite registers. -/
 noncomputable def naimarkProductExtensionDensity
-    (HA HB HauxA HauxB : FiniteHilbertSpace.{u})
+    (HA HB : FiniteHilbertSpace.{u})
+    (HauxA HauxB : FiniteHilbertSpace.{v})
     (ψ : QuantumState (HA.carrier × HB.carrier))
     (aux : QuantumState (HauxA.carrier × HauxB.carrier)) :
     MIPStarRE.Quantum.Op
@@ -120,7 +121,8 @@ noncomputable def naimarkProductExtensionDensity
 `(Alice × Bob) × (AliceAux × BobAux)` to
 `(Alice × AliceAux) × (Bob × BobAux)`. -/
 def naimarkProductExtensionEquiv
-    (HA HB HauxA HauxB : FiniteHilbertSpace.{u}) :
+    (HA HB : FiniteHilbertSpace.{u})
+    (HauxA HauxB : FiniteHilbertSpace.{v}) :
     ((HA.carrier × HB.carrier) × (HauxA.carrier × HauxB.carrier)) ≃
       ((HA.carrier × HauxA.carrier) × (HB.carrier × HauxB.carrier)) :=
   Equiv.prodProdProdComm HA.carrier HB.carrier HauxA.carrier HauxB.carrier
@@ -128,7 +130,8 @@ def naimarkProductExtensionEquiv
 /-- The product-extension density is the ordinary tensor-product density after
 the register permutation used by the dilated measurements. -/
 theorem naimarkProductExtensionDensity_eq_reindex_opTensor
-    (HA HB HauxA HauxB : FiniteHilbertSpace.{u})
+    (HA HB : FiniteHilbertSpace.{u})
+    (HauxA HauxB : FiniteHilbertSpace.{v})
     (ψ : QuantumState (HA.carrier × HB.carrier))
     (aux : QuantumState (HauxA.carrier × HauxB.carrier)) :
     naimarkProductExtensionDensity HA HB HauxA HauxB ψ aux =
@@ -140,7 +143,8 @@ theorem naimarkProductExtensionDensity_eq_reindex_opTensor
 
 /-- The product-extension density is positive semidefinite. -/
 theorem naimarkProductExtensionDensity_nonneg
-    (HA HB HauxA HauxB : FiniteHilbertSpace.{u})
+    (HA HB : FiniteHilbertSpace.{u})
+    (HauxA HauxB : FiniteHilbertSpace.{v})
     (ψ : QuantumState (HA.carrier × HB.carrier))
     (aux : QuantumState (HauxA.carrier × HauxB.carrier)) :
     0 ≤ naimarkProductExtensionDensity HA HB HauxA HauxB ψ aux := by
@@ -151,7 +155,8 @@ theorem naimarkProductExtensionDensity_nonneg
 /-- The quantum state `ψ ⊗ aux` in the register order used by the full Naimark
 correlation theorem. -/
 noncomputable def naimarkProductExtensionState
-    (HA HB HauxA HauxB : FiniteHilbertSpace.{u})
+    (HA HB : FiniteHilbertSpace.{u})
+    (HauxA HauxB : FiniteHilbertSpace.{v})
     (ψ : QuantumState (HA.carrier × HB.carrier))
     (aux : QuantumState (HauxA.carrier × HauxB.carrier)) :
     QuantumState ((HA.carrier × HauxA.carrier) × (HB.carrier × HauxB.carrier)) where
@@ -159,7 +164,8 @@ noncomputable def naimarkProductExtensionState
   density_psd := naimarkProductExtensionDensity_nonneg HA HB HauxA HauxB ψ aux
 
 @[simp] theorem naimarkProductExtensionState_density
-    (HA HB HauxA HauxB : FiniteHilbertSpace.{u})
+    (HA HB : FiniteHilbertSpace.{u})
+    (HauxA HauxB : FiniteHilbertSpace.{v})
     (ψ : QuantumState (HA.carrier × HB.carrier))
     (aux : QuantumState (HauxA.carrier × HauxB.carrier)) :
     (naimarkProductExtensionState HA HB HauxA HauxB ψ aux).density =
@@ -168,7 +174,8 @@ noncomputable def naimarkProductExtensionState
 /-- The product-extension state is normalized whenever both tensor factors are
 normalized. -/
 theorem naimarkProductExtensionState_isNormalized
-    (HA HB HauxA HauxB : FiniteHilbertSpace.{u})
+    (HA HB : FiniteHilbertSpace.{u})
+    (HauxA HauxB : FiniteHilbertSpace.{v})
     {ψ : QuantumState (HA.carrier × HB.carrier)}
     {aux : QuantumState (HauxA.carrier × HauxB.carrier)}
     (hψ : ψ.IsNormalized) (haux : aux.IsNormalized) :

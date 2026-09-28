@@ -176,7 +176,7 @@
 \section{Formal soundness target}
 
 \begin{theorem}[Quantum soundness of the low individual degree test]\label{thm:main-formal}
-	\lean{MIPStarRE.LDT.Test.mainFormal}
+	\lean{MIPStarRE.LDT.Test.mainFormalWithK}
 	\leanok
 	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
 	Let $(\psi, A^{\mathrm A}, B^{\mathrm A}, L^{\mathrm A},
@@ -212,6 +212,36 @@
 	factor \(400\) and the nonzero sampling condition are the corrected source
 	boundaries recorded in \cite{gap:issue-906-main-formal-k-bound} and
 	\cite{gap:issue-422-main-formal-zero-k-boundary}.
+\end{proof}
+
+\begin{theorem}[Simplified soundness bound]\label{thm:main-formal-simplified}
+	\lean{MIPStarRE.LDT.Test.mainFormal}
+	\leanok
+	\uses{def:low-individual-degree-test, def:projective-strategy, def:polymeasurements, def:simeq}
+	Let $m\geq1$. Let $(\psi,A^{\mathrm A},B^{\mathrm A},L^{\mathrm A},
+	A^{\mathrm B},B^{\mathrm B},L^{\mathrm B})$ be a projective strategy
+	passing the $(m,q,d)$ low individual degree test with probability at least
+	$1-\eps$. Set $K_{m,0}=m^4$, $K_{m,d}=d^2m^4$ for $d\ge1$, and
+	\[
+		\nu=21000K_{m,d}\bigl(\eps^{1/64}+(d/q)^{1/64}\bigr).
+	\]
+	There exist projective measurements
+	$G^{\mathrm A},G^{\mathrm B}\in\polymeas{m}{q}{d}$ such that, on average
+	over $u\sim\F_q^m$,
+	\[
+		A_a^{\mathrm A,u}\ot I\simeq_\nu I\ot G^{\mathrm B}_{[g(u)=a]},
+		\qquad
+		G^{\mathrm A}_{[g(u)=a]}\ot I\simeq_\nu I\ot A_a^{\mathrm B,u},
+	\]
+	and $G_g^{\mathrm A}\ot I\simeq_\nu I\ot G_g^{\mathrm B}$.
+\end{theorem}
+\begin{proof}
+	\leanok
+	\proves{thm:main-formal-simplified}
+	The proof follows \texttt{low\_degree\_simplified.tex},
+	using simplified main induction, heterogeneous role-register extraction,
+	linear projective rounding, and scalar absorption. The earlier
+	sampling-parameter theorem is Theorem~\ref{thm:main-formal}.
 \end{proof}
 
 \begin{proposition}[Source-boundary reduction for the final theorem]\label{prop:main-formal-source-reduction}

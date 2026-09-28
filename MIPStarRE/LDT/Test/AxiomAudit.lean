@@ -65,7 +65,7 @@ good-strategy hypotheses by using the selected Cauchy--Schwarz chain and the
 global-variance estimate.  The reduced `addInU` lemma remains only a downstream
 specialization.
 
-The audit for `Test.mainFormal` records that the current two-space, corrected
+The audit for `Test.mainFormalWithK` records that the earlier two-space, corrected
 large-`k` interface has no connection, residual, repair, data, or obligation
 hypotheses.  The large-`k` and `k > 0` scalar-cascade boundary is documented in
 `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and
@@ -103,11 +103,16 @@ ordinary large-error branch.  The answer-valued successor slice theorem
 `MainInductionStep.answerSuccessorRestrictedSliceConclusions` now performs the
 local recursive application to every restricted slice once the predecessor
 answer-valued induction hypothesis is in scope.  Thus the former transitive
-`sorryAx` dependency has been removed from the current `mainFormal` path.  The
+`sorryAx` dependency has been removed from the `mainFormalWithK` path.  The
 final theorem proves the saturated-error branch, while its small-error branch
 calls the checked role-register scalar-boundary theorem under the corrected
 nonzero sampling hypothesis.  The zero-sampling boundary tracked by #422 is
-removed from the source theorem statement by the explicit hypothesis `0 < k`.
+removed from that theorem statement by the explicit hypothesis `0 < k`.
+
+The public `Test.mainFormal` now uses the simplified proof, with no public
+sampling parameter and error `simplifiedMainFormalError`. Its projective
+strategy and three consistency conclusions have the same types as the earlier
+two-space theorem.
 
 The audit for `GlobalVariance.globalVarianceOfPoints` now requires the standard
 Lean axioms only: the issue-#1456 six-step local transport estimate is supplied
@@ -313,7 +318,9 @@ assert_standard_axioms
   MIPStarRE.LDT.Test.mainFormalConclusion_ofRoleRegisterScalarBoundary
 assert_standard_axioms MIPStarRE.LDT.Test.mainFormal_smallErrorConclusion
 assert_standard_axioms MIPStarRE.LDT.Test.mainFormalConclusion
+assert_standard_axioms MIPStarRE.LDT.Test.mainFormalWithK
 assert_standard_axioms MIPStarRE.LDT.Test.mainFormal
+assert_standard_axioms MIPStarRE.LDT.Test.mainFormalWithKDerived
 
 /-! Chapter 2 interfaces used by the final-theorem route.  These are
 foundational definitions and elementary API statements; the regression check is
@@ -409,6 +416,17 @@ assert_standard_axioms projectiveLowRankSum_of_spectralTruncationStatement
 assert_standard_axioms orthonormalization
 
 end MIPStarRE.LDT.MakingMeasurementsProjective
+
+namespace MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization
+
+-- The new linear orthogonalization route and both tensor-factor consequences
+-- are proved without additional axioms.
+assert_standard_axioms exists_projective_measurement_linear_bound
+assert_standard_axioms consistent_measurement_linear_bound
+assert_standard_axioms right_consistent_measurement_linear_bound
+assert_standard_axioms submeasurement_linear_bound
+
+end MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization
 
 assert_no_sorry_axiom MIPStarRE.LDT.SelfImprovement.AddInUFullStatement
 assert_no_sorry_axiom

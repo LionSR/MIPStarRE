@@ -1,17 +1,17 @@
 import MIPStarRE.LDT.Test.MainTheorem.SourceScalars
 import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Final
+import MIPStarRE.LDT.Test.MainTheorem.Simplified.Main
 
 /-!
 # Main-formal soundness theorem
 
-This module contains the corrected two-space final theorem for
-`thm:main-formal`.  The theorem starts from a general projective strategy
-`ProjStrat params ιA ιB`, applies the heterogeneous role-register route, and
-absorbs the explicit intermediate errors into the final parameter
-`mainFormalError`.
+This module contains the simplified two-space final theorem for
+`thm:main-formal`. It keeps the original general projective strategy
+`ProjStrat params ιA ιB` and the same three consistency conclusions,
+using `simplifiedMainFormalError` without a public pasting length.
 
-The public theorem uses the confirmed large-`k` correction `k ≥ 400 m d` and
-the nonzero sampling condition `0 < k`.  These are documented in
+The earlier corrected theorem is retained as `mainFormalWithK`. Its
+large-`k` correction `k ≥ 400 m d` and nonzero condition `0 < k` are documented in
 `docs/paper-gaps/issue-906-main-formal-k-bound.tex` and
 `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`.
 
@@ -297,7 +297,7 @@ the missing factor `400` is documented in
 `0 < k` corrects the zero-sampling boundary where the printed error collapses
 to zero; this boundary is documented in
 `docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`. -/
-theorem mainFormal
+theorem mainFormalWithK
     (params : Parameters)
     [FieldModel params.q]
     {ιA ιB : Type*}
@@ -325,6 +325,169 @@ theorem mainFormal
             (mainFormalError params k eps) := by
   let hpasses : strategy.PassesLowIndividualDegreeTest eps := ⟨hpass⟩
   exact mainFormalConclusion params strategy eps hpasses k hk hk0
+
+/-- Simplified public statement of `thm:main-formal`.
+
+The strategy and the three projective-measurement conclusions are unchanged.
+The simplification chooses the pasting length internally and gives error
+`21000 K_{m,d}(ε^(1/64) + (d/q)^(1/64))`.
+
+**Local fix:** This bound follows `blueprint/src/low_degree_simplified.tex`,
+`thm:main-formal`. The original sampling bound and its corrected `k`
+hypotheses remain available as `mainFormalWithK`; see
+`docs/paper-gaps/issue-906-main-formal-k-bound.tex` and
+`docs/paper-gaps/issue-422-main-formal-zero-k-boundary.tex`. -/
+theorem mainFormal
+    (params : Parameters)
+    [FieldModel params.q]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA]
+    [Fintype ιB] [DecidableEq ιB]
+    (strategy : ProjStrat params ιA ιB)
+    (eps : Error)
+    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps) :
+    ∃ G_A : ProjMeas (Polynomial params) ιA,
+      ∃ G_B : ProjMeas (Polynomial params) ιB,
+        ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+            (polynomialEvaluationFamily params G_B.toSubMeas)
+            (simplifiedMainFormalError params eps) ∧
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (polynomialEvaluationFamily params G_A.toSubMeas)
+            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+            (simplifiedMainFormalError params eps) ∧
+          ConsRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily G_A.toSubMeas)
+            (constSubMeasFamily G_B.toSubMeas)
+            (simplifiedMainFormalError params eps) := by
+  exact mainFormalSimplified params strategy eps hpass
+
+/-- The corrected sampling-parameter conclusion follows from `mainFormal`.
+
+When the old error is below one, its scalar regime bounds `eps` and `d/q` by
+one, and the simplified error is at most the old error. At or above one, the
+normalization bound supplies arbitrary projective polynomial measurements.
+This is a Lean-only corollary of the simplified theorem. -/
+theorem mainFormalWithKDerived
+    (params : Parameters)
+    [FieldModel params.q]
+    {ιA ιB : Type*}
+    [Fintype ιA] [DecidableEq ιA]
+    [Fintype ιB] [DecidableEq ιB]
+    (strategy : ProjStrat params ιA ιB)
+    (eps : Error)
+    (hpass : strategy.lowIndividualDegreeFailureProbability ≤ eps)
+    (k : ℕ)
+    (hk : 400 * params.m * params.d ≤ k)
+    (hk0 : 0 < k) :
+    ∃ G_A : ProjMeas (Polynomial params) ιA,
+      ∃ G_B : ProjMeas (Polynomial params) ιB,
+        ConsRel strategy.state (uniformDistribution (Point params))
+            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementA)
+            (polynomialEvaluationFamily params G_B.toSubMeas)
+            (mainFormalError params k eps) ∧
+          ConsRel strategy.state (uniformDistribution (Point params))
+            (polynomialEvaluationFamily params G_A.toSubMeas)
+            (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
+            (mainFormalError params k eps) ∧
+          ConsRel strategy.state (uniformDistribution Unit)
+            (constSubMeasFamily G_A.toSubMeas)
+            (constSubMeasFamily G_B.toSubMeas)
+            (mainFormalError params k eps) := by
+  by_cases hlarge : 1 ≤ mainFormalError params k eps
+  · exact mainFormal_trivial_witness params strategy eps k hlarge
+  · have heps : 0 ≤ eps := ProjStrat.eps_nonneg_of_passes ⟨hpass⟩
+    let hscalars := cascadeHypotheses_of_not_mainFormalError_ge_one heps hk0 hlarge
+    have hdk : params.d ≤ k := by
+      calc
+        params.d = 1 * params.d := by simp
+        _ ≤ params.m * params.d := Nat.mul_le_mul_right params.d params.hm
+        _ ≤ 400 * params.m * params.d := by
+          simpa [mul_assoc] using
+            (Nat.mul_le_mul_right (params.m * params.d)
+              (show 1 ≤ 400 by norm_num))
+        _ ≤ k := hk
+    have hscale :
+        simplifiedFinalScale params ≤
+          (k : Error) ^ (2 : ℕ) * (params.m : Error) ^ (4 : ℕ) := by
+      by_cases hd : params.d = 0
+      · have hk1 : (1 : Error) ≤ (k : Error) := by exact_mod_cast hk0
+        have hk2 : (1 : Error) ≤ (k : Error) ^ (2 : ℕ) := one_le_pow₀ hk1
+        simpa [simplifiedFinalScale, hd] using
+          (mul_le_mul_of_nonneg_right hk2
+            (show 0 ≤ (params.m : Error) ^ (4 : ℕ) by positivity))
+      · have hdR : (params.d : Error) ≤ (k : Error) := by exact_mod_cast hdk
+        have hd2 : (params.d : Error) ^ (2 : ℕ) ≤ (k : Error) ^ (2 : ℕ) :=
+          pow_le_pow_left₀ (by positivity) hdR 2
+        simpa [simplifiedFinalScale, hd] using
+          (mul_le_mul_of_nonneg_right hd2
+            (show 0 ≤ (params.m : Error) ^ (4 : ℕ) by positivity))
+    have hscale0 : 0 ≤ simplifiedFinalScale params := by
+      unfold simplifiedFinalScale
+      split_ifs <;> positivity
+    have hepsPow :
+        Real.rpow eps (1 / (64 : Error)) ≤
+          Real.rpow eps (1 / (40000 : Error)) :=
+      rpow_le_of_denom_le heps hscalars.hepsOne (by norm_num) (by norm_num)
+    have hdqPow :
+        Real.rpow ((params.d : Error) / params.q) (1 / (64 : Error)) ≤
+          Real.rpow ((params.d : Error) / params.q) (1 / (40000 : Error)) :=
+      rpow_le_of_denom_le hscalars.dqNN hscalars.dqLeOne
+        (by norm_num) (by norm_num)
+    have hsum0 :
+        0 ≤ Real.rpow eps (1 / (64 : Error)) +
+          Real.rpow ((params.d : Error) / params.q) (1 / (64 : Error)) :=
+      add_nonneg (Real.rpow_nonneg heps _) (Real.rpow_nonneg hscalars.dqNN _)
+    have hsum :
+        Real.rpow eps (1 / (64 : Error)) +
+            Real.rpow ((params.d : Error) / params.q) (1 / (64 : Error)) ≤
+          Real.rpow eps (1 / (40000 : Error)) +
+            Real.rpow ((params.d : Error) / params.q) (1 / (40000 : Error)) +
+            Real.exp (-((k : Error) /
+              (2560000 * (params.m : Error) ^ (2 : ℕ)))) := by
+      linarith [Real.exp_nonneg
+        (-((k : Error) / (2560000 * (params.m : Error) ^ (2 : ℕ))))]
+    have hcoefficient :
+        21000 * simplifiedFinalScale params ≤
+          100000 * ((k : Error) ^ (2 : ℕ) * (params.m : Error) ^ (4 : ℕ)) := by
+      calc
+        21000 * simplifiedFinalScale params ≤
+            100000 * simplifiedFinalScale params :=
+          mul_le_mul_of_nonneg_right (by norm_num) hscale0
+        _ ≤ 100000 * ((k : Error) ^ (2 : ℕ) *
+            (params.m : Error) ^ (4 : ℕ)) :=
+          mul_le_mul_of_nonneg_left hscale (by norm_num)
+    have herror : simplifiedMainFormalError params eps ≤
+        mainFormalError params k eps := by
+      calc
+        simplifiedMainFormalError params eps =
+            (21000 * simplifiedFinalScale params) *
+              (Real.rpow eps (1 / (64 : Error)) +
+                Real.rpow ((params.d : Error) / params.q) (1 / (64 : Error))) := by
+          unfold simplifiedMainFormalError
+          ring
+        _ ≤ (100000 * ((k : Error) ^ (2 : ℕ) *
+              (params.m : Error) ^ (4 : ℕ))) *
+              (Real.rpow eps (1 / (64 : Error)) +
+                Real.rpow ((params.d : Error) / params.q) (1 / (64 : Error))) :=
+          mul_le_mul_of_nonneg_right hcoefficient hsum0
+        _ ≤ (100000 * ((k : Error) ^ (2 : ℕ) *
+              (params.m : Error) ^ (4 : ℕ))) *
+              (Real.rpow eps (1 / (40000 : Error)) +
+                Real.rpow ((params.d : Error) / params.q) (1 / (40000 : Error)) +
+                Real.exp (-((k : Error) /
+                  (2560000 * (params.m : Error) ^ (2 : ℕ))))) :=
+          mul_le_mul_of_nonneg_left hsum (by positivity)
+        _ = mainFormalError params k eps := by
+          unfold mainFormalError
+          ring
+    obtain ⟨G_A, G_B, hA, hB, hself⟩ :=
+      mainFormal params strategy eps hpass
+    exact ⟨G_A, G_B, ConsRel.mono herror hA,
+      ConsRel.mono herror hB, ConsRel.mono herror hself⟩
+
+
+
 
 end Test
 

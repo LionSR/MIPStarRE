@@ -1,0 +1,41 @@
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.Defect
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.RankAllocation
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.SpectralMass
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.SelectedProjectors
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.FirstError
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.SecondError
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.ThirdError
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.ErrorBounds
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.PolarExtension
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.PolarAlgebra
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.PolarConstruction
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.PolarPositivePart
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.UnitaryConjugation
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.ThreeErrors
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.LinearOrthogonalization
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.ConsistentMeasurements
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.RightConsistentMeasurements
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.Submeasurement
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.DerivedMainLemma
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.DerivedRightMeasurement
+import MIPStarRE.LDT.MakingMeasurementsProjective.SimplifiedOrthogonalization.DerivedSubmeasurement
+
+/-!
+# Simplified state-dependent orthogonalization
+
+The state-dependent orthogonalization theorem with linear bound `9 Δ`, its
+finite-dimensional spectral selection and square polar construction, and the
+`18 ζ` consequences for consistent complete measurements and symmetric
+submeasurements.  The older fourth-root interfaces follow by scalar comparison
+and a unit-error fallback.
+
+The singular square-polar extension currently reuses the proved
+`QXPLayerIdentities.PositiveGram.Sigma` construction. Its import closure
+remains live when assessing which older repair files can be removed.
+
+## References
+
+- `blueprint/src/chapter/low_degree_simplified.tex`, Section
+  `Making measurements projective`.
+- `references/ldt-paper/orthonormalization.tex`, Section 5.
+-/

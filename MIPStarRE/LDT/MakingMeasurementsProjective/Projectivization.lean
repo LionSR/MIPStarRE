@@ -384,7 +384,9 @@ private lemma qSSCDefect_rightPlacedMeasurement_le_two_qBipartiteConsDefect
   simpa [qSSCDefect, diagB, hrightPlaced_outcome, hrightPlaced_total,
     rightTensor_mul_rightTensor, B.total_eq_one] using hmax'
 
-private lemma sourceAlmostProjective_of_ssc {Outcome : Type*}
+/-- The local self-consistency defect of a complete measurement bounds its
+state-dependent idempotence defect. -/
+lemma sourceAlmostProjective_of_ssc {Outcome : Type*}
     {ι : Type*} [Fintype ι] [DecidableEq ι]
     [Fintype Outcome]
     (ψ : QuantumState ι) (A : Measurement Outcome ι) (η : Error)
