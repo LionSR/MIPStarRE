@@ -9,6 +9,7 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Assembly
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
 import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.FinalFields
 import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
+import MIPStarRE.LDT.SelfImprovement.Simplified.VarianceCertificate
 
 /-!
 # Self-improvement theorem variants
@@ -104,13 +105,14 @@ lemma self_improvement_helper_with_slackness
 
 Self-improvement helper lemma for a polynomial measurement `G` consistent with
 the point measurement. It produces a polynomial submeasurement `H` and a
-positive semidefinite witness `Z` satisfying the four conclusions of the paper:
+positive contraction `Z` satisfying the four conclusions of the paper:
 completeness, consistency with `A`, strong self-consistency, and boundedness.
 The boundedness conclusion is split into positivity of `Z`, pointwise domination
 of the averaged point measurement, and the state-dependent gap estimate.  The
 strong-self-consistency branch is proved in this file and is not exposed as an
-additional public hypothesis. -/
-lemma selfImprovementHelper
+additional public hypothesis. The square certificate `Z² ≤ H.total` is
+the simplified proof's algebraic input for dilation. -/
+lemma self_improvement_helper_with_contraction
     (params : Parameters)
     [FieldModel params.q]
     (strategy : SymStrat params ι)
@@ -122,8 +124,10 @@ lemma selfImprovementHelper
       ConsRel strategy.state (uniformDistribution (Point params))
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (polynomialEvaluationFamily params G.toSubMeas) nu) :
-    ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
-      SelfImprovementHelperStatement params strategy H Z eps delta nu := by
+    ∃ H : SubMeas (Polynomial params) ι,
+      ∃ Z : MIPStarRE.Quantum.Op ι,
+        SelfImprovementHelperStatement params strategy H Z eps delta nu ∧
+          Z ≤ 1 ∧ Z * Z ≤ H.total := by
   rcases self_improvement_helper_with_slackness params strategy eps delta gamma
       hgood nu G with
     ⟨T, Hhat, Z, hhelperWithSlackness⟩
@@ -153,7 +157,9 @@ lemma selfImprovementHelper
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
         (pointConsistencyAddInUSelection params)
     simpa [hhelper.averagedConstruction] using htransfer
-  refine ⟨Hhat, Z, ?_⟩
+  have hcertificate := helper_filtered_certificate_of_slackness
+    params strategy T Hhat Z eps delta hhelperWithSlackness
+  refine ⟨Hhat, Z, ?_, hcertificate.2.1, hcertificate.2.2.1⟩
   refine
     { completeness := ?_
       pointConsistency := ?_
@@ -244,6 +250,27 @@ lemma selfImprovementHelper
         params strategy eps delta heps hdelta hhelper hpointSSC
         (fun h => (hhelperWithSlackness.complementarySlackness h).symm)
         hpointTransfer
+
+/-- The paper's non-projective self-improvement helper, recovered from
+the stronger SDP-certificate construction. -/
+lemma selfImprovementHelper
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (eps delta gamma : Error)
+    (hgood : strategy.IsGood eps delta gamma)
+    (nu : Error)
+    (G : Measurement (Polynomial params) ι)
+    (hcons :
+      ConsRel strategy.state (uniformDistribution (Point params))
+        (IdxProjMeas.toIdxSubMeas strategy.pointMeasurement)
+        (polynomialEvaluationFamily params G.toSubMeas) nu) :
+    ∃ H : SubMeas (Polynomial params) ι, ∃ Z : MIPStarRE.Quantum.Op ι,
+      SelfImprovementHelperStatement params strategy H Z eps delta nu := by
+  obtain ⟨H, Z, hstatement, _⟩ :=
+    self_improvement_helper_with_contraction params strategy eps delta gamma
+      hgood nu G hcons
+  exact ⟨H, Z, hstatement⟩
 
 /-- Internal large-error fallback for `selfImprovement`.
 

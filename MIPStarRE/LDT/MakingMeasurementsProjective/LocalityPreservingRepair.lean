@@ -40,7 +40,9 @@ The theorem proved here is the direct output of that route under a normalized
 bipartite state and the source almost-projective estimate for the left-lifted
 measurement. It is stated directly in terms of this estimate, rather than in
 terms of a separate repair-input assumption, and provides the unconditional
-repair step used by the orthonormalization theorem.
+repair step retained for the independent completion-route theorem. The public
+orthonormalization theorems now follow from the linear bound in
+`SimplifiedOrthogonalization`.
 -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
@@ -76,7 +78,8 @@ private lemma leftMarginalDensity_nonneg {ιA ιB : Type*}
     positivity
   simpa [leftMarginalDensity] using smul_nonneg hcoeff hsum
 
-private def leftMarginalState {ιA ιB : Type*}
+/-- The normalized left-register marginal of a bipartite quantum state. -/
+def leftMarginalState {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιB]
     (ψ : QuantumState (ιA × ιB)) : QuantumState ιA where
   density := leftMarginalDensity ψ.density
@@ -135,7 +138,8 @@ private lemma normalizedTrace_leftMarginalDensity_mul_eq
   simp [Fintype.card_prod]
   ring
 
-private lemma leftMarginalState_isNormalized {ιA ιB : Type*}
+/-- Normalization passes from a bipartite state to its left marginal. -/
+lemma leftMarginalState_isNormalized {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιB]
     {ψ : QuantumState (ιA × ιB)} (hψ : ψ.IsNormalized) :
     (leftMarginalState ψ).IsNormalized := by
@@ -148,7 +152,8 @@ private lemma leftMarginalState_isNormalized {ιA ιB : Type*}
         (X := (1 : MIPStarRE.Quantum.Op ιA))
   simpa [leftMarginalState] using hnorm.trans hψ
 
-private lemma leftMarginal_ev_eq {ιA ιB : Type*}
+/-- The expectation of a left-tensor operator is its left-marginal expectation. -/
+lemma leftMarginal_ev_eq {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιB]
     (ψ : QuantumState (ιA × ιB)) (X : MIPStarRE.Quantum.Op ιA) :
     ev ψ (leftTensor (ι₂ := ιB) X) = ev (leftMarginalState ψ) X := by
@@ -182,7 +187,8 @@ private lemma rightMarginalDensity_nonneg {ιA ιB : Type*}
     positivity
   simpa [rightMarginalDensity] using smul_nonneg hcoeff hsum
 
-private def rightMarginalState {ιA ιB : Type*}
+/-- The normalized state induced on Bob's local space by a bipartite state. -/
+def rightMarginalState {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
     (ψ : QuantumState (ιA × ιB)) : QuantumState ιB where
   density := rightMarginalDensity ψ.density
@@ -219,7 +225,8 @@ private lemma normalizedTrace_rightMarginalDensity_mul_eq
   simp [Fintype.card_prod]
   ring
 
-private lemma rightMarginalState_isNormalized {ιA ιB : Type*}
+/-- The right marginal of a normalized bipartite state is normalized. -/
+lemma rightMarginalState_isNormalized {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
     {ψ : QuantumState (ιA × ιB)} (hψ : ψ.IsNormalized) :
     (rightMarginalState ψ).IsNormalized := by
@@ -232,7 +239,9 @@ private lemma rightMarginalState_isNormalized {ιA ιB : Type*}
         (X := (1 : MIPStarRE.Quantum.Op ιB))
   simpa [rightMarginalState] using hnorm.trans hψ
 
-private lemma rightMarginal_ev_eq {ιA ιB : Type*}
+/-- Expectations of operators on Bob's tensor factor equal expectations in
+the right marginal state. -/
+lemma rightMarginal_ev_eq {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιA]
     (ψ : QuantumState (ιA × ιB)) (X : MIPStarRE.Quantum.Op ιB) :
     ev ψ (rightTensor (ι₁ := ιA) X) = ev (rightMarginalState ψ) X := by
@@ -431,8 +440,8 @@ private lemma sddRel_of_rightPlaced_sddOpRel {Outcome : Type*}
 /-- Locality-preserving `Q/X/XHat/P` repair for a left-lifted measurement at the
 paper's `2ζ` source-defect scale.
 
-This is the sharp Section 5 repair route needed in the proof of
-`thm:orthonormalization`: if the left-lifted source almost-projective defect is
+This is the earlier sharp Section 5 repair route: if the left-lifted
+source almost-projective defect is
 bounded by `2 * ζ`, then the final local projective submeasurement is still
 obtained with the paper's `84 * ζ^(1/4)` envelope.
 
@@ -441,7 +450,7 @@ for the scalar constant repair in
 `docs/paper-gaps/issue-1032-orthonormalization-constant.tex`.
 
 **Faithful encoding:** This is the paper's locality-preserving construction at
-the `2ζ` scale needed by the completion-to-measurement proof of
+the `2ζ` scale in the original completion-to-measurement proof of
 `thm:orthonormalization`. -/
 theorem leftPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
     {Outcome : Type*} {ιA ιB : Type*}

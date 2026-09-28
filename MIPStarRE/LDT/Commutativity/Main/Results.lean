@@ -1,5 +1,4 @@
 import MIPStarRE.LDT.Commutativity.Main.EvaluatedQuestions
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Second
 import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
 
 /-!

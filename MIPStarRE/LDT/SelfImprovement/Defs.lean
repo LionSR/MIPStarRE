@@ -1,6 +1,5 @@
 import MIPStarRE.LDT.GlobalVariance.Defs.Families
 import MIPStarRE.LDT.MainInductionStep.Defs
-import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
 
 /-!
 # Section 9 — Definitions
