@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Telescope
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Telescope
 
 /-!
 # Section 12 pasting: from-H-to-G theorem
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Telescope
 Derivation of `lem:from-H-to-G`, from the `G`-hat facts, the half-sandwich
 commutation theorem, and the telescoping Bernoulli-stage comparison.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

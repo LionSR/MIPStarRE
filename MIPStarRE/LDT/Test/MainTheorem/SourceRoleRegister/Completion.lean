@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Core
+module
+
+public import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Core
 
 /-!
 # Source-Boundary Role-Register Handoff: Completion Lemmas
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Core
 This module contains the completion and line-169 transport lemmas for the
 two-space source role-register route.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

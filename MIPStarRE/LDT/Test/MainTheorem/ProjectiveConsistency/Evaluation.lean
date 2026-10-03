@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Preliminaries.ComparisonProjective
-import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
+module
+
+public import MIPStarRE.LDT.Preliminaries.ComparisonProjective
+public import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
 # Projective consistency evaluation
@@ -8,6 +10,8 @@ This module contains the data-processing lemmas which turn polynomial-level
 projective consistency into pointwise consistency after evaluation at a sampled
 point.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -44,7 +48,7 @@ theorem consRel_constPolynomialEvaluation
         avgOver (uniformDistribution (Point params))
             (fun _ : Point params => qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas) =
           qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
-      haveI : Nonempty (Point params) := by infer_instance
+      have : Nonempty (Point params) := by infer_instance
       simpa using
         (avgOver_uniform_const (α := Point params)
           (qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas))
@@ -105,7 +109,7 @@ theorem consRel_constPolynomialEvaluation_heterogeneous
         avgOver (uniformDistribution (Point params))
             (fun _ : Point params => qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas) =
           qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas := by
-      haveI : Nonempty (Point params) := by infer_instance
+      have : Nonempty (Point params) := by infer_instance
       simpa using
         (avgOver_uniform_const (α := Point params)
           (qBipartiteConsDefect ψ A.toSubMeas B.toSubMeas))

@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.Distribution
-import MIPStarRE.LDT.Basic.PMFUniformAverages
+module
+
+public import MIPStarRE.LDT.Basic.Distribution
+public import MIPStarRE.LDT.Basic.PMFUniformAverages
 
 /-!
 # Module-valued uniform finite sums for project distributions
@@ -31,6 +33,8 @@ functions.
 These are formalization-internal finite probability lemmas for the low
 individual degree test development.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 
@@ -215,7 +219,7 @@ theorem uniformDistribution_sum_smul_equiv_fst {γ α β M : Type*}
         (uniformDistribution γ).weight x • f (e x).1 =
       ∑ a ∈ (uniformDistribution α).support, (uniformDistribution α).weight a • f a := by
   classical
-  haveI := Fintype.ofFinite β
+  have := Fintype.ofFinite β
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := γ)]
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := α)]
   simpa [PMF.realWeightedSum] using
@@ -233,7 +237,7 @@ theorem uniformDistribution_sum_smul_equiv_snd {γ α β M : Type*}
         (uniformDistribution γ).weight x • f (e x).2 =
       ∑ b ∈ (uniformDistribution β).support, (uniformDistribution β).weight b • f b := by
   classical
-  haveI := Fintype.ofFinite α
+  have := Fintype.ofFinite α
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := γ)]
   rw [uniformDistribution_sum_smul_eq_pmf_sum (α := β)]
   simpa [PMF.realWeightedSum] using
@@ -386,7 +390,7 @@ theorem uniformOnFinset_sum_smul_equiv {α β M : Type*}
       ∑ b ∈ (uniformDistribution β).support,
         (uniformDistribution β).weight b • f (e b).1 := by
   classical
-  haveI : Nonempty {a : α // a ∈ s} :=
+  have : Nonempty {a : α // a ∈ s} :=
     ⟨e (Classical.choice (inferInstance : Nonempty β))⟩
   calc
     ∑ a ∈ (Distribution.uniformOnFinset s).support,
@@ -418,7 +422,7 @@ theorem uniformOnFinset_filter_sum_smul_eq_subtype {α M : Type*}
         ⟨a.1, Finset.mem_filter.mpr ⟨Finset.mem_univ a.1, a.2⟩⟩
       left_inv := fun _ => rfl
       right_inv := fun _ => rfl }
-  haveI : Nonempty {a : α // a ∈ support} := by
+  have : Nonempty {a : α // a ∈ support} := by
     rcases (inferInstance : Nonempty {a : α // p a}) with ⟨a⟩
     exact ⟨⟨a.1, Finset.mem_filter.mpr ⟨Finset.mem_univ a.1, a.2⟩⟩⟩
   calc
@@ -448,7 +452,7 @@ theorem uniformOnFinset_filter_sum_smul_equiv {α β M : Type*}
       ∑ b ∈ (uniformDistribution β).support,
         (uniformDistribution β).weight b • f (e b).1 := by
   classical
-  haveI : Nonempty {a : α // p a} :=
+  have : Nonempty {a : α // p a} :=
     ⟨e (Classical.choice (inferInstance : Nonempty β))⟩
   calc
     ∑ a ∈ (Distribution.uniformOnFinset (Finset.univ.filter p)).support,

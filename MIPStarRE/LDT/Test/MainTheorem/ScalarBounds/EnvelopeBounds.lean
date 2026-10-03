@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.Definitions
+module
+
+public import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.Definitions
 
 /-!
 # Error cascade — envelope and root bounding machinery
@@ -13,6 +15,8 @@ All lemmas are technical and should not be part of downstream API.
 
 * `references/ldt-paper/inductive_step.tex`, lines 187–234.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

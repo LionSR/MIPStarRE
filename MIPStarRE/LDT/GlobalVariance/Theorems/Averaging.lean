@@ -1,4 +1,8 @@
-import MIPStarRE.LDT.GlobalVariance.Defs.Families
+module
+
+public import MIPStarRE.LDT.GlobalVariance.Defs.Families
+
+/-! ## Uniform averaging infrastructure -/
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -9,7 +13,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Uniform averaging infrastructure -/
+@[expose] public section
 
 private lemma ev_uniformAverage_sq_le_avg
     {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α]
@@ -252,5 +256,7 @@ lemma avgOver_polynomialDistribution_le_of_pointwise
         exact hpoint g
     _ = δ := by
       simp [polynomialDistribution, avgOver, uniformDistribution]
+
+end
 
 end MIPStarRE.LDT.GlobalVariance

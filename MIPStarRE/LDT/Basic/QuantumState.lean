@@ -1,11 +1,15 @@
-import MIPStarRE.LDT.Basic.ParametersBase
-import MIPStarRE.Quantum.FiniteMatrix
+module
+
+public import MIPStarRE.LDT.Basic.ParametersBase
+public import MIPStarRE.Quantum.FiniteMatrix
 
 /-!
 # Quantum states and tensor placement for the low individual degree test
 
 Core quantum-state definitions together with tensor-placement operators.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -37,7 +41,7 @@ theorem QuantumState.IsNormalized.nonempty {ι : Type*} [Fintype ι] [DecidableE
     {ψ : QuantumState ι} (hψ : ψ.IsNormalized) : Nonempty ι := by
   by_contra h
   rw [not_nonempty_iff] at h
-  letI := h
+  let := h
   rw [QuantumState.IsNormalized] at hψ
   have hzero : MIPStarRE.Quantum.normalizedTrace ψ.density = 0 := by
     simp [MIPStarRE.Quantum.normalizedTrace]
@@ -80,7 +84,8 @@ private theorem basis_unit {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty 
 noncomputable def basis {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
     (i : ι) : PureState ι where
   vector := fun j => if j = i then 1 else 0
-  unit := basis_unit i
+  unit := by
+    exact basis_unit i
 
 /-- The density matrix represented by a pure-state witness. -/
 noncomputable def density {ι : Type*} [Fintype ι] [DecidableEq ι] [Nonempty ι]
@@ -273,8 +278,8 @@ theorem tensor_isNormalized
     (ψ.tensor φ).IsNormalized := by
   have hι₁ : Nonempty ι₁ := hψ.nonempty
   have hι₂ : Nonempty ι₂ := hφ.nonempty
-  letI := hι₁
-  letI := hι₂
+  let := hι₁
+  let := hι₂
   rw [QuantumState.IsNormalized, tensor_density, normalizedTrace_opTensor, hψ, hφ, one_mul]
 
 end QuantumState

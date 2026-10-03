@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.Test.StrategyFailures
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer
-import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+public import MIPStarRE.LDT.Test.StrategyFailures
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer
+public import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 
 /-!
 # Section 7 — Selection-dependent transfer inequality for `lem:add-in-u`
@@ -16,6 +18,8 @@ The theorem below combines the already formalized selected Cauchy--Schwarz
 chain with the six-step cardinality-free local-variance transport bound to
 establish the paper's fully quantified transfer inequality.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

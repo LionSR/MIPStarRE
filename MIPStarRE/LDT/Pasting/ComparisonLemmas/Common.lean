@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Pasting.GHatFacts
-import MIPStarRE.LDT.Pasting.Core.CompletePart
-import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
-import MIPStarRE.LDT.Basic.LowDegreePolynomial
+module
+
+public import MIPStarRE.LDT.Pasting.GHatFacts
+public import MIPStarRE.LDT.Pasting.Core.CompletePart
+public import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
+public import MIPStarRE.LDT.Basic.LowDegreePolynomial
 
 /-!
 # Section 12 pasting: comparison common helpers
@@ -14,6 +16,8 @@ Shared postprocessing, symmetry, distribution, boundedness, and arithmetic helpe
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

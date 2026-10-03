@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Core
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Core
 
 /-!
 # Helper strong self-consistency bounds: post-delete transports
@@ -11,6 +13,8 @@ used before the residual-chain assembly.
 - `references/ldt-paper/self_improvement.tex`
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

@@ -1,9 +1,11 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainReverse
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainTail
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainReverse
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainTail
+public import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
+public import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.PhaseTwo
 
 /-!
 # Main scalar chain assembly
@@ -15,6 +17,8 @@ lines 72–131.  Phases 1, 3, 4, 6–7, and 8–9 are supplied by the reverse an
 tail parts of the paper chain; Phase 2 uses the reindexing infrastructure from
 `PhaseTwo`.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

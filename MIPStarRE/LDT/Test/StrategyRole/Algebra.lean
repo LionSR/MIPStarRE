@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyRole.Core
+module
+
+public import MIPStarRE.LDT.Test.StrategyRole.Core
 
 /-!
 # Role-register algebraic identities for the low individual degree test
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Test.StrategyRole.Core
 Role-pair projection algebra, symmetrized measurement definitions, and expectation
 identities for the classical role-register symmetrized state.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT
 

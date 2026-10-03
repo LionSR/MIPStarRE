@@ -1,16 +1,8 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.Core
-import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransportSum
-import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
+module
 
-namespace MIPStarRE.LDT.GlobalVariance
-
-open MIPStarRE.LDT
-open MIPStarRE.LDT.Preliminaries
-open MIPStarRE.LDT.MakingMeasurementsProjective
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+public import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.Core
+public import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransportSum
+public import MIPStarRE.LDT.GlobalVariance.Theorems.PolynomialSumBounds
 
 /-! ## Sum-form local-variance chain (complete)
 
@@ -46,6 +38,18 @@ Reindex each inner sum to a native distribution and apply the _sum bound.
 Finally reindex the left side from 𝒟 to rerandomizeCoord.
 ```
 -/
+
+namespace MIPStarRE.LDT.GlobalVariance
+
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Preliminaries
+open MIPStarRE.LDT.MakingMeasurementsProjective
+open MIPStarRE.LDT.ExpansionHypercubeGraph
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+@[expose] public section
 
 /-- Reverse generalize-B bound summed over all polynomials.
 
@@ -449,5 +453,7 @@ lemma localVarianceDeviation_sum_le_localVarianceOfPointsError
   -- absorb the transport-chain error into the public error
   exact le_trans hlocal_sum
     (localVarianceTransportChainError_le_localVarianceOfPointsError params strategy hgood)
+
+end
 
 end MIPStarRE.LDT.GlobalVariance

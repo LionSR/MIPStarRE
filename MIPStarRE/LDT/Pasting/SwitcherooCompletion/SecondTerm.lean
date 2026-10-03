@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 
 /-!
 # Section 12 pasting: switcheroo second term
 
 Complete-part self-consistency and the second switcheroo term.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

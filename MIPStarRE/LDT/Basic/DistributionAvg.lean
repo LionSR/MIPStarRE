@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.DistributionUniformSums
-import Mathlib.Probability.ProbabilityMassFunction.Integrals
+module
+
+public import MIPStarRE.LDT.Basic.DistributionUniformSums
+public import Mathlib.Probability.ProbabilityMassFunction.Integrals
 
 /-!
 # Average lemmas for finite-support distributions
@@ -21,6 +23,8 @@ uniform probability mass functions.
 These are formalization-internal finite probability lemmas for the low
 individual degree test development.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -209,7 +213,7 @@ theorem avgOver_eq_toPMF_integral {α : Type*}
     [Finite α] [MeasurableSpace α] [MeasurableSingletonClass α]
     (𝒟 : Distribution α) (h𝒟 : 𝒟.IsProbability) (f : α → Error) :
     avgOver 𝒟 f = ∫ a, f a ∂(𝒟.toPMF h𝒟).toMeasure := by
-  haveI := Fintype.ofFinite α
+  have := Fintype.ofFinite α
   rw [avgOver_eq_toPMF_sum 𝒟 h𝒟 f, PMF.integral_eq_sum]
   simp only [smul_eq_mul]
 
@@ -429,7 +433,7 @@ theorem avgOver_uniformOnFinset_eq_pmf_integral {α : Type*}
     (s : Finset α) (hs : s.Nonempty) (f : α → Error) :
     avgOver (Distribution.uniformOnFinset s) f =
       ∫ a, f a ∂(PMF.uniformOfFinset s hs).toMeasure := by
-  haveI := Fintype.ofFinite α
+  have := Fintype.ofFinite α
   rw [avgOver_uniformOnFinset_eq_pmf_sum s hs, PMF.integral_eq_sum]
   simp only [smul_eq_mul]
   symm

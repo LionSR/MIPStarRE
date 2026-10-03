@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
 
 /-!
 # Section 12 pasting: scalar bounds for complementary Bernoulli branches
@@ -7,6 +9,8 @@ This file collects the elementary scalar estimates used by the complementary
 branches of `thm:ld-pasting`.  These estimates correspond to the large-error
 reduction in `references/ldt-paper/ld-pasting.tex`, lines 52--55.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

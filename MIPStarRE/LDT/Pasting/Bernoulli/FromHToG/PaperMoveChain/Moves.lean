@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds
 
 /-!
 # Section 12 pasting: from-H-to-G paper moves
@@ -7,6 +9,8 @@ This file contains the two analytic moves in the adjacent-stage paper chain:
 `M₂ → M₃` and `M₃ → E`.  They are the Cauchy--Schwarz and collapse steps in
 `ld-pasting.tex`, immediately before the adjacent-stage recurrence is assembled.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

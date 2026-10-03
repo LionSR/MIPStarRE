@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
+module
+
+public import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 
 /-!
 # Section 12 pasting: G-hat facts
 
 Quadrant decompositions and `GHat` bookkeeping facts.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

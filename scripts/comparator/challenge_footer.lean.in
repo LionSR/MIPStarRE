@@ -2,7 +2,7 @@
 namespace MIPStarRE.LDT
 namespace Test
 
--- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:288-327  (MIPStarRE.LDT.Test.mainFormal)
+-- source: MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean:292-331  (MIPStarRE.LDT.Test.mainFormal)
 /--
 Corrected source statement of `thm:main-formal`.
 

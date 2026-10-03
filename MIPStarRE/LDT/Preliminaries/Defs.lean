@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Test.Defs
-import MIPStarRE.LDT.Tactic.QuantumNonneg
+module
+
+public import MIPStarRE.LDT.Test.Defs
+public import MIPStarRE.LDT.Tactic.QuantumNonneg
 
 /-!
 # Preliminary definitions and statement structures
@@ -23,6 +25,8 @@ consistency, sandwich, and completion statements in a form used by later files.
 
 - `references/ldt-paper/preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -128,7 +132,8 @@ noncomputable def diagonalSandwichFamily {Question Outcome : Type*}
       rw [leftTensor_mul_rightTensor_eq_opTensor]
       quantum_nonneg
     sum_eq_total := rfl
-    total_le_one := diagonalSandwichFamily_total_le_one A B q
+    total_le_one := by
+      exact diagonalSandwichFamily_total_le_one A B q
   }
 
 /-- `A ⊗ B_a`, the total bipartite family from `prop:cons-sub-meas`.
@@ -153,7 +158,8 @@ noncomputable def totalSandwichFamily {Question Outcome : Type*}
       rw [leftTensor_mul_rightTensor_eq_opTensor]
       quantum_nonneg
     sum_eq_total := rfl
-    total_le_one := totalSandwichFamily_total_le_one A B q
+    total_le_one := by
+      exact totalSandwichFamily_total_le_one A B q
   }
 
 /-- `A_a ⊗ B_a` for the two-space statement of `prop:cons-sub-meas`.
@@ -178,7 +184,8 @@ noncomputable def heterogeneousDiagonalSandwichFamily {Question Outcome : Type*}
       rw [leftTensor_mul_rightTensor_eq_opTensor]
       quantum_nonneg
     sum_eq_total := rfl
-    total_le_one := diagonalSandwichFamily_total_le_one A B q
+    total_le_one := by
+      exact diagonalSandwichFamily_total_le_one A B q
   }
 
 /-- `A ⊗ B_a` for the two-space statement of `prop:cons-sub-meas`.
@@ -202,7 +209,8 @@ noncomputable def heterogeneousTotalSandwichFamily {Question Outcome : Type*}
       rw [leftTensor_mul_rightTensor_eq_opTensor]
       quantum_nonneg
     sum_eq_total := rfl
-    total_le_one := totalSandwichFamily_total_le_one A B q
+    total_le_one := by
+      exact totalSandwichFamily_total_le_one A B q
   }
 
 /-- Same-space output statement for `prop:cons-sub-meas`.
@@ -349,7 +357,8 @@ noncomputable def completeAtOutcome {Outcome : Type*}
         · simpa [h, residual] using
             add_nonneg (B.outcome_pos a0) (sub_nonneg.mpr B.total_le_one)
         · simp [h, B.outcome_pos a]
-      sum_eq_total := completeAtOutcome_sum_eq_one B a0
+      sum_eq_total := by
+        exact completeAtOutcome_sum_eq_one B a0
       total_le_one := le_rfl
     }
     total_eq_one := rfl

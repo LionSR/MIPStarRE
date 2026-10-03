@@ -1,9 +1,11 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 
 /-!
 # Helper completeness: fiber operators and Cauchy--Schwarz bounds
@@ -17,6 +19,8 @@ analytic moves of the helper-completeness proof.
 - `references/ldt-paper/self_improvement.tex` lines 359--394
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

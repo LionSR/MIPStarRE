@@ -1,4 +1,14 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.Utilities
+module
+
+public import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.Utilities
+
+/-! # Axis-parallel point-line self-consistency transport
+
+This module contains the point-line consistency and rebasing interfaces used in
+the middle two `2ε` moves of the local-variance transport chain in
+`lem:local-variance-of-points` (`expansion.tex`, lines 306--307 and
+309--310).
+-/
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -10,13 +20,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! # Axis-parallel point-line self-consistency transport
-
-This module contains the point-line consistency and rebasing interfaces used in
-the middle two `2ε` moves of the local-variance transport chain in
-`lem:local-variance-of-points` (`expansion.tex`, lines 306--307 and
-309--310).
--/
+@[expose] public section
 
 /-- The `ε` consistency interface for the point-line event at the base point of
 an axis-parallel test sample.
@@ -84,6 +88,24 @@ private noncomputable def axisParallelBaseLineEventMeasurement
       unfold axisParallelLineAnswerFamily
       rw [postprocess_total]
       exact (strategy.axisParallelMeasurement { base := s.1, direction := s.2 }).total_eq_one)
+
+/-- At a base-point sample, the selected line event is the left operator used
+in the weighted point-line comparison. -/
+private lemma axisParallelBaseLineEvent_some
+    (params : Parameters)
+    [FieldModel params.q]
+    (strategy : SymStrat params ι)
+    (g : Polynomial params)
+    (s : AxisParallelTestSample params) :
+    (postprocess (axisParallelLineAnswerFamily strategy s)
+        (fun a : Fq params => if a = g s.1 then some () else none)).outcome (some ()) =
+      generalizeBLeftOperatorAtPolynomial params strategy g
+        ({ base := s.1, direction := s.2 }, s.1) := by
+  classical
+  simp [axisParallelLineAnswerFamily, axisParallelLineAnswerFamilyOf,
+    generalizeBLeftOperatorAtPolynomial, generalizeBLeftEventSubMeasAtPolynomial,
+    axisParallelLineQuestionParameter, subCoord, zeroCoord, postprocess,
+    Finset.sum_filter, Finset.sum_comm, eq_comm]
 
 /-- The symmetric `2ε` approximation interface for the point-line event.
 
@@ -214,12 +236,44 @@ lemma axisParallelBaseEventApproximation_weighted_sample
       (fun s _ => ((IdxSubMeas.liftLeft lineEvent) s).outcome (some ()))
       (fun s _ => ((IdxSubMeas.liftRight pointEvent) s).outcome (some ()))
       C (2 * eps) hAB hC
-  simpa [qSDDCore, C, R, S, pointEvent, lineEvent, IdxSubMeas.liftLeft,
-    IdxSubMeas.liftRight, weightedGeneralizeBLeftOperatorAtPolynomial,
-    weightedPointConditionedRightOperatorAtPolynomial, generalizeBLeftOperatorAtPolynomial,
-    generalizeBLeftEventSubMeasAtPolynomial, axisParallelLineAnswerFamily,
-    axisParallelLineQuestionParameter, subCoord, zeroCoord,
-    rightTensor_mul_leftTensor_eq_opTensor, rightTensor_mul_rightTensor] using hcab
+  calc
+    avgOver (uniformDistribution (AxisParallelTestSample params))
+        (fun s =>
+          let qu : AxisParallelLineQuestion params :=
+            ({ base := s.1, direction := s.2 }, s.1)
+          let D := weightedGeneralizeBLeftOperatorAtPolynomial params strategy G g qu -
+            weightedPointConditionedRightOperatorAtPolynomial params strategy G g s.1
+          ev strategy.state (Dᴴ * D)) =
+      avgOver (uniformDistribution (AxisParallelTestSample params))
+        (fun s =>
+          qSDDCore strategy.state
+            (fun ab : Unit × Unit =>
+              C s ab.1 ab.2 *
+                ((IdxSubMeas.liftLeft lineEvent) s).outcome (some ()))
+            (fun ab : Unit × Unit =>
+              C s ab.1 ab.2 *
+                ((IdxSubMeas.liftRight pointEvent) s).outcome (some ()))) := by
+          apply avgOver_congr
+          intro s
+          simp only [qSDDCore, Fintype.sum_prod_type, Fintype.sum_unique]
+          rw [show ((IdxSubMeas.liftLeft lineEvent) s).outcome (some ()) =
+              leftTensor (ι₂ := ι)
+                (generalizeBLeftOperatorAtPolynomial params strategy g
+                  ({ base := s.1, direction := s.2 }, s.1)) by
+                change leftTensor (ι₂ := ι)
+                    ((postprocess (axisParallelLineAnswerFamily strategy s)
+                      (fun a : Fq params => if a = g s.1 then some () else none)).outcome
+                        (some ())) = _
+                exact congrArg (leftTensor (ι₂ := ι))
+                  (axisParallelBaseLineEvent_some params strategy g s)]
+          rw [show ((IdxSubMeas.liftRight pointEvent) s).outcome (some ()) =
+              rightTensor (ι₁ := ι)
+                (pointConditionedOutcomeOperatorAtPolynomial params strategy g s.1) by
+                simp [pointEvent, IdxSubMeas.liftRight]]
+          simp only [C, R, S, weightedGeneralizeBLeftOperatorAtPolynomial,
+            weightedPointConditionedRightOperatorAtPolynomial,
+            rightTensor_mul_leftTensor_eq_opTensor, rightTensor_mul_rightTensor]
+    _ ≤ 2 * eps := hcab
 
 /-- Rebasing an incident axis-parallel line question at its sampled point does
 not change the evaluated line event operator.
@@ -360,5 +414,7 @@ lemma axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion
             (weightedPointConditionedRightOperatorAtPolynomial params strategy G g qu.2)
     _ ≤ 2 * eps := axisParallelPointLineConsistency_weighted_leftToRightLineQuestion
       params strategy eps delta gamma hgood G g
+
+end
 
 end MIPStarRE.LDT.GlobalVariance

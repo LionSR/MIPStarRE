@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.SwitcherooSetup.Infrastructure
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooSetup.Infrastructure
 
 /-!
 # Section 12 pasting: switcheroo centers
 
 Switcheroo center terms and their sandwich rewrites.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

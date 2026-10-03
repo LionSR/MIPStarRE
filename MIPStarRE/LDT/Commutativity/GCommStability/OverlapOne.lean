@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Pointwise
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.Pointwise
 
 /-!
 # Section 11 commutativity: `G`-stability overlap (step one)
@@ -12,6 +14,8 @@ integral.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

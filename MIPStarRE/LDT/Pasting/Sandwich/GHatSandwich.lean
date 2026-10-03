@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.Sandwich.Switcheroo
+module
+
+public import MIPStarRE.LDT.Pasting.Sandwich.Switcheroo
 
 /-!
 # Section 12 — Sandwich constructions: `GHat` sandwich families
 
 Completed-slice sandwich families and restriction helpers.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

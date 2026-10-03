@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds.SandwichContext
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds.SandwichContext
 
 /-!
 # Section 12 pasting: from-H-to-G collapsed bounds
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperBounds.SandwichContext
 Collapses the paper endpoint `M₄` to the next Lean stage and records the scalar
 bounds used by the final telescope.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

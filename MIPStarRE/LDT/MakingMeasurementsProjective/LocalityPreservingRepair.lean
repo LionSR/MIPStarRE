@@ -1,13 +1,15 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
-import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.Conversion
-import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
-import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
-import MIPStarRE.LDT.Preliminaries.CompletionTransfer
-import MIPStarRE.LDT.Preliminaries.DistanceBounds
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+public import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.Conversion
+public import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+public import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+public import MIPStarRE.LDT.Preliminaries.DistanceBounds
 
 /-!
 # Section 5 — Locality-preserving projectivization repair
@@ -42,6 +44,8 @@ measurement. It is stated directly in terms of this estimate, rather than in
 terms of a separate repair-input assumption, and provides the unconditional
 repair step used by the orthonormalization theorem.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -80,7 +84,8 @@ private def leftMarginalState {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB] [Nonempty ιB]
     (ψ : QuantumState (ιA × ιB)) : QuantumState ιA where
   density := leftMarginalDensity ψ.density
-  density_psd := leftMarginalDensity_nonneg ψ.density_psd
+  density_psd := by
+    exact leftMarginalDensity_nonneg ψ.density_psd
 
 private lemma leftTensor_eq_blockDiagonal_const {ιA ιB : Type*}
     [Fintype ιA] [DecidableEq ιA] [Fintype ιB] [DecidableEq ιB]
@@ -460,10 +465,10 @@ theorem leftPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
         (constSubMeasFamily (leftPlacedSubMeas (ιB := ιB) P.toSubMeas))
         (orthonormalizationMainLemmaError ζ) := by
   classical
-  letI : DecidableEq Outcome := Classical.decEq Outcome
+  let : DecidableEq Outcome := Classical.decEq Outcome
   rcases QuantumState.IsNormalized.nonempty (ι := ιA × ιB) hψ with ⟨⟨i, j⟩⟩
-  letI : Nonempty ιA := ⟨i⟩
-  letI : Nonempty ιB := ⟨j⟩
+  let : Nonempty ιA := ⟨i⟩
+  let : Nonempty ιB := ⟨j⟩
   let φ : QuantumState ιA := leftMarginalState ψ
   have hφ : φ.IsNormalized := leftMarginalState_isNormalized hψ
   have hterm : ∀ a : Outcome,
@@ -491,7 +496,7 @@ theorem leftPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
         hζ_small hSpectralLocal hsourceLocal
     by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier
         (fun a : Outcome => (qLayer.q.outcome a).rank))
-    · letI := hsigma
+    · let := hsigma
       obtain ⟨_xHat, _hxHat_coisometry, _hxHat_mixed, data, hq, _hx, _hxHat, hQP⟩ :=
         pQApprox_ofRankReductionSigmaRangePositiveGram φ A ζ hRank hφ hζ hζ_small
       have hAQ :
@@ -605,10 +610,10 @@ theorem rightPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
         (constSubMeasFamily (rightPlacedSubMeas (ιA := ιA) P.toSubMeas))
         (orthonormalizationMainLemmaError ζ) := by
   classical
-  letI : DecidableEq Outcome := Classical.decEq Outcome
+  let : DecidableEq Outcome := Classical.decEq Outcome
   rcases QuantumState.IsNormalized.nonempty (ι := ιA × ιB) hψ with ⟨⟨i, j⟩⟩
-  letI : Nonempty ιA := ⟨i⟩
-  letI : Nonempty ιB := ⟨j⟩
+  let : Nonempty ιA := ⟨i⟩
+  let : Nonempty ιB := ⟨j⟩
   let φ : QuantumState ιB := rightMarginalState ψ
   have hφ : φ.IsNormalized := rightMarginalState_isNormalized hψ
   have hterm : ∀ a : Outcome,
@@ -636,7 +641,7 @@ theorem rightPlacedProjectivizationRepair_of_sourceAlmostProjective_two_mul
         hζ_small hSpectralLocal hsourceLocal
     by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier
         (fun a : Outcome => (qLayer.q.outcome a).rank))
-    · letI := hsigma
+    · let := hsigma
       obtain ⟨_xHat, _hxHat_coisometry, _hxHat_mixed, data, hq, _hx, _hxHat, hQP⟩ :=
         pQApprox_ofRankReductionSigmaRangePositiveGram φ B ζ hRank hφ hζ hζ_small
       have hBQ :

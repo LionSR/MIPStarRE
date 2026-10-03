@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Selected
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Variance
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Selected
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Variance
 
 /-!
 # Add-in-u scalar transfer and off-diagonal expansion
@@ -13,6 +15,8 @@ helper strong self-consistency argument.
 - `references/ldt-paper/self_improvement.tex` lines 341--343
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 
 namespace MIPStarRE.LDT.SelfImprovement

@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.Core.CompletePart
+module
+
+public import MIPStarRE.LDT.Pasting.Core.CompletePart
 
 /-!
 # Section 12 pasting: switcheroo infrastructure
 
 Initial switcheroo infrastructure and aggregate expansion helpers.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

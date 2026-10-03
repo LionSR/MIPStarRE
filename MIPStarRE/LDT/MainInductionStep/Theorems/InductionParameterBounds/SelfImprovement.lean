@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
 
 /-!
 # Section 6 — Self-Improvement Error Bounds
@@ -13,6 +15,8 @@ consequences of the non-vacuous hypothesis
 - `blueprint/src/chapter/ch10_induction.tex`
 - `references/ldt-paper/inductive_step.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

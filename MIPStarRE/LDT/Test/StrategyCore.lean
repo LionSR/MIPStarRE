@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Test.Defs
+module
+
+public import MIPStarRE.LDT.Test.Defs
 
 /-!
 # Section 3 — Strategy core
 
 Base state-invariance and strategy structures for the low individual degree test.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

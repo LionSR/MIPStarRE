@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Scaffold.Core
+module
+
+public import MIPStarRE.LDT.Commutativity.Scaffold.Core
 
 /-!
 # Section 11 commutativity: symmetry transport
@@ -13,6 +15,8 @@ by the Section 11 commutativity argument.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

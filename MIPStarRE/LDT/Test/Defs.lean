@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
-import MIPStarRE.LDT.Basic.DistributionAvg
-import MIPStarRE.LDT.Basic.OpFamily
+module
+
+public import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
+public import MIPStarRE.LDT.Basic.DistributionAvg
+public import MIPStarRE.LDT.Basic.OpFamily
 
 /-!
 # Section 3 — Definitions
@@ -10,6 +12,8 @@ matching mass, consistency defect, and test-passing predicates.
 
 All operator fields now use `Op ι` directly with a generic `Fintype` index `ι`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 
 /-!
 # Section 5 — Q/X/XHat/P core data
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 Scalar error estimates, core data structures, and shared operator-family
 definitions for the paper's `Q/X/XHat/P` intermediate layer.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

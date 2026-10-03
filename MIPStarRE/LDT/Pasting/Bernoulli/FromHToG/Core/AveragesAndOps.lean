@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Pasting.Statements
-import MIPStarRE.LDT.Pasting.Bernoulli.Weights
+module
+
+public import MIPStarRE.LDT.Pasting.Statements
+public import MIPStarRE.LDT.Pasting.Bernoulli.Weights
 
 /-!
 # Section 12 pasting: operator averages and projective submeasurement lemmas
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.Pasting.Bernoulli.Weights
 Averages over uniform distributions, tensor placement identities, and
 projective submeasurement algebraic lemmas for the `fromHToG` reduction.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -76,7 +80,7 @@ lemma fromHToG_emptyRestrictedSandwichTotal_eq_one
         (fun gs => gs ∈ outcomesByType τ)
         (Classical.decPred (fun gs => gs ∈ outcomesByType τ)))
       (fun _ => ())).total = 1 := by
-  simp only [restrictSubMeas, outcomesByType, IsEmpty.forall_iff, Set.setOf_true,
+  simp only [restrictSubMeas, outcomesByType, IsEmpty.forall_iff, Set.ofPred_true,
     Set.mem_univ, ↓reduceIte, gHatSandwichFamily, gHatHalfProductOutcomeOperator,
     Matrix.conjTranspose_one, mul_one, gHatHalfProductTotalOperator, Finset.univ_unique,
     Finset.filter_true, Finset.sum_const, Finset.card_singleton, one_smul, postprocess_total]

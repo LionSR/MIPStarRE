@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
-import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
+public import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 
 /-!
 # Section 5 — Projective Non-Measurement from Spectral Truncation
@@ -15,6 +17,8 @@ and the zero family in the large-error regime.
 - Blueprint: Chapter 4 (`blueprint/src/chapter/ch04_projective.tex`)
 - Related downstream applications: #422 (mainFormal), #834 (Step 6)
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -69,7 +73,8 @@ private lemma outcome_spectrum_nonneg {Outcome : Type uOutcome}
   have hherm : (A.outcome a).IsHermitian := A.outcome_hermitian a
   have hsa : IsSelfAdjoint (A.outcome a) := hherm.isSelfAdjoint
   have hnonneg : 0 ≤ cfc (id : Error → Error) (A.outcome a) := by
-    simpa [cfc_id ℝ (A.outcome a) (ha := hsa)] using A.outcome_pos a
+    rw [cfc_id ℝ (A.outcome a) (ha := hsa)]
+    exact A.outcome_pos a
   exact (cfc_nonneg_iff (R := ℝ) (f := id) (a := A.outcome a) (ha := hsa)).mp hnonneg
 
 private lemma outcome_spectrum_le_one {Outcome : Type uOutcome}
@@ -80,7 +85,8 @@ private lemma outcome_spectrum_le_one {Outcome : Type uOutcome}
   have hherm : (A.outcome a).IsHermitian := A.outcome_hermitian a
   have hsa : IsSelfAdjoint (A.outcome a) := hherm.isSelfAdjoint
   have hle : cfc (id : Error → Error) (A.outcome a) ≤ 1 := by
-    simpa [cfc_id ℝ (A.outcome a) (ha := hsa)] using A.outcome_le_one a
+    rw [cfc_id ℝ (A.outcome a) (ha := hsa)]
+    exact A.outcome_le_one a
   exact (cfc_le_one_iff (f := id) (a := A.outcome a) (ha := hsa)).mp hle
 
 private lemma roundedProjectorFamily_projective {Outcome : Type uOutcome}
@@ -452,7 +458,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
           intro i
           dsimp [ratio]
           by_cases hfi : hherm.eigenvalues i - hherm.eigenvalues i ^ (2 : Nat) = 0
-          · simpa only [hfi, if_pos] using (show (0 : Error) ≤ 0 by positivity)
+          · simpa only [hfi, ite_eq_left] using (show (0 : Error) ≤ 0 by positivity)
           · have hx0 : 0 ≤ hherm.eigenvalues i :=
               outcome_spectrum_nonneg A a (hherm.eigenvalues i)
                 (hherm.eigenvalues_mem_spectrum_real i)
@@ -501,7 +507,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
               have hdef_ne : hherm.eigenvalues i - hherm.eigenvalues i ^ (2 : Nat) ≠ 0 := by
                 simpa using hfi
               dsimp [ratio]
-              rw [if_neg hfi]
+              rw [ite_eq_right hfi]
               exact (div_mul_cancel₀ _ hdef_ne).symm
             calc
               (hherm.eigenvalues i - truncationCutoff 0 (hherm.eigenvalues i)) ^ (2 : Nat)

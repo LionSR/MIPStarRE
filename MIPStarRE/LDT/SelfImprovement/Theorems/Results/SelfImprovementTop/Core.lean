@@ -1,14 +1,16 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Assembly
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.FinalFields
-import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.Assembly
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.FinalFields
+public import MIPStarRE.LDT.SelfImprovement.Theorems.AddInUFullStatement
 
 /-!
 # Self-improvement theorem variants
@@ -29,6 +31,8 @@ to `thm:self-improvement` in the blueprint.
 - `references/ldt-paper/self_improvement.tex`
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 
 namespace MIPStarRE.LDT.SelfImprovement

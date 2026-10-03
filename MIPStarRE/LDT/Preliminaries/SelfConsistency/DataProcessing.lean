@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
-import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.Completeness
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+module
+
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+public import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.Completeness
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 
 /-!
 # Self-consistency: data processing
@@ -14,6 +16,8 @@ postprocessing a measurement cannot substantially decrease consistency.
 - `references/ldt-paper/preliminaries.tex`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

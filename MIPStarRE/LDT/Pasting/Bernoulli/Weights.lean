@@ -1,11 +1,15 @@
-import MIPStarRE.LDT.Pasting.Statements
-import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
+module
+
+public import MIPStarRE.LDT.Pasting.Statements
+public import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
 /-!
 # Section 12 pasting: Bernoulli recurrence weights
 
 Recurrence-weight identities for the `fromHToG` reduction.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

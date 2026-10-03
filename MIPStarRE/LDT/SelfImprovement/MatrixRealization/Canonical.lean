@@ -1,5 +1,7 @@
-import MIPStarRE.Quantum.FiniteMatrix.TracePairing
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.CanonicalPrimal
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.TracePairing
+public import MIPStarRE.LDT.SelfImprovement.MatrixRealization.CanonicalPrimal
 
 /-!
 # Section 9 — Canonical matrix SDP dual and slackness layer
@@ -13,6 +15,8 @@ canonical facts live in `MatrixRealization/Canonical/Witness.lean`.
 
 - `references/ldt-paper/self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

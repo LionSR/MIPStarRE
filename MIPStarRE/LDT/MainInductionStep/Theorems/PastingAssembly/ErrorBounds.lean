@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.AnswerFields
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.AnswerFields
 
 /-!
 # Section 6 — Pasting Assembly: Error Bounds
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.AnswerFields
 This module contains the scalar absorption and degree-zero answer-valued pasting
 constructions for the small-error branch.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

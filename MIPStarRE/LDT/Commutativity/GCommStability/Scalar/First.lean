@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Common
+module
+
+public import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Common
 
 /-!
 # Section 11 commutativity: first scalar stability bound
 
 The first scalar stability defect and its Cauchy--Schwarz boundedness proof.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

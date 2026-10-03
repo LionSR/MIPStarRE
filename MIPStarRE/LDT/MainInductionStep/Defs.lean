@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyCore
+module
+
+public import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Section 6 — Definitions
@@ -10,6 +12,8 @@ averaging operators, and tensor-placement bookkeeping for the induction step.
 
 - `references/ldt-paper/inductive_step.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -240,7 +244,7 @@ private theorem restrictAxisParallelMeasurement_transportInvariant
 
 We use the constant polynomial because the restricted diagonal branch only reads
 line answers at `zeroCoord`. -/
-private noncomputable def diagonalValueRepresentative (params : Parameters)
+noncomputable def diagonalValueRepresentative (params : Parameters)
     [FieldModel params.q] (a : Fq params) :
     DiagonalLinePolynomial params where
   poly := _root_.Polynomial.C (decodeScalar a)
@@ -341,12 +345,12 @@ noncomputable def xRestrictedAnswerSymStrat (params : Parameters) [FieldModel pa
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement :=
     { toIdxProjMeas := restrictAxisParallelMeasurement params strategy x
-      transportInvariant :=
-        restrictAxisParallelMeasurement_transportInvariant params strategy x }
+      transportInvariant := by
+        exact restrictAxisParallelMeasurement_transportInvariant params strategy x }
   diagonalMeasurement :=
     { toIdxProjMeas := restrictDiagonalAnswerMeasurement params strategy x
-      transportInvariant :=
-        restrictDiagonalAnswerMeasurement_transportInvariant params strategy x }
+      transportInvariant := by
+        exact restrictDiagonalAnswerMeasurement_transportInvariant params strategy x }
 
 /-- The function-answer restricted strategy reuses the ambient bipartite state. -/
 @[simp] theorem xRestrictedAnswerSymStrat_state (params : Parameters)
@@ -405,8 +409,8 @@ noncomputable def xRestrictedStrategy (params : Parameters) [FieldModel params.q
   pointMeasurement := fun u => strategy.pointMeasurement (appendPoint params u x)
   axisParallelMeasurement :=
     { toIdxProjMeas := restrictAxisParallelMeasurement params strategy x
-      transportInvariant :=
-        restrictAxisParallelMeasurement_transportInvariant params strategy x }
+      transportInvariant := by
+        exact restrictAxisParallelMeasurement_transportInvariant params strategy x }
   diagonalMeasurement := restrictDiagonalMeasurement params strategy x
 
 /-- Restricting a strategy does not change its bipartite state. -/
@@ -461,7 +465,6 @@ point. -/
   simp only [restrictDiagonalMeasurement, ProjMeas.postprocess_toSubMeas,
     SubMeas.postprocess_comp]
   simp [diagonalValueRepresentative, DiagonalLinePolynomial.toFun, evalLinePolynomialModel]
-  rfl
 
 /-- The intermediate `ν` from `thm:main-induction`. -/
 noncomputable def mainInductionNu (params : Parameters) (k : ℕ)

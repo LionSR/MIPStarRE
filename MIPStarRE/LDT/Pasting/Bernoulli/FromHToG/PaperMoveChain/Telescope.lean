@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Moves
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Moves
 
 /-!
 # Section 12 pasting: from-H-to-G paper telescope
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.PaperMoveChain.Moves
 This file assembles the adjacent-stage paper move chain and records the final
 stage-mass telescope for the `fromHToG` reduction.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

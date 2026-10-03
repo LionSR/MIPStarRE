@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Commutativity.GCommStability.OverlapOne
-import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+module
+
+public import MIPStarRE.LDT.Commutativity.GCommStability.OverlapOne
+public import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 
 /-!
 # Section 11 commutativity: `G`-stability overlap (step two)
@@ -12,6 +14,8 @@ integral reduction begun in `OverlapOne`.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

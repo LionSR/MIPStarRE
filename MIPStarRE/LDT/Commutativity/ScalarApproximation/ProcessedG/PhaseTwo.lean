@@ -1,9 +1,11 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Normalization
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.PointSwap
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexing
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.First
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Normalization
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.PointSwap
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexing
+public import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
+public import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.First
 
 /-!
 # Phase 2 stability defect infrastructure
@@ -15,6 +17,8 @@ reindex the question-level defect into the stability defect via finite
 marginalization, and perform the subtraction algebra that rewrites the phase-2
 insertion/removal difference as the negative defect.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

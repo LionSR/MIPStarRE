@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.EnvelopeBounds
+module
+
+public import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.EnvelopeBounds
 
 /-!
 # Error cascade — bounds for `σ` and `ζ₁`
@@ -21,6 +23,8 @@ The first cascade steps have three components:
 
 * `references/ldt-paper/inductive_step.tex`, lines 187–234.
 -/
+
+@[expose] public section
 
 
 open scoped BigOperators

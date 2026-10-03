@@ -1,4 +1,13 @@
-import Lean
+module
+
+public import Lean
+
+/-! # Blueprint declaration checker
+
+Loads the library and checks the declaration names in `blueprint/lean_decls`.
+-/
+
+public section
 
 open Lean
 

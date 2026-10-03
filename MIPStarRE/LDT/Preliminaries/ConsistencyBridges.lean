@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.DistanceBounds
+module
+
+public import MIPStarRE.LDT.Preliminaries.DistanceBounds
 
 /-!
 # Preliminary comparison theorems: consistency-to-distance estimates
@@ -7,6 +9,8 @@ Estimates converting consistency of a submeasurement and a measurement into
 state-dependent distance controls for the diagonal and total sandwich families
 of `prop:cons-sub-meas`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

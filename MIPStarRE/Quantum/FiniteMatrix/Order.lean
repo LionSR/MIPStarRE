@@ -1,4 +1,6 @@
-import MIPStarRE.Quantum.FiniteMatrix.Basic
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.Basic
 
 /-!
 # Positive-semidefinite finite matrix order
@@ -11,6 +13,8 @@ monotonicity facts for sandwiches, Kronecker products, and reindexing.
 These are the matrix-operator facts used by the canonical SDP strong-duality
 argument in Section 9.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.Elementwise
 open WithLp
@@ -127,8 +131,8 @@ theorem kronecker_nonneg
     {d₁ d₂ : Type*} [hd₁ : Finite d₁] [hd₂ : Finite d₂]
     {A : Op d₁} {B : Op d₂} (hA : 0 ≤ A) (hB : 0 ≤ B) :
     0 ≤ Matrix.kronecker A B := by
-  letI : Fintype d₁ := Fintype.ofFinite d₁
-  letI : Fintype d₂ := Fintype.ofFinite d₂
+  let : Fintype d₁ := Fintype.ofFinite d₁
+  let : Fintype d₂ := Fintype.ofFinite d₂
   exact
     (Matrix.PosSemidef.kronecker
       (Matrix.nonneg_iff_posSemidef.mp hA)
@@ -139,8 +143,8 @@ theorem kronecker_le_kronecker_right_one
     {d₁ d₂ : Type*} [hd₁ : Finite d₁] [hd₂ : Finite d₂] [DecidableEq d₂]
     {A : Op d₁} {B : Op d₂} (hA : 0 ≤ A) (hB : B ≤ 1) :
     Matrix.kronecker A B ≤ Matrix.kronecker A (1 : Op d₂) := by
-  letI : Fintype d₁ := Fintype.ofFinite d₁
-  letI : Fintype d₂ := Fintype.ofFinite d₂
+  let : Fintype d₁ := Fintype.ofFinite d₁
+  let : Fintype d₂ := Fintype.ofFinite d₂
   change (Matrix.kronecker A (1 : Op d₂) - Matrix.kronecker A B).PosSemidef
   have hpsd : Matrix.PosSemidef (Matrix.kronecker A (1 - B)) := by
     exact Matrix.nonneg_iff_posSemidef.mp <| kronecker_nonneg hA (sub_nonneg.mpr hB)
@@ -152,8 +156,8 @@ theorem kronecker_mono_left
     {d₁ d₂ : Type*} [hd₁ : Finite d₁] [hd₂ : Finite d₂]
     {A₁ A₂ : Op d₁} {B : Op d₂} (hA : A₁ ≤ A₂) (hB : 0 ≤ B) :
     Matrix.kronecker A₁ B ≤ Matrix.kronecker A₂ B := by
-  letI : Fintype d₁ := Fintype.ofFinite d₁
-  letI : Fintype d₂ := Fintype.ofFinite d₂
+  let : Fintype d₁ := Fintype.ofFinite d₁
+  let : Fintype d₂ := Fintype.ofFinite d₂
   change (Matrix.kronecker A₂ B - Matrix.kronecker A₁ B).PosSemidef
   have hpsd : Matrix.PosSemidef (Matrix.kronecker (A₂ - A₁) B) := by
     exact Matrix.nonneg_iff_posSemidef.mp <| kronecker_nonneg (sub_nonneg.mpr hA) hB

@@ -1,8 +1,10 @@
-import MIPStarRE.Quantum.FiniteMatrix.Basic
-import MIPStarRE.Quantum.FiniteMatrix.Order
-import MIPStarRE.Quantum.FiniteMatrix.TracePairing
-import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
-import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.Basic
+public import MIPStarRE.Quantum.FiniteMatrix.Order
+public import MIPStarRE.Quantum.FiniteMatrix.TracePairing
+public import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
+public import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
 
 /-!
 # Finite-dimensional matrix layer for the MIP*=RE project

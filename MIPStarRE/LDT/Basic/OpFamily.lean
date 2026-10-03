@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 
 /-!
 # Raw operator families for the low individual degree test
@@ -18,6 +20,8 @@ honest submeasurements.
 - `blueprint/src/chapter/ch08_commutativity.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

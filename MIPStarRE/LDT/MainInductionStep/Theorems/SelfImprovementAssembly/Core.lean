@@ -1,10 +1,12 @@
-import MIPStarRE.LDT.MainInductionStep.Statements
-import MIPStarRE.LDT.Preliminaries.Defs
-import MIPStarRE.LDT.Test.StrategyFailures
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.Pasting.Bernoulli.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Statements
+public import MIPStarRE.LDT.Preliminaries.Defs
+public import MIPStarRE.LDT.Test.StrategyFailures
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
+public import MIPStarRE.LDT.Pasting.Bernoulli.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
 
 /-!
 # Section 6 — Ordinary Self-Improvement Data
@@ -22,6 +24,8 @@ The answer-valued slice-transport constructors are separated into
 
 - `blueprint/src/chapter/ch10_induction.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

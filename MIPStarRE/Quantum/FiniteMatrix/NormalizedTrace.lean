@@ -1,4 +1,6 @@
-import MIPStarRE.Quantum.FiniteMatrix.Basic
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.Basic
 
 /-!
 # Normalized trace, projectors, and spectral truncation
@@ -7,6 +9,8 @@ This module contains the normalized trace `τ`, the squared `τ`-norm, the
 paper-facing orthogonal-projection name, and the spectral-truncation witness used
 in the low individual degree test formalization.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.Elementwise
 open WithLp

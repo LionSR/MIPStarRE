@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization.Y
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
+module
+
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization.Y
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 
 /-!
 # Core full-slice closeness-of-inner-product comparison
@@ -20,6 +22,8 @@ the scalar public API exposed by
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

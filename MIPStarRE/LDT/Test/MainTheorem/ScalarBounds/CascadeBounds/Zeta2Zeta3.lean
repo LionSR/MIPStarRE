@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.SigmaZeta1
+module
+
+public import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.SigmaZeta1
 
 /-!
 # Error cascade — bounds for `ζ₂` and `ζ₃`
@@ -11,6 +13,8 @@ inductive step: the absorbing bounds for `ζ₂` and `ζ₃` obtained from the
 
 * `references/ldt-paper/inductive_step.tex`, lines 205--217 and 230.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

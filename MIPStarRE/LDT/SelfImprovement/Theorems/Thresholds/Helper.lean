@@ -1,6 +1,8 @@
-import Mathlib.Analysis.SpecialFunctions.Pow.Real
-import MIPStarRE.LDT.Basic.SqrtBounds
-import MIPStarRE.LDT.SelfImprovement.Defs
+module
+
+public import Mathlib.Analysis.SpecialFunctions.Pow.Real
+public import MIPStarRE.LDT.Basic.SqrtBounds
+public import MIPStarRE.LDT.SelfImprovement.Defs
 
 /-!
 # Section 9 — helper-stage numerical threshold absorptions
@@ -29,6 +31,8 @@ Blueprint mirrors:
 * `blueprint/src/chapter/ch07_self_improvement.tex`, lines 161--168 (point
   consistency) and 256--279 (strong self-consistency / boundedness).
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

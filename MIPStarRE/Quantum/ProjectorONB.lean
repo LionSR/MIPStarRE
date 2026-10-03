@@ -1,5 +1,7 @@
-import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
-import Mathlib.Analysis.Matrix.Spectrum
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
+public import Mathlib.Analysis.Matrix.Spectrum
 
 /-!
 # Projector Range Orthonormal Bases
@@ -14,6 +16,8 @@ low-degree-test formalization.
 - `references/ldt-paper/orthonormalization.tex`, lines 570--573.
 - `MIPStarRE/LDT/MakingMeasurementsProjective/QXPLayer/RankReduction/LowRank.lean`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.L2Operator
 
@@ -322,7 +326,7 @@ end ProjectorRangeONB
 
 /-- The nonzero-eigenvalue index set of a projector has cardinality equal to its
 matrix rank. -/
-private noncomputable def IsProj.nonzeroEigenEquivFinRank (P : Op ι) (hP : IsProj P) :
+noncomputable def IsProj.nonzeroEigenEquivFinRank (P : Op ι) (hP : IsProj P) :
     {i : ι // hP.isSelfAdjoint.isHermitian.eigenvalues i ≠ 0} ≃ Fin P.rank :=
   Fintype.equivFinOfCardEq hP.isSelfAdjoint.isHermitian.rank_eq_card_non_zero_eigs.symm
 

@@ -1,13 +1,17 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
-import MIPStarRE.LDT.CommutativityPoints.Defs
-import MIPStarRE.LDT.Preliminaries.ComparisonCore
-import MIPStarRE.LDT.Test.StrategyFailures
+module
+
+public import MIPStarRE.LDT.Basic.DistributionAvg
+public import MIPStarRE.LDT.CommutativityPoints.Defs
+public import MIPStarRE.LDT.Preliminaries.ComparisonCore
+public import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
 # Section 10 — commutativity points approximation layer
 
 Restricted-diagonal approximation infrastructure for commutativity at points.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.CommutativityPoints
 

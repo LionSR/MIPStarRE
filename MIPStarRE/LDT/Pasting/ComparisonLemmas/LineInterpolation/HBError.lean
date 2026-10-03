@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.BadMass
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.Averaging
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LdSandwichLineOnePoint.Core
-import MIPStarRE.LDT.Pasting.Core.DDistinct
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.BadMass
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.Averaging
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.LdSandwichLineOnePoint.Core
+public import MIPStarRE.LDT.Pasting.Core.DDistinct
 
 /-!
 # Line interpolation: H-B consistency error aggregation
@@ -14,6 +16,8 @@ and the final bad-mass aggregation lemma that drives `lem:h-b-consistency`.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Transfer
 
 /-!
 # Helper strong self-consistency bounds: core reductions
@@ -11,6 +13,8 @@ variance-swap identities used in the helper strong self-consistency chain.
 - `references/ldt-paper/self_improvement.tex`
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -263,13 +267,13 @@ private theorem helperOffDiagonalVarianceSwapSelection_pairs_sum
   intro h' _
   by_cases hne : h' ≠ h
   · by_cases heq : h u = h' u
-    · rw [if_pos ⟨hne, heq⟩, if_pos hne, if_pos heq, one_mul]
-    · rw [if_pos hne, if_neg heq]
-      simp only [Set.mem_setOf_eq, heq, and_false, if_false]
+    · rw [ite_eq_left ⟨hne, heq⟩, ite_eq_left hne, ite_eq_left heq, one_mul]
+    · rw [ite_eq_left hne, ite_eq_right heq]
+      simp only [Set.mem_ofPred_eq, heq, and_false, ite_false]
       ring
   · have hheq : h' = h := not_not.mp hne
     subst h'
-    simp only [Set.mem_setOf_eq, ne_eq, not_true_eq_false, false_and, if_false]
+    simp only [Set.mem_ofPred_eq, ne_eq, not_true_eq_false, false_and, ite_false]
 
 /-- The selected-chain endpoint `Q₄` is the off-diagonal indicator quantity. -/
 theorem helperOffDiagonalSelectedCSChainQ4_eq_indicator
@@ -367,7 +371,7 @@ theorem helperOffDiagonalSelectedCSChainQ3_eq_oneSidedSwappedIndicator
   refine Finset.sum_congr rfl ?_
   intro h' _
   by_cases heq : h uv.1 = h' uv.1
-  · rw [if_pos heq]
+  · rw [ite_eq_left heq]
     simp only [one_mul]
     rw [← ev_conjTranspose strategy.state]
     rw [conjTranspose_opTensor, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]

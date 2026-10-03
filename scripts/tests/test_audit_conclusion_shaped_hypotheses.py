@@ -31,7 +31,7 @@ class ParseDeclarationTests(unittest.TestCase):
             mod.write_text(
                 textwrap.dedent(
                     """\
-                    theorem wrapper
+                    public theorem wrapper
                         (params : Parameters)
                         (hrec :
                           let local : Package := mkPackage params

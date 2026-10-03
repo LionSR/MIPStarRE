@@ -1,14 +1,18 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.CommutativityPoints.Approximation
-import MIPStarRE.LDT.Pasting.Sandwich.GHatSandwich
-import MIPStarRE.LDT.Preliminaries.Defs
-import MIPStarRE.LDT.Test.StrategyCore
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.CommutativityPoints.Approximation
+public import MIPStarRE.LDT.Pasting.Sandwich.GHatSandwich
+public import MIPStarRE.LDT.Preliminaries.Defs
+public import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Section 12 — Sandwich constructions: pasted families
 
 Pasted interpolation families, recurrence weights, and final operator families.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

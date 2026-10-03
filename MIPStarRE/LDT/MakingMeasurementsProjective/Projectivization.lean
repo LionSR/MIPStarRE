@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
-import MIPStarRE.LDT.Basic.MeasurementLift
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+public import MIPStarRE.LDT.Basic.MeasurementLift
+public import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 5 — Rounding To Projectors Core
@@ -17,6 +19,8 @@ Section 5 theorem file.
 - `references/ldt-paper/orthonormalization.tex`
 - `blueprint/src/chapter/ch04_projective.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

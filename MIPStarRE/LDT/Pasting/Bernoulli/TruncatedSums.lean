@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.Defs.Tuples
+module
+
+public import MIPStarRE.LDT.Pasting.Defs.Tuples
 
 /-!
 # Section 12 pasting: Bernoulli truncated sums
 
 Truncated type sums and their one-step recurrence.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -25,16 +29,14 @@ private lemma gHatTypeWeight_le {k : ℕ} (τ : GHatType k) :
 private lemma gHatTypeWeight_prepend_true {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight (prependTypeBit true τ) = gHatTypeWeight τ + 1 := by
   unfold gHatTypeWeight
-  simpa [prependTypeBit, Fin.cons_zero, Fin.cons_succ, add_comm] using
-    (Fin.card_filter_univ_succ
-      (n := k) (p := fun i : Fin (k + 1) => (Fin.cons true τ : GHatType (k + 1)) i = true))
+  rw [Fin.card_filter_univ_succ]
+  simp [prependTypeBit, Fin.cons_zero, Fin.cons_succ, add_comm]
 
 private lemma gHatTypeWeight_prepend_false {k : ℕ} (τ : GHatType k) :
     gHatTypeWeight (prependTypeBit false τ) = gHatTypeWeight τ := by
   unfold gHatTypeWeight
-  simpa [prependTypeBit, Fin.cons_zero, Fin.cons_succ] using
-    (Fin.card_filter_univ_succ
-      (n := k) (p := fun i : Fin (k + 1) => (Fin.cons false τ : GHatType (k + 1)) i = true))
+  rw [Fin.card_filter_univ_succ]
+  simp [prependTypeBit, Fin.cons_zero, Fin.cons_succ]
 
 private lemma gHatTypeOperator_nonneg
     (G : MIPStarRE.Quantum.Op ι)
@@ -311,7 +313,7 @@ theorem truncatedTypeSumRecurrence
                     d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
                       gHatTypeWeight τtail :=
                   hcond.mpr h
-                rw [if_pos h', if_pos h]
+                rw [ite_eq_left h', ite_eq_left h]
                 simpa [prependTypeBit] using gHatTypeOperator_prepend_true G τprefix
               · have h' :
                     ¬ d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
@@ -354,7 +356,7 @@ theorem truncatedTypeSumRecurrence
                     d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +
                       gHatTypeWeight τtail :=
                   hcond.mpr h
-                rw [if_pos h', if_pos h]
+                rw [ite_eq_left h', ite_eq_left h]
                 simpa [prependTypeBit] using gHatTypeOperator_prepend_false G τprefix
               · have h' :
                     ¬ d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +

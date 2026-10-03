@@ -95,6 +95,8 @@ DECL_KEYWORDS: tuple[str, ...] = ("structure", "def", "abbrev")
 DECL_MODIFIERS: tuple[str, ...] = (
     "private",
     "protected",
+    "public",
+    "meta",
     "noncomputable",
     "partial",
     "unsafe",

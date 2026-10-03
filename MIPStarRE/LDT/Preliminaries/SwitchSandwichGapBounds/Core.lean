@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
+module
+
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 
 /-!
 # Switch-sandwich gap bounds: Cauchy–Schwarz core
@@ -11,6 +13,8 @@ estimates of the switch-sandwich argument.
 - `references/ldt-paper/preliminaries.tex`, `prop:switch-sandwich`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

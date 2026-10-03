@@ -1,11 +1,15 @@
-import MIPStarRE.LDT.Basic.QuantumState
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.FactBundles
+module
+
+public import MIPStarRE.LDT.Basic.QuantumState
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.FactBundles
 
 /-!
 # Section 12 pasting: from-H-to-G move lemmas
 
 Tensor, positivity, and Cauchy--Schwarz helper lemmas for the adjacent paper chain.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

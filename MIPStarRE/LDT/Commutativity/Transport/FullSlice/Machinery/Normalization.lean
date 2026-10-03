@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
+module
+
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
 
 /-!
 # Full-slice normalization and self-consistency machinery
@@ -16,6 +18,8 @@ the scalar public API exposed by the full-slice transport theorems.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

@@ -1,8 +1,10 @@
-import Mathlib.Data.Fintype.EquivFin
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
+module
+
+public import Mathlib.Data.Fintype.EquivFin
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.Core
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 
 /-!
 # Section 5 — Q/X/XHat/P identities and approximations
@@ -10,6 +12,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 Late-stage algebraic identities and approximation lemmas for the paper's
 `Q/X/XHat/P` intermediate layer.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -57,7 +61,7 @@ theorem orthonormal_normalized_image_of_adjoint_comp_eigenvectors
             · subst i
               rw [inner_smul_right]
               simp only [inner_self_eq_norm_sq_to_K, hv.norm_eq_one j, one_pow,
-                map_one, if_true, mul_one]
+                map_one, ite_true, mul_one]
             · rw [inner_smul_right]
               rw [orthonormal_iff_ite.mp hv i j]
   have hscale_mul :
@@ -78,7 +82,7 @@ theorem orthonormal_normalized_image_of_adjoint_comp_eigenvectors
         have hsqrt_sq : Real.sqrt (lam i) * Real.sqrt (lam i) = lam i := by
           rw [← sq, Real.sq_sqrt (le_of_lt (hlam i))]
         exact_mod_cast hsqrt_sq.symm
-      simp only [if_true, mul_one, one_div]
+      simp only [ite_true, mul_one, one_div]
       rw [hlam_eq]
       simp only [Complex.ofReal_inv]
       calc

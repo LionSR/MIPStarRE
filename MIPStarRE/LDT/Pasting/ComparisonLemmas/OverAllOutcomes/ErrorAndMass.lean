@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
 
 /-!
 # Section 12 pasting: over all outcomes — error terms and eligible mass
@@ -11,6 +13,8 @@ Error-arithmetic lemmas, eligible-mass bounds, and mass identities that feed the
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

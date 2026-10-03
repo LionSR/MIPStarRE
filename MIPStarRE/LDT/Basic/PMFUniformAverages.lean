@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.PMFAverages
+module
+
+public import MIPStarRE.LDT.Basic.PMFAverages
 
 /-!
 # Uniform PMF finite-expectation identities
@@ -28,6 +30,8 @@ be carried out directly in the probability-mass-function language.
 These are formalization-internal finite probability lemmas for the low
 individual degree test development.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

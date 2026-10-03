@@ -1,11 +1,15 @@
-import MIPStarRE.LDT.Basic.Distribution
-import MIPStarRE.LDT.Basic.QuantumState
+module
+
+public import MIPStarRE.LDT.Basic.Distribution
+public import MIPStarRE.LDT.Basic.QuantumState
 
 /-!
 # Operator expectation infrastructure for the low individual degree test
 
 Expectation-value and normalized-trace lemmas for quantum operators.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

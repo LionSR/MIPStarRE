@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyCore
+module
+
+public import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Section 3 — Classical two-prover strategies
@@ -10,6 +12,8 @@ paper's two-prover classical low individual degree test from
 The role-average lemmas below make explicit the same branch decomposition used
 by the paper-faithful two-space projective strategy container `ProjStrat`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -64,14 +68,14 @@ def restrictedDiagonalAccepts {params : Parameters} [FieldModel params.q]
   | .B => strategy.pointAnswerA u = strategy.diagonalAnswerB ℓ zeroCoord
 
 /-- Average the indicator of a decidable predicate over a uniform sample space. -/
-private noncomputable def indicatorAcceptanceProbability {β : Type*}
+noncomputable def indicatorAcceptanceProbability {β : Type*}
     [Fintype β] [DecidableEq β] [Nonempty β]
     (p : β → Prop) : Error := by
   classical
   exact avgOver (uniformDistribution β) fun s => if p s then (1 : Error) else 0
 
 /-- Average the paper's role-tagged acceptance predicate over `Role × β`. -/
-private noncomputable def roleTaggedAcceptanceProbability {β : Type*}
+noncomputable def roleTaggedAcceptanceProbability {β : Type*}
     [Fintype β] [DecidableEq β] [Nonempty β]
     (pA pB : β → Prop) : Error := by
   classical

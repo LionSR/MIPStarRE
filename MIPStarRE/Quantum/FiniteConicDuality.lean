@@ -1,5 +1,7 @@
-import Mathlib.Analysis.Convex.Cone.Dual
-import Mathlib.Topology.Algebra.Module.ContinuousLinearMap.PiProd
+module
+
+public import Mathlib.Analysis.Convex.Cone.Dual
+public import Mathlib.Topology.Algebra.Module.ContinuousLinearMap.PiProd
 
 /-!
 # Finite conic-duality separation lemmas
@@ -20,6 +22,8 @@ in the Section 9 matrix-realization layer.
 - `references/ldt-paper/self_improvement.tex`
 - `docs/reports/issue-2386-finite-sdp-duality-theorem-design.md`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.Quantum
 

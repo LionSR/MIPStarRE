@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
+module
+
+public import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 
 /-!
 # Preliminary comparison theorems: bipartite self-consistency (local bridges)
@@ -12,6 +14,8 @@ after a left/right lift of the family.
 - `references/ldt-paper/preliminaries.tex`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.SwitcherooContraction.Commuted
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooContraction.Commuted
 
 /-!
 # Section 12 pasting: switcheroo scalar expressions
 
 Named scalar expressions for the switcheroo contraction chain.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

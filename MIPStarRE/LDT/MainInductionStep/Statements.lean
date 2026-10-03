@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MainInductionStep.Defs
-import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Defs
+public import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
 # Section 6 — Induction Step Data
@@ -15,6 +17,8 @@ slice-wise induction, self-improvement, and pasting assembly.
 - `blueprint/src/chapter/ch10_induction.tex`
 - `references/ldt-paper/inductive_step.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

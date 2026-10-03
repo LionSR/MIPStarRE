@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
+module
+
+public import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
 
 /-!
 # Heterogeneous role-register measurement extraction
@@ -19,6 +21,8 @@ the projectivization step.
 
 * `references/ldt-paper/inductive_step.tex`, lines 84--109.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

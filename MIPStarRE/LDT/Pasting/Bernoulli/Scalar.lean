@@ -1,12 +1,16 @@
-import Mathlib.Probability.Moments.SubGaussian
-import Mathlib.Probability.Distributions.Binomial
-import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
+module
+
+public import Mathlib.Probability.Moments.SubGaussian
+public import Mathlib.Probability.Distributions.Binomial
+public import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
 /-!
 # Scalar Bernoulli polynomial helpers for pasting
 
 Purely scalar inequalities used by the matrix Chernoff comparison.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -201,7 +205,7 @@ private lemma binomial_lowerTail_eq
                 ring
               simpa only [Nat.cast_le, Measure.smul_apply,
                 MeasurableSpace.measurableSet_top, Measure.dirac_apply', smul_eq_mul,
-                Set.indicator_of_mem hmem, Pi.one_apply, mul_one, hrd, if_true, f, hpI_coe]
+                Set.indicator_of_mem hmem, Pi.one_apply, mul_one, hrd, ite_true, f, hpI_coe]
                 using htoReal
             · simp [Measure.smul_apply, hrd, f, hpI_coe, smul_eq_mul]
           · intro r hr

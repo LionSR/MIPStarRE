@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.Triangles.Core
+module
+
+public import MIPStarRE.LDT.Preliminaries.Triangles.Core
 
 /-!
 # Triangle Inequalities for State-Dependent Distance: Simultaneous Equivalence
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Preliminaries.Triangles.Core
 This module contains the simultaneous-equivalence triangle inequalities and the
 final approximate-delta triangle estimate.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

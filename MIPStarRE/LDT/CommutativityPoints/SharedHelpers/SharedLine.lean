@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.DistributionMapAverages
-import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
+module
+
+public import MIPStarRE.LDT.Basic.DistributionMapAverages
+public import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 
 /-!
 # Section 10 commutativity points: shared-line helpers
@@ -12,6 +14,8 @@ questions, used by both the lift and drop comparisons.
 - `references/ldt-paper/commutativity-points.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.CommutativityPoints
 

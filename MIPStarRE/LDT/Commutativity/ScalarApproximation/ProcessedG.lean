@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.MainChain
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG.MainChain
 
 /-!
 # Processed `G` scalar approximation
@@ -29,6 +31,8 @@ The formerly monolithic file has been split into focused leaf modules:
 This file provides the public statement of `commDataProcessedG`, the paper-facing
 scalar approximation theorem.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

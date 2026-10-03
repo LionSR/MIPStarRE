@@ -1,6 +1,8 @@
-import Mathlib.Algebra.MvPolynomial.SchwartzZippel
-import Mathlib.Algebra.MvPolynomial.CommRing
-import Mathlib.RingTheory.MvPolynomial.Basic
+module
+
+public import Mathlib.Algebra.MvPolynomial.SchwartzZippel
+public import Mathlib.Algebra.MvPolynomial.CommRing
+public import Mathlib.RingTheory.MvPolynomial.Basic
 
 /-!
 # Polynomial preliminaries
@@ -13,6 +15,8 @@ multivariate polynomial theorems.
 
 * `references/ldt-paper/preliminaries.tex`, Section 3 (Preliminaries)
 -/
+
+@[expose] public section
 
 open Finset Fintype
 

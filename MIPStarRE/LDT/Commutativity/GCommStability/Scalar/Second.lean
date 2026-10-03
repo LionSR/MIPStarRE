@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Common
+module
+
+public import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Common
 
 /-!
 # Section 11 commutativity: second scalar stability bound
 
 The mirrored scalar stability defect and its Cauchy--Schwarz boundedness proof.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
+module
+
+public import MIPStarRE.LDT.Commutativity.EvaluatedSliceBounds.PhaseOneThree
 
 /-!
 # Section 11 commutativity: evaluated-slice averaged expansion
@@ -12,6 +14,8 @@ estimates.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

@@ -1,3 +1,6 @@
+module
+
+meta import Lean
 import MIPStarRE.LDT.Test.MainTheorem.MainFormal
 
 /-!
@@ -16,6 +19,8 @@ line (`NORANGE` for compiler-generated declarations without a source range)
 — consumed by `assemble_challenge.py`.  See README.md in this directory for
 the full regeneration pipeline.
 -/
+
+meta section
 
 open Lean
 
@@ -41,7 +46,7 @@ def canon (env : Environment) (closure : NameSet) (n : Name) : Name :=
   -- collapse compiler-generated companions into their parent inductive
   let byTail := generatedTails.findSome? fun tail =>
     if s.endsWith ("." ++ tail) then
-      let parent := (s.dropRight (tail.length + 1)).toName
+      let parent := (s.dropEnd (tail.length + 1)).copy.toName
       match env.find? parent with
       | some (.inductInfo _) => if closure.contains parent then some parent else none
       | _ => none
@@ -106,4 +111,13 @@ def runExtract : MetaM Unit := do
     | some r => IO.println s!"{c}\t{path}\t{r.range.pos.line}\t{r.range.endPos.line}"
     | none => IO.println s!"{c}\t{path}\tNORANGE\tNORANGE"
 
-#eval runExtract
+/-- Load all declaration bodies and source ranges, including those of transitive
+imports. Ordinary module imports omit this information. -/
+unsafe def runExtractWithPrivateImports : IO Unit := do
+  initSearchPath (← findSysroot)
+  enableInitializersExecution
+  let env ← importModules #[{ module := `MIPStarRE.LDT.Test.MainTheorem.MainFormal }]
+    {} (loadExts := true) (level := .private)
+  discard <| runExtract.toIO { fileName := "extract_closure", fileMap := default } { env }
+
+#eval runExtractWithPrivateImports

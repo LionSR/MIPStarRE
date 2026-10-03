@@ -1,4 +1,6 @@
-import MIPStarRE.Quantum.FiniteMatrix.Order
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.Order
 
 /-!
 # Real trace pairing for finite matrix operators
@@ -8,6 +10,8 @@ This module records the continuous real-linear trace pairing
 functional by such a pairing, and the finite-dimensional Hilbert--Schmidt
 positivity facts used in weak duality and complementary slackness.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.Elementwise
 open WithLp

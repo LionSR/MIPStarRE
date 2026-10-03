@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 
 /-!
 # Section 12 pasting: switcheroo completion utilities
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 Post-theorem convenience lemmas: question-swapping, complete-part
 reinterpretations, and self-consistency inheritance.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

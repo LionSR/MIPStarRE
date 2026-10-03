@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
-import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
+public import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Consequences
+public import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.DropBridges
+public import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 
 /-!
 # Point-swap bound for the evaluated-slice paper chain
@@ -9,6 +11,8 @@ import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Core
 This file contains the right-register point-swap estimate used in the
 paper-faithful scalar chain for `lem:comm-data-processed-g`.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

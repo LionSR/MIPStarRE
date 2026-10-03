@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
 
 /-!
 # Section 6 — Main-Induction Error Bounds
@@ -13,6 +15,8 @@ the bounds `eps ≤ 1`, `delta ≤ 1`, `gamma ≤ 1`, `params.d ≤ params.q`, a
 - `blueprint/src/chapter/ch10_induction.tex`
 - `references/ldt-paper/inductive_step.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -691,7 +695,7 @@ theorem mainInductionSuccessorBound_pred
     (hk : 400 * params.next.m * params.next.d ≤ k) :
     400 * params.m * params.d ≤ k := by
   have hm_le : params.m ≤ params.next.m := by
-    simp [Parameters.next]
+    simp
   have hcoef : 400 * params.m ≤ 400 * params.next.m :=
     Nat.mul_le_mul_left 400 hm_le
   have hmul :

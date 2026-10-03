@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Selection
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Selection
 
 /-!
 # Scalar chain for the diagonal add-in-u transfer
@@ -12,6 +14,8 @@ identifications needed by the helper strong-self-consistency proof.
 - `references/ldt-paper/self_improvement.tex` lines 247--252
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

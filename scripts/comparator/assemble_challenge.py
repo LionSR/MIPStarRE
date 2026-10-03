@@ -117,8 +117,8 @@ class Assembler:
             if m:
                 stack.append(("ns", m.group(1)))
                 continue
-            m = re.match(r"section\s*([\w.À-￿']*)", s)
-            if m and s.startswith("section"):
+            m = re.match(r"(?:@\[.*?\]\s*)?(?:(?:public|meta|noncomputable)\s+)*section\s*([\w.À-￿']*)", s)
+            if m:
                 stack.append(("sec", m.group(1) or None))
                 continue
             m = re.match(r"end\s*([\w.À-￿']*)\s*(?:--.*)?$", s)
@@ -132,7 +132,7 @@ class Assembler:
         return [
             m.group(1).replace(".", "/") + ".lean"
             for raw in self.get_lines(path)
-            if (m := re.match(r"import\s+([\w.]+)", raw))
+            if (m := re.match(r"(?:(?:public|meta)\s+)*import\s+(?:all\s+)?([\w.]+)", raw))
         ]
 
     def module_ranks(self, mods: set[str]) -> dict[str, int]:

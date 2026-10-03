@@ -1,12 +1,16 @@
-import MIPStarRE.LDT.Commutativity.Main.Results
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion
-import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+module
+
+public import MIPStarRE.LDT.Commutativity.Main.Results
+public import MIPStarRE.LDT.Pasting.SwitcherooCompletion
+public import MIPStarRE.LDT.Preliminaries.CompletionTransfer
 
 /-!
 # Section 12 pasting: commuting-with-G complete part
 
 Complete-part commuting-with-`G` bounds.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

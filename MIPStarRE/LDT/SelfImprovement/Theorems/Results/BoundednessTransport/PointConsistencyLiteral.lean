@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.PointConsistency
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.PointConsistency
 
 /-!
 # Boundedness transport literal point-consistency estimates
@@ -11,6 +13,8 @@ from the natural-error estimates in `BoundednessTransport/PointConsistency.lean`
 - `references/ldt-paper/self_improvement.tex` lines 747--755
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

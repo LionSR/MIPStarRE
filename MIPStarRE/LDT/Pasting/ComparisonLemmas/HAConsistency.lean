@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.HBConsistency
-import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.HBConsistency
+public import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
 
 /-!
 # Section 12 pasting: H-A consistency
@@ -12,6 +14,8 @@ Vertical-line to point-consistency transport and completed-measurement statement
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

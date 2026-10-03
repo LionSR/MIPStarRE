@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 
 /-!
 # Section 5 — Naimark core
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Projectivization
 Core projector and compression lemmas for the one-measurement Naimark
 dilation construction.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

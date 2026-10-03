@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.MainInductionStep.Statements
-import MIPStarRE.LDT.Test.StrategyFailures
-import MIPStarRE.LDT.CommutativityPoints.Approximation
-import MIPStarRE.LDT.Tactic.AvgCongr
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Statements
+public import MIPStarRE.LDT.Test.StrategyFailures
+public import MIPStarRE.LDT.CommutativityPoints.Approximation
+public import MIPStarRE.LDT.Tactic.AvgCongr
 
 /-!
 # Section 6 -- Restricted Probability Common Lemmas
@@ -13,6 +15,8 @@ axis-parallel, diagonal, and answer-valued restricted-probability bounds.
 
 - `blueprint/src/chapter/ch10_induction.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -154,7 +158,7 @@ lemma weighted_embedded_average_le_full_average
             ring
     _ = ∑ i : Fin params.m, (1 / (params.next.m : Error)) * f (embedCoord params i) := by
             have hnext : (params.next.m : Error) = (params.m : Error) + 1 := by
-              simp [Parameters.next]
+              simp
             have hplus_ne : (params.m : Error) + 1 ≠ 0 := hnext ▸ hnextm
             have hweight :
                 sliceTransverseDirectionWeight params =

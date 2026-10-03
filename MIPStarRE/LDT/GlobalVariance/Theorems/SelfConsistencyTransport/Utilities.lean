@@ -1,14 +1,6 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.CollisionExpansion
+module
 
-namespace MIPStarRE.LDT.GlobalVariance
-
-open MIPStarRE.LDT
-open MIPStarRE.LDT.Preliminaries
-open MIPStarRE.LDT.MakingMeasurementsProjective
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+public import MIPStarRE.LDT.GlobalVariance.Theorems.CollisionExpansion
 
 /-! # Sampling and operator-symmetry utilities
 
@@ -24,6 +16,18 @@ Support lemmas for the good-strategy self-consistency transport
   marginals of the hypercube-edge sampling distribution are uniform
   (`expansion.tex:300–302`).
 -/
+
+namespace MIPStarRE.LDT.GlobalVariance
+
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Preliminaries
+open MIPStarRE.LDT.MakingMeasurementsProjective
+open MIPStarRE.LDT.ExpansionHypercubeGraph
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+@[expose] public section
 
 lemma ev_adjoint_sub_swap
     {κ : Type*} [Fintype κ] [DecidableEq κ]
@@ -325,5 +329,7 @@ lemma cabApproxDelta_sum_from_sdd
                 _ = ev ψ (((X - Y)ᴴ) * (X - Y)) := by
                     rw [hleft s g, hright s g]
     _ ≤ η := hcab
+
+end
 
 end MIPStarRE.LDT.GlobalVariance

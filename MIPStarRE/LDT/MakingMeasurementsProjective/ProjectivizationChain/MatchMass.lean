@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 
 /-!
 # Section 5 — completion match-mass helper
@@ -15,6 +17,8 @@ pre-completion transport in
 `ProjectivizationChain.Line169Repair`, and this file now keeps only the
 completion lemma that route consumes.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 

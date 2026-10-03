@@ -1,5 +1,7 @@
-import MIPStarRE.Quantum
-import MIPStarRE.LDT
+module
+
+public import MIPStarRE.Quantum
+public import MIPStarRE.LDT
 
 /-!
 # MIPStarRE
@@ -14,3 +16,5 @@ the theorem \(MIP^* = RE\).
 - The active low individual degree test development in `MIPStarRE.LDT`
 - The finite-dimensional quantum infrastructure in `MIPStarRE.Quantum`
 -/
+
+@[expose] public section

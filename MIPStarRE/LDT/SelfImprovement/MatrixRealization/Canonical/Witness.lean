@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical
+module
+
+public import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical
 
 /-!
 # Section 9 — Canonical matrix SDP witnesses
@@ -14,6 +16,8 @@ the self-improvement comparison.
 - `references/ldt-paper/self_improvement.tex`
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

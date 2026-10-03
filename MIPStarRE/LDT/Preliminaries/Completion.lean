@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
+module
+
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 
 /-!
 # Preliminary completion lemmas
@@ -7,6 +9,8 @@ Structural completion helpers that stay close to `completeAtOutcome` while
 keeping only the light projectivity dependencies from
 `SwitchSandwichPrep/Core.lean`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

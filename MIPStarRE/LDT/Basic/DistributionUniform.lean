@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
+module
+
+public import MIPStarRE.LDT.Basic.DistributionAvg
 
 /-!
 # Uniform subset estimates
@@ -9,6 +11,8 @@ nonempty finite subset, together with averaging bounds for `[0,1]`-valued
 functions.  The uniform-subset total-variation identity is proved by transport
 through Mathlib probability mass functions.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

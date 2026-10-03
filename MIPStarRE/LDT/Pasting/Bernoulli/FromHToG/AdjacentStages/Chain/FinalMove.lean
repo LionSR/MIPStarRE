@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain.HalfSandwich
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain.HalfSandwich
 
 /-!
 # Section 12 pasting: from-H-to-G final move-right chain
@@ -8,6 +10,8 @@ connecting `M₃ → M₄`.
 
 The preceding half-sandwich chain `M₁ → M₂ → M₃` lives in `Chain.HalfSandwich`.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

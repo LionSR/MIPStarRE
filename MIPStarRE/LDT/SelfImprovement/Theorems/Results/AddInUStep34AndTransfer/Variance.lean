@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Factored
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Factored
 
 /-!
 # Unselected add-in-u Step 3/4 global-variance bounds
@@ -11,6 +13,8 @@ combined global-variance bridges for the projection-simplified add-in-u chain.
 - `references/ldt-paper/self_improvement.tex` lines 299--340
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 
 namespace MIPStarRE.LDT.SelfImprovement

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas.Basic
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas.Basic
 
 /-!
 # Section 12 pasting: from-H-to-G head-tail stage reindexing
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas.Basic
 The head-tail reindexing lemmas for the adjacent-stage source expression in the
 paper's `from H to G` chain.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -142,10 +146,10 @@ lemma fromHToG_cons_type_outcome_sum
           by_cases hp : p.1.isSome = b ∧ gHatTupleType p.2 = τ
           · have htype : gHatTupleType (Fin.cons p.1 p.2) = prependTypeBit b τ :=
               (fromHToG_gHatTupleType_cons_eq params b τ p.1 p.2).2 hp
-            rw [if_pos htype, if_pos hp]
+            rw [ite_eq_left htype, ite_eq_left hp]
             simp [fromHToG_gHatSandwichFamily_cons_outcome]
-          · rw [if_neg]
-            · rw [if_neg hp]
+          · rw [ite_eq_right]
+            · rw [ite_eq_right hp]
             · intro h
               exact hp ((fromHToG_gHatTupleType_cons_eq params b τ p.1 p.2).1 h)
     _ = ∑ g : GHatOutcome params,

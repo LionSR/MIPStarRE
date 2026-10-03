@@ -1,5 +1,11 @@
-import MIPStarRE.LDT.GlobalVariance.Defs.Core
-import MIPStarRE.LDT.Test.StrategyCore
+module
+
+public import MIPStarRE.LDT.GlobalVariance.Defs.Core
+public import MIPStarRE.LDT.Test.StrategyCore
+
+/-! ## Weighted operators and variance families -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -10,8 +16,6 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 variable (params : Parameters) [FieldModel params.q]
-
-/-! ## Weighted operators and variance families -/
 
 /-- The operator `(G_g)^{1/2}` used throughout `expansion.tex`.
 Uses `CFC.sqrt` (continuous functional calculus) to compute the matrix

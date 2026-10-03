@@ -1,10 +1,12 @@
-import MIPStarRE.LDT.Tactic.LdtSimp
-import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
-import MIPStarRE.LDT.Preliminaries.Completion
-import MIPStarRE.LDT.Preliminaries.CompletionTransfer
-import MIPStarRE.LDT.Preliminaries.DistanceBounds
-import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
+module
+
+public import MIPStarRE.LDT.Tactic.LdtSimp
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.ProjectorApprox
+public import MIPStarRE.LDT.Preliminaries.Completion
+public import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+public import MIPStarRE.LDT.Preliminaries.DistanceBounds
+public import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 
 /-!
 # Section 5 — basic projectivization data
@@ -60,6 +62,8 @@ cascade uses the slightly widened absorbed scalar
 - Blueprint: `blueprint/src/chapter/ch04_projective.tex`
   (orthonormalization theorem).
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

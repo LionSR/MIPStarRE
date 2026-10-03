@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Left
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Middle
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
+module
+
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Left
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Middle
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 
 /-!
 # Switch-sandwich main: left-to-middle transfer
@@ -14,6 +16,8 @@ gap bounds.
 - `references/ldt-paper/preliminaries.tex`, `prop:switch-sandwich`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

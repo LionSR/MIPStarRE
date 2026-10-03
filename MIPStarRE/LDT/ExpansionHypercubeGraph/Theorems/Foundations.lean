@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
+module
+
+public import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
 
 /-!
 # Section 7 hypercube graph: trace-form foundations
@@ -16,6 +18,8 @@ families.
   `lem:global-rewrite`
 - `blueprint/src/chapter/ch05_expansion.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
@@ -72,7 +76,7 @@ def abstractMatrixModel (params : Parameters)
 lemma localVariance_eq_zero_of_isEmpty (hι : ¬ Nonempty ι) (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     localVariance params A ψ = 0 := by
-  haveI : IsEmpty ι := not_nonempty_iff.mp hι
+  have : IsEmpty ι := not_nonempty_iff.mp hι
   have hzero : ∀ uv : Point params × Point params,
       ev ψ (pointDifferenceSquaredOperator A uv.1 uv.2) = 0 := by
     intro uv
@@ -85,7 +89,7 @@ lemma localVariance_eq_zero_of_isEmpty (hι : ¬ Nonempty ι) (params : Paramete
 lemma globalVariance_eq_zero_of_isEmpty (hι : ¬ Nonempty ι) (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     globalVariance params A ψ = 0 := by
-  haveI : IsEmpty ι := not_nonempty_iff.mp hι
+  have : IsEmpty ι := not_nonempty_iff.mp hι
   have hzero : ∀ uv : Point params × Point params,
       ev ψ (pointDifferenceSquaredOperator A uv.1 uv.2) = 0 := by
     intro uv
@@ -98,7 +102,7 @@ lemma globalVariance_eq_zero_of_isEmpty (hι : ¬ Nonempty ι) (params : Paramet
 lemma localVarianceTraceForm_eq_zero_of_isEmpty (hι : ¬ Nonempty ι) (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     localVarianceTraceForm params A ψ = 0 := by
-  haveI : IsEmpty ι := not_nonempty_iff.mp hι
+  have : IsEmpty ι := not_nonempty_iff.mp hι
   simp [localVarianceTraceForm, localVarianceTraceWitness, MIPStarRE.Quantum.normalizedTrace]
 
 /-- If the ambient outcome type is empty, the global trace formula vanishes. -/
@@ -107,7 +111,7 @@ lemma globalVarianceTraceForm_eq_zero_of_isEmpty (hι : ¬ Nonempty ι)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι)
     (decomp : GlobalVarianceDecomposition params A) :
     globalVarianceTraceForm params A ψ decomp = 0 := by
-  haveI : IsEmpty ι := not_nonempty_iff.mp hι
+  have : IsEmpty ι := not_nonempty_iff.mp hι
   simp [globalVarianceTraceForm, globalVarianceTraceWitness, MIPStarRE.Quantum.normalizedTrace]
 
 /-! ## Finite-sum helper lemmas -/
@@ -260,7 +264,7 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
       (hypercubeVertexCount params : Error)⁻¹ *
         ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
   by_cases hι : Nonempty ι
-  · letI := hι
+  · let := hι
     let model := abstractMatrixModel params decomp.orthogonalComponent ψ
     let w := globalVarianceTraceWitness params A ψ decomp
     have htrace :
@@ -309,7 +313,6 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
                   simp [model, abstractMatrixModel, matrixExpectation, ev]
                   rfl
                 · simp only [Matrix.one_apply, huv, ↓reduceIte, zero_mul, Complex.zero_re]
-                  exact (if_neg huv).symm
         _ = ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ *
               decomp.orthogonalComponent u) := by
               simp
@@ -328,7 +331,7 @@ lemma globalVarianceTraceForm_eq_orthogonalClosedForm (params : Parameters)
             ∑ u, ev ψ ((decomp.orthogonalComponent u)ᴴ * decomp.orthogonalComponent u) := by
               rw [hdiag]
   · rw [globalVarianceTraceForm_eq_zero_of_isEmpty hι params A ψ decomp]
-    haveI : IsEmpty ι := not_nonempty_iff.mp hι
+    have : IsEmpty ι := not_nonempty_iff.mp hι
     simp [ev, MIPStarRE.Quantum.normalizedTrace]
 
 /-- Closed form of `globalVarianceTraceForm` in the same centered-correlation

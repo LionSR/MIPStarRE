@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Defs.Normalization
+module
+
+public import MIPStarRE.LDT.Commutativity.Defs.Normalization
 
 /-!
 # Section 11 commutativity: core operator estimates
@@ -11,6 +13,8 @@ the Section 11 commutativity argument.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

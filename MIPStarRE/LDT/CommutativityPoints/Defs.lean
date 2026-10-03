@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.GlobalVariance.Defs.Core
-import MIPStarRE.LDT.Test.StrategyCore
+module
+
+public import MIPStarRE.LDT.GlobalVariance.Defs.Core
+public import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Section 10 — Definitions
@@ -13,6 +15,8 @@ point/line bridge families, and the error terms used by `commutativityPoints`.
 - `references/ldt-paper/commutativity-points.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.CommutativityPoints
 

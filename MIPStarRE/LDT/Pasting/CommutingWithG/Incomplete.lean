@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
+module
+
+public import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
 
 /-!
 # Section 12 pasting: commuting-with-G incomplete part
 
 Incomplete-part commuting-with-`G` bounds.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

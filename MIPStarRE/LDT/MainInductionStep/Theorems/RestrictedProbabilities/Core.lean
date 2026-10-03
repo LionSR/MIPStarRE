@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Axis
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Diagonal
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Axis
+public import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Diagonal
 
 /-!
 # Section 6 -- Restricted Probability Statement
@@ -12,6 +14,8 @@ step.
 
 - `blueprint/src/chapter/ch10_induction.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

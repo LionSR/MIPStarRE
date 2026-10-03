@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Completion
+module
+
+public import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Completion
 
 /-!
 # Source-Boundary Role-Register Handoff: Final Point Consistency
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Test.MainTheorem.SourceRoleRegister.Completion
 This module contains the final completed-measurement and point-consistency
 statements used by the paper-facing `thm:main-formal` route.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

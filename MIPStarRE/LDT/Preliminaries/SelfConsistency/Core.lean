@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
+module
+
+public import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
+public import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
 
 /-!
 # Self-consistency: core squared-mass bounds
@@ -13,6 +15,8 @@ permutation-invariant states (`prop:cool-prop`).
 - `references/ldt-paper/preliminaries.tex`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

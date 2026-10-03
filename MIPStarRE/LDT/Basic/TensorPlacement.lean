@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Basic.Distribution
-import MIPStarRE.LDT.Basic.SubMeasurementCore
-import MIPStarRE.LDT.Basic.OperatorExpectations
+module
+
+public import MIPStarRE.LDT.Basic.Distribution
+public import MIPStarRE.LDT.Basic.SubMeasurementCore
+public import MIPStarRE.LDT.Basic.OperatorExpectations
 
 /-!
 # Tensor-placement helper lemmas and sandwich tensor estimates
@@ -9,6 +11,8 @@ Tensor-sum commutation, positivity/boundedness preservation,
 factoring lemmas, and sandwich-residual estimates used in
 the main induction step and polynomial-agreement arguments.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

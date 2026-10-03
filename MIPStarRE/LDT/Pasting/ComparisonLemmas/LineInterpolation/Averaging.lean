@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
-import MIPStarRE.LDT.Basic.DistributionUniform
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
+module
+
+public import MIPStarRE.LDT.Basic.DistributionAvg
+public import MIPStarRE.LDT.Basic.DistributionUniform
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
 
 /-!
 # Line interpolation: averaging and tensor helpers
@@ -13,6 +15,8 @@ line interpolation error bounding chain.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
-import MIPStarRE.LDT.CommutativityPoints.Approximation
+module
+
+public import MIPStarRE.LDT.Commutativity.Scaffold.Products
+public import MIPStarRE.LDT.CommutativityPoints.Approximation
 
 /-!
 # Reindexing and evaluation utilities for the evaluated-slice paper chain
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.CommutativityPoints.Approximation
 This file contains finite-reindexing and evaluated-family identities used by
 the paper-faithful scalar approximation chain.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

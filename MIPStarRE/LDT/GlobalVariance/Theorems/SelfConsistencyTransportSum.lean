@@ -1,14 +1,6 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.PointLine
+module
 
-namespace MIPStarRE.LDT.GlobalVariance
-
-open MIPStarRE.LDT
-open MIPStarRE.LDT.Preliminaries
-open MIPStarRE.LDT.MakingMeasurementsProjective
-open MIPStarRE.LDT.ExpansionHypercubeGraph
-open scoped BigOperators MatrixOrder Matrix ComplexOrder
-
-variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+public import MIPStarRE.LDT.GlobalVariance.Theorems.SelfConsistencyTransport.PointLine
 
 /-! ## Sum-form (cardinality-free) `2ε` axis-parallel consistency endpoints
 
@@ -23,6 +15,18 @@ polynomial sum, with no polynomial-cardinality loss.  These are the steps 2 and
 5 sum-level inputs to `eq:equivalent-local-variance`
 (`references/ldt-paper/expansion.tex:317--321`).
 -/
+
+namespace MIPStarRE.LDT.GlobalVariance
+
+open MIPStarRE.LDT
+open MIPStarRE.LDT.Preliminaries
+open MIPStarRE.LDT.MakingMeasurementsProjective
+open MIPStarRE.LDT.ExpansionHypercubeGraph
+open scoped BigOperators MatrixOrder Matrix ComplexOrder
+
+variable {ι : Type*} [Fintype ι] [DecidableEq ι]
+
+@[expose] public section
 
 private noncomputable def axisParallelPointAnswerMeasurement
     (params : Parameters) [FieldModel params.q]
@@ -66,12 +70,15 @@ private lemma liftLeft_lineAnswerMeasurement_outcome_at_g
     axisParallelLineAnswerMeasurement, axisParallelLineAnswerFamily,
     axisParallelLineAnswerFamilyOf,
     generalizeBLeftOperatorAtPolynomial, generalizeBLeftEventSubMeasAtPolynomial,
-    axisParallelLineQuestionParameter, subCoord, zeroCoord,
+    axisParallelLineQuestionParameter,
     SubMeas.toMeasurement_toSubMeas, mkLeftPlacedSubMeas_outcome, postprocess]
   congr 1
   congr 1
   apply Finset.ext
   intro a
+  have hzero : subCoord (s.1 s.2) (s.1 s.2) = zeroCoord := by
+    simp [subCoord, zeroCoord]
+  simp only [hzero]
   simp
 
 /-- The lifted point-answer family outcome at value `a = g(s.1)` reduces to the
@@ -321,5 +328,7 @@ lemma axisParallelPointLineConsistency_weighted_rightToLeftLineQuestion_sum
     _ ≤ 2 * eps :=
         axisParallelPointLineConsistency_weighted_leftToRightLineQuestion_sum
           params strategy eps delta gamma hgood G
+
+end
 
 end MIPStarRE.LDT.GlobalVariance

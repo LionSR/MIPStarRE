@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.SwitcherooContraction.ScalarTerms
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooContraction.ScalarTerms
 
 /-!
 # Section 12 pasting: switcheroo expansion
 
 Expansion identities and the left-front contraction bound.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

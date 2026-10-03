@@ -18,6 +18,24 @@ _spec.loader.exec_module(assemble_challenge)
 
 
 class AssembleChallengeTests(unittest.TestCase):
+    def test_module_imports_and_exposed_section_scopes(self) -> None:
+        assembler = assemble_challenge.Assembler(REPO_ROOT)
+        assembler._file_cache["Example.lean"] = [
+            "module",
+            "public import MIPStarRE.LDT.Basic",
+            "public meta import Lean",
+            "namespace Example",
+            "@[expose] public section",
+            "def first := 1",
+            "end",
+            "def second := 2",
+            "end Example",
+        ]
+        self.assertEqual(
+            assembler.imports_of("Example.lean"), ["MIPStarRE/LDT/Basic.lean", "Lean.lean"]
+        )
+        self.assertEqual(assembler.ns_stack_at("Example.lean", 8), ["Example"])
+
     def test_preserves_declaration_scoped_open_command(self) -> None:
         lines = [
             "namespace Example",

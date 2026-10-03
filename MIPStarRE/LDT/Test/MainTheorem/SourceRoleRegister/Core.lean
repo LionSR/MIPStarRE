@@ -1,9 +1,11 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.Test.SchwartzZippelStep
-import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.Evaluation
-import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
-import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+public import MIPStarRE.LDT.Test.SchwartzZippelStep
+public import MIPStarRE.LDT.Test.MainTheorem.ProjectiveConsistency.Evaluation
+public import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
+public import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
 
 /-!
 # Source-Boundary Role-Register Handoff: Core Reductions
@@ -11,6 +13,8 @@ import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
 This module contains the main-induction handoff, unsymmetrization, and the first
 two-space projectivization outputs for the source route toward `thm:main-formal`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -104,8 +108,8 @@ theorem sourceRoleRegisterPointConsistency_ofSymConsistency
           (Measurement.extractRoleRegisterAlice G).toSubMeas)
         (IdxProjMeas.toIdxSubMeas strategy.pointMeasurementB)
         (2 * σ) := by
-  haveI : Nonempty ιA := strategy.isNormalized.nonempty.map Prod.fst
-  haveI : Nonempty ιB := strategy.isNormalized.nonempty.map Prod.snd
+  have : Nonempty ιA := strategy.isNormalized.nonempty.map Prod.fst
+  have : Nonempty ιB := strategy.isNormalized.nonempty.map Prod.snd
   constructor
   · refine ⟨?_⟩
     have hmono :

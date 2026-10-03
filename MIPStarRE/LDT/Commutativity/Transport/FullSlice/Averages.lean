@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
-import MIPStarRE.LDT.Commutativity.Transport.Pullback
-import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
+module
+
+public import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
+public import MIPStarRE.LDT.Commutativity.Scaffold.Products
+public import MIPStarRE.LDT.Commutativity.Transport.Pullback
+public import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
 
 /-!
 # Full-slice averages and index equivalences
@@ -19,6 +21,8 @@ the scalar public API.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

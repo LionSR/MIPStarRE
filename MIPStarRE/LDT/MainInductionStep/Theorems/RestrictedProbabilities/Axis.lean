@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Base
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Base
 
 /-!
 # Section 6 -- Axis-Parallel Restricted Probability Bounds
@@ -10,6 +12,8 @@ bookkeeping for the main induction step.
 
 - `blueprint/src/chapter/ch10_induction.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -63,7 +67,6 @@ private lemma restrictedAxisSampleError_eq
       cases a
       rfl
     rw [hreadout]
-    rfl
   change
     qBipartiteConsDefect strategy.state
       ((strategy.pointMeasurement (appendPoint params u x)).toSubMeas)

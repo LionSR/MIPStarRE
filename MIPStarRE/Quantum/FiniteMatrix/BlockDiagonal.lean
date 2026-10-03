@@ -1,4 +1,6 @@
-import MIPStarRE.Quantum.FiniteMatrix.Order
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.Order
 
 /-!
 # Block-diagonal finite matrix operators
@@ -8,6 +10,8 @@ for finite complex matrices.  The canonical SDP block algebra in Section 9 uses
 these lemmas to compare the paper's block form with Mathlib's
 `Matrix.blockDiagonal`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.Elementwise
 open WithLp
@@ -22,7 +26,7 @@ theorem blockDiagonal_eq_sum_kronecker_diagonal {o m : Type*}
       ∑ b : o, Matrix.kronecker (B b)
         (Matrix.diagonal fun c : o => if c = b then (1 : ℂ) else 0) := by
   classical
-  letI : Fintype m := Fintype.ofFinite m
+  let : Fintype m := Fintype.ofFinite m
   ext x y
   rcases x with ⟨i, bx⟩
   rcases y with ⟨j, cy⟩
@@ -58,8 +62,8 @@ theorem blockDiagonal_nonneg {o m : Type*}
     (B : o → Matrix m m ℂ) (hB : ∀ b, 0 ≤ B b) :
     0 ≤ Matrix.blockDiagonal B := by
   classical
-  letI : Fintype o := Fintype.ofFinite o
-  letI : Fintype m := Fintype.ofFinite m
+  let : Fintype o := Fintype.ofFinite o
+  let : Fintype m := Fintype.ofFinite m
   rw [Matrix.blockDiagonal_eq_sum_kronecker_diagonal B]
   exact Finset.sum_nonneg fun b _ =>
     MIPStarRE.Quantum.kronecker_nonneg (hB b) (by
@@ -75,8 +79,8 @@ theorem blockDiagonal_nonneg_iff {o m : Type*}
     (B : o → Matrix m m ℂ) :
     0 ≤ Matrix.blockDiagonal B ↔ ∀ b, 0 ≤ B b := by
   classical
-  letI : Fintype o := Fintype.ofFinite o
-  letI : Fintype m := Fintype.ofFinite m
+  let : Fintype o := Fintype.ofFinite o
+  let : Fintype m := Fintype.ofFinite m
   constructor
   · intro hB b
     refine Matrix.nonneg_iff_posSemidef.mpr ?_

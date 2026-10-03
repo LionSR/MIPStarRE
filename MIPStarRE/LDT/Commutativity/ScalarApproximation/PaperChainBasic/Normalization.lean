@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
+module
+
+public import MIPStarRE.LDT.Commutativity.Scaffold.Products
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 
 /-!
 # Tensor normalization helpers for the evaluated-slice paper chain
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 This file contains the normalization estimates used as side conditions for
 `closenessOfIP` and its adjoint form in the scalar approximation chain.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Matrix
+module
+
+public import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Matrix
 
 /-!
 # Section 7 hypercube graph: local-to-global variance theorems
@@ -16,6 +18,8 @@ formalization.
   `lem:local-rewrite`, `lem:global-rewrite`, and `lem:local-to-global`
 - `blueprint/src/chapter/ch05_expansion.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
@@ -312,7 +316,7 @@ lemma localToGlobal (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     globalVariance params A ψ ≤ (params.m : Error) * localVariance params A ψ := by
   by_cases hι : Nonempty ι
-  · letI := hι
+  · let := hι
     change matrixGlobalVariance params (abstractMatrixModel params A ψ) ≤
       (params.m : Error) * matrixLocalVariance params (abstractMatrixModel params A ψ)
     exact matrixLocalToGlobal params (abstractMatrixModel params A ψ)
@@ -343,7 +347,7 @@ lemma localRewrite (params : Parameters)
     (A : Point params → MIPStarRE.Quantum.Op ι) (ψ : QuantumState ι) :
     LocalRewriteStatement params A ψ := by
   by_cases hι : Nonempty ι
-  · letI := hι
+  · let := hι
     exact ⟨by
       change matrixLocalVariance params (abstractMatrixModel params A ψ) =
         matrixLocalVarianceTraceForm params (abstractMatrixModel params A ψ)
@@ -362,7 +366,7 @@ lemma globalRewrite (params : Parameters)
     GlobalRewriteStatement params A ψ := by
   refine ⟨canonicalGlobalVarianceDecomposition params A, ?_⟩
   by_cases hι : Nonempty ι
-  · letI := hι
+  · let := hι
     calc
       globalVariance params A ψ
           = (hypercubeVertexCount params : Error)⁻¹ *

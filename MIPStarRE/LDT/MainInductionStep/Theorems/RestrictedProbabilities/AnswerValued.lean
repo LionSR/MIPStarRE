@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Core
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.MainError
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Core
+public import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
+public import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.MainError
 
 /-!
 # Section 6 -- Answer-Valued Restricted Probability Statement
@@ -12,6 +14,8 @@ bookkeeping for the main induction step.
 
 - `blueprint/src/chapter/ch10_induction.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -371,7 +375,6 @@ private lemma answerSuccessorRestrictedDiagonalSampleError_eq
   simp [AnswerSymStrat.diagonalPointAnswerFamily,
     AnswerSymStrat.diagonalLineAnswerFamily, xRestrictedAnswerSymStratOfAnswer]
   simp [diagonalPointAnswerFamilyOf, diagonalLineAnswerFamilyOf, hline]
-  rfl
 
 private noncomputable def answerSuccessorDiagonalSliceIndexError
     (params : Parameters)

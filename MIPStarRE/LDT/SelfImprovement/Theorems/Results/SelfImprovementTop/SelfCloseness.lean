@@ -1,8 +1,10 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
 # Final-fields self-closeness construction
@@ -12,6 +14,8 @@ field of `SelfImprovementFinalFields`.  The statements formalize the triangle
 transport through helper self-consistency and the orthonormalization SDD step in
 `references/ldt-paper/self_improvement.tex`, lines 727--741.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

@@ -1,13 +1,17 @@
-import MIPStarRE.LDT.Basic.QuantumState
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Commutativity.GCommStability.OverlapOne
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+module
+
+public import MIPStarRE.LDT.Basic.QuantumState
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.Commutativity.GCommStability.OverlapOne
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 11 commutativity: shared scalar stability helpers
 
 Auxiliary positivity, order, and bounded-residual lemmas used by the scalar stability estimates.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

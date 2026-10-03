@@ -1,11 +1,15 @@
-import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
+module
+
+public import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
+public import MIPStarRE.LDT.Pasting.SwitcherooCompletion.SecondTerm
 
 /-!
 # Section 12 pasting: complete-part reductions
 
 Complete-part aggregate commutation and scalar error bounds.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

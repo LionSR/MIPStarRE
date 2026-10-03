@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Zeta2Zeta3
+module
+
+public import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Zeta2Zeta3
 
 /-!
 # Error cascade — bound for `ζ₄`
@@ -10,6 +12,8 @@ inductive step and its absorption into `mainFormalError`.
 
 * `references/ldt-paper/inductive_step.tex`, lines 220--228.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

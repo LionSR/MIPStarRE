@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
-import MIPStarRE.LDT.Pasting.Defs.Context
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
+public import MIPStarRE.LDT.Pasting.Defs.Context
 
 /-!
 # Section 12 — Nontrivial pasting context corollaries
@@ -16,6 +18,8 @@ two displayed consequences that the blueprint names explicitly.
 - `references/ldt-paper/ld-pasting.tex` (Section 12)
 - `blueprint/src/chapter/ch09_pasting.tex` (`def:ld-pasting-context`)
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

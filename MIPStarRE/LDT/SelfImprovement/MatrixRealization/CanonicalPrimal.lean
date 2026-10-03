@@ -1,5 +1,7 @@
-import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Base
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
+public import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Base
 
 /-!
 # Section 9 — Canonical matrix SDP primal block form
@@ -12,6 +14,8 @@ from feasible canonical primal matrices.
 
 - `references/ldt-paper/self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -500,7 +504,6 @@ theorem matrixSdpCanonicalDiagonalBlock_blockDiagonal_mul_left (params : Paramet
   classical
   ext i j
   unfold matrixSdpCanonicalDiagonalBlock
-  simp only [Matrix.mul_apply]
   change (∑ y : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
       matrixSdpCanonicalBlockDiagonal params model B (b, i) y * X y (b, j)) =
     ∑ k : model.space.carrier, B b i k * X (b, k) (b, j)
@@ -539,7 +542,6 @@ theorem matrixSdpCanonicalDiagonalBlock_mul_blockDiagonal_right (params : Parame
   classical
   ext i j
   unfold matrixSdpCanonicalDiagonalBlock
-  simp only [Matrix.mul_apply]
   change (∑ y : MatrixSdpCanonicalBlockIndex params × model.space.carrier,
       X (b, i) y * matrixSdpCanonicalBlockDiagonal params model B y (b, j)) =
     ∑ k : model.space.carrier, X (b, i) (b, k) * B b k j

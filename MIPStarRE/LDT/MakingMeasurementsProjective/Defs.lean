@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.SubMeasurementCore
-import MIPStarRE.Quantum.Measurement
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementCore
+public import MIPStarRE.Quantum.Measurement
 
 /-!
 # Section 5 — Making measurements projective: definitions
@@ -37,6 +39,8 @@ identities, not the full tensor-product correlation theorem.
 Concrete `Matrix d d ℂ` witnesses are provided alongside the abstract
 operator-algebra formulation, giving honest probability and overlap formulas.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

@@ -1,16 +1,17 @@
-import MIPStarRE.Quantum.FiniteHilbert
-import MIPStarRE.Quantum.FiniteMatrix.Basic
-import MIPStarRE.Quantum.FiniteMatrix.Order
-import MIPStarRE.Quantum.FiniteMatrix.TracePairing
-import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
-import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
-import MIPStarRE.Quantum.FiniteConicDuality
-import MIPStarRE.Quantum.ProjectorONB
-import MIPStarRE.Quantum.Measurement
+module
 
--- Mathlib 4.31 header checks require this for this aggregate module.
-set_option linter.style.header false
+public import MIPStarRE.Quantum.FiniteHilbert
+public import MIPStarRE.Quantum.FiniteMatrix.Basic
+public import MIPStarRE.Quantum.FiniteMatrix.Order
+public import MIPStarRE.Quantum.FiniteMatrix.TracePairing
+public import MIPStarRE.Quantum.FiniteMatrix.BlockDiagonal
+public import MIPStarRE.Quantum.FiniteMatrix.NormalizedTrace
+public import MIPStarRE.Quantum.FiniteConicDuality
+public import MIPStarRE.Quantum.ProjectorONB
+public import MIPStarRE.Quantum.Measurement
 
+-- This aggregate module has no Mathlib-format copyright header.
+set_option linter.style.header false in
 /-!
 # Quantum infrastructure
 

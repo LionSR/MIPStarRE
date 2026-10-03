@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization.Y
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
+module
+
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization.Y
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Normalization
 
 /-!
 # X-evaluated full-slice closeness comparison
@@ -13,6 +15,8 @@ transition; extracted from `Closeness.lean` per #1127.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

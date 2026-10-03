@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Zeta4
+module
+
+public import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Zeta4
 
 /-!
 # Error cascade — final assembly
@@ -10,6 +12,8 @@ in Step 8 of the main inductive step.
 
 * `references/ldt-paper/inductive_step.tex`, lines 230--234.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

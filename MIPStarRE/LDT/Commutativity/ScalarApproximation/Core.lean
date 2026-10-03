@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
+module
+
+public import MIPStarRE.LDT.Commutativity.Scaffold.Products
 
 /-!
 # Section 11 commutativity: scalar approximation core
@@ -12,6 +14,8 @@ without creating import cycles.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

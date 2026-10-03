@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Saturated
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Separation
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+module
+
+public import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Saturated
+public import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Separation
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
 # Matrix SDP comparison
@@ -28,6 +30,8 @@ comparison with the self-improvement notation.
 - `references/ldt-paper/self_improvement.tex`
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -90,8 +94,8 @@ theorem matrixSdpDualSlackOperator_ofPointRealization (params : Parameters)
     matrixSdpDualSlackOperator params
         (matrixSdpPointRealizationOfStrategy params strategy) Z g =
       sdpDualSlackOperator params strategy Z g := by
-  rw [matrixSdpDualSlackOperator, sdpDualSlackOperator,
-    matrixAveragedPointOperator_ofPointRealization]
+  unfold matrixSdpDualSlackOperator sdpDualSlackOperator
+  rw [matrixAveragedPointOperator_ofPointRealization]
   rfl
 
 /-- Canonical primal-dual data with complementary slackness and zero slack

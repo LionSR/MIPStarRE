@@ -1,10 +1,12 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Basic.DistributionAvg
-import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.Basic.DistributionAvg
+public import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
 
 /-!
 # Diagonal add-in-u selection and point-sandwich endpoints
@@ -19,6 +21,8 @@ collision endpoints used by the helper strong-self-consistency argument.
 - `references/ldt-paper/self_improvement.tex` lines 247--252, 455--468
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -220,7 +224,7 @@ lemma pointConditioned_sandwichedPolynomialOutcome_outer_eq_ite
         0 := by
   classical
   by_cases heval : h u = h' u
-  · rw [if_pos heval]
+  · rw [ite_eq_left heval]
     let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
     have hproj : Ah * Ah = Ah := by
       simpa [Ah, pointConditionedOutcomeOperatorAtPolynomial] using
@@ -232,7 +236,7 @@ lemma pointConditioned_sandwichedPolynomialOutcome_outer_eq_ite
         pointConditionedOutcomeOperatorAtPolynomial, Ah, heval]
     rw [houtcome]
     exact proj_outer_sandwich_eq Ah (T.outcome h') hproj
-  · rw [if_neg heval]
+  · rw [ite_eq_right heval]
     let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
     let Ah' := pointConditionedOutcomeOperatorAtPolynomial params strategy h' u
     have horth : Ah * Ah' = 0 := by
@@ -272,7 +276,7 @@ lemma ev_opTensor_pointConditioned_sandwichedPolynomialOutcome_outer_eq_indicato
             (T.outcome h)) := by
   classical
   by_cases heval : h u = h' u
-  · rw [if_pos heval]
+  · rw [ite_eq_left heval]
     change ev strategy.state
         (opTensor
           (pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
@@ -283,8 +287,8 @@ lemma ev_opTensor_pointConditioned_sandwichedPolynomialOutcome_outer_eq_indicato
           (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h')
             (T.outcome h))
     rw [pointConditioned_sandwichedPolynomialOutcome_outer_eq_ite]
-    rw [if_pos heval, one_mul]
-  · rw [if_neg heval]
+    rw [ite_eq_left heval, one_mul]
+  · rw [ite_eq_right heval]
     change ev strategy.state
         (opTensor
           (pointConditionedOutcomeOperatorAtPolynomial params strategy h u *
@@ -295,7 +299,7 @@ lemma ev_opTensor_pointConditioned_sandwichedPolynomialOutcome_outer_eq_indicato
           (opTensor ((sandwichedPolynomialSubMeasAt params strategy T u).outcome h')
             (T.outcome h))
     rw [pointConditioned_sandwichedPolynomialOutcome_outer_eq_ite]
-    rw [if_neg heval, zero_mul]
+    rw [ite_eq_right heval, zero_mul]
     have hzeroTensor :
         opTensor (0 : MIPStarRE.Quantum.Op ι) (T.outcome h) = 0 := by
       ext i j
@@ -361,7 +365,7 @@ lemma sandwichedPolynomialOutcome_mul_pointConditioned_eq_ite
         0 := by
   classical
   by_cases heval : h u = h' u
-  · rw [if_pos heval]
+  · rw [ite_eq_left heval]
     let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
     have hproj : Ah * Ah = Ah := by
       simpa [Ah, pointConditionedOutcomeOperatorAtPolynomial] using
@@ -376,7 +380,7 @@ lemma sandwichedPolynomialOutcome_mul_pointConditioned_eq_ite
       (Ah * T.outcome h' * Ah) * Ah =
           Ah * T.outcome h' * (Ah * Ah) := by noncomm_ring
       _ = Ah * T.outcome h' * Ah := by rw [hproj]
-  · rw [if_neg heval]
+  · rw [ite_eq_right heval]
     let Ah := pointConditionedOutcomeOperatorAtPolynomial params strategy h u
     let Ah' := pointConditionedOutcomeOperatorAtPolynomial params strategy h' u
     have hrev : ¬ h' u = h u := fun hv => heval hv.symm
@@ -530,13 +534,13 @@ theorem polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq
               avgOver (uniformDistribution (Point params))
                 (fun u => if i u = r u then (1 : Error) else 0)) := by
         by_cases hir : i = r
-        · rw [if_pos hir]
-        · rw [if_neg hir]
+        · rw [ite_eq_left hir]
+        · rw [ite_eq_right hir]
           exact avgOver_nonneg _ _ fun u => by
             by_cases hu : i u = r u
-            · rw [if_pos hu]
+            · rw [ite_eq_left hu]
               norm_num
-            · rw [if_neg hu]
+            · rw [ite_eq_right hu]
       have hsummand_nonneg :
           0 ≤ ev strategy.state
             (opTensor (Outer.outcome a * T.outcome i * Outer.outcome a)
@@ -572,9 +576,9 @@ theorem polynomial_off_diagonal_swapped_indicator_sandwich_avg_le_mdq
         refine avgOver_congr (uniformDistribution (Point params)) _ _ ?_
         intro u
         by_cases hu : h u = h' u
-        · rw [if_pos hu, if_pos hu.symm]
+        · rw [ite_eq_left hu, ite_eq_left hu.symm]
         · have hrev : ¬ h' u = h u := fun hv => hu hv.symm
-          rw [if_neg hu, if_neg hrev]
+          rw [ite_eq_right hu, ite_eq_right hrev]
       rw [hcoef]
       simp [F, Outer, pointConditionedOutcomeOperatorAtPolynomial, hne]
     calc

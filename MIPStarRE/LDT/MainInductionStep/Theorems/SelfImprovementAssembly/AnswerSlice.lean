@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.Core
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.Core
 
 /-!
 # Section 6 — Answer-Valued Self-Improvement Slice Transport
@@ -13,6 +15,8 @@ theorem.
 
 - `blueprint/src/chapter/ch10_induction.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -156,8 +160,8 @@ noncomputable def xRestrictedAnswerSymStratOfAnswer
       (answerSelfImprovementCarrier params.next strategy) x).axisParallelMeasurement
   diagonalMeasurement :=
     { toIdxProjMeas := restrictAnswerDiagonalAnswerMeasurement params strategy x
-      transportInvariant :=
-        restrictAnswerDiagonalAnswerMeasurement_transportInvariant params strategy x }
+      transportInvariant := by
+        exact restrictAnswerDiagonalAnswerMeasurement_transportInvariant params strategy x }
 
 /-- Answer-valued slice restriction does not change the bipartite state. -/
 @[simp] theorem xRestrictedAnswerSymStratOfAnswer_state

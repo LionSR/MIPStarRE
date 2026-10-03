@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Commutativity.Scaffold.Core
-import MIPStarRE.LDT.MainInductionStep.Defs
-import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
+module
+
+public import MIPStarRE.LDT.Commutativity.Scaffold.Core
+public import MIPStarRE.LDT.MainInductionStep.Defs
+public import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
 
 /-!
 # Section 12 — Statements
@@ -14,6 +16,8 @@ switcheroo, completed-family, half-sandwich, recurrence, Chernoff, and final pas
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

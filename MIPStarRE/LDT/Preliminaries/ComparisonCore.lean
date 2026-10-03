@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Preliminaries.Defs
-import MIPStarRE.LDT.Basic.MeasurementLift
+module
+
+public import MIPStarRE.LDT.Preliminaries.Defs
+public import MIPStarRE.LDT.Basic.MeasurementLift
 
 /-!
 # Preliminary comparison theorems: core layer
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.Basic.MeasurementLift
 Core comparison lemmas and measurement-agreement translations for the
 preliminaries chapter.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
