@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.Decomposition
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.Decomposition
 
 /-!
 # Boundedness transport point-consistency estimates
@@ -13,6 +15,8 @@ projective fields.
 - `references/ldt-paper/self_improvement.tex` lines 435 and 747--755
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

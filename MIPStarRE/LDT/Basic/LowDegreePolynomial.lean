@@ -1,5 +1,7 @@
-import Mathlib
-import MIPStarRE.LDT.Basic.LinePolynomials
+module
+
+public import Mathlib
+public import MIPStarRE.LDT.Basic.LinePolynomials
 
 /-!
 # Low-individual-degree polynomials for the low individual degree test
@@ -11,6 +13,8 @@ of `mainFormal`, which must elaborate in the same environment as the
 Mathlib-only `Challenge.lean`.  Keep the full `import Mathlib`; do not narrow
 it.  See `docs/comparator.md`, "Environment alignment".
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT
 
@@ -25,8 +29,11 @@ theorem degreeOf_rename_embedCoord_lastCoord (params : Parameters) [FieldModel p
     (p : PolynomialModel params) :
     MvPolynomial.degreeOf (lastCoord params)
       (MvPolynomial.rename (embedCoord params) p : PolynomialModel params.next) = 0 := by
+  change MvPolynomial.degreeOf (lastCoord params)
+    (MvPolynomial.rename (embedCoord params) p :
+      MvPolynomial (Fin params.next.m) (Scalar params)) = 0
   rw [MvPolynomial.degreeOf, MvPolynomial.degrees_rename_of_injective
-    (embedCoord_injective params)]
+    (R := Scalar params) (embedCoord_injective params)]
   simp only [Multiset.count_eq_zero, Multiset.mem_map]
   rintro ⟨b, _, hb⟩
   exact embedCoord_ne_lastCoord params b hb
@@ -109,12 +116,15 @@ theorem degreeOf_rename_embedCoord_le (params : Parameters) [FieldModel params.q
     MvPolynomial.degreeOf i
       (MvPolynomial.rename (embedCoord params) g.poly : PolynomialModel params.next) ≤
       params.d := by
+  change MvPolynomial.degreeOf i
+    (MvPolynomial.rename (embedCoord params) g.poly :
+      MvPolynomial (Fin params.next.m) (Scalar params)) ≤ params.d
   have hinj : Function.Injective (embedCoord params) := embedCoord_injective params
   by_cases h : i.val < params.m
   · -- i is in the range of embedCoord: transfer the degree bound
     have hi : embedCoord params ⟨i.val, h⟩ = i := by
       ext; simp [embedCoord]
-    rw [← hi, MvPolynomial.degreeOf_rename_of_injective hinj]
+    rw [← hi, MvPolynomial.degreeOf_rename_of_injective (R := Scalar params) hinj]
     exact g.lowIndividualDegree _
   · -- i is not in range: degreeOf = 0
     have hi_last : i = lastCoord params := by
@@ -138,18 +148,17 @@ appended coordinate. -/
     (params : Parameters) [FieldModel params.q]
     (g : Polynomial params) (x : Fq params) (u : Point params) (y : Fq params) :
     appendAtHeight params g x (appendPoint params u y) = g u := by
-  change encodeScalar
+  change encodeScalar (params := params)
       (MvPolynomial.eval (decodePoint (appendPoint params u y))
         (MvPolynomial.rename (embedCoord params) g.poly)) =
-    encodeScalar (MvPolynomial.eval (decodePoint u) g.poly)
-  rw [MvPolynomial.eval_rename]
+    encodeScalar (params := params) (MvPolynomial.eval (decodePoint u) g.poly)
+  rw [MvPolynomial.eval_rename (R := Scalar params)]
   have hcoords :
       decodePoint (appendPoint params u y) ∘ embedCoord params = decodePoint u := by
     funext i
     simp [decodePoint, appendPoint, embedCoord]
     rfl
   rw [hcoords]
-  rfl
 
 /-- Coordinate map for restricting a polynomial in `m+1` variables to the slice `X_m = x`. -/
 noncomputable def restrictAtHeightCoordinateMap (params : Parameters) [FieldModel params.q]
@@ -170,10 +179,10 @@ private theorem degreeOf_restrictAtHeightCoordinateMap_le
   by_cases hji : j = embedCoord params i
   · subst hji
     rcases subsingleton_or_nontrivial (Scalar params) with hsub | hnontriv
-    · letI := hsub
+    · let := hsub
       have hX : (MvPolynomial.X i : PolynomialModel params) = 0 := Subsingleton.elim _ _
       simp [restrictAtHeightCoordinateMap, embedCoord, hX]
-    · letI := hnontriv
+    · let := hnontriv
       simp [restrictAtHeightCoordinateMap, embedCoord]
   · by_cases hj : j.1 < params.m
     · have hne : (⟨j.1, hj⟩ : Fin params.m) ≠ i := by
@@ -182,13 +191,13 @@ private theorem degreeOf_restrictAtHeightCoordinateMap_le
         ext
         simpa [embedCoord] using congrArg Fin.val h
       rcases subsingleton_or_nontrivial (Scalar params) with hsub | hnontriv
-      · letI := hsub
+      · let := hsub
         have hX : (MvPolynomial.X ⟨j.1, hj⟩ : PolynomialModel params) = 0 := Subsingleton.elim _ _
         simp [restrictAtHeightCoordinateMap, hj, hji, hX]
-      · letI := hnontriv
+      · let := hnontriv
         have hne' : i ≠ ⟨j.1, hj⟩ := by
           simpa [eq_comm] using hne
-        rw [restrictAtHeightCoordinateMap, dif_pos hj, MvPolynomial.degreeOf_X]
+        rw [restrictAtHeightCoordinateMap, dite_eq_left hj, MvPolynomial.degreeOf_X]
         simp [hne', hji]
     · simp [restrictAtHeightCoordinateMap, hj, MvPolynomial.degreeOf_C, hji]
 
@@ -208,7 +217,7 @@ theorem degreeOf_eval₂Hom_restrictAtHeightCoordinateMap_le
     rw [map_sum
       (g := MvPolynomial.eval₂Hom MvPolynomial.C (restrictAtHeightCoordinateMap params x))
       (s := p.support)
-      (f := fun n => (MvPolynomial.monomial n) (MvPolynomial.coeff n p))]
+      (f := fun n => (MvPolynomial.monomial n) (p.coeff n))]
     calc
       MvPolynomial.degreeOf i
           (∑ n ∈ p.support,
@@ -296,10 +305,10 @@ private theorem natDegree_axisCoordinatePolynomial_le (params : Parameters) [Fie
   by_cases hi : i = ℓ.direction
   · subst hi
     rcases subsingleton_or_nontrivial (Scalar params) with hsub | hnontriv
-    · letI := hsub
+    · let := hsub
       have hX : (_root_.Polynomial.X : LinePolynomialModel params) = 0 := Subsingleton.elim _ _
       simp [axisCoordinatePolynomial, hX]
-    · letI := hnontriv
+    · let := hnontriv
       simp [axisCoordinatePolynomial, add_comm]
   · simp [axisCoordinatePolynomial, hi, Polynomial.natDegree_C]
 
@@ -410,10 +419,10 @@ private theorem natDegree_diagonalCoordinatePolynomial_le (params : Parameters)
     (ℓ : DiagonalLine params) (i : Fin params.m) :
     (diagonalCoordinatePolynomial params ℓ i).natDegree ≤ 1 := by
   rcases subsingleton_or_nontrivial (Scalar params) with hsub | hnontriv
-  · letI := hsub
+  · let := hsub
     have hX : (_root_.Polynomial.X : LinePolynomialModel params) = 0 := Subsingleton.elim _ _
     simp [diagonalCoordinatePolynomial, hX]
-  · letI := hnontriv
+  · let := hnontriv
     calc
       (diagonalCoordinatePolynomial params ℓ i).natDegree ≤
           max (_root_.Polynomial.C (decodeScalar (ℓ.base i))).natDegree

@@ -22,6 +22,11 @@ suffix keeps this generated, intentionally monolithic fixture out of the
 temporary directory and byte-compares it with this checked-in copy; it never
 writes `Challenge.lean` at the repository root.
 
+The generated challenge is a Lean module. Its footer is stored as
+`challenge_footer.lean.in` because it is a concatenation template, not a
+standalone Lean source file. The badge guard still checks and exempts exactly
+its one intentional theorem hole.
+
 Run the deterministic guard from the repository root (requires a built library):
 
 ```sh
@@ -47,7 +52,7 @@ awk -F'\t' 'NF==4' closure.tsv > closure.clean.tsv
 # 2. assemble the challenge file (topological order, namespace handling)
 python3 scripts/comparator/assemble_challenge.py closure.clean.tsv > draft.lean
 cat scripts/comparator/challenge_header.lean draft.lean \
-    scripts/comparator/challenge_footer.lean \
+    scripts/comparator/challenge_footer.lean.in \
     > scripts/comparator/expected/Challenge.lean.expected
 ```
 
@@ -62,7 +67,7 @@ was generated from, and run its `./verify.sh` (its CI also runs on every push).
   kernel closure cannot see.  Extend them if regeneration produces compile
   errors in `Challenge.lean`; the script fails loudly if a table key no
   longer matches any extracted declaration.
-- The `mainFormal` statement in `challenge_footer.lean` mirrors the theorem in
+- The `mainFormal` statement in `challenge_footer.lean.in` mirrors the theorem in
   `MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean`.  If the library statement
   changes, update the footer too — comparator fails with "theorem statement do
   not match" until the two agree.

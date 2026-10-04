@@ -1,12 +1,16 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.Completion
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.ErrorBounds
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.Completion
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.ErrorBounds
 
 /-!
 # Section 5 — Orthonormalization
 
 The orthonormalization theorem and scalar bookkeeping lemmas from Section 5.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -186,7 +190,7 @@ lemma orthonormalizationMeasurement_of_consistency_from_projectivizationRepair
           (constSubMeasFamily A.toSubMeas.liftLeft)
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
-  letI : DecidableEq Outcome := Classical.decEq Outcome
+  let : DecidableEq Outcome := Classical.decEq Outcome
   intro hCons
   have hAlmost :
       MIPStarRE.LDT.MakingMeasurementsProjective.AlmostProjMeasStatement
@@ -332,7 +336,7 @@ theorem orthonormalizationCompletionRoute {Outcome : Type*}
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationCompletionRouteError ζ) := by
   classical
-  letI : DecidableEq Outcome := Classical.decEq Outcome
+  let : DecidableEq Outcome := Classical.decEq Outcome
   intro hssc
   have hζ_nonneg : 0 ≤ ζ :=
     le_trans
@@ -421,7 +425,7 @@ theorem orthonormalization {Outcome : Type*}
           (constSubMeasFamily P.toSubMeas.liftLeft)
           (orthonormalizationError ζ) := by
   classical
-  letI : DecidableEq Outcome := Classical.decEq Outcome
+  let : DecidableEq Outcome := Classical.decEq Outcome
   intro hssc
   have hζ_nonneg : 0 ≤ ζ :=
     le_trans

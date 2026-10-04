@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Linearized
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
-import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Linearized
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SdpMatrixBridge
+public import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
 
 /-!
 # Helper completeness: bracketed mass identities and reduced reductions
@@ -14,6 +16,8 @@ by the surrounding self-improvement theorem.
 - `references/ldt-paper/self_improvement.tex` lines 354--414
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Base
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Base
 
 /-!
 # Section 6 — Main Induction Theorems: Successor and Public Interfaces
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Base
 This module contains the answer-valued induction theorem, successor reductions,
 and the public corrected large-`k` main-induction interface.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -44,21 +48,21 @@ theorem answerMainInduction.{uF, vι}
     intro n
     refine Nat.strong_induction_on n ?_
     intro n ih params hm instField
-    letI : FieldModel.{uF} params.q := instField
+    let : FieldModel.{uF} params.q := instField
     intro ι instFintype instDecEq strategy eps delta gamma k hgood _hk_pos hk
-    letI : Fintype ι := instFintype
-    letI : DecidableEq ι := instDecEq
+    let : Fintype ι := instFintype
+    let : DecidableEq ι := instDecEq
     by_cases hm1 : params.m = 1
     · exact answerMainInductionBaseCase params strategy eps delta gamma k hm1 hgood
     · by_cases hsmall : mainInductionError params k eps delta gamma < 1
       · rcases Parameters.successorDecompositionOfNeOne params hm1 with ⟨pred, hnext⟩
         have hq : pred.q = params.q := by
           simpa [Parameters.next] using congrArg Parameters.q hnext
-        letI : FieldModel.{uF} pred.q := hq.symm ▸ instField
+        let : FieldModel.{uF} pred.q := hq.symm ▸ instField
         have hpred_lt : pred.m < n := by
           rw [← hm]
           cases hnext
-          simp [Parameters.next]
+          simp
         have hinduction : AnswerMainInductionHypothesis.{uF, vι} pred :=
           ih pred.m hpred_lt pred rfl inferInstance
         cases hnext
@@ -286,7 +290,7 @@ theorem mainInductionSuccessor
   rcases Parameters.successorDecompositionOfNeOne params hm1 with ⟨pred, hnext⟩
   have hq : pred.q = params.q := by
     simpa [Parameters.next] using congrArg Parameters.q hnext
-  letI : FieldModel pred.q := hq.symm ▸ (inferInstance : FieldModel params.q)
+  let : FieldModel pred.q := hq.symm ▸ (inferInstance : FieldModel params.q)
   cases hnext
   exact mainInductionSuccessorNext pred strategy eps delta gamma k hgood hk
 

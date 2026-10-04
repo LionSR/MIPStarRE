@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
-import MIPStarRE.LDT.Preliminaries.DistanceBounds
+module
+
+public import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
+public import MIPStarRE.LDT.Preliminaries.DistanceBounds
 /-!
 # Section 10 commutativity points: answer-valued diagonal measurements
 This file proves the commutativity-at-points theorem using the answer-valued
@@ -10,6 +12,8 @@ measurement.
 ## References
 - `references/ldt-paper/commutativity-points.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.CommutativityPoints
 

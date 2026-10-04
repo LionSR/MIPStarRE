@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.AveragesAndOps
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.StageMass
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.AveragesAndOps
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.StageMass
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
 
 /-!
 # Section 12 pasting: exact identities and error-bound lemma
@@ -9,6 +11,8 @@ import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLem
 Exact recurrence identities and the paper-total error absorption lemma that
 assemble the final `fromHToG` telescope conclusion.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

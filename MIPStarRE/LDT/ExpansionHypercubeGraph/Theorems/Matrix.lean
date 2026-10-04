@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Foundations
+module
+
+public import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Foundations
 
 /-!
 # Section 7 hypercube graph: matrix-realization theorems
@@ -12,6 +14,8 @@ realization model.
 - `references/ldt-paper/expansion.tex`
 - `blueprint/src/chapter/ch05_expansion.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
@@ -89,7 +93,6 @@ private lemma orthogonalModeProjector_re_sum (params : Parameters)
           intro v hv
           simp [orthogonalModeProjectorMatrix, constantModeProjectorMatrix, Matrix.one_apply,
             sub_mul]
-          rfl
     _ = ∑ u, ∑ v, Complex.re (((if u = v then (1 : ℂ) else 0) * z u v)) -
           ∑ u, ∑ v, Complex.re (((hypercubeVertexCount params : ℂ)⁻¹ * z u v)) := by
           simp_rw [Finset.sum_sub_distrib]
@@ -158,7 +161,7 @@ lemma matrixGlobalVariance_eq_closedForm (params : Parameters)
   unfold matrixGlobalVariance avgOver independentPointPair uniformDistribution
   rw [Distribution.uniformOnFinset_support]
   simp_rw [Distribution.uniformOnFinset_weight]
-  simp only [Finset.mem_univ, if_true]
+  simp only [Finset.mem_univ, ite_true]
   rw [Fintype.sum_prod_type]
   simp_rw [hsqdiff]
   let M : Error := hypercubeVertexCount params
@@ -483,7 +486,7 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
         · subst hu; simp
         · simp [hu]
       simp_rw [step]
-      simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
+      simp only [Finset.sum_ite_eq', Finset.mem_univ, ite_true]
       have hrow := rerandomizeCoordWeight_rowSum params a
       have hcast := congrArg (fun x : Error => (x : ℂ)) hrow
       push_cast at hcast
@@ -515,16 +518,7 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
         simp [Finset.sum_ite_eq', Finset.mem_univ]
       · simp [hau]
     simp_rw [step]
-    have hsingle :
-        (∑ x : Point params,
-          if a = x then (rerandomizeCoordWeight params x b : ℂ) else 0) =
-        (if a = a then (rerandomizeCoordWeight params a b : ℂ) else 0) := by
-      apply Finset.sum_eq_single a
-      · intro x _ hxa
-        simp [show ¬ a = x by exact fun h => hxa h.symm]
-      · intro ha
-        exact (ha (Finset.mem_univ a)).elim
-    simpa using hsingle
+    simp
   have hSum3 :
       ∑ uv : Point params × Point params,
         (rerandomizeCoordWeight params uv.1 uv.2 : ℂ) *
@@ -539,21 +533,7 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
       intro u
       by_cases hub : u = b
       · subst hub
-        have hsingle :
-            (∑ x : Point params,
-              if a = x then (rerandomizeCoordWeight params u x : ℂ) else 0) =
-            (rerandomizeCoordWeight params u a : ℂ) := by
-          simpa using
-            (Finset.sum_eq_single (s := (Finset.univ : Finset (Point params))) (a := a)
-              (f := fun x : Point params =>
-                if a = x then (rerandomizeCoordWeight params u x : ℂ) else 0)
-              (by
-                intro x _ hxa
-                simp [show ¬ a = x by exact fun h => hxa h.symm])
-              (by
-                intro ha
-                exact (ha (Finset.mem_univ a)).elim))
-        simpa using hsingle
+        simp
       · have hzero : ∀ v : Point params,
             (rerandomizeCoordWeight params u v : ℂ) *
                 (if a = v ∧ u = b then (1 : ℂ) else 0) = 0 := by
@@ -592,9 +572,9 @@ theorem laplacian_eq_edgeDifferenceForm (params : Parameters) :
             by_cases hv : v = a
             · subst hv; simp
             · simp [hv]]
-        simp only [Finset.sum_ite_eq', Finset.mem_univ, if_true]
+        simp only [Finset.sum_ite_eq', Finset.mem_univ, ite_true]
       simp_rw [step]
-      simp only [if_true]
+      simp only [ite_true]
       have hcol := rerandomizeCoordWeight_colSum params a
       have hcast := congrArg (fun x : Error => (x : ℂ)) hcol
       push_cast at hcast
@@ -762,7 +742,6 @@ lemma matrixLocalVarianceTraceForm_eq_closedForm (params : Parameters)
               refine Finset.sum_congr rfl ?_
               intro v hv
               simp [matrixLaplacianOperator, Matrix.one_apply, sub_mul]
-              rfl
     _ = ∑ u, ∑ v,
           Complex.re
             (((if u = v then ((hypercubeVertexCount params : ℂ)⁻¹) else 0) *

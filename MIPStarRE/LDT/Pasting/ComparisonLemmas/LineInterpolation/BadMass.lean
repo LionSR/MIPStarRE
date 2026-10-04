@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.BadLine
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.BadLine
 
 /-!
 # Line interpolation: bad-mass comparison
@@ -12,6 +14,8 @@ defect bounds, and `pastedInterpolation_verticalLine_defect_le_badMass`.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -362,7 +366,6 @@ lemma ldSandwichLineOnePointRightMeasurement_outcome_some_eq_sum
         else 0 := by
   simp [ldSandwichLineOnePointRightMeasurement, ldSandwichLineOnePointRightFamily,
     postprocess, i.2, Finset.sum_filter]
-  rfl
 
 lemma grouped_coordinate_mismatch_le_left_falseOutcome
     (params : Parameters) [FieldModel params.q]
@@ -505,7 +508,7 @@ lemma hBConsistencyCoordMass_le_linePointDefect
                     simp [term, hneq]
                   · intro hmem
                     exact False.elim (hmem (Finset.mem_univ _))
-                simpa [term] using hsingle
+                simp
               exact hsingle.symm
       _ = ∑ a : Fq params,
             ∑ f : AxisLinePolynomial params.next,

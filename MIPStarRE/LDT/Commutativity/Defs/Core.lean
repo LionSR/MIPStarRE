@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.CommutativityPoints.Defs
-import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
+module
+
+public import MIPStarRE.LDT.CommutativityPoints.Defs
+public import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
 # Section 11 commutativity: core definitions
@@ -13,6 +15,8 @@ stability steps of the Section 11 commutativity argument.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

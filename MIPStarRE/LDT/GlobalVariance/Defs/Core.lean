@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Core
+module
+
+public import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
+public import MIPStarRE.LDT.ExpansionHypercubeGraph.Defs.Core
 
 /-!
 # Section 8 global variance: core definitions
@@ -12,6 +14,8 @@ questions) underlying the Section 8 global-variance construction.
 - `references/ldt-paper/expansion.tex`
 - `blueprint/src/chapter/ch06_variance.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -78,7 +82,7 @@ def axisParallelLineQuestionParameter {params : Parameters} [FieldModel params.q
 @[simp] theorem axisParallelLineQuestionParameter_pointAt {params : Parameters}
     [FieldModel params.q] (ℓ : AxisParallelLine params) (t : Fq params) :
     axisParallelLineQuestionParameter (ℓ, ℓ.pointAt t) = t := by
-  simp only [axisParallelLineQuestionParameter, AxisParallelLine.pointAt, if_pos]
+  simp only [axisParallelLineQuestionParameter, AxisParallelLine.pointAt, ite_eq_left]
   simp [subCoord, addCoord]
 
 /-- The distribution of an axis-parallel line together with a point queried on it.

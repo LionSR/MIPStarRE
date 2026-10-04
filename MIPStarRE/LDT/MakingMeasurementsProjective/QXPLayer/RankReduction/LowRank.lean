@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.Sigma
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.Sigma
 
 /-!
 # Section 5 — Q/X/XHat/P low-rank truncation
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.Sigma
 Rank-reduction auxiliary-space constructions and the low-rank truncation branch for
 the paper's `Q/X/XHat/P` intermediate layer.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -27,7 +31,7 @@ lemma projectiveLowRankSum_auxData_of_rank_bound {Outcome : Type uOutcome}
       t.total = 1 ∧ Fintype.card auxSpace.carrier ≤ Fintype.card ι := by
   classical
   by_cases hsigma : Nonempty (FiniteHilbertSpace.sigmaFinCarrier m)
-  · letI := hsigma
+  · let := hsigma
     let auxSpace : FiniteHilbertSpace.{uι} := FiniteHilbertSpace.sigmaFin m
     refine ⟨auxSpace, sigmaFinProjMeas m, ?_⟩
     refine ⟨rfl, ?_⟩
@@ -266,8 +270,8 @@ lemma projectiveLowRankSum_truncate {Outcome : Type uOutcome}
   classical
   let d : ℕ := Fintype.card ι
   let Idx : Type uOutcome := Σ a : Outcome, Fin (R.outcome a).rank
-  letI : Fintype Idx := inferInstance
-  letI : DecidableEq Idx := Classical.decEq Idx
+  let : Fintype Idx := inferInstance
+  let : DecidableEq Idx := Classical.decEq Idx
   by_cases hr : Fintype.card Idx ≤ d
   · have hrank : ∑ a, (R.outcome a).rank ≤ Fintype.card ι := by
       simpa [Idx, d, Fintype.card_sigma] using hr
@@ -483,10 +487,10 @@ lemma projectiveLowRankSum_of_roundingWitness {Outcome : Type uOutcome}
       RankReductionWitness ψ A ζ data := by
   classical
   by_cases hOutcome : Nonempty Outcome
-  · letI : Nonempty Outcome := hOutcome
+  · let : Nonempty Outcome := hOutcome
     exact projectiveLowRankSum_truncate ψ hψ A ζ hζ hζ_le q hrounded
       source_almost_projective
-  · letI : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
+  · let : IsEmpty Outcome := not_nonempty_iff.mp hOutcome
     exfalso
     obtain ⟨i⟩ := (inferInstance : Nonempty ι)
     have htotal_zero : A.toSubMeas.total = 0 := by

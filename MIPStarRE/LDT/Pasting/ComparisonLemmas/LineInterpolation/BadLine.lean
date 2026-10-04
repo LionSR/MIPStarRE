@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.Core
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.Core
 
 /-!
 # Line interpolation: bad-line event
@@ -11,6 +13,8 @@ extraction in the line-interpolation argument.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

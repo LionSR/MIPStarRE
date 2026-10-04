@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas.TailStage
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.MoveLemmas.TailStage
 
 /-!
 # Section 12 pasting: from-H-to-G adjacent-stage source scalars
@@ -12,6 +14,8 @@ half-sandwich context algebra.  The downstream chain `M₁ → M₂ → M₃ →
 split between `AdjacentStages.Chain.HalfSandwich` and
 `AdjacentStages.Chain.FinalMove`.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

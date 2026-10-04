@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.DistributionUniform
-import MIPStarRE.LDT.Pasting.Statements
+module
+
+public import MIPStarRE.LDT.Basic.DistributionUniform
+public import MIPStarRE.LDT.Pasting.Statements
 
 /-!
 # Section 12 pasting: distinct tuple distribution bound
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.Pasting.Statements
 The total variation distance between the uniform distribution on all point tuples
 and the distribution restricted to distinct tuples.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -80,7 +84,7 @@ theorem ldDnoteq
       calc
         ∏ j ∈ Finset.range k with j < i, (1 - (j : Error) / params.q)
           ≤ ∏ j ∈ Finset.range k with j < i, (1 : Error) := by
-              exact Finset.prod_le_prod
+              exact Finset.prod_le_prod₀
                 (fun j hj => hfactor_nonneg j (Finset.mem_filter.mp hj).1)
                 (fun j hj => hfactor_le_one j (Finset.mem_filter.mp hj).1)
         _ = 1 := by simp

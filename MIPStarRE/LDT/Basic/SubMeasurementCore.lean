@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Basic.QuantumState
+module
+
+public import MIPStarRE.LDT.Basic.QuantumState
 
 /-!
 # Core submeasurement structures for the low individual degree test
 
 Foundational measurement, submeasurement, and projective-measurement structures.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -55,9 +59,10 @@ noncomputable def Measurement.trivialDistinguishedOutcome
   toSubMeas := {
     outcome := fun a => if a = a₀ then 1 else 0
     total := 1
-    outcome_pos := fun a => Measurement.trivialDistinguishedOutcome_outcome_pos a₀ a
+    outcome_pos := fun a => by
+      exact Measurement.trivialDistinguishedOutcome_outcome_pos a₀ a
     sum_eq_total :=
-      (Finset.sum_ite_eq' Finset.univ a₀ fun _ => 1).trans (if_pos (Finset.mem_univ a₀))
+      (Finset.sum_ite_eq' Finset.univ a₀ fun _ => 1).trans (ite_eq_left (Finset.mem_univ a₀))
     total_le_one := le_rfl
   }
   total_eq_one := rfl
@@ -98,7 +103,8 @@ noncomputable def ProjMeas.trivialDistinguishedOutcome
     [Fintype α] [Fintype ι] [DecidableEq ι]
     (a₀ : α) : ProjMeas α ι where
   toMeasurement := Measurement.trivialDistinguishedOutcome a₀
-  proj := ProjMeas.trivialDistinguishedOutcome_proj a₀
+  proj := fun a => by
+    exact ProjMeas.trivialDistinguishedOutcome_proj a₀ a
 
 /-! ### Derived properties -/
 

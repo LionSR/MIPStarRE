@@ -38,7 +38,7 @@ from tex_utils import strip_tex_comment as _strip_tex_comment
 
 _LEAN_DECL_RE = re.compile(
     r"^\s*(?:@\[.*?\]\s*)?"
-    r"(?:(?:noncomputable|protected|private)\s+)*"
+    r"(?:(?:noncomputable|protected|private|public|meta)\s+)*"
     r"(def|theorem|lemma|abbrev|instance|class|structure|inductive|axiom|opaque)\s+"
     r"([\w'+]+(?:\.[\w'+]+)*)"
     r"(?:\.\{[^}]+\})?",
@@ -52,7 +52,7 @@ _PR_REF_RE = re.compile(r"^refs/pull/(\d+)(?:/(?:merge|head))?$")
 
 _NAMESPACE_OPEN_RE = re.compile(r"^\s*namespace\s+([\w.]+)", re.MULTILINE)
 _SECTION_OPEN_RE = re.compile(
-    r"^\s*(?:(?:noncomputable|private|protected|local)\s+)*section(?:\s+([\w.]+))?",
+    r"^\s*(?:@\[.*?\]\s*)?(?:(?:noncomputable|private|protected|local|public|meta)\s+)*section(?:\s+([\w.]+))?",
     re.MULTILINE,
 )
 _NAMESPACE_CLOSE_RE = re.compile(r"^\s*end\s+([\w.]+)", re.MULTILINE)

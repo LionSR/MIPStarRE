@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.Chain
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.Chain
 
 /-!
 # Section 12 pasting: half-sandwich move-back chain
@@ -13,6 +15,8 @@ measurement back to the position required by the rotated half-sandwich endpoint.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.DistributionPMF
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
+module
+
+public import MIPStarRE.LDT.Basic.DistributionPMF
+public import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Preliminaries
 
 /-!
 # Section 6 — Induction Parameter Averaging Bounds
@@ -14,6 +16,8 @@ together with the
 - `blueprint/src/chapter/ch10_induction.tex`
 - `references/ldt-paper/inductive_step.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

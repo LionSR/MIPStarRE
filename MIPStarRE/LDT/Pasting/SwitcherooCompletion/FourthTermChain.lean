@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Pasting.SwitcherooContraction.ScalarTerms
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooContraction.ScalarTerms
+public import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Expansion
 
 /-!
 # Section 12 pasting: fourth-term chain helpers
@@ -8,6 +10,8 @@ Internal helpers by convention for the fourth-term chain in `commutativitySwitch
 These were extracted from `SwitcherooCompletion` to keep that file under
 the 1000-line threshold.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

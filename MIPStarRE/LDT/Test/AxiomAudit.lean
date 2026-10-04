@@ -1,19 +1,21 @@
-import Lean
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
-import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
-import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
-import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
-import MIPStarRE.LDT.Pasting.Bernoulli.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
-import MIPStarRE.LDT.Test.Classical
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
-import MIPStarRE.LDT.Test.MainTheorem.MainFormal
-import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
-import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
+module
+
+public meta import Lean
+public import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
+public import MIPStarRE.LDT.GlobalVariance.Theorems.MainTheorems
+public import MIPStarRE.LDT.MainInductionStep.Theorems.MainTheorems.Successor
+public import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkFull
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+public import MIPStarRE.LDT.MakingMeasurementsProjective.LocalityPreservingRepair
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Line169Repair
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Output
+public import MIPStarRE.LDT.Pasting.Bernoulli.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
+public import MIPStarRE.LDT.Test.Classical
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Core
+public import MIPStarRE.LDT.Test.MainTheorem.MainFormal
+public import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Final
+public import MIPStarRE.LDT.Test.StrategyBiProjUnsymmetrization
 
 /-!
 # Axiom audits for classical low-individual-degree soundness
@@ -227,6 +229,8 @@ This module is built explicitly in CI rather than imported from the umbrella
 library modules, so the axiom audits stay out of normal downstream imports
 while still acting as regression tests.
 -/
+
+meta section
 
 open Lean Elab Command
 

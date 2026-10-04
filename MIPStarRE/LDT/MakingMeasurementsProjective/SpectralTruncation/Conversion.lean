@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
-import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
+public import MIPStarRE.LDT.MakingMeasurementsProjective.SpectralTruncation.ProjectiveNonMeasurement
 
 /-!
 # Spectral truncation statement conversions
@@ -13,6 +15,8 @@ truncation theorem, which produces such a rounded projective family from the
 paper's almost-projective hypothesis, is proved in the sibling proof-layer
 module `SpectralTruncation.ProjectiveNonMeasurement`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

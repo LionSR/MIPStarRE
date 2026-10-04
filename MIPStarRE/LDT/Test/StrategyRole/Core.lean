@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyCore
+module
+
+public import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Role-register tensor algebra for the low individual degree test
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Test.StrategyCore
 Role-register operators and strategy symmetrization infrastructure extracted from
 `MIPStarRE.LDT.Test.Strategy`.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT
 
@@ -188,11 +192,12 @@ noncomputable def classicalRoleSymmState {ι : Type*} [Fintype ι] [DecidableEq 
   density :=
     (2 : Error) • rolePairCond Role.A Role.B ψ.density +
       (2 : Error) • rolePairCond Role.B Role.A (swapDensity ψ.density)
-  density_psd := add_nonneg
-    (smul_nonneg zero_le_two
-      (rolePairCond_nonneg Role.A Role.B ψ.density_psd))
-    (smul_nonneg zero_le_two
-      (rolePairCond_nonneg Role.B Role.A (swapDensity_nonneg ψ.density_psd)))
+  density_psd := by
+    exact add_nonneg
+      (smul_nonneg zero_le_two
+        (rolePairCond_nonneg Role.A Role.B ψ.density_psd))
+      (smul_nonneg zero_le_two
+        (rolePairCond_nonneg Role.B Role.A (swapDensity_nonneg ψ.density_psd)))
 
 @[simp] theorem classicalRoleSymmState_density_fixed {ι : Type*}
     [Fintype ι] [DecidableEq ι] (ψ : QuantumState (ι × ι)) :
@@ -369,7 +374,8 @@ theorem ev_classicalRoleSymmState_one {ι : Type*}
 noncomputable def swapQuantumState {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) : QuantumState (ι × ι) where
   density := swapDensity ψ.density
-  density_psd := swapDensity_nonneg ψ.density_psd
+  density_psd := by
+    exact swapDensity_nonneg ψ.density_psd
 
 lemma ev_swapQuantumState {ι : Type*} [Fintype ι] [DecidableEq ι]
     (ψ : QuantumState (ι × ι)) (Z : MIPStarRE.Quantum.Op (ι × ι)) :

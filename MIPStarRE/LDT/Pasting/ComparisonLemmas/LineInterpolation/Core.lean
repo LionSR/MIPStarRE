@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
 
 /-!
 # Line interpolation: core API
@@ -12,6 +14,8 @@ line-interpolation estimates.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

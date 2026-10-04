@@ -1,6 +1,8 @@
-import Mathlib.Analysis.Convex.SpecificFunctions.Pow
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Averaging
-import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
+module
+
+public import Mathlib.Analysis.Convex.SpecificFunctions.Pow
+public import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.Averaging
+public import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 
 /-!
 # Section 6 — Averaged Slice Error Bounds: Core Estimates
@@ -8,6 +10,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
 This module contains the Jensen and averaging estimates for ordinary and
 answer-valued restricted slice errors.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -236,7 +240,7 @@ lemma average_sliceSelfImprovementError_le
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
           simpa [mul_assoc] using hinner'
     _ = selfImprovementInInductionError params.next eps delta gamma := by
-          simp [selfImprovementInInductionError, Parameters.next]
+          simp [selfImprovementInInductionError]
 
 /-- Jensen/conditioning estimate controlling the averaged slice induction
 parameter `\mathbb{E}_x[\nu_x]` by the next-stage `\nu`, corresponding to the
@@ -393,7 +397,7 @@ private lemma average_sliceMainInductionNu_le
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))) := by
           simpa [mul_assoc] using hinner'
     _ = mainInductionNu params.next k eps delta gamma := by
-          simp [mainInductionNu, Parameters.next]
+          simp [mainInductionNu]
 
 /-- Averaging the recursive slice errors `\sigma_x` and telescoping the slice
 main-induction bound yields the paper's `\mathbb{E}_x[\sigma_x]` estimate used
@@ -566,7 +570,7 @@ lemma average_answerSuccessorSliceSelfImprovementError_le
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
           simpa [mul_assoc] using hinner'
     _ = selfImprovementInInductionError params.next eps delta gamma := by
-          simp [selfImprovementInInductionError, Parameters.next]
+          simp [selfImprovementInInductionError]
 
 /-- Answer-valued successor analogue of the averaged recursive induction
 parameter estimate.
@@ -743,7 +747,7 @@ lemma average_answerSuccessorSliceMainInductionNu_le
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (1024 : Error))) := by
           simpa [mul_assoc] using hinner'
     _ = mainInductionNu params.next k eps delta gamma := by
-          simp [mainInductionNu, Parameters.next]
+          simp [mainInductionNu]
 
 /-- Average of the recursive main-induction errors for answer-valued successor
 slices.

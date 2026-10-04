@@ -1,12 +1,14 @@
-import Mathlib.Analysis.Complex.Basic
-import Mathlib.Analysis.LocallyConvex.WithSeminorms
-import Mathlib.Analysis.Matrix.Normed
-import Mathlib.Topology.Bases
-import Mathlib.Topology.Instances.Matrix
-import MIPStarRE.Quantum.FiniteConicDuality
-import MIPStarRE.Quantum.FiniteMatrix.Order
-import MIPStarRE.Quantum.FiniteMatrix.TracePairing
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Basic
+module
+
+public import Mathlib.Analysis.Complex.Basic
+public import Mathlib.Analysis.LocallyConvex.WithSeminorms
+public import Mathlib.Analysis.Matrix.Normed
+public import Mathlib.Topology.Bases
+public import Mathlib.Topology.Instances.Matrix
+public import MIPStarRE.Quantum.FiniteConicDuality
+public import MIPStarRE.Quantum.FiniteMatrix.Order
+public import MIPStarRE.Quantum.FiniteMatrix.TracePairing
+public import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.StrongDuality.Basic
 
 /-!
 # Section 9 -- Canonical SDP separation argument
@@ -18,6 +20,8 @@ zero-duality-gap theorem for the canonical finite-dimensional matrix SDP.
 
 - `references/ldt-paper/self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

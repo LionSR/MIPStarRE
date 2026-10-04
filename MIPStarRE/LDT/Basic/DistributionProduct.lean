@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
+module
+
+public import MIPStarRE.LDT.Basic.DistributionAvg
 
 /-!
 # Product rules for finite-support distribution averages
@@ -26,6 +28,8 @@ depend, are in `MIPStarRE.LDT.Basic.DistributionUniformSums` and
 These are formalization-internal finite probability lemmas for the low
 individual degree test development.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

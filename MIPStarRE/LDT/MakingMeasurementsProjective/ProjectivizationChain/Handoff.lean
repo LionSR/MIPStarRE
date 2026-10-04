@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 
 /-!
 # Section 5 — projectivization self-consistency handoff
@@ -8,6 +10,8 @@ orthonormalization projectivization chain in the main inductive step.  The state
 convert pre-projective consistency and completion closeness into the projective
 consistency estimates used after `Q^A` and `Q^B` have been built.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 

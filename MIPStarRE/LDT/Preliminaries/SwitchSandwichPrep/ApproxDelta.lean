@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
+module
+
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 
 /-!
 # Switch-sandwich preparation: `approx_δ` overlap gaps
@@ -11,6 +13,8 @@ error under `approx_δ` families.
 - `references/ldt-paper/preliminaries.tex`, `prop:switch-sandwich`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

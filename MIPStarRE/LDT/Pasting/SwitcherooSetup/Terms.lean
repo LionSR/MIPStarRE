@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.SwitcherooSetup.Centers
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooSetup.Centers
 
 /-!
 # Section 12 pasting: switcheroo aggregate terms
 
 The remaining switcheroo aggregate terms and split formulas.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

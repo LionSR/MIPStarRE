@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 
 /-!
 # Section 5 — Rectangular SVD constructors for Q/X/XHat/P data
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.AlmostProjective
 Rectangular-SVD matrix identities and constructors for the paper's
 `Q/X/XHat/P` intermediate layer.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

@@ -1,6 +1,8 @@
-import MIPStarRE.Quantum.FiniteMatrix
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
-import MIPStarRE.LDT.SelfImprovement.Defs
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix
+public import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.TraceForms
+public import MIPStarRE.LDT.SelfImprovement.Defs
 
 /-!
 # Section 9 — Matrix realization
@@ -11,6 +13,8 @@ Concrete finite-dimensional matrix realizations of the self-improvement SDP data
 
 - `references/ldt-paper/self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 
@@ -57,9 +61,11 @@ noncomputable def matrixSdpStrictPrimalSubmeasurement (params : Parameters)
     (model : MatrixSdpRealization params) :
     MatrixSubmeasurement (DegreeBoundedPolynomialAnswer params) model.space where
   effect := fun _ => sdpStrictPrimalWeight params • (1 : MatrixOperator model.space)
-  pos := fun _ => sdpStrictPrimalEffect_nonneg params model.space
-  sum_le_one := (le_of_eq (matrixSdpStrictPrimalConstantSum params model)).trans
-    (errorHalf_smul_one_le_one model.space)
+  pos := fun _ => by
+    exact sdpStrictPrimalEffect_nonneg params model.space
+  sum_le_one := by
+    exact (le_of_eq (matrixSdpStrictPrimalConstantSum params model)).trans
+      (errorHalf_smul_one_le_one model.space)
 
 /-- The matrix-level strict-feasible primal witness has total mass `(1/2) I`. -/
 theorem matrixSdpStrictPrimalSubmeasurement_sum_effect (params : Parameters)

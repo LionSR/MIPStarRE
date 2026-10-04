@@ -1,11 +1,15 @@
-import MIPStarRE.LDT.Pasting.Defs.Interpolation
-import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
+module
+
+public import MIPStarRE.LDT.Pasting.Defs.Interpolation
+public import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
 # Section 12 — Definitions: consistency and families
 
 Global-consistency predicates and the completed-slice family constructions.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

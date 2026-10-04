@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Pasting.Statements
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
-import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
+module
+
+public import MIPStarRE.LDT.Pasting.Statements
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+public import MIPStarRE.LDT.Preliminaries.Triangles.SimEq
 
 /-!
 # Section 12 pasting: vertical-line consistency transfer
@@ -9,6 +11,8 @@ The `ldGbcon` transfer compares the slice family `G^x` with the vertical-line
 answers `B^u`.  It combines the conditioned axis-parallel consistency estimate
 with the point-to-vertical-line state-dependent-distance bound.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -28,7 +32,7 @@ private noncomputable def ldGbconAxisLineMeasurement
   { toSubMeas := postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas) (· zeroCoord)
     total_eq_one := (strategy.axisParallelMeasurement ℓ).total_eq_one }
 
-private noncomputable def ldGbconVerticalLineMeasurement
+noncomputable def ldGbconVerticalLineMeasurement
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι) :
     IdxMeas (Point params.next) (Fq params) ι := fun u =>
@@ -79,7 +83,6 @@ private lemma ldGbconAxisLineMeasurement_eq_verticalLineMeasurement
               (AxisParallelLine.rebaseAt ℓ (pointHeight params u))).toSubMeas)
             (· zeroCoord)).outcome a := by
               simp [ldGbconAxisLineMeasurement, hrebased, ℓ]
-              rfl
       _ = (postprocess ((strategy.axisParallelMeasurement ℓ).toSubMeas)
             (fun f => f (pointHeight params u))).outcome a := by
               exact AxisParallelCovariantMeasurement.reparamInvariant

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
+module
+
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.InnerProduct
 
 /-!
 # Cauchy–Schwarz Inequalities for Approximate Measurements
@@ -15,6 +17,8 @@ Formalizes Cauchy–Schwarz-style propositions from Section 3
 - `references/ldt-paper/preliminaries.tex`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

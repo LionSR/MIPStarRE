@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Sigma
 
 /-!
 # Section 5 — Q/X/XHat/P algebraic identities
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGra
 Algebraic identities for the `Q/X/XHat/P` layer, including the
 restatements of `Q_a`, `P_a`, the mixed product, and projectivity of `P`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

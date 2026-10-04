@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
-import MIPStarRE.LDT.Test.Defs
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
+public import MIPStarRE.LDT.Test.Defs
 
 /-!
 # Section 5 — Statements
@@ -27,6 +29,8 @@ bipartite auxiliary-state and correlation-preservation conclusion of
 paper's one-measurement helper.  The proof is the tensor-product assembly
 implemented in `NaimarkFull.lean`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

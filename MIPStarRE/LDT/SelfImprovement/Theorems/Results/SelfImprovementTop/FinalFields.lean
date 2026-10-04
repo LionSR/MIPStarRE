@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Completeness
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.SelfCloseness
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.Completeness
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.SelfImprovementTop.SelfCloseness
 
 /-!
 # Final-fields assembly routes
@@ -11,6 +13,8 @@ point-consistency, self-closeness, and projective-residual constructions into
 `SelfImprovementFinalFields`, using the total-difference route for the
 point-consistency field.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

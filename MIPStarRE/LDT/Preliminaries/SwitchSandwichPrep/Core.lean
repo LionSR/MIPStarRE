@@ -1,4 +1,8 @@
-import MIPStarRE.LDT.Preliminaries.ConsistencyBridges
+module
+
+public import MIPStarRE.LDT.Preliminaries.ConsistencyBridges
+
+/-! ### Bridge lemmas for `prop:switch-sandwich` -/
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -6,7 +10,7 @@ namespace MIPStarRE.LDT.Preliminaries
 
 open MIPStarRE.LDT
 
-/-! ### Bridge lemmas for `prop:switch-sandwich` -/
+@[expose] public section
 
 lemma weightedFinsetCauchySchwarz
     {Question Outcome : Type*}
@@ -213,5 +217,7 @@ lemma leftTensor_opBounded01
   · exact leftTensor_nonneg (ι₂ := ι₂) hB.nonnegative
   · exact sub_nonneg.mpr
       (leftTensor_le_one (ι₂ := ι₂) (sub_nonneg.mp hB.boundedByIdentity))
+
+end
 
 end MIPStarRE.LDT.Preliminaries

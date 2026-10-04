@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.ParametersBase
+module
+
+public import MIPStarRE.LDT.Basic.ParametersBase
 
 /-!
 # Axis-parallel lines for the low individual degree test
@@ -12,6 +14,8 @@ canonical parameterization, rebasing, and slice-embedding operations.
 - `references/ldt-paper/test_definition.tex`
 - `blueprint/src/chapter/ch02_test.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT
 

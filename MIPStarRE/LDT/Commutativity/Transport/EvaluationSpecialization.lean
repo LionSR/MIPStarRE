@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
-import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
+module
+
+public import MIPStarRE.LDT.Commutativity.GCommStability.OverlapTwo
+public import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
 
 /-!
 # Section 11 commutativity: transport via evaluation specialization
@@ -13,6 +15,8 @@ commutation argument.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

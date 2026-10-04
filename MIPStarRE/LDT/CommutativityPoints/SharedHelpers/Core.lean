@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.CommutativityPoints.Approximation
+module
+
+public import MIPStarRE.LDT.CommutativityPoints.Approximation
 
 /-!
 # Section 10 commutativity points: shared helpers core
@@ -11,6 +13,8 @@ commutativity-of-points argument.
 - `references/ldt-paper/commutativity-points.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.CommutativityPoints
 

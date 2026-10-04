@@ -16,7 +16,7 @@ DEFAULT_EXPECTED = Path("scripts/comparator/expected/Challenge.lean.expected")
 EXTRACTOR = Path("scripts/comparator/extract_closure.lean")
 ASSEMBLER = Path("scripts/comparator/assemble_challenge.py")
 HEADER = Path("scripts/comparator/challenge_header.lean")
-FOOTER = Path("scripts/comparator/challenge_footer.lean")
+FOOTER = Path("scripts/comparator/challenge_footer.lean.in")
 
 
 def run(cmd: Sequence[str], *, cwd: Path, stdout: Path | None = None) -> str:

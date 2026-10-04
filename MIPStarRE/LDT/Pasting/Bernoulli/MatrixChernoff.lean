@@ -1,13 +1,17 @@
-import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
-import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
-import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
-import MIPStarRE.LDT.Pasting.Statements
+module
+
+public import Mathlib.Analysis.CStarAlgebra.ContinuousFunctionalCalculus.Order
+public import Mathlib.Analysis.Matrix.HermitianFunctionalCalculus
+public import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
+public import MIPStarRE.LDT.Pasting.Statements
 
 /-!
 # Section 12 pasting: matrix Chernoff comparison
 
 Continuous-functional-calculus form of the Bernoulli matrix Chernoff lemma.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

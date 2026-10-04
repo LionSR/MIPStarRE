@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
+module
+
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
 
 /-!
 # Zero-family bounds on the full-slice product
@@ -12,6 +14,8 @@ factors against the zero family, each at most 1.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

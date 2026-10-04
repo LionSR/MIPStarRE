@@ -1,13 +1,17 @@
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
-import MIPStarRE.LDT.Basic.MeasurementLift
+module
+
+public import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Completion
+public import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
+public import MIPStarRE.LDT.Basic.MeasurementLift
 
 /-!
 # Preliminary comparison theorems: completion and chain rules
 
 Completion lemmas and final chain inequalities from the preliminaries chapter.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

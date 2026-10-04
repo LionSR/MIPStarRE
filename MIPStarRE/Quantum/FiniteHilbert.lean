@@ -1,5 +1,7 @@
-import Mathlib.Analysis.InnerProductSpace.Adjoint
-import Mathlib.Analysis.InnerProductSpace.PiL2
+module
+
+public import Mathlib.Analysis.InnerProductSpace.Adjoint
+public import Mathlib.Analysis.InnerProductSpace.PiL2
 
 /-!
 # Finite-dimensional Hilbert spaces
@@ -18,6 +20,8 @@ spaces and send the first basis into the corresponding initial segment of the
 second basis.  The resulting matrix statement is the finite-dimensional
 coisometry identity used in the paper's rectangular `Xhat` construction.
 -/
+
+@[expose] public section
 
 open Module
 

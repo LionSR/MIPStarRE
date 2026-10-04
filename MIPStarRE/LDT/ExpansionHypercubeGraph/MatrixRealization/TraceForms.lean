@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.OperatorExpectations
-import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.Core
+module
+
+public import MIPStarRE.LDT.Basic.OperatorExpectations
+public import MIPStarRE.LDT.ExpansionHypercubeGraph.MatrixRealization.Core
 
 /-!
 # Section 7 — Matrix variance trace forms
@@ -12,6 +14,8 @@ statements used after the Fourier spectral-gap material in `MatrixRealization.Co
 - `blueprint/src/chapter/ch05_expansion.tex`
 - `references/ldt-paper/expansion.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 

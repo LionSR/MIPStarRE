@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.OverAllOutcomes.ErrorAndMass
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.OverAllOutcomes.ErrorAndMass
 
 /-!
 # Section 12 pasting: over all outcomes — nonglobal-mass decomposition
@@ -12,6 +14,8 @@ the line-consistent residual.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -178,7 +182,7 @@ This is the formal version of the `consistent indicator` term in
 Schwartz--Zippel.  It keeps the inserted vertical-line measurement explicit: for
 each line answer `f`, we retain exactly the nonglobal eligible outcomes for which
 no supported slice disagrees with `f` along the sampled vertical line. -/
-private noncomputable def overAllOutcomesLineConsistentNonglobalLocal
+noncomputable def overAllOutcomesLineConsistentNonglobalLocal
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) {k : ℕ}
@@ -199,7 +203,7 @@ private noncomputable def overAllOutcomesLineConsistentNonglobalLocal
 Paper anchor: this is the explicit line-answer term just before the
 `Consistent_τ(g,y,u)` indicator in `ld-pasting.tex` lines 1204--1232.  The next
 lemmas sum out the inserted measurement and reduce it to that indicator. -/
-private noncomputable def overAllOutcomesDistinctLineConsistentNonglobalMass
+noncomputable def overAllOutcomesDistinctLineConsistentNonglobalMass
     (params : Parameters) [FieldModel params.q]
     (strategy : SymStrat params.next ι)
     (family : IdxPolyFamily params ι) (k : ℕ) : Error :=
@@ -377,14 +381,14 @@ private lemma lineConsistentLocal_le_indicatorLocal
               ¬ (∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
                 ((gs i).get hiSome) u ≠ f (xs i)) :=
           ⟨hlocal.1, ⟨f, hlocal.2⟩⟩
-        rw [if_pos hlocal, if_pos hind]
+        rw [ite_eq_left hlocal, ite_eq_left hind]
       · by_cases hind : (¬ IsGloballyConsistent params xs gs) ∧
             ∃ f : AxisLinePolynomial params.next,
               ¬ (∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
                 ((gs i).get hiSome) u ≠ f (xs i))
-        · rw [if_neg hlocal, if_pos hind]
+        · rw [ite_eq_right hlocal, ite_eq_left hind]
           exact A.outcome_pos gs
-        · rw [if_neg hlocal, if_neg hind]
+        · rw [ite_eq_right hlocal, ite_eq_right hind]
     · exact B.outcome_pos f
   calc
     overAllOutcomesLineConsistentNonglobalLocal params strategy family u xs

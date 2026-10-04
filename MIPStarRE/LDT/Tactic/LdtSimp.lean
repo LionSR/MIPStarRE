@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Tactic.LdtSimpAttr
-import MIPStarRE.LDT.Test.Defs
+module
+
+public import MIPStarRE.LDT.Tactic.LdtSimpAttr
+public import MIPStarRE.LDT.Test.Defs
 
 /-!
 # Audited `ldt_simp` whitelist
@@ -26,6 +28,8 @@ Initial whitelist:
   products or `opTensor` forms, matching the formulas used by existing proofs.
 -/
 
+@[expose] public section
+
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 namespace MIPStarRE.LDT
@@ -50,3 +54,7 @@ example {α : Type*} [Fintype α] [DecidableEq α] [Nonempty α] (f : α → Err
 end Examples
 
 end MIPStarRE.LDT
+
+-- This module exports attribute registrations, not new declarations. Its examples
+-- are intentionally anonymous, so the end-of-file private-module check is inapplicable.
+set_option linter.privateModule false

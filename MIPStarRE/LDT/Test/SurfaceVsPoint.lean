@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.Classical
+module
+
+public import MIPStarRE.LDT.Test.Classical
 
 /-!
 # Surface-versus-point classical infrastructure
@@ -12,6 +14,8 @@ test.
 - `references/ldt-paper/introduction.tex`, Theorem 1.1 (`thm:raz-safra`)
 - `blueprint/src/chapter/ch01_overview.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

@@ -1,5 +1,7 @@
-import MIPStarRE.Quantum.FiniteMatrix.TracePairing
-import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Witness
+module
+
+public import MIPStarRE.Quantum.FiniteMatrix.TracePairing
+public import MIPStarRE.LDT.SelfImprovement.MatrixRealization.Canonical.Witness
 
 /-!
 # Section 9 — Saturated canonical SDP witnesses
@@ -14,6 +16,8 @@ condition \(I \le Z\).
 
 - `references/ldt-paper/self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

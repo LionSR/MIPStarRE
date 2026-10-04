@@ -1,6 +1,8 @@
-import Mathlib.Analysis.InnerProductSpace.GramMatrix
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.Sigma
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Completion
+module
+
+public import Mathlib.Analysis.InnerProductSpace.GramMatrix
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.Sigma
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Completion
 
 /-!
 # Section 5 — Positive-Gram sigma-space specialization
@@ -8,6 +10,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGra
 Application of the positive-Gram polar construction to the canonical
 sigma-space layer obtained from a rank-reduction witness.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

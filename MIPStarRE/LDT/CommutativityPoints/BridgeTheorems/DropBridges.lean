@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.LiftBridges
+module
+
+public import MIPStarRE.LDT.CommutativityPoints.BridgeTheorems.LiftBridges
 
 /-!
 # Section 10 commutativity points: drop comparisons
@@ -12,6 +14,8 @@ point-commutativity argument.
 - `references/ldt-paper/commutativity-points.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.CommutativityPoints
 

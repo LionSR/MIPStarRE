@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.LeftTransfer
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.RightTransfer
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
+module
+
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.LeftTransfer
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichMain.RightTransfer
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.ApproxDelta
 
 /-!
 # Switch-sandwich main: completeness estimate
@@ -13,6 +15,8 @@ normalized quantum state with a subprobability distribution.
 - `references/ldt-paper/preliminaries.tex`, `prop:switch-sandwich`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

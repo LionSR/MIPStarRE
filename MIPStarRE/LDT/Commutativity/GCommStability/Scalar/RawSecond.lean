@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Common
+module
+
+public import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Common
 
 /-!
 # Section 11 commutativity: raw second scalar stability bound
 
 The raw uncollapsed form of the second scalar stability estimate.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseFive
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseFive
 
 /-!
 # Tail endpoints for the evaluated-slice paper chain
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseFive
 This file proves the two postprocessed self-consistency tail moves at the
 end of the paper-faithful scalar chain.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

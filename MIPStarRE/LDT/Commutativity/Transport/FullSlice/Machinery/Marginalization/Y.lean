@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization.Core
+module
+
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Machinery.Marginalization.Core
 
 /-!
 # Full-slice y-marginalization endpoint
@@ -13,6 +15,8 @@ public marginalization theorem.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

@@ -1,9 +1,11 @@
-import Mathlib.Algebra.BigOperators.Group.Finset.Sigma
-import Mathlib.Algebra.BigOperators.Ring.Finset
-import Mathlib.Algebra.Order.BigOperators.Group.Finset
-import Mathlib.Data.Finset.Max
-import Mathlib.Data.Finset.Powerset
-import Mathlib.Analysis.Real.Sqrt
+module
+
+public import Mathlib.Algebra.BigOperators.Group.Finset.Sigma
+public import Mathlib.Algebra.BigOperators.Ring.Finset
+public import Mathlib.Algebra.Order.BigOperators.Group.Finset
+public import Mathlib.Data.Finset.Max
+public import Mathlib.Data.Finset.Powerset
+public import Mathlib.Analysis.Real.Sqrt
 
 /-!
 # Section 5 — Combinatorial core of the `r > d` truncation branch
@@ -35,6 +37,8 @@ decomposition is available as `MIPStarRE.Quantum.IsProj.rangeONB`; the concrete
 * `references/ldt-paper/orthonormalization.tex` lines 559–658
   (proof of `lem:projective-low-rank-sum`, `r > d` branch).
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

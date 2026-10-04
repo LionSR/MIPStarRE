@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.OverAllOutcomes.NonglobalDecomposition
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.OverAllOutcomes.NonglobalDecomposition
 
 /-!
 # Section 12 pasting: over all outcomes — Schwartz–Zippel bounds and final assembly
@@ -11,6 +13,8 @@ assembly of `lem:over-all-outcomes`.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -99,8 +103,8 @@ private lemma lineConsistentIndicator_probability_le_mdq
           exact hgf.trans
             ((congrArg (fun line : AxisLinePolynomial params.next => line (xs i))
               hLine.symm).trans htupleEval)
-        rw [if_pos hCons, if_pos hsliceEq]
-      · rw [if_neg hCons]
+        rw [ite_eq_left hCons, ite_eq_left hsliceEq]
+      · rw [ite_eq_right hCons]
         by_cases hEq : ((gs i).get hiSome) u = hStarSlice u <;> simp [hEq]
     calc
       avgOver (uniformDistribution (Point params)) (fun u =>

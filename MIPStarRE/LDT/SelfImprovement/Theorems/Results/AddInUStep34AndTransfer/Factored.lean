@@ -1,14 +1,16 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.GlobalVariance.Defs.Families
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Residual
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.ScalarChain
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Raw
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Selected
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.GlobalVariance.Defs.Families
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.CommonHelpers
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Residual
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.ScalarChain
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Raw
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Selected
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.Bracketed
 
 /-!
 # Add-in-u Step 3/4 factored Cauchy--Schwarz bounds
@@ -21,6 +23,8 @@ Cauchy--Schwarz estimates for the `Q₂ → Q₃` and `Q₃ → Q₄` add-in-u m
 - `references/ldt-paper/self_improvement.tex` lines 299--340
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 
 namespace MIPStarRE.LDT.SelfImprovement

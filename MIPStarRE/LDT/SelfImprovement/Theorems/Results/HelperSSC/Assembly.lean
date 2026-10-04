@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.PostDeleteA
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperSSC.PostDeleteA
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.BoundednessGap
 
 /-!
 # Helper strong self-consistency bounds: residual assembly
@@ -12,6 +14,8 @@ the final helper-stage strong self-consistency assembly theorems.
 - `references/ldt-paper/self_improvement.tex`
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

@@ -1,8 +1,10 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.BernoulliTail
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.AveragesAndOps
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.BernoulliTail
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.Core.AveragesAndOps
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 12 pasting: from-H-to-G stage-mass bookkeeping
@@ -10,6 +12,8 @@ import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 Stage-`0` identification, terminal identification, adjacent-stage split, and
 telescoping lemmas that connect the Lean recurrence stages to the paper scalars.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -98,6 +102,7 @@ lemma fromHToG_interpolationEligible_iff_type_weight
       params.d + 1 ≤ gHatTypeWeight (gHatTupleType gs) := by
   simp [InterpolationEligible, gHatTupleHammingWeight, gHatTupleSupport,
     gHatTypeWeight, gHatTupleType]
+  rfl
 
 /-- Split the eligible sandwich total into a sum over exact Boolean outcome types. -/
 lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
@@ -143,7 +148,7 @@ lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
           refine Finset.sum_congr rfl ?_
           intro τ _
           by_cases hτ : params.d + 1 ≤ gHatTypeWeight τ
-          · rw [if_pos hτ]
+          · rw [ite_eq_left hτ]
             refine Finset.sum_congr rfl ?_
             intro gs hgs
             simp only [Finset.mem_filter] at hgs
@@ -151,8 +156,8 @@ lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
             have helig : InterpolationEligible params gs := by
               rw [fromHToG_interpolationEligible_iff_type_weight params gs]
               simpa [htype] using hτ
-            rw [if_pos helig]
-          · rw [if_neg hτ]
+            rw [ite_eq_left helig]
+          · rw [ite_eq_right hτ]
             refine Finset.sum_eq_zero ?_
             intro gs hgs
             simp only [Finset.mem_filter] at hgs
@@ -161,7 +166,7 @@ lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
               intro helig
               have hw := (fromHToG_interpolationEligible_iff_type_weight params gs).1 helig
               exact hτ (by simpa [htype] using hw)
-            rw [if_neg hnot]
+            rw [ite_eq_right hnot]
   simpa [interpolationEligibleSandwichFamily, restrictSubMeas, A] using hpartition
 
 /-- The per-type averaged sandwich total is the uniform average of the exact-type
@@ -262,10 +267,10 @@ lemma fromHToG_avgOver_head_branch_ev
             else 1 - family.averagedSubMeas.total)) := by
   cases b
   · rw [fromHToG_avgOver_head_ev]
-    simp only [Bool.false_eq_true, if_false]
+    simp only [Bool.false_eq_true, ite_false]
     rw [hincomplete]
   · rw [fromHToG_avgOver_head_ev]
-    simp only [if_true]
+    simp only [ite_true]
     rw [hcomplete]
 
 /-- The eligible averaged sandwich total is the sum of the eligible exact-type

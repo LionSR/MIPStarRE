@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
 
 /-!
 # Section 5 — Q/X/XHat/P q-completeness
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.RankReduction.LowRank
 Completeness estimates for the rank-reduced `Q` family in the paper's
 `Q/X/XHat/P` intermediate layer.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseSix
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseSeven
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseSix
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseSeven
 
 /-!
 # Reverse insertion endpoints for the evaluated-slice paper chain
@@ -8,6 +10,8 @@ This module re-exports the two reverse `eq:add-an-a` bounds used after the
 paper line-87 phase-five removal and packages them into the combined phase-67
 bridge consumed by `ProcessedG.lean`.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

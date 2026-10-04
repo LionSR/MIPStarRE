@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
-import MIPStarRE.LDT.Preliminaries.DistanceBounds
+module
+
+public import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.SharedLine
+public import MIPStarRE.LDT.Preliminaries.DistanceBounds
 
 /-!
 # Section 10 commutativity points: lift comparisons
@@ -13,6 +15,8 @@ argument.
 - `references/ldt-paper/commutativity-points.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.CommutativityPoints
 

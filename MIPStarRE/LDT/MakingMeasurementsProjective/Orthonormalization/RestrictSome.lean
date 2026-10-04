@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 
 /-!
 # Section 5 — restriction of completed projective submeasurements
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.Statements
 This file contains the elementary order algebra used after applying the
 orthonormalization theorem to the option completion of a submeasurement.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

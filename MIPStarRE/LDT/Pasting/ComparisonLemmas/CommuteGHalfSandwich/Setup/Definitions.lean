@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
-import MIPStarRE.LDT.Preliminaries.CompletionTransfer
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
+module
+
+public import MIPStarRE.LDT.CommutativityPoints.SharedHelpers.Core
+public import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.Common
 
 /-!
 # Section 12 pasting: commute G half-sandwich setup — definitions
@@ -14,6 +16,8 @@ helper lemmas used by the sum-bound and step-commutation submodules.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

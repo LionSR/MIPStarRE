@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.MainInductionStep.Defs
-import MIPStarRE.LDT.Test.StrategyFailures
-import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Defs
+public import MIPStarRE.LDT.Test.StrategyFailures
+public import MIPStarRE.LDT.Test.StrategyPolynomialFamilies
 
 /-!
 # Section 12 — Nontrivial pasting context
@@ -25,6 +27,8 @@ downstream theorems are re-stated in later modules.
 - `references/ldt-paper/ld-pasting.tex` (Section 12, `thm:ld-pasting`)
 - `blueprint/src/chapter/ch09_pasting.tex` (`def:ld-pasting-context`)
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

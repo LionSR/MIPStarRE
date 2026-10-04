@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.Chain
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.MoveChain.Chain
 
 /-!
 # Section 12 pasting: half-sandwich flat chain
@@ -14,6 +16,8 @@ composition.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -32,7 +36,7 @@ combined flat chain (`flatChainFamily`, `flatChainError`) together with their
 endpoint and summation lemmas.
 -/
 /-- Length of the post-move part of the flat chain. -/
-def commuteGHalfSandwich_postMoveFlatLength : ℕ → ℕ
+@[reducible] def commuteGHalfSandwich_postMoveFlatLength : ℕ → ℕ
   | 0 => 1
   | r + 1 => commuteGHalfSandwich_postMoveFlatLength r + 2
 
@@ -104,7 +108,7 @@ lemma commuteGHalfSandwich_postMoveFlatError_sum
       ring
 
 /-- Length of the combined move and post-move flat chain. -/
-def commuteGHalfSandwich_flatChainLength (r : ℕ) : ℕ :=
+@[reducible] def commuteGHalfSandwich_flatChainLength (r : ℕ) : ℕ :=
   r + commuteGHalfSandwich_postMoveFlatLength r
 
 /-- Operator-family sequence obtained by concatenating the move chain and the
@@ -257,8 +261,21 @@ lemma commuteGHalfSandwich_postMoveFlatFamily_last_active
                       rw [commuteGHalfSandwich_postMoveFlatLength_eq]
                       omega
                     exact hlt⟩)) q).outcome ogs := by
+                have hlength_ne : commuteGHalfSandwich_postMoveFlatLength (r + 1) ≠ 1 := by
+                  rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+                  omega
+                have hindex :
+                    (⟨2 * r + 1, by
+                        rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+                        omega⟩ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) =
+                      ⟨2 * (r + 1) - 1, by
+                        rw [commuteGHalfSandwich_postMoveFlatLength_eq]
+                        omega⟩ := by
+                  apply Fin.ext
+                  dsimp
+                  omega
                 simp [commuteGHalfSandwich_postMoveFlatFamily,
-                    commuteGHalfSandwich_postMoveFlatLength_eq]
+                  commuteGHalfSandwich_postMoveFlatLength_eq, hlength_ne, hindex]
         _ = (commuteGHalfSandwich_prefixSecondSliceLeftFamily params family (r + 1)
               (commuteGHalfSandwich_splitSuccLiftFamily params r
                 (commuteGHalfSandwich_recursiveTargetFamily params family r)) q).outcome ogs := by
@@ -339,14 +356,10 @@ lemma commuteGHalfSandwich_flatChainFamily_last
     rw [commuteGHalfSandwich_postMoveFlatLength_eq]
     omega
   have hidx :
-      (⟨commuteGHalfSandwich_flatChainLength r - r, by
-          unfold commuteGHalfSandwich_flatChainLength
-          rw [commuteGHalfSandwich_postMoveFlatLength_eq]
-          omega⟩ : Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) =
+      (⟨commuteGHalfSandwich_postMoveFlatLength r, Nat.lt_succ_self _⟩ :
+          Fin (commuteGHalfSandwich_postMoveFlatLength r + 1)) =
         Fin.last (commuteGHalfSandwich_postMoveFlatLength r) := by
-    ext
-    simp [Fin.last, commuteGHalfSandwich_flatChainLength,
-      commuteGHalfSandwich_postMoveFlatLength_eq]
+    rfl
   calc
     (commuteGHalfSandwich_flatChainFamily params family r
         (Fin.last (commuteGHalfSandwich_flatChainLength r)) q).outcome ogs

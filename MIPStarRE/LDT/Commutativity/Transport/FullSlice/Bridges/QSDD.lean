@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
+module
+
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Averages
 
 /-!
 # Full-slice `qSDDOp` averaging identity
@@ -14,6 +16,8 @@ the quartic scalar averages appearing in `commutativity-G.tex`.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

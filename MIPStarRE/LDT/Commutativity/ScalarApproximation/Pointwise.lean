@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
-import MIPStarRE.LDT.CommutativityPoints.Approximation
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.Core
+public import MIPStarRE.LDT.CommutativityPoints.Approximation
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 
 /-!
 # Section 11 commutativity: pointwise scalar approximation
@@ -13,6 +15,8 @@ the `G`-stability estimate, used as the base for the averaged scalar bound.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

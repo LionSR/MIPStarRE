@@ -1,12 +1,16 @@
-import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
-import MIPStarRE.LDT.Preliminaries.CompletionTransfer
-import MIPStarRE.LDT.Preliminaries.ComparisonCore
-import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
-import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
-import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
-import MIPStarRE.LDT.Test.StrategyFailures
+module
+
+public import MIPStarRE.LDT.ExpansionHypercubeGraph.Theorems.Results
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+public import MIPStarRE.LDT.Preliminaries.CompletionTransfer
+public import MIPStarRE.LDT.Preliminaries.ComparisonCore
+public import MIPStarRE.LDT.Preliminaries.PolynomialAgreement
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+public import MIPStarRE.LDT.GlobalVariance.Theorems.Averaging
+public import MIPStarRE.LDT.GlobalVariance.Theorems.Statements
+public import MIPStarRE.LDT.Test.StrategyFailures
+
+/-! # Algebraic identities and variance reductions -/
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -18,7 +22,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! # Algebraic identities and variance reductions -/
+@[expose] public section
 
 
 lemma pointConditionedExpansionTransfer
@@ -406,5 +410,7 @@ lemma globalVarianceDeviationAtPolynomial_le_m_localVarianceDeviationAtPolynomia
     _ = (params.m : Error) *
           localVarianceDeviationAtPolynomial params strategy strategy.state G g := by
         rw [hlocal]
+
+end
 
 end MIPStarRE.LDT.GlobalVariance

@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.ErrorBounds
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.SelfImprovement
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.ErrorBounds
+public import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.SelfImprovement
 
 /-!
 # Section 6 — Pasting Assembly: Successor Assembly
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.SelfImp
 This module contains the final answer-valued pasting invocation, averaged
 pasting data constructors, and ordinary successor assembly corollaries.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

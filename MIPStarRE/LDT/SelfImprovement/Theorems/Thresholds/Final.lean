@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Helper
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Helper
 
 /-!
 # Section 9 — final-stage numerical threshold absorptions
@@ -12,6 +14,8 @@ final-field construction theorems in the self-improvement theorem.
 The helper-stage estimates, including the square-root bound on the global-variance
 error, are in `Thresholds.Helper`.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

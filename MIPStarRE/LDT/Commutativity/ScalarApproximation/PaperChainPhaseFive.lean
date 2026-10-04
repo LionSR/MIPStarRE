@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Normalization
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.PointSwap
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexing
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Normalization
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.PointSwap
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainBasic.Reindexing
+public import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
 
 /-!
 # Phase-five endpoint for the evaluated-slice paper chain
@@ -9,6 +11,8 @@ import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.RawSecond
 This file isolates the paper line-87 removal endpoint and the finite
 reindexing to the raw scalar `G`-commutativity stability defect.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

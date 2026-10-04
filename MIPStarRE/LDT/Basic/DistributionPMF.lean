@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.DistributionUniformSums
+module
+
+public import MIPStarRE.LDT.Basic.DistributionUniformSums
 
 /-!
 # PMF expectations associated to project distributions
@@ -26,6 +28,8 @@ comparison with `PMF.realWeightedSum`.
 These are formalization-internal finite probability lemmas for the low
 individual degree test development.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

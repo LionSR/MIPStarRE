@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Basic.Distribution
-import Mathlib.Analysis.MeanInequalitiesPow
-import Mathlib.Probability.ProbabilityMassFunction.Monad
+module
+
+public import MIPStarRE.LDT.Basic.Distribution
+public import Mathlib.Analysis.MeanInequalitiesPow
+public import Mathlib.Probability.ProbabilityMassFunction.Monad
 
 /-!
 # PMF-weighted finite expectation identities
@@ -44,6 +46,8 @@ low individual degree test averaging layer.
 These are formalization-internal finite probability lemmas for the low
 individual degree test development.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 
@@ -112,8 +116,8 @@ theorem map_apply_toReal {α β : Type*} [Fintype α]
   · refine Finset.sum_congr rfl ?_
     intro a _
     by_cases h : b = e a
-    · rw [if_pos h, if_pos h]
-    · rw [if_neg h, if_neg h]
+    · rw [ite_eq_left h, ite_eq_left h]
+    · rw [ite_eq_right h, ite_eq_right h]
       rfl
   · intro a _
     by_cases h : b = e a
@@ -145,9 +149,9 @@ theorem map_sum_smul {α β M : Type*}
           refine Finset.sum_congr rfl ?_
           intro a _
           rw [Fintype.sum_eq_single (e a)]
-          · rw [if_pos rfl]
+          · rw [ite_eq_left rfl]
           · intro b hb
-            rw [if_neg hb, zero_smul]
+            rw [ite_eq_right hb, zero_smul]
 
 /-- Pointwise real-weight formula for a finite monadic composition of
 probability mass functions.  This is the finite real-valued form of
@@ -226,7 +230,7 @@ theorem uniformOfFintype_prod_eq_bind
       rw [PMF.map_apply]
       rw [ENNReal.tsum_eq_zero]
       intro b
-      rw [if_neg (by
+      rw [ite_eq_right (by
         intro h
         exact ha (congrArg Prod.fst h).symm)]
     rw [hmap_zero, mul_zero])]
@@ -235,7 +239,7 @@ theorem uniformOfFintype_prod_eq_bind
         PMF.uniformOfFintype β ab.2 := by
     rw [PMF.map_apply]
     rw [tsum_eq_single ab.2 (fun b hb => by
-      rw [if_neg (by
+      rw [ite_eq_right (by
         intro h
         exact hb (congrArg Prod.snd h).symm)])]
     simp
@@ -336,7 +340,7 @@ theorem uniformOfFintype_map_equiv
   rw [tsum_eq_single (e.symm b)]
   · simp [PMF.uniformOfFintype_apply, Fintype.card_congr e]
   · intro a ha
-    rw [if_neg]
+    rw [ite_eq_right]
     intro hb
     exact ha (by
       calc
@@ -386,7 +390,7 @@ theorem uniformOfFintype_sum_equiv_fst_smul {γ α β M : Type*}
     ∑ x : γ, (PMF.uniformOfFintype γ x).toReal • f (e x).1 =
       ∑ a : α, (PMF.uniformOfFintype α a).toReal • f a := by
   classical
-  haveI := Fintype.ofFinite β
+  have := Fintype.ofFinite β
   calc
     ∑ x : γ, (PMF.uniformOfFintype γ x).toReal • f (e x).1
         = ∑ ab : α × β,
@@ -413,7 +417,7 @@ theorem uniformOfFintype_sum_equiv_snd_smul {γ α β M : Type*}
     ∑ x : γ, (PMF.uniformOfFintype γ x).toReal • f (e x).2 =
       ∑ b : β, (PMF.uniformOfFintype β b).toReal • f b := by
   classical
-  haveI := Fintype.ofFinite α
+  have := Fintype.ofFinite α
   simpa using
     (uniformOfFintype_sum_equiv_fst_smul
       (e := e.trans (Equiv.prodComm α β)) (f := f))

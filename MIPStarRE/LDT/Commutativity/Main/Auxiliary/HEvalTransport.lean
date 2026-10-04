@@ -1,9 +1,11 @@
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.Closeness
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessXEval
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
-import MIPStarRE.LDT.Commutativity.Transport.FullSlice.ZeroBounds
-import MIPStarRE.LDT.Commutativity.Transport.EvaluationSpecialization
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
+module
+
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.Closeness
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.ClosenessXEval
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.Bridges.QSDD
+public import MIPStarRE.LDT.Commutativity.Transport.FullSlice.ZeroBounds
+public import MIPStarRE.LDT.Commutativity.Transport.EvaluationSpecialization
+public import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 
 /-!
 # Section 11 commutativity: hEval/closenessOfIP transport
@@ -21,6 +23,8 @@ including zero-operator triangulation helpers and the sharp bound
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

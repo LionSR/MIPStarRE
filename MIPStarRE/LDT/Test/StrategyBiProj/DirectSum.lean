@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyRole.Core
+module
+
+public import MIPStarRE.LDT.Test.StrategyRole.Core
 
 /-!
 # Two-Space Projective Strategies: Direct-Sum State Blocks
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Test.StrategyRole.Core
 This module contains the role-register direct-sum carriers and block-state
 construction used to symmetrize a heterogeneous projective strategy.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -155,8 +159,8 @@ theorem localPairABBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {X : MIPStarRE.Quantum.Op (ιA × ιB)} (hX : 0 ≤ X) :
     0 ≤ localPairABBlock X := by
   classical
-  letI := Fintype.ofFinite ιA
-  letI := Fintype.ofFinite ιB
+  let := Fintype.ofFinite ιA
+  let := Fintype.ofFinite ιB
   rw [CStarAlgebra.nonneg_iff_eq_star_mul_self] at hX ⊢
   rcases hX with ⟨C, hC⟩
   refine ⟨localPairABBlock C, ?_⟩
@@ -168,8 +172,8 @@ theorem localPairBABlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {X : MIPStarRE.Quantum.Op (ιB × ιA)} (hX : 0 ≤ X) :
     0 ≤ localPairBABlock X := by
   classical
-  letI := Fintype.ofFinite ιA
-  letI := Fintype.ofFinite ιB
+  let := Fintype.ofFinite ιA
+  let := Fintype.ofFinite ιB
   rw [CStarAlgebra.nonneg_iff_eq_star_mul_self] at hX ⊢
   rcases hX with ⟨C, hC⟩
   refine ⟨localPairBABlock C, ?_⟩
@@ -330,8 +334,8 @@ theorem normalizedTrace_rolePairDirectSumCond {ιA ιB : Type*}
       (LocalCarrierSum ιA ιB × LocalCarrierSum ιA ιB)) :
     MIPStarRE.Quantum.normalizedTrace (rolePairDirectSumCond rL rR X) =
       (1 / 4 : ℂ) * MIPStarRE.Quantum.normalizedTrace X := by
-  haveI : Nonempty Role := ⟨Role.A⟩
-  haveI : Nonempty (LocalCarrierSum ιA ιB) :=
+  have : Nonempty Role := ⟨Role.A⟩
+  have : Nonempty (LocalCarrierSum ιA ιB) :=
     ⟨Sum.inl (Classical.choice inferInstance)⟩
   calc
     MIPStarRE.Quantum.normalizedTrace (rolePairDirectSumCond rL rR X)
@@ -575,8 +579,8 @@ theorem localDirectSumBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {A : MIPStarRE.Quantum.Op ιA} {B : MIPStarRE.Quantum.Op ιB}
     (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ localDirectSumBlock A B := by
   classical
-  letI := Fintype.ofFinite ιA
-  letI := Fintype.ofFinite ιB
+  let := Fintype.ofFinite ιA
+  let := Fintype.ofFinite ιB
   rw [CStarAlgebra.nonneg_iff_eq_star_mul_self] at hA hB ⊢
   rcases hA with ⟨C, hC⟩
   rcases hB with ⟨D, hD⟩
@@ -602,7 +606,7 @@ theorem localDirectSumBlock_finset_sum {α ιA ιB : Type*} (s : Finset α)
       rw [Finset.sum_insert ha, Finset.sum_insert ha, Finset.sum_insert ha, ih]
       rw [localDirectSumBlock_add]
 
-private def roleBlockFamily {ιA ιB : Type*}
+def roleBlockFamily {ιA ιB : Type*}
     (A B : MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB)) :
     Role → MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB)
   | Role.A => A
@@ -706,8 +710,8 @@ theorem roleBlock_nonneg {ιA ιB : Type*} [Finite ιA] [Finite ιB]
     {A B : MIPStarRE.Quantum.Op (LocalCarrierSum ιA ιB)}
     (hA : 0 ≤ A) (hB : 0 ≤ B) : 0 ≤ roleBlock A B := by
   classical
-  letI := Fintype.ofFinite ιA
-  letI := Fintype.ofFinite ιB
+  let := Fintype.ofFinite ιA
+  let := Fintype.ofFinite ιB
   rw [CStarAlgebra.nonneg_iff_eq_star_mul_self] at hA hB ⊢
   rcases hA with ⟨C, hC⟩
   rcases hB with ⟨D, hD⟩

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyCore
+module
+
+public import MIPStarRE.LDT.Test.StrategyCore
 
 /-!
 # Polynomial-family interfaces for the low individual degree test
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Test.StrategyCore
 Packaged slice-indexed polynomial-family interfaces extracted from
 `MIPStarRE.LDT.Test.Strategy`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

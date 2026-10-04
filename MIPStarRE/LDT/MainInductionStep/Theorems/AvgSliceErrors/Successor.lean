@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors.Core
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors.Core
+public import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
 
 /-!
 # Section 6 — Averaged Slice Error Bounds: Successor Outputs
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSl
 This module packages recursive answer-valued slice measurements and the final
 self-improvement-to-main-induction error comparisons.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -377,7 +381,7 @@ lemma selfImprovementInInductionError_le_mainInductionNu
           (Real.rpow eps (1 / (32 : Error)) +
             Real.rpow delta (1 / (32 : Error)) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
-          simp [selfImprovementInInductionError, Parameters.next]
+          simp [selfImprovementInInductionError]
     _ ≤ 3000 * (params.next.m : Error) *
           (Real.rpow eps (1 / (1024 : Error)) +
             Real.rpow delta (1 / (1024 : Error)) +
@@ -456,7 +460,7 @@ lemma answer_selfImprovementInInductionError_le_mainInductionNu
           (Real.rpow eps (1 / (32 : Error)) +
             Real.rpow delta (1 / (32 : Error)) +
             Real.rpow (((params.d : Error) / (params.q : Error))) (1 / (32 : Error))) := by
-          simp [selfImprovementInInductionError, Parameters.next]
+          simp [selfImprovementInInductionError]
     _ ≤ 3000 * (params.next.m : Error) *
           (Real.rpow eps (1 / (1024 : Error)) +
             Real.rpow delta (1 / (1024 : Error)) +

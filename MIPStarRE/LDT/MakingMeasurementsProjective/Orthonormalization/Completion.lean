@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Tactic.LdtSimp
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSome
-import MIPStarRE.LDT.Test.StrategyCore
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+module
+
+public import MIPStarRE.LDT.Tactic.LdtSimp
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSome
+public import MIPStarRE.LDT.Test.StrategyCore
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Option Completion in the Orthonormalization Argument
@@ -11,6 +13,8 @@ theorem is applied to the completion of a submeasurement by a fresh failure
 outcome.  The results compare the completed measurement with the restriction
 obtained by discarding this fresh outcome.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

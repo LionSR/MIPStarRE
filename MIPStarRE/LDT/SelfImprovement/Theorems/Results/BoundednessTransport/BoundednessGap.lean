@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.PointConsistencyLiteral
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.BoundednessTransport.PointConsistencyLiteral
 
 /-!
 # Boundedness transport boundedness-gap estimates
@@ -12,6 +14,8 @@ constructors used in the self-improvement proof.
 - `references/ldt-paper/self_improvement.tex` lines 612--613 and 742--755
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

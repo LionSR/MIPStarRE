@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Split
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.StepLemmas.Move
 
 /-!
 # Section 12 pasting: half-sandwich move-chain base
@@ -14,6 +16,8 @@ split-successor comparison and the first move-chain comparison.
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

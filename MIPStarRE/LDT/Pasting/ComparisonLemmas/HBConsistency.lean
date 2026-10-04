@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LdSandwichLineOnePoint.Core
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.HBError
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.LdSandwichLineOnePoint.Core
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.LineInterpolation.HBError
 
 /-!
 # Section 12 pasting: H-B consistency
@@ -11,6 +13,8 @@ Aggregation theorem proving `lem:h-b-consistency` from the one-point line consis
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

@@ -52,6 +52,23 @@ from blueprint_lean_sync import (  # noqa: E402
 
 
 class BlueprintLeanSyncTests(unittest.TestCase):
+    def test_module_sections_preserve_namespace_after_bare_end(self) -> None:
+        with tempfile.TemporaryDirectory() as td:
+            lean_root = Path(td) / "MIPStarRE"
+            lean_root.mkdir()
+            source = lean_root / "Example.lean"
+            source.write_text(
+                "module\npublic import Mathlib\nnamespace Example\n"
+                "@[expose] public section\npublic def first := 1\nend\n"
+                "public meta section\nmeta def helper := 2\nend\n"
+                "theorem second : True := trivial\nend Example\n"
+            )
+            decls = collect_file_lean_decls(source, lean_root)
+            self.assertEqual(
+                [decl.fqn for decl in decls],
+                ["Example.first", "Example.helper", "Example.second"],
+            )
+
     def test_orphan_leanok_detection_tracks_statement_and_proof_context(self) -> None:
         with tempfile.TemporaryDirectory() as td:
             root = Path(td)

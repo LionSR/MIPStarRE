@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.MatchMass
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.MatchMass
 
 /-!
 # Section 5 — repaired completion transport
@@ -9,6 +11,8 @@ orthonormalization projectivization chain.  It compares a pre-projective measure
 with the orthonormalized submeasurement before completion, so that completion
 contributes no further loss to the relevant diagonal match mass.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 

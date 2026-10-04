@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.RectangularSvd
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.LayerAlgebra
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.RectangularSvd
 
 /-!
 # Section 5 — P-Q approximation for QXP layers
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.Rectangular
 The final comparison estimates between the projective family `P` produced
 from `XHat` and the original projective `Q` layer.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 
 /-!
 # Conservative quantum nonnegativity tactic
@@ -16,6 +18,8 @@ products are typically rewritten explicitly with
 `leftTensor_mul_rightTensor_eq_opTensor` before invoking the tactic; keeping that
 rewrite visible avoids broad backtracking in the tactic itself.
 -/
+
+public meta section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

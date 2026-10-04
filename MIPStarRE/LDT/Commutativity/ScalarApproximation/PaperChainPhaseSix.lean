@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseFive
+module
+
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseFive
 
 /-!
 # Phase-six reverse insertion for the evaluated-slice paper chain
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Commutativity.ScalarApproximation.PaperChainPhaseFive
 This file proves the first reverse `eq:add-an-a` bound used after the
 paper line-87 phase-five removal.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

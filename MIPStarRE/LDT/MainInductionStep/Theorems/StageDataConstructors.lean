@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.AnswerValued
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.SelfImprovementAssembly.AnswerSlice
+public import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.AnswerValued
 
 /-!
 # Section 6 — Stage-Data Constructors
@@ -16,6 +18,8 @@ and averaged pasting stage records: `SliceRestrictionData.ofRestrictedProbabilit
 
 - `blueprint/src/chapter/ch10_induction.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

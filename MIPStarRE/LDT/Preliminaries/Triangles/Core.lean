@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+module
+
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 
 /-!
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 This module contains the main triangle-substitution estimates for approximate
 measurements.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

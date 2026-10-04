@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.Basic
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.Basic
 
 /-!
 # Section 6 — Pasting Assembly: Answer-Valued Fields
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MainInductionStep.Theorems.PastingAssembly.Basic
 This module assembles the answer-valued averaged family fields and the
 commutativity input used by the pasting theorem.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 

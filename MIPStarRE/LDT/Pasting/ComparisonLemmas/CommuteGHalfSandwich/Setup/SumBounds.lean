@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.Definitions
+module
+
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich.Setup.Definitions
 
 /-!
 # Section 12 pasting: commute G half-sandwich setup — sum bounds
@@ -12,6 +14,8 @@ pair-prefix, and bipartite tensor families. Also contains the error-envelope bou
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

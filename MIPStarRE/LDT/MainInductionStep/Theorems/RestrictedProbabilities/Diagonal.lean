@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Base
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Theorems.RestrictedProbabilities.Base
 
 /-!
 # Section 6 -- Diagonal Restricted Probability Bounds
@@ -10,6 +12,8 @@ bookkeeping for the main induction step.
 
 - `blueprint/src/chapter/ch10_induction.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -61,7 +65,6 @@ private lemma restrictedDiagonalSampleError_eq
     RestrictedSymStrat.restrictedDiagonalLineAnswerFamily, diagonalPointAnswerFamily,
     diagonalLineAnswerFamily, xRestrictedStrategy]
   simp [diagonalPointAnswerFamilyOf, diagonalLineAnswerFamilyOf, hline]
-  rfl
 
 /-- Per-index diagonal-line consistency defect of the restricted `x`-slice strategy
 at embedded index `j`, averaged over the restricted diagonal sample space. -/

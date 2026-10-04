@@ -1,12 +1,16 @@
-import MIPStarRE.Quantum.FiniteHilbert
-import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSome
+module
+
+public import MIPStarRE.Quantum.FiniteHilbert
+public import MIPStarRE.LDT.MakingMeasurementsProjective.NaimarkCore
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization.RestrictSome
 
 /-!
 # Section 5 — one-measurement Naimark
 
 Unitary-extension machinery and the one-measurement Naimark lemma.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -82,7 +86,7 @@ private lemma partialIsometry_to_unitary
   let Pₗ : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n := Matrix.toEuclideanLin P
   let Vₗ : EuclideanSpace ℂ n →ₗ[ℂ] EuclideanSpace ℂ n := Matrix.toEuclideanLin V
   let S : Submodule ℂ (EuclideanSpace ℂ n) := LinearMap.range Pₗ
-  letI : InnerProductSpace ℂ S := Submodule.innerProductSpace S
+  let : InnerProductSpace ℂ S := Submodule.innerProductSpace S
   have hP_fix : ∀ x : S, Pₗ (x : EuclideanSpace ℂ n) = x := by
     intro x
     rcases x.2 with ⟨y, hy⟩
@@ -203,13 +207,13 @@ private lemma normalizedTrace_oneMeasLiftedDensity_mul_auxProj
     simp
   rw [hauxTrace]
   by_cases hd' : Nonempty d
-  · letI := hd'
+  · let := hd'
     have hd : (Fintype.card d : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
     have hα : (Fintype.card (Option α) : ℂ) ≠ 0 := Nat.cast_ne_zero.mpr Fintype.card_ne_zero
     rw [Fintype.card_prod, Nat.cast_mul]
     field_simp [hd, hα]
   · have hd0 : (Fintype.card d : ℂ) = 0 := by
-      letI : IsEmpty d := not_nonempty_iff.mp hd'
+      let : IsEmpty d := not_nonempty_iff.mp hd'
       simp
     rw [Fintype.card_prod, Nat.cast_mul, hd0]
     simp

@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
 
 /-!
 # Section 12 pasting: degree-zero branch
@@ -12,6 +14,8 @@ Auxiliary constructions for the `d = 0` complementary branch of
 - `references/ldt-paper/ld-pasting.tex`
 - `blueprint/src/chapter/ch09_pasting.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

@@ -1,4 +1,8 @@
-import MIPStarRE.LDT.GlobalVariance.Defs.Families
+module
+
+public import MIPStarRE.LDT.GlobalVariance.Defs.Families
+
+/-! ## Statement structures -/
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -9,7 +13,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! ## Statement structures -/
+@[expose] public section
 
 /-- Paper origin: `references/ldt-paper/expansion.tex:273-291`
 (`\label{lem:generalize-b}`).
@@ -98,5 +102,7 @@ structure GlobalVarianceOfPointsStatement (params : Parameters) [FieldModel para
   averagedGlobalVarianceBound :
     pointConditionedGlobalVariance params strategy G ≤
       globalVarianceOfPointsError params eps delta
+
+end
 
 end MIPStarRE.LDT.GlobalVariance

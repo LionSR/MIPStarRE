@@ -45,19 +45,19 @@ SORRY_RE = re.compile(r"\bsorry\b")
 # Comparator challenge scaffolding deliberately presents the target theorem with
 # exactly one ``sorry``; the companion repository replaces that hole with the
 # submitted proof. Additional holes in the same file must still count.
-INTENTIONAL_SORRY_PATH = "scripts/comparator/challenge_footer.lean"
+INTENTIONAL_SORRY_PATH = "scripts/comparator/challenge_footer.lean.in"
 MAIN_FORMAL_DECL_RE = re.compile(r"(?m)^theorem\s+mainFormal\b")
 AXIOM_RE = re.compile(
     r"(?m)^\s*"
     r"(?:@\[[^\]\n]*(?:\n\s*[^\]\n]*)*\]\s*)*"
-    r"(?:(?:private|protected|noncomputable|unsafe|partial)\s+)*"
+    r"(?:(?:private|protected|public|meta|noncomputable|unsafe|partial)\s+)*"
     r"axiom\s+[A-Za-z_]"
 )
 
 
 def tracked_lean_files(repo_root: Path) -> list[Path]:
     output = subprocess.check_output(
-        ["git", "ls-files", "*.lean"], cwd=repo_root, text=True
+        ["git", "ls-files", "*.lean", INTENTIONAL_SORRY_PATH], cwd=repo_root, text=True
     )
     return [repo_root / line for line in output.splitlines() if line]
 

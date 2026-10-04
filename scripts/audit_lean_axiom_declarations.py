@@ -28,7 +28,7 @@ from lean_header_utils import ldt_lean_files, line_number
 
 DECL_RE = re.compile(
     r"(?m)^[ \t]*"
-    r"(?:(?:private|protected|noncomputable|unsafe)[ \t]+)*"
+    r"(?:(?:private|protected|public|meta|noncomputable|unsafe)[ \t]+)*"
     r"(axiom|constant)[ \t]+([^\s:({\[]+)(?=\s|$|[:({\[])"
 )
 

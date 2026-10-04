@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyBiProj.DirectSum
+module
+
+public import MIPStarRE.LDT.Test.StrategyBiProj.DirectSum
 
 /-!
 # Two-Space Projective Strategies: Role-Register Measurements
@@ -7,6 +9,8 @@ This module contains the direct-sum measurement constructors and the
 role-register symmetric strategy associated to a heterogeneous projective
 strategy.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

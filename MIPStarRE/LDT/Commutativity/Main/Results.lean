@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Commutativity.Main.EvaluatedQuestions
-import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Second
-import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
+module
+
+public import MIPStarRE.LDT.Commutativity.Main.EvaluatedQuestions
+public import MIPStarRE.LDT.Commutativity.GCommStability.Scalar.Second
+public import MIPStarRE.LDT.Commutativity.ScalarApproximation.ProcessedG
 
 /-!
 # Section 11 commutativity: final results
@@ -20,6 +22,8 @@ See `docs/decisions/713-scalar-tensor-decision.md`.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

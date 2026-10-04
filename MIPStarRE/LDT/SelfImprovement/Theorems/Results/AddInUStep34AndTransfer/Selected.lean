@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Factored
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep34AndTransfer.Factored
 
 /-!
 # Selected add-in-u Step 3/4 global-variance bounds
@@ -11,6 +13,8 @@ Selected-family Cauchy--Schwarz estimates and factor bounds for the
 - `references/ldt-paper/self_improvement.tex` lines 299--340
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 
 namespace MIPStarRE.LDT.SelfImprovement

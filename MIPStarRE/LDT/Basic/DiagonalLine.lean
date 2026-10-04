@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.AxisParallelLine
+module
+
+public import MIPStarRE.LDT.Basic.AxisParallelLine
 
 /-!
 # Diagonal lines for the low individual degree test
@@ -10,6 +12,8 @@ Diagonal-line geometry and rebasing operations.
 - `references/ldt-paper/test_definition.tex`
 - `blueprint/src/chapter/ch02_test.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT
 

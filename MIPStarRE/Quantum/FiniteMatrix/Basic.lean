@@ -1,4 +1,6 @@
-import Mathlib
+module
+
+public import Mathlib
 
 /-!
 # Basic finite-dimensional matrix operators
@@ -13,6 +15,8 @@ positive-semidefinite order and normalized-trace material.
 The declarations in this file are matrix facts for the LDT
 formalization of `references/ldt-paper/`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder Matrix.Norms.Elementwise
 open WithLp

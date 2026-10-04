@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Basic.DistributionAvg
-import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
+module
+
+public import MIPStarRE.LDT.Basic.DistributionAvg
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 
 /-!
 # Section 7 hypercube graph: core definitions
@@ -11,6 +13,8 @@ Vertex-set cardinality and the hypercube graph edge relation on `F_q^m`.
 - `references/ldt-paper/expansion.tex`
 - `blueprint/src/chapter/ch05_expansion.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.ExpansionHypercubeGraph
 
@@ -217,7 +221,7 @@ noncomputable def independentPointPair (params : Parameters) :
   uniformDistribution (Point params × Point params)
 
 /-- An honest finite matrix register for the hypercube vertices. -/
-def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
+@[reducible] def pointHilbertSpace (params : Parameters) : FiniteHilbertSpace where
   carrier := Point params
   instFintype := inferInstance
   instDecidableEq := inferInstance

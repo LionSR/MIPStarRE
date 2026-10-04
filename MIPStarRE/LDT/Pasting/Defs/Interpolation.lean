@@ -1,11 +1,15 @@
-import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
-import MIPStarRE.LDT.Pasting.Defs.Tuples
+module
+
+public import MIPStarRE.LDT.Basic.LinePolynomialEmbedding
+public import MIPStarRE.LDT.Pasting.Defs.Tuples
 
 /-!
 # Section 12 — Definitions: interpolation
 
 Interpolation helpers extracted from `Pasting.Defs`.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -147,7 +151,7 @@ private theorem interpolateCompletedSlicesFromSupport_degree
       have hdeg :=
         (degreeOf_eval₂_C_X_le_natDegree
           (p := Li) (i := coord) (j := lastCoord params))
-      rw [if_neg hcoord_ne_last] at hdeg
+      rw [ite_eq_right hcoord_ne_last] at hdeg
       exact hdeg
     have hslice : MvPolynomial.degreeOf coord slicePoly ≤ params.d := by
       change MvPolynomial.degreeOf coord
@@ -176,7 +180,7 @@ private theorem interpolateCompletedSlicesFromSupport_degree
         have hdeg :=
           (degreeOf_eval₂_C_X_le_natDegree
             (p := Li) (i := lastCoord params) (j := lastCoord params))
-        rw [if_pos rfl] at hdeg
+        rw [ite_eq_left rfl] at hdeg
         exact hdeg
       exact hLiMv_nat.trans hLi_natDegree
     have hslice_zero : MvPolynomial.degreeOf (lastCoord params) slicePoly ≤ 0 := by
@@ -221,7 +225,7 @@ noncomputable def interpolateCompletedSlicesFromSupport (params : Parameters)
       Li.eval₂ MvPolynomial.C
         (MvPolynomial.X (lastCoord params))
     LiMv * slicePoly
-  lowIndividualDegree :=
-    interpolateCompletedSlicesFromSupport_degree params xs gs σ hσsupport hσcard
+  lowIndividualDegree := by
+    exact interpolateCompletedSlicesFromSupport_degree params xs gs σ hσsupport hσcard
 
 end MIPStarRE.LDT.Pasting

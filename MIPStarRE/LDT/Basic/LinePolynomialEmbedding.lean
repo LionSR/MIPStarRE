@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Basic.LowDegreePolynomial
+module
+
+public import MIPStarRE.LDT.Basic.LowDegreePolynomial
 
 /-!
 # Axis-line to global polynomial lifts
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Basic.LowDegreePolynomial
 Utility lemmas for substituting a univariate axis-line polynomial into a chosen
 ambient coordinate.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT
 

@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
 
 /-!
 # Measurement lift infrastructure for the low individual degree test
 
 Measurement-level tensor-factor lifts built from the submeasurement placement API.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

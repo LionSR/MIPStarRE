@@ -81,6 +81,7 @@ class GenerateBadgesTests(unittest.TestCase):
             r'''
             axiom plainAxiom : Prop
             private axiom privateAxiom : Prop
+            public axiom publicAxiom : Prop
             @[simp] protected axiom attributedAxiom : Prop
             @[simp]
             noncomputable unsafe axiom multilineAttributedAxiom : Prop
@@ -91,7 +92,7 @@ class GenerateBadgesTests(unittest.TestCase):
             AXIOM_RE,
         )
 
-        self.assertEqual(count, 4)
+        self.assertEqual(count, 5)
 
     @mock.patch("generate_badges.subprocess.check_output")
     def test_sorry_count_exempts_exactly_one_comparator_challenge_hole(
@@ -99,12 +100,12 @@ class GenerateBadgesTests(unittest.TestCase):
     ) -> None:
         check_output.return_value = (
             "MIPStarRE/Incomplete.lean\n"
-            "scripts/comparator/challenge_footer.lean\n"
+            "scripts/comparator/challenge_footer.lean.in\n"
         )
         with tempfile.TemporaryDirectory() as tmp_dir:
             repo_root = Path(tmp_dir)
             project_file = repo_root / "MIPStarRE/Incomplete.lean"
-            challenge_file = repo_root / "scripts/comparator/challenge_footer.lean"
+            challenge_file = repo_root / "scripts/comparator/challenge_footer.lean.in"
             project_file.parent.mkdir(parents=True)
             challenge_file.parent.mkdir(parents=True)
             project_file.write_text("theorem openGoal : True := by sorry\n")

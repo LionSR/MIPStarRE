@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
+module
+
+public import MIPStarRE.LDT.Commutativity.Scaffold.Symmetry
 
 /-!
 # Section 11 commutativity: product estimates
@@ -12,6 +14,8 @@ Section 11 commutativity argument.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

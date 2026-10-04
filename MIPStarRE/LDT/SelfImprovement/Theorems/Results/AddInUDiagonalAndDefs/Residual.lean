@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Selection
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUDiagonalAndDefs.Selection
 
 /-!
 # Off-diagonal residual estimates for the helper SSC argument
@@ -13,6 +15,8 @@ the Schwartz--Zippel endpoint.
 - `references/ldt-paper/self_improvement.tex` lines 455--468
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

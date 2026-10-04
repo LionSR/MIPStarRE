@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
+module
+
+public import MIPStarRE.LDT.Commutativity.EvaluatedSliceCommutation.Averages
 
 /-!
 # Section 11 commutativity: evaluated-slice commutation consequences
@@ -12,6 +14,8 @@ questions.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

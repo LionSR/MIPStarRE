@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Basic.ParametersBase
-import MIPStarRE.Quantum.FiniteMatrix
-import Mathlib
+module
+
+public import MIPStarRE.LDT.Basic.ParametersBase
+public import MIPStarRE.Quantum.FiniteMatrix
+public import Mathlib
 
 /-!
 # Distribution infrastructure for the low individual degree test
@@ -14,6 +16,8 @@ of `mainFormal`, which must elaborate in the same environment as the
 Mathlib-only `Challenge.lean`.  Keep the full `import Mathlib`; do not narrow
 it.  See `docs/comparator.md`, "Environment alignment".
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -205,13 +209,13 @@ theorem toPMF_map {α β : Type*} [DecidableEq β]
     intro a ha
     by_cases hea : e a = b
     · have hba : b = e a := hea.symm
-      rw [if_pos hea, if_pos hba, toPMF_apply]
+      rw [ite_eq_left hea, ite_eq_left hba, toPMF_apply]
     · have hba : b ≠ e a := fun hba => hea hba.symm
-      rw [if_neg hea, if_neg hba]
+      rw [ite_eq_right hea, ite_eq_right hba]
   · intro a ha
     by_cases hba : b = e a
-    · rw [if_pos hba, toPMF_apply_of_notMem 𝒟 h𝒟 ha]
-    · rw [if_neg hba]
+    · rw [ite_eq_left hba, toPMF_apply_of_notMem 𝒟 h𝒟 ha]
+    · rw [ite_eq_right hba]
 
 end Distribution
 

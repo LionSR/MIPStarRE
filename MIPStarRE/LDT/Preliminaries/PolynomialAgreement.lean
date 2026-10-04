@@ -1,8 +1,10 @@
-import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
-import MIPStarRE.LDT.Basic.DistributionAvg
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Preliminaries.Polynomials
-import Mathlib.Algebra.Polynomial.Roots
+module
+
+public import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
+public import MIPStarRE.LDT.Basic.DistributionAvg
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.Preliminaries.Polynomials
+public import Mathlib.Algebra.Polynomial.Roots
 
 /-!
 # Polynomial agreement bound (Step 5 hammer)
@@ -24,6 +26,8 @@ and `mainFormal` Step 5 (#425) share one proof.
 * `references/ldt-paper/inductive_step.tex`
 * `references/ldt-paper/preliminaries.tex`, Section 3
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

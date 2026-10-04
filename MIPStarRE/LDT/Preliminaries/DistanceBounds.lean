@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Preliminaries.ComparisonCore
+module
+
+public import MIPStarRE.LDT.Preliminaries.ComparisonCore
 
 /-!
 # Preliminary comparison theorems: distance bounds
 
 Triangle-inequality style bounds for `SDDRel` and `SDDOpRel`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

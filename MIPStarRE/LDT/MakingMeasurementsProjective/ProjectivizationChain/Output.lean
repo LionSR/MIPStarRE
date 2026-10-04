@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Orthonormalization
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Handoff
 
 /-!
 # Section 5 — orthonormalize-and-complete output
@@ -9,6 +11,8 @@ orthonormalization projectivization chain in the main inductive step.  It
 packages the orthonormalized projective submeasurement, the canonical completed
 projective measurement, and the associated state-dependent-distance estimates.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MakingMeasurementsProjective
 

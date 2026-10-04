@@ -59,7 +59,7 @@ class ComparatorChallengeDriftTests(unittest.TestCase):
     def test_readme_documents_update_command_and_footer_source(self) -> None:
         readme = README.read_text(encoding="utf-8")
         self.assertIn("python3 scripts/comparator/check_challenge_drift.py --root . --update", readme)
-        self.assertIn("challenge_footer.lean", readme)
+        self.assertIn("challenge_footer.lean.in", readme)
         self.assertIn("MIPStarRE/LDT/Test/MainTheorem/MainFormal.lean", readme)
 
 

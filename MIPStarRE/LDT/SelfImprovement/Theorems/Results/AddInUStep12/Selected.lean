@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Algebra
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Algebra
 
 /-!
 # Selected add-in-u Step 1/2 Cauchy--Schwarz bounds
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.SelfImprovement.Theorems.Results.AddInUStep12.Algebra
 Selected-family contraction inputs and raw `√(2δ)` estimates for the first
 two add-in-u moves in the self-improvement chain.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

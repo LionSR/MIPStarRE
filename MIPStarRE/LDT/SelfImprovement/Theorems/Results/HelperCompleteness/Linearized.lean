@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.InputSdp
-import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.FiberBounds
+module
+
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.InputSdp
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Results.HelperCompleteness.FiberBounds
 
 /-!
 # Helper completeness: the linearized SDP expression
@@ -14,6 +16,8 @@ statements here are the algebraic bridge from the two analytic moves to the
 - `references/ldt-paper/self_improvement.tex` lines 395--414
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

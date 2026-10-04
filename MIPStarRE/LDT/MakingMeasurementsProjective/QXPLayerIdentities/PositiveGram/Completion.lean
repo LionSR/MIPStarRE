@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Rows
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGram.Rows
 
 /-!
 # Section 5 — Positive-Gram completion
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayerIdentities.PositiveGra
 Completion and polar-extension lemmas for the positive spectral rows of a
 right Gram operator.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -38,14 +42,14 @@ private theorem exists_orthonormalBasis_extension_of_embedding
   have hrowFull : ∀ i : κ, rowFull (e i) = row i := by
     intro i
     simp [rowFull, invRange, Equiv.ofInjective_symm_apply]
-  have horthRange : Orthonormal ℂ ((Set.range e).restrict rowFull) := by
+  have horthRange : Orthonormal ℂ ((Set.range e).domRestrict rowFull) := by
     have hcomp : Orthonormal ℂ (fun x : Set.range e => row (invRange x)) :=
       hrow.comp invRange (Equiv.injective _)
     convert hcomp with x
     change rowFull x = row (invRange x)
     change (if hj : (x : μ) ∈ Set.range e then row (invRange ⟨x, hj⟩) else 0) =
       row (invRange x)
-    rw [dif_pos x.2]
+    rw [dite_eq_left x.2]
   obtain ⟨b, hb⟩ :=
     Orthonormal.exists_orthonormalBasis_extension_of_card_eq
       (𝕜 := ℂ) (E := EuclideanSpace ℂ μ) (ι := μ)
@@ -335,9 +339,9 @@ theorem positive_gram_polar_extension_mixed_eq_positive_rows
   classical
   ext r c
   let term : μ → ℂ := fun a => (Xᴴ * Uᵀ) r a * W a c
-  letI : Fintype {a : μ // a ∈ Set.range e} :=
+  let : Fintype {a : μ // a ∈ Set.range e} :=
     Subtype.fintype (fun a : μ => a ∈ Set.range e)
-  letI : Fintype {a : μ // ¬ a ∈ Set.range e} :=
+  let : Fintype {a : μ // ¬ a ∈ Set.range e} :=
     Subtype.fintype (fun a : μ => ¬ a ∈ Set.range e)
   have hsplit :=
     Fintype.sum_subtype_add_sum_subtype (p := fun a : μ => a ∈ Set.range e) term

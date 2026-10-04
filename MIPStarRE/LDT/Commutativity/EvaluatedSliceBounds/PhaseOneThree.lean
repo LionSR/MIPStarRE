@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Commutativity.Scaffold.Products
-import MIPStarRE.LDT.Preliminaries.CauchySchwarz
+module
+
+public import MIPStarRE.LDT.Commutativity.Scaffold.Products
+public import MIPStarRE.LDT.Preliminaries.CauchySchwarz
 
 /-!
 # Section 11 commutativity: the phase-1 evaluated-slice insertion bound
@@ -15,6 +17,8 @@ estimate.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

@@ -1,20 +1,24 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
-import MIPStarRE.LDT.Pasting.Bernoulli.MatrixChernoff
-import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
-import MIPStarRE.LDT.Pasting.Bernoulli.DegreeZero
-import MIPStarRE.LDT.Pasting.Defs.Tuples
-import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
-import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
-import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
-import MIPStarRE.LDT.Pasting.ComparisonLemmas.OverAllOutcomes.Final
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG
+public import MIPStarRE.LDT.Pasting.Bernoulli.MatrixChernoff
+public import MIPStarRE.LDT.Pasting.Bernoulli.ScalarBounds
+public import MIPStarRE.LDT.Pasting.Bernoulli.DegreeZero
+public import MIPStarRE.LDT.Pasting.Defs.Tuples
+public import MIPStarRE.LDT.Pasting.Sandwich.PastedFamilies
+public import MIPStarRE.LDT.Pasting.CommutingWithG.Complete
+public import MIPStarRE.LDT.Pasting.CommutingWithG.Incomplete
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.CommuteGHalfSandwich
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.HAConsistency
+public import MIPStarRE.LDT.Pasting.ComparisonLemmas.OverAllOutcomes.Final
 
 /-!
 # Section 12 pasting: final pasting theorems
 
 Final completeness and pasting theorems.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

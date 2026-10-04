@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Test.StrategyBiProj.Measurements
-import MIPStarRE.LDT.Test.StrategyFailures
+module
+
+public import MIPStarRE.LDT.Test.StrategyBiProj.Measurements
+public import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
 # Role-Register Averaging: Branch Equalities
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.Test.StrategyFailures
 This module proves the role-register branch equalities for heterogeneous
 projective strategies.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
@@ -659,8 +663,8 @@ theorem roleRegisterSymmStrategy_selfConsistency_eq_pointAgreement
     (strategy : ProjStrat params ιA ιB) :
     (strategy.roleRegisterSymmStrategy).selfConsistencyFailureProbability =
       strategy.pointAgreementFailureProbability := by
-  haveI : Nonempty ιA := strategy.isNormalized.nonempty.map Prod.fst
-  haveI : Nonempty ιB := strategy.isNormalized.nonempty.map Prod.snd
+  have : Nonempty ιA := strategy.isNormalized.nonempty.map Prod.fst
+  have : Nonempty ιB := strategy.isNormalized.nonempty.map Prod.snd
   unfold SymStrat.selfConsistencyFailureProbability ProjStrat.pointAgreementFailureProbability
   unfold bipartiteSSCError bipartiteConsError
   refine Finset.sum_congr rfl ?_
@@ -706,8 +710,8 @@ theorem roleRegisterSymmStrategy_axisParallel_eq_roleAverage
     (strategy : ProjStrat params ιA ιB) :
     (strategy.roleRegisterSymmStrategy).axisParallelFailureProbability =
       strategy.axisParallelRoleAverage := by
-  haveI : Nonempty ιA := strategy.isNormalized.nonempty.map Prod.fst
-  haveI : Nonempty ιB := strategy.isNormalized.nonempty.map Prod.snd
+  have : Nonempty ιA := strategy.isNormalized.nonempty.map Prod.fst
+  have : Nonempty ιB := strategy.isNormalized.nonempty.map Prod.snd
   let axParDist := uniformDistribution (AxisParallelTestSample params)
   let symmErr : AxisParallelTestSample params → Error := fun s =>
     qBipartiteConsDefect (strategy.roleRegisterSymmStrategy.state)
@@ -789,8 +793,8 @@ theorem roleRegisterSymmStrategy_diagonal_eq_roleAverage
     (strategy : ProjStrat params ιA ιB) :
     (strategy.roleRegisterSymmStrategy).diagonalFailureProbability =
       strategy.diagonalRoleAverage := by
-  haveI : Nonempty ιA := strategy.isNormalized.nonempty.map Prod.fst
-  haveI : Nonempty ιB := strategy.isNormalized.nonempty.map Prod.snd
+  have : Nonempty ιA := strategy.isNormalized.nonempty.map Prod.fst
+  have : Nonempty ιB := strategy.isNormalized.nonempty.map Prod.snd
   let symmErr := fun j : Fin params.m => fun s : RestrictedDiagonalSample params j =>
     qBipartiteConsDefect (strategy.roleRegisterSymmStrategy.state)
       (diagonalPointAnswerFamily strategy.roleRegisterSymmStrategy j s)

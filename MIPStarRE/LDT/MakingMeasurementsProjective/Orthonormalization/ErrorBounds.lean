@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.Defs
 
 /-!
 # Error Bounds for Orthonormalization
@@ -7,6 +9,8 @@ This file records the scalar estimates which compare the intermediate error
 terms in the proof of the orthonormalization theorem with the paper's final
 `100 * ζ ^ (1/4)` envelope.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

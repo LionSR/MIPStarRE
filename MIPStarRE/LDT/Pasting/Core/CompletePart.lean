@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Pasting.Statements
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
+module
+
+public import MIPStarRE.LDT.Pasting.Statements
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 
 /-!
 # Section 12 pasting: complete and incomplete part self-consistency
@@ -7,6 +9,8 @@ import MIPStarRE.LDT.Preliminaries.SelfConsistency.Extensions
 Scalar and state-dependent-distance consequences for the complete and incomplete
 parts of the pasted slice family.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

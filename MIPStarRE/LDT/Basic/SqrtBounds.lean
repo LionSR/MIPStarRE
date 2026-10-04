@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Basic.ParametersBase
+module
+
+public import MIPStarRE.LDT.Basic.ParametersBase
 
 /-!
 # Square-root bounds for error estimates
 
 Small reusable inequalities for square roots of nonnegative error terms.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT
 

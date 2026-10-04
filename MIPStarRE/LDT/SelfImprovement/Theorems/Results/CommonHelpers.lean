@@ -1,8 +1,10 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.GlobalVariance.Defs.Families
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.GlobalVariance.Defs.Families
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
 # Shared internal helpers for SelfImprovement results
@@ -27,6 +29,8 @@ so they can be reused across the split result-module leaves.
 - `references/ldt-paper/self_improvement.tex`
 - `blueprint/src/chapter/ch07_self_improvement.tex`
 -/
+
+@[expose] public section
 
 
 namespace MIPStarRE.LDT.SelfImprovement

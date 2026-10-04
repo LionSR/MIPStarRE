@@ -1,4 +1,15 @@
-import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.SumForm
+module
+
+public import MIPStarRE.LDT.GlobalVariance.Theorems.TransportChain.SumForm
+
+/-! # Main variance theorem reductions
+
+This module contains the high-level theorem reductions for
+`lem:local-variance-of-points`, `lem:global-variance-of-points`, and
+`lem:generalize-b`. These combine the algebraic identities, collision
+expansions, and transport estimates from the preceding modules into the final
+statement records used by downstream consumers.
+-/
 
 namespace MIPStarRE.LDT.GlobalVariance
 
@@ -10,14 +21,7 @@ open scoped BigOperators MatrixOrder Matrix ComplexOrder
 
 variable {ι : Type*} [Fintype ι] [DecidableEq ι]
 
-/-! # Main variance theorem reductions
-
-This module contains the high-level theorem reductions for
-`lem:local-variance-of-points`, `lem:global-variance-of-points`, and
-`lem:generalize-b`. These combine the algebraic identities, collision
-expansions, and transport estimates from the preceding modules into the final
-statement records used by downstream consumers.
--/
+@[expose] public section
 
 
 /-! ## Strategy-state reductions -/
@@ -279,5 +283,7 @@ lemma globalVarianceOfPoints
       params strategy eps delta gamma hgood G ?_
   intro g
   exact localVarianceTransportChainBound params strategy eps delta gamma hgood G g
+
+end
 
 end MIPStarRE.LDT.GlobalVariance

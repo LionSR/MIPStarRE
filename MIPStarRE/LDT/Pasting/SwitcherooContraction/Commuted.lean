@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.SwitcherooContraction.Split
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooContraction.Split
 
 /-!
 # Section 12 pasting: switcheroo commuted contraction
 
 The once-commuted contraction steps and the split-by-`g` rewrite.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

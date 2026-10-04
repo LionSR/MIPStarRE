@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Core
+module
+
+public import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Core
 
 /-!
 # Role-Register Averaging: Goodness Bound
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Test.StrategyBiProjRoleAverage.Core
 This module packages the branch equalities into the three-times-error goodness
 bound for the role-register symmetric strategy.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

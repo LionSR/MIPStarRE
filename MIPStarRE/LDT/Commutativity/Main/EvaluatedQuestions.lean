@@ -1,5 +1,7 @@
-import MIPStarRE.LDT.Commutativity.Main.Auxiliary.HEvalTransport
-import MIPStarRE.LDT.Commutativity.Main.Auxiliary.ScalarMarginalization
+module
+
+public import MIPStarRE.LDT.Commutativity.Main.Auxiliary.HEvalTransport
+public import MIPStarRE.LDT.Commutativity.Main.Auxiliary.ScalarMarginalization
 
 /-!
 # Section 11 commutativity: evaluated-question transport
@@ -12,6 +14,8 @@ full-polynomial and point-evaluated outcomes.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 

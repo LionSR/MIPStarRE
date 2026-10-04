@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain.FinalMove
+module
+
+public import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain.FinalMove
 
 /-!
 # Section 12 pasting: from-H-to-G S U S context-average bounds
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Pasting.Bernoulli.FromHToG.AdjacentStages.Chain.FinalMove
 Sandwich-sum identities and the `S U S` context-average bound used in the
 second half-sandwich and final move-right Cauchy--Schwarz steps.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -175,10 +179,10 @@ lemma fromHToG_avgOver_head_branch_ev_sandwich
             else 1 - family.averagedSubMeas.total) * S)) := by
   cases b
   · rw [fromHToG_avgOver_head_ev_sandwich]
-    simp only [Bool.false_eq_true, if_false]
+    simp only [Bool.false_eq_true, ite_false]
     rw [hincomplete]
   · rw [fromHToG_avgOver_head_ev_sandwich]
-    simp only [if_true]
+    simp only [ite_true]
     rw [hcomplete]
 
 /-- Summing the per-type averaged sandwich totals gives the full tail sandwich

@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
-import MIPStarRE.LDT.Test.StrategyFailures
+module
+
+public import MIPStarRE.LDT.Preliminaries.BipartiteSelfConsistency.Local
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.Core
+public import MIPStarRE.LDT.Test.StrategyFailures
 
 /-!
 # Self-consistency: strategy-level extensions
@@ -13,6 +15,8 @@ bundling the axis-parallel, self-consistency, and diagonal branches.
 - `references/ldt-paper/preliminaries.tex`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

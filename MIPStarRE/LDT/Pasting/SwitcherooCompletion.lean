@@ -1,12 +1,16 @@
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Utilities
-import MIPStarRE.LDT.Pasting.SwitcherooCompletion.FourthTermChain
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooCompletion.CompletePart
+public import MIPStarRE.LDT.Pasting.SwitcherooCompletion.Utilities
+public import MIPStarRE.LDT.Pasting.SwitcherooCompletion.FourthTermChain
 
 /-!
 # Section 12 pasting: switcheroo completion bounds
 
 Completion and first-stage switcheroo error bounds.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

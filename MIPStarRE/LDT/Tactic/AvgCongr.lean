@@ -1,5 +1,7 @@
-import Lean.Elab.Tactic
-import MIPStarRE.LDT.Basic.DistributionAvg
+module
+
+public meta import Lean.Elab.Tactic
+public import MIPStarRE.LDT.Basic.DistributionAvg
 
 /-!
 # Local `avgOver` congruence tactic
@@ -32,6 +34,8 @@ first tries the existing `avgOver_congr` theorem.  With a `using` tactic, the
 support-restricted theorem `avgOver_congr_on_support` is used only as a
 backtracking fallback when the plain route cannot close the resulting leaf.
 -/
+
+public meta section
 
 open Lean Elab Tactic
 open MIPStarRE.LDT

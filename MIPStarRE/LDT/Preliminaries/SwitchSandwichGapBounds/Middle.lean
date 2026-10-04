@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Core
+module
+
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichGapBounds.Core
 
 /-!
 # Switch-sandwich gap bounds: middle gap
@@ -11,6 +13,8 @@ question-level middle gap of the switch-sandwich argument.
 - `references/ldt-paper/preliminaries.tex`, `prop:switch-sandwich`
 - `blueprint/src/chapter/ch03_preliminaries.tex`
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

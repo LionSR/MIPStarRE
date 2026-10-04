@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.Preliminaries.ComparisonCore
-import MIPStarRE.LDT.Preliminaries.ConsistencyBridges
-import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
+module
+
+public import MIPStarRE.LDT.Preliminaries.ComparisonCore
+public import MIPStarRE.LDT.Preliminaries.ConsistencyBridges
+public import MIPStarRE.LDT.Preliminaries.SwitchSandwichPrep.Core
 
 /-!
 # Preliminary comparison theorems: projective converse
@@ -16,6 +18,8 @@ than relying on transitive re-exports through `SwitchSandwichPrep.Core`:
 supplies the `BipartiteSDDRel`/`ConsRel` bridging machinery, and
 `SwitchSandwichPrep.Core` provides `projSubMeas_diagMass_eq_mass`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

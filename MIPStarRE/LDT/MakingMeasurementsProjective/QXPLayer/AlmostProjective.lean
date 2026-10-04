@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
+module
+
+public import MIPStarRE.LDT.MakingMeasurementsProjective.QXPLayer.QCompleteness
 
 /-!
 # Section 5 — Q/X/XHat/P almost-projectivity
 
 Almost-projective estimates for the rank-reduced `Q` family.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

@@ -1,7 +1,9 @@
-import MIPStarRE.LDT.Basic.SubMeasurementFamilies
-import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
-import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
-import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
+module
+
+public import MIPStarRE.LDT.Basic.SubMeasurementFamilies
+public import MIPStarRE.LDT.Preliminaries.SelfConsistency.DataProcessing
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Thresholds.Final
+public import MIPStarRE.LDT.SelfImprovement.Theorems.Statements
 
 /-!
 # Final-fields completeness construction
@@ -12,6 +14,8 @@ from helper-stage completeness, through the orthonormalization SDD step, to the
 projective final-field completeness estimate in
 `references/ldt-paper/self_improvement.tex`, lines 351--414 and 713--717.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.SelfImprovement
 

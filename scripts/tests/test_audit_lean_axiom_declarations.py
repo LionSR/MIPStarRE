@@ -23,6 +23,13 @@ def write_lean(root: Path, text: str) -> None:
 
 
 class LeanAxiomDeclarationAuditTests(unittest.TestCase):
+    def test_flags_public_module_axioms(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            write_lean(root, "module\npublic axiom hiddenBridge : True\n")
+            result = run_audit(root)
+        self.assertEqual([finding.name for finding in result.findings], ["hiddenBridge"])
+
     def test_accepts_ordinary_sorry(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

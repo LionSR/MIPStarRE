@@ -1,11 +1,15 @@
-import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
-import MIPStarRE.LDT.Basic.OpFamily
+module
+
+public import MIPStarRE.LDT.Basic.ParametersFiniteAnswers
+public import MIPStarRE.LDT.Basic.OpFamily
 
 /-!
 # Section 12 — Definitions: tuples and operators
 
 Tuple distributions, type abbreviations, and basic operator helpers.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Commutativity.Defs.Core
+module
+
+public import MIPStarRE.LDT.Commutativity.Defs.Core
 
 /-!
 # Section 11 commutativity: stability definitions
@@ -11,6 +13,8 @@ stability reductions, including the weighted reindex of raw operator families.
 - `references/ldt-paper/commutativity-G.tex`
 - `blueprint/src/chapter/ch08_commutativity.tex`
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Commutativity
 
@@ -27,7 +31,7 @@ variable (params : Parameters) [FieldModel params.q]
 The outcome type `β` must retain every coordinate that still appears in
 `weight`; otherwise any later postprocessing would sum over an irrelevant fiber
 and change the operator by a multiplicity factor. -/
-private noncomputable def weightedReindexOpFamily
+noncomputable def weightedReindexOpFamily
     {α β : Type*} [Fintype α] [Fintype β]
     {κ : Type*} [Fintype κ] [DecidableEq κ]
     (base : OpFamily α κ)

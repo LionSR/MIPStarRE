@@ -40,7 +40,7 @@ from lean_header_utils import (
 
 _DECL_RE = re.compile(
     r"(?m)^[ \t]*"
-    r"(?:(?:private|protected|noncomputable|unsafe|nonrec)[ \t]+)*"
+    r"(?:(?:private|protected|public|meta|noncomputable|unsafe|nonrec)[ \t]+)*"
     r"(theorem|lemma)[ \t]+([^\s:({\[]+)(?=\s|$|[:({\[])"
 )
 _TOKEN_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_.'?]*")

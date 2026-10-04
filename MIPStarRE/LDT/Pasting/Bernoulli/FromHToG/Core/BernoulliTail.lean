@@ -1,8 +1,10 @@
-import Mathlib.Data.Nat.Choose.Sum
-import MIPStarRE.LDT.Pasting.Statements
-import MIPStarRE.LDT.Pasting.Bernoulli.Weights
-import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
-import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
+module
+
+public import Mathlib.Data.Nat.Choose.Sum
+public import MIPStarRE.LDT.Pasting.Statements
+public import MIPStarRE.LDT.Pasting.Bernoulli.Weights
+public import MIPStarRE.LDT.Pasting.Bernoulli.Scalar
+public import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 
 /-!
 # Section 12 pasting: Bernoulli tail polynomial combinatorics
@@ -10,6 +12,8 @@ import MIPStarRE.LDT.Pasting.Bernoulli.TruncatedSums
 Finset re-indexing and cardinality-grouping lemmas for the Bernoulli-tail
 operator endpoint of the `fromHToG` recurrence.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 
@@ -111,7 +115,7 @@ lemma fromHToG_sum_finsets_by_card_indicator
           intro hdr
           exact hrnot ⟨hdr, Nat.le_of_lt_succ hrange⟩
         dsimp [F]
-        rw [if_neg hnot]
+        rw [ite_eq_right hnot]
         simp
     _ = ∑ r ∈ Finset.Icc (d + 1) k,
         (Nat.choose k r : ℂ) • (G ^ r * (1 - G) ^ (k - r)) := by
@@ -120,7 +124,7 @@ lemma fromHToG_sum_finsets_by_card_indicator
       simp only [Finset.mem_Icc] at hr
       have hdr : d + 1 ≤ r := hr.1
       dsimp [F]
-      rw [if_pos hdr]
+      rw [ite_eq_left hdr]
       simp [Algebra.smul_def]
 
 /-- Terminal endpoint of the recurrence weight: after all `k` bits have been

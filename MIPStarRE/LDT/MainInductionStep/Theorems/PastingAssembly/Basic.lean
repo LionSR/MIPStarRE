@@ -1,11 +1,13 @@
-import Mathlib.Analysis.Convex.SpecificFunctions.Pow
-import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.MainError
-import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
-import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors.Successor
-import MIPStarRE.LDT.CommutativityPoints.Approximation
-import MIPStarRE.LDT.CommutativityPoints.AnswerTheorems
-import MIPStarRE.LDT.Pasting.Bernoulli.DegreeZero
-import MIPStarRE.LDT.Tactic.AvgCongr
+module
+
+public import Mathlib.Analysis.Convex.SpecificFunctions.Pow
+public import MIPStarRE.LDT.MainInductionStep.Theorems.InductionParameterBounds.MainError
+public import MIPStarRE.LDT.MainInductionStep.Theorems.StageDataConstructors
+public import MIPStarRE.LDT.MainInductionStep.Theorems.AvgSliceErrors.Successor
+public import MIPStarRE.LDT.CommutativityPoints.Approximation
+public import MIPStarRE.LDT.CommutativityPoints.AnswerTheorems
+public import MIPStarRE.LDT.Pasting.Bernoulli.DegreeZero
+public import MIPStarRE.LDT.Tactic.AvgCongr
 
 /-!
 # Section 6 — Pasting Assembly: Averaged Family Fields
@@ -13,6 +15,8 @@ import MIPStarRE.LDT.Tactic.AvgCongr
 This module contains the scalar preliminary bound and the averaged family-field
 lemmas used by the answer-valued successor route.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.MainInductionStep
 
@@ -198,7 +202,7 @@ lemma ldPastingInInductionNu_le_fifth_mainInductionNu
       Real.rpow zeta (1 / (32 : Error))
           = Real.rpow (3000 * n * S) (1 / (32 : Error)) := by
               dsimp [zeta, n, S]
-              simp [selfImprovementInInductionError, Parameters.next]
+              simp [selfImprovementInInductionError]
       _ = Real.rpow (3000 * n) (1 / (32 : Error)) * Real.rpow S (1 / (32 : Error)) := by
             calc
               Real.rpow (3000 * n * S) (1 / (32 : Error))
@@ -302,7 +306,7 @@ lemma ldPastingInInductionNu_le_fifth_mainInductionNu
               (by positivity : 0 ≤ 100 * ((k : Error) ^ (2 : ℕ))))
     _ = (1 / (5 : Error)) * mainInductionNu params.next k eps delta gamma := by
           dsimp [n, A, B, C, D]
-          simp [mainInductionNu, Parameters.next]
+          simp [mainInductionNu]
           ring
 
 /-- The nontrivial main-induction branch supplies the scalar side condition
@@ -523,7 +527,6 @@ lemma family_pointConsistencyError_eq_avg
           avg_congr with x, u
           simp [g, IdxPolyFamily.evaluatedAtNextPoint, polynomialEvaluationFamily,
             IdxProjMeas.toIdxSubMeas]
-          rfl
 
 /-- Point-consistency averaging for answer-valued restricted slices of an
 ordinary ambient successor strategy. -/
@@ -565,7 +568,6 @@ lemma family_answerRestrictedPointConsistencyError_eq_avg
           avg_congr with x, u
           simp [g, IdxPolyFamily.evaluatedAtNextPoint, polynomialEvaluationFamily,
             IdxProjMeas.toIdxSubMeas, xRestrictedAnswerSymStrat]
-          rfl
 
 /-- Answer-valued point-consistency averaging over the last coordinate.
 
@@ -612,7 +614,6 @@ lemma answer_family_pointConsistencyError_eq_avg
           avg_congr with x, u
           simp [g, IdxPolyFamily.evaluatedAtNextPoint, polynomialEvaluationFamily,
             IdxProjMeas.toIdxSubMeas, xRestrictedAnswerSymStratOfAnswer]
-          rfl
 
 /-- Average slice-wise point consistency for an answer-valued successor strategy.
 

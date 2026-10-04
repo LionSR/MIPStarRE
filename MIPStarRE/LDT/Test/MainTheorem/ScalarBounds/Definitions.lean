@@ -1,5 +1,7 @@
-import Mathlib
-import MIPStarRE.LDT.Basic.SqrtBounds
+module
+
+public import Mathlib
+public import MIPStarRE.LDT.Basic.SqrtBounds
 
 /-!
 # Error cascade — core definitions
@@ -18,6 +20,8 @@ it.  See `docs/comparator.md`, "Environment alignment".
 
 * `references/ldt-paper/inductive_step.tex`, lines 187–234.
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 

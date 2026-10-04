@@ -1,6 +1,8 @@
-import MIPStarRE.LDT.MainInductionStep.Defs
-import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Final
-import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
+module
+
+public import MIPStarRE.LDT.MainInductionStep.Defs
+public import MIPStarRE.LDT.Test.MainTheorem.ScalarBounds.CascadeBounds.Final
+public import MIPStarRE.LDT.MakingMeasurementsProjective.ProjectivizationChain.Basic
 
 /-!
 # Main-formal scalar bounds
@@ -42,6 +44,8 @@ the coarsening lemma that absorbs `orthonormalizeAndCompleteError` into
   `\label{thm:sigma-bound-main-formal}`, and
   `\label{thm:zeta-bounds-main-formal}`.
 -/
+
+@[expose] public section
 
 open scoped BigOperators MatrixOrder Matrix ComplexOrder
 

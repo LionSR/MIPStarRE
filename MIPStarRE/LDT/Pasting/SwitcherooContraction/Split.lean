@@ -1,10 +1,14 @@
-import MIPStarRE.LDT.Pasting.SwitcherooSetup.Terms
+module
+
+public import MIPStarRE.LDT.Pasting.SwitcherooSetup.Terms
 
 /-!
 # Section 12 pasting: switcheroo split contraction
 
 The split-form contraction and first mixed-term transfer.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT.Pasting
 

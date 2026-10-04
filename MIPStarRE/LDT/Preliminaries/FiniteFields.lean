@@ -1,7 +1,9 @@
-import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
-import Mathlib.Analysis.Fourier.FiniteAbelian.Orthogonality
-import Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar
-import MIPStarRE.LDT.Basic.ParametersBase
+module
+
+public import Mathlib.NumberTheory.LegendreSymbol.AddCharacter
+public import Mathlib.Analysis.Fourier.FiniteAbelian.Orthogonality
+public import Mathlib.Analysis.SpecialFunctions.Complex.CircleAddChar
+public import MIPStarRE.LDT.Basic.ParametersBase
 
 /-!
 # Finite fields and Fourier orthogonality
@@ -20,6 +22,8 @@ from `references/ldt-paper/preliminaries.tex` (lines 15–83).
 
 * `references/ldt-paper/preliminaries.tex`, lines 15–83
 -/
+
+@[expose] public section
 
 open scoped BigOperators
 
@@ -92,7 +96,7 @@ omit [Fintype F] [DecidableEq F] in
 omit [Fintype F] [DecidableEq F] in
 private theorem ffTrace_nondegenerate [Finite F] (a : F) (ha : a ≠ 0) :
     ∃ b : F, ffTrace (p := p) (F := F) (a * b) ≠ 0 := by
-  haveI : CharP F p := (Algebra.charP_iff (ZMod p) F p).mp (ZMod.charP p)
+  have : CharP F p := (Algebra.charP_iff (ZMod p) F p).mp (ZMod.charP p)
   have hp : p = ringChar F := by
     simpa using (ringChar.eq F p).symm
   subst p
@@ -203,7 +207,7 @@ theorem fourier_fact_vector (v : Fin m → F) :
           subst v
           ext u
           simp [ffVecChar, ffDotProduct]
-        rw [if_pos hzero, if_pos hv]
+        rw [ite_eq_left hzero, ite_eq_left hv]
       · have hvc : ffVecChar (p := p) (F := F) v ≠ 0 :=
           ffVecChar_ne_zero (p := p) (F := F) hv
         simp [hv, hvc]

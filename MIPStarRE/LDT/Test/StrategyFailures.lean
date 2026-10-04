@@ -1,4 +1,6 @@
-import MIPStarRE.LDT.Test.StrategyRole.Algebra
+module
+
+public import MIPStarRE.LDT.Test.StrategyRole.Algebra
 
 /-!
 # Symmetrized-strategy failure probabilities and test bounds
@@ -6,6 +8,8 @@ import MIPStarRE.LDT.Test.StrategyRole.Algebra
 Failure-probability surrogates and basic low-individual-degree test bounds for
 the split strategy interface.
 -/
+
+@[expose] public section
 
 namespace MIPStarRE.LDT
 

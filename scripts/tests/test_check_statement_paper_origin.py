@@ -53,6 +53,11 @@ class DeclRegexTests(unittest.TestCase):
         self.assertIsNotNone(m)
         self.assertEqual(m.group("name"), "FooStatement")
 
+    def test_public_module_structure(self) -> None:
+        m = DECL_RE.match("public structure FooStatement where")
+        self.assertIsNotNone(m)
+        self.assertEqual(m.group("name"), "FooStatement")
+
     def test_protected_def(self) -> None:
         m = DECL_RE.match("protected def FooStatement : Prop :=")
         self.assertIsNotNone(m)
