@@ -26,8 +26,7 @@ inductive Role where
   | B
   deriving DecidableEq, Repr, Inhabited
 
-/-- The two roles form a finite type. The explicit enumeration avoids the
-`Fintype` deriving handler's transparency failure in an exposed module section. -/
+/-- The two roles form a finite type, enumerated by the two constructors `A` and `B`. -/
 instance instFintypeRole : Fintype Role := ⟨{.A, .B}, by intro x; cases x <;> simp⟩
 
 def Role.other : Role → Role
