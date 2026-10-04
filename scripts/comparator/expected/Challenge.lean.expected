@@ -39,7 +39,7 @@ namespace MIPStarRE.LDT
 -- source: MIPStarRE/LDT/Basic/ParametersBase.lean:22-22  (MIPStarRE.LDT.Error)
 abbrev Error := ℝ
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:40-53  (MIPStarRE.LDT.Parameters)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:39-52  (MIPStarRE.LDT.Parameters)
 /-- Parameters for the `(m,q,d)` low individual degree test.
 
 Besides the usual positivity assumptions, we bundle the paper-faithful witness
@@ -63,21 +63,21 @@ abbrev Op (d : Type*) := Matrix d d ℂ
 end MIPStarRE.Quantum
 namespace MIPStarRE.LDT
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:178-178  (MIPStarRE.LDT.Fq)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:177-177  (MIPStarRE.LDT.Fq)
 abbrev Fq (params : Parameters) := Fin params.q
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:179-179  (MIPStarRE.LDT.Point)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:178-178  (MIPStarRE.LDT.Point)
 abbrev Point (params : Parameters) := Fin params.m → Fq params
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:182-183  (MIPStarRE.LDT.instInhabitedFinM)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:181-182  (MIPStarRE.LDT.instInhabitedFinM)
 instance {params : Parameters} : Inhabited (Fin params.m) :=
   ⟨⟨0, params.hm⟩⟩
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:185-186  (MIPStarRE.LDT.instInhabitedFq)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:184-185  (MIPStarRE.LDT.instInhabitedFq)
 instance {params : Parameters} : Inhabited (Fq params) :=
   ⟨⟨0, params.hq⟩⟩
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:218-225  (MIPStarRE.LDT.FieldModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:217-224  (MIPStarRE.LDT.FieldModel)
 /-- A bundled field model for the paper's `F_q`, together with a coding equivalence
 to the repository's finite carrier `Fin q`. -/
 class FieldModel (q : ℕ) where
@@ -91,66 +91,66 @@ class FieldModel (q : ℕ) where
 attribute [instance_reducible, instance] FieldModel.instField FieldModel.instFintype
   FieldModel.instDecidableEq
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:285-285  (MIPStarRE.LDT.Scalar)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:284-284  (MIPStarRE.LDT.Scalar)
 abbrev Scalar (params : Parameters) [FieldModel params.q] := FieldModel.K params.q
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:286-287  (MIPStarRE.LDT.PolynomialModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:285-286  (MIPStarRE.LDT.PolynomialModel)
 abbrev PolynomialModel (params : Parameters) [FieldModel params.q] :=
   MvPolynomial (Fin params.m) (Scalar params)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:288-289  (MIPStarRE.LDT.LinePolynomialModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:287-288  (MIPStarRE.LDT.LinePolynomialModel)
 abbrev LinePolynomialModel (params : Parameters) [FieldModel params.q] :=
   _root_.Polynomial (Scalar params)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:297-299  (MIPStarRE.LDT.decodeScalar)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:296-298  (MIPStarRE.LDT.decodeScalar)
 /-- Interpret a coded coordinate in `Fin q` as a scalar in the chosen field model. -/
 def decodeScalar {params : Parameters} [FieldModel params.q] (x : Fq params) : Scalar params :=
   (FieldModel.equiv (q := params.q)).symm x
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:301-303  (MIPStarRE.LDT.encodeScalar)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:300-302  (MIPStarRE.LDT.encodeScalar)
 /-- Re-encode a field-model scalar as its canonical representative in `Fin q`. -/
 def encodeScalar {params : Parameters} [FieldModel params.q] (x : Scalar params) : Fq params :=
   FieldModel.equiv (q := params.q) x
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:314-316  (MIPStarRE.LDT.zeroCoord)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:313-315  (MIPStarRE.LDT.zeroCoord)
 /-- The zero coordinate. -/
 def zeroCoord {params : Parameters} [FieldModel params.q] : Fq params :=
   encodeScalar 0
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:318-320  (MIPStarRE.LDT.addCoord)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:317-319  (MIPStarRE.LDT.addCoord)
 /-- Coordinate addition transported through the `Fin q` coding. -/
 def addCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x + decodeScalar y)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:347-349  (MIPStarRE.LDT.mulCoord)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:346-348  (MIPStarRE.LDT.mulCoord)
 /-- Coordinate multiplication transported through the `Fin q` coding. -/
 def mulCoord {params : Parameters} [FieldModel params.q] (x y : Fq params) : Fq params :=
   encodeScalar (decodeScalar x * decodeScalar y)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:355-357  (MIPStarRE.LDT.addPoint)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:354-356  (MIPStarRE.LDT.addPoint)
 /-- Pointwise addition in the coded ambient space. -/
 def addPoint {params : Parameters} [FieldModel params.q] (u v : Point params) : Point params :=
   fun i => addCoord (u i) (v i)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:359-362  (MIPStarRE.LDT.smulPoint)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:358-361  (MIPStarRE.LDT.smulPoint)
 /-- Scalar multiplication in the coded ambient space. -/
 def smulPoint {params : Parameters} [FieldModel params.q] (t : Fq params) (u : Point params) :
     Point params :=
   fun i => mulCoord t (u i)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:414-417  (MIPStarRE.LDT.decodePoint)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:413-416  (MIPStarRE.LDT.decodePoint)
 /-- Decode a coded point as a tuple of scalars in the chosen field model. -/
 def decodePoint {params : Parameters} [FieldModel params.q] (u : Point params) :
     Fin params.m → Scalar params :=
   fun i => decodeScalar (u i)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:419-422  (MIPStarRE.LDT.evalPolynomialModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:418-421  (MIPStarRE.LDT.evalPolynomialModel)
 /-- Evaluate a multivariate polynomial over the chosen field model on a coded point. -/
 noncomputable def evalPolynomialModel (params : Parameters) [FieldModel params.q]
     (p : PolynomialModel params) (u : Point params) : Fq params :=
   encodeScalar (MvPolynomial.eval (decodePoint u) p)
 
--- source: MIPStarRE/LDT/Basic/ParametersBase.lean:424-427  (MIPStarRE.LDT.evalLinePolynomialModel)
+-- source: MIPStarRE/LDT/Basic/ParametersBase.lean:423-426  (MIPStarRE.LDT.evalLinePolynomialModel)
 /-- Evaluate a univariate polynomial over the chosen field model on a coded point. -/
 noncomputable def evalLinePolynomialModel (params : Parameters) [FieldModel params.q]
     (p : LinePolynomialModel params) (t : Fq params) : Fq params :=
