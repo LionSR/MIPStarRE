@@ -207,7 +207,7 @@ theorem fourier_fact_vector (v : Fin m → F) :
           subst v
           ext u
           simp [ffVecChar, ffDotProduct]
-        rw [ite_eq_left hzero, ite_eq_left hv]
+        rw [if_pos hzero, if_pos hv]
       · have hvc : ffVecChar (p := p) (F := F) v ≠ 0 :=
           ffVecChar_ne_zero (p := p) (F := F) hv
         simp [hv, hvc]

@@ -62,7 +62,7 @@ noncomputable def Measurement.trivialDistinguishedOutcome
     outcome_pos := fun a => by
       exact Measurement.trivialDistinguishedOutcome_outcome_pos a₀ a
     sum_eq_total :=
-      (Finset.sum_ite_eq' Finset.univ a₀ fun _ => 1).trans (ite_eq_left (Finset.mem_univ a₀))
+      (Finset.sum_ite_eq' Finset.univ a₀ fun _ => 1).trans (if_pos (Finset.mem_univ a₀))
     total_le_one := le_rfl
   }
   total_eq_one := rfl

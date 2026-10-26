@@ -116,8 +116,8 @@ theorem map_apply_toReal {α β : Type*} [Fintype α]
   · refine Finset.sum_congr rfl ?_
     intro a _
     by_cases h : b = e a
-    · rw [ite_eq_left h, ite_eq_left h]
-    · rw [ite_eq_right h, ite_eq_right h]
+    · rw [if_pos h, if_pos h]
+    · rw [if_neg h, if_neg h]
       rfl
   · intro a _
     by_cases h : b = e a
@@ -149,9 +149,9 @@ theorem map_sum_smul {α β M : Type*}
           refine Finset.sum_congr rfl ?_
           intro a _
           rw [Fintype.sum_eq_single (e a)]
-          · rw [ite_eq_left rfl]
+          · rw [if_pos rfl]
           · intro b hb
-            rw [ite_eq_right hb, zero_smul]
+            rw [if_neg hb, zero_smul]
 
 /-- Pointwise real-weight formula for a finite monadic composition of
 probability mass functions.  This is the finite real-valued form of
@@ -230,7 +230,7 @@ theorem uniformOfFintype_prod_eq_bind
       rw [PMF.map_apply]
       rw [ENNReal.tsum_eq_zero]
       intro b
-      rw [ite_eq_right (by
+      rw [if_neg (by
         intro h
         exact ha (congrArg Prod.fst h).symm)]
     rw [hmap_zero, mul_zero])]
@@ -239,7 +239,7 @@ theorem uniformOfFintype_prod_eq_bind
         PMF.uniformOfFintype β ab.2 := by
     rw [PMF.map_apply]
     rw [tsum_eq_single ab.2 (fun b hb => by
-      rw [ite_eq_right (by
+      rw [if_neg (by
         intro h
         exact hb (congrArg Prod.snd h).symm)])]
     simp
@@ -340,7 +340,7 @@ theorem uniformOfFintype_map_equiv
   rw [tsum_eq_single (e.symm b)]
   · simp [PMF.uniformOfFintype_apply, Fintype.card_congr e]
   · intro a ha
-    rw [ite_eq_right]
+    rw [if_neg]
     intro hb
     exact ha (by
       calc

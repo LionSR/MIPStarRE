@@ -197,7 +197,7 @@ private theorem degreeOf_restrictAtHeightCoordinateMap_le
       · let := hnontriv
         have hne' : i ≠ ⟨j.1, hj⟩ := by
           simpa [eq_comm] using hne
-        rw [restrictAtHeightCoordinateMap, dite_eq_left hj, MvPolynomial.degreeOf_X]
+        rw [restrictAtHeightCoordinateMap, dif_pos hj, MvPolynomial.degreeOf_X]
         simp [hne', hji]
     · simp [restrictAtHeightCoordinateMap, hj, MvPolynomial.degreeOf_C, hji]
 

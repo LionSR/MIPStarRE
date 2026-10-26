@@ -84,7 +84,7 @@ theorem ldDnoteq
       calc
         ∏ j ∈ Finset.range k with j < i, (1 - (j : Error) / params.q)
           ≤ ∏ j ∈ Finset.range k with j < i, (1 : Error) := by
-              exact Finset.prod_le_prod₀
+              exact Finset.prod_le_prod
                 (fun j hj => hfactor_nonneg j (Finset.mem_filter.mp hj).1)
                 (fun j hj => hfactor_le_one j (Finset.mem_filter.mp hj).1)
         _ = 1 := by simp

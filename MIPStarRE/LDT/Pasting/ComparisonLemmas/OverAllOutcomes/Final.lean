@@ -103,8 +103,8 @@ private lemma lineConsistentIndicator_probability_le_mdq
           exact hgf.trans
             ((congrArg (fun line : AxisLinePolynomial params.next => line (xs i))
               hLine.symm).trans htupleEval)
-        rw [ite_eq_left hCons, ite_eq_left hsliceEq]
-      · rw [ite_eq_right hCons]
+        rw [if_pos hCons, if_pos hsliceEq]
+      · rw [if_neg hCons]
         by_cases hEq : ((gs i).get hiSome) u = hStarSlice u <;> simp [hEq]
     calc
       avgOver (uniformDistribution (Point params)) (fun u =>

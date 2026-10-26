@@ -151,7 +151,7 @@ private theorem interpolateCompletedSlicesFromSupport_degree
       have hdeg :=
         (degreeOf_eval₂_C_X_le_natDegree
           (p := Li) (i := coord) (j := lastCoord params))
-      rw [ite_eq_right hcoord_ne_last] at hdeg
+      rw [if_neg hcoord_ne_last] at hdeg
       exact hdeg
     have hslice : MvPolynomial.degreeOf coord slicePoly ≤ params.d := by
       change MvPolynomial.degreeOf coord
@@ -180,7 +180,7 @@ private theorem interpolateCompletedSlicesFromSupport_degree
         have hdeg :=
           (degreeOf_eval₂_C_X_le_natDegree
             (p := Li) (i := lastCoord params) (j := lastCoord params))
-        rw [ite_eq_left rfl] at hdeg
+        rw [if_pos rfl] at hdeg
         exact hdeg
       exact hLiMv_nat.trans hLi_natDegree
     have hslice_zero : MvPolynomial.degreeOf (lastCoord params) slicePoly ≤ 0 := by

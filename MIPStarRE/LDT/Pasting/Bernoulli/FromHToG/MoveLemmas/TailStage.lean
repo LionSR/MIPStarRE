@@ -146,10 +146,10 @@ lemma fromHToG_cons_type_outcome_sum
           by_cases hp : p.1.isSome = b ∧ gHatTupleType p.2 = τ
           · have htype : gHatTupleType (Fin.cons p.1 p.2) = prependTypeBit b τ :=
               (fromHToG_gHatTupleType_cons_eq params b τ p.1 p.2).2 hp
-            rw [ite_eq_left htype, ite_eq_left hp]
+            rw [if_pos htype, if_pos hp]
             simp [fromHToG_gHatSandwichFamily_cons_outcome]
-          · rw [ite_eq_right]
-            · rw [ite_eq_right hp]
+          · rw [if_neg]
+            · rw [if_neg hp]
             · intro h
               exact hp ((fromHToG_gHatTupleType_cons_eq params b τ p.1 p.2).1 h)
     _ = ∑ g : GHatOutcome params,

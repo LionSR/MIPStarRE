@@ -209,13 +209,13 @@ theorem toPMF_map {α β : Type*} [DecidableEq β]
     intro a ha
     by_cases hea : e a = b
     · have hba : b = e a := hea.symm
-      rw [ite_eq_left hea, ite_eq_left hba, toPMF_apply]
+      rw [if_pos hea, if_pos hba, toPMF_apply]
     · have hba : b ≠ e a := fun hba => hea hba.symm
-      rw [ite_eq_right hea, ite_eq_right hba]
+      rw [if_neg hea, if_neg hba]
   · intro a ha
     by_cases hba : b = e a
-    · rw [ite_eq_left hba, toPMF_apply_of_notMem 𝒟 h𝒟 ha]
-    · rw [ite_eq_right hba]
+    · rw [if_pos hba, toPMF_apply_of_notMem 𝒟 h𝒟 ha]
+    · rw [if_neg hba]
 
 end Distribution
 

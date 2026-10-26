@@ -4,6 +4,7 @@ keywords = ["math"]
 defaultTargets = ["MIPStarRE"]
 
 [leanOptions]
+autoImplicit = false
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
@@ -12,7 +13,8 @@ maxSynthPendingDepth = 3
 [[require]]
 name = "mathlib"
 scope = "leanprover-community"
-rev = "v4.35.0-rc2"
+git = "https://github.com/leanprover-community/mathlib4"
+rev = "0df444a360eaa60ab8c11dca51a86af692955474"
 
 [[lean_lib]]
 name = "MIPStarRE"

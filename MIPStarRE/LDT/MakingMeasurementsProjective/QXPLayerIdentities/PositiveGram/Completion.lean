@@ -49,7 +49,7 @@ private theorem exists_orthonormalBasis_extension_of_embedding
     change rowFull x = row (invRange x)
     change (if hj : (x : μ) ∈ Set.range e then row (invRange ⟨x, hj⟩) else 0) =
       row (invRange x)
-    rw [dite_eq_left x.2]
+    rw [dif_pos x.2]
   obtain ⟨b, hb⟩ :=
     Orthonormal.exists_orthonormalBasis_extension_of_card_eq
       (𝕜 := ℂ) (E := EuclideanSpace ℂ μ) (ι := μ)

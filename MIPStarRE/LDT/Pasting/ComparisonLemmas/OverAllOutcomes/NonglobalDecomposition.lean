@@ -381,14 +381,14 @@ private lemma lineConsistentLocal_le_indicatorLocal
               ¬ (∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
                 ((gs i).get hiSome) u ≠ f (xs i)) :=
           ⟨hlocal.1, ⟨f, hlocal.2⟩⟩
-        rw [ite_eq_left hlocal, ite_eq_left hind]
+        rw [if_pos hlocal, if_pos hind]
       · by_cases hind : (¬ IsGloballyConsistent params xs gs) ∧
             ∃ f : AxisLinePolynomial params.next,
               ¬ (∃ i : Fin k, ∃ hiSome : (gs i).isSome = true,
                 ((gs i).get hiSome) u ≠ f (xs i))
-        · rw [ite_eq_right hlocal, ite_eq_left hind]
+        · rw [if_neg hlocal, if_pos hind]
           exact A.outcome_pos gs
-        · rw [ite_eq_right hlocal, ite_eq_right hind]
+        · rw [if_neg hlocal, if_neg hind]
     · exact B.outcome_pos f
   calc
     overAllOutcomesLineConsistentNonglobalLocal params strategy family u xs

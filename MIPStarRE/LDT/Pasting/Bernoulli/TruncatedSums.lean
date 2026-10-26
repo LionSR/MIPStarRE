@@ -313,7 +313,7 @@ theorem truncatedTypeSumRecurrence
                     d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
                       gHatTypeWeight τtail :=
                   hcond.mpr h
-                rw [ite_eq_left h', ite_eq_left h]
+                rw [if_pos h', if_pos h]
                 simpa [prependTypeBit] using gHatTypeOperator_prepend_true G τprefix
               · have h' :
                     ¬ d + 1 ≤ gHatTypeWeight (Fin.cons true τprefix) +
@@ -356,7 +356,7 @@ theorem truncatedTypeSumRecurrence
                     d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +
                       gHatTypeWeight τtail :=
                   hcond.mpr h
-                rw [ite_eq_left h', ite_eq_left h]
+                rw [if_pos h', if_pos h]
                 simpa [prependTypeBit] using gHatTypeOperator_prepend_false G τprefix
               · have h' :
                     ¬ d + 1 ≤ gHatTypeWeight (Fin.cons false τprefix) +

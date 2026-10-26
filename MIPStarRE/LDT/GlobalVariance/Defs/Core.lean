@@ -82,7 +82,7 @@ def axisParallelLineQuestionParameter {params : Parameters} [FieldModel params.q
 @[simp] theorem axisParallelLineQuestionParameter_pointAt {params : Parameters}
     [FieldModel params.q] (ℓ : AxisParallelLine params) (t : Fq params) :
     axisParallelLineQuestionParameter (ℓ, ℓ.pointAt t) = t := by
-  simp only [axisParallelLineQuestionParameter, AxisParallelLine.pointAt, ite_eq_left]
+  simp only [axisParallelLineQuestionParameter, AxisParallelLine.pointAt, if_pos]
   simp [subCoord, addCoord]
 
 /-- The distribution of an axis-parallel line together with a point queried on it.

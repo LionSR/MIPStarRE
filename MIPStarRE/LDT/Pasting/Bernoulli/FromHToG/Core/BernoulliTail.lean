@@ -115,7 +115,7 @@ lemma fromHToG_sum_finsets_by_card_indicator
           intro hdr
           exact hrnot ⟨hdr, Nat.le_of_lt_succ hrange⟩
         dsimp [F]
-        rw [ite_eq_right hnot]
+        rw [if_neg hnot]
         simp
     _ = ∑ r ∈ Finset.Icc (d + 1) k,
         (Nat.choose k r : ℂ) • (G ^ r * (1 - G) ^ (k - r)) := by
@@ -124,7 +124,7 @@ lemma fromHToG_sum_finsets_by_card_indicator
       simp only [Finset.mem_Icc] at hr
       have hdr : d + 1 ≤ r := hr.1
       dsimp [F]
-      rw [ite_eq_left hdr]
+      rw [if_pos hdr]
       simp [Algebra.smul_def]
 
 /-- Terminal endpoint of the recurrence weight: after all `k` bits have been

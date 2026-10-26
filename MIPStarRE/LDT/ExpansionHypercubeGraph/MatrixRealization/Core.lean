@@ -413,7 +413,7 @@ private lemma fourierBasisChange_conj_laplacian (params : Parameters) :
             by_cases hαβ : α = β
             · subst hαβ
               simp
-            · rw [ite_eq_right hαβ]
+            · rw [if_neg hαβ]
               rw [mul_zero]
               exact (Matrix.diagonal_apply_ne
                 (fun γ => ((laplacianEigenvalue params γ : Error) : ℂ)) hαβ).symm

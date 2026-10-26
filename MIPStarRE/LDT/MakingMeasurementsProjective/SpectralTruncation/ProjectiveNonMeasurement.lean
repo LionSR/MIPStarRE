@@ -458,7 +458,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
           intro i
           dsimp [ratio]
           by_cases hfi : hherm.eigenvalues i - hherm.eigenvalues i ^ (2 : Nat) = 0
-          · simpa only [hfi, ite_eq_left] using (show (0 : Error) ≤ 0 by positivity)
+          · simpa only [hfi, if_pos] using (show (0 : Error) ≤ 0 by positivity)
           · have hx0 : 0 ≤ hherm.eigenvalues i :=
               outcome_spectrum_nonneg A a (hherm.eigenvalues i)
                 (hherm.eigenvalues_mem_spectrum_real i)
@@ -507,7 +507,7 @@ theorem projectiveNonMeasurement_of_sourceAlmostProjective_zero
               have hdef_ne : hherm.eigenvalues i - hherm.eigenvalues i ^ (2 : Nat) ≠ 0 := by
                 simpa using hfi
               dsimp [ratio]
-              rw [ite_eq_right hfi]
+              rw [if_neg hfi]
               exact (div_mul_cancel₀ _ hdef_ne).symm
             calc
               (hherm.eigenvalues i - truncationCutoff 0 (hherm.eigenvalues i)) ^ (2 : Nat)

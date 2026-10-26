@@ -267,8 +267,8 @@ private theorem helperOffDiagonalVarianceSwapSelection_pairs_sum
   intro h' _
   by_cases hne : h' ≠ h
   · by_cases heq : h u = h' u
-    · rw [ite_eq_left ⟨hne, heq⟩, ite_eq_left hne, ite_eq_left heq, one_mul]
-    · rw [ite_eq_left hne, ite_eq_right heq]
+    · rw [if_pos ⟨hne, heq⟩, if_pos hne, if_pos heq, one_mul]
+    · rw [if_pos hne, if_neg heq]
       simp only [Set.mem_ofPred_eq, heq, and_false, ite_false]
       ring
   · have hheq : h' = h := not_not.mp hne
@@ -371,7 +371,7 @@ theorem helperOffDiagonalSelectedCSChainQ3_eq_oneSidedSwappedIndicator
   refine Finset.sum_congr rfl ?_
   intro h' _
   by_cases heq : h uv.1 = h' uv.1
-  · rw [ite_eq_left heq]
+  · rw [if_pos heq]
     simp only [one_mul]
     rw [← ev_conjTranspose strategy.state]
     rw [conjTranspose_opTensor, Matrix.conjTranspose_mul, Matrix.conjTranspose_mul]

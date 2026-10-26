@@ -148,7 +148,7 @@ lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
           refine Finset.sum_congr rfl ?_
           intro τ _
           by_cases hτ : params.d + 1 ≤ gHatTypeWeight τ
-          · rw [ite_eq_left hτ]
+          · rw [if_pos hτ]
             refine Finset.sum_congr rfl ?_
             intro gs hgs
             simp only [Finset.mem_filter] at hgs
@@ -156,8 +156,8 @@ lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
             have helig : InterpolationEligible params gs := by
               rw [fromHToG_interpolationEligible_iff_type_weight params gs]
               simpa [htype] using hτ
-            rw [ite_eq_left helig]
-          · rw [ite_eq_right hτ]
+            rw [if_pos helig]
+          · rw [if_neg hτ]
             refine Finset.sum_eq_zero ?_
             intro gs hgs
             simp only [Finset.mem_filter] at hgs
@@ -166,7 +166,7 @@ lemma fromHToG_interpolationEligibleSandwich_total_eq_type_sum
               intro helig
               have hw := (fromHToG_interpolationEligible_iff_type_weight params gs).1 helig
               exact hτ (by simpa [htype] using hw)
-            rw [ite_eq_right hnot]
+            rw [if_neg hnot]
   simpa [interpolationEligibleSandwichFamily, restrictSubMeas, A] using hpartition
 
 /-- The per-type averaged sandwich total is the uniform average of the exact-type
