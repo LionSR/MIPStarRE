@@ -1,0 +1,14 @@
+{"end":{"col":37,"line":33,"offset":971},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.Preliminaries","start":{"col":10,"line":33,"offset":944}}
+{"end":{"col":18,"line":35,"offset":991},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT","start":{"col":5,"line":35,"offset":978}}
+{"end":{"col":22,"line":36,"offset":1014},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum","start":{"col":5,"line":36,"offset":997}}
+{"end":{"col":29,"line":50,"offset":1663},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":9,"line":50,"offset":1643}}
+{"end":{"col":51,"line":52,"offset":1758},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":31,"line":52,"offset":1738}}
+{"end":{"col":20,"line":133,"offset":5571},"kind":"platformTactic","name":"quantum_nonneg","start":{"col":6,"line":133,"offset":5557}}
+{"end":{"col":20,"line":159,"offset":6541},"kind":"platformTactic","name":"quantum_nonneg","start":{"col":6,"line":159,"offset":6527}}
+{"end":{"col":20,"line":185,"offset":7573},"kind":"platformTactic","name":"quantum_nonneg","start":{"col":6,"line":185,"offset":7559}}
+{"end":{"col":20,"line":210,"offset":8588},"kind":"platformTactic","name":"quantum_nonneg","start":{"col":6,"line":210,"offset":8574}}
+{"end":{"col":29,"line":265,"offset":10982},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":9,"line":265,"offset":10962}}
+{"end":{"col":29,"line":277,"offset":11523},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":9,"line":277,"offset":11503}}
+{"end":{"col":29,"line":288,"offset":12012},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":9,"line":288,"offset":11992}}
+{"end":{"col":29,"line":298,"offset":12442},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":9,"line":298,"offset":12422}}
+{"end":{"col":31,"line":384,"offset":15775},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.Preliminaries","start":{"col":4,"line":384,"offset":15748}}

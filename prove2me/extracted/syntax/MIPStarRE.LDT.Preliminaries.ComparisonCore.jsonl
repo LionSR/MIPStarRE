@@ -1,0 +1,15 @@
+{"end":{"col":31,"line":17,"offset":369},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.ConsRel","start":{"col":10,"line":17,"offset":348}}
+{"end":{"col":32,"line":27,"offset":808},"kind":"syntaxIdentifier","name":"_root_.MIPStarRE.LDT.ConsRel","start":{"col":4,"line":27,"offset":780}}
+{"end":{"col":34,"line":28,"offset":862},"kind":"syntaxIdentifier","name":"_root_.MIPStarRE.LDT.ConsRel","start":{"col":6,"line":28,"offset":834}}
+{"end":{"col":25,"line":32,"offset":967},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.ConsRel","start":{"col":4,"line":32,"offset":946}}
+{"end":{"col":37,"line":34,"offset":1006},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.Preliminaries","start":{"col":10,"line":34,"offset":979}}
+{"end":{"col":18,"line":36,"offset":1026},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT","start":{"col":5,"line":36,"offset":1013}}
+{"end":{"col":44,"line":78,"offset":2731},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.sq_le_self","start":{"col":16,"line":78,"offset":2703}}
+{"end":{"col":44,"line":89,"offset":3199},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.sq_le_self","start":{"col":16,"line":89,"offset":3171}}
+{"end":{"col":29,"line":255,"offset":10404},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":9,"line":255,"offset":10384}}
+{"end":{"col":59,"line":255,"offset":10435},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":39,"line":255,"offset":10415}}
+{"end":{"col":16,"line":259,"offset":10622},"kind":"platformTactic","name":"quantum_nonneg","start":{"col":2,"line":259,"offset":10608}}
+{"end":{"col":40,"line":635,"offset":26020},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":20,"line":635,"offset":26000}}
+{"end":{"col":40,"line":636,"offset":26104},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":20,"line":636,"offset":26084}}
+{"end":{"col":33,"line":653,"offset":26679},"kind":"syntaxIdentifier","name":"MIPStarRE.Quantum.Op","start":{"col":13,"line":653,"offset":26659}}
+{"end":{"col":31,"line":663,"offset":27040},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.Preliminaries","start":{"col":4,"line":663,"offset":27013}}

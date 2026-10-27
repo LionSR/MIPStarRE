@@ -1,0 +1,6 @@
+{"declEnd":{"col":16,"line":79,"offset":3062},"declStart":{"col":0,"line":75,"offset":2855},"docstring":null,"kind":"decl","nameText":null,"privateTok":null,"valKind":"simple","valStart":{"col":28,"line":78,"offset":3040}}
+{"const":"MIPStarRE.LDT._example","end":{"col":7,"line":75,"offset":2862},"kind":"ref","start":{"col":0,"line":75,"offset":2855}}
+{"const":"MIPStarRE.LDT.QuantumState","end":{"col":21,"line":76,"offset":2928},"kind":"ref","start":{"col":9,"line":76,"offset":2916}}
+{"const":"MIPStarRE.Quantum.Op","end":{"col":58,"line":76,"offset":2968},"kind":"ref","start":{"col":38,"line":76,"offset":2948}}
+{"const":"MIPStarRE.LDT.ev","end":{"col":10,"line":78,"offset":3021},"kind":"ref","start":{"col":8,"line":78,"offset":3019}}
+{"const":"MIPStarRE.LDT.opTensor","end":{"col":22,"line":78,"offset":3034},"kind":"ref","start":{"col":14,"line":78,"offset":3026}}

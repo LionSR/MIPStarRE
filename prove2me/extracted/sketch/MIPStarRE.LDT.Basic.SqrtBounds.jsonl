@@ -1,0 +1,8 @@
+{"declEnd":{"col":86,"line":20,"offset":585},"declStart":{"col":0,"line":15,"offset":232},"docstring":{"end":{"col":67,"line":15,"offset":299},"start":{"col":0,"line":15,"offset":232}},"kind":"decl","nameText":"sqrt_add_le_add_sqrt","privateTok":null,"valKind":"simple","valStart":{"col":50,"line":17,"offset":427}}
+{"declEnd":{"col":64,"line":30,"offset":1121},"declStart":{"col":0,"line":22,"offset":587},"docstring":{"end":{"col":78,"line":22,"offset":665},"start":{"col":0,"line":22,"offset":587}},"kind":"decl","nameText":"sqrt_add3_le_add3_sqrt","privateTok":null,"valKind":"simple","valStart":{"col":68,"line":25,"offset":834}}
+{"const":"MIPStarRE.LDT.sqrt_add_le_add_sqrt","end":{"col":28,"line":16,"offset":328},"kind":"ref","start":{"col":8,"line":16,"offset":308}}
+{"const":"MIPStarRE.LDT.Error","end":{"col":41,"line":16,"offset":341},"kind":"ref","start":{"col":36,"line":16,"offset":336}}
+{"const":"MIPStarRE.LDT.sqrt_add3_le_add3_sqrt","end":{"col":30,"line":23,"offset":696},"kind":"ref","start":{"col":8,"line":23,"offset":674}}
+{"const":"MIPStarRE.LDT.Error","end":{"col":45,"line":23,"offset":711},"kind":"ref","start":{"col":40,"line":23,"offset":706}}
+{"const":"MIPStarRE.LDT.sqrt_add_le_add_sqrt","end":{"col":63,"line":28,"offset":978},"kind":"ref","start":{"col":43,"line":28,"offset":958}}
+{"const":"MIPStarRE.LDT.sqrt_add_le_add_sqrt","end":{"col":37,"line":30,"offset":1094},"kind":"ref","start":{"col":17,"line":30,"offset":1074}}

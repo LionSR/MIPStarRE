@@ -1,0 +1,10 @@
+{"end":{"col":18,"line":41,"offset":1943},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT","start":{"col":5,"line":41,"offset":1930}}
+{"end":{"col":68,"line":65,"offset":2939},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.avgOver_congr","start":{"col":41,"line":65,"offset":2912}}
+{"end":{"col":79,"line":70,"offset":3206},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.avgOver_congr_on_support","start":{"col":41,"line":70,"offset":3168}}
+{"end":{"col":74,"line":125,"offset":5323},"kind":"platformTactic","name":"avg_congr","start":{"col":14,"line":125,"offset":5263}}
+{"end":{"col":11,"line":153,"offset":6304},"kind":"platformTactic","name":"avg_congr","start":{"col":2,"line":153,"offset":6295}}
+{"end":{"col":21,"line":159,"offset":6565},"kind":"platformTactic","name":"avg_congr","start":{"col":2,"line":159,"offset":6546}}
+{"end":{"col":30,"line":170,"offset":7140},"kind":"platformTactic","name":"avg_congr","start":{"col":2,"line":170,"offset":7112}}
+{"end":{"col":29,"line":177,"offset":7429},"kind":"platformTactic","name":"avg_congr","start":{"col":2,"line":177,"offset":7402}}
+{"end":{"col":37,"line":182,"offset":7629},"kind":"platformTactic","name":"avg_congr","start":{"col":2,"line":182,"offset":7594}}
+{"end":{"col":27,"line":185,"offset":7708},"kind":"platformTactic","name":"avg_congr","start":{"col":18,"line":185,"offset":7699}}

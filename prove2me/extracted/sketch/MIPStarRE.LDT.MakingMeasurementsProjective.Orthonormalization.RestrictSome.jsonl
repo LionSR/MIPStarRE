@@ -1,0 +1,12 @@
+{"declEnd":{"col":49,"line":35,"offset":1238},"declStart":{"col":0,"line":20,"offset":457},"docstring":{"end":{"col":18,"line":22,"offset":618},"start":{"col":0,"line":20,"offset":457}},"kind":"decl","nameText":"restrictSomeProjSubMeas","privateTok":null,"valKind":"whereStructInst","valStart":{"col":26,"line":26,"offset":815}}
+{"const":"MIPStarRE.LDT.MakingMeasurementsProjective.restrictSomeProjSubMeas","end":{"col":41,"line":23,"offset":660},"kind":"ref","start":{"col":18,"line":23,"offset":637}}
+{"const":"MIPStarRE.LDT.ProjSubMeas","end":{"col":20,"line":25,"offset":764},"kind":"ref","start":{"col":9,"line":25,"offset":753}}
+{"const":"MIPStarRE.LDT.ProjSubMeas","end":{"col":15,"line":26,"offset":803},"kind":"ref","start":{"col":4,"line":26,"offset":792}}
+{"const":"MIPStarRE.LDT.SubMeas.outcome","end":{"col":35,"line":28,"offset":871},"kind":"ref","start":{"col":28,"line":28,"offset":864}}
+{"const":"MIPStarRE.LDT.SubMeas.outcome","end":{"col":39,"line":29,"offset":922},"kind":"ref","start":{"col":32,"line":29,"offset":915}}
+{"const":"MIPStarRE.LDT.SubMeas.outcome_pos","end":{"col":43,"line":30,"offset":975},"kind":"ref","start":{"col":32,"line":30,"offset":964}}
+{"const":"MIPStarRE.LDT.SubMeas.outcome_pos","end":{"col":46,"line":33,"offset":1079},"kind":"ref","start":{"col":35,"line":33,"offset":1068}}
+{"const":"MIPStarRE.LDT.SubMeas.outcome","end":{"col":40,"line":34,"offset":1136},"kind":"ref","start":{"col":33,"line":34,"offset":1129}}
+{"const":"MIPStarRE.LDT.SubMeas.sum_eq_total","end":{"col":67,"line":34,"offset":1163},"kind":"ref","start":{"col":55,"line":34,"offset":1151}}
+{"const":"MIPStarRE.LDT.SubMeas.total_le_one","end":{"col":90,"line":34,"offset":1186},"kind":"ref","start":{"col":78,"line":34,"offset":1174}}
+{"const":"MIPStarRE.LDT.ProjSubMeas.proj","end":{"col":40,"line":35,"offset":1229},"kind":"ref","start":{"col":36,"line":35,"offset":1225}}

@@ -1,0 +1,22 @@
+-- Generated from MIPStarRE/LDT/Tactic/QuantumNonneg.lean by skeleton subtraction.
+import Definitions.Def_LIDT_MIPStarRE_LDT_Basic_Distribution
+import Definitions.Def_LIDT_MIPStarRE_LDT_Basic_OperatorExpectations
+import Definitions.Def_LIDT_MIPStarRE_LDT_Basic_ParametersBase
+import Definitions.Def_LIDT_MIPStarRE_LDT_Basic_QuantumState
+import Definitions.Def_LIDT_MIPStarRE_LDT_Basic_SubMeasurementCore
+import Definitions.Def_LIDT_MIPStarRE_LDT_Basic_SubMeasurementFamilies
+import Definitions.Def_LIDT_MIPStarRE_LDT_Basic_TensorPlacement
+import Definitions.Def_LIDT_MIPStarRE_Quantum_FiniteMatrix_Basic
+import Definitions.Def_LIDT_MIPStarRE_Quantum_FiniteMatrix_BlockDiagonal
+import Definitions.Def_LIDT_MIPStarRE_Quantum_FiniteMatrix_NormalizedTrace
+import Definitions.Def_LIDT_MIPStarRE_Quantum_FiniteMatrix_Order
+import Definitions.Def_LIDT_MIPStarRE_Quantum_FiniteMatrix_TracePairing
+import Mathlib
+
+namespace LIDT
+
+/- Prove2Me definition submissions do not admit custom parser or macro
+registrations. Every reachable `quantum_nonneg` invocation is lowered at its
+exact parser range; this empty compatibility bundle preserves source imports. -/
+
+end LIDT

@@ -1,0 +1,5 @@
+{"end":{"col":41,"line":18,"offset":404},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.MainInductionStep","start":{"col":10,"line":18,"offset":373}}
+{"end":{"col":18,"line":20,"offset":424},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT","start":{"col":5,"line":20,"offset":411}}
+{"end":{"col":33,"line":135,"offset":5492},"kind":"platformTactic","name":"avg_congr","start":{"col":14,"line":135,"offset":5473}}
+{"end":{"col":29,"line":242,"offset":11597},"kind":"platformTactic","name":"avg_congr","start":{"col":20,"line":242,"offset":11588}}
+{"end":{"col":35,"line":251,"offset":12027},"kind":"syntaxIdentifier","name":"MIPStarRE.LDT.MainInductionStep","start":{"col":4,"line":251,"offset":11996}}

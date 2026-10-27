@@ -1,0 +1,11 @@
+{
+  "definitions": 231,
+  "payloadsSha256": "6985be937d92cbcb65602a5d616c627925025827d02a10188640ac7c15a1de1b",
+  "planSha256": "0f00a68c961cfcbeeebfc7877b9e95b6052a69d54730ac3083230889ef11feaa",
+  "platformSha256": "396975ea3cb01a6e5ba9ffa0631881de6d95f40f99bd48678f5773727a9defe4",
+  "qpbtDeclarationsChecked": 865,
+  "schemaVersion": 1,
+  "solutions": 449,
+  "theorems": 449,
+  "typeAuditFailures": 0
+}
