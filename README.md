@@ -113,6 +113,34 @@ leanblueprint pdf    # PDF output
 leanblueprint web    # HTML output
 ```
 
+## For reviewers
+
+This repository accompanies the paper *Long-horizon autoformalization of a core theorem underlying MIP\*=RE* ([arXiv:2609.19814](https://arxiv.org/abs/2609.19814)).
+
+**Requirements.** Lean 4, installed with [elan](https://lean-lang.org/install/). The Lean and Mathlib versions pinned in `lean-toolchain` and `lakefile.toml` are fetched automatically. Linux or macOS, no special hardware, about 10 GB of free disk space. CI runs on GitHub-hosted Ubuntu runners; the times below were measured on macOS 26 with an Apple M4 Pro (12 cores, 48 GB of memory).
+
+**Install and build.** The two commands under [Build](#build): `lake exe cache get` downloads the dependencies and the prebuilt Mathlib (about 5 minutes), and `lake build` checks every proof in the library (about 8 minutes; 15 to 20 minutes on the CI runners).
+
+**Demo: the main theorem.** After the build:
+
+```bash
+lake build MIPStarRE.LDT.Test.AxiomAudit    # about 10 seconds
+printf 'import MIPStarRE.LDT.Test.MainTheorem.MainFormal\n#print axioms MIPStarRE.LDT.Test.mainFormal\n' > Check.lean
+lake env lean Check.lean                     # about 20 seconds
+```
+
+The first command ends with `Build completed successfully`; it fails if an audited declaration depends on `sorry` or on a non-standard axiom. The second prints
+
+```
+'MIPStarRE.LDT.Test.mainFormal' depends on axioms: [propext, Classical.choice, Quot.sound]
+```
+
+**Paper snapshot.** The measurements reported in the paper refer to commit `b39705bfd` (24 June 2026). Check it out and run the same build commands.
+
+**Independent check.** [LDT-comparator](https://github.com/LionSR/LDT-comparator) re-checks the main theorem against a self-contained statement with the Lean comparator and a second kernel (`./verify.sh`).
+
+**Use.** To build on the library, add this repository as a Lake dependency and `import MIPStarRE`. To apply the workflow to another paper, start from [oh-my-formalization](https://github.com/LionSR/oh-my-formalization). The workflow's own code is in `.github/workflows/` (review, repair, and issue automation) and `scripts/` (integrity checks).
+
 ## Contributing
 
 Start with [`docs/CONTRIBUTING.md`](docs/CONTRIBUTING.md) for PR/issue conventions and the review checklist. Key references:
